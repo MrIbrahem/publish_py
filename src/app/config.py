@@ -46,6 +46,11 @@ class OAuthConfig:
 
 
 @dataclass(frozen=True)
+class CorsConfig:
+    allowed_domains: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Settings:
     is_localhost: callable
     db_data: Dict
@@ -59,6 +64,7 @@ class Settings:
     oauth: Optional[OAuthConfig]
     paths: Paths
     disable_uploads: str
+    cors: CorsConfig
 
 
 def _load_db_data_new() -> DbConfig:
@@ -185,6 +191,11 @@ def get_settings() -> Settings:
         samesite=session_cookie_samesite,
     )
 
+    # Load CORS configuration
+    cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
+    cors_domains = tuple(d.strip() for d in cors_domains_str.split(",") if d.strip())
+    cors_config = CorsConfig(allowed_domains=cors_domains)
+
     if use_mw_oauth and oauth_config is None:
         raise RuntimeError(
             "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
@@ -203,6 +214,7 @@ def get_settings() -> Settings:
         cookie=cookie,
         oauth=oauth_config,
         disable_uploads=os.getenv("DISABLE_UPLOADS", ""),
+        cors=cors_config,
     )
 
 
