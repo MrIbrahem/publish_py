@@ -1,6 +1,5 @@
 """Tests for app_routes.cxtoken module."""
 
-import os
 import pytest
 from unittest.mock import patch, MagicMock
 from flask import Flask
@@ -9,17 +8,7 @@ from flask import Flask
 @pytest.fixture
 def app():
     """Create a test Flask application."""
-    os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
-    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
-    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
-
-    # Generate encryption key if not set
-    from cryptography.fernet import Fernet
-
-    if not os.environ.get("OAUTH_ENCRYPTION_KEY"):
-        os.environ["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
-
+    # Environment variables are set in conftest.py
     app = Flask(__name__)
     app.config["TESTING"] = True
     app.secret_key = "test_secret"

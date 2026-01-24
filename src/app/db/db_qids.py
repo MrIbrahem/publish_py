@@ -26,18 +26,23 @@ CREATE TABLE IF NOT EXISTS `qids` (
 """
 
 
-def ensure_qids_table(db_data: dict[str, Any]) -> None:
+def ensure_qids_table(db_data: dict[str, Any]) -> bool:
     """Create the qids table if it does not already exist.
 
     Args:
         db_data: Database connection configuration
+
+    Returns:
+        True if table was ensured successfully, False otherwise
     """
     try:
         db = Database(db_data)
         db.execute_query_safe(qids_table_creation_sql)
         logger.debug("qids table ensured")
+        return True
     except Exception as e:
         logger.error(f"Failed to ensure qids table: {e}")
+        return False
 
 
 class QidsDB:

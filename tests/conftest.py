@@ -10,11 +10,10 @@ os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
 os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
 os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
 
-# Generate encryption key if not set
-from cryptography.fernet import Fernet
-
-if not os.environ.get("OAUTH_ENCRYPTION_KEY"):
-    os.environ["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
+# Use a fixed encryption key for test reproducibility
+# This is a valid Fernet key for testing only - DO NOT use in production
+TEST_ENCRYPTION_KEY = "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI="
+os.environ.setdefault("OAUTH_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
 
 # Get the project root directory (parent of pytests folder)
 project_root = Path(__file__).parent.parent
