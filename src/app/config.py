@@ -20,11 +20,14 @@ class DbConfig:
 
 @dataclass(frozen=True)
 class Paths:
+    main_dir: str
     svg_data: str
     svg_data_thumb: str
     log_dir: str
     fix_nested_data: str
     svg_jobs_path: str
+    publish_reports_dir: str
+    words_json_path: str
 
 
 @dataclass(frozen=True)
@@ -112,6 +115,8 @@ def _get_paths() -> Paths:
     log_dir = f"{main_dir}/logs"
     fix_nested_data = f"{main_dir}/fix_nested_data"
     svg_jobs_path = f"{main_dir}/svg_jobs"
+    publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR", f"{main_dir}/publish_reports/reports_by_day")
+    words_json_path = os.getenv("WORDS_JSON_PATH", f"{main_dir}/td/Tables/jsons/words.json")
 
     # Ensure directories exist
     Path(svg_data).mkdir(parents=True, exist_ok=True)
@@ -121,11 +126,14 @@ def _get_paths() -> Paths:
     Path(svg_jobs_path).mkdir(parents=True, exist_ok=True)
 
     return Paths(
+        main_dir=main_dir,
         svg_data=svg_data,
         svg_data_thumb=svg_data_thumb,
         log_dir=log_dir,
         fix_nested_data=fix_nested_data,
         svg_jobs_path=svg_jobs_path,
+        publish_reports_dir=publish_reports_dir,
+        words_json_path=words_json_path,
     )
 
 

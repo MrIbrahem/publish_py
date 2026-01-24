@@ -13,7 +13,9 @@ The Python repository (`publish_py`) has successfully implemented **most core fu
 - ✅ **API Endpoints** - Complete
 - ✅ **Database Operations** - Complete
 - ⚠️ **Text Processing** - Placeholder only
-- ⚠️ **File-based Reports Viewer** - Not implemented (uses database instead)
+- ✅ **File-based Reports** - Complete (writes to reports_by_day/YYYY/MM/DD/ directories)
+- ✅ **Campaign Categories** - Complete (retrieves from database)
+- ✅ **Words Table Lookup** - Complete (reads from words.json)
 - ✅ **Wikidata Integration** - Complete
 
 ---
@@ -56,7 +58,7 @@ The Python repository (`publish_py`) has successfully implemented **most core fu
 | `InsertPublishReports()` | `ReportsDB.add()` | ✅ Complete | Full implementation |
 | `fetch_query()` | `Database.fetch_query_safe()` | ✅ Complete | Parameterized queries |
 | `execute_query()` | `Database.execute_query_safe()` | ✅ Complete | Safe execution |
-| `retrieveCampaignCategories()` | Not implemented | ⚠️ Missing | Returns empty string |
+| `retrieveCampaignCategories()` | `db/db_categories.py:get_campaign_category()` | ✅ Complete | Campaign to category mapping |
 
 ### 4. Helper Functions
 
@@ -105,9 +107,9 @@ def do_changes_to_text(...) -> str:
 - Adding Categories
 - Other wikitext corrections
 
-### 2. Campaign Categories ⚠️
+### 2. Campaign Categories ✅
 
-**Current State:** Returns empty string instead of actual category.
+**Current State:** ✅ Fully implemented.
 
 **PHP Implementation:**
 ```php
@@ -122,24 +124,24 @@ function retrieveCampaignCategories() {
 
 **Python Implementation:**
 ```python
-# Category mapping is not yet implemented.
-# In the PHP version, categories are retrieved from a 'categories' table
-cat = ""
+# db/db_categories.py - Retrieves campaign categories from database
+from src.app.db.db_categories import get_campaign_category
+cat = get_campaign_category(campaign, settings.db_data)
 ```
 
-**Recommendation:** Implement the `categories` table query and mapping.
-
-### 3. File-based Reports Viewer ℹ️
+### 3. File-based Reports ✅
 
 **PHP Implementation:** Uses file-based reports stored in `reports_by_day/YYYY/MM/DD/` directories.
 
-**Python Implementation:** Uses database-backed reports via API endpoint.
+**Python Implementation:** ✅ Now supports both approaches:
+1. Database-backed reports via API endpoint (original)
+2. File-based reports in `reports_by_day/YYYY/MM/DD/{rand_id}/` directories (added)
 
-**Status:** This is a **design decision**, not a missing feature. The Python implementation uses a more maintainable database-backed approach. Both approaches are valid.
+Both approaches are valid and work together.
 
-### 4. Words Table Lookup ⚠️
+### 4. Words Table Lookup ✅
 
-**Current State:** Not implemented.
+**Current State:** ✅ Fully implemented.
 
 **PHP Implementation:**
 ```php
@@ -148,9 +150,12 @@ $Words_table = json_decode(file_get_contents($word_file), true);
 $word = $Words_table[$title] ?? 0;
 ```
 
-**Python Implementation:** Uses hardcoded `word=0` in `insert_page_target()`.
-
-**Recommendation:** Implement words table lookup or add word count parameter to API.
+**Python Implementation:**
+```python
+# helpers/words.py - Loads and looks up words from JSON file
+from src.app.helpers.words import get_word_count
+word = get_word_count(sourcetitle)
+```
 
 ---
 
@@ -234,23 +239,15 @@ Comprehensive error handling:
    - Port the text processing logic from PHP or call the external service
    - This is essential for proper article formatting
 
-2. **Implement Campaign Categories**
-   - Add `categories` table support
-   - Implement `retrieveCampaignCategories()` equivalent
-
 ### Medium Priority
 
-3. **Words Table Integration**
-   - Implement words.json lookup or database equivalent
-   - Used for word count tracking
-
-4. **Add Integration Tests**
+2. **Add Integration Tests**
    - End-to-end tests for publishing workflow
    - Mock external API calls
 
 ### Low Priority
 
-5. **Enhanced Logging**
+3. **Enhanced Logging**
    - The file-based logging is implemented
    - Consider adding structured logging for production
 
@@ -266,10 +263,10 @@ Comprehensive error handling:
 |----------|-----------|-------|------------|
 | Core Endpoints | 4 | 4 | 100% |
 | Bot Functions | 12 | 12 | 100% |
-| Database Operations | 5 | 6 | 83% |
-| Helper Functions | 8 | 8 | 100% |
+| Database Operations | 6 | 6 | 100% |
+| Helper Functions | 9 | 9 | 100% |
 | External Integrations | 3 | 4 | 75% |
-| **Overall** | **32** | **34** | **94%** |
+| **Overall** | **34** | **35** | **97%** |
 
 ---
 
@@ -279,12 +276,9 @@ The Python repository is **ready for production use** with the following caveats
 
 1. **Text processing is not functional** - Articles will be published without reference fixing or other text transformations. This should be the top priority for implementation.
 
-2. **Campaign categories are not mapped** - Articles will be inserted without proper category assignment. This affects organization but not core functionality.
+2. **All other functionality is complete** - OAuth, publishing, database operations, Wikidata linking, campaign categories, words table lookup, file-based reports, and error handling are fully implemented.
 
-3. **All other functionality is complete** - OAuth, publishing, database operations, Wikidata linking, and error handling are fully implemented.
+The migration achieves **97% feature parity** with the PHP implementation. The remaining 3% consists of:
+- Text processing integration (3%)
 
-The migration achieves **94% feature parity** with the PHP implementation. The remaining 6% consists of:
-- Text processing integration (4%)
-- Campaign categories (2%)
-
-Both can be implemented without significant architectural changes.
+This can be implemented without significant architectural changes.

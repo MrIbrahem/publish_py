@@ -2,6 +2,7 @@
 src/all_pages_revids.json
 .github/workflows/snorkell-auto-documentation.yml
 *.txt
+!requirements.txt
 fix_refs_repo1
 src/publish_reports/**/*.json
 src/publish_reports/index2.php
@@ -25,3 +26,5 @@ pup2.html
 .env
 *.env
 /data/logs
+*.egg-info/
+*.egg
