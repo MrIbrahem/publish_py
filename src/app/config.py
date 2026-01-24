@@ -46,6 +46,20 @@ class OAuthConfig:
 
 
 @dataclass(frozen=True)
+class CorsConfig:
+    allowed_domains: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class UsersConfig:
+    """Configuration for user-related settings."""
+
+    special_users: dict[str, str]  # Maps alternate usernames to canonical usernames
+    fallback_user: str  # Fallback user for retry operations
+    users_without_hashtag: tuple[str, ...]  # Users who don't get hashtags on their own pages
+
+
+@dataclass(frozen=True)
 class Settings:
     is_localhost: callable
     db_data: Dict
@@ -59,6 +73,8 @@ class Settings:
     oauth: Optional[OAuthConfig]
     paths: Paths
     disable_uploads: str
+    cors: CorsConfig
+    users: UsersConfig
 
 
 def _load_db_data_new() -> DbConfig:
@@ -185,6 +201,39 @@ def get_settings() -> Settings:
         samesite=session_cookie_samesite,
     )
 
+    # Load CORS configuration
+    cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
+    cors_domains = tuple(d.strip() for d in cors_domains_str.split(",") if d.strip())
+    cors_config = CorsConfig(allowed_domains=cors_domains)
+
+    # Load users configuration
+    # Special users mapping: comma-separated pairs of "alternate:canonical"
+    special_users_str = os.getenv("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
+    special_users = {}
+    for pair in special_users_str.split(","):
+        pair = pair.strip()
+        if not pair:
+            continue
+        if ":" not in pair:
+            # Log warning for malformed pair (missing colon)
+            import logging
+
+            logging.getLogger(__name__).warning(f"Ignoring malformed SPECIAL_USERS pair (missing ':'): {pair}")
+            continue
+        alt, canonical = pair.split(":", 1)
+        special_users[alt.strip()] = canonical.strip()
+
+    fallback_user = os.getenv("FALLBACK_USER", "Mr. Ibrahem")
+
+    users_without_hashtag_str = os.getenv("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
+    users_without_hashtag = tuple(u.strip() for u in users_without_hashtag_str.split(",") if u.strip())
+
+    users_config = UsersConfig(
+        special_users=special_users,
+        fallback_user=fallback_user,
+        users_without_hashtag=users_without_hashtag,
+    )
+
     if use_mw_oauth and oauth_config is None:
         raise RuntimeError(
             "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
@@ -203,6 +252,8 @@ def get_settings() -> Settings:
         cookie=cookie,
         oauth=oauth_config,
         disable_uploads=os.getenv("DISABLE_UPLOADS", ""),
+        cors=cors_config,
+        users=users_config,
     )
 
 
