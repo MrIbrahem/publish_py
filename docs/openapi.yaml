@@ -1,0 +1,245 @@
+openapi: 3.0.3
+info:
+  title: Publish Reports API
+  description: |
+    REST API for accessing publish reports from the publish_py application.
+    
+    This API provides access to reports generated when articles are published
+    to Wikipedia via the ContentTranslation tool.
+  version: 1.0.0
+  contact:
+    name: MrIbrahem
+    url: https://github.com/MrIbrahem/publish_py
+
+servers:
+  - url: https://medwiki.toolforge.org
+    description: Production server
+  - url: http://localhost:5000
+    description: Development server
+
+paths:
+  /api/publish_reports:
+    get:
+      summary: Get publish reports
+      description: |
+        Retrieves publish reports with optional filtering by various parameters.
+        
+        Supports special filter values:
+        - `not_mt` / `not_empty`: Field is not empty
+        - `mt` / `empty`: Field is empty
+        - `>0`: Field is greater than 0
+        - `all`: Skip this filter
+      operationId: getPublishReports
+      tags:
+        - Reports
+      parameters:
+        - name: year
+          in: query
+          description: Filter by year extracted from date
+          required: false
+          schema:
+            type: integer
+            example: 2026
+        - name: month
+          in: query
+          description: Filter by month extracted from date (1-12)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 1
+        - name: title
+          in: query
+          description: Filter by page title
+          required: false
+          schema:
+            type: string
+            example: "Example_Page"
+        - name: user
+          in: query
+          description: Filter by username
+          required: false
+          schema:
+            type: string
+            example: "JohnDoe"
+        - name: lang
+          in: query
+          description: Filter by language code
+          required: false
+          schema:
+            type: string
+            example: "ar"
+        - name: sourcetitle
+          in: query
+          description: Filter by source title
+          required: false
+          schema:
+            type: string
+            example: "Source_Article"
+        - name: result
+          in: query
+          description: |
+            Filter by result status. Supports special values:
+            - `not_empty` or `not_mt`: Non-empty results only
+            - `empty` or `mt`: Empty results only
+            - `>0`: Results greater than 0
+            - `all`: No filtering (default)
+          required: false
+          schema:
+            type: string
+            example: "success"
+        - name: select
+          in: query
+          description: Comma-separated list of fields to return
+          required: false
+          schema:
+            type: string
+            example: "title,date,result"
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            example: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishReportsResponse'
+              examples:
+                success:
+                  summary: Successful response with reports
+                  value:
+                    results:
+                      - id: 123
+                        date: "2026-01-24T10:30:00"
+                        title: "Example_Page"
+                        user: "JohnDoe"
+                        lang: "en"
+                        sourcetitle: "Source_Example"
+                        result: "success"
+                        data: '{"key": "value"}'
+                    count: 1
+                empty:
+                  summary: No matching reports
+                  value:
+                    results: []
+                    count: 0
+        '403':
+          description: CORS not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "CORS not allowed"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "An internal error occurred while fetching reports"
+    options:
+      summary: CORS preflight request
+      description: Handles CORS preflight requests
+      operationId: publishReportsOptions
+      tags:
+        - Reports
+      responses:
+        '200':
+          description: CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Allowed origin domain
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: Allowed HTTP methods
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Allowed headers
+        '403':
+          description: CORS not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    PublishReportsResponse:
+      type: object
+      required:
+        - results
+        - count
+      properties:
+        results:
+          type: array
+          description: List of publish report records
+          items:
+            $ref: '#/components/schemas/ReportRecord'
+        count:
+          type: integer
+          description: Total number of results returned
+          example: 1
+
+    ReportRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the report
+          example: 123
+        date:
+          type: string
+          format: date-time
+          description: Timestamp when the report was created
+          example: "2026-01-24T10:30:00"
+        title:
+          type: string
+          description: Target page title
+          example: "Example_Page"
+        user:
+          type: string
+          description: Username who created the report
+          example: "JohnDoe"
+        lang:
+          type: string
+          description: Target language code
+          example: "en"
+        sourcetitle:
+          type: string
+          description: Source page title
+          example: "Source_Example"
+        result:
+          type: string
+          description: Result status of the publish operation
+          example: "success"
+        data:
+          type: string
+          description: JSON string containing additional data
+          example: '{"key": "value"}'
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "An internal error occurred"
+
+tags:
+  - name: Reports
+    description: Endpoints for managing and querying publish reports
