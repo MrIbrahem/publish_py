@@ -35,7 +35,7 @@ def get_reports_dir() -> Path:
     """Get/create the reports directory structure.
 
     Returns the path to the reports directory for today:
-    {publish_reports_dir}/YYYY/MM/DD/{rand_id}/
+    {settings.paths.publish_reports_dir}/YYYY/MM/DD/{rand_id}/
     """
     publish_reports = Path(settings.paths.publish_reports_dir)
 

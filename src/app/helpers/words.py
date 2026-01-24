@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 def _get_words_path() -> Path:
-    """Get the path for the words.json file from config.
+    """Get the configured path for the words.json file from application settings.
 
     Returns:
-        Path to words.json file
+        Path to words.json file as configured in settings.paths.words_json_path
     """
     return Path(settings.paths.words_json_path)
 
