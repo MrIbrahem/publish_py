@@ -12,7 +12,6 @@ use function Publish\AddToDb\InsertPageTarget;
 use function Publish\AddToDb\retrieveCampaignCategories;
 use function Publish\WD\LinkToWikidata;
 use function Publish\FilesHelps\to_do;
-use function Publish\AccessHelpsNew\get_access_from_db_new;
 use function Publish\AccessHelps\get_access_from_db;
 use function Publish\AddToDb\InsertPublishReports; // InsertPublishReports($title, $user, $lang, $sourcetitle, $result, $data)
 
@@ -50,10 +49,7 @@ function retryWithFallbackUser($sourcetitle, $lang, $title, $user, $original_err
     logger_debug("get_csrftoken failed for user: $user, retrying with Mr. Ibrahem");
 
     // Retry with "Mr. Ibrahem" credentials - get fresh credentials from database
-    $fallback_access = get_access_from_db_new('Mr. Ibrahem');
-    if ($fallback_access === null) {
-        $fallback_access = get_access_from_db('Mr. Ibrahem');
-    }
+    $fallback_access = get_access_from_db('Mr. Ibrahem');
 
     if ($fallback_access !== null) {
         $fallback_access_key = $fallback_access['access_key'];

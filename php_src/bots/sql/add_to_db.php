@@ -121,21 +121,3 @@ function InsertPageTarget($title, $tr_type, $cat, $lang, $user, $test, $target, 
     // $tab['query_params'] = $params;
     return $tab;
 }
-
-
-function InsertPublishReports($title, $user, $lang, $sourcetitle, $result, $data)
-{
-    // Validate required parameters
-    /*
-    if (empty($title) || empty($user) || empty($lang)) {
-        error_log("InsertPublishReports: Missing required parameters");
-        return false;
-    }
-    */
-    $query = "INSERT INTO publish_reports (`date`, `title`, `user`, `lang`, `sourcetitle`, `result`, `data`) VALUES (NOW(), ?, ?, ?, ?, ?, ?)";
-    $report_data = json_encode($data);
-    // remove .json from $result
-    $result = str_replace(".json", "", $result);
-    $params = [$title, $user, $lang, $sourcetitle, $result, $report_data];
-    execute_query($query, $params, "publish_reports");
-}

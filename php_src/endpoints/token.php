@@ -17,17 +17,11 @@ header("Access-Control-Allow-Origin: https://$allowed");
 
 use function Publish\GetToken\get_cxtoken;
 use function Publish\AccessHelps\get_access_from_db;
-use function Publish\AccessHelpsNew\get_access_from_db_new;
 use function Publish\AccessHelps\del_access_from_db;
-use function Publish\AccessHelpsNew\del_access_from_db_new;
 
 function get_token($wiki, $user)
 {
-    $access = get_access_from_db_new($user);
-
-    if ($access === null) {
-        $access = get_access_from_db($user);
-    }
+    $access = get_access_from_db($user);
 
     if ($access == null) {
         $cxtoken = ['error' => ['code' => 'no access', 'info' => 'no access'], 'username' => $user];
@@ -45,7 +39,6 @@ function get_token($wiki, $user)
     $err = $cxtoken['csrftoken_data']["error"]["code"] ?? null;
 
     if ($err == "mwoauth-invalid-authorization-invalid-user") {
-        del_access_from_db_new($user);
         del_access_from_db($user);
         $cxtoken["del_access"] = true;
     }

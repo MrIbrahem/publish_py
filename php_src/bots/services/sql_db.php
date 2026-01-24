@@ -46,8 +46,6 @@ class Database
 
     private function set_db($server_name)
     {
-        // $ts_pw = posix_getpwuid(posix_getuid());
-        // $ts_mycnf = parse_ini_file($ts_pw['dir'] . "/confs/db.ini");
         $ts_mycnf = parse_ini_file($this->home_dir . "/confs/db.ini");
         if ($server_name === 'localhost' || !getenv('HOME')) {
             $this->host = 'localhost:3306';

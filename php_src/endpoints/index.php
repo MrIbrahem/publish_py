@@ -4,7 +4,6 @@ namespace Publish\Endpoints;
 
 use function Publish\Helps\logger_debug;
 use function Publish\AccessHelps\get_access_from_db;
-use function Publish\AccessHelpsNew\get_access_from_db_new;
 use function Publish\EditProcess\processEdit;
 use function Publish\FilesHelps\to_do;
 use function Publish\Revids\get_revid_db;
@@ -101,10 +100,7 @@ function start($request)
         'edit' => [],
         'sourcetitle' => $request['sourcetitle'] ?? ''
     ];
-    $access = get_access_from_db_new($user);
-    if ($access === null) {
-        $access = get_access_from_db($user);
-    }
+    $access = get_access_from_db($user);
     if ($access == null) {
         handleNoAccess($user, $tab);
     } else {
