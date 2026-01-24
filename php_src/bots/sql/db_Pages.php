@@ -117,7 +117,5 @@ function InsertPageTarget($title, $tr_type, $cat, $lang, $user, $test, $target, 
     }
     execute_query($query, $params, $table_name);
     $tab['execute_query'] = true;
-    // $tab['query'] = $query;
-    // $tab['query_params'] = $params;
     return $tab;
 }

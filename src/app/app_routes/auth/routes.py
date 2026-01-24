@@ -4,8 +4,6 @@ Authentication helpers and OAuth routes for the SVG Translate web app.
 
 from __future__ import annotations
 
-import pymysql
-import mwoauth
 import logging
 import secrets
 from collections.abc import Sequence
@@ -13,6 +11,8 @@ from functools import wraps
 from typing import Any, Callable
 from urllib.parse import urlencode
 
+import mwoauth
+import pymysql
 from flask import (
     Blueprint,
     Response,
