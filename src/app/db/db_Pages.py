@@ -83,21 +83,11 @@ class PagesDB:
         self.db.execute_query_safe(table_creation_sql)
 
     def _row_to_record(self, row: dict[str, Any]) -> PageRecord:
-        return PageRecord(
-            id=int(row["id"]),
-            title=row["title"],
-            main_file=row.get("main_file"),
-            created_at=row.get("created_at"),
-            updated_at=row.get("updated_at"),
-        )
+        return PageRecord(**row)
 
     def _fetch_by_id(self, page_id: int) -> PageRecord:
         rows = self.db.fetch_query_safe(
-            """
-            SELECT id, title, main_file, created_at, updated_at
-            FROM pages
-            WHERE id = %s
-            """,
+            "SELECT * FROM pages WHERE id = %s",
             (page_id,),
         )
         if not rows:
@@ -106,11 +96,7 @@ class PagesDB:
 
     def _fetch_by_title(self, title: str) -> PageRecord:
         rows = self.db.fetch_query_safe(
-            """
-            SELECT id, title, main_file, created_at, updated_at
-            FROM pages
-            WHERE title = %s
-            """,
+            "SELECT * FROM pages WHERE title = %s",
             (title,),
         )
         if not rows:
@@ -119,39 +105,40 @@ class PagesDB:
 
     def list(self) -> List[PageRecord]:
         rows = self.db.fetch_query_safe(
-            """
-            SELECT id, title, main_file, created_at, updated_at
-            FROM pages
-            ORDER BY id ASC
-            """
+            "SELECT * FROM pages ORDER BY id ASC"
         )
         return [self._row_to_record(row) for row in rows]
 
-    def add(self, title: str, main_file: str) -> PageRecord:
+    def add(self, title: str, **kwargs) -> PageRecord:
         title = title.strip()
-        main_file = main_file.strip()
         if not title:
             raise ValueError("Title is required")
 
+        cols = ["title"] + list(kwargs.keys())
+        placeholders = ", ".join(["%s"] * len(cols))
+        values = [title] + list(kwargs.values())
+
         try:
-            # Use execute_query to allow exception to propagate
             self.db.execute_query(
-                """
-                INSERT INTO pages (title, main_file) VALUES (%s, %s)
-                """,
-                (title, main_file),
+                f"INSERT INTO pages ({', '.join(cols)}) VALUES ({placeholders})",
+                tuple(values),
             )
         except pymysql.err.IntegrityError:
-            # This assumes a UNIQUE constraint on the title column
             raise ValueError(f"Page '{title}' already exists") from None
 
         return self._fetch_by_title(title)
 
-    def update(self, page_id: int, title: str, main_file: str) -> PageRecord:
+    def update(self, page_id: int, **kwargs) -> PageRecord:
         _ = self._fetch_by_id(page_id)
+        if not kwargs:
+            return self._fetch_by_id(page_id)
+
+        set_clause = ", ".join([f"`{col}` = %s" for col in kwargs.keys()])
+        values = list(kwargs.values()) + [page_id]
+
         self.db.execute_query_safe(
-            "UPDATE pages SET title = %s, main_file = %s WHERE id = %s",
-            (title, main_file, page_id),
+            f"UPDATE pages SET {set_clause} WHERE id = %s",
+            tuple(values),
         )
         return self._fetch_by_id(page_id)
 
@@ -163,22 +150,21 @@ class PagesDB:
         )
         return record
 
-    def add_or_update(self, title: str, main_file: str) -> PageRecord:
+    def add_or_update(self, title: str, **kwargs) -> PageRecord:
         title = title.strip()
-        main_file = main_file.strip()
-
         if not title:
-            logger.error("Title is required for add_or_update")
+            raise ValueError("Title is required")
 
-        self.db.execute_query_safe(
-            """
-            INSERT INTO pages (title, main_file) VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE
-                title = COALESCE(VALUES(title), title),
-                main_file = COALESCE(VALUES(main_file), main_file)
-            """,
-            (title, main_file),
-        )
+        cols = ["title"] + list(kwargs.keys())
+        placeholders = ", ".join(["%s"] * len(cols))
+        updates = ", ".join([f"`{col}` = VALUES(`{col}`)" for col in kwargs.keys()])
+        values = [title] + list(kwargs.values())
+
+        sql = f"INSERT INTO pages ({', '.join(cols)}) VALUES ({placeholders})"
+        if updates:
+            sql += f" ON DUPLICATE KEY UPDATE {updates}"
+
+        self.db.execute_query_safe(sql, tuple(values))
         return self._fetch_by_title(title)
 
 
