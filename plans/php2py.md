@@ -49,20 +49,21 @@ php_src/
 src/app/
 ├── app_routes/
 │   ├── cxtoken/
-│   │   └── routes.py       # Token endpoint (to be implemented)
+│   │   └── routes.py       # Token endpoint ✅ IMPLEMENTED
 │   └── post/
-│       └── routes.py       # Post endpoint (to be implemented)
+│       └── routes.py       # Post endpoint ✅ IMPLEMENTED
 ├── services/
-│   ├── __init__.py
-│   ├── oauth_client.py     # NEW: OAuth client wrapper
-│   ├── mediawiki_api.py    # NEW: MediaWiki API client
-│   ├── wikidata_client.py  # NEW: Wikidata integration
-│   └── revids_service.py   # NEW: Revision ID lookup
+│   ├── __init__.py         # ✅ CREATED
+│   ├── oauth_client.py     # ✅ CREATED: OAuth client wrapper
+│   ├── mediawiki_api.py    # ✅ CREATED: MediaWiki API client
+│   ├── wikidata_client.py  # ✅ CREATED: Wikidata integration
+│   ├── revids_service.py   # ✅ CREATED: Revision ID lookup
+│   └── text_processor.py   # ✅ CREATED: Text processing
 ├── helpers/
-│   ├── __init__.py
-│   ├── cors.py             # NEW: CORS validation
-│   ├── files.py            # NEW: File logging utilities
-│   └── format.py           # NEW: Title/user formatting
+│   ├── __init__.py         # ✅ CREATED
+│   ├── cors.py             # ✅ CREATED: CORS validation
+│   ├── files.py            # ✅ CREATED: File logging utilities
+│   └── format.py           # ✅ CREATED: Title/user formatting
 └── crypto.py               # Already exists (encryption)
 ```
 
@@ -72,20 +73,20 @@ src/app/
 
 | PHP File/Function | Python Module/Function | Status |
 |-------------------|------------------------|--------|
-| `Publish\CORS\is_allowed()` | `helpers/cors.py:is_allowed()` | NEW |
-| `Publish\GetToken\get_csrftoken()` | `services/oauth_client.py:get_csrf_token()` | NEW |
-| `Publish\GetToken\post_params()` | `services/oauth_client.py:post_params()` | NEW |
-| `Publish\GetToken\get_cxtoken()` | `services/oauth_client.py:get_cxtoken()` | NEW |
-| `Publish\AccessHelps\get_access_from_db()` | `users/store.py:get_user_token()` (extend) | EXISTS |
-| `Publish\AccessHelps\del_access_from_db()` | `users/store.py:delete_user_token()` (exists) | EXISTS |
-| `Publish\FilesHelps\to_do()` | `helpers/files.py:to_do()` | NEW |
-| `Publish\Revids\get_revid()` | `services/revids_service.py:get_revid()` | NEW |
-| `Publish\Revids\get_revid_db()` | `services/revids_service.py:get_revid_db()` | NEW |
-| `Publish\DoEdit\publish_do_edit()` | `services/mediawiki_api.py:publish_do_edit()` | NEW |
-| `Publish\EditProcess\processEdit()` | `app_routes/post/routes.py:process_edit()` | NEW |
-| `Publish\WD\LinkToWikidata()` | `services/wikidata_client.py:link_to_wikidata()` | NEW |
-| `Publish\AddToDb\InsertPublishReports()` | `db/db_publish_reports.py:ReportsDB.add()` (extend) | EXISTS |
-| `Publish\AddToDb\InsertPageTarget()` | `db/db_Pages.py:PagesDB.insert_page_target()` | NEW |
+| `Publish\CORS\is_allowed()` | `helpers/cors.py:is_allowed()` | ✅ DONE |
+| `Publish\GetToken\get_csrftoken()` | `services/oauth_client.py:get_csrf_token()` | ✅ DONE |
+| `Publish\GetToken\post_params()` | `services/oauth_client.py:post_params()` | ✅ DONE |
+| `Publish\GetToken\get_cxtoken()` | `services/oauth_client.py:get_cxtoken()` | ✅ DONE |
+| `Publish\AccessHelps\get_access_from_db()` | `users/store.py:get_user_token_by_username()` | ✅ DONE |
+| `Publish\AccessHelps\del_access_from_db()` | `users/store.py:delete_user_token_by_username()` | ✅ DONE |
+| `Publish\FilesHelps\to_do()` | `helpers/files.py:to_do()` | ✅ DONE |
+| `Publish\Revids\get_revid()` | `services/revids_service.py:get_revid()` | ✅ DONE |
+| `Publish\Revids\get_revid_db()` | `services/revids_service.py:get_revid_db()` | ✅ DONE |
+| `Publish\DoEdit\publish_do_edit()` | `services/mediawiki_api.py:publish_do_edit()` | ✅ DONE |
+| `Publish\EditProcess\processEdit()` | `app_routes/post/routes.py:_process_edit()` | ✅ DONE |
+| `Publish\WD\LinkToWikidata()` | `services/wikidata_client.py:link_to_wikidata()` | ✅ DONE |
+| `Publish\AddToDb\InsertPublishReports()` | `db/db_publish_reports.py:ReportsDB.add()` | ✅ DONE |
+| `Publish\AddToDb\InsertPageTarget()` | `db/db_Pages.py:PagesDB.insert_page_target()` | ✅ DONE |
 
 ---
 
@@ -1156,52 +1157,52 @@ def test_post_requires_auth(client):
 ### Phase 1: Foundation (Week 1)
 
 1. **Create helper modules**
-   - [ ] `helpers/cors.py` - CORS validation
-   - [ ] `helpers/format.py` - Title/user formatting
-   - [ ] `helpers/files.py` - File logging
-   - [ ] `services/text_processor.py` - Text processing
+   - [x] `helpers/cors.py` - CORS validation
+   - [x] `helpers/format.py` - Title/user formatting
+   - [x] `helpers/files.py` - File logging
+   - [x] `services/text_processor.py` - Text processing
 
 2. **Update database layer**
-   - [ ] Add `get_user_token_by_username()` to `users/store.py`
-   - [ ] Add `insert_page_target()` to `db/db_Pages.py`
+   - [x] Add `get_user_token_by_username()` to `users/store.py`
+   - [x] Add `insert_page_target()` to `db/db_Pages.py`
    - [ ] Ensure `qids` table exists
 
 3. **Add dependencies**
-   - [ ] Update `requirements.txt` with OAuth libraries
+   - [x] Update `requirements.txt` with OAuth libraries
 
 ### Phase 2: OAuth Service (Week 2)
 
 1. **Create OAuth client**
-   - [ ] `services/oauth_client.py` with:
+   - [x] `services/oauth_client.py` with:
      - `get_csrf_token()`
      - `post_params()`
      - `get_cxtoken()`
 
 2. **Create MediaWiki API client**
-   - [ ] `services/mediawiki_api.py` with:
+   - [x] `services/mediawiki_api.py` with:
      - `publish_do_edit()`
 
 3. **Create revision ID service**
-   - [ ] `services/revids_service.py` with:
+   - [x] `services/revids_service.py` with:
      - `get_revid()`
      - `get_revid_db()`
 
 ### Phase 3: cxtoken Endpoint (Week 2-3)
 
 1. **Implement cxtoken route**
-   - [ ] Update `app_routes/cxtoken/routes.py`
-   - [ ] Add error handling for invalid authorization
-   - [ ] Add CORS headers to response
+   - [x] Update `app_routes/cxtoken/routes.py`
+   - [x] Add error handling for invalid authorization
+   - [x] Add CORS headers to response
 
 2. **Test cxtoken**
-   - [ ] Unit tests
+   - [x] Unit tests
    - [ ] Integration tests with mock OAuth
    - [ ] Manual testing with real OAuth
 
 ### Phase 4: Wikidata Service (Week 3)
 
 1. **Create Wikidata client**
-   - [ ] `services/wikidata_client.py` with:
+   - [x] `services/wikidata_client.py` with:
      - `get_qid_for_mdtitle()`
      - `get_title_info()`
      - `link_to_wikidata()`
@@ -1213,12 +1214,12 @@ def test_post_requires_auth(client):
 ### Phase 5: Post Endpoint (Week 4)
 
 1. **Implement post route**
-   - [ ] Update `app_routes/post/routes.py`
-   - [ ] Implement `process_edit()` function
-   - [ ] Implement `handle_no_access()` function
+   - [x] Update `app_routes/post/routes.py`
+   - [x] Implement `process_edit()` function
+   - [x] Implement `handle_no_access()` function
 
 2. **Test post endpoint**
-   - [ ] Unit tests for each function
+   - [x] Unit tests for each function
    - [ ] Integration tests with mock database and API
    - [ ] End-to-end testing
 
@@ -1245,18 +1246,18 @@ def test_post_requires_auth(client):
 
 ### New Files to Create
 
-- [ ] `src/app/helpers/__init__.py`
-- [ ] `src/app/helpers/cors.py`
-- [ ] `src/app/helpers/format.py`
-- [ ] `src/app/helpers/files.py`
-- [ ] `src/app/services/__init__.py`
-- [ ] `src/app/services/oauth_client.py`
-- [ ] `src/app/services/mediawiki_api.py`
-- [ ] `src/app/services/revids_service.py`
-- [ ] `src/app/services/wikidata_client.py`
-- [ ] `src/app/services/text_processor.py`
-- [ ] `tests/test_helpers/test_cors.py`
-- [ ] `tests/test_helpers/test_format.py`
+- [x] `src/app/helpers/__init__.py`
+- [x] `src/app/helpers/cors.py`
+- [x] `src/app/helpers/format.py`
+- [x] `src/app/helpers/files.py`
+- [x] `src/app/services/__init__.py`
+- [x] `src/app/services/oauth_client.py`
+- [x] `src/app/services/mediawiki_api.py`
+- [x] `src/app/services/revids_service.py`
+- [x] `src/app/services/wikidata_client.py`
+- [x] `src/app/services/text_processor.py`
+- [x] `tests/test_helpers/test_cors.py`
+- [x] `tests/test_helpers/test_format.py`
 - [ ] `tests/test_services/test_oauth_client.py`
 - [ ] `tests/test_services/test_mediawiki_api.py`
 - [ ] `tests/test_services/test_wikidata_client.py`
@@ -1265,12 +1266,12 @@ def test_post_requires_auth(client):
 
 ### Files to Modify
 
-- [ ] `src/app/app_routes/cxtoken/routes.py` - Full implementation
-- [ ] `src/app/app_routes/post/routes.py` - Full implementation
-- [ ] `src/app/users/store.py` - Add `get_user_token_by_username()`
-- [ ] `src/app/db/db_Pages.py` - Add `insert_page_target()`
-- [ ] `src/app/config.py` - Add CORS domains config
-- [ ] `requirements.txt` or `pyproject.toml` - Add dependencies
+- [x] `src/app/app_routes/cxtoken/routes.py` - Full implementation
+- [x] `src/app/app_routes/post/routes.py` - Full implementation
+- [x] `src/app/users/store.py` - Add `get_user_token_by_username()`
+- [x] `src/app/db/db_Pages.py` - Add `insert_page_target()`
+- [x] `src/app/config.py` - Add CORS domains config
+- [x] `requirements.txt` or `pyproject.toml` - Add dependencies
 - [ ] `src/app/__init__.py` - Register new blueprints if needed
 
 ---
