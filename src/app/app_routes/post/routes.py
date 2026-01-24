@@ -12,6 +12,7 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 
 from ...config import settings
+from ...db.db_categories import get_campaign_category
 from ...db.db_Pages import PagesDB
 from ...db.db_publish_reports import ReportsDB
 from ...helpers.cors import is_allowed
@@ -22,6 +23,7 @@ from ...helpers.format import (
     format_user,
     make_summary,
 )
+from ...helpers.words import get_word_count
 from ...services.mediawiki_api import publish_do_edit
 from ...services.revids_service import get_revid, get_revid_db
 from ...services.text_processor import do_changes_to_text
@@ -205,11 +207,13 @@ def _add_to_db(
     Returns:
         Database operation result
     """
-    # Category mapping is not yet implemented.
-    # In the PHP version, categories are retrieved from a 'categories' table
-    # based on the campaign name. For now, use an empty string which is valid
-    # and means no category is assigned. The database allows NULL/empty categories.
-    cat = ""
+    # Get category from campaign using database lookup
+    # This mirrors the PHP retrieveCampaignCategories() function
+    cat = get_campaign_category(campaign, settings.db_data)
+
+    # Get word count from words table
+    # This mirrors the PHP $Words_table[$title] ?? 0 lookup
+    word = get_word_count(sourcetitle)
 
     # Check if abuse filter warning was triggered
     to_users_table = "abusefilter-warning-39" in json.dumps(wd_result)
@@ -224,6 +228,7 @@ def _add_to_db(
         target=title,
         to_users_table=to_users_table,
         mdwiki_revid=int(mdwiki_revid) if mdwiki_revid else None,
+        word=word,
     )
 
 
