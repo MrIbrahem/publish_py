@@ -15,8 +15,6 @@ if (!$alowed) {
 
 header("Access-Control-Allow-Origin: https://$alowed");
 
-include_once __DIR__ . '/vendor_load.php';
-
 include_once __DIR__ . '/bots/config.php';
 include_once __DIR__ . '/bots/helps.php';
 include_once __DIR__ . '/bots/access_helps.php';

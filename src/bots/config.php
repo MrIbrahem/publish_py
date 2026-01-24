@@ -1,7 +1,5 @@
 <?php
 //---
-include_once __DIR__ . '/../vendor_load.php';
-//---
 use Defuse\Crypto\Key;
 //---
 $inifile = 'I:/mdwiki/mdwiki/confs/OAuthConfig.ini';
