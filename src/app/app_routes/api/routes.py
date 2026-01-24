@@ -25,9 +25,17 @@ def _parse_select_fields(select_param: Optional[str]) -> Optional[List[str]]:
 
 def _record_to_dict(record) -> Dict[str, Any]:
     """Convert a ReportRecord to a dictionary."""
+    # Handle date conversion with None safety
+    if record.date is None:
+        date_str = ""
+    elif hasattr(record.date, "isoformat"):
+        date_str = record.date.isoformat()
+    else:
+        date_str = str(record.date)
+
     return {
         "id": record.id,
-        "date": record.date.isoformat() if hasattr(record.date, "isoformat") else str(record.date),
+        "date": date_str,
         "title": record.title,
         "user": record.user,
         "lang": record.lang,
@@ -111,7 +119,8 @@ def get_publish_reports() -> Response:
 
     except Exception as e:
         logger.exception("Error fetching publish_reports")
-        return jsonify({"error": str(e)}), 500
+        # Return generic error message to avoid exposing internal details
+        return jsonify({"error": "An internal error occurred while fetching reports"}), 500
 
 
 __all__ = ["bp_api"]

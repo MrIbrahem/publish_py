@@ -15,6 +15,7 @@ from . import Database
 logger = logging.getLogger(__name__)
 
 # Parameter configuration matching PHP endpoint_params
+# These are hardcoded and trusted - column names are NOT from user input
 PUBLISH_REPORTS_PARAMS = [
     {"name": "year", "column": "YEAR(date)", "type": "number"},
     {"name": "month", "column": "MONTH(date)", "type": "number"},
@@ -24,6 +25,12 @@ PUBLISH_REPORTS_PARAMS = [
     {"name": "sourcetitle", "column": "sourcetitle", "type": "text"},
     {"name": "result", "column": "result", "type": "text"},
 ]
+
+# Valid columns that can be used in SELECT and WHERE clauses (for validation)
+_VALID_COLUMNS = frozenset({
+    "id", "date", "title", "user", "lang", "sourcetitle", "result", "data",
+    "YEAR(date)", "MONTH(date)",
+})
 
 table_creation_sql = """
 CREATE TABLE IF NOT EXISTS `publish_reports` (
@@ -161,6 +168,11 @@ class ReportsDB:
             name = param_def["name"]
             column = param_def["column"]
 
+            # Validate column is in the trusted allowlist (defense in depth)
+            if column not in _VALID_COLUMNS:
+                logger.warning(f"Skipping unrecognized column: {column}")
+                continue
+
             if name not in filters:
                 continue
 
@@ -185,7 +197,9 @@ class ReportsDB:
         query += " ORDER BY id DESC"
 
         if limit:
-            query += f" LIMIT {int(limit)}"
+            # Use parameterized query for LIMIT
+            query += " LIMIT %s"
+            params.append(int(limit))
 
         rows = self.db.fetch_query_safe(query, tuple(params) if params else None)
 
