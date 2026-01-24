@@ -33,7 +33,6 @@ function get_user_id($user)
     if (!$result) {
         return null;
     }
-    // ---
     foreach ($result as $row) {
         $user_id = $row['id'];
         $user_db = decode_value($row['u_n'], 'decrypt');
@@ -42,7 +41,6 @@ function get_user_id($user)
             return $user_id;
         }
     }
-    // ---
     return null;
 };
 
@@ -74,7 +72,6 @@ function get_access_from_db_new($user)
     }
 
     $result = $result[0];
-    // ---
     return [
         'access_key' => decode_value($result['a_k'], $key_type = "decrypt"),
         'access_secret' => decode_value($result['a_s'], $key_type = "decrypt")

@@ -19,11 +19,8 @@ function GetQidForMdtitle($title)
     $query = <<<SQL
         SELECT qid FROM qids WHERE title = ?
     SQL;
-    // ---
     $params = [$title];
-    // ---
     $result = fetch_query($query, $params);
-    // ---
     return $result;
 }
 
@@ -33,11 +30,8 @@ function GetTitleInfoOld($targettitle, $lang)
     $targettitle = urlencode($targettitle);
     // $targettitle = str_replace('/', '%2F', $targettitle);
     // $targettitle = str_replace(' ', '_', $targettitle);
-    // ---
     $url = "https://$lang.wikipedia.org/api/rest_v1/page/summary/$targettitle";
-    // ---
     logger_debug("GetTitleInfo url: $url");
-    // ---
     try {
         $result = get_url_curl($url);
         logger_debug("GetTitleInfo result: $result");
@@ -46,13 +40,11 @@ function GetTitleInfoOld($targettitle, $lang)
         logger_debug("GetTitleInfo: $e");
         $result = null;
     }
-    // ---
     return $result;
 }
 
 function GetTitleInfo($targettitle, $lang)
 {
-    // ---
     $params = [
         "action" => "query",
         "format" => "json",
@@ -60,11 +52,8 @@ function GetTitleInfo($targettitle, $lang)
         "utf8" => 1,
         "formatversion" => "2"
     ];
-    // ---
     $url = "https://$lang.wikipedia.org/w/api.php" . "?" . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
-    // ---
     logger_debug("GetTitleInfo url: $url");
-    // ---
     try {
         $result = get_url_curl($url);
         logger_debug("GetTitleInfo result: $result");
@@ -75,14 +64,12 @@ function GetTitleInfo($targettitle, $lang)
         logger_debug("GetTitleInfo: $e");
         $result = null;
     }
-    // ---
     return $result;
 }
 
 function LinkIt($qid, $lang, $sourcetitle, $targettitle, $access_key, $access_secret)
 {
     $https_domain = "https://www.wikidata.org";
-    // ---
     $apiParams = [
         "action" => "wbsetsitelink",
         "linktitle" => $targettitle,
@@ -94,33 +81,26 @@ function LinkIt($qid, $lang, $sourcetitle, $targettitle, $access_key, $access_se
         $apiParams["title"] = $sourcetitle;
         $apiParams["site"] = "enwiki";
     }
-    // ---
     $response = post_params($apiParams, $https_domain, $access_key, $access_secret);
-    // ---
     $Result = json_decode($response, true) ?? [];
-    // ---
     // if (isset($Result->error)) {
     if (isset($Result['error'])) {
         logger_debug("post_params: Result->error: " . json_encode($Result['error']));
     }
-    // ---
     if ($Result == null) {
         logger_debug("post_params: Error: " . json_last_error() . " " . json_last_error_msg());
         logger_debug("response:");
         logger_debug($response);
     }
-    // ---
     return $Result;
 }
 function getAccessCredentials($user, $access_key, $access_secret)
 {
     if (!$access_key || !$access_secret) {
         $access = get_access_from_db_new($user);
-        // ---
         if ($access === null) {
             $access = get_access_from_db($user);
         }
-        // ---
         if ($access === null) {
             logger_debug("user = $user");
             logger_debug("access == null");
@@ -129,7 +109,6 @@ function getAccessCredentials($user, $access_key, $access_secret)
         $access_key = $access['access_key'];
         $access_secret = $access['access_secret'];
     }
-    // ---
     return [$access_key, $access_secret];
 }
 

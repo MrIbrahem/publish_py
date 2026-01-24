@@ -34,7 +34,6 @@ class Database
         if (empty($db_suffix)) {
             $db_suffix = 'mdwiki';
         }
-        // ---
         $this->home_dir = getenv("HOME");
         //---
         if (substr(__DIR__, 0, 2) == 'I:') {
@@ -49,9 +48,7 @@ class Database
     {
         // $ts_pw = posix_getpwuid(posix_getuid());
         // $ts_mycnf = parse_ini_file($ts_pw['dir'] . "/confs/db.ini");
-        // ---
         $ts_mycnf = parse_ini_file($this->home_dir . "/confs/db.ini");
-        // ---
         if ($server_name === 'localhost' || !getenv('HOME')) {
             $this->host = 'localhost:3306';
             $this->dbname = $ts_mycnf['user'] . "__" . $this->db_suffix;

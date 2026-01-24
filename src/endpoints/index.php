@@ -48,15 +48,10 @@ function determineHashtag($title, $user)
 function handleNoAccess($user, $tab)
 {
     $error = ['code' => 'noaccess', 'info' => 'noaccess'];
-    // ---
     $editit = ['error' => $error, 'edit' => ['error' => $error, 'username' => $user], 'username' => $user];
-    // ---
     $tab['result_to_cx'] = $editit;
-    // ---
     to_do($tab, "noaccess");
-    // ---
     InsertPublishReports($tab['title'], $user, $tab['lang'], $tab['sourcetitle'], "noaccess", $tab);
-    // ---
     logger_debug("\n<br>");
     logger_debug("\n<br>");
 
@@ -69,50 +64,33 @@ function handleNoAccess($user, $tab)
 function executeStartProcess($request, $user, $access, $tab)
 {
     $text = $request['text'] ?? '';
-    // ---
     // $summary = $request['summary'] ?? '';
-    // ---
     $revid = get_revid($tab['sourcetitle']);
-    // ---
     if (empty($revid)) $revid = get_revid_db($tab['sourcetitle']);
-    // ---
     if (empty($revid)) {
         $tab['empty revid'] = 'Can not get revid from all_pages_revids.json';
         $revid = $request['revid'] ?? $request['revision'] ?? '';
     }
-    // ---
     $tab['revid'] = $revid;
-    // ---
     $hashtag = determineHashtag($tab['title'], $user);
-    // ---
     $tab['summary'] = make_summary($revid, $tab['sourcetitle'], $tab['lang'], $hashtag);
-    // ---
     // file_put_contents(__DIR__ . '/post.log', print_r(getallheaders(), true));
-    // ---
     $newtext = DoChangesToText1($tab['sourcetitle'], $tab['title'], $text, $tab['lang'], $revid);
-    // ---
     if (!empty($newtext)) {
-        // ---
         $tab['fix_refs'] = ($newtext != $text) ? 'yes' : 'no';
-        // ---
         $text = $newtext;
     }
-    // ---
     $editit = processEdit($request, $access, $text, $user, $tab);
-    // ---
     logger_debug("\n<br>");
     logger_debug("\n<br>");
-    // ---
     print(json_encode($editit, JSON_PRETTY_PRINT));
 }
 
 
 function start($request)
 {
-    // ---
     $user = formatUser($request['user'] ?? '');
     $title = formatTitle($request['title'] ?? '');
-    // ---
     $tab = [
         'title' => $title,
         'summary' => "",
@@ -123,13 +101,10 @@ function start($request)
         'edit' => [],
         'sourcetitle' => $request['sourcetitle'] ?? ''
     ];
-    // ---
     $access = get_access_from_db_new($user);
-    // ---
     if ($access === null) {
         $access = get_access_from_db($user);
     }
-    // ---
     if ($access == null) {
         handleNoAccess($user, $tab);
     } else {
