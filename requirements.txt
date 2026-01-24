@@ -1,0 +1,9 @@
+pytest
+flask
+flask-wtf
+flask-limiter
+mwoauth
+pymysql
+requests
+requests_oauthlib
+cryptography
