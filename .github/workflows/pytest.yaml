@@ -26,15 +26,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest flask flask-wtf flask-limiter mwoauth pymysql requests requests_oauthlib cryptography
-    
-    - name: Set environment variables for tests
-      run: |
-        echo "FLASK_SECRET_KEY=test_secret_key_12345678901234567890" >> $GITHUB_ENV
-        echo "OAUTH_MWURI=https://en.wikipedia.org/w/index.php" >> $GITHUB_ENV
-        echo "OAUTH_CONSUMER_KEY=test" >> $GITHUB_ENV
-        echo "OAUTH_CONSUMER_SECRET=test" >> $GITHUB_ENV
-        echo "OAUTH_ENCRYPTION_KEY=rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI=" >> $GITHUB_ENV
+        pip install -r requirements.txt
     
     - name: Run tests
       run: |
