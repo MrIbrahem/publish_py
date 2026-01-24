@@ -12,7 +12,7 @@ from flask_wtf.csrf import CSRFProtect
 from .app_routes import (
     bp_auth,
     bp_main,
-    bp_token,
+    bp_cxtoken,
     bp_post,
 )
 from .config import settings
@@ -69,7 +69,7 @@ def create_app() -> Flask:
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)
-    app.register_blueprint(bp_token)
+    app.register_blueprint(bp_cxtoken)
     app.register_blueprint(bp_post)
 
     @app.context_processor

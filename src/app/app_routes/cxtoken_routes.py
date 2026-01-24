@@ -29,14 +29,14 @@ from flask import (
 
 from ..users.current import current_user, oauth_required
 
-bp_token = Blueprint("token", __name__)
+bp_cxtoken = Blueprint("token", __name__)
 logger = logging.getLogger(__name__)
 
 
 @oauth_required
-@bp_token.get("/")
+@bp_cxtoken.get("/")
 def index():
     ...
 
 
-__all__ = ["bp_token"]
+__all__ = ["bp_cxtoken"]

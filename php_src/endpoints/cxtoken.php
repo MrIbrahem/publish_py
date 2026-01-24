@@ -49,7 +49,6 @@ print(json_encode($cxtoken, JSON_PRETTY_PRINT));
 
 $wiki    = $_GET['wiki'] ?? '';
 $user    = $_GET['user'] ?? '';
-$ty      = $_GET['ty'] ?? '';
 
 $specialUsers = [
     "Mr. Ibrahem 1" => "Mr. Ibrahem",
