@@ -1,5 +1,5 @@
 """
-TODO: file should be update from add_to_db.php
+TODO: should be updated to match php_src/bots/sql/db_Pages.php
 """
 from __future__ import annotations
 

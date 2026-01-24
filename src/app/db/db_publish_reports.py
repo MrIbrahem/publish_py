@@ -1,5 +1,5 @@
 """
-TODO: should mirror php_src/bots/sql/db_publish_reports.php
+TODO: should be updated to match php_src/bots/sql/db_publish_reports.php
 """
 from __future__ import annotations
 
