@@ -1,16 +1,30 @@
 """
-TODO: should be updated to match php_src/bots/sql/db_publish_reports.php
+Database handler for publish_reports table.
+
+Mirrors: php_src/bots/sql/db_publish_reports.php
 """
 
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, Dict, List, Optional
 
 from . import Database
 
 logger = logging.getLogger(__name__)
+
+# Parameter configuration matching PHP endpoint_params
+PUBLISH_REPORTS_PARAMS = [
+    {"name": "year", "column": "YEAR(date)", "type": "number"},
+    {"name": "month", "column": "MONTH(date)", "type": "number"},
+    {"name": "title", "column": "title", "type": "text"},
+    {"name": "user", "column": "user", "type": "text"},
+    {"name": "lang", "column": "lang", "type": "text"},
+    {"name": "sourcetitle", "column": "sourcetitle", "type": "text"},
+    {"name": "result", "column": "result", "type": "text"},
+]
+
 table_creation_sql = """
 CREATE TABLE IF NOT EXISTS `publish_reports` (
     `id` int NOT NULL AUTO_INCREMENT,
@@ -112,8 +126,89 @@ class ReportsDB:
         )
         return record
 
+    def query_with_filters(
+        self,
+        filters: Dict[str, Any],
+        select_fields: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+    ) -> List[ReportRecord]:
+        """Query reports with dynamic filtering.
+
+        Args:
+            filters: Dictionary of filter parameters
+            select_fields: Optional list of fields to return
+            limit: Optional result limit
+
+        Returns:
+            List of matching ReportRecord objects
+        """
+        # Build SELECT clause
+        valid_fields = {"id", "date", "title", "user", "lang", "sourcetitle", "result", "data"}
+        if select_fields:
+            fields = [f for f in select_fields if f in valid_fields]
+            # Always include 'id' for record mapping
+            if "id" not in fields:
+                fields.insert(0, "id")
+            select_clause = ", ".join(fields)
+        else:
+            select_clause = "id, date, title, user, lang, sourcetitle, result, data"
+
+        query = f"SELECT DISTINCT {select_clause} FROM publish_reports"
+        params: List[Any] = []
+        conditions: List[str] = []
+
+        for param_def in PUBLISH_REPORTS_PARAMS:
+            name = param_def["name"]
+            column = param_def["column"]
+
+            if name not in filters:
+                continue
+
+            value = filters[name]
+
+            # Handle special values
+            if value in ("not_mt", "not_empty"):
+                conditions.append(f"({column} != '' AND {column} IS NOT NULL)")
+            elif value in ("mt", "empty"):
+                conditions.append(f"({column} = '' OR {column} IS NULL)")
+            elif value in (">0", "&#62;0"):
+                conditions.append(f"{column} > 0")
+            elif str(value).lower() == "all":
+                continue  # Skip this filter
+            else:
+                conditions.append(f"{column} = %s")
+                params.append(value)
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += " ORDER BY id DESC"
+
+        if limit:
+            query += f" LIMIT {int(limit)}"
+
+        rows = self.db.fetch_query_safe(query, tuple(params) if params else None)
+
+        # Handle partial field selection by providing defaults
+        result_records = []
+        for row in rows:
+            record = ReportRecord(
+                id=int(row.get("id", 0)),
+                date=row.get("date", ""),
+                title=row.get("title", ""),
+                user=row.get("user", ""),
+                lang=row.get("lang", ""),
+                sourcetitle=row.get("sourcetitle", ""),
+                result=row.get("result", ""),
+                data=row.get("data", ""),
+            )
+            result_records.append(record)
+
+        return result_records
+
 
 __all__ = [
     "ReportsDB",
     "ReportRecord",
+    "PUBLISH_REPORTS_PARAMS",
 ]
