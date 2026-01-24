@@ -13,10 +13,26 @@ from . import Database
 
 logger = logging.getLogger(__name__)
 
+table_creation_sql = """
+CREATE TABLE IF NOT EXISTS `publish_reports` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `user` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `lang` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `sourcetitle` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `result` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `publish_reports_chk_1` CHECK (json_valid(`data`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+"""
+
 
 @dataclass
-class PageRecord:
-    """Representation of a page."""
+class ReportRecord:
+    """Representation of a report."""
 
     id: int
     title: str
@@ -25,7 +41,7 @@ class PageRecord:
     updated_at: Any | None = None
 
 
-class PagesDB:
+class ReportsDB:
     """MySQL-backed"""
 
     def __init__(self, db_data: dict[str, Any]):
@@ -33,23 +49,7 @@ class PagesDB:
         self._ensure_table()
 
     def _ensure_table(self) -> None:
-        self.db.execute_query_safe(
-            """
-            CREATE TABLE IF NOT EXISTS `publish_reports` (
-                `id` int NOT NULL AUTO_INCREMENT,
-                `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                `user` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                `lang` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                `sourcetitle` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                `result` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-                PRIMARY KEY (`id`),
-                CONSTRAINT `publish_reports_chk_1` CHECK (json_valid(`data`))
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-            """
-        )
+        self.db.execute_query_safe(table_creation_sql)
 
     def _row_to_record(self, row: dict[str, Any]) -> PageRecord:
         return PageRecord(
@@ -152,6 +152,6 @@ class PagesDB:
 
 
 __all__ = [
-    "PagesDB",
-    "PageRecord",
+    "ReportsDB",
+    "ReportRecord",
 ]
