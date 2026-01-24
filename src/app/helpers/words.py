@@ -62,8 +62,14 @@ def _load_words_table() -> dict[str, int]:
         if words_path.exists():
             with open(words_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                # Ensure all values are integers
-                return {str(k): int(v) if isinstance(v, (int, float, str)) and str(v).isdigit() else 0 for k, v in data.items()}
+                # Ensure all values are integers using try-except for robust conversion
+                result = {}
+                for k, v in data.items():
+                    try:
+                        result[str(k)] = int(v)
+                    except (ValueError, TypeError):
+                        result[str(k)] = 0
+                return result
         else:
             logger.debug(f"Words file not found at {words_path}")
             return {}

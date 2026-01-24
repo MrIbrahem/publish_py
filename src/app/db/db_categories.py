@@ -70,18 +70,17 @@ class CategoriesDB:
 
 # Cached function to avoid repeated database queries
 @lru_cache(maxsize=1)
-def _get_cached_campaign_categories(db_data_hash: str, db_data: tuple) -> dict[str, str]:
+def _get_cached_campaign_categories(db_data_tuple: tuple) -> dict[str, str]:
     """Get cached campaign categories.
 
     Args:
-        db_data_hash: Hash of db_data for cache invalidation
-        db_data: Database configuration as tuple (for hashability)
+        db_data_tuple: Database configuration as tuple (for hashability)
 
     Returns:
         Dictionary mapping campaign names to category names
     """
     # Convert tuple back to dict
-    db_dict = dict(db_data)
+    db_dict = dict(db_data_tuple)
     categories_db = CategoriesDB(db_dict)
     return categories_db.retrieve_campaign_categories()
 
@@ -97,10 +96,10 @@ def get_campaign_category(campaign: str, db_data: dict[str, Any]) -> str:
         Category name, or empty string if not found
     """
     # Create a hashable version of db_data for caching
+    # Using sorted tuple for deterministic ordering
     db_data_tuple = tuple(sorted(db_data.items()))
-    db_data_hash = str(hash(db_data_tuple))
 
-    categories = _get_cached_campaign_categories(db_data_hash, db_data_tuple)
+    categories = _get_cached_campaign_categories(db_data_tuple)
     return categories.get(campaign, "")
 
 

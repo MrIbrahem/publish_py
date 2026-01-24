@@ -63,13 +63,12 @@ def to_do(tab: dict[str, Any], status: str) -> None:
     """
     now = datetime.now()
 
-    # Add timestamp and status to the entry
-    log_entry = {
-        "time": int(now.timestamp()),
-        "time_date": now.strftime("%Y-%m-%d %H:%M:%S"),
-        "status": status,
-        **tab,
-    }
+    # Build log entry with explicit keys first, then add tab data
+    # Tab data is added after to allow intentional overrides of time/status
+    log_entry = dict(tab)  # Copy tab first
+    log_entry["time"] = int(now.timestamp())
+    log_entry["time_date"] = now.strftime("%Y-%m-%d %H:%M:%S")
+    log_entry["status"] = status
 
     # Write to JSON lines log file (existing behavior)
     log_dir = Path(settings.paths.log_dir)

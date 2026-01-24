@@ -25,3 +25,5 @@ pup2.html
 .env
 *.env
 /data/logs
+*.egg-info/
+*.egg
