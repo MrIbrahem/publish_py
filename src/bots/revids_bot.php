@@ -7,7 +7,7 @@ use function Publish\Revids\get_revid_db;
 use function Publish\Revids\get_revid;
 */
 
-use function Publish\Helps\pub_test_print;
+use function Publish\Helps\logger_debug;
 use function Publish\Helps\get_url_curl;
 
 function get_revid_db($sourcetitle)
@@ -47,7 +47,7 @@ function get_revid($sourcetitle)
         $revid = $json[$sourcetitle] ?? "";
         return $revid;
     } catch (\Exception $e) {
-        pub_test_print($e->getMessage());
+        logger_debug($e->getMessage());
     }
     return "";
 }

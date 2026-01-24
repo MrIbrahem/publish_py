@@ -8,13 +8,11 @@ use function Publish\GetToken\get_cxtoken;
 use function Publish\GetToken\post_params;
 */
 
-include_once __DIR__ . '/../include.php';
-
 use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
 use MediaWiki\OAuthClient\Token;
-use function Publish\Helps\pub_test_print;
+use function Publish\Helps\logger_debug;
 
 function get_client($wiki, $oauthUrl = "")
 {
@@ -43,8 +41,8 @@ function get_csrftoken($client, $access_key, $access_secret, $apiUrl)
     // ---
     if ($data == null || !isset($data['query']['tokens']['csrftoken'])) {
         // Handle error
-        pub_test_print("<br>get_csrftoken Error: " . json_last_error() . " " . json_last_error_msg());
-        pub_test_print($data);
+        logger_debug("<br>get_csrftoken Error: " . json_last_error() . " " . json_last_error_msg());
+        logger_debug($data);
     }
     // ---
     return $data;
@@ -69,7 +67,7 @@ function post_params($apiParams, $https_domain, $access_key, $access_secret)
     $apiParams["format"] = "json";
     $apiParams["token"] = $csrftoken;
     // ---
-    pub_test_print("post_params: apiParams:" . json_encode($apiParams, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    logger_debug("post_params: apiParams:" . json_encode($apiParams, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     // ---
     $response = $client->makeOAuthCall($accessToken, $apiUrl, true, $apiParams);
     // ---
@@ -89,7 +87,7 @@ function get_cxtoken($wiki, $access_key, $access_secret)
     $apiResult = json_decode($response, true);
     // ---
     if ($apiResult == null || isset($apiResult['error'])) {
-        pub_test_print("<br>get_cxtoken: Error: " . json_last_error() . " " . json_last_error_msg());
+        logger_debug("<br>get_cxtoken: Error: " . json_last_error() . " " . json_last_error_msg());
     }
     // ---
     return $apiResult;

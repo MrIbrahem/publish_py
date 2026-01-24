@@ -6,7 +6,7 @@ Usage:
 use function Publish\EditProcess\processEdit;
 */
 
-use function Publish\Helps\pub_test_print;
+use function Publish\Helps\logger_debug;
 use function Publish\DoEdit\publish_do_edit;
 use function Publish\AddToDb\InsertPageTarget;
 use function Publish\AddToDb\retrieveCampaignCategories;
@@ -52,7 +52,7 @@ function get_errors_file($editit, $place_holder)
 function retryWithFallbackUser($sourcetitle, $lang, $title, $user, $original_error)
 {
     $LinkTowd = [];
-    pub_test_print("get_csrftoken failed for user: $user, retrying with Mr. Ibrahem");
+    logger_debug("get_csrftoken failed for user: $user, retrying with Mr. Ibrahem");
 
     // Retry with "Mr. Ibrahem" credentials - get fresh credentials from database
     $fallback_access = get_access_from_db_new('Mr. Ibrahem');
@@ -70,7 +70,7 @@ function retryWithFallbackUser($sourcetitle, $lang, $title, $user, $original_err
         if (!isset($LinkTowd['error'])) {
             $LinkTowd['fallback_user'] = 'Mr. Ibrahem';
             $LinkTowd['original_user'] = $user;
-            pub_test_print("Successfully linked using Mr. Ibrahem fallback credentials");
+            logger_debug("Successfully linked using Mr. Ibrahem fallback credentials");
         }
     }
     return $LinkTowd;
@@ -89,7 +89,7 @@ function handleSuccessfulEdit($sourcetitle, $lang, $user, $title, $access_key, $
         }
         // Log errors if they still exist after retry
     } catch (\Exception $e) {
-        pub_test_print($e->getMessage());
+        logger_debug($e->getMessage());
     }
     // ---
     if (isset($LinkTowd['error'])) {

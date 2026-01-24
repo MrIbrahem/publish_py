@@ -7,13 +7,11 @@ use function Publish\DoEdit\publish_do_edit;
 use function Publish\DoEdit\get_edits_token;
 */
 
-include_once __DIR__ . '/../include.php';
-
 use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
 use MediaWiki\OAuthClient\Token;
-use function Publish\Helps\pub_test_print;
+use function Publish\Helps\logger_debug;
 
 function get_edits_token($client, $accessToken, $apiUrl)
 {
@@ -23,7 +21,7 @@ function get_edits_token($client, $accessToken, $apiUrl)
     // ---
     if ($data == null || !isset($data->query->tokens->csrftoken)) {
         // Handle error
-        pub_test_print("<br>get_edits_token Error: " . json_last_error() . " " . json_last_error_msg());
+        logger_debug("<br>get_edits_token Error: " . json_last_error() . " " . json_last_error_msg());
         return null;
     }
     // ---

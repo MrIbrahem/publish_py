@@ -7,7 +7,7 @@ use function Publish\FilesHelps\to_do;
 use function Publish\FilesHelps\check_dirs;
 */
 
-use function Publish\Helps\pub_test_print;
+use function Publish\Helps\logger_debug;
 
 // $rand_id = rand(0, 999999999);
 $rand_id = time() .  "-" . bin2hex(random_bytes(6));
@@ -28,7 +28,7 @@ function to_do($tab, $file_name)
         // ---
         file_put_contents($file_j, json_encode($tab, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     } catch (\Exception $e) {
-        pub_test_print($e->getMessage());
+        logger_debug($e->getMessage());
     }*/
     // ---
     try {
@@ -37,7 +37,7 @@ function to_do($tab, $file_name)
         // ---
         file_put_contents($file_j, json_encode($tab, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     } catch (\Exception $e) {
-        pub_test_print($e->getMessage());
+        logger_debug($e->getMessage());
     }
 }
 

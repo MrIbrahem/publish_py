@@ -10,13 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 include_once __DIR__ . '/include.php';
 
-use function Publish\Helps\pub_test_print;
+use function Publish\Helps\logger_debug;
 use function Publish\AccessHelps\get_access_from_db;
 use function Publish\AccessHelpsNew\get_access_from_db_new;
 use function WpRefs\FixPage\DoChangesToText1;
 use function Publish\EditProcess\processEdit;
 use function Publish\FilesHelps\to_do;
-// use function Publish\Helps\get_url_curl;
 use function Publish\Revids\get_revid_db;
 use function Publish\Revids\get_revid;
 use function Publish\AddToDb\InsertPublishReports; // InsertPublishReports($title, $user, $lang, $sourcetitle, $result, $data)
@@ -66,8 +65,8 @@ function handleNoAccess($user, $tab)
     // ---
     InsertPublishReports($tab['title'], $user, $tab['lang'], $tab['sourcetitle'], "noaccess", $tab);
     // ---
-    pub_test_print("\n<br>");
-    pub_test_print("\n<br>");
+    logger_debug("\n<br>");
+    logger_debug("\n<br>");
 
     print(json_encode($editit, JSON_PRETTY_PRINT));
 
@@ -120,8 +119,8 @@ function start2($request, $user, $access, $tab)
     // ---
     $editit = processEdit($request, $access, $text, $user, $tab);
     // ---
-    pub_test_print("\n<br>");
-    pub_test_print("\n<br>");
+    logger_debug("\n<br>");
+    logger_debug("\n<br>");
     // ---
     print(json_encode($editit, JSON_PRETTY_PRINT));
     // ---

@@ -6,13 +6,11 @@ use function Publish\WD\LinkToWikidata;
 use function Publish\WD\GetQidForMdtitle;
 */
 
-include_once __DIR__ . '/../include.php';
-
 use function Publish\GetToken\post_params;
 use function Publish\MdwikiSql\fetch_query;
 use function Publish\AccessHelps\get_access_from_db;
 use function Publish\AccessHelpsNew\get_access_from_db_new;
-use function Publish\Helps\pub_test_print;
+use function Publish\Helps\logger_debug;
 use function Publish\Helps\get_url_curl;
 
 
@@ -38,14 +36,14 @@ function GetTitleInfoOld($targettitle, $lang)
     // ---
     $url = "https://$lang.wikipedia.org/api/rest_v1/page/summary/$targettitle";
     // ---
-    pub_test_print("GetTitleInfo url: $url");
+    logger_debug("GetTitleInfo url: $url");
     // ---
     try {
         $result = get_url_curl($url);
-        pub_test_print("GetTitleInfo result: $result");
+        logger_debug("GetTitleInfo result: $result");
         $result = json_decode($result, true);
     } catch (\Exception $e) {
-        pub_test_print("GetTitleInfo: $e");
+        logger_debug("GetTitleInfo: $e");
         $result = null;
     }
     // ---
@@ -65,16 +63,16 @@ function GetTitleInfo($targettitle, $lang)
     // ---
     $url = "https://$lang.wikipedia.org/w/api.php" . "?" . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
     // ---
-    pub_test_print("GetTitleInfo url: $url");
+    logger_debug("GetTitleInfo url: $url");
     // ---
     try {
         $result = get_url_curl($url);
-        pub_test_print("GetTitleInfo result: $result");
+        logger_debug("GetTitleInfo result: $result");
         $result = json_decode($result, true);
         // { "query": { "pages": [ { "pageid": 5049507, "ns": 2, "title": "利用者:Mr. Ibrahem/オランザピン/サミドルファン" } ] } }
         $result = $result['query']['pages'][0];
     } catch (\Exception $e) {
-        pub_test_print("GetTitleInfo: $e");
+        logger_debug("GetTitleInfo: $e");
         $result = null;
     }
     // ---
@@ -103,13 +101,13 @@ function LinkIt($qid, $lang, $sourcetitle, $targettitle, $access_key, $access_se
     // ---
     // if (isset($Result->error)) {
     if (isset($Result['error'])) {
-        pub_test_print("post_params: Result->error: " . json_encode($Result['error']));
+        logger_debug("post_params: Result->error: " . json_encode($Result['error']));
     }
     // ---
     if ($Result == null) {
-        pub_test_print("post_params: Error: " . json_last_error() . " " . json_last_error_msg());
-        pub_test_print("response:");
-        pub_test_print($response);
+        logger_debug("post_params: Error: " . json_last_error() . " " . json_last_error_msg());
+        logger_debug("response:");
+        logger_debug($response);
     }
     // ---
     return $Result;
@@ -124,8 +122,8 @@ function getAccessCredentials($user, $access_key, $access_secret)
         }
         // ---
         if ($access === null) {
-            pub_test_print("user = $user");
-            pub_test_print("access == null");
+            logger_debug("user = $user");
+            logger_debug("access == null");
             return null;
         }
         $access_key = $access['access_key'];
@@ -151,7 +149,7 @@ function LinkToWikidata($sourcetitle, $lang, $user, $targettitle, $access_key, $
     $link_result["qid"] = $qid;
 
     if (isset($link_result['success']) && $link_result['success']) {
-        pub_test_print("success: true");
+        logger_debug("success: true");
         return ['result' => "success", 'qid' => $qid];
     }
 
