@@ -94,10 +94,11 @@ def _retry_with_fallback_user(
     Returns:
         Link result dictionary
     """
-    logger.debug(f"get_csrftoken failed for user: {user}, retrying with Mr. Ibrahem")
+    fallback_user = settings.users.fallback_user
+    logger.debug(f"get_csrftoken failed for user: {user}, retrying with {fallback_user}")
 
-    # Retry with "Mr. Ibrahem" credentials
-    fallback_token = get_user_token_by_username("Mr. Ibrahem")
+    # Retry with fallback user credentials
+    fallback_token = get_user_token_by_username(fallback_user)
 
     if fallback_token is not None:
         fallback_access_key, fallback_access_secret = fallback_token.decrypted()
@@ -105,16 +106,16 @@ def _retry_with_fallback_user(
         link_result = link_to_wikidata(
             sourcetitle,
             lang,
-            "Mr. Ibrahem",
+            fallback_user,
             title,
             fallback_access_key,
             fallback_access_secret,
         )
 
         if "error" not in link_result:
-            link_result["fallback_user"] = "Mr. Ibrahem"
+            link_result["fallback_user"] = fallback_user
             link_result["original_user"] = user
-            logger.debug("Successfully linked using Mr. Ibrahem fallback credentials")
+            logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
 
         return link_result
 
@@ -147,8 +148,9 @@ def _handle_successful_edit(
     try:
         link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
 
-        # Check if the error is get_csrftoken failure and user is not already "Mr. Ibrahem"
-        if link_result.get("error") == "get_csrftoken failed" and user != "Mr. Ibrahem":
+        # Check if the error is get_csrftoken failure and user is not already the fallback user
+        fallback_user = settings.users.fallback_user
+        if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
             link_result["fallback"] = _retry_with_fallback_user(sourcetitle, lang, title, user, link_result["error"])
     except Exception as e:
         logger.error(f"Error linking to Wikidata: {e}")

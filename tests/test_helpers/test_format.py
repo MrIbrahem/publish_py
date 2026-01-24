@@ -3,12 +3,12 @@
 import pytest
 
 from src.app.helpers.format import (
-    SPECIAL_USERS,
     determine_hashtag,
     format_title,
     format_user,
     make_summary,
 )
+from src.app.config import settings
 
 
 class TestFormatTitle:
@@ -80,10 +80,18 @@ class TestMakeSummary:
         assert summary == expected
 
 
-class TestSpecialUsers:
-    """Tests for SPECIAL_USERS constant."""
+class TestUsersConfig:
+    """Tests for users configuration."""
 
-    def test_special_users_mapping(self):
-        """Test that special users mapping is correct."""
-        assert SPECIAL_USERS["Mr. Ibrahem 1"] == "Mr. Ibrahem"
-        assert SPECIAL_USERS["Admin"] == "Mr. Ibrahem"
+    def test_special_users_mapping_from_config(self):
+        """Test that special users mapping is correctly loaded from config."""
+        assert settings.users.special_users["Mr. Ibrahem 1"] == "Mr. Ibrahem"
+        assert settings.users.special_users["Admin"] == "Mr. Ibrahem"
+
+    def test_fallback_user_from_config(self):
+        """Test that fallback user is correctly loaded from config."""
+        assert settings.users.fallback_user == "Mr. Ibrahem"
+
+    def test_users_without_hashtag_from_config(self):
+        """Test that users without hashtag is correctly loaded from config."""
+        assert "Mr. Ibrahem" in settings.users.users_without_hashtag

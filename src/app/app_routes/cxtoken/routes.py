@@ -10,8 +10,8 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 
+from ...config import settings
 from ...helpers.cors import is_allowed
-from ...helpers.format import SPECIAL_USERS
 from ...services.oauth_client import get_cxtoken
 from ...users.store import delete_user_token_by_username, get_user_token_by_username
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 def _format_user(user: str) -> str:
     """Format username, applying special user mappings."""
-    user = SPECIAL_USERS.get(user, user)
+    user = settings.users.special_users.get(user, user)
     return user.replace("_", " ")
 
 

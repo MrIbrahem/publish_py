@@ -3,10 +3,7 @@
 Mirrors: php_src/endpoints/post.php (formatTitle, formatUser, determineHashtag, make_summary)
 """
 
-SPECIAL_USERS = {
-    "Mr. Ibrahem 1": "Mr. Ibrahem",
-    "Admin": "Mr. Ibrahem",
-}
+from ..config import settings
 
 
 def format_title(title: str) -> str:
@@ -19,7 +16,9 @@ def format_title(title: str) -> str:
         Formatted title with underscores replaced and special user paths normalized
     """
     title = title.replace("_", " ")
-    title = title.replace("Mr. Ibrahem 1/", "Mr. Ibrahem/")
+    # Normalize special user paths based on config
+    for alt_user, canonical_user in settings.users.special_users.items():
+        title = title.replace(f"{alt_user}/", f"{canonical_user}/")
     return title
 
 
@@ -32,7 +31,7 @@ def format_user(user: str) -> str:
     Returns:
         Formatted username with underscores replaced and special users mapped
     """
-    user = SPECIAL_USERS.get(user, user)
+    user = settings.users.special_users.get(user, user)
     return user.replace("_", " ")
 
 
@@ -47,8 +46,11 @@ def determine_hashtag(title: str, user: str) -> str:
         Hashtag string (empty for user's own pages)
     """
     hashtag = "#mdwikicx"
-    if "Mr. Ibrahem" in title and user == "Mr. Ibrahem":
-        hashtag = ""
+    # Users without hashtag on their own pages
+    for exempt_user in settings.users.users_without_hashtag:
+        if exempt_user in title and user == exempt_user:
+            hashtag = ""
+            break
     return hashtag
 
 
