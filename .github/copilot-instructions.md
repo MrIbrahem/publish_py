@@ -48,7 +48,11 @@ ruff format src/ tests/
 
 The following rules are intentionally ignored (see `pyproject.toml`):
 - E402: Module level import not at top of file
+- E225, E226, E227, E228: Whitespace around operators
+- E252: Missing whitespace around parameter equals
 - E501: Line too long (handled by Black)
+- E224: Tab before operator
+- E203: Whitespace before punctuation
 - F841: Local variable assigned but never used
 - F401: Module imported but unused
 
@@ -173,7 +177,7 @@ Routes are organized into blueprints:
 
 ## Environment Variables
 
-Required environment variables (see `example.env`):
+Required environment variables (see `src/example.env`):
 
 - `FLASK_SECRET_KEY`: Flask session secret key
 - `DB_NAME`: Database name
@@ -231,10 +235,10 @@ Retrieve publish reports with filtering options.
 
 ### Working with OAuth
 
-- OAuth is handled by `oauth_client.py`
-- Tokens are encrypted using `crypto.py`
-- User data is stored using `users/store.py`
-- Current user context is available via `users/current.py`
+- OAuth is handled by `src/app/services/oauth_client.py`
+- Tokens are encrypted using `src/app/crypto.py`
+- User data is stored using `src/app/users/store.py`
+- Current user context is available via `src/app/users/current.py`
 
 ## Important Notes
 
