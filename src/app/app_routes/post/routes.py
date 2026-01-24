@@ -9,7 +9,7 @@ from flask import (
     render_template,
 )
 
-from ..users.current import current_user, oauth_required
+from ...users.current import current_user, oauth_required
 
 bp_post = Blueprint("post", __name__)
 logger = logging.getLogger(__name__)

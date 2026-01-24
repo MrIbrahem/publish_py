@@ -1,5 +1,5 @@
 """
-TODO: should be mirror php_src/endpoints/token.php
+TODO: should be mirror php_src/endpoints/cxtoken.php
 
 should only accept requests from specific domains
 
@@ -28,9 +28,9 @@ from flask import (
     render_template,
 )
 
-from ..users.current import current_user, oauth_required
+from ...users.current import current_user, oauth_required
 
-bp_cxtoken = Blueprint("token", __name__)
+bp_cxtoken = Blueprint("cxtoken", __name__)
 logger = logging.getLogger(__name__)
 
 
