@@ -94,7 +94,7 @@ def login() -> Response:
     # start login
     try:
         redirect_url, request_token = start_login(sign_state_token(state_nonce))
-    except (RuntimeError, mwoauth.MWOAuthException):
+    except (RuntimeError, Exception):
         logger.exception("Failed to start OAuth login")
         flash("Failed to initiate OAuth login", "danger")
         return redirect(url_for("main.index", error="Failed to initiate OAuth login"))
