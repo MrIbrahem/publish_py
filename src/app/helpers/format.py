@@ -46,9 +46,10 @@ def determine_hashtag(title: str, user: str) -> str:
         Hashtag string (empty for user's own pages)
     """
     hashtag = "#mdwikicx"
-    # Users without hashtag on their own pages
+    # Users without hashtag on their own pages (check for user path pattern)
     for exempt_user in settings.users.users_without_hashtag:
-        if exempt_user in title and user == exempt_user:
+        # Match user pages like "Username/..." or exact username match in title
+        if (f"{exempt_user}/" in title or title == exempt_user) and user == exempt_user:
             hashtag = ""
             break
     return hashtag

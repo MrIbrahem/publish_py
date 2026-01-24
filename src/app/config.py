@@ -211,9 +211,17 @@ def get_settings() -> Settings:
     special_users_str = os.getenv("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
     special_users = {}
     for pair in special_users_str.split(","):
-        if ":" in pair:
-            alt, canonical = pair.split(":", 1)
-            special_users[alt.strip()] = canonical.strip()
+        pair = pair.strip()
+        if not pair:
+            continue
+        if ":" not in pair:
+            # Log warning for malformed pair (missing colon)
+            import logging
+
+            logging.getLogger(__name__).warning(f"Ignoring malformed SPECIAL_USERS pair (missing ':'): {pair}")
+            continue
+        alt, canonical = pair.split(":", 1)
+        special_users[alt.strip()] = canonical.strip()
 
     fallback_user = os.getenv("FALLBACK_USER", "Mr. Ibrahem")
 
