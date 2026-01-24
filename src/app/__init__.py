@@ -11,8 +11,8 @@ from flask_wtf.csrf import CSRFProtect
 
 from .app_routes import (
     bp_auth,
-    bp_main,
     bp_cxtoken,
+    bp_main,
     bp_post,
 )
 from .config import settings

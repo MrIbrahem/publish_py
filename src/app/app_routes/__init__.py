@@ -1,7 +1,6 @@
-
 from .auth.routes import bp_auth
-from .main.routes import bp_main
 from .cxtoken_routes import bp_cxtoken
+from .main.routes import bp_main
 from .post_routes import bp_post
 
 __all__ = [

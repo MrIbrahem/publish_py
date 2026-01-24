@@ -17,8 +17,7 @@ logger = logging.getLogger(__name__)
 
 @oauth_required
 @bp_post.post("/")
-def index():
-    ...
+def index(): ...
 
 
 __all__ = ["bp_post"]

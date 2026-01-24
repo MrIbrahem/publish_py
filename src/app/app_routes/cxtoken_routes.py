@@ -20,6 +20,7 @@ function is_allowed()
 }
 
 """
+
 import logging
 
 from flask import (
@@ -35,8 +36,7 @@ logger = logging.getLogger(__name__)
 
 @oauth_required
 @bp_cxtoken.get("/")
-def index():
-    ...
+def index(): ...
 
 
 __all__ = ["bp_cxtoken"]

@@ -1,6 +1,7 @@
 """
 TODO: should be updated to match php_src/bots/sql/db_Pages.php
 """
+
 from __future__ import annotations
 
 import logging
@@ -57,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `pages_users` (
 @dataclass
 class PageRecord:
     """Representation of a page."""
+
     id: int
     title: str
     word: int | None = None
@@ -104,9 +106,7 @@ class PagesDB:
         return self._row_to_record(rows[0])
 
     def list(self) -> List[PageRecord]:
-        rows = self.db.fetch_query_safe(
-            "SELECT * FROM pages ORDER BY id ASC"
-        )
+        rows = self.db.fetch_query_safe("SELECT * FROM pages ORDER BY id ASC")
         return [self._row_to_record(row) for row in rows]
 
     def add(self, title: str, **kwargs) -> PageRecord:
