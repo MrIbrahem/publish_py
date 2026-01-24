@@ -502,7 +502,7 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 ### Phase 1: Database Layer
 - [x] Add `PUBLISH_REPORTS_PARAMS` configuration to `db_publish_reports.py`
 - [x] Implement `query_with_filters()` method in `ReportsDB` class
-- [ ] Add unit tests for new database method
+- [x] Add unit tests for new database method
 
 ### Phase 2: Route Layer
 - [x] Create `src/app/app_routes/api/` directory
@@ -514,16 +514,16 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 ### Phase 3: Frontend Update
 - [x] Update `src/templates/reports.html` line 176: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
 - [x] Update `src/templates/reports.html` line 190: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
-- [ ] Test frontend functionality with new endpoint
+- [x] Test frontend functionality with new endpoint
 
 ### Phase 4: Testing
-- [ ] Test each parameter filter individually
-- [ ] Test combined parameter filters
-- [ ] Test special values (`not_empty`, `empty`, `>0`)
-- [ ] Test `select` field filtering
-- [ ] Test `limit` parameter
-- [ ] Verify CORS handling
-- [ ] Test frontend integration
+- [x] Test each parameter filter individually
+- [x] Test combined parameter filters
+- [x] Test special values (`not_empty`, `empty`, `>0`)
+- [x] Test `select` field filtering
+- [x] Test `limit` parameter
+- [x] Verify CORS handling
+- [x] Test frontend integration
 
 ### Phase 5: Documentation
 - [x] Update API documentation (see `docs/api.md`)

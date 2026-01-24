@@ -1165,7 +1165,7 @@ def test_post_requires_auth(client):
 2. **Update database layer**
    - [x] Add `get_user_token_by_username()` to `users/store.py`
    - [x] Add `insert_page_target()` to `db/db_Pages.py`
-   - [ ] Ensure `qids` table exists
+   - [x] Ensure `qids` table exists
 
 3. **Add dependencies**
    - [x] Update `requirements.txt` with OAuth libraries
@@ -1196,8 +1196,8 @@ def test_post_requires_auth(client):
 
 2. **Test cxtoken**
    - [x] Unit tests
-   - [ ] Integration tests with mock OAuth
-   - [ ] Manual testing with real OAuth
+   - [x] Integration tests with mock OAuth
+   - [x] Manual testing with real OAuth
 
 ### Phase 4: Wikidata Service (Week 3)
 
@@ -1208,8 +1208,8 @@ def test_post_requires_auth(client):
      - `link_to_wikidata()`
 
 2. **Test Wikidata integration**
-   - [ ] Unit tests
-   - [ ] Integration tests with mock API
+   - [x] Unit tests
+   - [x] Integration tests with mock API
 
 ### Phase 5: Post Endpoint (Week 4)
 
@@ -1220,25 +1220,25 @@ def test_post_requires_auth(client):
 
 2. **Test post endpoint**
    - [x] Unit tests for each function
-   - [ ] Integration tests with mock database and API
-   - [ ] End-to-end testing
+   - [x] Integration tests with mock database and API
+   - [x] End-to-end testing
 
 ### Phase 6: Deployment & Monitoring (Week 5)
 
 1. **Deploy to test environment**
-   - [ ] Set environment variables
-   - [ ] Run database migrations
-   - [ ] Test with real OAuth
+   - [x] Set environment variables
+   - [x] Run database migrations
+   - [x] Test with real OAuth
 
 2. **Monitor and fix issues**
-   - [ ] Review logs
-   - [ ] Fix bugs
-   - [ ] Optimize performance
+   - [x] Review logs
+   - [x] Fix bugs
+   - [x] Optimize performance
 
 3. **Deploy to production**
-   - [ ] Gradual rollout
-   - [ ] Monitor metrics
-   - [ ] Rollback plan ready
+   - [x] Gradual rollout
+   - [x] Monitor metrics
+   - [x] Rollback plan ready
 
 ---
 
@@ -1258,11 +1258,11 @@ def test_post_requires_auth(client):
 - [x] `src/app/services/text_processor.py`
 - [x] `tests/test_helpers/test_cors.py`
 - [x] `tests/test_helpers/test_format.py`
-- [ ] `tests/test_services/test_oauth_client.py`
-- [ ] `tests/test_services/test_mediawiki_api.py`
-- [ ] `tests/test_services/test_wikidata_client.py`
-- [ ] `tests/test_routes/test_cxtoken.py`
-- [ ] `tests/test_routes/test_post.py`
+- [x] `tests/test_services/test_oauth_client.py`
+- [x] `tests/test_services/test_mediawiki_api.py`
+- [x] `tests/test_services/test_wikidata_client.py`
+- [x] `tests/test_routes/test_cxtoken.py`
+- [x] `tests/test_routes/test_post.py`
 
 ### Files to Modify
 
@@ -1272,7 +1272,7 @@ def test_post_requires_auth(client):
 - [x] `src/app/db/db_Pages.py` - Add `insert_page_target()`
 - [x] `src/app/config.py` - Add CORS domains config
 - [x] `requirements.txt` or `pyproject.toml` - Add dependencies
-- [ ] `src/app/__init__.py` - Register new blueprints if needed
+- [x] `src/app/__init__.py` - Register new blueprints if needed
 
 ---
 
