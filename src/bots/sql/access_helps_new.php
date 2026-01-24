@@ -17,6 +17,8 @@ $user_ids_cache = [];
 function get_user_id($user)
 {
     //---
+    global $user_ids_cache;
+    //---
     // Validate and sanitize username
     $user = trim($user);
     //---

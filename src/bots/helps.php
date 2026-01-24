@@ -10,6 +10,18 @@ use function Publish\Helps\decode_value;
 
 use Defuse\Crypto\Crypto;
 
+function logger_debug($s)
+{
+    //---
+    if (!isset($_REQUEST['test'])) return;
+    //---
+    if (gettype($s) == 'string') {
+        echo "\n<br>\n$s";
+    } else {
+        echo "\n<br>\n";
+        print_r($s);
+    }
+}
 
 function decode_value($value, $key_type = "cookie")
 {
