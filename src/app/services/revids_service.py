@@ -55,10 +55,12 @@ def get_revid_db(sourcetitle: str) -> str:
         "title": sourcetitle,
     }
 
-    # Determine if localhost
-    is_local = os.getenv("FLASK_ENV") == "development"
-
-    if is_local:
+    # Determine API URL - use localhost if configured, otherwise use production
+    # Check for explicit localhost configuration or development environment
+    api_base_url = os.getenv("REVIDS_API_URL")
+    if api_base_url:
+        url = api_base_url
+    elif os.getenv("FLASK_ENV") == "development" or os.getenv("USE_LOCAL_API") == "1":
         url = "http://localhost:9001/api"
     else:
         url = "https://mdwiki.toolforge.org/api.php"

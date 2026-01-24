@@ -69,8 +69,9 @@ def index() -> Response:
     if user_token is None:
         error_response = {"error": {"code": "no access", "info": "no access"}, "username": user}
         response = jsonify(error_response)
+        response.status_code = 403
         response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
-        return response, 403
+        return response
 
     # Decrypt credentials
     access_key, access_secret = user_token.decrypted()

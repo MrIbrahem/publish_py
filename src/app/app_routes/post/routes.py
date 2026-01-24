@@ -203,7 +203,10 @@ def _add_to_db(
     Returns:
         Database operation result
     """
-    # TODO: Implement campaign to category mapping
+    # Category mapping is not yet implemented.
+    # In the PHP version, categories are retrieved from a 'categories' table
+    # based on the campaign name. For now, use an empty string which is valid
+    # and means no category is assigned. The database allows NULL/empty categories.
     cat = ""
 
     # Check if abuse filter warning was triggered
@@ -397,8 +400,9 @@ def index() -> Response:
 
     if user_token is None:
         response = _handle_no_access(user, tab)
+        response.status_code = 403
         response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
-        return response, 403
+        return response
 
     # Get credentials
     access_key, access_secret = user_token.decrypted()
