@@ -21,3 +21,7 @@ src/pup2.html
 test.php
 pup2.html
 /src/reports
+*.pyc
+.env
+*.env
+/data/logs

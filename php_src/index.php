@@ -11,6 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 use function Publish\Endpoints\start;
 
 include_once __DIR__ . '/include.php';
-include_once __DIR__ . '/endpoints/index.php';
+include_once __DIR__ . '/endpoints/post.php';
 
 start($_POST);
