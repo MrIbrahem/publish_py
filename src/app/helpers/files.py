@@ -5,10 +5,8 @@ Mirrors: php_src/bots/files_helps.php
 
 import json
 import logging
-import os
 import uuid
 from datetime import datetime
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -37,10 +35,9 @@ def get_reports_dir() -> Path:
     """Get/create the reports directory structure.
 
     Returns the path to the reports directory for today:
-    {main_dir}/publish_reports/reports_by_day/YYYY/MM/DD/{rand_id}/
+    {publish_reports_dir}/YYYY/MM/DD/{rand_id}/
     """
-    main_dir = os.getenv("MAIN_DIR", os.path.expanduser("~/data"))
-    publish_reports = Path(main_dir) / "publish_reports" / "reports_by_day"
+    publish_reports = Path(settings.paths.publish_reports_dir)
 
     # Create directory structure: YYYY/MM/DD/rand_id
     now = datetime.now()

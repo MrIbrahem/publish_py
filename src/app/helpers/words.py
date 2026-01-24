@@ -14,39 +14,21 @@ $word = $Words_table[$title] ?? 0;
 
 import json
 import logging
-import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+
+from ..config import settings
 
 logger = logging.getLogger(__name__)
 
 
-def _get_default_words_path() -> Path:
-    """Get the default path for the words.json file.
+def _get_words_path() -> Path:
+    """Get the path for the words.json file from config.
 
     Returns:
         Path to words.json file
     """
-    # Check environment variable first
-    words_path = os.getenv("WORDS_JSON_PATH")
-    if words_path:
-        return Path(words_path)
-
-    # Default paths to check (in order of priority)
-    main_dir = os.getenv("MAIN_DIR", os.path.expanduser("~/data"))
-    possible_paths = [
-        Path(main_dir) / "td" / "Tables" / "jsons" / "words.json",
-        Path(main_dir) / "words.json",
-        Path(__file__).parent.parent.parent.parent / "data" / "words.json",
-    ]
-
-    for path in possible_paths:
-        if path.exists():
-            return path
-
-    # Return default path even if it doesn't exist
-    return Path(main_dir) / "td" / "Tables" / "jsons" / "words.json"
+    return Path(settings.paths.words_json_path)
 
 
 @lru_cache(maxsize=1)
@@ -56,7 +38,7 @@ def _load_words_table() -> dict[str, int]:
     Returns:
         Dictionary mapping article titles to word counts
     """
-    words_path = _get_default_words_path()
+    words_path = _get_words_path()
 
     try:
         if words_path.exists():

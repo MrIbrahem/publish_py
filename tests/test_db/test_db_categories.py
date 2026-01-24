@@ -1,6 +1,6 @@
 """Tests for db.db_categories module."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -14,7 +14,7 @@ from src.app.db.db_categories import (
 class TestCategoriesDB:
     """Tests for CategoriesDB class."""
 
-    def test_retrieve_campaign_categories_returns_mapping(self):
+    def test_retrieve_campaign_categories_returns_mapping(self, monkeypatch):
         """Test that retrieve_campaign_categories returns category mapping."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
@@ -22,25 +22,25 @@ class TestCategoriesDB:
             {"campaign": "campaign2", "category": "Category:Science"},
         ]
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            categories_db = CategoriesDB({})
-            result = categories_db.retrieve_campaign_categories()
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        categories_db = CategoriesDB({})
+        result = categories_db.retrieve_campaign_categories()
 
-            assert result["campaign1"] == "Category:Health"
-            assert result["campaign2"] == "Category:Science"
+        assert result["campaign1"] == "Category:Health"
+        assert result["campaign2"] == "Category:Science"
 
-    def test_retrieve_campaign_categories_handles_empty_result(self):
+    def test_retrieve_campaign_categories_handles_empty_result(self, monkeypatch):
         """Test that empty result is handled gracefully."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            categories_db = CategoriesDB({})
-            result = categories_db.retrieve_campaign_categories()
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        categories_db = CategoriesDB({})
+        result = categories_db.retrieve_campaign_categories()
 
-            assert result == {}
+        assert result == {}
 
-    def test_retrieve_campaign_categories_handles_null_category(self):
+    def test_retrieve_campaign_categories_handles_null_category(self, monkeypatch):
         """Test that null category values are handled."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
@@ -48,38 +48,38 @@ class TestCategoriesDB:
             {"campaign": "campaign2", "category": "Category:Valid"},
         ]
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            categories_db = CategoriesDB({})
-            result = categories_db.retrieve_campaign_categories()
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        categories_db = CategoriesDB({})
+        result = categories_db.retrieve_campaign_categories()
 
-            assert result["campaign1"] == ""
-            assert result["campaign2"] == "Category:Valid"
+        assert result["campaign1"] == ""
+        assert result["campaign2"] == "Category:Valid"
 
-    def test_get_category_for_campaign_returns_category(self):
+    def test_get_category_for_campaign_returns_category(self, monkeypatch):
         """Test that get_category_for_campaign returns correct category."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
             {"campaign": "test_campaign", "category": "Test Category"},
         ]
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            categories_db = CategoriesDB({})
-            result = categories_db.get_category_for_campaign("test_campaign")
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        categories_db = CategoriesDB({})
+        result = categories_db.get_category_for_campaign("test_campaign")
 
-            assert result == "Test Category"
+        assert result == "Test Category"
 
-    def test_get_category_for_campaign_returns_empty_for_missing(self):
+    def test_get_category_for_campaign_returns_empty_for_missing(self, monkeypatch):
         """Test that empty string is returned for missing campaign."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
             {"campaign": "other_campaign", "category": "Other Category"},
         ]
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            categories_db = CategoriesDB({})
-            result = categories_db.get_category_for_campaign("missing_campaign")
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        categories_db = CategoriesDB({})
+        result = categories_db.get_category_for_campaign("missing_campaign")
 
-            assert result == ""
+        assert result == ""
 
 
 class TestGetCampaignCategory:
@@ -89,55 +89,55 @@ class TestGetCampaignCategory:
         """Clear cache before each test."""
         clear_categories_cache()
 
-    def test_returns_category_for_campaign(self):
+    def test_returns_category_for_campaign(self, monkeypatch):
         """Test that get_campaign_category returns correct category."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
             {"campaign": "test", "category": "TestCategory"},
         ]
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            clear_categories_cache()
-            result = get_campaign_category("test", {"host": "test"})
-            assert result == "TestCategory"
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        clear_categories_cache()
+        result = get_campaign_category("test", {"host": "test"})
+        assert result == "TestCategory"
 
-    def test_returns_empty_for_missing_campaign(self):
+    def test_returns_empty_for_missing_campaign(self, monkeypatch):
         """Test that empty string is returned for missing campaign."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            clear_categories_cache()
-            result = get_campaign_category("missing", {"host": "test"})
-            assert result == ""
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        clear_categories_cache()
+        result = get_campaign_category("missing", {"host": "test"})
+        assert result == ""
 
 
 class TestClearCategoriesCache:
     """Tests for clear_categories_cache function."""
 
-    def test_clears_cache(self):
+    def test_clears_cache(self, monkeypatch):
         """Test that clear_categories_cache clears the cache."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
             {"campaign": "test", "category": "Category1"},
         ]
 
-        with patch("src.app.db.db_categories.Database", return_value=mock_db):
-            clear_categories_cache()
-            result1 = get_campaign_category("test", {"host": "test"})
+        monkeypatch.setattr("src.app.db.db_categories.Database", lambda db_data: mock_db)
+        clear_categories_cache()
+        result1 = get_campaign_category("test", {"host": "test"})
 
-            # Change mock return value
-            mock_db.fetch_query_safe.return_value = [
-                {"campaign": "test", "category": "Category2"},
-            ]
+        # Change mock return value
+        mock_db.fetch_query_safe.return_value = [
+            {"campaign": "test", "category": "Category2"},
+        ]
 
-            # Should still return cached value
-            result2 = get_campaign_category("test", {"host": "test"})
-            assert result2 == result1
+        # Should still return cached value
+        result2 = get_campaign_category("test", {"host": "test"})
+        assert result2 == result1
 
-            # Clear cache
-            clear_categories_cache()
+        # Clear cache
+        clear_categories_cache()
 
-            # Should now return new value
-            result3 = get_campaign_category("test", {"host": "test"})
-            assert result3 == "Category2"
+        # Should now return new value
+        result3 = get_campaign_category("test", {"host": "test"})
+        assert result3 == "Category2"
