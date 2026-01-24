@@ -18,7 +18,7 @@ from .app_routes import (
 )
 from .config import settings
 from .cookies import CookieHeaderClient
-from .db import close_cached_db
+from .db import close_cached_db, ensure_qids_table
 from .users.current import context_user
 from .users.store import ensure_user_token_table
 
@@ -67,6 +67,7 @@ def create_app() -> Flask:
 
     if settings.use_mw_oauth and (settings.db_data.get("host") or settings.db_data.get("db_connect_file")):
         ensure_user_token_table()
+        ensure_qids_table(settings.db_data)
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)
