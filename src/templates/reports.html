@@ -173,7 +173,7 @@
 
         $(document).ready(function() {
             // Load filters once only
-            $.getJSON('/api/index.php?get=publish_reports')
+            $.getJSON('/api/publish_reports')
                 .done(function(json) {
                     if (json && json.results) {
                         populateFilterOptions(json.results);
@@ -187,7 +187,7 @@
             // إعداد DataTable
             let table = $('#resultsTable').DataTable({
                 ajax: {
-                    url: '/api/index.php?get=publish_reports',
+                    url: '/api/publish_reports',
                     data: function(d) {
                         const formData = $('#filterForm').serializeArray();
                         formData.forEach(field => {

@@ -500,20 +500,20 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 ## Implementation Checklist
 
 ### Phase 1: Database Layer
-- [ ] Add `PUBLISH_REPORTS_PARAMS` configuration to `db_publish_reports.py`
-- [ ] Implement `query_with_filters()` method in `ReportsDB` class
+- [x] Add `PUBLISH_REPORTS_PARAMS` configuration to `db_publish_reports.py`
+- [x] Implement `query_with_filters()` method in `ReportsDB` class
 - [ ] Add unit tests for new database method
 
 ### Phase 2: Route Layer
-- [ ] Create `src/app/app_routes/api/` directory
-- [ ] Create `src/app/app_routes/api/__init__.py`
-- [ ] Create `src/app/app_routes/api/routes.py` with `get_publish_reports()` endpoint
-- [ ] Update `src/app/app_routes/__init__.py` to export `bp_api`
-- [ ] Register blueprint in main app file
+- [x] Create `src/app/app_routes/api/` directory
+- [x] Create `src/app/app_routes/api/__init__.py`
+- [x] Create `src/app/app_routes/api/routes.py` with `get_publish_reports()` endpoint
+- [x] Update `src/app/app_routes/__init__.py` to export `bp_api`
+- [x] Register blueprint in main app file
 
 ### Phase 3: Frontend Update
-- [ ] Update `src/templates/reports.html` line 176: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
-- [ ] Update `src/templates/reports.html` line 190: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
+- [x] Update `src/templates/reports.html` line 176: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
+- [x] Update `src/templates/reports.html` line 190: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
 - [ ] Test frontend functionality with new endpoint
 
 ### Phase 4: Testing
@@ -526,8 +526,8 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 - [ ] Test frontend integration
 
 ### Phase 5: Documentation
-- [ ] Update API documentation
-- [ ] Add OpenAPI/Swagger spec if applicable
+- [x] Update API documentation (see `docs/api.md`)
+- [x] Add OpenAPI/Swagger spec (see `docs/openapi.yaml`)
 
 ---
 

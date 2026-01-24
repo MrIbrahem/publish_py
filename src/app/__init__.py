@@ -10,6 +10,7 @@ from flask import Flask, flash, render_template
 from flask_wtf.csrf import CSRFProtect
 
 from .app_routes import (
+    bp_api,
     bp_auth,
     bp_cxtoken,
     bp_main,
@@ -71,6 +72,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_cxtoken)
     app.register_blueprint(bp_post)
+    app.register_blueprint(bp_api, url_prefix="/api")
 
     @app.context_processor
     def _inject_user():  # pragma: no cover - trivial wrapper
