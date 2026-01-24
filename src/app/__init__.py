@@ -28,7 +28,7 @@ def format_stage_timestamp(value: str) -> str:
         return ""
     try:
         dt = datetime.fromisoformat(value)
-    except Exception:
+    except (ValueError, TypeError):
         logger.exception("Failed to parse timestamp: %s", value)
         return ""
     # convert 24h → 12h with AM/PM

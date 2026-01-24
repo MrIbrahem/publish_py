@@ -4,6 +4,7 @@ Authentication helpers and OAuth routes for the SVG Translate web app.
 
 from __future__ import annotations
 
+import pymysql
 import mwoauth
 import logging
 import secrets
@@ -249,7 +250,7 @@ def logout() -> Response:
         try:
             delete_user_token(user_id)
             flash("You have been logged out successfully.", "info")
-        except Exception:
+        except pymysql.MySQLError:
             logger.exception("Failed to delete user token during logout")
             flash("Error while clearing OAuth credentials.", "danger")
     else:

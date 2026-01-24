@@ -35,7 +35,7 @@ class PagesDB:
     def _ensure_table(self) -> None:
         self.db.execute_query_safe(
             """
-            CREATE TABLE `publish_reports` (
+            CREATE TABLE IF NOT EXISTS `publish_reports` (
                 `id` int NOT NULL AUTO_INCREMENT,
                 `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,

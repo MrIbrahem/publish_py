@@ -35,7 +35,7 @@ class PagesDB:
     def _ensure_table(self) -> None:
         self.db.execute_query_safe(
             """
-            CREATE TABLE `pages` (
+            CREATE TABLE IF NOT EXISTS `pages` (
                 `id` int unsigned NOT NULL AUTO_INCREMENT,
                 `title` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
                 `word` int DEFAULT NULL,
@@ -54,7 +54,7 @@ class PagesDB:
                 KEY `target` (`target`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-            CREATE TABLE `pages_users` (
+            CREATE TABLE IF NOT EXISTS `pages_users` (
                 `id` int unsigned NOT NULL AUTO_INCREMENT,
                 `title` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
                 `word` int DEFAULT NULL,
