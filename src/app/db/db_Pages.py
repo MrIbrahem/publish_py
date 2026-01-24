@@ -12,6 +12,7 @@ import pymysql
 from . import Database
 
 logger = logging.getLogger(__name__)
+
 table_creation_sql = """
 CREATE TABLE IF NOT EXISTS `pages` (
     `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -56,7 +57,6 @@ CREATE TABLE IF NOT EXISTS `pages_users` (
 @dataclass
 class PageRecord:
     """Representation of a page."""
-
     id: int
     title: str
     word: int | None = None
