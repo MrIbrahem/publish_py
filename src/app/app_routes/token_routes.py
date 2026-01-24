@@ -1,13 +1,7 @@
-<?PHP
+"""
+TODO: should be mirror php_src/endpoints/token.php
 
-namespace Publish\CORS;
-
-/*
-
-use function Publish\CORS\is_allowed;
-
-*/
-
+should only accept requests from specific domains
 
 function is_allowed()
 {
@@ -24,3 +18,25 @@ function is_allowed()
     }
     return $is_allowed;
 }
+
+"""
+import logging
+
+from flask import (
+    Blueprint,
+    render_template,
+)
+
+from ..users.current import current_user, oauth_required
+
+bp_token = Blueprint("token", __name__)
+logger = logging.getLogger(__name__)
+
+
+@oauth_required
+@bp_token.get("/")
+def index():
+    ...
+
+
+__all__ = ["bp_token"]
