@@ -4,6 +4,7 @@ Authentication helpers and OAuth routes for the SVG Translate web app.
 
 from __future__ import annotations
 
+import mwoauth
 import logging
 import secrets
 from collections.abc import Sequence
@@ -92,7 +93,7 @@ def login() -> Response:
     # start login
     try:
         redirect_url, request_token = start_login(sign_state_token(state_nonce))
-    except Exception:
+    except (RuntimeError, mwoauth.MWOAuthException):
         logger.exception("Failed to start OAuth login")
         flash("Failed to initiate OAuth login", "danger")
         return redirect(url_for("main.index", error="Failed to initiate OAuth login"))
