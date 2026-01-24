@@ -12,7 +12,6 @@ import pymysql
 from . import Database
 
 logger = logging.getLogger(__name__)
-
 table_creation_sql = """
 CREATE TABLE IF NOT EXISTS `publish_reports` (
     `id` int NOT NULL AUTO_INCREMENT,
@@ -26,19 +25,21 @@ CREATE TABLE IF NOT EXISTS `publish_reports` (
     PRIMARY KEY (`id`),
     CONSTRAINT `publish_reports_chk_1` CHECK (json_valid(`data`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 """
 
 
 @dataclass
 class ReportRecord:
-    """Representation of a report."""
+    """Representation of a report record."""
 
     id: int
+    date: Any
     title: str
-    main_file: str | None
-    created_at: Any | None = None
-    updated_at: Any | None = None
+    user: str
+    lang: str
+    sourcetitle: str
+    result: str
+    data: str
 
 
 class ReportsDB:
