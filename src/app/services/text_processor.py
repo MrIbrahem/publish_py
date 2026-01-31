@@ -32,8 +32,7 @@ def do_changes_to_text(
         text=text,
         title=title,
         lang=lang,
-        source_title=source_title,
+        source_title=sourcetitle,
         mdwiki_revid=mdwiki_revid
     )
-        
     return text
