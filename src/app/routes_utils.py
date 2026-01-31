@@ -25,19 +25,6 @@ def load_auth_payload(user: Any | None):
     return auth_payload
 
 
-def get_error_message(error_code: str | None) -> str:
-    if not error_code:
-        return ""
-    # ---
-    messages = {
-        "task-active": "A task for this title is already in progress.",
-        "not-found": "Task not found.",
-        "task-create-failed": "Task creation failed.",
-    }
-    # ---
-    return messages.get(error_code, error_code)
-
-
 def _format_timestamp(value: datetime | str | None) -> tuple[str, str]:
     """
     Format a timestamp value for user display and provide a sortable ISO-style key.
@@ -76,39 +63,3 @@ def _format_timestamp(value: datetime | str | None) -> tuple[str, str]:
     sort_key = dt.isoformat()
 
     return display, sort_key
-
-
-def order_stages(stages: Dict[str, Any] | None) -> List[tuple[str, Dict[str, Any]]]:
-    if not stages:
-        return []
-    ordered = [(name, data) for name, data in stages.items() if isinstance(data, dict)]
-    ordered.sort(key=lambda item: item[1].get("number", 0))
-    return ordered
-
-
-def format_task(task: dict) -> dict:
-    """Formats a task dictionary for the tasks list view."""
-    results = task.get("results") or {}
-    injects_result = results.get("injects_result") or {}
-
-    created_display, created_sort = _format_timestamp(task.get("created_at"))
-    updated_display, updated_sort = _format_timestamp(task.get("updated_at"))
-
-    stages = task.get("stages") or {}
-
-    return {
-        "id": task.get("id"),
-        "title": task.get("title"),
-        "status": task.get("status"),
-        "files_to_upload_count": results.get("files_to_upload_count", 0),
-        "new_translations_count": results.get("new_translations_count", 0),
-        "total_files": results.get("total_files", 0),
-        "nested_files": injects_result.get("nested_files", 0),
-        "created_at_display": created_display,
-        "created_at_sort": created_sort,
-        "updated_at_display": updated_display,
-        "updated_at_sort": updated_sort,
-        "username": task.get("username", ""),
-        "results": results,
-        "stages": stages,
-    }
