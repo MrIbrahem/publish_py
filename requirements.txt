@@ -1,4 +1,3 @@
-pytest
 flask
 flask-wtf
 flask-limiter
