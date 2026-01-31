@@ -7,4 +7,4 @@ pymysql
 requests
 requests_oauthlib
 cryptography
-https://github.com/MrIbrahem/fix_refs_new_py
+fix_refs @ git+https://github.com/MrIbrahem/fix_refs_new_py.git@v0.1.0
