@@ -29,7 +29,7 @@ jobs:
         pip install -r requirements.txt
     - name: Install test dependencies
       run: |
-        pip install -r requirements-div.txt
+        pip install -r requirements-dev.txt
     
     - name: Run tests
       run: |

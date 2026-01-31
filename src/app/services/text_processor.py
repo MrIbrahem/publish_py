@@ -1,8 +1,11 @@
 """Text processing utilities.
 
 Mirrors: php_src/text_change.php
+
+https://github.com/MrIbrahem/fix_refs_new_py/blob/update/src/__init__.py
 """
 
+from fix_refs import DoChangesToText1
 
 def do_changes_to_text(
     sourcetitle: str,
@@ -25,5 +28,11 @@ def do_changes_to_text(
     Returns:
         Modified text (currently unchanged)
     """
-    # Placeholder for future changes
+    text = DoChangesToText1(
+        text=text,
+        title=title,
+        lang=lang,
+        source_title=sourcetitle,
+        mdwiki_revid=mdwiki_revid
+    )
     return text
