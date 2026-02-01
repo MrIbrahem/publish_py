@@ -14,7 +14,7 @@ def app():
     app.secret_key = "test_secret"
 
     # Import and register the blueprint
-    from src.app.app_routes.cxtoken.routes import bp_cxtoken
+    from src.app_main.app_routes.cxtoken.routes import bp_cxtoken
 
     app.register_blueprint(bp_cxtoken)
     return app

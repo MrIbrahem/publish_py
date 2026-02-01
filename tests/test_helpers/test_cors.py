@@ -33,7 +33,7 @@ class TestIsAllowed:
         with app.test_request_context(
             headers={"Origin": "https://medwiki.toolforge.org"}
         ):
-            from src.app.helpers.cors import is_allowed
+            from src.app_main.helpers.cors import is_allowed
 
             result = is_allowed()
             assert result == "medwiki.toolforge.org"
@@ -43,7 +43,7 @@ class TestIsAllowed:
         with app.test_request_context(
             headers={"Referer": "https://mdwikicx.toolforge.org/page"}
         ):
-            from src.app.helpers.cors import is_allowed
+            from src.app_main.helpers.cors import is_allowed
 
             result = is_allowed()
             assert result == "mdwikicx.toolforge.org"
@@ -53,7 +53,7 @@ class TestIsAllowed:
         with app.test_request_context(
             headers={"Origin": "https://evil.com", "Referer": "https://evil.com"}
         ):
-            from src.app.helpers.cors import is_allowed
+            from src.app_main.helpers.cors import is_allowed
 
             result = is_allowed()
             assert result is None
@@ -61,7 +61,7 @@ class TestIsAllowed:
     def test_rejects_empty_headers(self, app):
         """Test that empty headers are rejected."""
         with app.test_request_context():
-            from src.app.helpers.cors import is_allowed
+            from src.app_main.helpers.cors import is_allowed
 
             result = is_allowed()
             assert result is None

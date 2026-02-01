@@ -15,7 +15,7 @@ def app():
     app.secret_key = "test_secret"
 
     # Import and register the blueprint
-    from src.app.app_routes.post.routes import bp_post
+    from src.app_main.app_routes.post.routes import bp_post
 
     app.register_blueprint(bp_post)
     return app
@@ -196,7 +196,7 @@ class TestGetErrorsFile:
 
     def test_returns_placeholder_for_unknown_error(self):
         """Test that placeholder is returned for unknown errors."""
-        from src.app.app_routes.post.routes import _get_errors_file
+        from src.app_main.app_routes.post.routes import _get_errors_file
 
         result = _get_errors_file({"some": "error"}, "errors")
 
@@ -204,7 +204,7 @@ class TestGetErrorsFile:
 
     def test_returns_protectedpage_for_protected_error(self):
         """Test that protectedpage is returned for protected page error."""
-        from src.app.app_routes.post.routes import _get_errors_file
+        from src.app_main.app_routes.post.routes import _get_errors_file
 
         result = _get_errors_file({"error": {"code": "protectedpage"}}, "errors")
 
@@ -212,7 +212,7 @@ class TestGetErrorsFile:
 
     def test_returns_ratelimited_for_rate_limit_error(self):
         """Test that ratelimited is returned for rate limit error."""
-        from src.app.app_routes.post.routes import _get_errors_file
+        from src.app_main.app_routes.post.routes import _get_errors_file
 
         result = _get_errors_file({"error": {"info": "ratelimited"}}, "errors")
 

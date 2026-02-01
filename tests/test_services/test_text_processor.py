@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.app.services.text_processor import do_changes_to_text
+from src.app_main.services.text_processor import do_changes_to_text
 
 
 class TestDoChangesToText:

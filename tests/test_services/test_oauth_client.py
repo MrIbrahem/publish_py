@@ -13,7 +13,7 @@ class TestGetOauthClient:
             mock_settings.oauth.consumer_key = "test_consumer_key"
             mock_settings.oauth.consumer_secret = "test_consumer_secret"
 
-            from src.app.services.oauth_client import get_oauth_client
+            from src.app_main.services.oauth_client import get_oauth_client
 
             result = get_oauth_client("access_key", "access_secret", "en.wikipedia.org")
 
@@ -42,7 +42,7 @@ class TestGetCsrfToken:
             }
             mock_requests.get.return_value = mock_response
 
-            from src.app.services.oauth_client import get_csrf_token
+            from src.app_main.services.oauth_client import get_csrf_token
 
             result = get_csrf_token("access_key", "access_secret", "en")
 
@@ -69,7 +69,7 @@ class TestPostParams:
             mock_response.text = '{"success": true}'
             mock_requests.post.return_value = mock_response
 
-            from src.app.services.oauth_client import post_params
+            from src.app_main.services.oauth_client import post_params
 
             result = post_params(
                 {"action": "edit"},
@@ -94,7 +94,7 @@ class TestPostParams:
                 "error": {"code": "mwoauth-invalid-authorization"}
             }
 
-            from src.app.services.oauth_client import post_params
+            from src.app_main.services.oauth_client import post_params
 
             result = post_params(
                 {"action": "edit"},
@@ -115,7 +115,7 @@ class TestGetCxtoken:
         with patch("src.app.services.oauth_client.post_params") as mock_post:
             mock_post.return_value = '{"cxtoken": "some_cx_token"}'
 
-            from src.app.services.oauth_client import get_cxtoken
+            from src.app_main.services.oauth_client import get_cxtoken
 
             result = get_cxtoken("en", "access_key", "access_secret")
 
@@ -127,7 +127,7 @@ class TestGetCxtoken:
         with patch("src.app.services.oauth_client.post_params") as mock_post:
             mock_post.return_value = "not valid json"
 
-            from src.app.services.oauth_client import get_cxtoken
+            from src.app_main.services.oauth_client import get_cxtoken
 
             result = get_cxtoken("en", "access_key", "access_secret")
 

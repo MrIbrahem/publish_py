@@ -9,7 +9,7 @@ class TestGetRevid:
 
     def test_returns_empty_string_when_file_not_found(self):
         """Test that empty string is returned when file doesn't exist."""
-        from src.app.services.revids_service import get_revid
+        from src.app_main.services.revids_service import get_revid
 
         result = get_revid("Nonexistent Page")
         assert result == ""
@@ -17,7 +17,7 @@ class TestGetRevid:
     def test_returns_empty_string_when_title_not_in_file(self):
         """Test that empty string is returned when title is not in the file."""
         with patch("builtins.open", MagicMock(side_effect=FileNotFoundError)):
-            from src.app.services.revids_service import get_revid
+            from src.app_main.services.revids_service import get_revid
 
             result = get_revid("Nonexistent Page")
             assert result == ""
@@ -31,7 +31,7 @@ class TestGetRevidDb:
         with patch("src.app.services.revids_service.requests") as mock_requests:
             mock_requests.get.side_effect = Exception("Network error")
 
-            from src.app.services.revids_service import get_revid_db
+            from src.app_main.services.revids_service import get_revid_db
 
             result = get_revid_db("Some Page")
             assert result == ""
@@ -45,7 +45,7 @@ class TestGetRevidDb:
             }
             mock_requests.get.return_value = mock_response
 
-            from src.app.services.revids_service import get_revid_db
+            from src.app_main.services.revids_service import get_revid_db
 
             result = get_revid_db("Test Page")
             assert result == "12345"

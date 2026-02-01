@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.app.helpers.words import clear_words_cache, get_word_count
+from src.app_main.helpers.words import clear_words_cache, get_word_count
 
 
 class TestGetWordCount:

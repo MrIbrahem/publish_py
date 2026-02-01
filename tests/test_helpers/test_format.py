@@ -2,13 +2,13 @@
 
 import pytest
 
-from src.app.helpers.format import (
+from src.app_main.helpers.format import (
     determine_hashtag,
     format_title,
     format_user,
     make_summary,
 )
-from src.app.config import settings
+from src.app_main.config import settings
 
 
 class TestFormatTitle:

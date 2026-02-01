@@ -33,7 +33,7 @@ This document outlines the implementation plan for migrating the PHP `/api/index
 ## Current State
 
 ### Existing Database Handler
-**File:** [`src/app/db/db_publish_reports.py`](../src/app/db/db_publish_reports.py)
+**File:** [`src/app/db/db_publish_reports.py`](../src/app_main/db/db_publish_reports.py)
 
 The existing `ReportsDB` class provides basic CRUD operations:
 - `list()` - Returns all records (no filtering)
@@ -48,7 +48,7 @@ The existing `ReportsDB` class provides basic CRUD operations:
 - Field selection (`select` parameter)
 
 ### Existing Routes Structure
-**File:** [`src/app/app_routes/__init__.py`](../src/app/app_routes/__init__.py)
+**File:** [`src/app/app_routes/__init__.py`](../src/app_main/app_routes/__init__.py)
 
 ```python
 from .auth.routes import bp_auth
@@ -114,12 +114,12 @@ class ReportsDB:
         limit: Optional[int] = None,
     ) -> List[ReportRecord]:
         """Query reports with dynamic filtering.
-        
+
         Args:
             filters: Dictionary of filter parameters
             select_fields: Optional list of fields to return
             limit: Optional result limit
-            
+
         Returns:
             List of matching ReportRecord objects
         """
@@ -130,20 +130,20 @@ class ReportsDB:
             select_clause = ", ".join(fields) if fields else "*"
         else:
             select_clause = "id, date, title, user, lang, sourcetitle, result, data"
-        
+
         query = f"SELECT DISTINCT {select_clause} FROM publish_reports"
         params = []
         conditions = []
-        
+
         for param_def in PUBLISH_REPORTS_PARAMS:
             name = param_def["name"]
             column = param_def["column"]
-            
+
             if name not in filters:
                 continue
-                
+
             value = filters[name]
-            
+
             # Handle special values
             if value in ("not_mt", "not_empty"):
                 conditions.append(f"({column} != '' AND {column} IS NOT NULL)")
@@ -156,15 +156,15 @@ class ReportsDB:
             else:
                 conditions.append(f"{column} = %s")
                 params.append(value)
-        
+
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
-        
+
         query += " ORDER BY id DESC"
-        
+
         if limit:
             query += f" LIMIT {int(limit)}"
-        
+
         rows = self.db.fetch_query_safe(query, tuple(params) if params else None)
         return [self._row_to_record(row) for row in rows]
 ```
@@ -218,7 +218,7 @@ def _record_to_dict(record) -> Dict[str, Any]:
 @bp_api.route("/publish_reports", methods=["GET", "OPTIONS"])
 def get_publish_reports() -> Response:
     """Handle publish_reports API requests.
-    
+
     Query Parameters:
         year: Filter by year of date
         month: Filter by month of date
@@ -229,19 +229,19 @@ def get_publish_reports() -> Response:
         result: Filter by result status
         select: Comma-separated list of fields to return
         limit: Maximum number of results
-        
+
     Special Values:
         not_empty / not_mt: Field is not empty
         empty / mt: Field is empty
         >0: Field is greater than 0
         all: Skip this filter
-        
+
     Returns:
         JSON response with matching reports or error
     """
     # Handle CORS preflight
     allowed = is_allowed()
-    
+
     if request.method == "OPTIONS":
         if not allowed:
             return jsonify({"error": "CORS not allowed"}), 403
@@ -255,38 +255,38 @@ def get_publish_reports() -> Response:
         # Extract filter parameters
         filters = {}
         filter_params = ["year", "month", "title", "user", "lang", "sourcetitle", "result"]
-        
+
         for param in filter_params:
             value = request.args.get(param)
             if value is not None and value != "":
                 filters[param] = value
-        
+
         # Extract select fields
         select_param = request.args.get("select")
         select_fields = _parse_select_fields(select_param)
-        
+
         # Extract limit
         limit = request.args.get("limit", type=int)
-        
+
         # Query database
         db = ReportsDB(settings.db_data)
         records = db.query_with_filters(filters, select_fields, limit)
-        
+
         # Build response
         data = [_record_to_dict(r) for r in records]
-        
+
         response_data = {
             "results": data,
             "count": len(data),
         }
-        
+
         response = jsonify(response_data)
-        
+
         if allowed:
             response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
-        
+
         return response
-        
+
     except Exception as e:
         logger.exception("Error fetching publish_reports")
         return jsonify({
