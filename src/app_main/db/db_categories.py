@@ -99,7 +99,8 @@ def get_campaign_category(campaign: str, db_data: DbConfig) -> str:
     """
     # Create a hashable version of db_data for caching
     # Using sorted tuple for deterministic ordering
-    db_data_tuple = tuple(sorted(db_data.__dict__.items()))
+    db_data_items = db_data.__dict__.items() if isinstance(db_data, DbConfig) else db_data.items()
+    db_data_tuple = tuple(sorted(db_data_items))
 
     categories = _get_cached_campaign_categories(db_data_tuple)
     return categories.get(campaign, "")

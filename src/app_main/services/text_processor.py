@@ -34,6 +34,12 @@ def do_changes_to_text(
     Returns:
         Modified text (currently unchanged)
     """
+    if not isinstance(text, str):
+        return text
+
+    if not text.strip():
+        return text
+
     text = DoChangesToText1(
         text=text,
         title=title,

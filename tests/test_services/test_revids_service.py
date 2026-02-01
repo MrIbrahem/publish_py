@@ -28,7 +28,7 @@ class TestGetRevidDb:
 
     def test_returns_empty_string_on_error(self):
         """Test that empty string is returned on error."""
-        with patch("src.app.services.revids_service.requests") as mock_requests:
+        with patch("src.app_main.services.revids_service.requests") as mock_requests:
             mock_requests.get.side_effect = Exception("Network error")
 
             from src.app_main.services.revids_service import get_revid_db
@@ -38,7 +38,7 @@ class TestGetRevidDb:
 
     def test_returns_revid_on_success(self):
         """Test that revid is returned on success."""
-        with patch("src.app.services.revids_service.requests") as mock_requests:
+        with patch("src.app_main.services.revids_service.requests") as mock_requests:
             mock_response = MagicMock()
             mock_response.json.return_value = {
                 "results": [{"title": "Test Page", "revid": 12345}]

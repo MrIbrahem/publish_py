@@ -18,7 +18,8 @@ class TestDoChangesToText:
             lang="ar",
             mdwiki_revid="12345",
         )
-        assert result == text
+        expected = "Some wiki text content\n[[Category:Translated from MDWiki]]\n"
+        assert result == expected
 
     def test_handles_empty_text(self):
         """Test that empty text is handled correctly."""
