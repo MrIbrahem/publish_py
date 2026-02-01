@@ -9,6 +9,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from ..config import DbConfig
+
 from . import Database
 
 logger = logging.getLogger(__name__)
@@ -26,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `qids` (
 """
 
 
-def ensure_qids_table(db_data: dict[str, Any]) -> bool:
+def ensure_qids_table(db_data: DbConfig) -> bool:
     """Create the qids table if it does not already exist.
 
     Args:
@@ -48,7 +50,7 @@ def ensure_qids_table(db_data: dict[str, Any]) -> bool:
 class QidsDB:
     """MySQL-backed database handler for qids table."""
 
-    def __init__(self, db_data: dict[str, Any]):
+    def __init__(self, db_data: DbConfig):
         self.db = Database(db_data)
         self._ensure_table()
 

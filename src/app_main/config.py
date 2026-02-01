@@ -60,7 +60,6 @@ class UsersConfig:
 @dataclass(frozen=True)
 class Settings:
     is_localhost: callable
-    db_data: Dict
     database_data: DbConfig
     STATE_SESSION_KEY: str
     REQUEST_TOKEN_SESSION_KEY: str
@@ -84,7 +83,7 @@ def get_db_connection_file(db_host):
     return db_connect_file
 
 
-def _load_db_data_new() -> DbConfig:
+def _load_database_credentials() -> DbConfig:
     DB_HOST = os.getenv("DB_HOST", "")
 
     db_connect_file = get_db_connection_file(DB_HOST)
@@ -97,18 +96,6 @@ def _load_db_data_new() -> DbConfig:
         db_connect_file=db_connect_file,
     )
     return data
-
-
-def _load_db_data() -> dict[str, str]:
-    db_connect_file = get_db_connection_file(os.getenv("DB_HOST", ""))
-    db_data = {
-        "host": os.getenv("DB_HOST", ""),
-        "dbname": os.getenv("DB_NAME", ""),
-        "user": os.getenv("DB_USER", ""),
-        "password": os.getenv("DB_PASSWORD", ""),
-        "db_connect_file": db_connect_file,
-    }
-    return db_data
 
 
 def _get_paths() -> Paths:
@@ -239,8 +226,7 @@ def get_settings() -> Settings:
     return Settings(
         is_localhost=is_localhost,
         paths=_get_paths(),
-        database_data=_load_db_data_new(),
-        db_data=_load_db_data(),
+        database_data=_load_database_credentials(),
         STATE_SESSION_KEY=STATE_SESSION_KEY,
         REQUEST_TOKEN_SESSION_KEY=REQUEST_TOKEN_SESSION_KEY,
         secret_key=secret_key,
