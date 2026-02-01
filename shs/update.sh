@@ -1,5 +1,8 @@
 #!/bin/bash
 # toolforge-jobs run update --image python3.11 --command "~/shs/update.sh" --wait
+
+set -euo pipefail
+
 export SUB_DIR_COPY="src"
 export COPY_TO_TARGET="requirements.txt"
 export CLEAN_INSTALL=1
