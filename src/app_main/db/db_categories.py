@@ -81,9 +81,10 @@ def _get_cached_campaign_categories(db_data_tuple: tuple) -> dict[str, str]:
     Returns:
         Dictionary mapping campaign names to category names
     """
-    # Convert tuple back to dict
+    # Convert tuple back to DbConfig object
     db_dict = dict(db_data_tuple)
-    categories_db = CategoriesDB(db_dict)
+    db_config = DbConfig(**db_dict)
+    categories_db = CategoriesDB(db_config)
     return categories_db.retrieve_campaign_categories()
 
 

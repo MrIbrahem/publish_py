@@ -102,7 +102,7 @@ class TestGetCampaignCategory:
         """Clear cache before each test."""
         clear_categories_cache()
 
-    def test_returns_category_for_campaign(self, monkeypatch):
+    def test_returns_category_for_campaign(self, monkeypatch, fixture_for_category_db):
         """Test that get_campaign_category returns correct category."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
@@ -111,24 +111,24 @@ class TestGetCampaignCategory:
 
         monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
         clear_categories_cache()
-        result = get_campaign_category("test", {"host": "test"})
+        result = get_campaign_category("test", fixture_for_category_db)
         assert result == "TestCategory"
 
-    def test_returns_empty_for_missing_campaign(self, monkeypatch):
+    def test_returns_empty_for_missing_campaign(self, monkeypatch, fixture_for_category_db):
         """Test that empty string is returned for missing campaign."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
         monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
         clear_categories_cache()
-        result = get_campaign_category("missing", {"host": "test"})
+        result = get_campaign_category("missing", fixture_for_category_db)
         assert result == ""
 
 
 class TestClearCategoriesCache:
     """Tests for clear_categories_cache function."""
 
-    def test_clears_cache(self, monkeypatch):
+    def test_clears_cache(self, monkeypatch, fixture_for_category_db):
         """Test that clear_categories_cache clears the cache."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
@@ -137,7 +137,7 @@ class TestClearCategoriesCache:
 
         monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
         clear_categories_cache()
-        result1 = get_campaign_category("test", {"host": "test"})
+        result1 = get_campaign_category("test", fixture_for_category_db)
 
         # Change mock return value
         mock_db.fetch_query_safe.return_value = [
@@ -145,12 +145,12 @@ class TestClearCategoriesCache:
         ]
 
         # Should still return cached value
-        result2 = get_campaign_category("test", {"host": "test"})
+        result2 = get_campaign_category("test", fixture_for_category_db)
         assert result2 == result1
 
         # Clear cache
         clear_categories_cache()
 
         # Should now return new value
-        result3 = get_campaign_category("test", {"host": "test"})
+        result3 = get_campaign_category("test", fixture_for_category_db)
         assert result3 == "Category2"
