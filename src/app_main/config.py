@@ -41,7 +41,6 @@ class OAuthConfig:
     consumer_key: str
     consumer_secret: str
     user_agent: str
-    upload_host: str
 
 
 @dataclass(frozen=True)
@@ -71,7 +70,6 @@ class Settings:
     cookie: CookieConfig
     oauth: Optional[OAuthConfig]
     paths: Paths
-    disable_uploads: str
     cors: CorsConfig
     users: UsersConfig
 
@@ -152,7 +150,6 @@ def _load_oauth_config() -> Optional[OAuthConfig]:
             "USER_AGENT",
             "Copy SVG Translations/1.0 (https://copy-svg-langs.toolforge.org; tools.copy-svg-langs@toolforge.org)",
         ),
-        upload_host=os.getenv("UPLOAD_END_POINT", "commons.wikimedia.org"),
     )
 
 
@@ -242,7 +239,6 @@ def get_settings() -> Settings:
         oauth_encryption_key=oauth_encryption_key,
         cookie=cookie,
         oauth=oauth_config,
-        disable_uploads=os.getenv("DISABLE_UPLOADS", ""),
         cors=cors_config,
         users=users_config,
     )

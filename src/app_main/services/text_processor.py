@@ -1,11 +1,18 @@
-"""Text processing utilities.
+"""
+Text processing utilities.
 
 Mirrors: php_src/text_change.php
 
-https://github.com/MrIbrahem/fix_refs_new_py/blob/update/src/__init__.py
 """
+import os
+try:
+    from fix_refs import DoChangesToText1  # type: ignore
+except ImportError:
+    fix_refs_path = os.getenv("FIX_REFS_PY_PATH", "")
+    if fix_refs_path and os.path.isdir(fix_refs_path):
+        os.sys.path.insert(0, fix_refs_path)
+    from fix_refs import DoChangesToText1  # type: ignore
 
-from fix_refs import DoChangesToText1
 
 def do_changes_to_text(
     sourcetitle: str,
@@ -14,9 +21,8 @@ def do_changes_to_text(
     lang: str,
     mdwiki_revid: str,
 ) -> str:
-    """Apply text changes (e.g., fix references).
-
-    This is a placeholder for future text processing.
+    """
+    Apply text changes (e.g., fix references).
 
     Args:
         sourcetitle: Source page title
