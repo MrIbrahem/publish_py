@@ -7,6 +7,7 @@ export SUB_DIR_COPY="src"
 export COPY_TO_TARGET="requirements.txt"
 export CLEAN_INSTALL=1
 export USER_NAME="MrIbrahem"
+export PYTHON_BIN="python3"
 BRANCH="${1:-main}"
 REPO=publish_py
 TARGET_PATH=~/www/python/src

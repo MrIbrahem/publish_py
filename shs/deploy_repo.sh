@@ -73,21 +73,19 @@ fi
 
 # Compile all Python files to .pyc explicitly to avoid race conditions
 # Ensure the Python3 binary exists before compiling
-PYTHON_BIN="$HOME/local/bin/python3"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
 
-export PYTHONDONTWRITEBYTECODE=1
-
-# Compile all Python files in the TARGET_DIR
-"$PYTHON_BIN" -m compileall -q -f "$TARGET_DIR"
-
-unset PYTHONDONTWRITEBYTECODE
+if [ -x "$PYTHON_BIN" ]; then
+    export PYTHONDONTWRITEBYTECODE=1
+    "$PYTHON_BIN" -m compileall -q -f "$TARGET_DIR"
+    unset PYTHONDONTWRITEBYTECODE
+else
+    echo ">>> Warning: Python binary not found at $PYTHON_BIN, skipping bytecode compilation"
+fi
 
 # Optional: Set permissions
 # chmod -R 770 "$TARGET_DIR"
 find "$TARGET_DIR" -type f ! -name "*.pyc" -exec chmod 770 {} \;
-
-# Optional: Install dependencies
-#"$HOME/local/bin/python3" -m pip install -r "$TARGET_DIR/requirements.in"
 
 # Remove the "$CLONE_DIR" directory.
 rm -rf "$CLONE_DIR"
