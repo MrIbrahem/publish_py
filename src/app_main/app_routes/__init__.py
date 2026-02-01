@@ -3,6 +3,7 @@ from .auth.routes import bp_auth
 from .cxtoken.routes import bp_cxtoken
 from .main.routes import bp_main
 from .post.routes import bp_post
+from .refs.routes import bp_fixrefs
 
 __all__ = [
     "bp_api",
@@ -10,4 +11,5 @@ __all__ = [
     "bp_main",
     "bp_cxtoken",
     "bp_post",
+    "bp_fixrefs",
 ]
