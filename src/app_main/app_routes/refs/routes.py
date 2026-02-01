@@ -15,7 +15,7 @@ bp_fixrefs = Blueprint("fixrefs", __name__)
 logger = logging.getLogger(__name__)
 
 
-@bp_fixrefs.get("/")
+@bp_fixrefs.route("/", methods=["GET"])
 def index():
     current_user_obj = current_user()
     return render_template(

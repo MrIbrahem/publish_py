@@ -74,7 +74,7 @@ def create_app() -> Flask:
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_cxtoken)
     app.register_blueprint(bp_post)
-    app.register_blueprint(bp_fixrefs)
+    app.register_blueprint(bp_fixrefs, url_prefix="/fixrefs")
     app.register_blueprint(bp_api, url_prefix="/api")
 
     @app.context_processor
