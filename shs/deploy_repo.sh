@@ -72,10 +72,13 @@ if [ -n "$COPY_TO_TARGET" ]; then
 fi
 
 # Compile all Python files to .pyc explicitly to avoid race conditions
+# Ensure the Python3 binary exists before compiling
+PYTHON_BIN="$HOME/local/bin/python3"
+
 export PYTHONDONTWRITEBYTECODE=1
 
 # Compile all Python files in the TARGET_DIR
-"$HOME/local/bin/python3" -m compileall -q -f "$TARGET_DIR"
+"$PYTHON_BIN" -m compileall -q -f "$TARGET_DIR"
 
 unset PYTHONDONTWRITEBYTECODE
 
