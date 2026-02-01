@@ -7,6 +7,7 @@
             <h4 class="card-title mb-4">Fix References</h4>
 
             <form method="POST" action="/fixrefs/">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="mb-3">
                     <label for="sourceTitle" class="form-label">Source Title</label>
                     <input type="text" class="form-control" id="sourceTitle" name="sourceTitle" required
