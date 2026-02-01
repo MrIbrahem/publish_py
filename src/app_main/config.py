@@ -74,10 +74,11 @@ class Settings:
 
 
 def get_db_connection_file(db_host):
-    db_connect_file = os.getenv("DB_CONNECT_FILE", os.path.join(os.path.expanduser("~"), "replica.my.cnf"))
+    db_connect_file = os.getenv("DB_CONNECT_FILE", "~/replica.my.cnf")
+    db_connect_file = Path(db_connect_file).expanduser()
 
-    if os.path.exists(db_connect_file) and db_host != "127.0.0.1":
-        db_connect_file = db_connect_file
+    if db_connect_file.exists() and db_host != "127.0.0.1":
+        db_connect_file = db_connect_file.as_posix()
     else:
         db_connect_file = None
     return db_connect_file
