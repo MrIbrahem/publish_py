@@ -28,3 +28,4 @@ pup2.html
 /data/logs
 *.egg-info/
 *.egg
+coverage.xml
