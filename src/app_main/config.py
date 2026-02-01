@@ -74,31 +74,40 @@ class Settings:
     users: UsersConfig
 
 
-def _load_db_data_new() -> DbConfig:
+def get_db_connection_file(db_host):
     db_connect_file = os.getenv("DB_CONNECT_FILE", os.path.join(os.path.expanduser("~"), "replica.my.cnf"))
 
-    return DbConfig(
+    if os.path.exists(db_connect_file) and db_host != "127.0.0.1":
+        db_connect_file = db_connect_file
+    else:
+        db_connect_file = None
+    return db_connect_file
+
+
+def _load_db_data_new() -> DbConfig:
+    DB_HOST = os.getenv("DB_HOST", "")
+
+    db_connect_file = get_db_connection_file(DB_HOST)
+
+    data = DbConfig(
         db_name=os.getenv("DB_NAME", ""),
-        db_host=os.getenv("DB_HOST", ""),
+        db_host=DB_HOST,
         db_user=os.getenv("DB_USER", None),
         db_password=os.getenv("DB_PASSWORD", None),
-        db_connect_file=db_connect_file if os.path.exists(db_connect_file) else None,
+        db_connect_file=db_connect_file,
     )
+    return data
 
 
 def _load_db_data() -> dict[str, str]:
-    db_connect_file = os.getenv("DB_CONNECT_FILE", os.path.join(os.path.expanduser("~"), "replica.my.cnf"))
-
+    db_connect_file = get_db_connection_file(os.getenv("DB_HOST", ""))
     db_data = {
         "host": os.getenv("DB_HOST", ""),
         "dbname": os.getenv("DB_NAME", ""),
         "user": os.getenv("DB_USER", ""),
         "password": os.getenv("DB_PASSWORD", ""),
+        "db_connect_file": db_connect_file,
     }
-
-    if os.path.exists(db_connect_file):
-        db_data["db_connect_file"] = db_connect_file
-
     return db_data
 
 
@@ -148,7 +157,7 @@ def _load_oauth_config() -> Optional[OAuthConfig]:
         consumer_secret=consumer_secret,
         user_agent=os.getenv(
             "USER_AGENT",
-            "Copy SVG Translations/1.0 (https://copy-svg-langs.toolforge.org; tools.copy-svg-langs@toolforge.org)",
+            "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)",
         ),
     )
 
