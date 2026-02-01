@@ -29,7 +29,7 @@ def index():
 @bp_fixrefs.route("/", methods=["POST"])
 def process():
     current_user_obj = current_user()
-
+    result = ""
     try:
         result = do_changes_to_text(
             sourcetitle=request.form.get("sourceTitle", ""),
@@ -38,28 +38,20 @@ def process():
             lang=request.form.get("lang", ""),
             mdwiki_revid=request.form.get("mdwikiRevid", ""),
         )
-        return render_template(
-            "fix-refs.html",
-            current_user=current_user_obj,
-            sourceTitle=request.form.get("sourceTitle", ""),
-            title=request.form.get("title", ""),
-            lang=request.form.get("lang", ""),
-            mdwiki_revid=request.form.get("mdwikiRevid", ""),
-            text=request.form.get("text", ""),
-            result=result,
-        )
     except Exception as e:
         logger.error(f"Error processing text: {e}")
-        return render_template(
-            "fix-refs.html",
-            current_user=current_user_obj,
-            sourceTitle=request.form.get("sourceTitle", ""),
-            title=request.form.get("title", ""),
-            lang=request.form.get("lang", ""),
-            mdwiki_revid=request.form.get("mdwikiRevid", ""),
-            text=request.form.get("text", ""),
-            result=f"Error: {e}",
-        )
+        result = f"Error processing text: {e}"
+
+    return render_template(
+        "fix-refs.html",
+        current_user=current_user_obj,
+        sourceTitle=request.form.get("sourceTitle", ""),
+        title=request.form.get("title", ""),
+        lang=request.form.get("lang", ""),
+        mdwiki_revid=request.form.get("mdwikiRevid", ""),
+        text=request.form.get("text", ""),
+        result=result,
+    )
 
 
 __all__ = ["bp_fixrefs"]
