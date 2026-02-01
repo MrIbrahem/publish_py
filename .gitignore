@@ -29,3 +29,4 @@ pup2.html
 *.egg-info/
 *.egg
 coverage.xml
+.coverage
