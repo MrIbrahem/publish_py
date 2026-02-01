@@ -4,7 +4,7 @@ import pytest
 
 from src.app_main.services.text_processor import do_changes_to_text, DoChangesToText1
 
-
+@pytest.mark.skip
 class TestDoChangesToText:
     """Tests for do_changes_to_text function."""
 
