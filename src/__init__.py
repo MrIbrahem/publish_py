@@ -1,2 +1,2 @@
 
-import env_config  # noqa: F401 # Triggers environment configuration
+from . import env_config  # noqa: F401 # Triggers environment configuration

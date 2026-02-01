@@ -6,7 +6,7 @@ WSGI entry point for the Flask application.
 from __future__ import annotations
 
 import sys
-import env_config # type: ignore # Triggers environment configuration
+from . import env_config  # type: ignore # Triggers environment configuration
 
 from app_main import create_app  # noqa: E402
 from log import config_console_logger  # noqa: E402
