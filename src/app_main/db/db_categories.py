@@ -11,6 +11,8 @@ import logging
 from functools import lru_cache
 from typing import Any
 
+from ..config import DbConfig
+
 from .db_class import Database
 
 logger = logging.getLogger(__name__)
@@ -19,7 +21,7 @@ logger = logging.getLogger(__name__)
 class CategoriesDB:
     """MySQL-backed handler for campaign categories."""
 
-    def __init__(self, db_data: dict[str, Any]):
+    def __init__(self, db_data: DbConfig):
         self.db = Database(db_data)
 
     def retrieve_campaign_categories(self) -> dict[str, str]:
@@ -79,13 +81,14 @@ def _get_cached_campaign_categories(db_data_tuple: tuple) -> dict[str, str]:
     Returns:
         Dictionary mapping campaign names to category names
     """
-    # Convert tuple back to dict
+    # Convert tuple back to DbConfig object
     db_dict = dict(db_data_tuple)
-    categories_db = CategoriesDB(db_dict)
+    db_config = DbConfig(**db_dict)
+    categories_db = CategoriesDB(db_config)
     return categories_db.retrieve_campaign_categories()
 
 
-def get_campaign_category(campaign: str, db_data: dict[str, Any]) -> str:
+def get_campaign_category(campaign: str, db_data: DbConfig) -> str:
     """Get the category for a campaign, with caching.
 
     Args:
@@ -97,7 +100,8 @@ def get_campaign_category(campaign: str, db_data: dict[str, Any]) -> str:
     """
     # Create a hashable version of db_data for caching
     # Using sorted tuple for deterministic ordering
-    db_data_tuple = tuple(sorted(db_data.items()))
+    db_data_items = db_data.__dict__.items() if isinstance(db_data, DbConfig) else db_data.items()
+    db_data_tuple = tuple(sorted(db_data_items))
 
     categories = _get_cached_campaign_categories(db_data_tuple)
     return categories.get(campaign, "")

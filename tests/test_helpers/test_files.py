@@ -38,7 +38,7 @@ class TestGetReportsDir:
                 log_dir=tmpdir,
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
 
             reports_dir = get_reports_dir()
             assert reports_dir.exists()
@@ -52,7 +52,7 @@ class TestGetReportsDir:
                 log_dir=tmpdir,
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
 
             reports_dir = get_reports_dir()
             now = datetime.now()
@@ -77,7 +77,7 @@ class TestToDo:
                 publish_reports_dir=f"{tmpdir}/publish_reports/reports_by_day",
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
 
             tab = {"title": "Test Page", "user": "TestUser"}
             to_do(tab, "success")
@@ -105,7 +105,7 @@ class TestToDo:
                 publish_reports_dir=f"{tmpdir}/publish_reports/reports_by_day",
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
 
             tab = {"title": "Test Page", "user": "TestUser"}
             to_do(tab, "success")
@@ -139,7 +139,7 @@ class TestToDo:
                 publish_reports_dir=f"{tmpdir}/publish_reports/reports_by_day",
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
 
             tab = {"title": "Test"}
             to_do(tab, "test")

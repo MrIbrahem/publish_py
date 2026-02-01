@@ -171,7 +171,7 @@ def _handle_successful_edit(
         to_do(tab3, file_name)
 
         # Insert to reports
-        reports_db = ReportsDB(settings.db_data)
+        reports_db = ReportsDB(settings.database_data)
         reports_db.add(
             title=title,
             user=user,
@@ -209,7 +209,7 @@ def _add_to_db(
     """
     # Get category from campaign using database lookup
     # This mirrors the PHP retrieveCampaignCategories() function
-    cat = get_campaign_category(campaign, settings.db_data)
+    cat = get_campaign_category(campaign, settings.database_data)
 
     # Get word count from words table
     # This mirrors the PHP $Words_table[$title] ?? 0 lookup
@@ -218,7 +218,7 @@ def _add_to_db(
     # Check if abuse filter warning was triggered
     to_users_table = "abusefilter-warning-39" in json.dumps(wd_result)
 
-    pages_db = PagesDB(settings.db_data)
+    pages_db = PagesDB(settings.database_data)
     return pages_db.insert_page_target(
         title=sourcetitle,
         tr_type="lead",
@@ -302,7 +302,7 @@ def _process_edit(
     to_do(tab, to_do_file)
 
     # Insert to reports
-    reports_db = ReportsDB(settings.db_data)
+    reports_db = ReportsDB(settings.database_data)
     reports_db.add(
         title=title,
         user=user,
@@ -335,7 +335,7 @@ def _handle_no_access(user: str, tab: dict[str, Any]) -> Response:
     to_do(tab, "noaccess")
 
     # Insert to reports
-    reports_db = ReportsDB(settings.db_data)
+    reports_db = ReportsDB(settings.database_data)
     reports_db.add(
         title=tab["title"],
         user=user,

@@ -60,7 +60,6 @@ class UsersConfig:
 @dataclass(frozen=True)
 class Settings:
     is_localhost: callable
-    db_data: Dict
     database_data: DbConfig
     STATE_SESSION_KEY: str
     REQUEST_TOKEN_SESSION_KEY: str
@@ -74,32 +73,30 @@ class Settings:
     users: UsersConfig
 
 
-def _load_db_data_new() -> DbConfig:
-    db_connect_file = os.getenv("DB_CONNECT_FILE", os.path.join(os.path.expanduser("~"), "replica.my.cnf"))
+def get_db_connection_file(db_host):
+    db_connect_file = os.getenv("DB_CONNECT_FILE", "~/replica.my.cnf")
+    db_connect_file = Path(db_connect_file).expanduser()
 
-    return DbConfig(
+    if db_connect_file.exists() and db_host != "127.0.0.1":
+        db_connect_file = db_connect_file.as_posix()
+    else:
+        db_connect_file = None
+    return db_connect_file
+
+
+def _load_database_credentials() -> DbConfig:
+    DB_HOST = os.getenv("DB_HOST", "")
+
+    db_connect_file = get_db_connection_file(DB_HOST)
+
+    data = DbConfig(
         db_name=os.getenv("DB_NAME", ""),
-        db_host=os.getenv("DB_HOST", ""),
+        db_host=DB_HOST,
         db_user=os.getenv("DB_USER", None),
         db_password=os.getenv("DB_PASSWORD", None),
-        db_connect_file=db_connect_file if os.path.exists(db_connect_file) else None,
+        db_connect_file=db_connect_file,
     )
-
-
-def _load_db_data() -> dict[str, str]:
-    db_connect_file = os.getenv("DB_CONNECT_FILE", os.path.join(os.path.expanduser("~"), "replica.my.cnf"))
-
-    db_data = {
-        "host": os.getenv("DB_HOST", ""),
-        "dbname": os.getenv("DB_NAME", ""),
-        "user": os.getenv("DB_USER", ""),
-        "password": os.getenv("DB_PASSWORD", ""),
-    }
-
-    if os.path.exists(db_connect_file):
-        db_data["db_connect_file"] = db_connect_file
-
-    return db_data
+    return data
 
 
 def _get_paths() -> Paths:
@@ -148,7 +145,7 @@ def _load_oauth_config() -> Optional[OAuthConfig]:
         consumer_secret=consumer_secret,
         user_agent=os.getenv(
             "USER_AGENT",
-            "Copy SVG Translations/1.0 (https://copy-svg-langs.toolforge.org; tools.copy-svg-langs@toolforge.org)",
+            "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)",
         ),
     )
 
@@ -230,8 +227,7 @@ def get_settings() -> Settings:
     return Settings(
         is_localhost=is_localhost,
         paths=_get_paths(),
-        database_data=_load_db_data_new(),
-        db_data=_load_db_data(),
+        database_data=_load_database_credentials(),
         STATE_SESSION_KEY=STATE_SESSION_KEY,
         REQUEST_TOKEN_SESSION_KEY=REQUEST_TOKEN_SESSION_KEY,
         secret_key=secret_key,

@@ -24,7 +24,7 @@ def get_pages_db() -> PagesDB:
             )
 
         try:
-            _PAGE_STORE = PagesDB(settings.db_data)
+            _PAGE_STORE = PagesDB(settings.database_data)
         except Exception as exc:  # pragma: no cover - defensive guard for startup failures
             logger.exception("Failed to initialize MySQL page store")
             raise RuntimeError("Unable to initialize page store") from exc

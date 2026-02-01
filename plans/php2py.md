@@ -698,7 +698,7 @@ def handle_no_access(user: str, tab: dict) -> tuple[dict, int]:
     to_do(tab, "noaccess")
 
     # Insert to database
-    db = settings.db_data
+    db = settings.database_data
     reports_db = ReportsDB(db)
     reports_db.add(
         title=tab["title"],
@@ -750,7 +750,7 @@ def get_error_filename(editit: dict) -> str:
 def add_to_db(title: str, lang: str, user: str, wd_result: dict,
               campaign: str, sourcetitle: str, mdwiki_revid: str) -> dict:
     """Add page target to database."""
-    db = settings.db_data
+    db = settings.database_data
     pages_db = PagesDB(db)
 
     # Determine if user table should be used
@@ -833,7 +833,7 @@ def process_edit(request_data: dict, access_key: str, access_secret: str,
     to_do(tab, to_do_file)
 
     # Insert to database
-    db = settings.db_data
+    db = settings.database_data
     reports_db = ReportsDB(db)
     reports_db.add(
         title=title,

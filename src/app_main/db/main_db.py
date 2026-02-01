@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 def has_db_config() -> bool:
     """Return ``True`` when database connection details are configured."""
 
-    db_settings = settings.db_data or {}
-    return bool(db_settings.get("host") or db_settings.get("db_connect_file"))
+    db_settings = settings.database_data or {}
+    return bool(db_settings.db_host or db_settings.db_connect_file)
 
 
 def get_db() -> Database:
@@ -28,7 +28,7 @@ def get_db() -> Database:
         logger.error("MySQL configuration is not available for the user token store.")
 
     if _db is None:
-        _db = Database(settings.db_data)
+        _db = Database(settings.database_data)
     return _db
 
 

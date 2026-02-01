@@ -269,7 +269,7 @@ def get_publish_reports() -> Response:
         limit = request.args.get("limit", type=int)
 
         # Query database
-        db = ReportsDB(settings.db_data)
+        db = ReportsDB(settings.database_data)
         records = db.query_with_filters(filters, select_fields, limit)
 
         # Build response

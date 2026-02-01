@@ -10,6 +10,8 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+from ..config import DbConfig
+
 from . import Database
 
 logger = logging.getLogger(__name__)
@@ -65,7 +67,7 @@ class ReportRecord:
 class ReportsDB:
     """MySQL-backed"""
 
-    def __init__(self, db_data: dict[str, Any]):
+    def __init__(self, db_data: DbConfig):
         self.db = Database(db_data)
         self._ensure_table()
 
