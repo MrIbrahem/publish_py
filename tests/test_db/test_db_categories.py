@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.app.db.db_categories import (
+from src.app_main.db.db_categories import (
     CategoriesDB,
     clear_categories_cache,
     get_campaign_category,

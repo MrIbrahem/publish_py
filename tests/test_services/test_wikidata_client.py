@@ -14,7 +14,7 @@ class TestGetQidForMdtitle:
             mock_db.fetch_query_safe.return_value = [{"qid": "Q12345"}]
             mock_get_db.return_value = mock_db
 
-            from src.app.services.wikidata_client import get_qid_for_mdtitle
+            from src.app_main.services.wikidata_client import get_qid_for_mdtitle
 
             result = get_qid_for_mdtitle("Test Page")
 
@@ -27,7 +27,7 @@ class TestGetQidForMdtitle:
             mock_db.fetch_query_safe.return_value = []
             mock_get_db.return_value = mock_db
 
-            from src.app.services.wikidata_client import get_qid_for_mdtitle
+            from src.app_main.services.wikidata_client import get_qid_for_mdtitle
 
             result = get_qid_for_mdtitle("Nonexistent Page")
 
@@ -40,7 +40,7 @@ class TestGetQidForMdtitle:
             mock_db.fetch_query_safe.side_effect = Exception("Database error")
             mock_get_db.return_value = mock_db
 
-            from src.app.services.wikidata_client import get_qid_for_mdtitle
+            from src.app_main.services.wikidata_client import get_qid_for_mdtitle
 
             result = get_qid_for_mdtitle("Test Page")
 
@@ -63,7 +63,7 @@ class TestGetTitleInfo:
             }
             mock_requests.get.return_value = mock_response
 
-            from src.app.services.wikidata_client import get_title_info
+            from src.app_main.services.wikidata_client import get_title_info
 
             result = get_title_info("Test Page", "en")
 
@@ -76,7 +76,7 @@ class TestGetTitleInfo:
         with patch("src.app.services.wikidata_client.requests") as mock_requests:
             mock_requests.get.side_effect = Exception("Network error")
 
-            from src.app.services.wikidata_client import get_title_info
+            from src.app_main.services.wikidata_client import get_title_info
 
             result = get_title_info("Test Page", "en")
 
@@ -93,7 +93,7 @@ class TestLinkToWikidata:
             mock_qid.return_value = "Q12345"
             mock_link.return_value = {"success": True}
 
-            from src.app.services.wikidata_client import link_to_wikidata
+            from src.app_main.services.wikidata_client import link_to_wikidata
 
             result = link_to_wikidata(
                 "Source Page",
@@ -112,7 +112,7 @@ class TestLinkToWikidata:
         with patch("src.app.services.wikidata_client.get_qid_for_mdtitle") as mock_qid:
             mock_qid.return_value = "Q12345"
 
-            from src.app.services.wikidata_client import link_to_wikidata
+            from src.app_main.services.wikidata_client import link_to_wikidata
 
             result = link_to_wikidata(
                 "Source Page",
@@ -133,7 +133,7 @@ class TestLinkToWikidata:
             mock_qid.return_value = "Q12345"
             mock_link.return_value = {"error": {"code": "protectedpage"}}
 
-            from src.app.services.wikidata_client import link_to_wikidata
+            from src.app_main.services.wikidata_client import link_to_wikidata
 
             result = link_to_wikidata(
                 "Source Page",

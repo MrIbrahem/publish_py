@@ -32,7 +32,7 @@ class TestQueryWithFilters:
             }
         ]
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         records = db.query_with_filters({"year": "2026"})
@@ -48,7 +48,7 @@ class TestQueryWithFilters:
         """Test filtering by month."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"month": "1"})
@@ -61,7 +61,7 @@ class TestQueryWithFilters:
         """Test filtering by user."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"user": "TestUser"})
@@ -74,7 +74,7 @@ class TestQueryWithFilters:
         """Test filtering by language."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"lang": "ar"})
@@ -87,7 +87,7 @@ class TestQueryWithFilters:
         """Test combined parameter filters."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"year": "2026", "user": "TestUser", "lang": "en"})
@@ -102,7 +102,7 @@ class TestQueryWithFilters:
         """Test special value 'not_empty'."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"result": "not_empty"})
@@ -115,7 +115,7 @@ class TestQueryWithFilters:
         """Test special value 'empty'."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"result": "empty"})
@@ -128,7 +128,7 @@ class TestQueryWithFilters:
         """Test special value '>0'."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"year": ">0"})
@@ -141,7 +141,7 @@ class TestQueryWithFilters:
         """Test special value 'all' is skipped."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"user": "all"})
@@ -161,7 +161,7 @@ class TestQueryWithFilters:
             }
         ]
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({}, select_fields=["title", "date"])
@@ -177,7 +177,7 @@ class TestQueryWithFilters:
         """Test limit parameter."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({}, limit=10)
@@ -190,7 +190,7 @@ class TestQueryWithFilters:
         """Test that invalid select fields are filtered out."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app.db.db_publish_reports import ReportsDB
+        from src.app_main.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({}, select_fields=["title", "invalid_field", "date"])

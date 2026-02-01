@@ -12,7 +12,7 @@ class TestPublishDoEdit:
         with patch("src.app.services.mediawiki_api.post_params") as mock_post:
             mock_post.return_value = '{"edit": {"result": "Success", "newrevid": 12345}}'
 
-            from src.app.services.mediawiki_api import publish_do_edit
+            from src.app_main.services.mediawiki_api import publish_do_edit
 
             result = publish_do_edit(
                 {"action": "edit", "title": "Test Page"},
@@ -29,7 +29,7 @@ class TestPublishDoEdit:
         with patch("src.app.services.mediawiki_api.post_params") as mock_post:
             mock_post.return_value = '{"error": {"code": "protectedpage", "info": "Page is protected"}}'
 
-            from src.app.services.mediawiki_api import publish_do_edit
+            from src.app_main.services.mediawiki_api import publish_do_edit
 
             result = publish_do_edit(
                 {"action": "edit", "title": "Protected Page"},
@@ -46,7 +46,7 @@ class TestPublishDoEdit:
         with patch("src.app.services.mediawiki_api.post_params") as mock_post:
             mock_post.return_value = ""
 
-            from src.app.services.mediawiki_api import publish_do_edit
+            from src.app_main.services.mediawiki_api import publish_do_edit
 
             result = publish_do_edit(
                 {"action": "edit", "title": "Test Page"},
@@ -62,7 +62,7 @@ class TestPublishDoEdit:
         with patch("src.app.services.mediawiki_api.post_params") as mock_post:
             mock_post.return_value = "not valid json"
 
-            from src.app.services.mediawiki_api import publish_do_edit
+            from src.app_main.services.mediawiki_api import publish_do_edit
 
             result = publish_do_edit(
                 {"action": "edit", "title": "Test Page"},
@@ -78,7 +78,7 @@ class TestPublishDoEdit:
         with patch("src.app.services.mediawiki_api.post_params") as mock_post:
             mock_post.return_value = '{"edit": {"result": "Success"}}'
 
-            from src.app.services.mediawiki_api import publish_do_edit
+            from src.app_main.services.mediawiki_api import publish_do_edit
 
             publish_do_edit(
                 {"action": "edit", "title": "Test Page"},
