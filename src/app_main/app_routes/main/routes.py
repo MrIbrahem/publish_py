@@ -19,8 +19,16 @@ logger = logging.getLogger(__name__)
 
 
 @bp_main.get("/")
-@bp_main.get("/reports")
 def index():
+    current_user_obj = current_user()
+    return render_template(
+        "index.html",
+        current_user=current_user_obj,
+    )
+
+
+@bp_main.get("/reports")
+def reports():
     current_user_obj = current_user()
     return render_template(
         "reports.html",

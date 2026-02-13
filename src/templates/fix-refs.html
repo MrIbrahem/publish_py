@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Fix References</h4>
+
+            <form method="POST" action="/fixrefs/">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="sourceTitle" class="form-label">Source Title</label>
+                        <input type="text" class="form-control form-control-sm" id="sourceTitle" name="sourceTitle" required
+                               value="{{ sourceTitle or '' }}">
+                    </div>
+                    <div class="col">
+                        <label for="title" class="form-label">Target Title</label>
+                        <input type="text" class="form-control form-control-sm" id="title" name="title" required
+                               value="{{ title or '' }}">
+                    </div>
+                    <div class="col">
+                        <label for="lang" class="form-label">Language</label>
+                        <input type="text" class="form-control form-control-sm" id="lang" name="lang" required placeholder="e.g., en, ar"
+                               value="{{ lang or '' }}">
+                    </div>
+                    <div class="col">
+                        <label for="mdwikiRevid" class="form-label">MDWiki Revision ID</label>
+                        <input type="text" class="form-control form-control-sm" id="mdwikiRevid" name="mdwikiRevid"
+                               value="{{ mdwiki_revid or '' }}">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="text" class="form-label">Text Content</label>
+                    <textarea class="form-control" id="text" name="text" rows="10" required>{{ text or '' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Process Text</button>
+            </form>
+
+            {% if result is defined and result is not none %}
+            <div class="mt-4">
+                <h5>Result:</h5>
+                <pre class="bg-light p-3 border rounded">{{ result }}</pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
