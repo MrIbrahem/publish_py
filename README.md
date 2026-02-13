@@ -6,7 +6,8 @@ This repository manages the final steps in the process of publishing Wikipedia a
 - ✔️ `/` [POST]
 - ✔️ `/` [GET]
 - ✔️ `/login` [GET]
-- ✔️ `/fixrefs` [GET]
+- ✔️ `/fixrefs` [GET, POST]
+- [ ] `/api` [GET]
 - [ ] `/new_html` [GET]
 
 # Code sources
@@ -16,7 +17,7 @@ This repository manages the final steps in the process of publishing Wikipedia a
 | `/` | POST | publish | [PHP Source](https://github.com/Mdwiki-TD/publish) |
 | `/` | GET | publish_reports | [PHP Source](https://github.com/Mdwiki-TD/publish/tree/main/src/publish_reports) |
 | `/login` | GET | auth | [PHP Source](https://github.com/Mdwiki-TD/auth-repo) |
-| `/fixrefs` | GET | - | [fix_refs_py](https://github.com/MrIbrahem/fix_refs_new_py) \| [PHP Source](https://github.com/Mdwiki-TD/fix_refs) |
+| `/fixrefs` | GET, POST | - | [fix_refs_py](https://github.com/MrIbrahem/fix_refs_new_py) \| [PHP Source](https://github.com/Mdwiki-TD/fix_refs) |
 | `/api` | GET | - | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API) |
 | `/new_html` | GET | - | [mdwikicx/new_html](https://github.com/mdwikicx/new_html) |
 

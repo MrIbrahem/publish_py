@@ -39,7 +39,7 @@
                 <button type="submit" class="btn btn-primary">Process Text</button>
             </form>
 
-            {% if result is not none %}
+            {% if result is defined and result is not none %}
             <div class="mt-4">
                 <h5>Result:</h5>
                 <pre class="bg-light p-3 border rounded">{{ result }}</pre>
