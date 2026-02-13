@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Publish Reports Viewer</h4>
+            <form id="filterForm" class="row g-3">
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="year">Year</label>
+                                    <select class="form-select" name="year" id="year"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="month">Month</label>
+                                    <select class="form-select" name="month" id="month"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <label class="input-group-text" for="lang">Language</label>
+                                    <select class="form-select" name="lang" id="lang"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-3">
+                            <div class="input-group">
+                                <label class="input-group-text" for="sourcetitle">Source Title</label>
+                                <select class="form-select" name="sourcetitle" id="sourcetitle"></select>
+                            </div>
+                        </div> -->
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <label class="input-group-text" for="user">User</label>
+                            <select class="form-select" name="user" id="user"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="result">Result</label>
+                            <select class="form-select" name="result" id="result"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-outline-secondary w-100" id="resetBtn">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loading" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="card mt-4 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" id="resultsTable" style="width:100%">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="display:none">ID</th>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>User</th>
+                            <th>Language</th>
+                            <th>Source Title</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Data Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <pre class="json-data" id="modalData"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
