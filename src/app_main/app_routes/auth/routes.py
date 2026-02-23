@@ -8,14 +8,13 @@ import logging
 import secrets
 from collections.abc import Sequence
 from functools import wraps
-from typing import Any, Callable
+from typing import Any, Callable, cast
 from urllib.parse import urlencode
 
 import mwoauth
 import pymysql
 from flask import (
     Blueprint,
-    Response,
     flash,
     g,
     make_response,
@@ -24,6 +23,7 @@ from flask import (
     session,
     url_for,
 )
+from werkzeug.wrappers import Response as WerkzeugResponse
 
 from ...config import settings
 from ...users.current import CurrentUser
@@ -76,16 +76,22 @@ def login_required(fn: Callable[..., Any]) -> Callable[..., Any]:
 
 
 @bp_auth.get("/login")
-def login() -> Response:
+def login() -> WerkzeugResponse:
     if not settings.use_mw_oauth:
         flash("OAuth login is disabled", "warning")
         return redirect(url_for("main.index", error="oauth-disabled"))
 
+    if settings.oauth is None:
+        flash("OAuth not configured", "danger")
+        return redirect(url_for("main.index", error="oauth-not-configured"))
+
     if not login_rate_limiter.allow(_client_key()):
         time_left = login_rate_limiter.try_after(_client_key()).total_seconds()
-        time_left = str(time_left).split(".")[0]
-        flash(f"Too many login attempts. Please try again after {time_left}s.", "warning")
-        return redirect(url_for("main.index", error=f"Too many login attempts. Please try again after {time_left}s."))
+        time_left_str = str(time_left).split(".")[0]
+        flash(f"Too many login attempts. Please try again after {time_left_str}s.", "warning")
+        return redirect(
+            url_for("main.index", error=f"Too many login attempts. Please try again after {time_left_str}s.")
+        )
 
     state_nonce = secrets.token_urlsafe(32)
     session[oauth_state_nonce] = state_nonce
@@ -101,17 +107,21 @@ def login() -> Response:
 
     # ------------------
     # add request_token to session
-    session[request_token_key] = list(request_token)
+    session[request_token_key] = cast(list[str], list(request_token))
     return redirect(redirect_url)
 
 
 @bp_auth.get("/callback")
-def callback() -> Response:
+def callback() -> WerkzeugResponse:
     # ------------------
     # use oauth
     if not settings.use_mw_oauth:
         flash("OAuth login is disabled", "warning")
         return redirect(url_for("main.index", error="oauth-disabled"))
+
+    if settings.oauth is None:
+        flash("OAuth not configured", "danger")
+        return redirect(url_for("main.index", error="oauth-not-configured"))
 
     # ------------------
     # callback rate limiter
@@ -220,9 +230,10 @@ def callback() -> Response:
     g.current_user = CurrentUser(str(user_id), str(username))
     g.is_authenticated = True
     g.authenticated_user_id = str(user_id)
+    oauth_config = settings.oauth  # Already validated as non-None above
     g.oauth_credentials = {
-        "consumer_key": settings.oauth.consumer_key,
-        "consumer_secret": settings.oauth.consumer_secret,
+        "consumer_key": oauth_config.consumer_key,
+        "consumer_secret": oauth_config.consumer_secret,
         "access_token": str(token_key),
         "access_secret": str(token_secret),
     }
@@ -233,7 +244,7 @@ def callback() -> Response:
 @bp_auth.get("/logout")
 # @login_required
 # Users with stale cookies will be redirected with a "login-required" error instead of being able to clean up their authentication state
-def logout() -> Response:
+def logout() -> WerkzeugResponse:
     user_id = session.pop("uid", None)
     session.pop(request_token_key, None)
     session.pop(oauth_state_nonce, None)

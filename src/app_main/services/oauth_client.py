@@ -25,7 +25,12 @@ def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wiki
 
     Returns:
         OAuth1 authentication object
+
+    Raises:
+        RuntimeError: If OAuth is not configured
     """
+    if settings.oauth is None:
+        raise RuntimeError("OAuth is not configured")
     return OAuth1(
         settings.oauth.consumer_key,
         client_secret=settings.oauth.consumer_secret,

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -59,7 +60,7 @@ class UsersConfig:
 
 @dataclass(frozen=True)
 class Settings:
-    is_localhost: callable
+    is_localhost: Callable[[str], bool]
     database_data: DbConfig
     STATE_SESSION_KEY: str
     REQUEST_TOKEN_SESSION_KEY: str
