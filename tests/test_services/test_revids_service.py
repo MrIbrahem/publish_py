@@ -1,7 +1,8 @@
 """Tests for services.revids_service module."""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 
 class TestGetRevid:
@@ -40,9 +41,7 @@ class TestGetRevidDb:
         """Test that revid is returned on success."""
         with patch("src.app_main.services.revids_service.requests") as mock_requests:
             mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "results": [{"title": "Test Page", "revid": 12345}]
-            }
+            mock_response.json.return_value = {"results": [{"title": "Test Page", "revid": 12345}]}
             mock_requests.get.return_value = mock_response
 
             from src.app_main.services.revids_service import get_revid_db

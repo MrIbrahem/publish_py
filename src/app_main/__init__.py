@@ -3,23 +3,25 @@
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, Type
 
-from flask import Flask, flash, render_template
+from flask import Flask, flash, render_template, request
 from flask_wtf.csrf import CSRFProtect
 
 from .app_routes import (
     bp_api,
     bp_auth,
     bp_cxtoken,
+    bp_fixrefs,
     bp_main,
     bp_post,
-    bp_fixrefs,
 )
 from .config import settings
 from .cookies import CookieHeaderClient
 from .db import close_cached_db, ensure_qids_table
+from .extensions import csrf
 from .users.current import context_user
 from .users.store import ensure_user_token_table
 
@@ -44,27 +46,51 @@ def format_stage_timestamp(value: str) -> str:
     return f"{month} {dt.day}, {dt.year}, {hour12}:{minute} {ampm}"
 
 
-def create_app() -> Flask:
-    """Instantiate and configure the Flask application."""
+def create_app(config_class: Type | None = None) -> Flask:
+    """Instantiate and configure the Flask application.
+
+    Args:
+        config_class: Optional configuration class to use. If not provided,
+                     uses environment-based settings.
+
+    Returns:
+        Configured Flask application instance.
+
+    Example:
+        from app_main import create_app
+        from app_main.config import TestingConfig
+        app = create_app(TestingConfig)
+    """
+    # Use absolute paths based on the current module location
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    template_dir = os.path.join(base_dir, "..", "templates")
+    static_dir = os.path.join(base_dir, "..", "static")
 
     app = Flask(
         __name__,
-        template_folder="../templates",
-        static_folder="../static",
+        template_folder=template_dir,
+        static_folder=static_dir,
     )
     app.url_map.strict_slashes = False
     app.test_client_class = CookieHeaderClient
-    app.secret_key = settings.secret_key
-    app.config.update(
-        SESSION_COOKIE_HTTPONLY=settings.cookie.httponly,
-        SESSION_COOKIE_SECURE=settings.cookie.secure,
-        SESSION_COOKIE_SAMESITE=settings.cookie.samesite,
-    )
+
+    # Load configuration
+    if config_class is not None:
+        # Use provided config class (Flask-style)
+        app.config.from_object(config_class())
+    else:
+        # Use environment-based settings (legacy behavior)
+        app.secret_key = settings.secret_key
+        app.config.update(
+            SESSION_COOKIE_HTTPONLY=settings.cookie.httponly,
+            SESSION_COOKIE_SECURE=settings.cookie.secure,
+            SESSION_COOKIE_SAMESITE=settings.cookie.samesite,
+        )
 
     app.config["USE_MW_OAUTH"] = settings.use_mw_oauth
 
     # Initialize CSRF protection
-    csrf = CSRFProtect(app)  # noqa: F841
+    csrf.init_app(app)
 
     if settings.use_mw_oauth and (settings.database_data.db_host or settings.database_data.db_connect_file):
         ensure_user_token_table()
@@ -101,5 +127,15 @@ def create_app() -> Flask:
         logger.error("Internal Server Error: %s", e)
         flash("Internal Server Error", "danger")
         return render_template("index.html", title="Internal Server Error"), 500
+
+    # Add cache control headers to prevent CSRF token caching issues
+    @app.after_request
+    def add_cache_headers(response):
+        """Prevent CSRF token caching on form-related routes."""
+        if request.endpoint and any(request.endpoint.startswith(bp) for bp in ["auth.", "post.", "fixrefs."]):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
 
     return app

@@ -6,7 +6,6 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-
 from src.app_main.helpers.words import clear_words_cache, get_word_count
 
 

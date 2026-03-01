@@ -12,8 +12,8 @@ from flask import (
     request,
 )
 
-from ...users.current import current_user
 from ...services.text_processor import do_changes_to_text
+from ...users.current import current_user
 
 bp_fixrefs = Blueprint("fixrefs", __name__)
 logger = logging.getLogger(__name__)

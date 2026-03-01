@@ -1,8 +1,9 @@
 """Tests for app_routes.post module."""
 
 import json
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 from flask import Flask
 
 
@@ -46,10 +47,12 @@ class TestPostEndpoint:
 
     def test_returns_no_access_when_user_not_found(self, client):
         """Test that no access error is returned when user not found."""
-        with patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed, \
-                patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token, \
-                patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do, \
-                patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db:
+        with (
+            patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed,
+            patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db,
+        ):
             mock_is_allowed.return_value = "medwiki.toolforge.org"
             mock_get_token.return_value = None
 
@@ -59,13 +62,15 @@ class TestPostEndpoint:
 
             response = client.post(
                 "/",
-                data=json.dumps({
-                    "user": "UnknownUser",
-                    "title": "Test Page",
-                    "target": "en",
-                    "sourcetitle": "Source Page",
-                    "text": "Content",
-                }),
+                data=json.dumps(
+                    {
+                        "user": "UnknownUser",
+                        "title": "Test Page",
+                        "target": "en",
+                        "sourcetitle": "Source Page",
+                        "text": "Content",
+                    }
+                ),
                 content_type="application/json",
             )
 
@@ -86,16 +91,18 @@ class TestPostEndpoint:
 
     def test_successful_edit_returns_success(self, client):
         """Test that successful edit returns success result."""
-        with patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed, \
-                patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token, \
-                patch("src.app_main.app_routes.post.routes.get_revid") as mock_get_revid, \
-                patch("src.app_main.app_routes.post.routes.get_revid_db") as mock_get_revid_db, \
-                patch("src.app_main.app_routes.post.routes.do_changes_to_text") as mock_changes, \
-                patch("src.app_main.app_routes.post.routes.publish_do_edit") as mock_edit, \
-                patch("src.app_main.app_routes.post.routes.link_to_wikidata") as mock_link, \
-                patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do, \
-                patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db, \
-                patch("src.app_main.app_routes.post.routes.PagesDB") as mock_pages_db:
+        with (
+            patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed,
+            patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.post.routes.get_revid") as mock_get_revid,
+            patch("src.app_main.app_routes.post.routes.get_revid_db") as mock_get_revid_db,
+            patch("src.app_main.app_routes.post.routes.do_changes_to_text") as mock_changes,
+            patch("src.app_main.app_routes.post.routes.publish_do_edit") as mock_edit,
+            patch("src.app_main.app_routes.post.routes.link_to_wikidata") as mock_link,
+            patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.post.routes.PagesDB") as mock_pages_db,
+        ):
 
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
@@ -111,9 +118,7 @@ class TestPostEndpoint:
             mock_changes.return_value = "Modified content"
 
             # Mock successful edit
-            mock_edit.return_value = {
-                "edit": {"result": "Success", "newrevid": 67890}
-            }
+            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
 
             # Mock Wikidata link
             mock_link.return_value = {"result": "success", "qid": "Q123"}
@@ -127,13 +132,15 @@ class TestPostEndpoint:
 
             response = client.post(
                 "/",
-                data=json.dumps({
-                    "user": "TestUser",
-                    "title": "Test Page",
-                    "target": "ar",
-                    "sourcetitle": "Source Page",
-                    "text": "Original content",
-                }),
+                data=json.dumps(
+                    {
+                        "user": "TestUser",
+                        "title": "Test Page",
+                        "target": "ar",
+                        "sourcetitle": "Source Page",
+                        "text": "Original content",
+                    }
+                ),
                 content_type="application/json",
             )
 
@@ -143,13 +150,15 @@ class TestPostEndpoint:
 
     def test_handles_captcha_response(self, client):
         """Test that captcha response is handled correctly."""
-        with patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed, \
-                patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token, \
-                patch("src.app_main.app_routes.post.routes.get_revid") as mock_get_revid, \
-                patch("src.app_main.app_routes.post.routes.do_changes_to_text") as mock_changes, \
-                patch("src.app_main.app_routes.post.routes.publish_do_edit") as mock_edit, \
-                patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do, \
-                patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db:
+        with (
+            patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed,
+            patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.post.routes.get_revid") as mock_get_revid,
+            patch("src.app_main.app_routes.post.routes.do_changes_to_text") as mock_changes,
+            patch("src.app_main.app_routes.post.routes.publish_do_edit") as mock_edit,
+            patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db,
+        ):
 
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
@@ -165,11 +174,7 @@ class TestPostEndpoint:
             mock_changes.return_value = None
 
             # Mock captcha response
-            mock_edit.return_value = {
-                "edit": {
-                    "captcha": {"id": "123", "type": "image"}
-                }
-            }
+            mock_edit.return_value = {"edit": {"captcha": {"id": "123", "type": "image"}}}
 
             # Mock database
             mock_reports_instance = MagicMock()
@@ -177,13 +182,15 @@ class TestPostEndpoint:
 
             response = client.post(
                 "/",
-                data=json.dumps({
-                    "user": "TestUser",
-                    "title": "Test Page",
-                    "target": "ar",
-                    "sourcetitle": "Source Page",
-                    "text": "Content",
-                }),
+                data=json.dumps(
+                    {
+                        "user": "TestUser",
+                        "title": "Test Page",
+                        "target": "ar",
+                        "sourcetitle": "Source Page",
+                        "text": "Content",
+                    }
+                ),
                 content_type="application/json",
             )
 

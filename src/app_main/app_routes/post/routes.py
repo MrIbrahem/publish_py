@@ -291,7 +291,9 @@ def _process_edit(
             access_key,
             access_secret,
         )
-        editit["sql_result"] = _add_to_db(title, lang, user, editit["LinkToWikidata"], campaign, sourcetitle, mdwiki_revid)
+        editit["sql_result"] = _add_to_db(
+            title, lang, user, editit["LinkToWikidata"], campaign, sourcetitle, mdwiki_revid
+        )
         to_do_file = "success"
     elif is_captcha:
         to_do_file = "captcha"

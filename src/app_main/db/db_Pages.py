@@ -11,7 +11,6 @@ from typing import Any, List
 import pymysql
 
 from ..config import DbConfig
-
 from . import Database
 
 logger = logging.getLogger(__name__)

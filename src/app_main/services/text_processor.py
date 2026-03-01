@@ -4,7 +4,9 @@ Text processing utilities.
 Mirrors: php_src/text_change.php
 
 """
+
 import os
+
 DoChangesToText1 = None
 
 try:
@@ -45,11 +47,5 @@ def do_changes_to_text(
     if not text.strip():
         return text
 
-    text = DoChangesToText1(
-        text=text,
-        title=title,
-        lang=lang,
-        source_title=sourcetitle,
-        mdwiki_revid=mdwiki_revid
-    )
+    text = DoChangesToText1(text=text, title=title, lang=lang, source_title=sourcetitle, mdwiki_revid=mdwiki_revid)
     return text

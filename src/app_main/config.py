@@ -242,3 +242,95 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+
+
+# =============================================================================
+# Flask-style Configuration Classes
+# =============================================================================
+# These classes follow Flask's conventional configuration pattern and are
+# designed to work with create_app(config_class=ConfigClass).
+#
+# Example usage:
+#     from app_main import create_app
+#     from app_main.config import TestingConfig
+#     app = create_app(TestingConfig)
+# =============================================================================
+
+
+class Config:
+    """Base configuration class for Flask applications.
+
+    This class provides Flask-standard configuration attributes that can be
+    used with app.config.from_object(). It wraps the dataclass-based settings.
+    """
+
+    # Flask core settings
+    DEBUG: bool = False
+    TESTING: bool = False
+    SECRET_KEY: str | None = None
+    SECRET_KEY_FALLBACKS: list[str] | None = None
+
+    # Session cookie settings (populated from settings by default)
+    SESSION_COOKIE_HTTPONLY: bool = True
+    SESSION_COOKIE_SECURE: bool = True
+    SESSION_COOKIE_SAMESITE: str = "Lax"
+
+    # CSRF protection settings
+    WTF_CSRF_ENABLED: bool = True
+    WTF_CSRF_TIME_LIMIT: int | None = None  # None = tokens don't expire
+    WTF_CSRF_SSL_STRICT: bool = True
+
+    # Request handling
+    MAX_CONTENT_LENGTH: int | None = 16 * 1024 * 1024  # 16MB default
+
+    def __init__(self) -> None:
+        """Initialize configuration with values from environment-based settings."""
+        # Sync with the dataclass-based settings for backward compatibility
+        self.SECRET_KEY = settings.secret_key
+        self.SESSION_COOKIE_HTTPONLY = settings.cookie.httponly
+        self.SESSION_COOKIE_SECURE = settings.cookie.secure
+        self.SESSION_COOKIE_SAMESITE = settings.cookie.samesite
+
+        # Load SECRET_KEY_FALLBACKS from environment for key rotation support
+        # Format: comma-separated list of fallback keys
+        # Example: FLASK_SECRET_KEY_FALLBACKS="old-key-1,old-key-2"
+        fallbacks_str = os.getenv("FLASK_SECRET_KEY_FALLBACKS", "")
+        if fallbacks_str:
+            self.SECRET_KEY_FALLBACKS = [key.strip() for key in fallbacks_str.split(",") if key.strip()]
+
+
+class DevelopmentConfig(Config):
+    """Development configuration with debugging enabled."""
+
+    DEBUG: bool = True
+    SESSION_COOKIE_SECURE: bool = False  # Allow HTTP in development
+    WTF_CSRF_SSL_STRICT: bool = False  # Allow CSRF without HTTPS
+
+
+class TestingConfig(Config):
+    """Testing configuration with CSRF disabled for easier form testing."""
+
+    # Prevent pytest from collecting this as a test class
+    __test__ = False
+
+    DEBUG: bool = False
+    TESTING: bool = True
+    WTF_CSRF_ENABLED: bool = False  # Disable CSRF for test requests
+    SESSION_COOKIE_SECURE: bool = False
+
+    # Use a fixed test secret key
+    SECRET_KEY: str = "test-secret-key-not-for-production"
+
+
+class ProductionConfig(Config):
+    """Production configuration with strict security settings."""
+
+    DEBUG: bool = False
+    TESTING: bool = False
+    WTF_CSRF_ENABLED: bool = True
+    WTF_CSRF_SSL_STRICT: bool = True
+
+    # Production should always use secure cookies
+    SESSION_COOKIE_SECURE: bool = True
+    SESSION_COOKIE_HTTPONLY: bool = True
+    SESSION_COOKIE_SAMESITE: str = "Lax"

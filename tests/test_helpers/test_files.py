@@ -7,7 +7,6 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-
 from src.app_main.helpers.files import _get_rand_id, get_reports_dir, to_do
 
 

@@ -1,12 +1,17 @@
 """
-# isort:skip_file
 WSGI entry point for the Flask application.
 """
 
 from __future__ import annotations
 
 import sys
-from env_config import _env_file_path # type: ignore # Triggers environment configuration
+from pathlib import Path
+
+# Load environment variables before any other imports
+from env_config import load_environment
+
+load_environment()
+
 from app_main import create_app  # noqa: E402
 from log import config_console_logger  # noqa: E402
 
