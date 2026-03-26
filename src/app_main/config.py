@@ -134,9 +134,9 @@ def _env_int(name: str, default: int) -> int:
 
 
 def _load_oauth_config() -> Optional[OAuthConfig]:
-    mw_uri = os.getenv("OAUTH_MWURI")
-    consumer_key = os.getenv("OAUTH_CONSUMER_KEY")
-    consumer_secret = os.getenv("OAUTH_CONSUMER_SECRET")
+    mw_uri = os.getenv("OAUTH_MWURI", "")
+    consumer_key = os.getenv("OAUTH_CONSUMER_KEY", "")
+    consumer_secret = os.getenv("OAUTH_CONSUMER_SECRET", "")
     if not (mw_uri and consumer_key and consumer_secret):
         return None
 
@@ -162,7 +162,7 @@ def is_localhost(host: str) -> bool:
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    secret_key = os.getenv("FLASK_SECRET_KEY")
+    secret_key = os.getenv("FLASK_SECRET_KEY", "")
     if not secret_key:
         raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
 
@@ -175,7 +175,7 @@ def get_settings() -> Settings:
     use_mw_oauth = _env_bool("USE_MW_OAUTH", default=True)
     oauth_config = _load_oauth_config()
 
-    oauth_encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY")
+    oauth_encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY", "")
     if use_mw_oauth and not oauth_encryption_key:
         raise RuntimeError("OAUTH_ENCRYPTION_KEY environment variable is required when USE_MW_OAUTH is enabled")
 
