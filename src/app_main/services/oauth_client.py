@@ -131,7 +131,7 @@ def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict[str, Any
         logger.error(f"Failed to parse cxtoken response: {response}")
         result = {"error": "Failed to parse response"}
 
-    if result is None or "error" in result:
+    if not result or "error" in result:
         logger.error(f"get_cxtoken error: {result}")
 
     return result or {}
