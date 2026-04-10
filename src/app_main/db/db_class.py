@@ -38,10 +38,7 @@ class Database:
         self.user = db_data.db_user
         self.password = db_data.db_password
 
-        if not db_data.db_connect_file:
-            self.credentials = {"user": self.user, "password": self.password}
-        else:
-            self.credentials = {"read_default_file": db_data.db_connect_file}
+        self.credentials = {"user": self.user, "password": self.password}
 
         self._lock = threading.RLock()
         self.connection: Any | None = None

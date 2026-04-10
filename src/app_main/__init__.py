@@ -92,7 +92,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     # Initialize CSRF protection
     csrf.init_app(app)
 
-    if settings.use_mw_oauth and (settings.database_data.db_host or settings.database_data.db_connect_file):
+    if settings.use_mw_oauth and settings.database_data.db_host:
         ensure_user_token_table()
         ensure_qids_table(settings.database_data)
 
@@ -132,7 +132,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     @app.after_request
     def add_cache_headers(response):
         """Prevent CSRF token caching on form-related routes."""
-        if request.endpoint and any(request.endpoint.startswith(bp) for bp in ["auth.", "post.", "fixrefs."]):
+        if request.endpoint and any(request.endpoint.startswith(bp) for bp in ["auth.", "post.", "fixrefs.", "cxtoken."]):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"

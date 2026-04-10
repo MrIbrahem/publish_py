@@ -19,7 +19,6 @@ def fixture_for_category_db() -> DbConfig:
         db_host="localhost",
         db_user="user",
         db_password="pass",
-        db_connect_file=None,
     )
 
 

@@ -16,7 +16,6 @@ class DbConfig:
     db_host: str
     db_user: str | None
     db_password: str | None
-    db_connect_file: str | None
 
 
 @dataclass(frozen=True)
@@ -73,29 +72,14 @@ class Settings:
     cors: CorsConfig
     users: UsersConfig
 
-
-def get_db_connection_file(db_host):
-    db_connect_file = os.getenv("DB_CONNECT_FILE", "~/replica.my.cnf")
-    db_connect_file = Path(db_connect_file).expanduser()
-
-    if db_connect_file.exists() and db_host != "127.0.0.1":
-        db_connect_file = db_connect_file.as_posix()
-    else:
-        db_connect_file = None
-    return db_connect_file
-
-
 def _load_database_credentials() -> DbConfig:
-    DB_HOST = os.getenv("DB_HOST", "")
-
-    db_connect_file = get_db_connection_file(DB_HOST)
+    TOOL_TOOLSDB_HOST = os.getenv("TOOL_TOOLSDB_HOST", "")
 
     data = DbConfig(
-        db_name=os.getenv("DB_NAME", ""),
-        db_host=DB_HOST,
-        db_user=os.getenv("DB_USER", None),
-        db_password=os.getenv("DB_PASSWORD", None),
-        db_connect_file=db_connect_file,
+        db_name=os.getenv("TOOL_TOOLSDB_DBNAME", ""),
+        db_host=TOOL_TOOLSDB_HOST,
+        db_user=os.getenv("TOOL_TOOLSDB_USER", None),
+        db_password=os.getenv("TOOL_TOOLSDB_PASSWORD", None),
     )
     return data
 

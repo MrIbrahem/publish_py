@@ -17,7 +17,7 @@ def has_db_config() -> bool:
     """Return ``True`` when database connection details are configured."""
 
     db_settings = settings.database_data or {}
-    return bool(db_settings.db_host or db_settings.db_connect_file)
+    return bool(db_settings.db_host)
 
 
 def get_db() -> Database:
