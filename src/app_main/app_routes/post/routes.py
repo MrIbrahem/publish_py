@@ -350,7 +350,30 @@ def _handle_no_access(user: str, tab: dict[str, Any]) -> Response:
     return jsonify(editit)
 
 
-@bp_post.route("/", methods=["POST", "OPTIONS"])
+@bp_post.route("/", methods=["OPTIONS"])
+def index_preflight() -> Response:
+    """
+    Handle preflight requests.
+
+    Returns:
+        Preflight response
+    """
+    # Check CORS
+    allowed = is_allowed()
+
+    # Handle CORS preflight
+    if not allowed:
+        return jsonify({"error": "CORS not allowed"}), 403
+
+    response = Response("", status=200)
+    response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
+    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+
+    return response
+
+
+@bp_post.route("/", methods=["POST"])
 def index() -> Response:
     """Handle post/publish requests.
 
@@ -370,16 +393,6 @@ def index() -> Response:
     """
     # Check CORS
     allowed = is_allowed()
-
-    # Handle CORS preflight
-    if request.method == "OPTIONS":
-        if not allowed:
-            return jsonify({"error": "CORS not allowed"}), 403
-        response = Response("", status=200)
-        response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
-        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        return response
 
     if not allowed:
         return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
