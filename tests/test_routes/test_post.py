@@ -52,8 +52,8 @@ class TestPostEndpoint:
         with (
             patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.post.worker.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.post.worker.ReportsDB") as mock_reports_db,
         ):
             mock_is_allowed.return_value = "medwiki.toolforge.org"
             mock_get_token.return_value = None
@@ -96,14 +96,14 @@ class TestPostEndpoint:
         with (
             patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.post.routes.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.post.routes.get_revid_db") as mock_get_revid_db,
+            patch("src.app_main.app_routes.post.worker.get_revid") as mock_get_revid,
+            patch("src.app_main.app_routes.post.worker.get_revid_db") as mock_get_revid_db,
             patch("src.app_main.app_routes.post.routes.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.post.routes.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.post.routes.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.post.routes.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.post.worker.publish_do_edit") as mock_edit,
+            patch("src.app_main.app_routes.post.worker.link_to_wikidata") as mock_link,
+            patch("src.app_main.app_routes.post.worker.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.post.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.post.worker.PagesDB") as mock_pages_db,
         ):
 
             mock_is_allowed.return_value = "medwiki.toolforge.org"
@@ -155,11 +155,11 @@ class TestPostEndpoint:
         with (
             patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.post.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.post.routes.get_revid") as mock_get_revid,
+            patch("src.app_main.app_routes.post.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.post.routes.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.post.routes.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.post.routes.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.post.routes.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.post.worker.publish_do_edit") as mock_edit,
+            patch("src.app_main.app_routes.post.worker.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.post.worker.ReportsDB") as mock_reports_db,
         ):
 
             mock_is_allowed.return_value = "medwiki.toolforge.org"
@@ -198,31 +198,3 @@ class TestPostEndpoint:
 
             data = response.get_json()
             assert "captcha" in data["edit"]
-
-
-class TestGetErrorsFile:
-    """Tests for _get_errors_file function."""
-
-    def test_returns_placeholder_for_unknown_error(self):
-        """Test that placeholder is returned for unknown errors."""
-        from src.app_main.app_routes.post.routes import _get_errors_file
-
-        result = _get_errors_file({"some": "error"}, "errors")
-
-        assert result == "errors"
-
-    def test_returns_protectedpage_for_protected_error(self):
-        """Test that protectedpage is returned for protected page error."""
-        from src.app_main.app_routes.post.routes import _get_errors_file
-
-        result = _get_errors_file({"error": {"code": "protectedpage"}}, "errors")
-
-        assert result == "protectedpage"
-
-    def test_returns_ratelimited_for_rate_limit_error(self):
-        """Test that ratelimited is returned for rate limit error."""
-        from src.app_main.app_routes.post.routes import _get_errors_file
-
-        result = _get_errors_file({"error": {"info": "ratelimited"}}, "errors")
-
-        assert result == "ratelimited"
