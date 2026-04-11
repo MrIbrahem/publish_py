@@ -125,7 +125,8 @@ def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict[str, Any
         access_secret: OAuth access secret
 
     Returns:
-        API response as dictionary
+        API response as dictionary containing token data like: { "age": 3600, "exp": 1775877248, "jwt": "..........." }
+
     """
     https_domain = f"https://{wiki}.wikipedia.org"
     api_params = {

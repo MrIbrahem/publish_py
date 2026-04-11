@@ -20,9 +20,12 @@ def is_allowed() -> str | None:
     origin = request.headers.get("Origin", "")
 
     if current_app.config.get("CORS_DISABLED"):
-        return origin
+        logger.warning(f"CORS is disabled, Access allowed: referer={referer}, origin={origin}")
+        return origin or 1
 
     if not settings.cors.allowed_domains:
+        logger.warning(f"Access denied: referer={referer}, origin={origin}")
+        logger.warning("No allowed domains configured")
         return None
 
     for domain in settings.cors.allowed_domains:
