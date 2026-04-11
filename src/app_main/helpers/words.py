@@ -31,6 +31,10 @@ def _load_words_table() -> dict[str, int]:
     """
     words_path: Path = settings.paths.words_json_path
 
+    if not words_path:
+        logger.warning("Words JSON path not set in settings")
+        return {}
+
     try:
         if words_path.exists():
             with open(words_path, "r", encoding="utf-8") as f:

@@ -23,6 +23,10 @@ def get_revid(sourcetitle: str) -> str:
     """
     revids_file_path: Path = settings.paths.revids_file_path
 
+    if not revids_file_path:
+        logger.warning("revids_file_path not set in config")
+        return ""
+
     if revids_file_path.exists():
         try:
             with open(revids_file_path, encoding="utf-8") as f:
@@ -47,6 +51,10 @@ def get_revid_db(sourcetitle: str) -> str:
         "get": "revids",
         "title": sourcetitle,
     }
+
+    if not settings.revids_api_url:
+        logger.warning("revids_api_url not set in config")
+        return ""
 
     try:
         response = requests.get(settings.revids_api_url, params=params, timeout=30)
