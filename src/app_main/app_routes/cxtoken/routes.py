@@ -86,8 +86,6 @@ def index() -> Response:
         cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
         response = jsonify(cxtoken)
         response.status_code = 403
-        response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
-        return response
     else:
         # Decrypt credentials
         access_key, access_secret = user_token.decrypted()
