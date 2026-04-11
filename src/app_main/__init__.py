@@ -87,12 +87,12 @@ def create_app(config_class: Type | None = None) -> Flask:
             SESSION_COOKIE_SAMESITE=settings.cookie.samesite,
         )
 
-    app.config["USE_MW_OAUTH"] = settings.use_mw_oauth
+    app.config["USE_MW_OAUTH"] = settings.oauth.enabled
 
     # Initialize CSRF protection
     csrf.init_app(app)
 
-    if settings.use_mw_oauth and settings.database_data.db_host:
+    if settings.oauth.enabled and settings.database_data.db_host:
         ensure_user_token_table()
         ensure_qids_table(settings.database_data)
 
@@ -107,7 +107,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     def _inject_user():  # pragma: no cover - trivial wrapper
         return context_user()
 
-    app.jinja_env.globals.setdefault("USE_MW_OAUTH", settings.use_mw_oauth)
+    app.jinja_env.globals.setdefault("USE_MW_OAUTH", settings.oauth.enabled)
     app.jinja_env.filters["format_stage_timestamp"] = format_stage_timestamp
 
     @app.teardown_appcontext

@@ -39,8 +39,8 @@ from .rate_limit import callback_rate_limiter, login_rate_limiter
 logger = logging.getLogger(__name__)
 bp_auth = Blueprint("auth", __name__)
 
-oauth_state_nonce = settings.STATE_SESSION_KEY
-request_token_key = settings.REQUEST_TOKEN_SESSION_KEY
+oauth_state_nonce = settings.sessions.state_key
+request_token_key = settings.sessions.request_token_key
 
 
 def _client_key() -> str:
@@ -77,7 +77,7 @@ def login_required(fn: Callable[..., Any]) -> Callable[..., Any]:
 
 @bp_auth.get("/login")
 def login() -> WerkzeugResponse:
-    if not settings.use_mw_oauth:
+    if not settings.oauth.enabled:
         flash("OAuth login is disabled", "warning")
         return redirect(url_for("main.index", error="oauth-disabled"))
 
@@ -115,7 +115,7 @@ def login() -> WerkzeugResponse:
 def callback() -> WerkzeugResponse:
     # ------------------
     # use oauth
-    if not settings.use_mw_oauth:
+    if not settings.oauth.enabled:
         flash("OAuth login is disabled", "warning")
         return redirect(url_for("main.index", error="oauth-disabled"))
 
