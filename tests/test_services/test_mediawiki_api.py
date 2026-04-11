@@ -91,3 +91,35 @@ class TestPublishDoEdit:
             # Verify the domain was passed correctly
             call_args = mock_post.call_args
             assert call_args[0][1] == "https://ar.wikipedia.org"
+
+
+class TestGetTitleInfo:
+    """Tests for get_title_info function."""
+
+    def test_returns_page_info_on_success(self):
+        """Test that page info is returned on success."""
+        with patch("src.app_main.services.mediawiki_api.requests") as mock_requests:
+            mock_response = MagicMock()
+            mock_response.json.return_value = {
+                "query": {"pages": [{"pageid": 123, "title": "Test Page", "missing": False}]}
+            }
+            mock_requests.get.return_value = mock_response
+
+            from src.app_main.services.mediawiki_api import get_title_info
+
+            result = get_title_info("Test Page", "en")
+
+            assert result is not None
+            assert result["pageid"] == 123
+            assert result["title"] == "Test Page"
+
+    def test_returns_none_on_error(self):
+        """Test that None is returned on error."""
+        with patch("src.app_main.services.mediawiki_api.requests") as mock_requests:
+            mock_requests.get.side_effect = Exception("Network error")
+
+            from src.app_main.services.mediawiki_api import get_title_info
+
+            result = get_title_info("Test Page", "en")
+
+            assert result is None

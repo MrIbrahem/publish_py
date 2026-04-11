@@ -84,13 +84,14 @@ def index() -> Response:
         "result": "",
         "edit": {},
         "sourcetitle": request_data.get("sourcetitle", ""),
+        "request_revid": request_data.get("revid", "") or request_data.get("revision", ""),
     }
 
     # Get access credentials
     user_token = get_user_token_by_username(user)
 
     if user_token is None:
-        response = jsonify(_handle_no_access(user, tab))
+        response = jsonify(_handle_no_access(tab))
         response.status_code = 403
         response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
         return response
@@ -98,8 +99,15 @@ def index() -> Response:
     # Get credentials
     access_key, access_secret = user_token.decrypted()
 
+    # Add captcha parameters if present
+    if request_data.get("wpCaptchaId") and request_data.get("wpCaptchaWord"):
+        tab["wp_captcha_params"] = {
+            "wpCaptchaId": request_data["wpCaptchaId"],
+            "wpCaptchaWord": request_data["wpCaptchaWord"],
+        }
+
     # Process the edit
-    editit = _process_edit(request_data, access_key, access_secret, text, user, tab)
+    editit = _process_edit(access_key, access_secret, text, tab)
 
     response = jsonify(editit)
     response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"

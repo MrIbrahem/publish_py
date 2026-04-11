@@ -4,12 +4,49 @@ Mirrors: php_src/bots/api/do_edit.php
 """
 
 import json
+import requests
 import logging
 from typing import Any
+import urllib.parse
 
+from ..config import settings
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)
+
+
+def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
+    """Get page information from Wikipedia API.
+
+    Args:
+        targettitle: Target page title
+        lang: Language code
+
+    Returns:
+        Page info dictionary or None if not found
+    """
+    params = {
+        "action": "query",
+        "format": "json",
+        "titles": targettitle,
+        "utf8": 1,
+        "formatversion": "2",
+    }
+    url = f"https://{lang}.wikipedia.org/w/api.php"
+
+    headers = {"User-Agent": settings.user_agent}
+
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=30)
+        result = response.json()
+        logger.debug(f"GetTitleInfo result: {result}")
+        pages = result.get("query", {}).get("pages", [])
+        if pages:
+            return pages[0]
+    except Exception as e:
+        logger.error(f"GetTitleInfo error: {e}")
+
+    return None
 
 
 def publish_do_edit(

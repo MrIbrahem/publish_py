@@ -192,80 +192,48 @@ class PagesDB:
 
     def insert_page_target(
         self,
-        title: str,
+        sourcetitle: str,
         tr_type: str,
         cat: str,
         lang: str,
         user: str,
         target: str,
-        to_users_table: bool = False,
+        table_name: str,
         mdwiki_revid: int | None = None,
         word: int = 0,
     ) -> dict[str, Any]:
-        """Insert a page target record.
+        """
+        Insert a page target record.
 
         Mirrors: php_src/bots/sql/db_Pages.php InsertPageTarget()
 
         Args:
-            title: Page title
+            sourcetitle: Page title
             tr_type: Translation type
             cat: Category
             lang: Target language
             user: Username
             target: Target page title
-            to_users_table: Whether to insert to pages_users table
+            table_name:
             mdwiki_revid: MDWiki revision ID
             word: Word count
 
         Returns:
             Dictionary with operation result
         """
-        # Normalize inputs
-        title = title.replace("_", " ")
-        target = target.replace("_", " ")
-        user = user.replace("_", " ")
 
-        result: dict[str, Any] = {
-            "use_user_sql": False,
-            "to_users_table": to_users_table,
-        }
-
-        # Validate required fields
-        if not user or not title or not lang:
-            result["one_empty"] = {"title": title, "lang": lang, "user": user}
-            return result
-
-        # Determine which table to use
-        use_user_sql = to_users_table
-        if not to_users_table:
-            user_t = user.replace("User:", "").replace("user:", "")
-            if user_t in target:
-                use_user_sql = True
-
-        result["use_user_sql"] = use_user_sql
-
-        # Check if exists and update if needed
-        exists = self._find_exists_or_update(title, lang, user, target, use_user_sql)
-        if exists:
-            result["exists"] = "already_in"
-            return result
-
-        # Insert new record
-        table_name = "pages_users" if use_user_sql else "pages"
         query = f"""
             INSERT INTO {table_name} (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
             VALUES (%s, %s, %s, %s, %s, %s, DATE(NOW()), %s, %s)
         """
-        params = (title, word, tr_type, cat, lang, user, target, mdwiki_revid)
+        params = (sourcetitle, word, tr_type, cat, lang, user, target, mdwiki_revid)
 
         try:
             self.db.execute_query_safe(query, params)
-            result["execute_query"] = True
+            return True
         except Exception as e:
             logger.error(f"Failed to insert page target: {e}")
-            result["error"] = str(e)
-
-        return result
+            return str(e)
 
 
 __all__ = [
