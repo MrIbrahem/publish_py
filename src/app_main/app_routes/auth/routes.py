@@ -77,10 +77,6 @@ def login_required(fn: Callable[..., Any]) -> Callable[..., Any]:
 
 @bp_auth.get("/login")
 def login() -> WerkzeugResponse:
-    if not settings.oauth.enabled:
-        flash("OAuth login is disabled", "warning")
-        return redirect(url_for("main.index", error="oauth-disabled"))
-
     if settings.oauth is None:
         flash("OAuth not configured", "danger")
         return redirect(url_for("main.index", error="oauth-not-configured"))
@@ -115,10 +111,6 @@ def login() -> WerkzeugResponse:
 def callback() -> WerkzeugResponse:
     # ------------------
     # use oauth
-    if not settings.oauth.enabled:
-        flash("OAuth login is disabled", "warning")
-        return redirect(url_for("main.index", error="oauth-disabled"))
-
     if settings.oauth is None:
         flash("OAuth not configured", "danger")
         return redirect(url_for("main.index", error="oauth-not-configured"))
@@ -230,13 +222,17 @@ def callback() -> WerkzeugResponse:
     g.current_user = CurrentUser(str(user_id), str(username))
     g.is_authenticated = True
     g.authenticated_user_id = str(user_id)
+
     oauth_config = settings.oauth  # Already validated as non-None above
-    g.oauth_credentials = {
-        "consumer_key": oauth_config.consumer_key,
-        "consumer_secret": oauth_config.consumer_secret,
-        "access_token": str(token_key),
-        "access_secret": str(token_secret),
-    }
+    if oauth_config:
+        g.oauth_credentials = {
+            "consumer_key": oauth_config.consumer_key,
+            "consumer_secret": oauth_config.consumer_secret,
+            "access_token": str(token_key),
+            "access_secret": str(token_secret),
+        }
+    else:
+        g.oauth_credentials = None
 
     return response
 

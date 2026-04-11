@@ -24,7 +24,7 @@ class OAuthIdentityError(Exception):
 
 
 def get_handshaker():
-    if not settings.oauth:
+    if settings.oauth is None:
         raise RuntimeError("MediaWiki OAuth configuration is incomplete")
 
     consumer_token = mwoauth.ConsumerToken(settings.oauth.consumer_key, settings.oauth.consumer_secret)
