@@ -1,26 +1,17 @@
-"""Post/Publish endpoint for Content Translation.
-
-Mirrors: php_src/endpoints/post.php
-
-This endpoint handles publishing translated pages to Wikipedia.
+"""
+Post/Publish endpoint worker for Content Translation.
 """
 
 import json
 import logging
 from typing import Any
-
-from flask import Blueprint, Response
-
 from ...config import settings
 from ...db.db_categories import get_campaign_category
 from ...db.db_Pages import PagesDB
 from ...db.db_publish_reports import ReportsDB
-from ...helpers.cors import is_allowed
 from ...helpers.files import to_do
 from ...helpers.format import (
     determine_hashtag,
-    format_title,
-    format_user,
     make_summary,
 )
 from ...helpers.words import get_word_count
@@ -30,8 +21,16 @@ from ...services.text_processor import do_changes_to_text
 from ...services.wikidata_client import link_to_wikidata
 from ...users.store import get_user_token_by_username
 
-bp_post = Blueprint("post", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
+
+
+def _get_revid(sourcetitle) -> str:
+    revid = get_revid(sourcetitle)
+
+    if not revid:
+        revid = get_revid_db(sourcetitle)
+
+    return revid
 
 
 def _get_errors_file(editit: dict[str, Any], placeholder: str) -> str:
@@ -82,7 +81,6 @@ def _retry_with_fallback_user(
     lang: str,
     title: str,
     user: str,
-    original_error: str,
 ) -> dict[str, Any]:
     """Retry Wikidata linking with fallback user credentials.
 
@@ -91,7 +89,6 @@ def _retry_with_fallback_user(
         lang: Target language code
         title: Target page title
         user: Original user
-        original_error: Original error message
 
     Returns:
         Link result dictionary
@@ -153,7 +150,7 @@ def _handle_successful_edit(
         # Check if the error is get_csrftoken failure and user is not already the fallback user
         fallback_user = settings.users.fallback_user
         if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
-            link_result["fallback"] = _retry_with_fallback_user(sourcetitle, lang, title, user, link_result["error"])
+            link_result["fallback"] = _retry_with_fallback_user(sourcetitle, lang, title, user)
     except Exception as e:
         logger.error(f"Error linking to Wikidata: {e}")
 
@@ -258,7 +255,21 @@ def _process_edit(
     campaign = tab["campaign"]
     title = tab["title"]
     summary = tab["summary"]
-    mdwiki_revid = tab.get("revid", "")
+
+    # Get revision ID
+    mdwiki_revid = _get_revid(tab["sourcetitle"])
+
+    if not mdwiki_revid:
+        tab["empty revid"] = "Can not get revid from all_pages_revids.json"
+        mdwiki_revid = request_data.get("revid", "") or request_data.get("revision", "")
+
+    tab["revid"] = mdwiki_revid
+    # Apply text changes (fix references)
+    newtext = do_changes_to_text(tab["sourcetitle"], tab["title"], text, tab["lang"], mdwiki_revid)
+
+    if newtext:
+        tab["fix_refs"] = "yes" if newtext != text else "no"
+        text = newtext
 
     # Generate summary
     hashtag = determine_hashtag(tab["title"], user)
@@ -288,7 +299,7 @@ def _process_edit(
     tab["result"] = success
 
     if success == "Success":
-        editit["LinkToWikidata"] = _handle_successful_edit(
+        link_to_wikidata = _handle_successful_edit(
             sourcetitle,
             lang,
             user,
@@ -296,8 +307,16 @@ def _process_edit(
             access_key,
             access_secret,
         )
+        editit["LinkToWikidata"] = link_to_wikidata
+
         editit["sql_result"] = _add_to_db(
-            title, lang, user, editit["LinkToWikidata"], campaign, sourcetitle, mdwiki_revid
+            title,
+            lang,
+            user,
+            link_to_wikidata,
+            campaign,
+            sourcetitle,
+            mdwiki_revid,
         )
         to_do_file = "success"
     elif is_captcha:
@@ -310,6 +329,7 @@ def _process_edit(
 
     # Insert to reports
     reports_db = ReportsDB(settings.database_data)
+
     reports_db.add(
         title=title,
         user=user,
@@ -322,7 +342,7 @@ def _process_edit(
     return editit
 
 
-def _handle_no_access(user: str, tab: dict[str, Any]) -> Response:
+def _handle_no_access(user: str, tab: dict[str, Any]) -> dict:
     """Handle case when user has no access credentials.
 
     Args:
@@ -353,16 +373,6 @@ def _handle_no_access(user: str, tab: dict[str, Any]) -> Response:
     )
 
     return editit
-
-
-def _get_revid(sourcetitle):
-    revid = get_revid(sourcetitle)
-
-    if not revid:
-        revid = get_revid_db(sourcetitle)
-
-    return revid
-
 
 
 __all__ = [

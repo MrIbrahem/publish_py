@@ -11,10 +11,9 @@ from flask import Blueprint, Response, jsonify, request
 
 from ...helpers.cors import is_allowed
 from ...helpers.format import format_title, format_user
-from ...services.text_processor import do_changes_to_text
 from ...users.store import get_user_token_by_username
 
-from .worker import _process_edit, _handle_no_access, _get_revid
+from .worker import _process_edit, _handle_no_access
 
 bp_post = Blueprint("post", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
@@ -98,20 +97,6 @@ def index() -> Response:
 
     # Get credentials
     access_key, access_secret = user_token.decrypted()
-
-    # Get revision ID
-    revid = _get_revid(tab["sourcetitle"])
-
-    if not revid:
-        tab["empty revid"] = "Can not get revid from all_pages_revids.json"
-        revid = request_data.get("revid", "") or request_data.get("revision", "")
-
-    tab["revid"] = revid
-    # Apply text changes (fix references)
-    newtext = do_changes_to_text(tab["sourcetitle"], tab["title"], text, tab["lang"], revid)
-    if newtext:
-        tab["fix_refs"] = "yes" if newtext != text else "no"
-        text = newtext
 
     # Process the edit
     editit = _process_edit(request_data, access_key, access_secret, text, user, tab)
