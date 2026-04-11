@@ -58,7 +58,16 @@ def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dic
     }
     headers = {"User-Agent": settings.user_agent}
     client = get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
-    response = requests.get(api_url, headers=headers, params=params, auth=client, timeout=30)
+
+    try:
+        response = requests.get(api_url, headers=headers, params=params, auth=client, timeout=30)
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"Connection error: {e}")
+        return {"error": {"code": "Connection error", "info": "Connection error"}, "exception": str(e), "response": ""}
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Request error: {e}")
+        return {"error": {"code": "Request error", "info": "Request error"}, "exception": str(e), "response": ""}
 
     try:
         result = response.json()

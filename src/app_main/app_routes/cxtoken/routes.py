@@ -41,12 +41,19 @@ def get_cxtoken_for_user_wiki(wiki, user):
     # Get cxtoken
     cxtoken = get_cxtoken(wiki, access_key, access_secret)
 
+    if isinstance(cxtoken, str):
+        logger.warning("cxtoken error")
+        logger.warning(cxtoken)
+
     # Handle invalid authorization
-    err = cxtoken.get("csrftoken_data", {}).get("error", {}).get("code")
-    if err == "mwoauth-invalid-authorization-invalid-user":
-        delete_user_token_by_username(user)
-        cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
-        return cxtoken, 403
+    err = cxtoken.get("csrftoken_data", {}).get("error", {})
+    if err:
+        if err.get("code") == "mwoauth-invalid-authorization-invalid-user":
+            delete_user_token_by_username(user)
+            cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
+            return cxtoken, 403
+        else:
+            return cxtoken.get("csrftoken_data", {}), 403
 
     return cxtoken, 200
 
