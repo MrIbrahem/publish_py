@@ -42,6 +42,7 @@ class CookieConfig:
 @dataclass(frozen=True)
 class SessionConfig:
     """Keys used for storing data in Flask session."""
+
     state_key: str
     request_token_key: str
 
@@ -49,6 +50,7 @@ class SessionConfig:
 @dataclass(frozen=True)
 class OAuthConfig:
     """MediaWiki OAuth specific configuration."""
+
     mw_uri: str
     consumer_key: str
     consumer_secret: str
@@ -73,6 +75,7 @@ class UsersConfig:
 @dataclass(frozen=True)
 class Settings:
     """Main settings container."""
+
     secret_key: str
     user_agent: str
     revids_api_url: str
@@ -86,6 +89,7 @@ class Settings:
     oauth: Optional[OAuthConfig]
     cors: CorsConfig
     users: UsersConfig
+
 
 # --- Helper Functions ---
 
@@ -114,6 +118,7 @@ def resolve_path(_path) -> Path:
     _path = os.path.expandvars(str(_path))
     _path = Path(_path).expanduser()
     return _path
+
 
 # --- Configuration Loaders ---
 
@@ -342,6 +347,9 @@ class DevelopmentConfig(Config):
     SESSION_COOKIE_SECURE: bool = False  # Allow HTTP in development
     WTF_CSRF_SSL_STRICT: bool = False  # Allow CSRF without HTTPS
 
+    # Disable CORS for testing
+    CORS_DISABLED: bool = True
+
 
 class TestingConfig(Config):
     """Testing configuration with CSRF disabled for easier form testing."""
@@ -357,6 +365,9 @@ class TestingConfig(Config):
     # Use a fixed test secret key
     SECRET_KEY: str = "test-secret-key-not-for-production"
 
+    # Disable CORS for testing
+    CORS_DISABLED: bool = True
+
 
 class ProductionConfig(Config):
     """Production configuration with strict security settings."""
@@ -370,3 +381,5 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SECURE: bool = True
     SESSION_COOKIE_HTTPONLY: bool = True
     SESSION_COOKIE_SAMESITE: str = "Lax"
+
+    CORS_DISABLED: bool = False

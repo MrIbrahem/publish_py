@@ -4,7 +4,7 @@ Mirrors: php_src/bots/cors.php
 """
 
 import logging
-from flask import request
+from flask import current_app, request
 
 from ..config import settings
 
@@ -16,6 +16,12 @@ def is_allowed() -> str | None:
 
     Returns the allowed domain name or None.
     """
+    if current_app.config.CORS_DISABLED:
+        return "test"
+
+    if not settings.cors.allowed_domains:
+        return None
+
     referer = request.headers.get("Referer", "")
     origin = request.headers.get("Origin", "")
 
