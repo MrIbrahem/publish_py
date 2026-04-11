@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import os
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
+
+# --- Data Classes for Configuration Sections ---
 
 
 @dataclass(frozen=True)
@@ -37,18 +40,20 @@ class CookieConfig:
 
 
 @dataclass(frozen=True)
+class SessionConfig:
+    """Keys used for storing data in Flask session."""
+    state_key: str
+    request_token_key: str
+
+
+@dataclass(frozen=True)
 class OAuthConfig:
+    """MediaWiki OAuth specific configuration."""
     mw_uri: str
     consumer_key: str
     consumer_secret: str
     encryption_key: Optional[str]
     enabled: bool = True
-
-
-@dataclass(frozen=True)
-class SessionConfig:
-    state_key: str
-    request_token_key: str
 
 
 @dataclass(frozen=True)
@@ -67,41 +72,87 @@ class UsersConfig:
 
 @dataclass(frozen=True)
 class Settings:
+    """Main settings container."""
     secret_key: str
     user_agent: str
-    is_localhost: Callable[[str], bool]
     revids_api_url: str
+    is_localhost: Callable[[str], bool]
 
+    # Nested configurations
     database_data: DbConfig
     paths: Paths
     cookie: CookieConfig
+    sessions: SessionConfig
+    oauth: Optional[OAuthConfig]
     cors: CorsConfig
     users: UsersConfig
 
     STATE_SESSION_KEY: str
     REQUEST_TOKEN_SESSION_KEY: str
     use_mw_oauth: bool
-    oauth: Optional[OAuthConfig]
-
-    sessions: SessionConfig
 
 
-def _load_database_credentials() -> DbConfig:
-    TOOL_TOOLSDB_HOST = os.getenv("TOOL_TOOLSDB_HOST", "")
+# --- Helper Functions ---
 
-    data = DbConfig(
-        db_name=os.getenv("TOOL_TOOLSDB_DBNAME", ""),
-        db_host=TOOL_TOOLSDB_HOST,
-        db_user=os.getenv("TOOL_TOOLSDB_USER", None),
-        db_password=os.getenv("TOOL_TOOLSDB_PASSWORD", None),
-    )
-    return data
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    """Convert environment variable to boolean."""
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_int(name: str, default: int) -> int:
+    """Convert environment variable to integer."""
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except ValueError as exc:  # pragma: no cover - defensive guard
+        raise ValueError(f"Environment variable {name} must be an integer") from exc
 
 
 def resolve_path(_path) -> Path:
+    """Expand environment variables and user home directory in paths."""
     _path = os.path.expandvars(str(_path))
     _path = Path(_path).expanduser()
     return _path
+
+# --- Configuration Loaders ---
+
+
+def _load_database_config() -> DbConfig:
+    return DbConfig(
+        db_name=os.getenv("TOOL_TOOLSDB_DBNAME", ""),
+        db_host=os.getenv("TOOL_TOOLSDB_HOST", ""),
+        db_user=os.getenv("TOOL_TOOLSDB_USER", None),
+        db_password=os.getenv("TOOL_TOOLSDB_PASSWORD", None),
+    )
+
+
+def _load_oauth_config() -> Optional[OAuthConfig]:
+    """
+    Loads OAuth settings and validates them if enabled.
+    Returns None if USE_MW_OAUTH is disabled.
+    """
+    mw_uri = os.getenv("OAUTH_MWURI", "")
+    consumer_key = os.getenv("OAUTH_CONSUMER_KEY", "")
+    consumer_secret = os.getenv("OAUTH_CONSUMER_SECRET", "")
+    if not (mw_uri and consumer_key and consumer_secret):
+        return None
+
+    _encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY", "")
+    use_mw_oauth = _env_bool("USE_MW_OAUTH", default=True)
+
+    return OAuthConfig(
+        mw_uri=mw_uri,
+        consumer_key=consumer_key,
+        consumer_secret=consumer_secret,
+        encryption_key=_encryption_key,
+        enabled=use_mw_oauth,
+    )
 
 
 def _get_paths() -> Paths:
@@ -123,43 +174,8 @@ def _get_paths() -> Paths:
     )
 
 
-def _env_bool(name: str, default: bool = False) -> bool:
-    value = os.getenv(name)
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "yes", "on"}
-
-
-def _env_int(name: str, default: int) -> int:
-    value = os.getenv(name)
-    if value is None:
-        return default
-    try:
-        return int(value)
-    except ValueError as exc:  # pragma: no cover - defensive guard
-        raise ValueError(f"Environment variable {name} must be an integer") from exc
-
-
-def _load_oauth_config() -> Optional[OAuthConfig]:
-    mw_uri = os.getenv("OAUTH_MWURI", "")
-    consumer_key = os.getenv("OAUTH_CONSUMER_KEY", "")
-    consumer_secret = os.getenv("OAUTH_CONSUMER_SECRET", "")
-    if not (mw_uri and consumer_key and consumer_secret):
-        return None
-
-    _encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY", "")
-    use_mw_oauth = _env_bool("USE_MW_OAUTH", default=True)
-
-    return OAuthConfig(
-        mw_uri=mw_uri,
-        consumer_key=consumer_key,
-        consumer_secret=consumer_secret,
-        encryption_key=_encryption_key,
-        enabled=use_mw_oauth,
-    )
-
-
 def is_localhost(host: str) -> bool:
+    """Check if the host refers to a local environment."""
     local_hosts = [
         "localhost",
         "127.0.0.1",
@@ -255,7 +271,7 @@ def get_settings() -> Settings:
 
         secret_key=secret_key,
         paths=_get_paths(),
-        database_data=_load_database_credentials(),
+        database_data=_load_database_config(),
 
         STATE_SESSION_KEY=STATE_SESSION_KEY,
         REQUEST_TOKEN_SESSION_KEY=REQUEST_TOKEN_SESSION_KEY,
