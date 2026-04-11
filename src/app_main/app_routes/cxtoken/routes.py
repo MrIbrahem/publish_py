@@ -15,7 +15,7 @@ from ...helpers.cors import is_allowed
 from ...services.oauth_client import get_cxtoken
 from ...users.store import delete_user_token_by_username, get_user_token_by_username
 
-bp_cxtoken = Blueprint("cxtoken", __name__)
+bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
 logger = logging.getLogger(__name__)
 
 
