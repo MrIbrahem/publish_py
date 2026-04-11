@@ -3,9 +3,12 @@
 Mirrors: php_src/bots/cors.php
 """
 
+import logging
 from flask import request
 
 from ..config import settings
+
+logger = logging.getLogger(__name__)
 
 
 def is_allowed() -> str | None:
@@ -19,4 +22,5 @@ def is_allowed() -> str | None:
     for domain in settings.cors.allowed_domains:
         if domain in referer or domain in origin:
             return domain
+    logger.warning(f"Access denied: referer={referer}, origin={origin}")
     return None
