@@ -10,6 +10,7 @@ from typing import Any
 import requests
 
 from ..db import get_db
+from ..config import settings
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)
@@ -33,38 +34,6 @@ def get_qid_for_mdtitle(title: str) -> str | None:
             return result[0].get("qid")
     except Exception as e:
         logger.error(f"Error fetching QID for {title}: {e}")
-
-    return None
-
-
-def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
-    """Get page information from Wikipedia API.
-
-    Args:
-        targettitle: Target page title
-        lang: Language code
-
-    Returns:
-        Page info dictionary or None if not found
-    """
-    params = {
-        "action": "query",
-        "format": "json",
-        "titles": targettitle,
-        "utf8": 1,
-        "formatversion": "2",
-    }
-    url = f"https://{lang}.wikipedia.org/w/api.php"
-
-    try:
-        response = requests.get(url, params=params, timeout=30)
-        result = response.json()
-        logger.debug(f"GetTitleInfo result: {result}")
-        pages = result.get("query", {}).get("pages", [])
-        if pages:
-            return pages[0]
-    except Exception as e:
-        logger.error(f"GetTitleInfo error: {e}")
 
     return None
 

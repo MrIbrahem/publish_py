@@ -1,14 +1,13 @@
 """Tests for helpers.format module."""
 
 import pytest
-
+from src.app_main.config import settings
 from src.app_main.helpers.format import (
     determine_hashtag,
     format_title,
     format_user,
     make_summary,
 )
-from src.app_main.config import settings
 
 
 class TestFormatTitle:
@@ -70,7 +69,9 @@ class TestMakeSummary:
     def test_generates_correct_summary(self):
         """Test that edit summary is generated correctly."""
         summary = make_summary("12345", "Source Page", "ar", "#mdwikicx")
-        expected = "Created by translating the page [[:mdwiki:Special:Redirect/revision/12345|Source Page]] to:ar #mdwikicx"
+        expected = (
+            "Created by translating the page [[:mdwiki:Special:Redirect/revision/12345|Source Page]] to:ar #mdwikicx"
+        )
         assert summary == expected
 
     def test_generates_summary_without_hashtag(self):

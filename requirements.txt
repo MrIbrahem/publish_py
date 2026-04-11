@@ -8,4 +8,5 @@ pymysql
 requests
 requests_oauthlib
 cryptography
+cachetools
 git+https://github.com/MrIbrahem/fix_refs_new_py.git

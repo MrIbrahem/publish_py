@@ -12,7 +12,6 @@ from functools import lru_cache
 from typing import Any
 
 from ..config import DbConfig
-
 from .db_class import Database
 
 logger = logging.getLogger(__name__)
@@ -44,9 +43,7 @@ class CategoriesDB:
         camp_to_cats: dict[str, str] = {}
 
         try:
-            rows = self.db.fetch_query_safe(
-                "SELECT campaign, category FROM categories"
-            )
+            rows = self.db.fetch_query_safe("SELECT campaign, category FROM categories")
             for row in rows:
                 campaign = row.get("campaign")
                 category = row.get("category")

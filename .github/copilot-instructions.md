@@ -180,10 +180,10 @@ Routes are organized into blueprints:
 Required environment variables (see `src/example.env`):
 
 - `FLASK_SECRET_KEY`: Flask session secret key
-- `DB_NAME`: Database name
-- `DB_HOST`: Database host
-- `DB_USER`: Database username
-- `DB_PASSWORD`: Database password
+- `TOOL_TOOLSDB_DBNAME`: Database name
+- `TOOL_TOOLSDB_HOST`: Database host
+- `TOOL_TOOLSDB_USER`: Database username
+- `TOOL_TOOLSDB_PASSWORD`: Database password
 - `OAUTH_MWURI`: MediaWiki OAuth URI
 - `OAUTH_CONSUMER_KEY`: OAuth consumer key
 - `OAUTH_CONSUMER_SECRET`: OAuth consumer secret

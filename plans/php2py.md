@@ -597,8 +597,8 @@ RAND_ID = f"{int(datetime.now().timestamp())}-{secrets.token_hex(6)}"
 def get_reports_dir() -> Path:
     """Get/create the reports directory structure."""
     # Determine base directory
-    main_dir = os.getenv("MAIN_DIR", os.path.expanduser("~/data"))
-    publish_reports = Path(main_dir) / "publish_reports" / "reports_by_day"
+    flask_data_dir = os.getenv("FLASK_DATA_DIR", os.path.expanduser("~/data"))
+    publish_reports = Path(flask_data_dir) / "publish_reports" / "reports_by_day"
 
     # Create directory structure: YYYY/MM/DD/rand_id
     now = datetime.now()

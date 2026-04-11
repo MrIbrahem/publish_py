@@ -58,18 +58,9 @@ def oauth_required(func: F) -> F:
 
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any):
-        if settings.use_mw_oauth and not current_user():
+        if settings.oauth and settings.oauth.enabled and not current_user():
             session["post_login_redirect"] = request.url
             return redirect(url_for("auth.login"))
         return func(*args, **kwargs)
 
     return cast(F, wrapper)
-
-
-def context_user() -> dict[str, Any]:
-    user = current_user()
-    return {
-        "current_user": user,
-        "is_authenticated": user is not None,
-        "username": user.username if user else None,
-    }

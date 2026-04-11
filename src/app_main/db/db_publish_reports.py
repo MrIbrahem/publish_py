@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from ..config import DbConfig
-
 from . import Database
 
 logger = logging.getLogger(__name__)
@@ -29,10 +28,20 @@ PUBLISH_REPORTS_PARAMS = [
 ]
 
 # Valid columns that can be used in SELECT and WHERE clauses (for validation)
-_VALID_COLUMNS = frozenset({
-    "id", "date", "title", "user", "lang", "sourcetitle", "result", "data",
-    "YEAR(date)", "MONTH(date)",
-})
+_VALID_COLUMNS = frozenset(
+    {
+        "id",
+        "date",
+        "title",
+        "user",
+        "lang",
+        "sourcetitle",
+        "result",
+        "data",
+        "YEAR(date)",
+        "MONTH(date)",
+    }
+)
 
 table_creation_sql = """
 CREATE TABLE IF NOT EXISTS `publish_reports` (

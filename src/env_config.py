@@ -1,22 +1,30 @@
 """
 Central configuration for the SVG Translate web application.
+
+This module handles loading environment variables from .env files.
+It should be imported and initialized at application startup.
 """
 
-import os
-from pathlib import Path
-
+import logging
 from dotenv import load_dotenv
-_env_file_path = None
 
-try:
-    load_dotenv()
-except Exception:
-    _HOME = os.getenv("HOME")
+logger = logging.getLogger(__name__)
 
-    if _HOME:
-        _env_file_path = Path(f"{_HOME}/.env")
 
-        if not _env_file_path.exists():
-            _env_file_path = Path(f"{_HOME}/confs/.env")
+def load_environment() -> None:
+    """Load environment variables from .env files.
 
-        load_dotenv(_env_file_path)
+    This function loads environment variables from .env files
+
+    This function is safe to call multiple times - subsequent calls will not
+    override already loaded environment variables.
+    """
+    try:
+        load_dotenv()
+    except Exception:
+        logger.warning("Failed to load .env file from current working directory")
+
+
+# Keep backward compatibility: auto-load on import for legacy code
+# New code should call load_environment() explicitly
+load_environment()

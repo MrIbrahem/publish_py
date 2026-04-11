@@ -21,7 +21,9 @@ def app():
         os.environ["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
 
     app = Flask(__name__)
+    app.url_map.strict_slashes = False
     app.config["TESTING"] = True
+    app.config["CORS_DISABLED"] = False
     return app
 
 
@@ -30,9 +32,7 @@ class TestIsAllowed:
 
     def test_allows_medwiki_origin(self, app):
         """Test that medwiki.toolforge.org origin is allowed."""
-        with app.test_request_context(
-            headers={"Origin": "https://medwiki.toolforge.org"}
-        ):
+        with app.test_request_context(headers={"Origin": "https://medwiki.toolforge.org"}):
             from src.app_main.helpers.cors import is_allowed
 
             result = is_allowed()
@@ -40,9 +40,7 @@ class TestIsAllowed:
 
     def test_allows_mdwikicx_referer(self, app):
         """Test that mdwikicx.toolforge.org referer is allowed."""
-        with app.test_request_context(
-            headers={"Referer": "https://mdwikicx.toolforge.org/page"}
-        ):
+        with app.test_request_context(headers={"Referer": "https://mdwikicx.toolforge.org/page"}):
             from src.app_main.helpers.cors import is_allowed
 
             result = is_allowed()
@@ -50,9 +48,7 @@ class TestIsAllowed:
 
     def test_rejects_unknown_origin(self, app):
         """Test that unknown origin is rejected."""
-        with app.test_request_context(
-            headers={"Origin": "https://evil.com", "Referer": "https://evil.com"}
-        ):
+        with app.test_request_context(headers={"Origin": "https://evil.com", "Referer": "https://evil.com"}):
             from src.app_main.helpers.cors import is_allowed
 
             result = is_allowed()

@@ -25,7 +25,12 @@ def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wiki
 
     Returns:
         OAuth1 authentication object
+
+    Raises:
+        RuntimeError: If OAuth is not configured
     """
+    if settings.oauth is None:
+        raise RuntimeError("OAuth is not configured")
     return OAuth1(
         settings.oauth.consumer_key,
         client_secret=settings.oauth.consumer_secret,
@@ -51,10 +56,27 @@ def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dic
         "meta": "tokens",
         "format": "json",
     }
-
+    headers = {"User-Agent": settings.user_agent}
     client = get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
-    response = requests.get(api_url, params=params, auth=client, timeout=30)
-    return response.json()
+
+    try:
+        response = requests.get(api_url, headers=headers, params=params, auth=client, timeout=30)
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"Connection error: {e}")
+        return {"error": {"code": "Connection error", "info": "Connection error"}, "exception": str(e), "response": ""}
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Request error: {e}")
+        return {"error": {"code": "Request error", "info": "Request error"}, "exception": str(e), "response": ""}
+
+    try:
+        result = response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {e}")
+        logger.error(response.text)
+        result = {"error": "JSON decode error", "response": response.text}
+
+    return result
 
 
 def post_params(
@@ -98,7 +120,8 @@ def post_params(
     logger.debug(f"post_params: apiParams: {api_params}")
 
     client = get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
-    response = requests.post(api_url, data=api_params, auth=client, timeout=60)
+    headers = {"User-Agent": settings.user_agent}  # , headers=headers
+    response = requests.post(api_url, headers=headers, data=api_params, auth=client, timeout=60)
     return response.text
 
 
@@ -111,7 +134,8 @@ def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict[str, Any
         access_secret: OAuth access secret
 
     Returns:
-        API response as dictionary
+        API response as dictionary containing token data like: { "age": 3600, "exp": 1775877248, "jwt": "..........." }
+
     """
     https_domain = f"https://{wiki}.wikipedia.org"
     api_params = {
@@ -124,9 +148,6 @@ def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict[str, Any
         result = json.loads(response)
     except json.JSONDecodeError:
         logger.error(f"Failed to parse cxtoken response: {response}")
-        result = {"error": "Failed to parse response"}
+        result = {"error": {"code": "parse-error", "info": "Failed to parse response"}}
 
-    if result is None or "error" in result:
-        logger.error(f"get_cxtoken error: {result}")
-
-    return result or {}
+    return result

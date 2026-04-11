@@ -1,7 +1,8 @@
 """Tests for services.oauth_client module."""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 
 class TestGetOauthClient:
@@ -27,19 +28,15 @@ class TestGetCsrfToken:
 
     def test_returns_token_response(self):
         """Test that CSRF token is retrieved from API."""
-        with patch("src.app_main.services.oauth_client.requests") as mock_requests, \
-             patch("src.app_main.services.oauth_client.settings") as mock_settings:
+        with (
+            patch("src.app_main.services.oauth_client.requests") as mock_requests,
+            patch("src.app_main.services.oauth_client.settings") as mock_settings,
+        ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
 
             mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "query": {
-                    "tokens": {
-                        "csrftoken": "test_csrf_token+\\"
-                    }
-                }
-            }
+            mock_response.json.return_value = {"query": {"tokens": {"csrftoken": "test_csrf_token+\\"}}}
             mock_requests.get.return_value = mock_response
 
             from src.app_main.services.oauth_client import get_csrf_token
@@ -56,15 +53,15 @@ class TestPostParams:
 
     def test_includes_csrf_token_in_request(self):
         """Test that CSRF token is included in POST request."""
-        with patch("src.app_main.services.oauth_client.get_csrf_token") as mock_get_token, \
-             patch("src.app_main.services.oauth_client.requests") as mock_requests, \
-             patch("src.app_main.services.oauth_client.settings") as mock_settings:
+        with (
+            patch("src.app_main.services.oauth_client.get_csrf_token") as mock_get_token,
+            patch("src.app_main.services.oauth_client.requests") as mock_requests,
+            patch("src.app_main.services.oauth_client.settings") as mock_settings,
+        ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
 
-            mock_get_token.return_value = {
-                "query": {"tokens": {"csrftoken": "token123"}}
-            }
+            mock_get_token.return_value = {"query": {"tokens": {"csrftoken": "token123"}}}
             mock_response = MagicMock()
             mock_response.text = '{"success": true}'
             mock_requests.post.return_value = mock_response
@@ -85,14 +82,14 @@ class TestPostParams:
 
     def test_returns_error_when_csrf_fails(self):
         """Test that error is returned when CSRF token retrieval fails."""
-        with patch("src.app_main.services.oauth_client.get_csrf_token") as mock_get_token, \
-             patch("src.app_main.services.oauth_client.settings") as mock_settings:
+        with (
+            patch("src.app_main.services.oauth_client.get_csrf_token") as mock_get_token,
+            patch("src.app_main.services.oauth_client.settings") as mock_settings,
+        ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
 
-            mock_get_token.return_value = {
-                "error": {"code": "mwoauth-invalid-authorization"}
-            }
+            mock_get_token.return_value = {"error": {"code": "mwoauth-invalid-authorization"}}
 
             from src.app_main.services.oauth_client import post_params
 

@@ -10,7 +10,6 @@ import logging
 from typing import Any
 
 from ..config import DbConfig
-
 from . import Database
 
 logger = logging.getLogger(__name__)

@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock
 
 import pytest
-
 from src.app_main.config import DbConfig
 from src.app_main.db.db_categories import (
     CategoriesDB,
@@ -20,7 +19,6 @@ def fixture_for_category_db() -> DbConfig:
         db_host="localhost",
         db_user="user",
         db_password="pass",
-        db_connect_file=None,
     )
 
 

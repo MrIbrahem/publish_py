@@ -1,7 +1,8 @@
 """Tests for services.wikidata_client module."""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 
 class TestGetQidForMdtitle:
@@ -47,49 +48,15 @@ class TestGetQidForMdtitle:
             assert result is None
 
 
-class TestGetTitleInfo:
-    """Tests for get_title_info function."""
-
-    def test_returns_page_info_on_success(self):
-        """Test that page info is returned on success."""
-        with patch("src.app_main.services.wikidata_client.requests") as mock_requests:
-            mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "query": {
-                    "pages": [
-                        {"pageid": 123, "title": "Test Page", "missing": False}
-                    ]
-                }
-            }
-            mock_requests.get.return_value = mock_response
-
-            from src.app_main.services.wikidata_client import get_title_info
-
-            result = get_title_info("Test Page", "en")
-
-            assert result is not None
-            assert result["pageid"] == 123
-            assert result["title"] == "Test Page"
-
-    def test_returns_none_on_error(self):
-        """Test that None is returned on error."""
-        with patch("src.app_main.services.wikidata_client.requests") as mock_requests:
-            mock_requests.get.side_effect = Exception("Network error")
-
-            from src.app_main.services.wikidata_client import get_title_info
-
-            result = get_title_info("Test Page", "en")
-
-            assert result is None
-
-
 class TestLinkToWikidata:
     """Tests for link_to_wikidata function."""
 
     def test_returns_success_on_successful_link(self):
         """Test that success result is returned on successful link."""
-        with patch("src.app_main.services.wikidata_client.get_qid_for_mdtitle") as mock_qid, \
-             patch("src.app_main.services.wikidata_client._link_it") as mock_link:
+        with (
+            patch("src.app_main.services.wikidata_client.get_qid_for_mdtitle") as mock_qid,
+            patch("src.app_main.services.wikidata_client._link_it") as mock_link,
+        ):
             mock_qid.return_value = "Q12345"
             mock_link.return_value = {"success": True}
 
@@ -128,8 +95,10 @@ class TestLinkToWikidata:
 
     def test_returns_link_error_with_qid(self):
         """Test that link error includes QID."""
-        with patch("src.app_main.services.wikidata_client.get_qid_for_mdtitle") as mock_qid, \
-             patch("src.app_main.services.wikidata_client._link_it") as mock_link:
+        with (
+            patch("src.app_main.services.wikidata_client.get_qid_for_mdtitle") as mock_qid,
+            patch("src.app_main.services.wikidata_client._link_it") as mock_link,
+        ):
             mock_qid.return_value = "Q12345"
             mock_link.return_value = {"error": {"code": "protectedpage"}}
 

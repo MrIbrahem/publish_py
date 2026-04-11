@@ -37,7 +37,7 @@ def get_reports_dir() -> Path:
     Returns the path to the reports directory for today:
     {settings.paths.publish_reports_dir}/YYYY/MM/DD/{rand_id}/
     """
-    publish_reports = Path(settings.paths.publish_reports_dir)
+    publish_reports: Path = settings.paths.publish_reports_dir
 
     # Create directory structure: YYYY/MM/DD/rand_id
     now = datetime.now()
@@ -68,7 +68,7 @@ def to_do(tab: dict[str, Any], status: str) -> None:
     log_entry["status"] = status
 
     # Write to JSON lines log file (existing behavior)
-    log_dir = Path(settings.paths.log_dir)
+    log_dir: Path = settings.paths.log_dir
     today = now.strftime("%Y-%m-%d")
     log_file = log_dir / f"publish_{today}.json"
 

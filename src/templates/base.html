@@ -38,10 +38,35 @@
             </ul>
             <span class="navbar-text">
                 <!-- User info or login/logout links can go here -->
+                {% if oauth_enabled %}
+                {% if current_user %}
+                <a href="/profile" class="btn btn-outline-primary">{{ current_user.username }}</a>
+                <a href="/logout" class="btn btn-outline-primary">Logout</a>
+                {% else %}
+                <a href="/login" class="btn btn-outline-primary">Login</a>
+                {% endif %}
+                {% else %}
+                -
+                {% endif %}
             </span>
         </div>
     </div>
 </nav>
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+<div class="container">
+    <div class="alert-stack mb-4">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
 
 <body>
     {% block content %}{% endblock %}
