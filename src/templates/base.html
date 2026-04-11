@@ -53,6 +53,21 @@
     </div>
 </nav>
 
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+<div class="container">
+    <div class="alert-stack mb-4">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
 <body>
     {% block content %}{% endblock %}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

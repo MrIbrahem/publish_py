@@ -56,10 +56,18 @@ def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dic
         "meta": "tokens",
         "format": "json",
     }
-
+    headers = {"User-Agent": settings.user_agent}
     client = get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
-    response = requests.get(api_url, params=params, auth=client, timeout=30)
-    return response.json()
+    response = requests.get(api_url, headers=headers, params=params, auth=client, timeout=30)
+
+    try:
+        result = response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {e}")
+        logger.error(response.text)
+        result = {"error": "JSON decode error", "response": response.text}
+
+    return result
 
 
 def post_params(
@@ -103,7 +111,8 @@ def post_params(
     logger.debug(f"post_params: apiParams: {api_params}")
 
     client = get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
-    response = requests.post(api_url, data=api_params, auth=client, timeout=60)
+    headers = {"User-Agent": settings.user_agent}  # , headers=headers
+    response = requests.post(api_url, headers=headers, data=api_params, auth=client, timeout=60)
     return response.text
 
 

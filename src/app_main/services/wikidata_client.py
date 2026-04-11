@@ -10,6 +10,7 @@ from typing import Any
 import requests
 
 from ..db import get_db
+from ..config import settings
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)
@@ -56,8 +57,10 @@ def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
     }
     url = f"https://{lang}.wikipedia.org/w/api.php"
 
+    headers = {"User-Agent": settings.user_agent}
+
     try:
-        response = requests.get(url, params=params, timeout=30)
+        response = requests.get(url, headers=headers, params=params, timeout=30)
         result = response.json()
         logger.debug(f"GetTitleInfo result: {result}")
         pages = result.get("query", {}).get("pages", [])

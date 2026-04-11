@@ -37,7 +37,7 @@ from .oauth import (
 from .rate_limit import callback_rate_limiter, login_rate_limiter
 
 logger = logging.getLogger(__name__)
-bp_auth = Blueprint("auth", __name__)
+bp_auth = Blueprint("auth", __name__, url_prefix="")
 
 oauth_state_nonce = settings.sessions.state_key
 request_token_key = settings.sessions.request_token_key

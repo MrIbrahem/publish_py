@@ -14,7 +14,7 @@ from flask import (
 
 from ...users.current import current_user
 
-bp_main = Blueprint("main", __name__)
+bp_main = Blueprint("main", __name__, url_prefix="")
 logger = logging.getLogger(__name__)
 
 

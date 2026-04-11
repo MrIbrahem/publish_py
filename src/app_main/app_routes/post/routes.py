@@ -30,7 +30,7 @@ from ...services.text_processor import do_changes_to_text
 from ...services.wikidata_client import link_to_wikidata
 from ...users.store import get_user_token_by_username
 
-bp_post = Blueprint("post", __name__)
+bp_post = Blueprint("post", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
 
 
