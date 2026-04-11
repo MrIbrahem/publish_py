@@ -15,7 +15,7 @@ from ...helpers.format import (
     make_summary,
 )
 from ...helpers.words import get_word_count
-from ...services.mediawiki_api import publish_do_edit
+from ...services.mediawiki_api import publish_do_edit, get_title_info
 from ...services.revids_service import get_revid, get_revid_db
 from ...services.text_processor import do_changes_to_text
 from ...services.wikidata_client import link_to_wikidata
@@ -31,6 +31,22 @@ def _get_revid(sourcetitle) -> str:
         revid = get_revid_db(sourcetitle)
 
     return revid
+
+
+def shouldAddedToWikidata(lang, title):
+    """
+    """
+    page_information = get_title_info(title, lang)
+    if not page_information:
+        return False
+
+    page_namespace = page_information.get("ns", None)
+
+    if page_namespace == 2:
+        # skip link to wd for user pages
+        return False
+
+    return True
 
 
 def _get_errors_file(editit: dict[str, Any], placeholder: str) -> str:
@@ -144,6 +160,10 @@ def _handle_successful_edit(
     """
     link_result: dict[str, Any] = {}
 
+    if not shouldAddedToWikidata(lang, title):
+        # skip link to wd for user pages
+        return {"error": "skip link to wd for user pages"}
+
     try:
         link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
 
@@ -182,7 +202,7 @@ def _handle_successful_edit(
 
 
 def _add_to_db(
-    title: str,
+    target: str,
     lang: str,
     user: str,
     wd_result: dict[str, Any],
@@ -193,7 +213,7 @@ def _add_to_db(
     """Add page to database.
 
     Args:
-        title: Target page title
+        target: Target page title
         lang: Target language code
         user: Username
         wd_result: Wikidata result
@@ -215,36 +235,131 @@ def _add_to_db(
     # Check if abuse filter warning was triggered
     to_users_table = "abusefilter-warning-39" in json.dumps(wd_result)
 
-    pages_db = PagesDB(settings.database_data)
-    return pages_db.insert_page_target(
-        title=sourcetitle,
+    return insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, word, to_users_table)
+
+
+def insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, word, to_users_table):
+
+    # Normalize inputs
+    sourcetitle = sourcetitle.replace("_", " ")
+    target = target.replace("_", " ")
+    user = user.replace("_", " ")
+
+    # Validate required fields
+    if not user or not sourcetitle or not lang:
+        return {
+            "use_user_sql": False,
+            "to_users_table": to_users_table,
+            "one_empty": {"title": sourcetitle, "lang": lang, "user": user},
+        }
+
+    return insert_to_db_2(
+        sourcetitle=sourcetitle,
         tr_type="lead",
         cat=cat,
         lang=lang,
         user=user,
-        target=title,
+        target=target,
         to_users_table=to_users_table,
         mdwiki_revid=int(mdwiki_revid) if mdwiki_revid else None,
         word=word,
     )
 
 
+def insert_to_db_2(
+    sourcetitle: str,
+    lang: str,
+    user: str,
+    tr_type: str,
+    cat: str,
+    target: str,
+    to_users_table: bool = False,
+    mdwiki_revid: int | None = None,
+    word: int = 0,
+) -> dict[str, Any]:
+    """Insert a page target record.
+
+    Mirrors: php_src/bots/sql/db_Pages.php InsertPageTarget()
+
+    Args:
+        sourcetitle: Page title
+        tr_type: Translation type
+        cat: Category
+        lang: Target language
+        user: Username
+        target: Target page title
+        to_users_table: Whether to insert to pages_users table
+        mdwiki_revid: MDWiki revision ID
+        word: Word count
+
+    Returns:
+        Dictionary with operation result
+    """
+    pages_db = PagesDB(settings.database_data)
+
+    result: dict[str, Any] = {
+        "use_user_sql": False,
+        "to_users_table": to_users_table,
+    }
+
+    # Determine which table to use
+    use_user_sql = to_users_table
+    if not to_users_table:
+        user_t = user.replace("User:", "").replace("user:", "")
+        if user_t in target:
+            use_user_sql = True
+
+    result["use_user_sql"] = use_user_sql
+
+    # Check if exists and update if needed
+    exists = pages_db._find_exists_or_update(sourcetitle, lang, user, target, use_user_sql)
+    if exists:
+        result["exists"] = "already_in"
+        return result
+
+    table_name = "pages_users" if use_user_sql else "pages"
+
+    # Insert new record
+    add_done = pages_db.insert_page_target(
+        sourcetitle=sourcetitle,
+        tr_type=tr_type,
+        cat=cat,
+        lang=lang,
+        user=user,
+        target=target,
+        table_name=table_name,
+        mdwiki_revid=mdwiki_revid,
+        word=word,
+    )
+
+    result["execute_query"] = add_done is True
+
+    return result
+
+
+def load_to_do_file(editit) -> str:
+    if editit.get("edit", {}).get("result", "") == "Success":
+        to_do_file = "success"
+    elif editit.get("edit", {}).get("captcha"):
+        to_do_file = "captcha"
+    else:
+        to_do_file = _get_errors_file(editit, "errors")
+
+    return to_do_file
+
+
 def _process_edit(
-    request_data: dict[str, Any],
     access_key: str,
     access_secret: str,
     text: str,
-    user: str,
     tab: dict[str, Any],
 ) -> dict[str, Any]:
     """Process the edit request.
 
     Args:
-        request_data: Original request data
         access_key: OAuth access key
         access_secret: OAuth access secret
         text: Page text content
-        user: Username
         tab: Operation metadata
 
     Returns:
@@ -254,18 +369,18 @@ def _process_edit(
     lang = tab["lang"]
     campaign = tab["campaign"]
     title = tab["title"]
-    summary = tab["summary"]
+    user = tab["user"]
 
     # Get revision ID
-    mdwiki_revid = _get_revid(tab["sourcetitle"])
+    mdwiki_revid = _get_revid(sourcetitle)
 
     if not mdwiki_revid:
         tab["empty revid"] = "Can not get revid from all_pages_revids.json"
-        mdwiki_revid = request_data.get("revid", "") or request_data.get("revision", "")
+        mdwiki_revid = tab.get("request_revid", "")
 
     tab["revid"] = mdwiki_revid
     # Apply text changes (fix references)
-    newtext = do_changes_to_text(tab["sourcetitle"], tab["title"], text, tab["lang"], mdwiki_revid)
+    newtext = do_changes_to_text(sourcetitle, tab["title"], text, lang, mdwiki_revid)
 
     if newtext:
         tab["fix_refs"] = "yes" if newtext != text else "no"
@@ -273,33 +388,31 @@ def _process_edit(
 
     # Generate summary
     hashtag = determine_hashtag(tab["title"], user)
-    tab["summary"] = make_summary(mdwiki_revid, tab["sourcetitle"], tab["lang"], hashtag)
-    summary = tab["summary"]
+
+    tab["summary"] = make_summary(mdwiki_revid, sourcetitle, lang, hashtag)
 
     # Prepare API parameters
     api_params = {
         "action": "edit",
         "title": title,
-        "summary": summary,
+        "summary": tab["summary"],
         "text": text,
         "format": "json",
     }
 
     # Add captcha parameters if present
-    if request_data.get("wpCaptchaId") and request_data.get("wpCaptchaWord"):
-        api_params["wpCaptchaId"] = request_data["wpCaptchaId"]
-        api_params["wpCaptchaWord"] = request_data["wpCaptchaWord"]
+    if tab.get("wp_captcha_params"):
+        api_params.update(tab["wp_captcha_params"])
 
     # Perform the edit
     editit = publish_do_edit(api_params, lang, access_key, access_secret)
 
     success = editit.get("edit", {}).get("result", "")
-    is_captcha = editit.get("edit", {}).get("captcha")
 
     tab["result"] = success
 
     if success == "Success":
-        link_to_wikidata = _handle_successful_edit(
+        link_to_wd = _handle_successful_edit(
             sourcetitle,
             lang,
             user,
@@ -307,22 +420,21 @@ def _process_edit(
             access_key,
             access_secret,
         )
-        editit["LinkToWikidata"] = link_to_wikidata
 
-        editit["sql_result"] = _add_to_db(
+        sql_result = _add_to_db(
             title,
             lang,
             user,
-            link_to_wikidata,
+            link_to_wd,
             campaign,
             sourcetitle,
             mdwiki_revid,
         )
-        to_do_file = "success"
-    elif is_captcha:
-        to_do_file = "captcha"
-    else:
-        to_do_file = _get_errors_file(editit, "errors")
+
+        editit["LinkToWikidata"] = link_to_wd
+        editit["sql_result"] = sql_result
+
+    to_do_file = load_to_do_file(editit)
 
     tab["result_to_cx"] = editit
     to_do(tab, to_do_file)
@@ -342,16 +454,16 @@ def _process_edit(
     return editit
 
 
-def _handle_no_access(user: str, tab: dict[str, Any]) -> dict:
+def _handle_no_access(tab: dict[str, Any]) -> dict:
     """Handle case when user has no access credentials.
 
     Args:
-        user: Username
         tab: Operation metadata
 
     Returns:
         JSON error response
     """
+    user = tab["user"]
     error = {"code": "noaccess", "info": "noaccess"}
     editit = {
         "error": error,
@@ -363,6 +475,7 @@ def _handle_no_access(user: str, tab: dict[str, Any]) -> dict:
 
     # Insert to reports
     reports_db = ReportsDB(settings.database_data)
+
     reports_db.add(
         title=tab["title"],
         user=user,
