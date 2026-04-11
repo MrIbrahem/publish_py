@@ -33,8 +33,8 @@ class TestGetReportsDir:
         """Test that the reports directory structure is created."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
-                publish_reports_dir=f"{tmpdir}/publish_reports/reports_by_day",
-                log_dir=tmpdir,
+                publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
+                log_dir=Path(tmpdir),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
             monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
