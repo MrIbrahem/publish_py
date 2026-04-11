@@ -20,10 +20,11 @@ class DbConfig:
 
 @dataclass(frozen=True)
 class Paths:
-    main_dir: str
+    flask_data_dir: str
     log_dir: str
     publish_reports_dir: str
     words_json_path: str
+    revids_file_path: Path
 
 
 @dataclass(frozen=True)
@@ -72,6 +73,7 @@ class Settings:
     cors: CorsConfig
     users: UsersConfig
 
+
 def _load_database_credentials() -> DbConfig:
     TOOL_TOOLSDB_HOST = os.getenv("TOOL_TOOLSDB_HOST", "")
 
@@ -84,19 +86,28 @@ def _load_database_credentials() -> DbConfig:
     return data
 
 
+def resolve_path(_path) -> Path:
+    _path = os.path.expandvars(str(_path))
+    _path = Path(_path).expanduser()
+    return _path
+
+
 def _get_paths() -> Paths:
-    main_dir = os.getenv("MAIN_DIR", os.path.join(os.path.expanduser("~"), "data"))
-    log_dir = f"{main_dir}/logs"
-    publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR", f"{main_dir}/publish_reports/reports_by_day")
-    words_json_path = os.getenv("WORDS_JSON_PATH", f"{main_dir}/td/Tables/jsons/words.json")
+    flask_data_dir = os.getenv("FLASK_DATA_DIR") or os.path.join(os.path.expanduser("~"), "~/data")
+    log_dir = f"{flask_data_dir}/logs"
+    publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR") or f"{flask_data_dir}/publish_reports/reports_by_day"
+    words_json_path = os.getenv("WORDS_JSON_PATH") or f"{flask_data_dir}/td/Tables/jsons/words.json"
+
+    revids_file_path = os.getenv("ALL_PAGES_REVIDS_PATH") or "~/public_html/all_pages_revids.json"
 
     Path(log_dir).mkdir(parents=True, exist_ok=True)
 
     return Paths(
-        main_dir=main_dir,
+        flask_data_dir=flask_data_dir,
         log_dir=log_dir,
         publish_reports_dir=publish_reports_dir,
         words_json_path=words_json_path,
+        revids_file_path=resolve_path(revids_file_path),
     )
 
 

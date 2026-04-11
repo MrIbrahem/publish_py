@@ -4,9 +4,9 @@ import sys
 from logging.handlers import WatchedFileHandler
 from pathlib import Path
 
-main_dir = os.getenv("MAIN_DIR", os.path.join(os.path.expanduser("~"), "data"))
+flask_data_dir = os.getenv("FLASK_DATA_DIR", os.path.join(os.path.expanduser("~"), "data"))
 
-log_dir_path = f"{main_dir}/logs"
+log_dir_path = f"{flask_data_dir}/logs"
 
 log_dir = Path(log_dir_path)
 log_dir.mkdir(parents=True, exist_ok=True)
