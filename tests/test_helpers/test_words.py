@@ -95,7 +95,7 @@ class TestClearWordsCache:
             with open(words_file, "w") as f:
                 json.dump(words_data, f)
 
-            mock_paths = SimpleNamespace(words_json_path=str(words_file))
+            mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
             monkeypatch.setattr("src.app_main.helpers.words.settings", mock_settings)
 
