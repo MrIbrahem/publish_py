@@ -8,11 +8,11 @@ import sys
 
 # Load environment variables before any other imports
 from env_config import load_environment
-from .app_main.config import ProductionConfig
 
 load_environment()
 
 from app_main import create_app  # noqa: E402
+from app_main.config import ProductionConfig  # noqa: E402
 from log import config_console_logger  # noqa: E402
 
 config_console_logger()
