@@ -87,11 +87,6 @@ class Settings:
     cors: CorsConfig
     users: UsersConfig
 
-    STATE_SESSION_KEY: str
-    REQUEST_TOKEN_SESSION_KEY: str
-    use_mw_oauth: bool
-
-
 # --- Helper Functions ---
 
 
@@ -137,21 +132,30 @@ def _load_oauth_config() -> Optional[OAuthConfig]:
     Loads OAuth settings and validates them if enabled.
     Returns None if USE_MW_OAUTH is disabled.
     """
+    mw_oauth_enabled = _env_bool("USE_MW_OAUTH", default=True)
+    if not mw_oauth_enabled:
+        return None
+
     mw_uri = os.getenv("OAUTH_MWURI", "")
     consumer_key = os.getenv("OAUTH_CONSUMER_KEY", "")
     consumer_secret = os.getenv("OAUTH_CONSUMER_SECRET", "")
-    if not (mw_uri and consumer_key and consumer_secret):
-        return None
+    encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY", "")
 
-    _encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY", "")
-    use_mw_oauth = _env_bool("USE_MW_OAUTH", default=True)
+    # Validate mandatory fields for OAuth
+    if not all([mw_uri, consumer_key, consumer_secret]):
+        raise RuntimeError(
+            "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
+        )
+
+    if not encryption_key:
+        raise RuntimeError("OAUTH_ENCRYPTION_KEY is required when USE_MW_OAUTH is enabled")
 
     return OAuthConfig(
         mw_uri=mw_uri,
         consumer_key=consumer_key,
         consumer_secret=consumer_secret,
-        encryption_key=_encryption_key,
-        enabled=use_mw_oauth,
+        encryption_key=encryption_key,
+        enabled=mw_oauth_enabled,
     )
 
 
@@ -163,7 +167,8 @@ def _get_paths() -> Paths:
 
     revids_file_path = os.getenv("ALL_PAGES_REVIDS_PATH") or "~/public_html/all_pages_revids.json"
 
-    Path(log_dir).mkdir(parents=True, exist_ok=True)
+    # Ensure log directory exists
+    Path(resolve_path(log_dir)).mkdir(parents=True, exist_ok=True)
 
     return Paths(
         flask_data_dir=flask_data_dir,
@@ -201,58 +206,44 @@ def load_cookie_config():
 
 
 def load_special_users() -> dict:
+    """
+    Special users mapping: comma-separated pairs of "alternate:canonical"
+    """
     special_users_str = os.getenv("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
     special_users = {}
-    for pair in special_users_str.split(","):
-        pair = pair.strip()
-        if not pair:
-            continue
-
-        if ":" not in pair:
-            # Log warning for malformed pair (missing colon)
-            import logging
-
+    for pair in (p.strip() for p in special_users_str.split(",") if p.strip()):
+        if ":" in pair:
+            alt, canonical = pair.split(":", 1)
+            special_users[alt.strip()] = canonical.strip()
+        else:
             logging.getLogger(__name__).warning(f"Ignoring malformed SPECIAL_USERS pair (missing ':'): {pair}")
-            continue
 
-        alt, canonical = pair.split(":", 1)
-        special_users[alt.strip()] = canonical.strip()
     return special_users
 
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
+    """
+    Initialize and return a cached Settings object.
+    Main entry point for application configuration.
+    """
     secret_key = os.getenv("FLASK_SECRET_KEY", "")
     if not secret_key:
         raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
 
+    # Load and organize sub-configs
     cookie = load_cookie_config()
 
-    STATE_SESSION_KEY = os.getenv("STATE_SESSION_KEY", "oauth_state_nonce")
-    REQUEST_TOKEN_SESSION_KEY = os.getenv("REQUEST_TOKEN_SESSION_KEY", "state")
+    sessions = SessionConfig(
+        state_key=os.getenv("STATE_SESSION_KEY", "oauth_state_nonce"),
+        request_token_key=os.getenv("REQUEST_TOKEN_SESSION_KEY", "state"),
+    )
 
-    oauth_config = _load_oauth_config()
-
-    if oauth_config.enabled and not oauth_config.encryption_key:
-        raise RuntimeError("OAUTH_ENCRYPTION_KEY environment variable is required when USE_MW_OAUTH is enabled")
-
-    if oauth_config.enabled and oauth_config is None:
-        raise RuntimeError(
-            "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
-        )
-
-    # Load CORS configuration
-    cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
-    cors_domains = tuple(d.strip() for d in cors_domains_str.split(",") if d.strip())
-    cors_config = CorsConfig(allowed_domains=cors_domains)
-
-    # Load users configuration
-    # Special users mapping: comma-separated pairs of "alternate:canonical"
+    # Load User Mappings
     special_users = load_special_users()
-
     fallback_user = os.getenv("FALLBACK_USER", "Mr. Ibrahem")
 
-    users_without_hashtag_str = os.getenv("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
+    users_without_hashtag_str = os.getenv("USERS_WITHOUT_HASHTAG") or "Mr. Ibrahem"
     users_without_hashtag = tuple(u.strip() for u in users_without_hashtag_str.split(",") if u.strip())
 
     users_config = UsersConfig(
@@ -261,29 +252,31 @@ def get_settings() -> Settings:
         users_without_hashtag=users_without_hashtag,
     )
 
+    # Load CORS configuration
+    cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
+    cors_domains = tuple(d.strip() for d in cors_domains_str.split(",") if d.strip())
+    cors_config = CorsConfig(allowed_domains=cors_domains)
+
     revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
 
     user_agent = os.getenv("USER_AGENT", "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)")
 
     return Settings(
-        is_localhost=is_localhost,
-        revids_api_url=revids_api_url,
-
         secret_key=secret_key,
-        paths=_get_paths(),
+        user_agent=user_agent,
+        revids_api_url=revids_api_url,
+        is_localhost=is_localhost,
         database_data=_load_database_config(),
-
-        STATE_SESSION_KEY=STATE_SESSION_KEY,
-        REQUEST_TOKEN_SESSION_KEY=REQUEST_TOKEN_SESSION_KEY,
-
+        paths=_get_paths(),
         cookie=cookie,
-        oauth=oauth_config,
+        sessions=sessions,
+        oauth=_load_oauth_config(),
         cors=cors_config,
         users=users_config,
-        user_agent=user_agent,
     )
 
 
+# Singleton settings instance
 settings = get_settings()
 
 
