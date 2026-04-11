@@ -10,12 +10,12 @@ from env_config import load_environment
 load_environment()
 
 from app_main import create_app  # noqa: E402
-from app_main.config import TestingConfig  # noqa: E402
+from app_main.config import DevelopmentConfig  # noqa: E402
 from log import config_console_logger  # noqa: E402
 
 config_console_logger()
 
-app = create_app(TestingConfig)
+app = create_app(DevelopmentConfig)
 
 if __name__ == "__main__":
     app.run(debug=True)
