@@ -5,10 +5,10 @@ Mirrors: php_src/bots/revids_bot.php
 
 import json
 import logging
-import os
 from pathlib import Path
 import requests
 from ..config import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -48,10 +48,8 @@ def get_revid_db(sourcetitle: str) -> str:
         "title": sourcetitle,
     }
 
-    api_base_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
-
     try:
-        response = requests.get(api_base_url, params=params, timeout=30)
+        response = requests.get(settings.revids_api_url, params=params, timeout=30)
         data = response.json()
         results = {r["title"]: str(r["revid"]) for r in data.get("results", [])}
         return results.get(sourcetitle, "")

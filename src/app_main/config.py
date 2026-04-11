@@ -41,7 +41,14 @@ class OAuthConfig:
     mw_uri: str
     consumer_key: str
     consumer_secret: str
-    user_agent: str
+    encryption_key: Optional[str]
+    enabled: bool = True
+
+
+@dataclass(frozen=True)
+class SessionConfig:
+    state_key: str
+    request_token_key: str
 
 
 @dataclass(frozen=True)
@@ -60,18 +67,23 @@ class UsersConfig:
 
 @dataclass(frozen=True)
 class Settings:
-    is_localhost: Callable[[str], bool]
-    database_data: DbConfig
-    STATE_SESSION_KEY: str
-    REQUEST_TOKEN_SESSION_KEY: str
     secret_key: str
-    use_mw_oauth: bool
-    oauth_encryption_key: Optional[str]
-    cookie: CookieConfig
-    oauth: Optional[OAuthConfig]
+    user_agent: str
+    is_localhost: Callable[[str], bool]
+    revids_api_url: str
+
+    database_data: DbConfig
     paths: Paths
+    cookie: CookieConfig
     cors: CorsConfig
     users: UsersConfig
+
+    STATE_SESSION_KEY: str
+    REQUEST_TOKEN_SESSION_KEY: str
+    use_mw_oauth: bool
+    oauth: Optional[OAuthConfig]
+
+    sessions: SessionConfig
 
 
 def _load_database_credentials() -> DbConfig:
@@ -93,7 +105,7 @@ def resolve_path(_path) -> Path:
 
 
 def _get_paths() -> Paths:
-    flask_data_dir = os.getenv("FLASK_DATA_DIR") or os.path.join(os.path.expanduser("~"), "~/data")
+    flask_data_dir = os.getenv("FLASK_DATA_DIR") or "~/data"
     log_dir = f"{flask_data_dir}/logs"
     publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR") or f"{flask_data_dir}/publish_reports/reports_by_day"
     words_json_path = os.getenv("WORDS_JSON_PATH") or f"{flask_data_dir}/td/Tables/jsons/words.json"
@@ -135,14 +147,15 @@ def _load_oauth_config() -> Optional[OAuthConfig]:
     if not (mw_uri and consumer_key and consumer_secret):
         return None
 
+    _encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY", "")
+    use_mw_oauth = _env_bool("USE_MW_OAUTH", default=True)
+
     return OAuthConfig(
         mw_uri=mw_uri,
         consumer_key=consumer_key,
         consumer_secret=consumer_secret,
-        user_agent=os.getenv(
-            "USER_AGENT",
-            "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)",
-        ),
+        encryption_key=_encryption_key,
+        enabled=use_mw_oauth,
     )
 
 
@@ -155,24 +168,10 @@ def is_localhost(host: str) -> bool:
     return any(x in host for x in local_hosts)
 
 
-@lru_cache(maxsize=1)
-def get_settings() -> Settings:
-    secret_key = os.getenv("FLASK_SECRET_KEY", "")
-    if not secret_key:
-        raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
-
+def load_cookie_config():
     session_cookie_secure = _env_bool("SESSION_COOKIE_SECURE", default=True)
     session_cookie_httponly = _env_bool("SESSION_COOKIE_HTTPONLY", default=True)
     session_cookie_samesite = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
-    STATE_SESSION_KEY = os.getenv("STATE_SESSION_KEY", "oauth_state_nonce")
-    REQUEST_TOKEN_SESSION_KEY = os.getenv("REQUEST_TOKEN_SESSION_KEY", "state")
-
-    use_mw_oauth = _env_bool("USE_MW_OAUTH", default=True)
-    oauth_config = _load_oauth_config()
-
-    oauth_encryption_key = os.getenv("OAUTH_ENCRYPTION_KEY", "")
-    if use_mw_oauth and not oauth_encryption_key:
-        raise RuntimeError("OAUTH_ENCRYPTION_KEY environment variable is required when USE_MW_OAUTH is enabled")
 
     cookie = CookieConfig(
         name=os.getenv("AUTH_COOKIE_NAME", "uid_enc"),
@@ -182,6 +181,50 @@ def get_settings() -> Settings:
         samesite=session_cookie_samesite,
     )
 
+    return cookie
+
+
+def load_special_users() -> dict:
+    special_users_str = os.getenv("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
+    special_users = {}
+    for pair in special_users_str.split(","):
+        pair = pair.strip()
+        if not pair:
+            continue
+
+        if ":" not in pair:
+            # Log warning for malformed pair (missing colon)
+            import logging
+
+            logging.getLogger(__name__).warning(f"Ignoring malformed SPECIAL_USERS pair (missing ':'): {pair}")
+            continue
+
+        alt, canonical = pair.split(":", 1)
+        special_users[alt.strip()] = canonical.strip()
+    return special_users
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    secret_key = os.getenv("FLASK_SECRET_KEY", "")
+    if not secret_key:
+        raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
+
+    cookie = load_cookie_config()
+
+    STATE_SESSION_KEY = os.getenv("STATE_SESSION_KEY", "oauth_state_nonce")
+    REQUEST_TOKEN_SESSION_KEY = os.getenv("REQUEST_TOKEN_SESSION_KEY", "state")
+
+    oauth_config = _load_oauth_config()
+
+    if oauth_config.enabled and not oauth_config.encryption_key:
+        raise RuntimeError("OAUTH_ENCRYPTION_KEY environment variable is required when USE_MW_OAUTH is enabled")
+
+    if oauth_config.enabled and oauth_config is None:
+        raise RuntimeError(
+            "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
+        )
+
     # Load CORS configuration
     cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
     cors_domains = tuple(d.strip() for d in cors_domains_str.split(",") if d.strip())
@@ -189,20 +232,7 @@ def get_settings() -> Settings:
 
     # Load users configuration
     # Special users mapping: comma-separated pairs of "alternate:canonical"
-    special_users_str = os.getenv("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
-    special_users = {}
-    for pair in special_users_str.split(","):
-        pair = pair.strip()
-        if not pair:
-            continue
-        if ":" not in pair:
-            # Log warning for malformed pair (missing colon)
-            import logging
-
-            logging.getLogger(__name__).warning(f"Ignoring malformed SPECIAL_USERS pair (missing ':'): {pair}")
-            continue
-        alt, canonical = pair.split(":", 1)
-        special_users[alt.strip()] = canonical.strip()
+    special_users = load_special_users()
 
     fallback_user = os.getenv("FALLBACK_USER", "Mr. Ibrahem")
 
@@ -215,24 +245,26 @@ def get_settings() -> Settings:
         users_without_hashtag=users_without_hashtag,
     )
 
-    if use_mw_oauth and oauth_config is None:
-        raise RuntimeError(
-            "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
-        )
+    revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
+
+    user_agent = os.getenv("USER_AGENT", "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)")
 
     return Settings(
         is_localhost=is_localhost,
+        revids_api_url=revids_api_url,
+
+        secret_key=secret_key,
         paths=_get_paths(),
         database_data=_load_database_credentials(),
+
         STATE_SESSION_KEY=STATE_SESSION_KEY,
         REQUEST_TOKEN_SESSION_KEY=REQUEST_TOKEN_SESSION_KEY,
-        secret_key=secret_key,
-        use_mw_oauth=use_mw_oauth,
-        oauth_encryption_key=oauth_encryption_key,
+
         cookie=cookie,
         oauth=oauth_config,
         cors=cors_config,
         users=users_config,
+        user_agent=user_agent,
     )
 
 

@@ -4,7 +4,8 @@ import sys
 from logging.handlers import WatchedFileHandler
 from pathlib import Path
 
-flask_data_dir = os.getenv("FLASK_DATA_DIR", os.path.join(os.path.expanduser("~"), "data"))
+flask_data_dir = os.getenv("FLASK_DATA_DIR") or "~/data"
+flask_data_dir = Path(os.path.expandvars(flask_data_dir)).expanduser()
 
 log_dir_path = f"{flask_data_dir}/logs"
 
