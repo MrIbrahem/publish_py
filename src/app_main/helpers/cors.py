@@ -16,14 +16,14 @@ def is_allowed() -> str | None:
 
     Returns the allowed domain name or None.
     """
-    if current_app.config.CORS_DISABLED:
-        return "test"
+    referer = request.headers.get("Referer", "")
+    origin = request.headers.get("Origin", "")
+
+    if current_app.config.get("CORS_DISABLED"):
+        return origin
 
     if not settings.cors.allowed_domains:
         return None
-
-    referer = request.headers.get("Referer", "")
-    origin = request.headers.get("Origin", "")
 
     for domain in settings.cors.allowed_domains:
         if domain in referer or domain in origin:

@@ -21,7 +21,9 @@ def app():
         os.environ["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
 
     app = Flask(__name__)
+    app.url_map.strict_slashes = False
     app.config["TESTING"] = True
+    app.config["CORS_DISABLED"] = False
     return app
 
 

@@ -11,8 +11,10 @@ def app():
     """Create a test Flask application."""
     # Environment variables are set in conftest.py
     app = Flask(__name__)
+    app.url_map.strict_slashes = False
     app.config["TESTING"] = True
     app.secret_key = "test_secret"
+    app.config["CORS_DISABLED"] = False
 
     # Import and register the blueprint
     from src.app_main.app_routes.cxtoken.routes import bp_cxtoken
@@ -35,7 +37,7 @@ class TestCxtokenEndpoint:
         with patch("src.app_main.app_routes.cxtoken.routes.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = None
 
-            response = client.get("/?wiki=en&user=TestUser")
+            response = client.get("/cxtoken?wiki=en&user=TestUser")
 
             assert response.status_code == 403
             assert b"Access denied" in response.data
@@ -45,7 +47,7 @@ class TestCxtokenEndpoint:
         with patch("src.app_main.app_routes.cxtoken.routes.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
-            response = client.get("/")
+            response = client.get("/cxtoken")
 
             assert response.status_code == 400
             data = response.get_json()
@@ -57,7 +59,7 @@ class TestCxtokenEndpoint:
         with patch("src.app_main.app_routes.cxtoken.routes.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
-            response = client.get("/?wiki=en")
+            response = client.get("/cxtoken?wiki=en")
 
             assert response.status_code == 400
             data = response.get_json()
@@ -72,7 +74,7 @@ class TestCxtokenEndpoint:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
             mock_get_token.return_value = None
 
-            response = client.get("/?wiki=en&user=UnknownUser")
+            response = client.get("/cxtoken?wiki=en&user=UnknownUser")
 
             assert response.status_code == 403
             data = response.get_json()
@@ -96,7 +98,7 @@ class TestCxtokenEndpoint:
             # Mock cxtoken response
             mock_get_cxtoken.return_value = {"cxtoken": "test_cx_token_123"}
 
-            response = client.get("/?wiki=en&user=TestUser")
+            response = client.get("/cxtoken?wiki=en&user=TestUser")
 
             assert response.status_code == 200
             data = response.get_json()
@@ -108,7 +110,7 @@ class TestCxtokenEndpoint:
         with patch("src.app_main.app_routes.cxtoken.routes.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
-            response = client.options("/")
+            response = client.options("/cxtoken")
 
             assert response.status_code == 200
             assert "Access-Control-Allow-Origin" in response.headers
@@ -133,7 +135,7 @@ class TestCxtokenEndpoint:
                 "csrftoken_data": {"error": {"code": "mwoauth-invalid-authorization-invalid-user"}}
             }
 
-            response = client.get("/?wiki=en&user=TestUser")
+            response = client.get("/cxtoken?wiki=en&user=TestUser")
 
             # Verify delete was called
             mock_delete.assert_called_once()

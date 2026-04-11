@@ -12,8 +12,10 @@ def app():
     """Create a test Flask application."""
     # Environment variables are set in conftest.py
     app = Flask(__name__)
+    app.url_map.strict_slashes = False
     app.config["TESTING"] = True
     app.secret_key = "test_secret"
+    app.config["CORS_DISABLED"] = False
 
     # Import and register the blueprint
     from src.app_main.app_routes.post.routes import bp_post
@@ -37,7 +39,7 @@ class TestPostEndpoint:
             mock_is_allowed.return_value = None
 
             response = client.post(
-                "/",
+                "/publish",
                 data=json.dumps({"user": "TestUser", "title": "Test Page"}),
                 content_type="application/json",
             )
@@ -61,7 +63,7 @@ class TestPostEndpoint:
             mock_reports_db.return_value = mock_reports_instance
 
             response = client.post(
-                "/",
+                "/publish",
                 data=json.dumps(
                     {
                         "user": "UnknownUser",
@@ -84,7 +86,7 @@ class TestPostEndpoint:
         with patch("src.app_main.app_routes.post.routes.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
-            response = client.options("/")
+            response = client.options("/publish")
 
             assert response.status_code == 200
             assert "Access-Control-Allow-Origin" in response.headers
@@ -131,7 +133,7 @@ class TestPostEndpoint:
             mock_pages_instance.insert_page_target.return_value = {"execute_query": True}
 
             response = client.post(
-                "/",
+                "/publish",
                 data=json.dumps(
                     {
                         "user": "TestUser",
@@ -181,7 +183,7 @@ class TestPostEndpoint:
             mock_reports_db.return_value = mock_reports_instance
 
             response = client.post(
-                "/",
+                "/publish",
                 data=json.dumps(
                     {
                         "user": "TestUser",
