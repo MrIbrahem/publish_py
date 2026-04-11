@@ -68,6 +68,7 @@ def login_required(fn: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(fn)
     def wrapper(*args, **kwargs):
         if not getattr(g, "is_authenticated", False):
+            logger.warning("login_required: unauthenticated access denied to %s", fn.__name__)
             flash("You must be logged in to view this page", "warning")
             return redirect(url_for("main.index", error="login-required"))
         return fn(*args, **kwargs)
@@ -77,14 +78,18 @@ def login_required(fn: Callable[..., Any]) -> Callable[..., Any]:
 
 @bp_auth.get("/login")
 def login() -> WerkzeugResponse:
+    logger.info("OAuth login initiated, client: %s", _client_key())
+
     if settings.oauth is None:
         flash("OAuth not configured", "danger")
+        logger.warning("OAuth login failed: OAuth not configured")
         return redirect(url_for("main.index", error="oauth-not-configured"))
 
     if not login_rate_limiter.allow(_client_key()):
         time_left = login_rate_limiter.try_after(_client_key()).total_seconds()
         time_left_str = str(time_left).split(".")[0]
         flash(f"Too many login attempts. Please try again after {time_left_str}s.", "warning")
+        logger.warning("OAuth login rate limited, client: %s, try_after: %ss", _client_key(), time_left_str)
         return redirect(
             url_for("main.index", error=f"Too many login attempts. Please try again after {time_left_str}s.")
         )
@@ -96,6 +101,7 @@ def login() -> WerkzeugResponse:
     # start login
     try:
         redirect_url, request_token = start_login(sign_state_token(state_nonce))
+        logger.info("OAuth login started successfully, redirecting to MediaWiki")
     except (RuntimeError, Exception):
         logger.exception("Failed to start OAuth login")
         flash("Failed to initiate OAuth login", "danger")
@@ -104,6 +110,7 @@ def login() -> WerkzeugResponse:
     # ------------------
     # add request_token to session
     session[request_token_key] = cast(list[str], list(request_token))
+    logger.debug("OAuth request token stored in session")
     return redirect(redirect_url)
 
 
@@ -185,6 +192,7 @@ def callback() -> WerkzeugResponse:
     # user info
     user_identifier = identity.get("sub") or identity.get("id") or identity.get("central_id") or identity.get("user_id")
     if not user_identifier:
+        logger.warning("OAuth callback failed: missing user identifier in identity")
         flash("Missing user id", "danger")
         return redirect(url_for("main.index", error="Missing id"))
 
@@ -197,6 +205,7 @@ def callback() -> WerkzeugResponse:
 
     username = identity.get("username") or identity.get("name")
     if not username:
+        logger.warning("OAuth callback failed: missing username in identity")
         flash("Missing username", "danger")
         return redirect(url_for("main.index", error="Missing username"))
 
@@ -255,17 +264,21 @@ def logout() -> WerkzeugResponse:
     session.pop(oauth_state_nonce, None)
     session.pop("username", None)
 
+    logger.info("Logout requested, user_id: %s", user_id)
+
     # extract user_id from signed cookie if needed
     if user_id is None:
         signed = request.cookies.get(settings.cookie.name)
         if signed:
             user_id = extract_user_id(signed)
+            logger.debug("Extracted user_id from cookie: %s", user_id)
 
     # delete user token if possible
     if isinstance(user_id, int):
         try:
             delete_user_token(user_id)
             flash("You have been logged out successfully.", "info")
+            logger.info("User token deleted for user_id: %s", user_id)
         except pymysql.MySQLError:
             logger.exception("Failed to delete user token during logout")
             flash("Error while clearing OAuth credentials.", "danger")
