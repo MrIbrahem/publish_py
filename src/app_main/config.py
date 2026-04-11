@@ -23,10 +23,10 @@ class DbConfig:
 
 @dataclass(frozen=True)
 class Paths:
-    flask_data_dir: str
-    log_dir: str
-    publish_reports_dir: str
-    words_json_path: str
+    flask_data_dir: Path
+    log_dir: Path
+    publish_reports_dir: Path
+    words_json_path: Path
     revids_file_path: Path
 
 
@@ -171,10 +171,10 @@ def _get_paths() -> Paths:
     Path(resolve_path(log_dir)).mkdir(parents=True, exist_ok=True)
 
     return Paths(
-        flask_data_dir=flask_data_dir,
-        log_dir=log_dir,
-        publish_reports_dir=publish_reports_dir,
-        words_json_path=words_json_path,
+        flask_data_dir=resolve_path(flask_data_dir),
+        log_dir=resolve_path(log_dir),
+        publish_reports_dir=resolve_path(publish_reports_dir),
+        words_json_path=resolve_path(words_json_path),
         revids_file_path=resolve_path(revids_file_path),
     )
 

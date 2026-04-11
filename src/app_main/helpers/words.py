@@ -22,15 +22,6 @@ from ..config import settings
 logger = logging.getLogger(__name__)
 
 
-def _get_words_path() -> Path:
-    """Get the configured path for the words.json file from application settings.
-
-    Returns:
-        Path to words.json file as configured in settings.paths.words_json_path
-    """
-    return Path(settings.paths.words_json_path)
-
-
 @lru_cache(maxsize=1)
 def _load_words_table() -> dict[str, int]:
     """Load words table from JSON file.
@@ -38,7 +29,7 @@ def _load_words_table() -> dict[str, int]:
     Returns:
         Dictionary mapping article titles to word counts
     """
-    words_path = _get_words_path()
+    words_path: Path = settings.paths.words_json_path
 
     try:
         if words_path.exists():
