@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import os
 from datetime import datetime
-from typing import Tuple, Type
+from typing import Tuple, Type, Any
 
 from flask import Flask, flash, render_template, request
 from flask_wtf.csrf import CSRFProtect
@@ -22,10 +22,20 @@ from .config import settings
 from .cookies import CookieHeaderClient
 from .db import close_cached_db, ensure_qids_table
 from .extensions import csrf
-from .users.current import context_user
+from .users.current import current_user
 from .users.store import ensure_user_token_table
 
 logger = logging.getLogger(__name__)
+
+
+def context_data() -> dict[str, Any]:
+    user = current_user()
+    return {
+        "current_user": user,
+        "is_authenticated": user is not None,
+        "username": user.username if user else None,
+        "oauth_enabled": bool(settings.oauth),
+    }
 
 
 def format_stage_timestamp(value: str) -> str:
@@ -105,8 +115,8 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_api, url_prefix="/api")
 
     @app.context_processor
-    def _inject_user():  # pragma: no cover - trivial wrapper
-        return context_user()
+    def _inject_data():  # pragma: no cover - trivial wrapper
+        return context_data()
 
     app.jinja_env.globals.setdefault("USE_MW_OAUTH", oauth_enabled)
     app.jinja_env.filters["format_stage_timestamp"] = format_stage_timestamp

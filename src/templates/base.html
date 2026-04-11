@@ -38,7 +38,7 @@
             </ul>
             <span class="navbar-text">
                 <!-- User info or login/logout links can go here -->
-                {% if oauth_credentials %}
+                {% if oauth_enabled %}
                 {% if current_user %}
                 <a href="/profile" class="btn btn-outline-primary">{{ current_user.username }}</a>
                 <a href="/logout" class="btn btn-outline-primary">Logout</a>

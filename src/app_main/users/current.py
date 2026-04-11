@@ -64,13 +64,3 @@ def oauth_required(func: F) -> F:
         return func(*args, **kwargs)
 
     return cast(F, wrapper)
-
-
-def context_user() -> dict[str, Any]:
-    user = current_user()
-    return {
-        "current_user": user,
-        "is_authenticated": user is not None,
-        "username": user.username if user else None,
-        "oauth_credentials": getattr(g, "oauth_credentials", None),
-    }
