@@ -72,4 +72,5 @@ def context_user() -> dict[str, Any]:
         "current_user": user,
         "is_authenticated": user is not None,
         "username": user.username if user else None,
+        "oauth_credentials": getattr(g, "oauth_credentials", None),
     }
