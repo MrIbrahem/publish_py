@@ -344,8 +344,14 @@ class DevelopmentConfig(Config):
     """Development configuration with debugging enabled."""
 
     DEBUG: bool = True
-    SESSION_COOKIE_SECURE: bool = False  # Allow HTTP in development
-    WTF_CSRF_SSL_STRICT: bool = False  # Allow CSRF without HTTPS
+    TESTING: bool = True
+    WTF_CSRF_ENABLED: bool = True
+    WTF_CSRF_SSL_STRICT: bool = True
+
+    # Production should always use secure cookies
+    SESSION_COOKIE_SECURE: bool = True
+    SESSION_COOKIE_HTTPONLY: bool = True
+    SESSION_COOKIE_SAMESITE: str = "Lax"
 
     # Disable CORS for testing
     CORS_DISABLED: bool = True
