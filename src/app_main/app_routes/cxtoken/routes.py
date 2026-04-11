@@ -86,26 +86,27 @@ def index() -> Response:
         cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
         response = jsonify(cxtoken)
         response.status_code = 403
-    else:
-        # Decrypt credentials
-        access_key, access_secret = user_token.decrypted()
+        response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
+        return response
 
-        # Get cxtoken
-        cxtoken = get_cxtoken(wiki, access_key, access_secret)
+    # Decrypt credentials
+    access_key, access_secret = user_token.decrypted()
 
-        # Handle invalid authorization
-        err = cxtoken.get("csrftoken_data", {}).get("error", {}).get("code")
-        if err == "mwoauth-invalid-authorization-invalid-user":
-            delete_user_token_by_username(user)
-            cxtoken["del_access"] = True
+    # Get cxtoken
+    cxtoken = get_cxtoken(wiki, access_key, access_secret)
 
-        response = jsonify(cxtoken)
-        # { "age": 3600, "exp": 1775879885, "jwt": "..." }
-        if cxtoken.get("jwt"):
-            store_jwt(cxtoken, user, wiki)
+    # Handle invalid authorization
+    err = cxtoken.get("csrftoken_data", {}).get("error", {}).get("code")
+    if err == "mwoauth-invalid-authorization-invalid-user":
+        delete_user_token_by_username(user)
+        cxtoken["del_access"] = True
 
+    # { "age": 3600, "exp": 1775879885, "jwt": "..." }
+    if cxtoken.get("jwt"):
+        store_jwt(cxtoken, user, wiki)
+
+    response = jsonify(cxtoken)
     response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
-
     return response
 
 
