@@ -9,6 +9,7 @@ It validates CORS, retrieves user access credentials, and returns tokens.
 import logging
 
 from flask import Blueprint, Response, jsonify, request
+from cachetools import cached, TTLCache
 
 from ...config import settings
 from ...helpers.cors import is_allowed
@@ -18,11 +19,21 @@ from ...users.store import delete_user_token_by_username, get_user_token_by_user
 bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
 logger = logging.getLogger(__name__)
 
+cache = TTLCache(maxsize=100, ttl=3600)
+
 
 def _format_user(user: str) -> str:
     """Format username, applying special user mappings."""
     user = settings.users.special_users.get(user, user)
     return user.replace("_", " ")
+
+
+def store_jwt(cxtoken, user, wiki) -> None:
+    cache[(user, wiki)] = cxtoken
+
+
+def get_from_store(user, wiki) -> None:
+    return cache.get((user, wiki))
 
 
 @bp_cxtoken.route("/", methods=["GET", "OPTIONS"])
@@ -63,33 +74,40 @@ def index() -> Response:
     # Format user (apply special user mappings)
     user = _format_user(user)
 
+    if get_from_store(user, wiki):
+        response = jsonify(get_from_store(user, wiki))
+        response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
+        return response
+
     # Get access credentials from database
     user_token = get_user_token_by_username(user)
 
     if user_token is None:
-        error_response = {"error": {"code": "no access", "info": "no access"}, "username": user}
-        response = jsonify(error_response)
+        cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
+        response = jsonify(cxtoken)
         response.status_code = 403
         response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
         return response
+    else:
+        # Decrypt credentials
+        access_key, access_secret = user_token.decrypted()
 
-    # Decrypt credentials
-    access_key, access_secret = user_token.decrypted()
+        # Get cxtoken
+        cxtoken = get_cxtoken(wiki, access_key, access_secret)
 
-    # Get cxtoken
-    cxtoken = get_cxtoken(wiki, access_key, access_secret)
+        # Handle invalid authorization
+        err = cxtoken.get("csrftoken_data", {}).get("error", {}).get("code")
+        if err == "mwoauth-invalid-authorization-invalid-user":
+            delete_user_token_by_username(user)
+            cxtoken["del_access"] = True
 
-    if not cxtoken:
-        cxtoken = {"error": "no cxtoken"}
+        response = jsonify(cxtoken)
+        # { "age": 3600, "exp": 1775879885, "jwt": "..." }
+        if cxtoken.get("jwt"):
+            store_jwt(cxtoken, user, wiki)
 
-    # Handle invalid authorization
-    err = cxtoken.get("csrftoken_data", {}).get("error", {}).get("code")
-    if err == "mwoauth-invalid-authorization-invalid-user":
-        delete_user_token_by_username(user)
-        cxtoken["del_access"] = True
-
-    response = jsonify(cxtoken)
     response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
+
     return response
 
 
