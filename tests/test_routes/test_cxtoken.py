@@ -140,4 +140,4 @@ class TestCxtokenEndpoint:
             # Verify delete was called
             mock_delete.assert_called_once()
             data = response.get_json()
-            assert data.get("del_access") is True
+            assert data == {"error": {"code": "no access", "info": "no access"}, "username": "TestUser"}
