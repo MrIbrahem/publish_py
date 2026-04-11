@@ -109,16 +109,19 @@ def login() -> WerkzeugResponse:
 
 @bp_auth.get("/callback")
 def callback() -> WerkzeugResponse:
+    logger.info("OAuth callback initiated, client: %s", _client_key())
     # ------------------
     # use oauth
     if settings.oauth is None:
         flash("OAuth not configured", "danger")
+        logger.warning("OAuth callback failed: OAuth not configured")
         return redirect(url_for("main.index", error="oauth-not-configured"))
 
     # ------------------
     # callback rate limiter
     if not callback_rate_limiter.allow(_client_key()):
         flash("Too many login attempts", "warning")
+        logger.warning("OAuth callback rate limit exceeded, client: %s", _client_key())
         return redirect(url_for("main.index", error="Too many login attempts"))
 
     # ------------------
@@ -127,11 +130,13 @@ def callback() -> WerkzeugResponse:
     returned_state = request.args.get("state")
     if not expected_state or not returned_state:
         flash("Invalid OAuth state", "danger")
+        logger.warning("OAuth callback failed: missing state token")
         return redirect(url_for("main.index", error="Invalid OAuth state"))
 
     verified_state = verify_state_token(returned_state)
     if verified_state != expected_state:
         flash("OAuth state mismatch", "danger")
+        logger.warning("OAuth callback failed: state mismatch")
         return redirect(url_for("main.index", error="oauth-state-mismatch"))
 
     # ------------------
@@ -140,6 +145,7 @@ def callback() -> WerkzeugResponse:
     oauth_verifier = request.args.get("oauth_verifier")
     if not raw_request_token or not oauth_verifier:
         flash("Invalid OAuth verifier", "danger")
+        logger.warning("OAuth callback failed: missing request token or verifier")
         return redirect(url_for("main.index", error="Invalid OAuth verifier"))
 
     # ------------------
@@ -208,7 +214,9 @@ def callback() -> WerkzeugResponse:
 
     # ------------------
     # set cookies
-    response = make_response(redirect(session.pop("post_login_redirect", url_for("main.index"))))
+    redirect_url = session.pop("post_login_redirect", url_for("main.index"))
+    logger.info("OAuth callback complete, redirecting to: %s", redirect_url)
+    response = make_response(redirect(redirect_url))
     response.set_cookie(
         settings.cookie.name,
         sign_user_id(user_id),
@@ -222,6 +230,7 @@ def callback() -> WerkzeugResponse:
     g.current_user = CurrentUser(str(user_id), str(username))
     g.is_authenticated = True
     g.authenticated_user_id = str(user_id)
+    logger.info("OAuth login successful for user_id=%s username=%s", user_id, username)
 
     oauth_config = settings.oauth  # Already validated as non-None above
     if oauth_config:
