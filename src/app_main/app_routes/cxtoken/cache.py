@@ -31,27 +31,23 @@ class CxToken:
             "jwt": self.jwt,
         }
 
-    def __post_init__(self):
-        self.stored_at = time.time()
-
 
 def store_jwt(cxtoken: dict, user: str, wiki: str) -> None:
     """
     cxtoken: { "age": 3600, "exp": 1775879885, "jwt": "..." }
     """
-    cache[(user, wiki)] = CxToken(
-        age=cxtoken["age"],
-        exp=cxtoken["exp"],
-        jwt=cxtoken["jwt"],
-    )
+    if cxtoken.get("jwt") and cxtoken.get("age") and cxtoken.get("exp"):
+        cache[(user, wiki)] = CxToken(
+            age=cxtoken["age"],
+            exp=cxtoken["exp"],
+            jwt=cxtoken["jwt"],
+        )
 
 
-def get_from_store(user: str, wiki: str) -> dict:
-    """
-    { "age": 3600, "exp": 1775879885, "jwt": "..." }
-    """
+def get_from_store(user: str, wiki: str) -> dict | None:
     in_cache: CxToken = cache.get((user, wiki))
-    if not in_cache:
-        return None
 
-    return in_cache.to_dict()
+    if in_cache:
+        return in_cache.to_dict()
+
+    return None

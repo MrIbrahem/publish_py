@@ -107,7 +107,7 @@ def index() -> Response:
     else:
         cxtoken, status_code = get_cxtoken_for_user_wiki(wiki, user)
 
-        if status_code == 200 and cxtoken.get("jwt") and cxtoken.get("age"):
+        if status_code == 200:
             store_jwt(cxtoken, user, wiki)
 
     response = jsonify(cxtoken)
