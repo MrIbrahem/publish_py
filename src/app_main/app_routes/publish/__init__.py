@@ -1,3 +1,3 @@
-from .routes import bp_post
+from .routes import bp_publish
 
-__all__ = ["bp_post"]
+__all__ = ["bp_publish"]

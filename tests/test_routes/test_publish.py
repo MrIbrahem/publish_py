@@ -18,9 +18,9 @@ def app():
     app.config["CORS_DISABLED"] = False
 
     # Import and register the blueprint
-    from src.app_main.app_routes.publish.routes import bp_post
+    from src.app_main.app_routes.publish.routes import bp_publish
 
-    app.register_blueprint(bp_post)
+    app.register_blueprint(bp_publish)
     return app
 
 

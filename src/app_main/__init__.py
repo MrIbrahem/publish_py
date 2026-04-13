@@ -16,7 +16,7 @@ from .app_routes import (
     bp_cxtoken,
     bp_fixrefs,
     bp_main,
-    bp_post,
+    bp_publish,
 )
 from .config import settings
 from .cookies import CookieHeaderClient
@@ -110,7 +110,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_cxtoken)
-    app.register_blueprint(bp_post)
+    app.register_blueprint(bp_publish)
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
 
