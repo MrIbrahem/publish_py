@@ -30,3 +30,4 @@ pup2.html
 *.egg
 coverage.xml
 .coverage
+.coverage.*
