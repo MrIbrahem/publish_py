@@ -15,7 +15,7 @@ from ...users.store import get_user_token_by_username
 
 from .worker import _process_edit, _handle_no_access
 
-bp_publish = Blueprint("post", __name__, url_prefix="/publish")
+bp_publish = Blueprint("publish", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
 
 
@@ -85,6 +85,8 @@ def index() -> Response:
         "edit": {},
         "sourcetitle": request_data.get("sourcetitle", ""),
         "request_revid": request_data.get("revid", "") or request_data.get("revision", ""),
+        "tr_type": request_data.get("tr_type", "lead"),
+        "words": 0,
     }
 
     # Get access credentials

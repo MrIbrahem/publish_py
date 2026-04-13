@@ -678,7 +678,7 @@ from ..services.wikidata_client import link_to_wikidata
 from ..services.text_processor import do_changes_to_text
 from ...config import settings
 
-bp_post = Blueprint("post", __name__)
+bp_post = Blueprint("publish", __name__)
 logger = logging.getLogger(__name__)
 
 def handle_no_access(user: str, tab: dict) -> tuple[dict, int]:
