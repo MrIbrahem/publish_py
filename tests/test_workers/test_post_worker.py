@@ -1,5 +1,5 @@
 """
-Tests for app_routes.post.worker module.
+Tests for app_routes.publish.worker module.
 """
 
 import json
@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.app_main.app_routes.post.worker import (
+from src.app_main.app_routes.publish.worker import (
     _get_revid,
     _handle_no_access,
     _process_edit,
