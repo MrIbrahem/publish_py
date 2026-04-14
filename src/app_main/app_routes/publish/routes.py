@@ -9,7 +9,7 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 
-from ...cors import validate_access
+from ...cors import check_cors, validate_access
 from ...helpers.format import format_title, format_user
 from ...users.store import get_user_token_by_username
 
@@ -62,6 +62,15 @@ def handle_form(request_data) -> Response:
     editit = _process_edit(access_key, access_secret, text, tab)
 
     response = jsonify(editit)
+    return response
+
+
+@check_cors
+@bp_publish.route("/", methods=["OPTIONS"])
+def publish_preflight() -> Response:
+    response = Response("", status=200)
+    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
     return response
 
 
