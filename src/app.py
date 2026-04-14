@@ -3,11 +3,13 @@ WSGI entry point for the Flask application.
 """
 
 from __future__ import annotations
+import logging
+
 from app_main import create_app
 from app_main.config import ProductionConfig
-from log import config_console_logger
+from logger_config import configure_logging
 
-config_console_logger()
+configure_logging(logging.INFO)
 
 app = create_app(ProductionConfig)
 

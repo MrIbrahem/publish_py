@@ -113,19 +113,7 @@ def index_get() -> Response:
     if not allowed:
         return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
 
-    request_data = {
-        "user": request.args.get("user", ""),
-        "title": request.args.get("title", ""),
-        "target": request.args.get("target", ""),
-        "sourcetitle": request.args.get("sourcetitle", ""),
-        "text": request.args.get("text", ""),
-        "revid": request.args.get("revid", "") or request.args.get("revision", ""),
-        "campaign": request.args.get("campaign", ""),
-        "wpCaptchaId": request.args.get("wpCaptchaId"),
-        "wpCaptchaWord": request.args.get("wpCaptchaWord"),
-    }
-
-    return handel_form(request_data, allowed)
+    return handel_form(request.args, allowed)
 
 
 @bp_publish.route("/", methods=["POST"])
