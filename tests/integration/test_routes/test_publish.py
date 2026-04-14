@@ -25,8 +25,9 @@ def app():
 
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.config["TESTING"] = True
     app.secret_key = "test_secret"
+
+    app.config["TESTING"] = True
     app.config["CORS_DISABLED"] = False
 
     from src.app_main.app_routes.publish.routes import bp_publish
