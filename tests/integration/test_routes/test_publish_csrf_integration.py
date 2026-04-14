@@ -57,6 +57,75 @@ def csrf_client(csrf_app):
     return csrf_app.test_client()
 
 
+class TestPublishEndpointWithCSRF2:
+    """Integration tests for publish endpoint with CSRF enabled."""
+
+    @pytest.fixture(autouse=True)
+    def mock_is_allowed(self):
+        """
+        auto allow all
+        """
+        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
+            mocked.return_value = "medwiki.toolforge.org"
+            yield mocked
+
+    def test_options_preflight_with_csrf_enabled(self, csrf_client):
+        """Test OPTIONS preflight request with CSRF enabled."""
+        response = csrf_client.options("/publish")
+
+        assert response.status_code == 200
+        assert "Access-Control-Allow-Origin" in response.headers
+        assert "Access-Control-Allow-Methods" in response.headers
+
+    def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
+        """Test that no access error returns 403 even with CSRF enabled."""
+        with (
+
+            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+        ):
+            mock_get_token.return_value = None
+
+            mock_reports_instance = MagicMock()
+            mock_reports_db.return_value = mock_reports_instance
+
+            response = csrf_client.post(
+                "/publish",
+                data=json.dumps(
+                    {
+                        "user": "UnknownUser",
+                        "title": "Test Page",
+                        "target": "ar",
+                        "sourcetitle": "Source Page",
+                        "text": "Content",
+                    }
+                ),
+                content_type="application/json",
+            )
+
+            assert response.status_code == 403
+            data = response.get_json()
+            assert data["error"]["code"] == "noaccess"
+
+
+class TestPublishEndpointWithDenyCSRF:
+    """Integration tests for publish endpoint with CSRF enabled."""
+
+    def test_cors_validation_still_works(self, csrf_client):
+        """Test that CORS validation is applied before CSRF check."""
+        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_deny:
+            mock_deny.return_value = None
+
+            response = csrf_client.post(
+                "/publish",
+                data=json.dumps({"user": "TestUser", "title": "Test Page"}),
+                content_type="application/json",
+            )
+
+            assert response.status_code == 403
+
+
 class TestPublishEndpointWithCSRF:
     """Integration tests for publish endpoint with CSRF enabled."""
 
@@ -587,72 +656,3 @@ class TestPublishEndpointWithCSRF:
             if to_do_calls:
                 tab_arg = to_do_calls[0][0][0]
                 assert tab_arg.get("fix_refs") == "yes"
-
-
-class TestPublishEndpointWithCSRF2:
-    """Integration tests for publish endpoint with CSRF enabled."""
-
-    @pytest.fixture(autouse=True)
-    def mock_is_allowed(self):
-        """
-        auto allow all
-        """
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
-            mocked.return_value = "medwiki.toolforge.org"
-            yield mocked
-
-    def test_options_preflight_with_csrf_enabled(self, csrf_client):
-        """Test OPTIONS preflight request with CSRF enabled."""
-        response = csrf_client.options("/publish")
-
-        assert response.status_code == 200
-        assert "Access-Control-Allow-Origin" in response.headers
-        assert "Access-Control-Allow-Methods" in response.headers
-
-    def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
-        """Test that no access error returns 403 even with CSRF enabled."""
-        with (
-
-            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-        ):
-            mock_get_token.return_value = None
-
-            mock_reports_instance = MagicMock()
-            mock_reports_db.return_value = mock_reports_instance
-
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps(
-                    {
-                        "user": "UnknownUser",
-                        "title": "Test Page",
-                        "target": "ar",
-                        "sourcetitle": "Source Page",
-                        "text": "Content",
-                    }
-                ),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "noaccess"
-
-
-class TestPublishEndpointWithDenyCSRF:
-    """Integration tests for publish endpoint with CSRF enabled."""
-
-    def test_cors_validation_still_works(self, csrf_client):
-        """Test that CORS validation is applied before CSRF check."""
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_deny:
-            mock_deny.return_value = None
-
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({"user": "TestUser", "title": "Test Page"}),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 403
