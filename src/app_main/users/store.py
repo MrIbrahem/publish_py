@@ -202,6 +202,9 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
     """
     username = username.strip()
 
+    if not username:
+        return None
+
     db = get_db()
     rows: list[Dict[str, Any]] = db.fetch_query_safe(
         """
