@@ -67,7 +67,7 @@ class TestPublishEndpointWithDenyCSRF:
     def test_cors_validation_still_works(self, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
         with (
-            patch("src.app_main.cors.cors.is_allowed") as mock_deny,
+            patch("src.app_main.cors.is_allowed_checker.is_allowed") as mock_deny,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
         ):

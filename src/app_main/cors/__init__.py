@@ -2,7 +2,7 @@ import functools
 
 from flask import jsonify, request
 
-from .cors import is_allowed
+from .is_allowed_checker import is_allowed
 from .publish_secret_checks import check_publish_secret_code
 
 

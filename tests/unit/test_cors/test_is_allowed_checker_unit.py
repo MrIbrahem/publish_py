@@ -1,10 +1,10 @@
-"""Tests for cors module."""
+"""Tests for is_allowed_checker module."""
 
 from unittest.mock import MagicMock
 
 import pytest
 
-from src.app_main.cors.cors import get_host
+from src.app_main.cors.is_allowed_checker import get_host
 
 
 class TestGetHost:

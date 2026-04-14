@@ -18,11 +18,11 @@ def mock_request(mocker):
 
     mock_app = MagicMock()
     mock_app.config = {"CORS_DISABLED": False}
-    mocker.patch("src.app_main.cors.cors.current_app", mock_app)
+    mocker.patch("src.app_main.cors.is_allowed_checker.current_app", mock_app)
 
     mock_settings = MagicMock()
     mock_settings.cors.allowed_domains = ["trusted.com", "api.partner.net"]
-    mocker.patch("src.app_main.cors.cors.settings", mock_settings)
+    mocker.patch("src.app_main.cors.is_allowed_checker.settings", mock_settings)
 
     return mock_req, mock_app
 
