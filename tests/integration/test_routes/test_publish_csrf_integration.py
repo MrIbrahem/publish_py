@@ -34,13 +34,15 @@ def csrf_app():
     from flask_wtf.csrf import CSRFProtect
 
     app = Flask(__name__)
-    app.config.update({
-        "TESTING": True,
-        "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
-        "WTF_CSRF_ENABLED": True,
-        "WTF_CSRF_SSL_STRICT": False,
-        "CORS_DISABLED": False,
-    })
+    app.config.update(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
+            "WTF_CSRF_ENABLED": True,
+            "WTF_CSRF_SSL_STRICT": False,
+            "CORS_DISABLED": False,
+        }
+    )
     app.url_map.strict_slashes = False
 
     csrf = CSRFProtect(app)
@@ -66,14 +68,14 @@ class TestPublishEndpointWithCSRF2:
         """
         auto allow all
         """
-        # with patch("src.app_main.cors.is_allowed") as mocked:
-        with patch("src.app_main.cors.is_allowed") as mocked:
+        with patch("src.app_main.cors.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 
     def test_options_preflight_with_csrf_enabled(self, csrf_client):
         """Test OPTIONS preflight request with CSRF enabled."""
-        response = csrf_client.options("/publish")
+        with patch("src.app_main.cors.is_allowed", return_value="medwiki.toolforge.org"):
+            response = csrf_client.options("/publish")
 
         assert response.status_code == 200
         assert "Access-Control-Allow-Origin" in response.headers
