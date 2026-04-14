@@ -11,7 +11,20 @@ from .config import settings
 logger = logging.getLogger(__name__)
 
 
-def is_allowed() -> str | None:
+def check_publish_secret_code() -> str | None:
+    expected_secret = settings.publish_secret_code
+    if not expected_secret:
+        return False
+
+    received_secret = request.headers.get("X-Secret-Key")
+
+    if received_secret and received_secret == expected_secret:
+        return True
+
+    return False
+
+
+def _is_allowed() -> str | None:
     """Check if request is from an exact allowed domain or same origin."""
     referer = request.headers.get("Referer", "")
     origin = request.headers.get("Origin", "")
@@ -49,3 +62,7 @@ def is_allowed() -> str | None:
     logger.warning(f"Access denied: referer={referer}, origin={origin}")
     logger.warning(str(request.headers))
     return None
+
+
+def is_allowed() -> str | None:
+    return check_publish_secret_code() or _is_allowed()
