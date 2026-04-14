@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import Tuple, Type, Any
 
 from flask import Flask, flash, render_template, request
-from flask_wtf.csrf import CSRFProtect
 
 from .app_routes import (
     bp_api,

@@ -323,6 +323,11 @@ class Config:
     WTF_CSRF_ENABLED: bool = True
     WTF_CSRF_TIME_LIMIT: int | None = None  # None = tokens don't expire
     WTF_CSRF_SSL_STRICT: bool = True
+    WTF_CSRF_CHECK_DEFAULT: bool = True  # default value
+    WTF_CSRF_FIELD_NAME: str = "csrf_token"  # default value
+    WTF_CSRF_HEADERS: list[str] = ["X-CSRFToken", "X-CSRF-Token"]  # default value
+    WTF_CSRF_METHODS: list[str] = ["POST", "PUT", "PATCH", "DELETE"]  # default value
+    # WTF_CSRF_SECRET_KEY: str = settings.secret_key # default value
 
     # Request handling
     MAX_CONTENT_LENGTH: int | None = 16 * 1024 * 1024  # 16MB default
