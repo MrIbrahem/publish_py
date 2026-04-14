@@ -24,11 +24,12 @@ def csrf_app():
     os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
     os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
     os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
-    os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
     os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
     os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
     os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
     os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
+
+    os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
 
     from flask import Flask
     from flask_wtf.csrf import CSRFProtect
@@ -36,10 +37,10 @@ def csrf_app():
     app = Flask(__name__)
     app.config.update(
         {
-            "TESTING": True,
             "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
             "WTF_CSRF_ENABLED": True,
             "WTF_CSRF_SSL_STRICT": False,
+            "TESTING": True,
             "CORS_DISABLED": False,
         }
     )
