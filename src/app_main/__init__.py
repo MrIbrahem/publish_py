@@ -113,6 +113,9 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
 
+    if app.config.get("WTF_CSRF_ENABLED"):
+        csrf.exempt(bp_publish)
+
     @app.context_processor
     def _inject_data():  # pragma: no cover - trivial wrapper
         return context_data()
@@ -142,7 +145,8 @@ def create_app(config_class: Type | None = None) -> Flask:
     @app.after_request
     def add_cache_headers(response):
         """Prevent CSRF token caching on form-related routes."""
-        if request.endpoint and any(request.endpoint.startswith(bp) for bp in ["auth.", "post.", "fixrefs.", "cxtoken."]):
+        endpoints = ["auth.", "post.", "fixrefs.", "cxtoken."]
+        if request.endpoint and any(request.endpoint.startswith(bp) for bp in endpoints):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
