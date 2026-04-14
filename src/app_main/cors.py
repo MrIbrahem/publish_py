@@ -61,7 +61,7 @@ def _is_allowed() -> str | None:
             return domain
 
     logger.warning(f"Access denied: referer={referer}, origin={origin}")
-    logger.warning(str(request.headers))
+    # Avoid logging sensitive headers like X-Secret-Key
     return None
 
 
