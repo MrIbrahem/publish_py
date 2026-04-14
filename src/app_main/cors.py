@@ -15,14 +15,17 @@ logger = logging.getLogger(__name__)
 def check_publish_secret_code() -> str | None:
     expected_secret = settings.publish_secret_code
     if not expected_secret:
-        return False
+        return None
 
     received_secret = request.headers.get("X-Secret-Key")
 
     if received_secret and received_secret == expected_secret:
-        return True
+        origin = request.headers.get("Origin")
+        if origin:
+            return urlparse(origin).netloc
+        return urlparse(request.host_url).netloc
 
-    return False
+    return None
 
 
 def _is_allowed() -> str | None:
