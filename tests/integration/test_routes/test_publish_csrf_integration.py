@@ -34,18 +34,17 @@ def csrf_app():
     from flask_wtf.csrf import CSRFProtect
 
     app = Flask(__name__)
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret-key-for-csrf-integration-tests"
-    app.config["WTF_CSRF_ENABLED"] = True
-    app.config["WTF_CSRF_SSL_STRICT"] = False
-    app.config["CORS_DISABLED"] = False
+    app.config.update({
+        "TESTING": True,
+        "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
+        "WTF_CSRF_ENABLED": True,
+        "WTF_CSRF_SSL_STRICT": False,
+        "CORS_DISABLED": False,
+    })
     app.url_map.strict_slashes = False
 
-    csrf = CSRFProtect()
-    csrf.init_app(app)
-
+    csrf = CSRFProtect(app)
     from src.app_main.app_routes.publish.routes import bp_publish
-
     app.register_blueprint(bp_publish)
     csrf.exempt(bp_publish)
 
@@ -61,10 +60,17 @@ def csrf_client(csrf_app):
 class TestPublishEndpointWithCSRF:
     """Integration tests for publish endpoint with CSRF enabled."""
 
+    @pytest.fixture(autouse=True)
+    def mock_is_allowed(self):
+        """تفعيل السماح بالنطاق تلقائياً لجميع الاختبارات."""
+        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
+            mocked.return_value = "medwiki.toolforge.org"
+            yield mocked
+
     def test_cors_validation_still_works(self, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed:
-            mock_is_allowed.return_value = None
+        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_deny:
+            mock_deny.return_value = None
 
             response = csrf_client.post(
                 "/publish",
