@@ -68,7 +68,7 @@ class TestPublishEndpointWithCSRF2:
         """
         auto allow all
         """
-        with patch("src.app_main.cors.cors.is_allowed") as mocked:
+        with patch("src.app_main.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 
@@ -168,6 +168,7 @@ class BasePublishTest:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
         ):
             # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
@@ -175,6 +176,7 @@ class BasePublishTest:
             mock_changes.return_value = None
             mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
             mock_link.return_value = {"result": "success", "qid": "Q123"}
+            mock_should_add.return_value = True
 
             mock_reports_db.return_value = MagicMock()
             pages = MagicMock()
@@ -191,6 +193,7 @@ class BasePublishTest:
                 "reports_db": mock_reports_db,
                 "pages_db": mock_pages_db,
                 "pages": pages,
+                "should_add": mock_should_add,
             }
 
     # ── helper ──────────────────────────────────────────────────────────────
