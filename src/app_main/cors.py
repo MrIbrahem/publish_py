@@ -47,4 +47,5 @@ def is_allowed() -> str | None:
             return domain
 
     logger.warning(f"Access denied: referer={referer}, origin={origin}")
+    logger.warning(str(request.headers))
     return None
