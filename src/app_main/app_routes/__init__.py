@@ -1,5 +1,4 @@
-# from .api.routes import bp_api
-from .api.routes2 import bp_api
+from .api.routes import bp_api
 from .auth.routes import bp_auth
 from .cxtoken.routes import bp_cxtoken
 from .main.routes import bp_main
