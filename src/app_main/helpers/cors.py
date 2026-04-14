@@ -41,7 +41,7 @@ def is_allowed() -> str | None:
     for domain in settings.cors.allowed_domains:
         # Note: Using 'in' can be risky; using exact domain matching is safer
         if (origin and domain in origin) or (referer and domain in referer):
-            return origin or domain
+            return domain
 
     logger.warning(f"Access denied: referer={referer}, origin={origin}")
     return None
