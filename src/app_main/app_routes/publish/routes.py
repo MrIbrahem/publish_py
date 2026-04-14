@@ -42,7 +42,7 @@ def index_preflight() -> Response:
     return response
 
 
-@bp_publish.route("/", methods=["POST"])
+@bp_publish.route("/", methods=["POST", "GET"])
 def index() -> Response:
     """Handle post/publish requests.
 
