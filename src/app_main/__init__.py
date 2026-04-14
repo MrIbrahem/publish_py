@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Tuple, Type, Any
 
 from flask import Flask, flash, render_template, request
+from flask_openapi3 import OpenAPI
 
 from .app_routes import (
     bp_api,
@@ -55,7 +56,7 @@ def format_stage_timestamp(value: str) -> str:
     return f"{month} {dt.day}, {dt.year}, {hour12}:{minute} {ampm}"
 
 
-def create_app(config_class: Type | None = None) -> Flask:
+def create_app(config_class: Type | None = None) -> OpenAPI:
     """Instantiate and configure the Flask application.
 
     Args:
@@ -75,7 +76,8 @@ def create_app(config_class: Type | None = None) -> Flask:
     template_dir = os.path.join(base_dir, "..", "templates")
     static_dir = os.path.join(base_dir, "..", "static")
 
-    app = Flask(
+    # app = Flask(
+    app = OpenAPI(
         __name__,
         template_folder=template_dir,
         static_folder=static_dir,

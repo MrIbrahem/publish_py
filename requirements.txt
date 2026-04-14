@@ -9,4 +9,5 @@ requests
 requests_oauthlib
 cryptography
 cachetools
+flask-openapi3[swagger,redoc,rapidoc,rapipdf,scalar,elements]
 git+https://github.com/MrIbrahem/fix_refs_new_py.git
