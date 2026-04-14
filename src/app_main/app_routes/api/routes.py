@@ -10,7 +10,7 @@ from flask import Blueprint, Response, jsonify, request
 
 from ...config import settings
 from ...db.db_publish_reports import ReportsDB
-from ...cors import is_allowed
+from ...cors import check_cors
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
@@ -23,6 +23,7 @@ def _parse_select_fields(select_param: Optional[str]) -> Optional[List[str]]:
     return [f.strip() for f in select_param.split(",") if f.strip()]
 
 
+@check_cors(set_allow_origin=True)
 @bp_api.route("/publish_reports", methods=["OPTIONS"])
 def publish_reports_preflight() -> Response:
     """
@@ -32,18 +33,13 @@ def publish_reports_preflight() -> Response:
         Preflight response
     """
 
-    # Handle CORS preflight
-    allowed = is_allowed()
-
-    if not allowed:
-        return jsonify({"error": "CORS not allowed"}), 403
     response = Response("", status=200)
-    response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
     response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
 
+@check_cors(set_allow_origin=True)
 @bp_api.route("/publish_reports", methods=["GET"])
 def get_publish_reports() -> Response:
     """
@@ -69,8 +65,6 @@ def get_publish_reports() -> Response:
     Returns:
         JSON response with matching reports or error
     """
-    # Handle CORS preflight
-    allowed = is_allowed()
 
     # Extract filter parameters
     filters: Dict[str, Any] = {}
@@ -107,9 +101,6 @@ def get_publish_reports() -> Response:
     }
 
     response = jsonify(response_data)
-
-    if allowed:
-        response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
 
     return response
 
