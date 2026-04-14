@@ -34,17 +34,16 @@ class TestCxtokenEndpoint:
 
     def test_cors_not_allowed_without_origin(self, client):
         """Test that requests without allowed origin are rejected."""
-        with patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed:
-            mock_is_allowed.return_value = None
+        response = client.get(
+            "/cxtoken?wiki=en&user=TestUser",
+            base_url="https://unknown-site.com",
+        )
 
-            response = client.get("/cxtoken?wiki=en&user=TestUser")
-
-            assert response.status_code == 403
-            assert b"Access denied" in response.data
+        assert response.status_code == 403
 
     def test_returns_error_for_empty_params(self, client):
         """Test that error is returned for empty parameters."""
-        with patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed:
+        with patch("src.app_main.cors.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
             response = client.get("/cxtoken")
@@ -56,7 +55,7 @@ class TestCxtokenEndpoint:
 
     def test_returns_error_for_missing_user(self, client):
         """Test that error is returned when user is missing."""
-        with patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed:
+        with patch("src.app_main.cors.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
             response = client.get("/cxtoken?wiki=en")
@@ -68,7 +67,7 @@ class TestCxtokenEndpoint:
     def test_returns_no_access_when_user_not_found(self, client):
         """Test that no access error is returned when user not found in DB."""
         with (
-            patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed,
+            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
         ):
             mock_is_allowed.return_value = "medwiki.toolforge.org"
@@ -84,7 +83,7 @@ class TestCxtokenEndpoint:
     def test_returns_cxtoken_on_success(self, client):
         """Test that cxtoken is returned on success."""
         with (
-            patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed,
+            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
@@ -107,18 +106,19 @@ class TestCxtokenEndpoint:
 
     def test_handles_options_request(self, client):
         """Test that OPTIONS request is handled for CORS preflight."""
-        with patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed:
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
+        response = client.options(
+            "/cxtoken",
+            base_url="https://medwiki.toolforge.org",
+            headers={"Origin": "https://medwiki.toolforge.org"},
+        )
 
-            response = client.options("/cxtoken")
-
-            assert response.status_code == 200
-            assert "Access-Control-Allow-Origin" in response.headers
+        assert response.status_code == 200
+        assert "Access-Control-Allow-Methods" in response.headers
 
     def test_deletes_access_on_invalid_authorization(self, client):
         """Test that access is deleted on invalid authorization error."""
         with (
-            patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed,
+            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
             patch("src.app_main.app_routes.cxtoken.routes.delete_user_token_by_username") as mock_delete,

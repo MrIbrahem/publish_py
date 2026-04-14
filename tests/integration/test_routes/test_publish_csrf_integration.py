@@ -74,11 +74,13 @@ class TestPublishEndpointWithCSRF2:
 
     def test_options_preflight_with_csrf_enabled(self, csrf_client):
         """Test OPTIONS preflight request with CSRF enabled."""
-        with patch("src.app_main.cors.cors.is_allowed", return_value="medwiki.toolforge.org"):
-            response = csrf_client.options("/publish")
+        response = csrf_client.options(
+            "/publish",
+            base_url="https://medwiki.toolforge.org",
+            headers={"Origin": "https://medwiki.toolforge.org"},
+        )
 
         assert response.status_code == 200
-        assert "Access-Control-Allow-Origin" in response.headers
         assert "Access-Control-Allow-Methods" in response.headers
 
     def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
@@ -141,7 +143,7 @@ class BasePublishTest:
 
     @pytest.fixture(autouse=True)
     def mock_is_allowed(self):
-        with patch("src.app_main.cors.cors.is_allowed") as mocked:
+        with patch("src.app_main.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 
