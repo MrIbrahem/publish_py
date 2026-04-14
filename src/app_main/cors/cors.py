@@ -23,15 +23,16 @@ def is_allowed(request: Request) -> str | None:
 
     # Extract the host (netloc) from our current server URL
     # e.g., 'example.com' or 'localhost:5000'
-    server_host = urlparse(request.host_url).netloc
+    server_host = get_host(request.host_url)
 
     # Helper function to extract host from a URL string
+
+    origin_host = get_host(origin) if origin else ""
 
     if current_app.config.get("CORS_DISABLED"):
         logger.warning(f"CORS is disabled. Access allowed: referer={referer}, origin={origin}")
         return origin or "*"
 
-    origin_host = get_host(origin) if origin else ""
     referer_host = get_host(referer) if referer else ""
 
     # 1. Check for Same-Origin (Exact Host Match)
