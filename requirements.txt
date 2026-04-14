@@ -5,6 +5,7 @@ flask-wtf
 flask-limiter
 mwoauth
 pymysql
+colorlog
 requests
 requests_oauthlib
 cryptography
