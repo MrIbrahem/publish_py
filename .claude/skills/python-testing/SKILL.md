@@ -1,5 +1,7 @@
 # pytest - Professional Python Testing
 
+-   [source](https://github.com/MacPhobos/research-mind/blob/main/.claude/skills/toolchains-python-testing-pytest/skill.md?plain=1)
+
 ## Overview
 
 pytest is the industry-standard Python testing framework, offering powerful features like fixtures, parametrization, markers, plugins, and seamless integration with FastAPI, Django, and Flask. It provides a simple, scalable approach to testing from unit tests to complex integration scenarios.
