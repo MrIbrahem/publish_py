@@ -14,7 +14,7 @@ def mock_request(mocker):
     mock_req.host_url = "https://mysite.com/"
     mock_req.headers = {}
 
-    mocker.patch("src.app_main.cors.cors.request", mock_req)
+    mocker.patch("src.app_main.cors.request", mock_req)
 
     mock_app = MagicMock()
     mock_app.config = {"CORS_DISABLED": False}
@@ -43,7 +43,7 @@ class TestCORSValidation:
     def test_cors_validation(self, mock_request, headers, expected):
         mock_req, _ = mock_request
         mock_req.headers = headers
-        assert is_allowed() == expected
+        assert is_allowed(mock_req) == expected
 
     def test_disabled_cors_bypass(self, mock_request):
         """Should allow everything if CORS_DISABLED is True."""
@@ -52,4 +52,4 @@ class TestCORSValidation:
         mock_req.headers = {"Origin": "https://unknown-site.com"}
 
         # When CORS is disabled, returns origin or "*"
-        assert is_allowed() == "https://unknown-site.com"
+        assert is_allowed(mock_req) == "https://unknown-site.com"
