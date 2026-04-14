@@ -143,7 +143,7 @@ def index_get() -> Response:
     if not allowed:
         return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
 
-    return handel_form(request.args, allowed)
+    return handle_form(request.args, allowed)
 
 
 __all__ = ["bp_publish"]
