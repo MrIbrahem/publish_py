@@ -19,7 +19,6 @@ def csrf_app():
     os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
     os.environ.setdefault("OAUTH_CONSUMER_KEY", "test_consumer_key")
     os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test_consumer_secret")
-    os.environ.setdefault("OAUTH_ENCRYPTION_KEY", "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI=")
     os.environ.setdefault("WIKIDATA_DOMAIN", "www.wikidata.org")
     os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
     os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
