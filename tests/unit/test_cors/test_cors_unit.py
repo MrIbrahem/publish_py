@@ -19,6 +19,7 @@ class TestGetHost:
         pytest.param("http://192.168.1.1:9000/admin", "192.168.1.1:9000", id="ip_address"),
         pytest.param("example.com/path", "", id="no_scheme_returns_empty"),
         pytest.param("", "", id="empty_string"),
+        pytest.param("not-a-url", "", id="not-a-url"),
         pytest.param("https://user:pass@example.com", "user:pass@example.com", id="userinfo"),
     ])
     def test_get_host(self, url, expected):
