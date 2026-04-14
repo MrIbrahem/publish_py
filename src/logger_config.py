@@ -97,7 +97,7 @@ def setup_file_handler(project_logger: logging.Logger, log_file: Path, level: in
     project_logger.addHandler(file_handler)
 
 
-def configure_logging(DEBUG) -> None:
+def configure_logging(level) -> None:
     # Create log directory if needed
 
     flask_data_dir = os.getenv("FLASK_DATA_DIR") or "~/data"
