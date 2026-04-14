@@ -23,7 +23,7 @@ def _parse_select_fields(select_param: Optional[str]) -> Optional[List[str]]:
     return [f.strip() for f in select_param.split(",") if f.strip()]
 
 
-@check_cors(set_allow_origin=True)
+@check_cors
 @bp_api.route("/publish_reports", methods=["OPTIONS"])
 def publish_reports_preflight() -> Response:
     """
@@ -39,7 +39,7 @@ def publish_reports_preflight() -> Response:
     return response
 
 
-@check_cors(set_allow_origin=True)
+@check_cors
 @bp_api.route("/publish_reports", methods=["GET"])
 def get_publish_reports() -> Response:
     """

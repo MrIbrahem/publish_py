@@ -6,7 +6,7 @@ from .cors import is_allowed
 from .publish_secret_checks import check_publish_secret_code
 
 
-def validate_access(func, set_allow_origin=False):
+def validate_access(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
@@ -16,7 +16,7 @@ def validate_access(func, set_allow_origin=False):
         if has_valid_secret_code or allowed:
             response = func(*args, **kwargs)
 
-            if set_allow_origin:
+            if hasattr(response, "headers"):
                 response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
 
             return response
@@ -29,7 +29,7 @@ def validate_access(func, set_allow_origin=False):
     return wrapper
 
 
-def check_cors(func, set_allow_origin=False):
+def check_cors(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
@@ -38,7 +38,7 @@ def check_cors(func, set_allow_origin=False):
             return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
 
         response = func(*args, **kwargs)
-        if set_allow_origin:
+        if hasattr(response, "headers"):
             response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
 
         return response

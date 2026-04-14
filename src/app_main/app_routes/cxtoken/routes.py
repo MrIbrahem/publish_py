@@ -58,7 +58,7 @@ def get_cxtoken_for_user_wiki(wiki, user):
     return cxtoken, 200
 
 
-@check_cors(set_allow_origin=True)
+@check_cors
 @bp_cxtoken.route("/", methods=["OPTIONS"])
 def index_preflight() -> Response:
     """
@@ -74,7 +74,7 @@ def index_preflight() -> Response:
     return response
 
 
-@check_cors(set_allow_origin=True)
+@check_cors
 @bp_cxtoken.route("/", methods=["GET"])
 def index() -> Response:
     """Handle cxtoken requests.
