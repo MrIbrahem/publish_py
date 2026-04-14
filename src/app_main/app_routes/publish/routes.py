@@ -65,8 +65,8 @@ def handle_form(request_data) -> Response:
     return response
 
 
-@check_cors
 @bp_publish.route("/", methods=["OPTIONS"])
+@check_cors
 def publish_preflight() -> Response:
     response = Response("", status=200)
     response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
@@ -74,8 +74,8 @@ def publish_preflight() -> Response:
     return response
 
 
-@validate_access
 @bp_publish.route("/", methods=["POST"])
+@validate_access
 def index() -> Response:
     """Handle post/publish requests.
 
