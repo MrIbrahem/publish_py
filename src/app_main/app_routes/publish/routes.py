@@ -115,7 +115,7 @@ def index() -> Response:
         return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
 
     # Get request data
-    request_data = request.get_json() or {}
+    request_data = request.form.to_dict() or request.get_json(silent=True) or {}
 
     return handel_form(request_data, allowed)
 
