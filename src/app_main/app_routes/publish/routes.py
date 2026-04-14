@@ -90,32 +90,6 @@ def handel_form(request_data, allowed) -> Response:
     return response
 
 
-@bp_publish.route("/", methods=["GET"])
-def index_get() -> Response:
-    """Handle post/publish requests.
-
-    Request Args (URL query parameters):
-        user: Username
-        title: Target page title
-        target: Target language code
-        sourcetitle: Source page title
-        text: Page content
-        revid: Source revision ID (optional)
-        campaign: Campaign name (optional)
-        wpCaptchaId: Captcha ID (optional)
-        wpCaptchaWord: Captcha answer (optional)
-
-    Returns:
-        JSON response with edit result
-    """
-    allowed = is_allowed()
-
-    if not allowed:
-        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
-
-    return handel_form(request.args, allowed)
-
-
 @bp_publish.route("/", methods=["POST"])
 def index() -> Response:
     """Handle post/publish requests.
@@ -144,6 +118,32 @@ def index() -> Response:
     request_data = request.get_json() or {}
 
     return handel_form(request_data, allowed)
+
+
+@bp_publish.route("/", methods=["GET"])
+def index_get() -> Response:
+    """Handle post/publish requests.
+
+    Request Args (URL query parameters):
+        user: Username
+        title: Target page title
+        target: Target language code
+        sourcetitle: Source page title
+        text: Page content
+        revid: Source revision ID (optional)
+        campaign: Campaign name (optional)
+        wpCaptchaId: Captcha ID (optional)
+        wpCaptchaWord: Captcha answer (optional)
+
+    Returns:
+        JSON response with edit result
+    """
+    allowed = is_allowed()
+
+    if not allowed:
+        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
+
+    return handel_form(request.args, allowed)
 
 
 __all__ = ["bp_publish"]
