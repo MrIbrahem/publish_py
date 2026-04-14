@@ -117,7 +117,7 @@ def index() -> Response:
     # Get request data
     request_data = request.form.to_dict() or request.get_json(silent=True) or {}
 
-    return handel_form(request_data, allowed)
+    return handle_form(request_data, allowed)
 
 
 @bp_publish.route("/", methods=["GET"])
