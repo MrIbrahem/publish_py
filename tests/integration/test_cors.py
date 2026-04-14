@@ -1,4 +1,4 @@
-"""Tests for helpers.cors module."""
+"""Tests for cors module."""
 
 import pytest
 from flask import Flask
@@ -33,7 +33,7 @@ class TestIsAllowed:
     def test_allows_medwiki_origin(self, app):
         """Test that medwiki.toolforge.org origin is allowed."""
         with app.test_request_context(headers={"Origin": "https://medwiki.toolforge.org"}):
-            from src.app_main.helpers.cors import is_allowed
+            from src.app_main.cors import is_allowed
 
             result = is_allowed()
             assert result == "medwiki.toolforge.org"
@@ -41,7 +41,7 @@ class TestIsAllowed:
     def test_allows_mdwikicx_referer(self, app):
         """Test that mdwikicx.toolforge.org referer is allowed."""
         with app.test_request_context(headers={"Referer": "https://mdwikicx.toolforge.org/page"}):
-            from src.app_main.helpers.cors import is_allowed
+            from src.app_main.cors import is_allowed
 
             result = is_allowed()
             assert result == "mdwikicx.toolforge.org"
@@ -49,7 +49,7 @@ class TestIsAllowed:
     def test_rejects_unknown_origin(self, app):
         """Test that unknown origin is rejected."""
         with app.test_request_context(headers={"Origin": "https://evil.com", "Referer": "https://evil.com"}):
-            from src.app_main.helpers.cors import is_allowed
+            from src.app_main.cors import is_allowed
 
             result = is_allowed()
             assert result is None
@@ -57,7 +57,7 @@ class TestIsAllowed:
     def test_rejects_empty_headers(self, app):
         """Test that empty headers are rejected."""
         with app.test_request_context():
-            from src.app_main.helpers.cors import is_allowed
+            from src.app_main.cors import is_allowed
 
             result = is_allowed()
             assert result is None

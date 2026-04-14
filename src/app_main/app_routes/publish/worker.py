@@ -34,8 +34,7 @@ def _get_revid(sourcetitle) -> str:
 
 
 def shouldAddedToWikidata(lang, title):
-    """
-    """
+    """ """
     page_information = get_title_info(title, lang)
     if not page_information:
         return False
@@ -209,6 +208,8 @@ def _add_to_db(
     campaign: str,
     sourcetitle: str,
     mdwiki_revid: str,
+    tr_type: str = "lead",
+    words: int = 0,
 ) -> dict[str, Any]:
     """Add page to database.
 
@@ -220,6 +221,8 @@ def _add_to_db(
         campaign: Campaign name
         sourcetitle: Source page title
         mdwiki_revid: MDWiki revision ID
+        tr_type: Translation type
+        words: Article words
 
     Returns:
         Database operation result
@@ -228,18 +231,13 @@ def _add_to_db(
     # This mirrors the PHP retrieveCampaignCategories() function
     cat = get_campaign_category(campaign, settings.database_data)
 
-    # Get word count from words table
-    # This mirrors the PHP $Words_table[$title] ?? 0 lookup
-    word = get_word_count(sourcetitle)
-
     # Check if abuse filter warning was triggered
     to_users_table = "abusefilter-warning-39" in json.dumps(wd_result)
 
-    return insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, word, to_users_table)
+    return insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, words, to_users_table, tr_type=tr_type,)
 
 
-def insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, word, to_users_table):
-
+def insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, word, to_users_table, tr_type="lead",):
     # Normalize inputs
     sourcetitle = sourcetitle.replace("_", " ")
     target = target.replace("_", " ")
@@ -255,7 +253,7 @@ def insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, word, to_us
 
     return insert_to_db_2(
         sourcetitle=sourcetitle,
-        tr_type="lead",
+        tr_type=tr_type,
         cat=cat,
         lang=lang,
         user=user,
@@ -370,6 +368,10 @@ def _process_edit(
     campaign = tab["campaign"]
     title = tab["title"]
     user = tab["user"]
+    tr_type = tab["tr_type"]
+
+    # Get word count (mirrors PHP $tab['words'] = $Words_table[$title] ?? 0)
+    tab["words"] = get_word_count(sourcetitle)
 
     # Get revision ID
     mdwiki_revid = _get_revid(sourcetitle)
@@ -379,6 +381,7 @@ def _process_edit(
         mdwiki_revid = tab.get("request_revid", "")
 
     tab["revid"] = mdwiki_revid
+
     # Apply text changes (fix references)
     newtext = do_changes_to_text(sourcetitle, tab["title"], text, lang, mdwiki_revid)
 
@@ -429,6 +432,8 @@ def _process_edit(
             campaign,
             sourcetitle,
             mdwiki_revid,
+            tr_type=tr_type,
+            words=tab["words"],
         )
 
         editit["LinkToWikidata"] = link_to_wd

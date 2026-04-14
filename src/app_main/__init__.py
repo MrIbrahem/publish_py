@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import Tuple, Type, Any
 
 from flask import Flask, flash, render_template, request
-from flask_wtf.csrf import CSRFProtect
 
 from .app_routes import (
     bp_api,
@@ -16,7 +15,7 @@ from .app_routes import (
     bp_cxtoken,
     bp_fixrefs,
     bp_main,
-    bp_post,
+    bp_publish,
 )
 from .config import settings
 from .cookies import CookieHeaderClient
@@ -76,6 +75,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     template_dir = os.path.join(base_dir, "..", "templates")
     static_dir = os.path.join(base_dir, "..", "static")
 
+    # app = Flask(
     app = Flask(
         __name__,
         template_folder=template_dir,
@@ -110,9 +110,12 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_cxtoken)
-    app.register_blueprint(bp_post)
+    app.register_blueprint(bp_publish)
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
+
+    if app.config.get("WTF_CSRF_ENABLED"):
+        csrf.exempt(bp_publish)
 
     @app.context_processor
     def _inject_data():  # pragma: no cover - trivial wrapper
@@ -143,7 +146,8 @@ def create_app(config_class: Type | None = None) -> Flask:
     @app.after_request
     def add_cache_headers(response):
         """Prevent CSRF token caching on form-related routes."""
-        if request.endpoint and any(request.endpoint.startswith(bp) for bp in ["auth.", "post.", "fixrefs.", "cxtoken."]):
+        endpoints = ["auth.", "publish.", "fixrefs.", "cxtoken."]
+        if request.endpoint and any(request.endpoint.startswith(bp) for bp in endpoints):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"

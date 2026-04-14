@@ -9,17 +9,17 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 
-from ...helpers.cors import is_allowed
+from ...cors import is_allowed
 from ...helpers.format import format_title, format_user
 from ...users.store import get_user_token_by_username
 
 from .worker import _process_edit, _handle_no_access
 
-bp_post = Blueprint("post", __name__, url_prefix="/publish")
+bp_publish = Blueprint("publish", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
 
 
-@bp_post.route("/", methods=["OPTIONS"])
+@bp_publish.route("/", methods=["OPTIONS"])
 def index_preflight() -> Response:
     """
     Handle preflight requests.
@@ -42,7 +42,7 @@ def index_preflight() -> Response:
     return response
 
 
-@bp_post.route("/", methods=["POST"])
+@bp_publish.route("/", methods=["POST"])
 def index() -> Response:
     """Handle post/publish requests.
 
@@ -85,6 +85,8 @@ def index() -> Response:
         "edit": {},
         "sourcetitle": request_data.get("sourcetitle", ""),
         "request_revid": request_data.get("revid", "") or request_data.get("revision", ""),
+        "tr_type": request_data.get("tr_type", "lead"),
+        "words": 0,
     }
 
     # Get access credentials
@@ -114,4 +116,4 @@ def index() -> Response:
     return response
 
 
-__all__ = ["bp_post"]
+__all__ = ["bp_publish"]

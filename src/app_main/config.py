@@ -79,6 +79,7 @@ class Settings:
     secret_key: str
     user_agent: str
     revids_api_url: str
+    wikidata_domain: str
     is_localhost: Callable[[str], bool]
 
     # Nested configurations
@@ -263,6 +264,7 @@ def get_settings() -> Settings:
     cors_config = CorsConfig(allowed_domains=cors_domains)
 
     revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
+    wikidata_domain = os.getenv("WIKIDATA_DOMAIN") or "www.wikidata.org"
 
     user_agent = os.getenv("USER_AGENT", "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)")
 
@@ -270,6 +272,7 @@ def get_settings() -> Settings:
         secret_key=secret_key,
         user_agent=user_agent,
         revids_api_url=revids_api_url,
+        wikidata_domain=wikidata_domain,
         is_localhost=is_localhost,
         database_data=_load_database_config(),
         paths=_get_paths(),
@@ -320,6 +323,11 @@ class Config:
     WTF_CSRF_ENABLED: bool = True
     WTF_CSRF_TIME_LIMIT: int | None = None  # None = tokens don't expire
     WTF_CSRF_SSL_STRICT: bool = True
+    WTF_CSRF_CHECK_DEFAULT: bool = True  # default value
+    WTF_CSRF_FIELD_NAME: str = "csrf_token"  # default value
+    WTF_CSRF_HEADERS: list[str] = ["X-CSRFToken", "X-CSRF-Token"]  # default value
+    WTF_CSRF_METHODS: list[str] = ["POST", "PUT", "PATCH", "DELETE"]  # default value
+    # WTF_CSRF_SECRET_KEY: str = settings.secret_key # default value
 
     # Request handling
     MAX_CONTENT_LENGTH: int | None = 16 * 1024 * 1024  # 16MB default

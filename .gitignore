@@ -30,3 +30,6 @@ pup2.html
 *.egg
 coverage.xml
 .coverage
+.coverage.*
+/php_publish
+app2.py
