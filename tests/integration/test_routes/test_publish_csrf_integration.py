@@ -65,7 +65,8 @@ class TestPublishEndpointWithCSRF2:
         """
         auto allow all
         """
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
+        # with patch("src.app_main.cors.is_allowed") as mocked:
+        with patch("src.app_main.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 
@@ -114,7 +115,7 @@ class TestPublishEndpointWithDenyCSRF:
 
     def test_cors_validation_still_works(self, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_deny:
+        with patch("src.app_main.cors.is_allowed") as mock_deny:
             mock_deny.return_value = None
 
             response = csrf_client.post(
@@ -131,7 +132,7 @@ class BasePublishTest:
 
     @pytest.fixture(autouse=True)
     def mock_is_allowed(self):
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
+        with patch("src.app_main.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 
