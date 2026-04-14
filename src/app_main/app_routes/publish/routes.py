@@ -42,7 +42,7 @@ def index_preflight() -> Response:
     return response
 
 
-def handel_form(request_data) -> Response:
+def handel_form(request_data, allowed) -> Response:
     # Format inputs
     user = format_user(request_data.get("user", ""))
     title = format_title(request_data.get("title", ""))
@@ -94,7 +94,7 @@ def handel_form(request_data) -> Response:
 def index_get() -> Response:
     """Handle post/publish requests.
 
-    Request Body (JSON):
+    Request Args (URL query parameters):
         user: Username
         title: Target page title
         target: Target language code
@@ -108,16 +108,24 @@ def index_get() -> Response:
     Returns:
         JSON response with edit result
     """
-    # Check CORS
     allowed = is_allowed()
 
     if not allowed:
         return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
 
-    # Get request data
-    request_data = request.get_json() or {}
+    request_data = {
+        "user": request.args.get("user", ""),
+        "title": request.args.get("title", ""),
+        "target": request.args.get("target", ""),
+        "sourcetitle": request.args.get("sourcetitle", ""),
+        "text": request.args.get("text", ""),
+        "revid": request.args.get("revid", "") or request.args.get("revision", ""),
+        "campaign": request.args.get("campaign", ""),
+        "wpCaptchaId": request.args.get("wpCaptchaId"),
+        "wpCaptchaWord": request.args.get("wpCaptchaWord"),
+    }
 
-    return handel_form(request_data)
+    return handel_form(request_data, allowed)
 
 
 @bp_publish.route("/", methods=["POST"])
@@ -147,7 +155,7 @@ def index() -> Response:
     # Get request data
     request_data = request.get_json() or {}
 
-    return handel_form(request_data)
+    return handel_form(request_data, allowed)
 
 
 __all__ = ["bp_publish"]
