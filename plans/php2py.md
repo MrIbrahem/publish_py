@@ -240,7 +240,7 @@ from flask import Blueprint, jsonify, request
 
 from ...users.store import get_user_token, delete_user_token
 from ...users.current import current_user
-from ..helpers.cors import is_allowed
+from ..cors import is_allowed
 from ..services.oauth_client import get_cxtoken
 
 bp_cxtoken = Blueprint("cxtoken", __name__)

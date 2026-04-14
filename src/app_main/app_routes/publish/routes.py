@@ -9,7 +9,7 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 
-from ...helpers.cors import is_allowed
+from ...cors import is_allowed
 from ...helpers.format import format_title, format_user
 from ...users.store import get_user_token_by_username
 

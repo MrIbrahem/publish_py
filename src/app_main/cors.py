@@ -6,7 +6,7 @@ import logging
 from urllib.parse import urlparse
 from flask import current_app, request
 
-from ..config import settings
+from .config import settings
 
 logger = logging.getLogger(__name__)
 
