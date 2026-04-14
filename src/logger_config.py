@@ -118,7 +118,7 @@ def configure_logging(level) -> None:
     error_log_path = log_dir / "errors.log"
 
     setup_logging(
-        level=logging.DEBUG if DEBUG else logging.INFO,
+        level=level,
         name="app_main",
         log_file=all_log_path,
         error_log_file=error_log_path,
