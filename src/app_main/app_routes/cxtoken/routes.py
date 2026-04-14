@@ -11,7 +11,7 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 
 from ...config import settings
-from ...cors import is_allowed
+from ...cors import check_cors
 from ...services.oauth_client import get_cxtoken
 from ...users.store import delete_user_token_by_username, get_user_token_by_username
 from .cache import store_jwt, get_from_store
@@ -59,6 +59,7 @@ def get_cxtoken_for_user_wiki(wiki, user):
 
 
 @bp_cxtoken.route("/", methods=["OPTIONS"])
+@check_cors
 def index_preflight() -> Response:
     """
     Handle preflight requests.
@@ -66,21 +67,16 @@ def index_preflight() -> Response:
     Returns:
         Preflight response
     """
-    # Check CORS
-    allowed = is_allowed()
-
-    # Handle CORS preflight
-    if not allowed:
-        return jsonify({"error": "CORS not allowed"}), 403
 
     response = Response("", status=200)
-    response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
     response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    # response.headers["Access-Control-Max-Age"] =
     return response
 
 
 @bp_cxtoken.route("/", methods=["GET"])
+@check_cors
 def index() -> Response:
     """Handle cxtoken requests.
 
@@ -91,11 +87,6 @@ def index() -> Response:
     Returns:
         JSON response with cxtoken data or error
     """
-    # Check CORS
-    allowed = is_allowed()
-
-    if not allowed:
-        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
 
     # Get request parameters
     wiki = request.args.get("wiki", "")
@@ -119,7 +110,6 @@ def index() -> Response:
 
     response = jsonify(cxtoken)
     response.status_code = status_code
-    response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
 
     return response
 

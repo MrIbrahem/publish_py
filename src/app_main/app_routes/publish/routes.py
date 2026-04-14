@@ -9,7 +9,7 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 
-from ...cors import is_allowed
+from ...cors import check_cors, validate_access
 from ...helpers.format import format_title, format_user
 from ...users.store import get_user_token_by_username
 
@@ -19,56 +19,7 @@ bp_publish = Blueprint("publish", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
 
 
-@bp_publish.route("/", methods=["OPTIONS"])
-def index_preflight() -> Response:
-    """
-    Handle preflight requests.
-
-    Returns:
-        Preflight response
-    """
-    # Check CORS
-    allowed = is_allowed()
-
-    # Handle CORS preflight
-    if not allowed:
-        return jsonify({"error": "CORS not allowed"}), 403
-
-    response = Response("", status=200)
-    response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-
-    return response
-
-
-@bp_publish.route("/", methods=["POST"])
-def index() -> Response:
-    """Handle post/publish requests.
-
-    Request Body (JSON):
-        user: Username
-        title: Target page title
-        target: Target language code
-        sourcetitle: Source page title
-        text: Page content
-        revid: Source revision ID (optional)
-        campaign: Campaign name (optional)
-        wpCaptchaId: Captcha ID (optional)
-        wpCaptchaWord: Captcha answer (optional)
-
-    Returns:
-        JSON response with edit result
-    """
-    # Check CORS
-    allowed = is_allowed()
-
-    if not allowed:
-        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
-
-    # Get request data
-    request_data = request.get_json() or {}
-
+def handle_form(request_data) -> Response:
     # Format inputs
     user = format_user(request_data.get("user", ""))
     title = format_title(request_data.get("title", ""))
@@ -95,7 +46,6 @@ def index() -> Response:
     if user_token is None:
         response = jsonify(_handle_no_access(tab))
         response.status_code = 403
-        response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
         return response
 
     # Get credentials
@@ -112,8 +62,50 @@ def index() -> Response:
     editit = _process_edit(access_key, access_secret, text, tab)
 
     response = jsonify(editit)
-    response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
     return response
+
+
+@bp_publish.route("/", methods=["OPTIONS"])
+@check_cors
+def publish_preflight() -> Response:
+    response = Response("", status=200)
+    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
+    return response
+
+
+@bp_publish.route("/", methods=["POST"])
+@validate_access
+def index() -> Response:
+    """Handle post/publish requests.
+
+    Request Body (JSON):
+        user: Username
+        title: Target page title
+        target: Target language code
+        sourcetitle: Source page title
+        text: Page content
+        revid: Source revision ID (optional)
+        campaign: Campaign name (optional)
+        wpCaptchaId: Captcha ID (optional)
+        wpCaptchaWord: Captcha answer (optional)
+
+    Returns:
+        JSON response with edit result
+    """
+
+    # Get request data
+    request_data = request.form.to_dict()
+    if not request_data:
+        json_data = request.get_json(silent=True)
+        if json_data is None:
+            request_data = {}
+        elif isinstance(json_data, dict):
+            request_data = json_data
+        else:
+            return jsonify({"error": "JSON body must be an object"}), 400
+
+    return handle_form(request_data)
 
 
 __all__ = ["bp_publish"]

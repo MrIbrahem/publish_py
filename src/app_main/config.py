@@ -76,6 +76,7 @@ class UsersConfig:
 class Settings:
     """Main settings container."""
 
+    publish_secret_code: str
     secret_key: str
     user_agent: str
     revids_api_url: str
@@ -267,8 +268,10 @@ def get_settings() -> Settings:
     wikidata_domain = os.getenv("WIKIDATA_DOMAIN") or "www.wikidata.org"
 
     user_agent = os.getenv("USER_AGENT", "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)")
+    publish_secret_code = os.getenv("PUBLISH_SECRET_CODE", "")
 
     return Settings(
+        publish_secret_code=publish_secret_code,
         secret_key=secret_key,
         user_agent=user_agent,
         revids_api_url=revids_api_url,

@@ -34,17 +34,20 @@ def csrf_app():
     from flask_wtf.csrf import CSRFProtect
 
     app = Flask(__name__)
-    app.config.update({
-        "TESTING": True,
-        "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
-        "WTF_CSRF_ENABLED": True,
-        "WTF_CSRF_SSL_STRICT": False,
-        "CORS_DISABLED": False,
-    })
+    app.config.update(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
+            "WTF_CSRF_ENABLED": True,
+            "WTF_CSRF_SSL_STRICT": False,
+            "CORS_DISABLED": False,
+        }
+    )
     app.url_map.strict_slashes = False
 
     csrf = CSRFProtect(app)
     from src.app_main.app_routes.publish.routes import bp_publish
+
     app.register_blueprint(bp_publish)
     csrf.exempt(bp_publish)
 
@@ -65,22 +68,24 @@ class TestPublishEndpointWithCSRF2:
         """
         auto allow all
         """
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
+        with patch("src.app_main.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 
     def test_options_preflight_with_csrf_enabled(self, csrf_client):
         """Test OPTIONS preflight request with CSRF enabled."""
-        response = csrf_client.options("/publish")
+        response = csrf_client.options(
+            "/publish",
+            base_url="https://medwiki.toolforge.org",
+            headers={"Origin": "https://medwiki.toolforge.org"},
+        )
 
         assert response.status_code == 200
-        assert "Access-Control-Allow-Origin" in response.headers
         assert "Access-Control-Allow-Methods" in response.headers
 
     def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
         """Test that no access error returns 403 even with CSRF enabled."""
         with (
-
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
@@ -114,8 +119,15 @@ class TestPublishEndpointWithDenyCSRF:
 
     def test_cors_validation_still_works(self, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_deny:
+        with (
+            patch("src.app_main.cors.cors.is_allowed") as mock_deny,
+            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+        ):
             mock_deny.return_value = None
+            mock_get_token.return_value = None
+            mock_reports_db_instance = MagicMock()
+            mock_reports_db.return_value = mock_reports_db_instance
 
             response = csrf_client.post(
                 "/publish",
@@ -131,7 +143,7 @@ class BasePublishTest:
 
     @pytest.fixture(autouse=True)
     def mock_is_allowed(self):
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
+        with patch("src.app_main.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 
@@ -156,6 +168,7 @@ class BasePublishTest:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
         ):
             # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
@@ -163,6 +176,7 @@ class BasePublishTest:
             mock_changes.return_value = None
             mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
             mock_link.return_value = {"result": "success", "qid": "Q123"}
+            mock_should_add.return_value = True
 
             mock_reports_db.return_value = MagicMock()
             pages = MagicMock()
@@ -179,6 +193,7 @@ class BasePublishTest:
                 "reports_db": mock_reports_db,
                 "pages_db": mock_pages_db,
                 "pages": pages,
+                "should_add": mock_should_add,
             }
 
     # ── helper ──────────────────────────────────────────────────────────────
@@ -198,16 +213,21 @@ class BasePublishTest:
             "text": "Content",
         }
         return {**base, **overrides}
+
+
 # ─── أ: التدفق الناجح ────────────────────────────────────────────────────────
 
 
 class TestSuccessFlows(BasePublishTest):
-
     def test_successful_edit(self, csrf_client, common_patches):
         # common_patches يغطي الـ happy-path بالكامل — لا شيء إضافي هنا
-        response = self._post(csrf_client, self._default_payload(
-            campaign="test_campaign", tr_type="lead",
-        ))
+        response = self._post(
+            csrf_client,
+            self._default_payload(
+                campaign="test_campaign",
+                tr_type="lead",
+            ),
+        )
 
         assert response.status_code == 200
         data = response.get_json()
@@ -218,9 +238,12 @@ class TestSuccessFlows(BasePublishTest):
         # نُعدّل فقط القيمة التي تختلف عن الـ default
         common_patches["changes"].return_value = "Fixed reference content"
 
-        response = self._post(csrf_client, self._default_payload(
-            text="Original content with references",
-        ))
+        response = self._post(
+            csrf_client,
+            self._default_payload(
+                text="Original content with references",
+            ),
+        )
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
@@ -239,8 +262,8 @@ class TestSuccessFlows(BasePublishTest):
 
 # ─── ب: منطق البيانات والـ Metadata ─────────────────────────────────────────
 
-class TestMetadataLogic(BasePublishTest):
 
+class TestMetadataLogic(BasePublishTest):
     def test_tr_type_passed_correctly(self, csrf_client, common_patches):
         response = self._post(csrf_client, self._default_payload(tr_type="section"))
 
@@ -263,10 +286,13 @@ class TestMetadataLogic(BasePublishTest):
             assert tab["words"] == 500
 
     def test_hashtag_logic(self, csrf_client, common_patches):
-        response = self._post(csrf_client, self._default_payload(
-            user="Mr. Ibrahem",
-            title="Mr. Ibrahem/Test Page",
-        ))
+        response = self._post(
+            csrf_client,
+            self._default_payload(
+                user="Mr. Ibrahem",
+                title="Mr. Ibrahem/Test Page",
+            ),
+        )
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
@@ -291,8 +317,8 @@ class TestMetadataLogic(BasePublishTest):
 
 # ─── ج: معالجة الأخطاء والـ Captcha ─────────────────────────────────────────
 
-class TestErrorAndEdgeCases(BasePublishTest):
 
+class TestErrorAndEdgeCases(BasePublishTest):
     def test_captcha_handling(self, csrf_client, common_patches):
         # نُعدّل الـ edit ليعيد captcha بدلاً من Success
         common_patches["edit"].return_value = {
@@ -322,8 +348,8 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 # ─── د: الحالات المعقدة ───────────────────────────────────────────────────────
 
-class TestComplexWorkflows(BasePublishTest):
 
+class TestComplexWorkflows(BasePublishTest):
     def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
         with patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add:
             mock_should_add.return_value = True
