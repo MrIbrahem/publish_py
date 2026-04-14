@@ -115,6 +115,7 @@ class TestPostEndpoint:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
         ):
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
@@ -122,6 +123,7 @@ class TestPostEndpoint:
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
+            mock_should_add.return_value = True
 
             # Mock revision ID
             mock_get_revid.return_value = "12345"
