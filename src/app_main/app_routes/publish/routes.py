@@ -42,7 +42,7 @@ def index_preflight() -> Response:
     return response
 
 
-def handel_form(request_data, allowed) -> Response:
+def handle_form(request_data, allowed) -> Response:
     # Format inputs
     user = format_user(request_data.get("user", ""))
     title = format_title(request_data.get("title", ""))
