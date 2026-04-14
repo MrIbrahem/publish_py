@@ -35,7 +35,7 @@ class TestPostEndpoint:
 
     def test_cors_not_allowed_without_origin(self, client):
         """Test that requests without allowed origin are rejected."""
-        with patch("src.app_main.cors.is_allowed") as mock_is_allowed:
+        with patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = None
 
             response = client.post(
@@ -50,7 +50,7 @@ class TestPostEndpoint:
     def test_returns_no_access_when_user_not_found(self, client):
         """Test that no access error is returned when user not found."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
+            patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
@@ -83,7 +83,7 @@ class TestPostEndpoint:
 
     def test_handles_options_request(self, client):
         """Test that OPTIONS request is handled for CORS preflight."""
-        with patch("src.app_main.cors.is_allowed") as mock_is_allowed:
+        with patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed:
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
             response = client.options("/publish")
@@ -94,7 +94,7 @@ class TestPostEndpoint:
     def test_successful_edit_returns_success(self, client):
         """Test that successful edit returns success result."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
+            patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
@@ -105,7 +105,6 @@ class TestPostEndpoint:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
             # Mock user token
@@ -153,7 +152,7 @@ class TestPostEndpoint:
     def test_handles_captcha_response(self, client):
         """Test that captcha response is handled correctly."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
+            patch("src.app_main.cors.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -161,7 +160,6 @@ class TestPostEndpoint:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
-
             mock_is_allowed.return_value = "medwiki.toolforge.org"
 
             # Mock user token
