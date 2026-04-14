@@ -12,6 +12,10 @@ from ..config import settings
 logger = logging.getLogger(__name__)
 
 
+def get_host(url: str) -> str:
+    return urlparse(url).netloc
+
+
 def is_allowed(request: Request) -> str | None:
     """Check if request is from an exact allowed domain or same origin."""
     referer = request.headers.get("Referer", "")
@@ -22,8 +26,6 @@ def is_allowed(request: Request) -> str | None:
     server_host = urlparse(request.host_url).netloc
 
     # Helper function to extract host from a URL string
-    def get_host(url: str) -> str:
-        return urlparse(url).netloc
 
     if current_app.config.get("CORS_DISABLED"):
         logger.warning(f"CORS is disabled. Access allowed: referer={referer}, origin={origin}")

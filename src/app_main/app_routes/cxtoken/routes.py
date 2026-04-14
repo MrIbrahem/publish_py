@@ -71,6 +71,7 @@ def index_preflight() -> Response:
     response = Response("", status=200)
     response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    # response.headers["Access-Control-Max-Age"] =
     return response
 
 
