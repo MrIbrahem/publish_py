@@ -919,6 +919,8 @@ project/
 │   ├── test_models.py       # Model tests
 │   ├── test_services.py     # Service tests
 │   ├── test_api.py          # API tests
+│   └── unit/
+│       └── __init__.py
 │   └── integration/
 │       ├── __init__.py
 │       └── test_workflows.py
