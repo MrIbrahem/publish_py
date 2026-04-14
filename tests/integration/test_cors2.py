@@ -1,7 +1,8 @@
 """Tests for cors module."""
 
-import pytest
+from unittest.mock import MagicMock
 
+import pytest
 
 from src.app_main.cors import is_allowed
 
@@ -9,23 +10,24 @@ from src.app_main.cors import is_allowed
 @pytest.fixture
 def mock_request(mocker):
     """Fixture to mock Flask's request and current_app."""
-    mock_req = mocker.patch("src.app_main.cors.request")
-    # Default host setup
+    mock_req = MagicMock()
     mock_req.host_url = "https://mysite.com/"
     mock_req.headers = {}
 
-    mock_app = mocker.patch("src.app_main.cors.current_app")
-    mock_app.config = {"CORS_DISABLED": False}
+    mocker.patch("src.app_main.cors.request", mock_req)
 
-    # Mock settings
-    mock_settings = mocker.patch("src.app_main.cors.settings")
+    mock_app = MagicMock()
+    mock_app.config = {"CORS_DISABLED": False}
+    mocker.patch("src.app_main.cors.current_app", mock_app)
+
+    mock_settings = MagicMock()
     mock_settings.cors.allowed_domains = ["trusted.com", "api.partner.net"]
+    mocker.patch("src.app_main.cors.settings", mock_settings)
 
     return mock_req
 
 
 class TestCORSValidation:
-
     def test_allowed_same_origin(self, mock_request):
         """Should allow if Origin matches host_url exactly."""
         mock_request.headers = {"Origin": "https://mysite.com"}
@@ -61,6 +63,7 @@ class TestCORSValidation:
     def test_disabled_cors_bypass(self, mocker, mock_request):
         """Should allow everything if CORS_DISABLED is True."""
         from app.utils.cors import current_app
+
         current_app.config["CORS_DISABLED"] = True
         mock_request.headers = {"Origin": "https://unknown-site.com"}
 
