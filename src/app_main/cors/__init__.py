@@ -22,9 +22,19 @@ def validate_access(func):
             return response
 
         if not has_valid_secret_code:
-            return jsonify({"error": "Access denied. Invalid or missing secret key."}), 403
+            return jsonify({
+                "error": {
+                    "code": "access_denied",
+                    "info": "Access denied. Invalid or missing secret key."
+                }
+            }), 403
 
-        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
+        return jsonify({
+            "error": {
+                "code": "access_denied",
+                "info": "Access denied. Requests are only allowed from authorized domains."
+            }
+        }), 403
 
     return wrapper
 
@@ -35,7 +45,12 @@ def check_cors(func):
 
         allowed = is_allowed(request)
         if not allowed:
-            return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
+            return jsonify({
+                "error": {
+                    "code": "access_denied",
+                    "info": "Access denied. Requests are only allowed from authorized domains."
+                }
+            }), 403
 
         response = func(*args, **kwargs)
         if hasattr(response, "headers"):
