@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from flask import Flask
+from src.app_main.app_routes.cxtoken import routes
 
 
 @pytest.fixture
@@ -12,9 +13,9 @@ def app():
     # Environment variables are set in conftest.py
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.config["TESTING"] = True
     app.secret_key = "test_secret"
-    app.config["CORS_DISABLED"] = False
+    app.config["TESTING"] = True
+    app.config["CORS_DISABLED"] = True
 
     # Import and register the blueprint
     from src.app_main.app_routes.cxtoken.routes import bp_cxtoken
@@ -43,34 +44,28 @@ class TestCxtokenEndpoint:
 
     def test_returns_error_for_empty_params(self, client):
         """Test that error is returned for empty parameters."""
-        with patch("src.app_main.cors.is_allowed") as mock_is_allowed:
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
 
-            response = client.get("/cxtoken")
+        response = client.get("/cxtoken")
 
-            assert response.status_code == 400
-            data = response.get_json()
-            assert "error" in data
-            assert data["error"]["code"] == "no data"
+        assert response.status_code == 400
+        data = response.get_json()
+        assert "error" in data
+        assert data["error"]["code"] == "no data"
 
     def test_returns_error_for_missing_user(self, client):
         """Test that error is returned when user is missing."""
-        with patch("src.app_main.cors.is_allowed") as mock_is_allowed:
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
 
-            response = client.get("/cxtoken?wiki=en")
+        response = client.get("/cxtoken?wiki=en")
 
-            assert response.status_code == 400
-            data = response.get_json()
-            assert "error" in data
+        assert response.status_code == 400
+        data = response.get_json()
+        assert "error" in data
 
     def test_returns_no_access_when_user_not_found(self, client):
         """Test that no access error is returned when user not found in DB."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
             mock_get_token.return_value = None
 
             response = client.get("/cxtoken?wiki=en&user=UnknownUser")
@@ -83,11 +78,9 @@ class TestCxtokenEndpoint:
     def test_returns_cxtoken_on_success(self, client):
         """Test that cxtoken is returned on success."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
 
             # Mock user token
             mock_token = MagicMock()
@@ -118,13 +111,10 @@ class TestCxtokenEndpoint:
     def test_deletes_access_on_invalid_authorization(self, client):
         """Test that access is deleted on invalid authorization error."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
             patch("src.app_main.app_routes.cxtoken.routes.delete_user_token_by_username") as mock_delete,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             # Mock user token
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
