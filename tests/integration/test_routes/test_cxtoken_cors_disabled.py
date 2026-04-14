@@ -72,7 +72,10 @@ class TestCxtokenEndpoint:
 
             assert response.status_code == 403
             data = response.get_json()
+            assert isinstance(data, dict)
+
             assert "error" in data
+            assert isinstance(data["error"], dict)
             assert data["error"]["code"] == "no access"
 
     def test_returns_cxtoken_on_success(self, client):
