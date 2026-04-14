@@ -7,28 +7,12 @@ import logging
 from urllib.parse import urlparse
 from flask import current_app, request
 
-from .config import settings
+from ..config import settings
 
 logger = logging.getLogger(__name__)
 
 
-def check_publish_secret_code() -> str | None:
-    expected_secret = settings.publish_secret_code
-    if not expected_secret:
-        return None
-
-    received_secret = request.headers.get("X-Secret-Key")
-
-    if received_secret and received_secret == expected_secret:
-        origin = request.headers.get("Origin")
-        if origin:
-            return urlparse(origin).netloc
-        return urlparse(request.host_url).netloc
-
-    return None
-
-
-def _is_allowed() -> str | None:
+def is_allowed() -> str | None:
     """Check if request is from an exact allowed domain or same origin."""
     referer = request.headers.get("Referer", "")
     origin = request.headers.get("Origin", "")
@@ -64,9 +48,4 @@ def _is_allowed() -> str | None:
             return domain
 
     logger.warning(f"Access denied: referer={referer}, origin={origin}")
-    # Avoid logging sensitive headers like X-Secret-Key
     return None
-
-
-def is_allowed() -> str | None:
-    return check_publish_secret_code() or _is_allowed()

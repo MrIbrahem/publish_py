@@ -1,11 +1,9 @@
 """
-WSGI entry point for the Flask application.
+WSGI entry point for the Flask application for Development
 """
 
 from __future__ import annotations
-import os
 import logging
-from pathlib import Path
 
 # Load environment variables before any other imports
 from env_config import load_environment
