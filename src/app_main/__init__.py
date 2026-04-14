@@ -145,7 +145,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     @app.after_request
     def add_cache_headers(response):
         """Prevent CSRF token caching on form-related routes."""
-        endpoints = ["auth.", "post.", "fixrefs.", "cxtoken."]
+        endpoints = ["auth.", "publish.", "fixrefs.", "cxtoken."]
         if request.endpoint and any(request.endpoint.startswith(bp) for bp in endpoints):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
