@@ -62,7 +62,9 @@ class TestPublishEndpointWithCSRF:
 
     @pytest.fixture(autouse=True)
     def mock_is_allowed(self):
-        """تفعيل السماح بالنطاق تلقائياً لجميع الاختبارات."""
+        """
+        auto allow all
+        """
         with patch("src.app_main.app_routes.publish.routes.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
@@ -87,7 +89,6 @@ class TestPublishEndpointWithCSRF:
         This test verifies the full flow works with CSRF enabled at app level.
         """
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
@@ -98,8 +99,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -142,7 +141,7 @@ class TestPublishEndpointWithCSRF:
     def test_tr_type_parameter_passed_correctly(self, csrf_client):
         """Test that tr_type parameter is correctly passed through the flow."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
@@ -153,8 +152,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -195,7 +192,7 @@ class TestPublishEndpointWithCSRF:
     def test_words_field_in_tab(self, csrf_client):
         """Test that words field is correctly set in the tab dict."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -206,8 +203,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
             patch("src.app_main.app_routes.publish.worker.get_word_count") as mock_word_count,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -249,7 +244,7 @@ class TestPublishEndpointWithCSRF:
     def test_captcha_handling_with_csrf_enabled(self, csrf_client):
         """Test captcha response handling with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -257,8 +252,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -297,12 +290,11 @@ class TestPublishEndpointWithCSRF:
     def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
         """Test that no access error returns 403 even with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
             mock_get_token.return_value = None
 
             mock_reports_instance = MagicMock()
@@ -329,7 +321,7 @@ class TestPublishEndpointWithCSRF:
     def test_wikidata_link_fallback_user_with_csrf_enabled(self, csrf_client):
         """Test Wikidata link with fallback user when get_csrftoken fails."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -340,8 +332,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -396,19 +386,16 @@ class TestPublishEndpointWithCSRF:
 
     def test_options_preflight_with_csrf_enabled(self, csrf_client):
         """Test OPTIONS preflight request with CSRF enabled."""
-        with patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed:
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
+        response = csrf_client.options("/publish")
 
-            response = csrf_client.options("/publish")
-
-            assert response.status_code == 200
-            assert "Access-Control-Allow-Origin" in response.headers
-            assert "Access-Control-Allow-Methods" in response.headers
+        assert response.status_code == 200
+        assert "Access-Control-Allow-Origin" in response.headers
+        assert "Access-Control-Allow-Methods" in response.headers
 
     def test_edit_error_handling_with_csrf_enabled(self, csrf_client):
         """Test edit error handling with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -416,8 +403,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -457,7 +442,7 @@ class TestPublishEndpointWithCSRF:
     def test_determine_hashtag_logic_with_csrf_enabled(self, csrf_client):
         """Test that hashtag determination works correctly with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -467,8 +452,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -509,7 +492,7 @@ class TestPublishEndpointWithCSRF:
     def test_revid_resolution_with_csrf_enabled(self, csrf_client):
         """Test revision ID resolution with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
@@ -520,8 +503,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -558,7 +539,7 @@ class TestPublishEndpointWithCSRF:
     def test_empty_revid_fallback_with_csrf_enabled(self, csrf_client):
         """Test empty revid fallback to request_revid with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
@@ -569,8 +550,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
@@ -614,7 +593,7 @@ class TestPublishEndpointWithCSRF:
     def test_fix_refs_applied_with_csrf_enabled(self, csrf_client):
         """Test that fix_refs is applied when text changes with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.is_allowed") as mock_is_allowed,
+
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -624,8 +603,6 @@ class TestPublishEndpointWithCSRF:
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
