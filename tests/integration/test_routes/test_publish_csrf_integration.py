@@ -144,48 +144,12 @@ class BasePublishTest:
             self.mock_get_token = mock_get_token
             yield token
 
-
-class TestSuccessFlows(BasePublishTest):
-    """Successful edit flows."""
-
-    def test_successful_edit_no_token_required(self, csrf_client):
+    @pytest.fixture
+    def common_patches(self):
+        """Patch the full happy-path stack and expose mocks as a dict."""
         with (
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.get_revid_db"),
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do"),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = "Modified content"
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
-
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Original content",
-                    "campaign": "test_campaign", "tr_type": "lead",
-                }),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 200
-            data = response.get_json()
-            assert data["edit"]["result"] == "Success"
-            assert data["LinkToWikidata"]["result"] == "success"
-
-    def test_fix_refs_applied(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
+            patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
             patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
@@ -193,293 +157,179 @@ class TestSuccessFlows(BasePublishTest):
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
         ):
+            # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
-            mock_changes.return_value = "Fixed reference content"
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
-
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Original content with references",
-                }),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 200
-            if mock_to_do.call_args_list:
-                assert mock_to_do.call_args_list[0][0][0].get("fix_refs") == "yes"
-
-    def test_revid_resolution(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do"),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
-        ):
-            mock_get_revid.return_value = "67890"
             mock_get_revid_db.return_value = "12345"
             mock_changes.return_value = None
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 99999}}
+            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
             mock_link.return_value = {"result": "success", "qid": "Q123"}
+
             mock_reports_db.return_value = MagicMock()
             pages = MagicMock()
             pages.insert_page_target.return_value = {"execute_query": True}
             mock_pages_db.return_value = pages
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content",
-                }),
-                content_type="application/json",
-            )
+            yield {
+                "get_revid": mock_get_revid,
+                "get_revid_db": mock_get_revid_db,
+                "changes": mock_changes,
+                "edit": mock_edit,
+                "link": mock_link,
+                "to_do": mock_to_do,
+                "reports_db": mock_reports_db,
+                "pages_db": mock_pages_db,
+                "pages": pages,
+            }
 
-            assert response.status_code == 200
-            mock_get_revid.assert_called_once_with("Source Page")
+    # ── helper ──────────────────────────────────────────────────────────────
+    def _post(self, client, payload: dict):
+        return client.post(
+            "/publish",
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+    def _default_payload(self, **overrides):
+        base = {
+            "user": "TestUser",
+            "title": "Test Page",
+            "target": "ar",
+            "sourcetitle": "Source Page",
+            "text": "Content",
+        }
+        return {**base, **overrides}
+# ─── أ: التدفق الناجح ────────────────────────────────────────────────────────
+
+
+class TestSuccessFlows(BasePublishTest):
+
+    def test_successful_edit(self, csrf_client, common_patches):
+        # common_patches يغطي الـ happy-path بالكامل — لا شيء إضافي هنا
+        response = self._post(csrf_client, self._default_payload(
+            campaign="test_campaign", tr_type="lead",
+        ))
+
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["edit"]["result"] == "Success"
+        assert data["LinkToWikidata"]["result"] == "success"
+
+    def test_fix_refs_applied(self, csrf_client, common_patches):
+        # نُعدّل فقط القيمة التي تختلف عن الـ default
+        common_patches["changes"].return_value = "Fixed reference content"
+
+        response = self._post(csrf_client, self._default_payload(
+            text="Original content with references",
+        ))
+
+        assert response.status_code == 200
+        to_do_calls = common_patches["to_do"].call_args_list
+        if to_do_calls:
+            assert to_do_calls[0][0][0].get("fix_refs") == "yes"
+
+    def test_revid_resolution(self, csrf_client, common_patches):
+        common_patches["get_revid"].return_value = "67890"
+        common_patches["get_revid_db"].return_value = "12345"
+
+        response = self._post(csrf_client, self._default_payload())
+
+        assert response.status_code == 200
+        common_patches["get_revid"].assert_called_once_with("Source Page")
 
 
 # ─── ب: منطق البيانات والـ Metadata ─────────────────────────────────────────
 
 class TestMetadataLogic(BasePublishTest):
-    """Data logic and metadata field tests."""
 
-    def test_tr_type_parameter_passed_correctly(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.get_revid_db"),
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do"),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
+    def test_tr_type_passed_correctly(self, csrf_client, common_patches):
+        response = self._post(csrf_client, self._default_payload(tr_type="section"))
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content", "tr_type": "section",
-                }),
-                content_type="application/json",
-            )
+        assert response.status_code == 200
+        calls = common_patches["pages"].insert_page_target.call_args_list
+        if calls:
+            assert calls[0].kwargs.get("tr_type") == "section"
 
-            assert response.status_code == 200
-            calls = pages.insert_page_target.call_args_list
-            if calls:
-                assert calls[0].kwargs.get("tr_type") == "section"
-
-    def test_words_field_in_tab(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
-            patch("src.app_main.app_routes.publish.worker.get_word_count") as mock_word_count,
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
+    def test_words_field_in_tab(self, csrf_client, common_patches):
+        with patch("src.app_main.app_routes.publish.worker.get_word_count") as mock_word_count:
             mock_word_count.return_value = 500
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content",
-                }),
-                content_type="application/json",
-            )
+            response = self._post(csrf_client, self._default_payload())
 
-            assert response.status_code == 200
-            if mock_to_do.call_args_list:
-                tab = mock_to_do.call_args_list[0][0][0]
-                assert "words" in tab
-                assert tab["words"] == 500
+        assert response.status_code == 200
+        to_do_calls = common_patches["to_do"].call_args_list
+        if to_do_calls:
+            tab = to_do_calls[0][0][0]
+            assert "words" in tab
+            assert tab["words"] == 500
 
-    def test_determine_hashtag_logic(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
+    def test_hashtag_logic(self, csrf_client, common_patches):
+        response = self._post(csrf_client, self._default_payload(
+            user="Mr. Ibrahem",
+            title="Mr. Ibrahem/Test Page",
+        ))
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "Mr. Ibrahem", "title": "Mr. Ibrahem/Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content",
-                }),
-                content_type="application/json",
-            )
+        assert response.status_code == 200
+        to_do_calls = common_patches["to_do"].call_args_list
+        if to_do_calls:
+            summary = to_do_calls[0][0][0].get("summary", "")
+            assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
 
-            assert response.status_code == 200
-            if mock_to_do.call_args_list:
-                summary = mock_to_do.call_args_list[0][0][0].get("summary", "")
-                assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
+    def test_empty_revid_fallback(self, csrf_client, common_patches):
+        # نُعدّل الـ revid ليكون فارغاً
+        common_patches["get_revid"].return_value = ""
+        common_patches["get_revid_db"].return_value = ""
 
-    def test_empty_revid_fallback(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
-        ):
-            mock_get_revid.return_value = ""
-            mock_get_revid_db.return_value = ""
-            mock_changes.return_value = None
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
+        response = self._post(csrf_client, self._default_payload(revid="99999"))
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content", "revid": "99999",
-                }),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 200
-            if mock_to_do.call_args_list:
-                tab = mock_to_do.call_args_list[0][0][0]
-                assert tab.get("revid") == "99999"
-                assert "empty revid" in tab
+        assert response.status_code == 200
+        to_do_calls = common_patches["to_do"].call_args_list
+        if to_do_calls:
+            tab = to_do_calls[0][0][0]
+            assert tab.get("revid") == "99999"
+            assert "empty revid" in tab
 
 
 # ─── ج: معالجة الأخطاء والـ Captcha ─────────────────────────────────────────
 
 class TestErrorAndEdgeCases(BasePublishTest):
-    """Error handling and captcha tests."""
 
-    def test_captcha_handling(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.to_do"),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
-            mock_edit.return_value = {
-                "edit": {"captcha": {"id": "12345", "type": "image"}, "result": "Failure"}
+    def test_captcha_handling(self, csrf_client, common_patches):
+        # نُعدّل الـ edit ليعيد captcha بدلاً من Success
+        common_patches["edit"].return_value = {
+            "edit": {"captcha": {"id": "12345", "type": "image"}, "result": "Failure"}
+        }
+
+        response = self._post(csrf_client, self._default_payload())
+
+        assert response.status_code == 200
+        assert "captcha" in response.get_json()["edit"]
+
+    def test_edit_error_handling(self, csrf_client, common_patches):
+        common_patches["edit"].return_value = {
+            "edit": {
+                "result": "Failure",
+                "error": {"code": "protectedpage", "info": "Page is protected"},
             }
-            mock_reports_db.return_value = MagicMock()
+        }
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content",
-                }),
-                content_type="application/json",
-            )
+        response = self._post(csrf_client, self._default_payload(title="Protected Page"))
 
-            assert response.status_code == 200
-            assert "captcha" in response.get_json()["edit"]
-
-    def test_edit_error_handling(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.to_do"),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
-            mock_edit.return_value = {
-                "edit": {
-                    "result": "Failure",
-                    "error": {"code": "protectedpage", "info": "Page is protected"},
-                }
-            }
-            mock_reports_db.return_value = MagicMock()
-
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Protected Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content",
-                }),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 200
-            data = response.get_json()
-            assert data["edit"]["result"] == "Failure"
-            assert "error" in data["edit"]
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["edit"]["result"] == "Failure"
+        assert "error" in data["edit"]
 
 
 # ─── د: الحالات المعقدة ───────────────────────────────────────────────────────
 
 class TestComplexWorkflows(BasePublishTest):
-    """Complex multi-step workflows."""
 
-    def test_wikidata_link_fallback_user(self, csrf_client):
-        with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do"),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
+    def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
+        with patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add:
             mock_should_add.return_value = True
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.side_effect = [
+
+            # أول استدعاء يفشل، الثاني ينجح عبر fallback user
+            common_patches["link"].side_effect = [
                 {"error": "get_csrftoken failed", "qid": "Q123"},
                 {"result": "success", "qid": "Q123"},
             ]
@@ -488,29 +338,15 @@ class TestComplexWorkflows(BasePublishTest):
             fallback_token.decrypted.return_value = ("fallback_key", "fallback_secret")
 
             def get_token_side_effect(username):
-                if username == "TestUser":
-                    return self.mock_get_token.return_value
-                elif username == "Mr. Ibrahem":
+                if username == "Mr. Ibrahem":
                     return fallback_token
-                return None
+                return self.mock_get_token.return_value
 
             self.mock_get_token.side_effect = get_token_side_effect
 
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
+            response = self._post(csrf_client, self._default_payload())
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({
-                    "user": "TestUser", "title": "Test Page", "target": "ar",
-                    "sourcetitle": "Source Page", "text": "Content",
-                }),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 200
-            data = response.get_json()
-            assert data["edit"]["result"] == "Success"
-            assert "fallback" in data["LinkToWikidata"]
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["edit"]["result"] == "Success"
+        assert "fallback" in data["LinkToWikidata"]
