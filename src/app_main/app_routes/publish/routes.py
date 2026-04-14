@@ -42,33 +42,7 @@ def index_preflight() -> Response:
     return response
 
 
-@bp_publish.route("/", methods=["POST", "GET"])
-def index() -> Response:
-    """Handle post/publish requests.
-
-    Request Body (JSON):
-        user: Username
-        title: Target page title
-        target: Target language code
-        sourcetitle: Source page title
-        text: Page content
-        revid: Source revision ID (optional)
-        campaign: Campaign name (optional)
-        wpCaptchaId: Captcha ID (optional)
-        wpCaptchaWord: Captcha answer (optional)
-
-    Returns:
-        JSON response with edit result
-    """
-    # Check CORS
-    allowed = is_allowed()
-
-    if not allowed:
-        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
-
-    # Get request data
-    request_data = request.get_json() or {}
-
+def handel_form(request_data) -> Response:
     # Format inputs
     user = format_user(request_data.get("user", ""))
     title = format_title(request_data.get("title", ""))
@@ -114,6 +88,66 @@ def index() -> Response:
     response = jsonify(editit)
     response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
     return response
+
+
+@bp_publish.route("/", methods=["GET"])
+def index_get() -> Response:
+    """Handle post/publish requests.
+
+    Request Body (JSON):
+        user: Username
+        title: Target page title
+        target: Target language code
+        sourcetitle: Source page title
+        text: Page content
+        revid: Source revision ID (optional)
+        campaign: Campaign name (optional)
+        wpCaptchaId: Captcha ID (optional)
+        wpCaptchaWord: Captcha answer (optional)
+
+    Returns:
+        JSON response with edit result
+    """
+    # Check CORS
+    allowed = is_allowed()
+
+    if not allowed:
+        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
+
+    # Get request data
+    request_data = request.get_json() or {}
+
+    return handel_form(request_data)
+
+
+@bp_publish.route("/", methods=["POST"])
+def index() -> Response:
+    """Handle post/publish requests.
+
+    Request Body (JSON):
+        user: Username
+        title: Target page title
+        target: Target language code
+        sourcetitle: Source page title
+        text: Page content
+        revid: Source revision ID (optional)
+        campaign: Campaign name (optional)
+        wpCaptchaId: Captcha ID (optional)
+        wpCaptchaWord: Captcha answer (optional)
+
+    Returns:
+        JSON response with edit result
+    """
+    # Check CORS
+    allowed = is_allowed()
+
+    if not allowed:
+        return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
+
+    # Get request data
+    request_data = request.get_json() or {}
+
+    return handel_form(request_data)
 
 
 __all__ = ["bp_publish"]
