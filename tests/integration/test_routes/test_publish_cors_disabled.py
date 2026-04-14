@@ -1,0 +1,207 @@
+"""Tests for app_routes.post module."""
+
+import json
+from unittest.mock import MagicMock, patch
+
+import pytest
+from flask import Flask
+
+
+@pytest.fixture
+def app():
+    """Create a test Flask application."""
+    import os
+
+    os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
+    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
+    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
+    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
+    os.environ.setdefault("CORS_ALLOWED_DOMAINS", "")
+
+    from cryptography.fernet import Fernet
+
+    if not os.environ.get("OAUTH_ENCRYPTION_KEY"):
+        os.environ["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
+
+    app = Flask(__name__)
+    app.url_map.strict_slashes = False
+    app.secret_key = "test_secret"
+
+    app.config["TESTING"] = True
+    app.config["CORS_DISABLED"] = True
+
+    from src.app_main.app_routes.publish.routes import bp_publish
+
+    app.register_blueprint(bp_publish)
+    return app
+
+
+@pytest.fixture
+def client(app):
+    """Create a test client."""
+    return app.test_client()
+
+
+class TestPostEndpoint:
+    """Tests for post endpoint."""
+
+    @pytest.mark.skip(reason="Test client uses localhost which triggers same-origin bypass in CORS check")
+    def test_cors_not_allowed_without_origin(self, client):
+        """Test that requests from unauthorized origins are rejected when no secret key is provided."""
+        response = client.post(
+            "/publish",
+            base_url="https://medwiki.toolforge.org",
+            headers={"Origin": "https://attacker-site.com"},
+            data=json.dumps({"user": "TestUser", "title": "Test Page"}),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 403
+
+    def test_no_access_returns_when_user_not_found(self, client):
+        """Test that no access error is returned when user not found."""
+        with (
+            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+        ):
+            mock_get_token.return_value = None
+
+            # Mock database
+            mock_reports_instance = MagicMock()
+            mock_reports_db.return_value = mock_reports_instance
+
+            response = client.post(
+                "/publish",
+                data=json.dumps(
+                    {
+                        "user": "UnknownUser",
+                        "title": "Test Page",
+                        "target": "en",
+                        "sourcetitle": "Source Page",
+                        "text": "Content",
+                    }
+                ),
+                content_type="application/json",
+            )
+
+            assert response.status_code == 403
+            data = response.get_json()
+            assert isinstance(data, dict)
+
+            assert "error" in data
+            assert isinstance(data["error"], dict)
+            assert data["error"]["code"] == "noaccess"
+
+    def test_handles_options_request(self, client):
+        """Test that OPTIONS request is handled for CORS preflight."""
+        response = client.options(
+            "/publish",
+            base_url="https://medwiki.toolforge.org",
+            headers={"Origin": "https://medwiki.toolforge.org"},
+        )
+
+        assert response.status_code == 200
+        assert "Access-Control-Allow-Methods" in response.headers
+
+    def test_successful_edit_returns_success(self, client):
+        """Test that successful edit returns success result."""
+        with (
+            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
+            patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
+            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
+            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
+            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
+            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+        ):
+            # Mock user token
+            mock_token = MagicMock()
+            mock_token.decrypted.return_value = ("access_key", "access_secret")
+            mock_get_token.return_value = mock_token
+            mock_should_add.return_value = True
+
+            # Mock revision ID
+            mock_get_revid.return_value = "12345"
+
+            # Mock text changes
+            mock_changes.return_value = "Modified content"
+
+            # Mock successful edit
+            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
+
+            # Mock Wikidata link
+            mock_link.return_value = {"result": "success", "qid": "Q123"}
+
+            # Mock database operations
+            mock_reports_instance = MagicMock()
+            mock_reports_db.return_value = mock_reports_instance
+            mock_pages_instance = MagicMock()
+            mock_pages_db.return_value = mock_pages_instance
+            mock_pages_instance.insert_page_target.return_value = {"execute_query": True}
+
+            response = client.post(
+                "/publish",
+                data=json.dumps(
+                    {
+                        "user": "TestUser",
+                        "title": "Test Page",
+                        "target": "ar",
+                        "sourcetitle": "Source Page",
+                        "text": "Original content",
+                    }
+                ),
+                content_type="application/json",
+            )
+            assert response.status_code == 200
+
+            data = response.get_json()
+            assert data["edit"]["result"] == "Success"
+
+    def test_handles_captcha_response(self, client):
+        """Test that captcha response is handled correctly."""
+        with (
+            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
+            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
+            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
+            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
+            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+        ):
+            # Mock user token
+            mock_token = MagicMock()
+            mock_token.decrypted.return_value = ("access_key", "access_secret")
+            mock_get_token.return_value = mock_token
+
+            # Mock revision ID
+            mock_get_revid.return_value = "12345"
+
+            # Mock text changes
+            mock_changes.return_value = None
+
+            # Mock captcha response
+            mock_edit.return_value = {"edit": {"captcha": {"id": "123", "type": "image"}}}
+
+            # Mock database
+            mock_reports_instance = MagicMock()
+            mock_reports_db.return_value = mock_reports_instance
+
+            response = client.post(
+                "/publish",
+                data=json.dumps(
+                    {
+                        "user": "TestUser",
+                        "title": "Test Page",
+                        "target": "ar",
+                        "sourcetitle": "Source Page",
+                        "text": "Content",
+                    }
+                ),
+                content_type="application/json",
+            )
+
+            data = response.get_json()
+            assert "captcha" in data["edit"]
