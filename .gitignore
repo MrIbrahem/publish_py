@@ -31,3 +31,4 @@ pup2.html
 coverage.xml
 .coverage
 .coverage.*
+/php_publish_1
