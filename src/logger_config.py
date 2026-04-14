@@ -107,7 +107,7 @@ def configure_logging(level) -> None:
     try:
         log_dir.mkdir(parents=True, exist_ok=True)
     except OSError as exc:
-        setup_logging(level=logging.DEBUG if DEBUG else logging.INFO, name="app_main")
+        setup_logging(level=level, name="app_main")
         logging.getLogger("app_main").warning(
             "Falling back to console logging; could not create log directory %s: %s", log_dir, exc
         )
