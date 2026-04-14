@@ -2,7 +2,6 @@
 
 Mirrors: php_src/bots/cors.php
 """
-
 import logging
 from urllib.parse import urlparse
 from flask import current_app, request
@@ -13,34 +12,38 @@ logger = logging.getLogger(__name__)
 
 
 def is_allowed() -> str | None:
-    """Check if request is from an allowed domain or the same origin.
-
-    Returns the allowed domain name or None.
-    """
+    """Check if request is from an exact allowed domain or same origin."""
     referer = request.headers.get("Referer", "")
     origin = request.headers.get("Origin", "")
 
-    # 1. Get the current server's base URL (Same-Origin)
-    host_url = request.host_url.rstrip('/')
+    # Extract the host (netloc) from our current server URL
+    # e.g., 'example.com' or 'localhost:5000'
+    server_host = urlparse(request.host_url).netloc
 
     if current_app.config.get("CORS_DISABLED"):
         logger.warning(f"CORS is disabled. Access allowed: referer={referer}, origin={origin}")
         return origin or "*"
 
-    # 2. Automatically allow requests from the same origin
-    # Verify if Origin or Referer starts with our host URL
-    if (origin and origin.startswith(host_url)) or (referer and referer.startswith(host_url)):
-        return origin or host_url
+    # Helper function to extract host from a URL string
+    def get_host(url: str) -> str:
+        return urlparse(url).netloc
+
+    origin_host = get_host(origin) if origin else ""
+    referer_host = get_host(referer) if referer else ""
+
+    # 1. Check for Same-Origin (Exact Host Match)
+    if (origin_host and origin_host == server_host) or (referer_host and referer_host == server_host):
+        return origin or request.host_url.rstrip('/')
 
     if not settings.cors.allowed_domains:
         logger.warning(f"Access denied: referer={referer}, origin={origin}")
-        logger.warning("No allowed domains configured")
         return None
 
-    # 3. Validate against allowed domains in settings
+    # 2. Check for Exact Match in allowed domains list
+    # Assuming allowed_domains contains: ['mysite.com', 'api.mysite.com']
     for domain in settings.cors.allowed_domains:
-        # Note: Using 'in' can be risky; using exact domain matching is safer
-        if (origin and domain in origin) or (referer and domain in referer):
+        if (origin_host == domain) or (referer_host == domain):
+            # return origin or f"https://{domain}"
             return domain
 
     logger.warning(f"Access denied: referer={referer}, origin={origin}")
