@@ -2,12 +2,12 @@
 
 import pytest
 from flask import Flask
+import os
 
 
 @pytest.fixture
 def app():
     """Create a test Flask application."""
-    import os
 
     os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
     os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
