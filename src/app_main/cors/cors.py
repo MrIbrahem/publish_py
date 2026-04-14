@@ -5,14 +5,14 @@ Mirrors: php_src/bots/cors.php
 """
 import logging
 from urllib.parse import urlparse
-from flask import current_app, request
+from flask import Request, current_app
 
 from ..config import settings
 
 logger = logging.getLogger(__name__)
 
 
-def is_allowed() -> str | None:
+def is_allowed(request: Request) -> str | None:
     """Check if request is from an exact allowed domain or same origin."""
     referer = request.headers.get("Referer", "")
     origin = request.headers.get("Origin", "")
@@ -21,13 +21,13 @@ def is_allowed() -> str | None:
     # e.g., 'example.com' or 'localhost:5000'
     server_host = urlparse(request.host_url).netloc
 
-    if current_app.config.get("CORS_DISABLED"):
-        logger.warning(f"CORS is disabled. Access allowed: referer={referer}, origin={origin}")
-        return origin or "*"
-
     # Helper function to extract host from a URL string
     def get_host(url: str) -> str:
         return urlparse(url).netloc
+
+    if current_app.config.get("CORS_DISABLED"):
+        logger.warning(f"CORS is disabled. Access allowed: referer={referer}, origin={origin}")
+        return origin or "*"
 
     origin_host = get_host(origin) if origin else ""
     referer_host = get_host(referer) if referer else ""

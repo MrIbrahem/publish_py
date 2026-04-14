@@ -1,6 +1,6 @@
 import functools
 
-from flask import jsonify
+from flask import jsonify, request
 
 from .cors import is_allowed
 from .publish_secret_checks import check_publish_secret_code
@@ -10,7 +10,7 @@ def validate_access(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
-        allowed = is_allowed()
+        allowed = is_allowed(request)
         has_valid_secret_code = check_publish_secret_code()
 
         if has_valid_secret_code or allowed:
@@ -33,7 +33,7 @@ def check_cors(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
-        allowed = is_allowed()
+        allowed = is_allowed(request)
         if not allowed:
             return jsonify({"error": "Access denied. Requests are only allowed from authorized domains."}), 403
 
