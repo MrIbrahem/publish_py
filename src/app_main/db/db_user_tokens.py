@@ -63,8 +63,8 @@ class UserTokenRecord:
         return access_key, access_secret
 
     def __post_init__(self) -> None:
-        self.access_token = _coerce_bytes(self.access_token),
-        self.access_secret = _coerce_bytes(self.access_secret),
+        self.access_token = _coerce_bytes(self.access_token)
+        self.access_secret = _coerce_bytes(self.access_secret)
 
 
 class UserTokenDB:
