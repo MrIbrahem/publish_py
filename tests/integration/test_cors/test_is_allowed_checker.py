@@ -1,7 +1,5 @@
 """
-
 Tests for is_allowed — grouped by behavior branch.
-
 """
 
 import pytest
