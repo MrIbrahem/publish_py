@@ -4,7 +4,7 @@ Tests for cors wrappers module.
 
 from unittest.mock import MagicMock
 
-from src.app_main.shared.cors import check_cors, validate_access
+from src.app_main.shared.core.cors import check_cors, validate_access
 
 
 class TestValidateAccessDecorated:

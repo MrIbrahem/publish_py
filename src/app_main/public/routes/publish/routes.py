@@ -9,7 +9,7 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 
-from ....shared.cors import check_cors, validate_access
+from ....shared.core.cors import check_cors, validate_access
 from ....shared.utils.helpers.format import format_title, format_user
 from ....shared.services.users_services import get_user_token_by_username
 from .worker import _handle_no_access, _process_edit

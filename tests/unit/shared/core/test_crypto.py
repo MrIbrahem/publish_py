@@ -6,7 +6,7 @@ Tests for encryption/decryption helpers used for OAuth token storage.
 from __future__ import annotations
 
 import pytest
-from src.app_main.shared.crypto import _require_fernet, decrypt_value, encrypt_value
+from src.app_main.shared.core.crypto import _require_fernet, decrypt_value, encrypt_value
 
 
 class TestEncryptValue:

@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from src.app_main.shared.cors import is_allowed
+from src.app_main.shared.core.cors import is_allowed
 
 
 @pytest.fixture
