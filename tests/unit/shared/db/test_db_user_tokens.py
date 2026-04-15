@@ -112,7 +112,7 @@ class TestUserTokenRecord:
         assert isinstance(record.access_token, bytes)
         assert isinstance(record.access_secret, bytes)
 
-    @patch("src.app_main.db.db_user_tokens.decrypt_value")
+    @patch("src.new_app.shared.db.db_user_tokens.decrypt_value")
     def test_decrypted_returns_tuple(self, mock_decrypt, sample_token_record):
         """Test that decrypted returns tuple of decrypted values."""
         mock_decrypt.side_effect = ["decrypted_token", "decrypted_secret"]
@@ -129,7 +129,7 @@ class TestUserTokenDB:
     def test_init_creates_database(self, monkeypatch, db_config):
         """Test that initialization creates a Database instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
 
@@ -141,7 +141,7 @@ class TestUserTokenDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"user_id": 12345}]
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         result = token_db.get_user_id("TestUser")
@@ -157,7 +157,7 @@ class TestUserTokenDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         result = token_db.get_user_id("MissingUser")
@@ -169,7 +169,7 @@ class TestUserTokenDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         with pytest.raises(LookupError, match="User user_id 999 was not found"):
@@ -180,7 +180,7 @@ class TestUserTokenDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         with pytest.raises(LookupError, match="User 'MissingUser' was not found"):
@@ -194,7 +194,7 @@ class TestUserTokenDB:
             {"user_id": 2, "username": "User2", "access_token": b"t2", "access_secret": b"s2"},
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         result = token_db.list()
@@ -211,13 +211,13 @@ class TestUserTokenDB:
             {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         with pytest.raises(ValueError, match="Unknown or immutable columns for user_tokens"):
             token_db.update(1, unknown_column="value")
 
-    @patch("src.app_main.db.db_user_tokens.encrypt_value")
+    @patch("src.new_app.shared.db.db_user_tokens.encrypt_value")
     def test_update_encrypts_token_columns(self, mock_encrypt, monkeypatch, db_config):
         """Test that update encrypts access_token and access_secret columns."""
         mock_db = MagicMock()
@@ -226,7 +226,7 @@ class TestUserTokenDB:
         ]
         mock_encrypt.return_value = b"encrypted_value"
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         token_db.update(1, access_token="new_token")
@@ -239,7 +239,7 @@ class TestUserTokenDB:
     def test_upsert_requires_non_empty_username(self, monkeypatch, db_config):
         """Test that upsert requires non-empty username."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         with pytest.raises(ValueError, match="Username is required"):
@@ -248,8 +248,8 @@ class TestUserTokenDB:
         with pytest.raises(ValueError, match="Username is required"):
             token_db.upsert(1, "   ", "token", "secret")
 
-    @patch("src.app_main.db.db_user_tokens.encrypt_value")
-    @patch("src.app_main.db.db_user_tokens.current_ts")
+    @patch("src.new_app.shared.db.db_user_tokens.encrypt_value")
+    @patch("src.new_app.shared.db.db_user_tokens.current_ts")
     def test_upsert_executes_insert_query(self, mock_ts, mock_encrypt, monkeypatch, db_config):
         """Test that upsert executes correct INSERT query."""
         mock_db = MagicMock()
@@ -259,7 +259,7 @@ class TestUserTokenDB:
         mock_ts.return_value = "2024-01-01 00:00:00"
         mock_encrypt.side_effect = [b"enc_token", b"enc_secret"]
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         token_db.upsert(1, "TestUser", "access_key", "access_secret")
@@ -274,7 +274,7 @@ class TestUserTokenDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         with pytest.raises(LookupError, match="User user_id 999 was not found"):
@@ -287,7 +287,7 @@ class TestUserTokenDB:
             {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
         result = token_db.delete(1)
@@ -305,7 +305,7 @@ class TestUserTokenDB:
             {"user_id": 1, "username": "TestUser", "access_token": b"t1", "access_secret": b"s1"}
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         with patch.object(UserTokenDB, "upsert") as mock_upsert:
             mock_upsert.return_value = UserTokenRecord(

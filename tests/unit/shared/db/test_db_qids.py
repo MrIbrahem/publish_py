@@ -32,7 +32,7 @@ class TestQidsDB:
     def test_init_creates_database_instance(self, monkeypatch, db_config):
         """Test that initialization creates a Database instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
 
@@ -45,7 +45,7 @@ class TestQidsDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"qid": "Q12345"}]
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
         result = qids_db.get_qid_by_title("TestArticle")
@@ -61,7 +61,7 @@ class TestQidsDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
         result = qids_db.get_qid_by_title("MissingArticle")
@@ -73,7 +73,7 @@ class TestQidsDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"other_field": "value"}]
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
         result = qids_db.get_qid_by_title("TestArticle")
@@ -84,7 +84,7 @@ class TestQidsDB:
         """Test that add inserts a new QID record."""
         mock_db = MagicMock()
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
         qids_db.add("TestArticle", "Q12345")
@@ -102,7 +102,7 @@ class TestQidsDB:
         """Test that add updates existing record via ON DUPLICATE KEY."""
         mock_db = MagicMock()
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
         qids_db.add("ExistingArticle", "Q99999")
@@ -119,7 +119,7 @@ class TestEnsureQidsTable:
         """Test that function returns True when table creation succeeds."""
         mock_db = MagicMock()
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         result = ensure_qids_table(db_config)
 
@@ -131,7 +131,7 @@ class TestEnsureQidsTable:
         mock_db = MagicMock()
         mock_db.execute_query_safe.side_effect = Exception("DB Error")
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         result = ensure_qids_table(db_config)
 
@@ -144,7 +144,7 @@ class TestEnsureQidsTable:
         mock_db = MagicMock()
         mock_db.execute_query_safe.side_effect = Exception("DB Connection Failed")
 
-        monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_qids.Database", lambda db_data: mock_db)
 
         with caplog.at_level(logging.ERROR):
             result = ensure_qids_table(db_config)

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from src.app_main.config import DbConfig
-from src.app_main.db.db_categories import (
+from src.new_app.shared.db.db_categories import (
     CategoriesDB,
     clear_categories_cache,
     get_campaign_category,
@@ -33,7 +33,7 @@ class TestCategoriesDB:
             {"campaign": "campaign2", "category": "Category:Science"},
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         categories_db = CategoriesDB(fixture_for_category_db)
         result = categories_db.retrieve_campaign_categories()
 
@@ -45,7 +45,7 @@ class TestCategoriesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         categories_db = CategoriesDB(fixture_for_category_db)
         result = categories_db.retrieve_campaign_categories()
 
@@ -59,7 +59,7 @@ class TestCategoriesDB:
             {"campaign": "campaign2", "category": "Category:Valid"},
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         categories_db = CategoriesDB(fixture_for_category_db)
         result = categories_db.retrieve_campaign_categories()
 
@@ -73,7 +73,7 @@ class TestCategoriesDB:
             {"campaign": "test_campaign", "category": "Test Category"},
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         categories_db = CategoriesDB(fixture_for_category_db)
         result = categories_db.get_category_for_campaign("test_campaign")
 
@@ -86,7 +86,7 @@ class TestCategoriesDB:
             {"campaign": "other_campaign", "category": "Other Category"},
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         categories_db = CategoriesDB(fixture_for_category_db)
         result = categories_db.get_category_for_campaign("missing_campaign")
 
@@ -107,7 +107,7 @@ class TestGetCampaignCategory:
             {"campaign": "test", "category": "TestCategory"},
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         clear_categories_cache()
         result = get_campaign_category("test", fixture_for_category_db)
         assert result == "TestCategory"
@@ -117,7 +117,7 @@ class TestGetCampaignCategory:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         clear_categories_cache()
         result = get_campaign_category("missing", fixture_for_category_db)
         assert result == ""
@@ -133,7 +133,7 @@ class TestClearCategoriesCache:
             {"campaign": "test", "category": "Category1"},
         ]
 
-        monkeypatch.setattr("src.app_main.db.db_categories.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.new_app.shared.db.db_categories.Database", lambda db_data: mock_db)
         clear_categories_cache()
         result1 = get_campaign_category("test", fixture_for_category_db)
 
