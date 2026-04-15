@@ -48,7 +48,7 @@ src/
 │   │   ├── files.py
 │   │   ├── format.py
 │   │   └── words.py
-│   ├── online_services/
+│   ├── clients/
 │   │   ├── __init__.py
 │   │   ├── mediawiki_api.py
 │   │   ├── oauth_client.py
