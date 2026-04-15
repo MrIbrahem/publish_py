@@ -4,7 +4,7 @@ from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.db.db_publish_reports import (
+from src.app_main.shared.domain.db.db_publish_reports import (
     _VALID_COLUMNS,
     PUBLISH_REPORTS_PARAMS,
     ReportRecord,
@@ -39,7 +39,7 @@ class TestQueryWithFilters:
             }
         ]
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         records = db.query_with_filters({"year": "2026"})
@@ -55,7 +55,7 @@ class TestQueryWithFilters:
         """Test filtering by month."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"month": "1"})
@@ -68,7 +68,7 @@ class TestQueryWithFilters:
         """Test filtering by user."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"user": "TestUser"})
@@ -81,7 +81,7 @@ class TestQueryWithFilters:
         """Test filtering by language."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"lang": "ar"})
@@ -94,7 +94,7 @@ class TestQueryWithFilters:
         """Test combined parameter filters."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"year": "2026", "user": "TestUser", "lang": "en"})
@@ -109,7 +109,7 @@ class TestQueryWithFilters:
         """Test special value 'not_empty'."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"result": "not_empty"})
@@ -122,7 +122,7 @@ class TestQueryWithFilters:
         """Test special value 'empty'."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"result": "empty"})
@@ -135,7 +135,7 @@ class TestQueryWithFilters:
         """Test special value '>0'."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"year": ">0"})
@@ -148,7 +148,7 @@ class TestQueryWithFilters:
         """Test special value 'all' is skipped."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({"user": "all"})
@@ -168,7 +168,7 @@ class TestQueryWithFilters:
             }
         ]
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({}, select_fields=["title", "date"])
@@ -184,7 +184,7 @@ class TestQueryWithFilters:
         """Test limit parameter."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({}, limit=10)
@@ -197,7 +197,7 @@ class TestQueryWithFilters:
         """Test that invalid select fields are filtered out."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         db = ReportsDB({"host": "test"})
         db.query_with_filters({}, select_fields=["title", "invalid_field", "date"])
@@ -214,7 +214,7 @@ class TestReportRecord:
         """Test creating ReportRecord with required fields."""
         from datetime import datetime
 
-        from src.app_main.shared.db.db_publish_reports import ReportRecord
+        from src.app_main.shared.domain.db.db_publish_reports import ReportRecord
 
         record = ReportRecord(
             id=1,
@@ -233,7 +233,7 @@ class TestReportRecord:
         """Test that to_dict converts date to ISO format."""
         from datetime import datetime
 
-        from src.app_main.shared.db.db_publish_reports import ReportRecord
+        from src.app_main.shared.domain.db.db_publish_reports import ReportRecord
 
         record = ReportRecord(
             id=1,
@@ -253,7 +253,7 @@ class TestReportRecord:
 
     def test_to_dict_handles_none_date(self):
         """Test that to_dict handles None date."""
-        from src.app_main.shared.db.db_publish_reports import ReportRecord
+        from src.app_main.shared.domain.db.db_publish_reports import ReportRecord
 
         record = ReportRecord(
             id=1,
@@ -283,7 +283,7 @@ class TestReportsDBCore:
 
     def test_init_creates_database(self, mock_db):
         """Test that initialization creates a Database instance."""
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         reports_db = ReportsDB({"host": "test"})
 
@@ -294,7 +294,7 @@ class TestReportsDBCore:
         """Test that _fetch_by_id raises LookupError when report not found."""
         mock_db.fetch_query_safe.return_value = []
 
-        from src.app_main.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
         reports_db = ReportsDB({"host": "test"})
         with pytest.raises(LookupError, match="Report id 999 was not found"):
@@ -306,14 +306,14 @@ class TestValidColumns:
 
     def test_contains_expected_columns(self):
         """Test that _VALID_COLUMNS contains expected column names."""
-        from src.app_main.shared.db.db_publish_reports import _VALID_COLUMNS
+        from src.app_main.shared.domain.db.db_publish_reports import _VALID_COLUMNS
 
         expected = {"id", "date", "title", "user", "lang", "sourcetitle", "result", "data", "YEAR(date)", "MONTH(date)"}
         assert _VALID_COLUMNS == expected
 
     def test_all_param_columns_are_valid(self):
         """Test that all columns referenced in PUBLISH_REPORTS_PARAMS are valid."""
-        from src.app_main.shared.db.db_publish_reports import _VALID_COLUMNS, PUBLISH_REPORTS_PARAMS
+        from src.app_main.shared.domain.db.db_publish_reports import _VALID_COLUMNS, PUBLISH_REPORTS_PARAMS
 
         for param in PUBLISH_REPORTS_PARAMS:
             assert param["column"] in _VALID_COLUMNS

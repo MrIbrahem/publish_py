@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import pymysql
 import pytest
 from src.app_main.config import DbConfig
-from src.app_main.shared.db.db_pages import (
+from src.app_main.shared.domain.db.db_pages import (
     PageRecord,
     PagesDB,
 )

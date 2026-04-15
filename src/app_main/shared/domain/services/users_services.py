@@ -8,7 +8,7 @@ import logging
 from typing import Optional
 
 from ....config import settings
-from ...db.db_user_tokens import UserTokenDB, UserTokenRecord
+from ..db.db_user_tokens import UserTokenDB, UserTokenRecord
 from .db_service import has_db_config
 
 logger = logging.getLogger(__name__)

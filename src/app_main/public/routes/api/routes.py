@@ -10,7 +10,7 @@ from flask import Blueprint, Response, jsonify, request
 
 from ....config import settings
 from ....shared.core.cors import check_cors
-from ....shared.db.db_publish_reports import ReportsDB
+from ....shared.domain.db.db_publish_reports import ReportsDB
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)

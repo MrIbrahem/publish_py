@@ -8,8 +8,8 @@ import logging
 from typing import Any
 
 from ....config import settings
-from ....shared.db.db_categories import get_campaign_category
-from ....shared.db.db_publish_reports import ReportsDB
+from ....shared.domain.db.db_categories import get_campaign_category
+from ....shared.domain.db.db_publish_reports import ReportsDB
 from ....shared.utils.helpers.files import to_do
 from ....shared.utils.helpers.format import (
     determine_hashtag,
