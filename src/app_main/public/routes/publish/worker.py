@@ -17,7 +17,7 @@ from ....shared.helpers.format import (
 )
 from ....shared.helpers.words import get_word_count
 from ....shared.clients.mediawiki_api import get_title_info, publish_do_edit
-from ....shared.clients.revids_service import get_revid, get_revid_db
+from ....shared.clients.revids_client import get_revid, get_revid_db
 from ....shared.clients.text_processor import do_changes_to_text
 from ....shared.clients.wikidata_client import link_to_wikidata
 from ....shared.services.pages_service import find_exists_or_update, insert_page_target

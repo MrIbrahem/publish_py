@@ -111,7 +111,7 @@ src/
 │   ├── services/          # Business logic services
 │   │   ├── mediawiki_api.py
 │   │   ├── oauth_client.py
-│   │   ├── revids_service.py
+│   │   ├── revids_client.py
 │   │   ├── text_processor.py
 │   │   └── wikidata_client.py
 │   ├── helpers/           # Utility functions

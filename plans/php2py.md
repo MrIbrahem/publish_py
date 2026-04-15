@@ -57,7 +57,7 @@ src/app/
 │   ├── oauth_client.py     # ✅ CREATED: OAuth client wrapper
 │   ├── mediawiki_api.py    # ✅ CREATED: MediaWiki API client
 │   ├── wikidata_client.py  # ✅ CREATED: Wikidata integration
-│   ├── revids_service.py   # ✅ CREATED: Revision ID lookup
+│   ├── revids_client.py   # ✅ CREATED: Revision ID lookup
 │   └── text_processor.py   # ✅ CREATED: Text processing
 ├── helpers/
 │   ├── __init__.py         # ✅ CREATED
@@ -80,8 +80,8 @@ src/app/
 | `Publish\AccessHelps\get_access_from_db()` | `users/store.py:get_user_token_by_username()` | ✅ DONE |
 | `Publish\AccessHelps\del_access_from_db()` | `users/store.py:delete_user_token_by_username()` | ✅ DONE |
 | `Publish\FilesHelps\to_do()` | `helpers/files.py:to_do()` | ✅ DONE |
-| `Publish\Revids\get_revid()` | `services/revids_service.py:get_revid()` | ✅ DONE |
-| `Publish\Revids\get_revid_db()` | `services/revids_service.py:get_revid_db()` | ✅ DONE |
+| `Publish\Revids\get_revid()` | `services/revids_client.py:get_revid()` | ✅ DONE |
+| `Publish\Revids\get_revid_db()` | `services/revids_client.py:get_revid_db()` | ✅ DONE |
 | `Publish\DoEdit\publish_do_edit()` | `services/mediawiki_api.py:publish_do_edit()` | ✅ DONE |
 | `Publish\EditProcess\processEdit()` | `app_routes/post/routes.py:_process_edit()` | ✅ DONE |
 | `Publish\WD\LinkToWikidata()` | `services/wikidata_client.py:link_to_wikidata()` | ✅ DONE |
@@ -433,7 +433,7 @@ def publish_do_edit(api_params: dict, wiki: str, access_key: str, access_secret:
     return result
 ```
 
-#### 3. Create [src/app/services/revids_service.py](../src/app_main/clients/revids_service.py)
+#### 3. Create [src/app/services/revids_client.py](../src/app_main/clients/revids_client.py)
 
 ```python
 """Revision ID lookup service."""
@@ -673,7 +673,7 @@ from ..helpers.format import format_title, format_user, determine_hashtag, make_
 from ..helpers.files import to_do
 from ..services.oauth_client import post_params
 from ..services.mediawiki_api import publish_do_edit
-from ..services.revids_service import get_revid, get_revid_db
+from ..services.revids_client import get_revid, get_revid_db
 from ..services.wikidata_client import link_to_wikidata
 from ..services.text_processor import do_changes_to_text
 from ...config import settings
@@ -1181,7 +1181,7 @@ def test_post_requires_auth(client):
      - `publish_do_edit()`
 
 3. **Create revision ID service**
-   - [x] `services/revids_service.py` with:
+   - [x] `services/revids_client.py` with:
      - `get_revid()`
      - `get_revid_db()`
 
@@ -1251,7 +1251,7 @@ def test_post_requires_auth(client):
 - [x] `src/app/services/__init__.py`
 - [x] `src/app/services/oauth_client.py`
 - [x] `src/app/services/mediawiki_api.py`
-- [x] `src/app/services/revids_service.py`
+- [x] `src/app/services/revids_client.py`
 - [x] `src/app/services/wikidata_client.py`
 - [x] `src/app/services/text_processor.py`
 - [x] `tests/test_helpers/test_cors.py`

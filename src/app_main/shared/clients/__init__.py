@@ -6,7 +6,7 @@ Used in both admin and public blueprints.
 
 from .mediawiki_api import get_title_info, publish_do_edit
 from .oauth_client import get_csrf_token, get_cxtoken, get_oauth_client, post_params
-from .revids_service import get_revid, get_revid_db
+from .revids_client import get_revid, get_revid_db
 from .text_processor import do_changes_to_text
 from .wikidata_client import get_qid_for_mdtitle, link_to_wikidata
 

@@ -117,7 +117,7 @@ The Python implementation is a thorough port of the PHP publish endpoint, coveri
 ### 4.7 `get_revid_db` API URL construction differs
 
 -   **PHP**: `start.php:24-28` — Uses `http://localhost:9001/api?get=revids&title=...` in dev, `https://mdwiki.toolforge.org/api.php?get=revids&title=...` in prod, using `http_build_query()` with `PHP_QUERY_RFC3986`.
--   **Python**: `revids_service.py` — Uses `settings.revids_api_url` (default `https://mdwiki.toolforge.org/api.php`) with `requests.get()` and `params` dict, which uses URL-encoded `+` for spaces.
+-   **Python**: `revids_client.py` — Uses `settings.revids_api_url` (default `https://mdwiki.toolforge.org/api.php`) with `requests.get()` and `params` dict, which uses URL-encoded `+` for spaces.
 -   **Exact difference**: PHP uses `?get=revids&title=` with RFC 3986 encoding (spaces as `%20`). Python's `requests` library defaults to URL encoding (spaces as `+`). Also, PHP appends query string to the base URL directly; Python uses the params dict which may encode differently.
 -   **Impact**: **Minor** — The API likely accepts both encoding styles, but edge cases with special characters could differ.
 
