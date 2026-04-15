@@ -8,7 +8,6 @@ import logging
 from typing import Any
 from ...config import settings
 from ...db.db_categories import get_campaign_category
-from ...db.db_Pages import PagesDB
 from ...db.db_publish_reports import ReportsDB
 from ...helpers.files import to_do
 from ...helpers.format import (
@@ -20,15 +19,10 @@ from ...online_services.mediawiki_api import publish_do_edit, get_title_info
 from ...online_services.revids_service import get_revid, get_revid_db
 from ...online_services.text_processor import do_changes_to_text
 from ...online_services.wikidata_client import link_to_wikidata
+from ...services.pages_service import find_exists_or_update, insert_page_target
 from ...services.users_services import get_user_token_by_username
 
 logger = logging.getLogger(__name__)
-
-
-@functools.lru_cache(maxsize=1)
-def load_pages_db() -> PagesDB:
-    pages_db = PagesDB(settings.database_data)
-    return pages_db
 
 
 @functools.lru_cache(maxsize=1)
@@ -244,10 +238,30 @@ def _add_to_db(
     # Check if abuse filter warning was triggered
     to_users_table = "abusefilter-warning-39" in json.dumps(wd_result)
 
-    return insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, words, to_users_table, tr_type=tr_type,)
+    return insert_to_db(
+        target,
+        lang,
+        user,
+        sourcetitle,
+        mdwiki_revid,
+        cat,
+        words,
+        to_users_table,
+        tr_type=tr_type,
+    )
 
 
-def insert_to_db(target, lang, user, sourcetitle, mdwiki_revid, cat, word, to_users_table, tr_type="lead",):
+def insert_to_db(
+    target,
+    lang,
+    user,
+    sourcetitle,
+    mdwiki_revid,
+    cat,
+    word,
+    to_users_table,
+    tr_type="lead",
+):
     # Normalize inputs
     sourcetitle = sourcetitle.replace("_", " ")
     target = target.replace("_", " ")
@@ -303,8 +317,6 @@ def insert_to_db_2(
     Returns:
         Dictionary with operation result
     """
-    pages_db = load_pages_db()
-
     result: dict[str, Any] = {
         "use_user_sql": False,
         "to_users_table": to_users_table,
@@ -320,7 +332,7 @@ def insert_to_db_2(
     result["use_user_sql"] = use_user_sql
 
     # Check if exists and update if needed
-    exists = pages_db._find_exists_or_update(sourcetitle, lang, user, target, use_user_sql)
+    exists = find_exists_or_update(sourcetitle, lang, user, target, use_user_sql)
     if exists:
         result["exists"] = "already_in"
         return result
@@ -328,7 +340,7 @@ def insert_to_db_2(
     table_name = "pages_users" if use_user_sql else "pages"
 
     # Insert new record
-    add_done = pages_db.insert_page_target(
+    add_done = insert_page_target(
         sourcetitle=sourcetitle,
         tr_type=tr_type,
         cat=cat,
