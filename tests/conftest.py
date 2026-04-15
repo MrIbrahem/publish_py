@@ -42,7 +42,7 @@ sys.path.insert(0, str(python_src_path))
 
 
 # Import after environment setup
-from src.app_main import create_app  # noqa: E402
+from src.new_app import create_app  # noqa: E402
 from src.new_app.config import TestingConfig  # noqa: E402
 
 

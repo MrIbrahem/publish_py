@@ -21,7 +21,7 @@ class TestPublishRouteIntegration:
 
     def test_publish_rejects_missing_csrf(self, app):
         """Test that publish route rejects requests without CSRF token when enabled."""
-        from src.app_main import create_app
+        from src.new_app import create_app
         from src.new_app.config import Config
 
         class TestConfigWithCSRF(Config):
