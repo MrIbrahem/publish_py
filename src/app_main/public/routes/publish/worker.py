@@ -10,15 +10,15 @@ from typing import Any
 from ....config import settings
 from ....shared.db.db_categories import get_campaign_category
 from ....shared.db.db_publish_reports import ReportsDB
-from ....shared.helpers.files import to_do
-from ....shared.helpers.format import (
+from ....shared.utils.helpers.files import to_do
+from ....shared.utils.helpers.format import (
     determine_hashtag,
     make_summary,
 )
-from ....shared.helpers.words import get_word_count
+from ....shared.utils.helpers.words import get_word_count
 from ....shared.clients.mediawiki_api import get_title_info, publish_do_edit
 from ....shared.clients.revids_client import get_revid, get_revid_db
-from ....shared.clients.text_processor import do_changes_to_text
+from ....shared.utils.helpers.text_processor import do_changes_to_text
 from ....shared.clients.wikidata_client import link_to_wikidata
 from ....shared.services.pages_service import find_exists_or_update, insert_page_target
 from ....shared.services.users_services import get_user_token_by_username

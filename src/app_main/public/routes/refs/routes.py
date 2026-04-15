@@ -12,7 +12,7 @@ from flask import (
     request,
 )
 
-from ....shared.clients.text_processor import do_changes_to_text
+from ....shared.utils.helpers.text_processor import do_changes_to_text
 from ....shared.auth.identity import current_user
 
 bp_fixrefs = Blueprint("fixrefs", __name__, url_prefix="/fixrefs")
