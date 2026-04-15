@@ -59,7 +59,6 @@ class UserTokenRecord:
 
         access_key = decrypt_value(self.access_token)
         access_secret = decrypt_value(self.access_secret)
-        # mark_token_used(self.user_id)
         return access_key, access_secret
 
     def __post_init__(self) -> None:
@@ -69,6 +68,20 @@ class UserTokenRecord:
 
 class UserTokenDB:
     """MySQL-backed"""
+
+    _ENCRYPTED_COLUMNS = frozenset({"access_token", "access_secret"})
+    _ALLOWED_COLUMNS = frozenset(
+        {
+            "user_id",
+            "username",
+            "access_token",
+            "access_secret",
+            "created_at",
+            "updated_at",
+            "last_used_at",
+            "rotated_at",
+        }
+    )
 
     def __init__(self, db_data: DbConfig):
         self.db = Database(db_data)
@@ -113,48 +126,43 @@ class UserTokenDB:
         rows = self.db.fetch_query_safe("SELECT * FROM user_tokens ORDER BY user_id ASC")
         return [self._row_to_record(row) for row in rows]
 
-    def add(self, username: str, **kwargs) -> UserTokenRecord:
-        username = username.strip()
-        if not username:
-            raise ValueError("Username is required")
-
-        cols = ["username"] + list(kwargs.keys())
-        placeholders = ", ".join(["%s"] * len(cols))
-        values = [username] + list(kwargs.values())
-
-        try:
-            self.db.execute_query(
-                f"INSERT INTO user_tokens ({', '.join(cols)}) VALUES ({placeholders})",
-                tuple(values),
-            )
-        except pymysql.err.IntegrityError:
-            raise ValueError(f"User '{username}' already exists") from None
-
-        return self._fetch_by_username(username)
-
     def update(self, user_id: int, **kwargs) -> UserTokenRecord:
         _ = self._fetch_by_id(user_id)
         if not kwargs:
             return self._fetch_by_id(user_id)
 
-        set_clause = ", ".join([f"`{col}` = %s" for col in kwargs.keys()])
-        values = list(kwargs.values()) + [user_id]
+        unknown = set(kwargs) - self._ALLOWED_COLUMNS
+        if unknown:
+            raise ValueError(f"Unknown columns for user_tokens: {sorted(unknown)}")
+
+        set_parts: list[str] = []
+        values: list[Any] = []
+        for col, val in kwargs.items():
+            if col in self._ENCRYPTED_COLUMNS:
+                val = encrypt_value(val)
+            set_parts.append(f"`{col}` = %s")
+            values.append(val)
+        values.append(user_id)
 
         self.db.execute_query_safe(
-            f"UPDATE user_tokens SET {set_clause} WHERE user_id = %s",
+            f"UPDATE user_tokens SET {', '.join(set_parts)} WHERE user_id = %s",
             tuple(values),
         )
         return self._fetch_by_id(user_id)
 
-    def upsert(self, user_id: int, username: str, access_key: str, access_secret: str) -> None:
+    def upsert(self, user_id: int, username: str, access_key: str, access_secret: str) -> UserTokenRecord:
         """Insert or update the encrypted OAuth credentials for a user."""
+
+        username = username.strip()
+        if not username:
+            raise ValueError("Username is required")
 
         user_id = int(user_id) if isinstance(user_id, str) else user_id
         now = current_ts()
         encrypted_token = encrypt_value(access_key)
         encrypted_secret = encrypt_value(access_secret)
 
-        return self.db.execute_query_safe(
+        self.db.execute_query_safe(
             """
                 INSERT INTO user_tokens (
                     user_id,
@@ -185,6 +193,17 @@ class UserTokenDB:
                 now,
             ),
         )
+
+        return self._fetch_by_id(user_id)
+
+    def add(
+        self,
+        user_id: int,
+        username: str,
+        access_key: str,
+        access_secret: str,
+    ) -> UserTokenRecord:
+        return self.upsert(user_id, username, access_key, access_secret)
 
     def delete(self, user_id: int) -> UserTokenRecord:
         record = self._fetch_by_id(user_id)
