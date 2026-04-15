@@ -156,6 +156,8 @@ class BasePublishTest:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
             patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.app_main.app_routes.publish.worker.find_exists_or_update") as mock_find_exists,
+            patch("src.app_main.app_routes.publish.worker.insert_page_target") as mock_insert_page,
         ):
             # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
@@ -164,6 +166,8 @@ class BasePublishTest:
             mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
             mock_link.return_value = {"result": "success", "qid": "Q123"}
             mock_should_add.return_value = True
+            mock_find_exists.return_value = False
+            mock_insert_page.return_value = True
 
             mock_load_reports_db.return_value = MagicMock()
 
@@ -176,6 +180,8 @@ class BasePublishTest:
                 "to_do": mock_to_do,
                 "load_reports_db": mock_load_reports_db,
                 "should_add": mock_should_add,
+                "find_exists_or_update": mock_find_exists,
+                "insert_page_target": mock_insert_page,
             }
 
     # ── helper ──────────────────────────────────────────────────────────────
@@ -244,7 +250,7 @@ class TestMetadataLogic(BasePublishTest):
         response = self._post(csrf_client, self._default_payload(tr_type="section"))
 
         assert response.status_code == 200
-        calls = common_patches["pages"].insert_page_target.call_args_list
+        calls = common_patches["insert_page_target"].call_args_list
         if calls:
             assert calls[0].kwargs.get("tr_type") == "section"
 

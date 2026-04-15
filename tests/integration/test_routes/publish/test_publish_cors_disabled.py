@@ -55,13 +55,13 @@ class TestPostEndpoint:
         with (
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
 
             # Mock database
             mock_reports_instance = MagicMock()
-            mock_reports_db.return_value = mock_reports_instance
+            mock_load_reports_db.return_value = mock_reports_instance
 
             response = client.post(
                 "/publish",
