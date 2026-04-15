@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 from itsdangerous import BadSignature, BadTimeSignature, URLSafeTimedSerializer
-from src.app_main.shared.cookies.cookie import (
+from src.app_main.shared.core.cookies.cookie import (
     extract_user_id,
     sign_state_token,
     sign_user_id,
@@ -70,7 +70,7 @@ class TestExtractUserId:
     def test_returns_none_for_malformed_data(self, monkeypatch):
         """Test that None is returned when data doesn't contain uid."""
         # Create a token with wrong data structure
-        from src.app_main.shared.cookies.cookie import _serializer
+        from src.app_main.shared.core.cookies.cookie import _serializer
 
         signed = _serializer.dumps({"wrong_key": 12345})
 
@@ -80,7 +80,7 @@ class TestExtractUserId:
 
     def test_returns_none_for_non_integer_uid(self, monkeypatch):
         """Test that None is returned when uid is not an integer."""
-        from src.app_main.shared.cookies.cookie import _serializer
+        from src.app_main.shared.core.cookies.cookie import _serializer
 
         signed = _serializer.dumps({"uid": "not_an_integer"})
 
@@ -148,7 +148,7 @@ class TestVerifyStateToken:
 
     def test_returns_none_when_nonce_missing(self, monkeypatch):
         """Test that None is returned when nonce is missing from data."""
-        from src.app_main.shared.cookies.cookie import _state_serializer
+        from src.app_main.shared.core.cookies.cookie import _state_serializer
 
         signed = _state_serializer.dumps({"wrong_key": "value"})
 
@@ -158,7 +158,7 @@ class TestVerifyStateToken:
 
     def test_returns_none_when_nonce_not_string(self, monkeypatch):
         """Test that None is returned when nonce is not a string."""
-        from src.app_main.shared.cookies.cookie import _state_serializer
+        from src.app_main.shared.core.cookies.cookie import _state_serializer
 
         signed = _state_serializer.dumps({"nonce": 12345})
 

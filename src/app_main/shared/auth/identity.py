@@ -7,7 +7,7 @@ from typing import Optional
 
 from flask import g, request, session
 
-from ..cookies.cookie import extract_user_id
+from ..core.cookies.cookie import extract_user_id
 from ...config import settings
 from ..services.users_services import UserTokenRecord, get_user_token
 

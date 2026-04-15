@@ -20,7 +20,7 @@ from .public.routes import (
     bp_publish,
 )
 from .config import settings
-from .shared.cookies import CookieHeaderClient
+from .shared.core.cookies import CookieHeaderClient
 from .shared.db import ensure_qids_table
 from .shared.core.extensions import csrf_init_app, csrf_exempt
 from .shared.services import close_cached_db
