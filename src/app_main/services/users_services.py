@@ -60,7 +60,10 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
         return None
 
     store = get_store()
-    return store._fetch_by_id(user_id)
+    try:
+        return store._fetch_by_id(user_id)
+    except LookupError:
+        return None
 
 
 def delete_user_token(user_id: int) -> None:
@@ -91,7 +94,10 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
         return None
 
     store = get_store()
-    return store._fetch_by_username(username)
+    try:
+        return store._fetch_by_username(username)
+    except LookupError:
+        return None
 
 
 def delete_user_token_by_username(username: str) -> None:
