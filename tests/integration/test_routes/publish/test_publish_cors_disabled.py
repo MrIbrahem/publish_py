@@ -106,9 +106,10 @@ class TestPostEndpoint:
             patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
             patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.app_main.app_routes.publish.worker.find_exists_or_update") as mock_find_exists,
+            patch("src.app_main.app_routes.publish.worker.insert_page_target") as mock_insert_page,
         ):
             # Mock user token
             mock_token = MagicMock()
@@ -130,10 +131,7 @@ class TestPostEndpoint:
 
             # Mock database operations
             mock_reports_instance = MagicMock()
-            mock_reports_db.return_value = mock_reports_instance
-            mock_pages_instance = MagicMock()
-            mock_pages_db.return_value = mock_pages_instance
-            mock_pages_instance.insert_page_target.return_value = {"execute_query": True}
+            mock_load_reports_db.return_value = mock_reports_instance
 
             response = client.post(
                 "/publish",
