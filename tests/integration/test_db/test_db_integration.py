@@ -53,7 +53,10 @@ class TestDatabaseIntegration:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn
 
-            with Database(config) as db:
+            db = Database(config)
+            db.connection = mock_conn  # Set the connection directly
+
+            with db:
                 assert db is not None
 
             # Connection should be closed after exiting context

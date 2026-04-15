@@ -165,9 +165,11 @@ class TestPagesDB:
         monkeypatch.setattr("src.app_main.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
+        # Reset mock to ignore calls made during initialization (_ensure_table)
+        mock_db.execute_query_safe.reset_mock()
         result = pages_db.update(1)
 
-        # Should not execute update query
+        # Should not execute update query when no kwargs provided
         mock_db.execute_query_safe.assert_not_called()
         assert result.id == 1
 
