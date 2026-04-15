@@ -11,6 +11,13 @@ def _load_request() -> Request:
     return request
 
 
+def _validate_url(text):
+    if text == "*" or text.startswith(("http://", "https://")):
+        return text
+
+    return f"https://{text}"
+
+
 def validate_access(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -21,7 +28,7 @@ def validate_access(func):
         if has_valid_secret_code or allowed:
             response = func(*args, **kwargs)
             # uncomment next after testing TestValidateAccessControlAllowOrigin
-            # domain = allowed or has_valid_secret_code
+            # domain = _validate_url(allowed or has_valid_secret_code)
 
             if hasattr(response, "headers"):
                 response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
