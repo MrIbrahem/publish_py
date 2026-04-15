@@ -22,7 +22,7 @@ from .public.routes import (
 from .config import settings
 from .shared.cookies import CookieHeaderClient
 from .shared.db import ensure_qids_table
-from .shared.extensions import csrf_init_app, csrf_exempt
+from .shared.core.extensions import csrf_init_app, csrf_exempt
 from .shared.services import close_cached_db
 from .shared.services.users_services import ensure_user_token_table
 from .shared.auth.identity import current_user
