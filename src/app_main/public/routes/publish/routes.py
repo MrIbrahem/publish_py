@@ -11,7 +11,7 @@ from flask import Blueprint, Response, jsonify, request
 
 from ....shared.core.cors import check_cors, validate_access
 from ....shared.utils.helpers.format import format_title, format_user
-from ....shared.services.users_services import get_user_token_by_username
+from ....shared.domain.services.users_services import get_user_token_by_username
 from .worker import _handle_no_access, _process_edit
 
 bp_publish = Blueprint("publish", __name__, url_prefix="/publish")

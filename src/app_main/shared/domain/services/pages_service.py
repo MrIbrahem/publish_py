@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, List
 
 from ....config import settings
 from ...db.db_pages import PageRecord, PagesDB
-from ...services import has_db_config
+from .db_service import has_db_config
 
 logger = logging.getLogger(__name__)
 

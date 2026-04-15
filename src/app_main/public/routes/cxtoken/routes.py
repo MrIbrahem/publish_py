@@ -13,7 +13,7 @@ from flask import Blueprint, Response, jsonify, request
 from ....config import settings
 from ....shared.core.cors import check_cors
 from ....shared.clients.oauth_client import get_cxtoken
-from ....shared.services.users_services import delete_user_token_by_username, get_user_token_by_username
+from ....shared.domain.services.users_services import delete_user_token_by_username, get_user_token_by_username
 from .cache import get_from_store, store_jwt
 
 bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")

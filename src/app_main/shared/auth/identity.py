@@ -9,7 +9,7 @@ from flask import g, request, session
 
 from ..core.cookies.cookie import extract_user_id
 from ...config import settings
-from ..services.users_services import UserTokenRecord, get_user_token
+from ..domain.services.users_services import UserTokenRecord, get_user_token
 
 
 @dataclass(frozen=True)
