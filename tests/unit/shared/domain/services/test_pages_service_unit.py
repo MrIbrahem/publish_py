@@ -19,7 +19,7 @@ The service layer provides:
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.services.pages_service import (
+from src.app_main.shared.domain.services.pages_service import (
     add_or_update_page,
     add_page,
     delete_page,
