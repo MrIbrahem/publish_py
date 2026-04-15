@@ -20,7 +20,7 @@ def get_pages_db() -> PagesDB:
     if _PAGE_STORE is None:
         if not has_db_config():
             raise RuntimeError(
-                "Template administration requires database configuration; no fallback store is available."
+                "PagesDB requires database configuration; no fallback store is available."
             )
 
         try:

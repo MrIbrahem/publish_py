@@ -176,15 +176,12 @@ def _handle_successful_edit(
         # skip link to wd for user pages
         return {"error": "skip link to wd for user pages"}
 
-    try:
-        link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
+    link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
 
-        # Check if the error is get_csrftoken failure and user is not already the fallback user
-        fallback_user = settings.users.fallback_user
-        if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
-            link_result["fallback"] = _retry_with_fallback_user(sourcetitle, lang, title, user)
-    except Exception as e:
-        logger.error(f"Error linking to Wikidata: {e}")
+    # Check if the error is get_csrftoken failure and user is not already the fallback user
+    fallback_user = settings.users.fallback_user
+    if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
+        link_result["fallback"] = _retry_with_fallback_user(sourcetitle, lang, title, user)
 
     if "error" in link_result:
         tab3 = {

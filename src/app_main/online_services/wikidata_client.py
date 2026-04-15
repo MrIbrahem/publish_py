@@ -72,7 +72,11 @@ def _link_it(
         api_params["title"] = sourcetitle
         api_params["site"] = "enwiki"
 
-    response = post_params(api_params, https_domain, access_key, access_secret)
+    try:
+        response = post_params(api_params, https_domain, access_key, access_secret)
+    except Exception:
+        logger.error(f"Failed to parse Wikidata response: {response}")
+        return {}
 
     try:
         result = json.loads(response) if response else {}
