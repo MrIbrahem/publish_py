@@ -13,7 +13,7 @@ from flask import (
 )
 
 from ...clients.text_processor import do_changes_to_text
-from ...users.current import current_user
+from ....new_app.shared.auth.identity import current_user
 
 bp_fixrefs = Blueprint("fixrefs", __name__, url_prefix="/fixrefs")
 logger = logging.getLogger(__name__)

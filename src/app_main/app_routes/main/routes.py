@@ -12,7 +12,7 @@ from flask import (
     send_from_directory,
 )
 
-from ...users.current import current_user
+from ....new_app.shared.auth.identity import current_user
 
 bp_main = Blueprint("main", __name__, url_prefix="")
 logger = logging.getLogger(__name__)

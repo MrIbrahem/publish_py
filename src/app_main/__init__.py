@@ -23,7 +23,7 @@ from .db import ensure_qids_table
 from .extensions import csrf
 from .services import close_cached_db
 from .services.users_services import ensure_user_token_table
-from .users.current import current_user
+from ..new_app.shared.auth.identity import current_user
 
 logger = logging.getLogger(__name__)
 

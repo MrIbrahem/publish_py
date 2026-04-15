@@ -26,7 +26,7 @@ from werkzeug.wrappers import Response as WerkzeugResponse
 
 from ...config import settings
 from ...services.users_services import delete_user_token, upsert_user_token
-from ...users.current import CurrentUser
+from ....new_app.shared.auth.identity import CurrentUser
 from ....new_app.shared.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
 from .oauth import (
     OAuthIdentityError,

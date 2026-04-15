@@ -1,0 +1,127 @@
+"""
+Unit tests for auth.identity module.
+
+Tests for current user helpers.
+"""
+
+from unittest.mock import MagicMock
+
+import pytest
+from src.new_app.shared.auth.identity import (
+    CurrentUser,
+    _resolve_user_id,
+    current_user,
+)
+
+
+class TestCurrentUser:
+    """Tests for CurrentUser dataclass."""
+
+    def test_create_with_fields(self):
+        """Test creating CurrentUser with fields."""
+        user = CurrentUser(user_id="12345", username="TestUser")
+
+        assert user.user_id == "12345"
+        assert user.username == "TestUser"
+
+    def test_is_frozen(self):
+        """Test that CurrentUser is immutable."""
+        user = CurrentUser(user_id="12345", username="TestUser")
+
+        with pytest.raises(AttributeError):
+            user.user_id = "99999"
+
+
+class TestResolveUserId:
+    """Tests for _resolve_user_id function."""
+
+    def test_returns_int_from_session(self, app):
+        """Test that int uid from session is returned."""
+        with app.test_request_context():
+            from flask import session
+
+            session["uid"] = 12345
+
+            result = _resolve_user_id()
+
+            assert result == 12345
+            assert isinstance(result, int)
+
+    def test_converts_string_uid_to_int(self, app):
+        """Test that string uid is converted to int."""
+        with app.test_request_context():
+            from flask import session
+
+            session["uid"] = "12345"
+
+            result = _resolve_user_id()
+
+            assert result == 12345
+            assert isinstance(result, int)
+
+    def test_returns_none_when_no_uid(self, app):
+        """Test that None is returned when no uid in session."""
+        with app.test_request_context():
+            result = _resolve_user_id()
+
+            assert result is None
+
+    def test_returns_none_for_invalid_uid(self, app):
+        """Test that None is returned for invalid uid."""
+        with app.test_request_context():
+            from flask import session
+
+            session["uid"] = "not_a_number"
+
+            result = _resolve_user_id()
+
+            assert result is None
+
+
+class TestCurrentUserFunction:
+    """Tests for current_user function."""
+
+    def test_returns_none_when_no_user_id(self, app):
+        """Test that None is returned when no user ID found."""
+        with app.test_request_context():
+            result = current_user()
+
+            assert result is None
+
+    def test_returns_user_from_session(self, app, monkeypatch):
+        """Test that user is returned from session."""
+        mock_user = MagicMock()
+        mock_user.username = "TestUser"
+
+        def mock_get_user_token(uid):
+            if uid == 12345:
+                return mock_user
+            return None
+
+        monkeypatch.setattr("src.new_app.shared.auth.identity.get_user_token", mock_get_user_token)
+
+        with app.test_request_context():
+            from flask import session
+
+            session["uid"] = 12345
+
+            result = current_user()
+
+            assert result is mock_user
+
+    def test_updates_session_username(self, app, monkeypatch):
+        """Test that session username is updated from user record."""
+        mock_user = MagicMock()
+        mock_user.username = "UpdatedName"
+
+        monkeypatch.setattr("src.new_app.shared.auth.identity.get_user_token", lambda uid: mock_user)
+
+        with app.test_request_context():
+            from flask import session
+
+            session["uid"] = 12345
+            session["username"] = "OldName"
+
+            current_user()
+
+            assert session["username"] == "UpdatedName"

@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import wraps
-from typing import Any, Callable, Optional, TypeVar, cast
+from typing import Optional
 
-from flask import g, redirect, request, session, url_for
+from flask import g, request, session
 
-from ...new_app.shared.cookies.cookie import extract_user_id
-from ..config import settings
-from ..services.users_services import UserTokenRecord, get_user_token
-
-F = TypeVar("F", bound=Callable[..., Any])
+from ..cookies.cookie import extract_user_id
+from ....app_main.config import settings
+from ....app_main.services.users_services import UserTokenRecord, get_user_token
 
 
 @dataclass(frozen=True)
@@ -53,14 +50,7 @@ def current_user() -> Optional[UserTokenRecord]:
     return user
 
 
-def oauth_required(func: F) -> F:
-    """Decorator that requires a full OAuth credential bundle."""
-
-    @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any):
-        if settings.oauth and settings.oauth.enabled and not current_user():
-            session["post_login_redirect"] = request.url
-            return redirect(url_for("auth.login"))
-        return func(*args, **kwargs)
-
-    return cast(F, wrapper)
+__all__ = [
+    "CurrentUser",
+    "current_user",
+]
