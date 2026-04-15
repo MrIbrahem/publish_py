@@ -1,10 +1,10 @@
-"""Tests for cors module."""
+"""Tests for is_allowed_checker module."""
 
 from unittest.mock import MagicMock
 
 import pytest
 
-from src.app_main.cors.cors import get_host
+from src.app_main.cors.is_allowed_checker import get_host
 
 
 class TestGetHost:
@@ -19,7 +19,9 @@ class TestGetHost:
         pytest.param("http://192.168.1.1:9000/admin", "192.168.1.1:9000", id="ip_address"),
         pytest.param("example.com/path", "", id="no_scheme_returns_empty"),
         pytest.param("", "", id="empty_string"),
-        pytest.param("https://user:pass@example.com", "user:pass@example.com", id="userinfo"),
+        pytest.param("not-a-url", "", id="not-a-url"),
+        pytest.param("sip://user:pass@example.com", "user:pass@example.com", id="userinfo"),
+        pytest.param("ftp://ar.wikipedia.org", "ar.wikipedia.org", id="ar.wikipedia.org"),
     ])
     def test_get_host(self, url, expected):
         assert get_host(url) == expected

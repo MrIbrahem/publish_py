@@ -103,7 +103,14 @@ def index() -> Response:
         elif isinstance(json_data, dict):
             request_data = json_data
         else:
-            return jsonify({"error": "JSON body must be an object"}), 400
+            response = jsonify({
+                "error": {
+                    "code": "request_error",
+                    "info": "JSON body must be an object"
+                }
+            })
+            response.status_code = 400
+            return response
 
     return handle_form(request_data)
 

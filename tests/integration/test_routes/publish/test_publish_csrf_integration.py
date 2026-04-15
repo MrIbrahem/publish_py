@@ -7,28 +7,16 @@ using a configuration similar to ProductionConfig.
 import json
 from unittest.mock import MagicMock, patch
 
+from flask.app import Flask
 import pytest
 
 
 @pytest.fixture
-def csrf_app():
+def csrf_app() -> Flask:
     """Create a Flask app with CSRF protection enabled (like Production)."""
     import os
 
-    os.environ.setdefault("FLASK_SECRET_KEY", "test-secret-key-for-csrf-integration-tests")
-    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test_consumer_key")
-    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test_consumer_secret")
-    os.environ.setdefault("WIKIDATA_DOMAIN", "www.wikidata.org")
-    os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
-    os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
-    os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
-    os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
-    os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
-    os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
-    os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
-    os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
 
     from flask import Flask
     from flask_wtf.csrf import CSRFProtect
@@ -36,10 +24,10 @@ def csrf_app():
     app = Flask(__name__)
     app.config.update(
         {
-            "TESTING": True,
             "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
             "WTF_CSRF_ENABLED": True,
             "WTF_CSRF_SSL_STRICT": False,
+            "TESTING": True,
             "CORS_DISABLED": False,
         }
     )
@@ -58,6 +46,30 @@ def csrf_app():
 def csrf_client(csrf_app):
     """Create a test client with CSRF protection enabled."""
     return csrf_app.test_client()
+
+
+class TestPublishEndpointWithDenyCSRF:
+    """Integration tests for publish endpoint with CSRF enabled."""
+
+    def test_cors_validation_still_works(self, csrf_client):
+        """Test that CORS validation is applied before CSRF check."""
+        with (
+            patch("src.app_main.cors.is_allowed_checker.is_allowed") as mock_deny,
+            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+        ):
+            mock_deny.return_value = None
+            mock_get_token.return_value = None
+            mock_reports_db_instance = MagicMock()
+            mock_reports_db.return_value = mock_reports_db_instance
+
+            response = csrf_client.post(
+                "/publish",
+                data=json.dumps({"user": "TestUser", "title": "Test Page"}),
+                content_type="application/json",
+            )
+
+            assert response.status_code == 403
 
 
 class TestPublishEndpointWithCSRF2:
@@ -112,30 +124,6 @@ class TestPublishEndpointWithCSRF2:
             assert response.status_code == 403
             data = response.get_json()
             assert data["error"]["code"] == "noaccess"
-
-
-class TestPublishEndpointWithDenyCSRF:
-    """Integration tests for publish endpoint with CSRF enabled."""
-
-    def test_cors_validation_still_works(self, csrf_client):
-        """Test that CORS validation is applied before CSRF check."""
-        with (
-            patch("src.app_main.cors.cors.is_allowed") as mock_deny,
-            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-        ):
-            mock_deny.return_value = None
-            mock_get_token.return_value = None
-            mock_reports_db_instance = MagicMock()
-            mock_reports_db.return_value = mock_reports_db_instance
-
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({"user": "TestUser", "title": "Test Page"}),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 403
 
 
 class BasePublishTest:
@@ -215,9 +203,6 @@ class BasePublishTest:
         return {**base, **overrides}
 
 
-# ─── أ: التدفق الناجح ────────────────────────────────────────────────────────
-
-
 class TestSuccessFlows(BasePublishTest):
     def test_successful_edit(self, csrf_client, common_patches):
         # common_patches يغطي الـ happy-path بالكامل — لا شيء إضافي هنا
@@ -258,9 +243,6 @@ class TestSuccessFlows(BasePublishTest):
 
         assert response.status_code == 200
         common_patches["get_revid"].assert_called_once_with("Source Page")
-
-
-# ─── ب: منطق البيانات والـ Metadata ─────────────────────────────────────────
 
 
 class TestMetadataLogic(BasePublishTest):
@@ -315,9 +297,6 @@ class TestMetadataLogic(BasePublishTest):
             assert "empty revid" in tab
 
 
-# ─── ج: معالجة الأخطاء والـ Captcha ─────────────────────────────────────────
-
-
 class TestErrorAndEdgeCases(BasePublishTest):
     def test_captcha_handling(self, csrf_client, common_patches):
         # نُعدّل الـ edit ليعيد captcha بدلاً من Success
@@ -344,9 +323,6 @@ class TestErrorAndEdgeCases(BasePublishTest):
         data = response.get_json()
         assert data["edit"]["result"] == "Failure"
         assert "error" in data["edit"]
-
-
-# ─── د: الحالات المعقدة ───────────────────────────────────────────────────────
 
 
 class TestComplexWorkflows(BasePublishTest):

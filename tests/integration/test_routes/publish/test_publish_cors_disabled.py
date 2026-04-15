@@ -3,31 +3,24 @@
 import json
 from unittest.mock import MagicMock, patch
 
+from flask.testing import FlaskClient
 import pytest
 from flask import Flask
 
 
 @pytest.fixture
-def app():
+def app() -> Flask:
     """Create a test Flask application."""
     import os
 
-    os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
-    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
-    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
-    os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
-
-    from cryptography.fernet import Fernet
-
-    if not os.environ.get("OAUTH_ENCRYPTION_KEY"):
-        os.environ["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
+    os.environ.setdefault("CORS_ALLOWED_DOMAINS", "")
 
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.config["TESTING"] = True
     app.secret_key = "test_secret"
-    app.config["CORS_DISABLED"] = False
+
+    app.config["TESTING"] = True
+    app.config["CORS_DISABLED"] = True
 
     from src.app_main.app_routes.publish.routes import bp_publish
 
@@ -36,7 +29,7 @@ def app():
 
 
 @pytest.fixture
-def client(app):
+def client(app: Flask) -> FlaskClient:
     """Create a test client."""
     return app.test_client()
 
@@ -57,15 +50,13 @@ class TestPostEndpoint:
 
         assert response.status_code == 403
 
-    def test_returns_no_access_when_user_not_found(self, client):
+    def test_no_access_returns_when_user_not_found(self, client):
         """Test that no access error is returned when user not found."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
             mock_get_token.return_value = None
 
             # Mock database
@@ -88,7 +79,10 @@ class TestPostEndpoint:
 
             assert response.status_code == 403
             data = response.get_json()
+            assert isinstance(data, dict)
+
             assert "error" in data
+            assert isinstance(data["error"], dict)
             assert data["error"]["code"] == "noaccess"
 
     def test_handles_options_request(self, client):
@@ -105,7 +99,6 @@ class TestPostEndpoint:
     def test_successful_edit_returns_success(self, client):
         """Test that successful edit returns success result."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
@@ -115,13 +108,13 @@ class TestPostEndpoint:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
             patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             # Mock user token
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = mock_token
+            mock_should_add.return_value = True
 
             # Mock revision ID
             mock_get_revid.return_value = "12345"
@@ -155,15 +148,14 @@ class TestPostEndpoint:
                 ),
                 content_type="application/json",
             )
-
             assert response.status_code == 200
+
             data = response.get_json()
             assert data["edit"]["result"] == "Success"
 
     def test_handles_captcha_response(self, client):
         """Test that captcha response is handled correctly."""
         with (
-            patch("src.app_main.cors.is_allowed") as mock_is_allowed,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
@@ -171,8 +163,6 @@ class TestPostEndpoint:
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
             patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
-            mock_is_allowed.return_value = "medwiki.toolforge.org"
-
             # Mock user token
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")

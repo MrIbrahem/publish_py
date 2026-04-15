@@ -3,8 +3,17 @@
 import os
 import sys
 from pathlib import Path
+from typing import Generator, Any
+from unittest.mock import MagicMock
 
+from flask.app import Flask
+from flask.testing import FlaskClient
 import pytest
+
+os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
+os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
+os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
+os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
 
 # Set environment variables before any imports that might need them
 os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
@@ -16,6 +25,13 @@ os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
 # This is a valid Fernet key for testing only - DO NOT use in production
 TEST_ENCRYPTION_KEY = "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI="
 os.environ.setdefault("OAUTH_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
+
+os.environ.setdefault("WIKIDATA_DOMAIN", "test.wikidata.org")
+
+os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
+os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
+os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
+os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
 
 # Get the project root directory (parent of pytests folder)
 project_root = Path(__file__).parent.parent
@@ -31,7 +47,7 @@ from src.app_main.config import TestingConfig  # noqa: E402
 
 
 @pytest.fixture
-def app():
+def app() -> Generator[Flask, Any, None]:
     """Create and configure a test Flask application.
 
     Yields:
@@ -44,7 +60,7 @@ def app():
 
 
 @pytest.fixture
-def client(app):
+def client(app: Flask) -> FlaskClient:
     """Create a test client for the app.
 
     Args:
@@ -89,3 +105,25 @@ def auth_client(app):
         sess["username"] = "TestUser"
 
     return client
+
+
+@pytest.fixture
+def mock_is_denied(mocker):
+    return mocker.patch("src.app_main.cors.is_allowed", return_value=None)
+
+
+@pytest.fixture
+def mock_is_allowed(mocker):
+    return mocker.patch("src.app_main.cors.is_allowed", return_value=None)
+
+
+@pytest.fixture
+def mock_check_secret(mocker):
+    return mocker.patch("src.app_main.cors.check_publish_secret_code", return_value=None)
+
+
+@pytest.fixture
+def mock_load_request(mocker):
+    mock_req = MagicMock()
+    mocker.patch("src.app_main.cors._load_request", return_value=mock_req)
+    return mock_req

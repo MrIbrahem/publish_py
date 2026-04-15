@@ -60,7 +60,7 @@ class OAuthConfig:
 
 @dataclass(frozen=True)
 class CorsConfig:
-    allowed_domains: tuple[str, ...]
+    allowed_domains: list[str]
 
 
 @dataclass(frozen=True)
@@ -261,7 +261,8 @@ def get_settings() -> Settings:
 
     # Load CORS configuration
     cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
-    cors_domains = tuple(d.strip() for d in cors_domains_str.split(",") if d.strip())
+    cors_domains = [d.strip() for d in cors_domains_str.split(",") if d.strip()]
+
     cors_config = CorsConfig(allowed_domains=cors_domains)
 
     revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
