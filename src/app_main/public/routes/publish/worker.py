@@ -302,7 +302,7 @@ def insert_to_db_2(
 ) -> dict[str, Any]:
     """Insert a page target record.
 
-    Mirrors: php_src/bots/sql/db_Pages.php InsertPageTarget()
+    Mirrors: php_src/bots/sql/db_pages.php InsertPageTarget()
 
     Args:
         sourcetitle: Page title

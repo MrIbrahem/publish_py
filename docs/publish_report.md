@@ -124,7 +124,7 @@ The Python implementation is a thorough port of the PHP publish endpoint, coveri
 ### 4.8 `InsertPageTarget` INSERT statement differs
 
 -   **PHP**: `add_to_db.php:36-39` — `INSERT INTO $table_name (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid) SELECT ?, ?, ?, ?, ?, ?, DATE(NOW()), ?, ?` — uses `SELECT` clause for values, applies `DATE(NOW())` server-side.
--   **Python**: `db_Pages.py` `insert_page_target()` — Likely uses a standard INSERT with parameterized values, applying the date from Python rather than `DATE(NOW())`.
+-   **Python**: `db_pages.py` `insert_page_target()` — Likely uses a standard INSERT with parameterized values, applying the date from Python rather than `DATE(NOW())`.
 -   **Exact difference**: PHP uses `INSERT ... SELECT` with `DATE(NOW())` for the `pupdate` column. Python likely sends the date as a parameter.
 -   **Impact**: **Minor** — The `pupdate` value may differ by timezone (PHP uses MySQL's `NOW()`, Python uses Python's datetime).
 

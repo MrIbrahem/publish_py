@@ -33,7 +33,7 @@ php_src/
 │   ├── cors.php            # CORS validation
 │   ├── sql/
 │   │   ├── access_helps.php # Access key management
-│   │   ├── db_Pages.php     # Pages table operations
+│   │   ├── db_pages.php     # Pages table operations
 │   │   └── db_publish_reports.php # Reports table
 │   ├── files_helps.php     # File logging
 │   ├── helps.php           # Encryption helpers
@@ -86,7 +86,7 @@ src/app/
 | `Publish\EditProcess\processEdit()` | `app_routes/post/routes.py:_process_edit()` | ✅ DONE |
 | `Publish\WD\LinkToWikidata()` | `services/wikidata_client.py:link_to_wikidata()` | ✅ DONE |
 | `Publish\AddToDb\InsertPublishReports()` | `db/db_publish_reports.py:ReportsDB.add()` | ✅ DONE |
-| `Publish\AddToDb\InsertPageTarget()` | `db/db_Pages.py:PagesDB.insert_page_target()` | ✅ DONE |
+| `Publish\AddToDb\InsertPageTarget()` | `db/db_pages.py:PagesDB.insert_page_target()` | ✅ DONE |
 
 ---
 
@@ -668,7 +668,7 @@ from flask import Blueprint, jsonify, request
 from ...users.store import get_user_token, get_user_token_by_username
 from ...users.current import current_user
 from ...db.db_publish_reports import ReportsDB
-from ...db.db_Pages import PagesDB
+from ...db.db_pages import PagesDB
 from ..helpers.format import format_title, format_user, determine_hashtag, make_summary
 from ..helpers.files import to_do
 from ..services.oauth_client import post_params
@@ -958,7 +958,7 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
 The PHP code uses an `access_keys` table, while Python uses `user_tokens`.
 - use `user_tokens` insted of `access_keys` Table
 
-### 3. Extend [src/app/db/db_Pages.py](../src/app_main/db/db_Pages.py)
+### 3. Extend [src/app/db/db_pages.py](../src/app_main/db/db_pages.py)
 
 Add `insert_page_target` method:
 
@@ -1162,7 +1162,7 @@ def test_post_requires_auth(client):
 
 2. **Update database layer**
    - [x] Add `get_user_token_by_username()` to `users/store.py`
-   - [x] Add `insert_page_target()` to `db/db_Pages.py`
+   - [x] Add `insert_page_target()` to `db/db_pages.py`
    - [x] Ensure `qids` table exists
 
 3. **Add dependencies**
@@ -1267,7 +1267,7 @@ def test_post_requires_auth(client):
 - [x] `src/app/app_routes/cxtoken/routes.py` - Full implementation
 - [x] `src/app/app_routes/post/routes.py` - Full implementation
 - [x] `src/app/users/store.py` - Add `get_user_token_by_username()`
-- [x] `src/app/db/db_Pages.py` - Add `insert_page_target()`
+- [x] `src/app/db/db_pages.py` - Add `insert_page_target()`
 - [x] `src/app/config.py` - Add CORS domains config
 - [x] `requirements.txt` or `pyproject.toml` - Add dependencies
 - [x] `src/app/__init__.py` - Register new blueprints if needed

@@ -106,7 +106,7 @@ src/
 │   ├── db/                # Database modules
 │   │   ├── db_class.py    # Base database class
 │   │   ├── db_publish_reports.py
-│   │   ├── db_Pages.py
+│   │   ├── db_pages.py
 │   │   └── db_qids.py
 │   ├── services/          # Business logic services
 │   │   ├── mediawiki_api.py

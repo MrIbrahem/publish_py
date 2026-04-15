@@ -67,7 +67,7 @@ class TestPagesDBIntegration:
     def test_pages_db_creates_tables_on_init(self):
         """Test that PagesDB creates tables on initialization."""
         from src.app_main.config import DbConfig
-        from src.app_main.shared.db.db_Pages import PagesDB
+        from src.app_main.shared.db.db_pages import PagesDB
 
         config = DbConfig(
             db_name="test_db",
@@ -76,7 +76,7 @@ class TestPagesDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_Pages.Database") as MockDB:
+        with patch("src.app_main.shared.db.db_pages.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 

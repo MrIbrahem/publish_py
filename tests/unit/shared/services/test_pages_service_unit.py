@@ -13,7 +13,7 @@ The service layer provides:
 - Lazy initialization of PagesDB with caching
 - Configuration validation before DB operations
 - Simplified API for common page operations
-- Mirrors the PHP helper functions from php_src/bots/sql/db_Pages.php
+- Mirrors the PHP helper functions from php_src/bots/sql/db_pages.php
 """
 
 from unittest.mock import MagicMock, patch
