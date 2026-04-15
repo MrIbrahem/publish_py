@@ -16,10 +16,10 @@ from ...helpers.format import (
     make_summary,
 )
 from ...helpers.words import get_word_count
-from ...services.mediawiki_api import publish_do_edit, get_title_info
-from ...services.revids_service import get_revid, get_revid_db
-from ...services.text_processor import do_changes_to_text
-from ...services.wikidata_client import link_to_wikidata
+from ...online_services.mediawiki_api import publish_do_edit, get_title_info
+from ...online_services.revids_service import get_revid, get_revid_db
+from ...online_services.text_processor import do_changes_to_text
+from ...online_services.wikidata_client import link_to_wikidata
 from ...users.store import get_user_token_by_username
 
 logger = logging.getLogger(__name__)
