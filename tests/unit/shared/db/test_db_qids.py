@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from src.app_main.config import DbConfig
-from src.app_main.db.db_qids import (
+from src.new_app.shared.db.db_qids import (
     QidsDB,
     ensure_qids_table,
 )

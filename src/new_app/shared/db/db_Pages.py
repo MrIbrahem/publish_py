@@ -10,8 +10,8 @@ from typing import Any, List
 
 import pymysql
 
-from ..config import DbConfig
-from . import Database
+from ....app_main.config import DbConfig
+from ....app_main.db import Database
 from .sql_schema_tables import sql_tables
 
 logger = logging.getLogger(__name__)

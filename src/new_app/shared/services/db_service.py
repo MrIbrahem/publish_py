@@ -6,7 +6,7 @@ import logging
 from typing import Any, Optional
 
 from ....app_main.config import settings
-from ....app_main.db.db_class import Database
+from ..db.db_class import Database
 
 _db: Database | None = None
 

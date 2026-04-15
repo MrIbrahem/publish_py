@@ -9,9 +9,9 @@ from typing import Any, List
 
 import pymysql
 
-from ..config import DbConfig
-from ...new_app.shared.crypto import decrypt_value, encrypt_value
-from . import Database
+from ....app_main.config import DbConfig
+from ..crypto import decrypt_value, encrypt_value
+from ....app_main.db import Database
 from .sql_schema_tables import sql_tables
 
 logger = logging.getLogger(__name__)

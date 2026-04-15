@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 from functools import lru_cache
 
-from ..config import DbConfig
+from ....app_main.config import DbConfig
 from .db_class import Database
 from .sql_schema_tables import sql_tables
 

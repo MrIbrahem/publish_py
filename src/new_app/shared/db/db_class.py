@@ -8,7 +8,7 @@ from typing import Any, Iterable, Sequence
 
 import pymysql
 
-from ..config import DbConfig
+from ....app_main.config import DbConfig
 
 logger = logging.getLogger(__name__)
 
