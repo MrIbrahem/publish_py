@@ -6,7 +6,9 @@ Mirrors: php_src/bots/revids_bot.php
 import json
 import logging
 from pathlib import Path
+
 import requests
+
 from ..config import settings
 
 logger = logging.getLogger(__name__)

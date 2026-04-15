@@ -1,4 +1,5 @@
 """
+# isort:skip_file
 WSGI entry point for the Flask application for Production
 """
 

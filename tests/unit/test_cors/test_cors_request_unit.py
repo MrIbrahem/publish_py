@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock
 
 import pytest
-
 from src.app_main.cors import is_allowed
 
 
@@ -28,18 +27,20 @@ def mock_request(mocker):
 
 
 class TestCORSValidation:
-    @pytest.mark.parametrize("headers, expected", [
-        # Allowed
-        ({"Origin": "sip://mysite.com"}, "sip://mysite.com"),
-        ({"Origin": "ftp://trusted.com"}, "ftp://trusted.com"),
-        ({"Referer": "http://api.partner.net/dashboard"}, "http://api.partner.net"),
-
-        # Denied
-        ({"Origin": "https://trusted.com.attacker.com"}, None),
-        ({"Origin": "https://nottrusted.com"}, None),
-        ({"Origin": "https://sub.trusted.com"}, None),
-        ({}, None),
-    ])
+    @pytest.mark.parametrize(
+        "headers, expected",
+        [
+            # Allowed
+            ({"Origin": "sip://mysite.com"}, "sip://mysite.com"),
+            ({"Origin": "ftp://trusted.com"}, "ftp://trusted.com"),
+            ({"Referer": "http://api.partner.net/dashboard"}, "http://api.partner.net"),
+            # Denied
+            ({"Origin": "https://trusted.com.attacker.com"}, None),
+            ({"Origin": "https://nottrusted.com"}, None),
+            ({"Origin": "https://sub.trusted.com"}, None),
+            ({}, None),
+        ],
+    )
     def test_cors_validation(self, mock_request, headers, expected):
         mock_req, _ = mock_request
         mock_req.headers = headers

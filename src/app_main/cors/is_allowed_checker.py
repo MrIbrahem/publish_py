@@ -4,8 +4,10 @@ CORS validation helpers.
 Mirrors: php_src/bots/cors.php
 
 """
+
 import logging
 from urllib.parse import urlparse
+
 from flask import current_app
 from flask.wrappers import Request
 

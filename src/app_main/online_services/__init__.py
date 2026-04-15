@@ -1,6 +1,6 @@
 """Services for external API integration."""
 
-from .mediawiki_api import publish_do_edit, get_title_info
+from .mediawiki_api import get_title_info, publish_do_edit
 from .oauth_client import get_csrf_token, get_cxtoken, get_oauth_client, post_params
 from .revids_service import get_revid, get_revid_db
 from .text_processor import do_changes_to_text

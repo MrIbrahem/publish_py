@@ -11,8 +11,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from ..config import DbConfig
-from .sql_schema_tables import sql_tables
 from . import Database
+from .sql_schema_tables import sql_tables
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,7 @@ _VALID_COLUMNS = frozenset(
         "MONTH(date)",
     }
 )
+
 
 @dataclass
 class ReportRecord:

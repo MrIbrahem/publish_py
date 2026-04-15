@@ -4,11 +4,10 @@ from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.db.db_publish_reports import (
+    _VALID_COLUMNS,
     PUBLISH_REPORTS_PARAMS,
     ReportRecord,
-    _VALID_COLUMNS,
 )
 
 
@@ -208,13 +207,13 @@ class TestQueryWithFilters:
         assert "invalid_field" not in query
 
 
-
 class TestReportRecord:
     """Tests for ReportRecord dataclass."""
 
     def test_create_with_required_fields(self):
         """Test creating ReportRecord with required fields."""
         from datetime import datetime
+
         from src.app_main.db.db_publish_reports import ReportRecord
 
         record = ReportRecord(
@@ -233,6 +232,7 @@ class TestReportRecord:
     def test_to_dict_converts_date_to_iso(self):
         """Test that to_dict converts date to ISO format."""
         from datetime import datetime
+
         from src.app_main.db.db_publish_reports import ReportRecord
 
         record = ReportRecord(
@@ -313,7 +313,7 @@ class TestValidColumns:
 
     def test_all_param_columns_are_valid(self):
         """Test that all columns referenced in PUBLISH_REPORTS_PARAMS are valid."""
-        from src.app_main.db.db_publish_reports import PUBLISH_REPORTS_PARAMS, _VALID_COLUMNS
+        from src.app_main.db.db_publish_reports import _VALID_COLUMNS, PUBLISH_REPORTS_PARAMS
 
         for param in PUBLISH_REPORTS_PARAMS:
             assert param["column"] in _VALID_COLUMNS

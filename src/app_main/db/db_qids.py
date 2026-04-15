@@ -7,6 +7,7 @@ Stores Wikidata QIDs for MDWiki page titles.
 from __future__ import annotations
 
 import logging
+
 from ..config import DbConfig
 from . import Database
 from .sql_schema_tables import sql_tables

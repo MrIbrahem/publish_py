@@ -2,9 +2,9 @@
 
 from unittest.mock import MagicMock, patch
 
-from flask.testing import FlaskClient
 import pytest
 from flask import Flask
+from flask.testing import FlaskClient
 
 
 @pytest.fixture
@@ -35,9 +35,7 @@ class TestCxtokenEndpoint:
 
     def test_cors_not_allowed_without_origin(self, client):
 
-        with (
-            patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
-        ):
+        with (patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
             mock_get_token.return_value = None
 
             """Test that requests without allowed origin are rejected."""
@@ -69,9 +67,7 @@ class TestCxtokenEndpoint:
 
     def test_returns_no_access_when_user_not_found(self, client):
         """Test that no access error is returned when user not found in DB."""
-        with (
-            patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
-        ):
+        with (patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
             mock_get_token.return_value = None
 
             response = client.get("/cxtoken?wiki=en&user=UnknownUser")

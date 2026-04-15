@@ -1,6 +1,4 @@
-"""
-
-"""
+""" """
 
 from __future__ import annotations
 
@@ -11,9 +9,8 @@ from typing import Any, List
 
 import pymysql
 
-from ..crypto import decrypt_value, encrypt_value
-
 from ..config import DbConfig
+from ..crypto import decrypt_value, encrypt_value
 from . import Database
 from .sql_schema_tables import sql_tables
 

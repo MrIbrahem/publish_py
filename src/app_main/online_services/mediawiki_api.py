@@ -4,10 +4,11 @@ Mirrors: php_src/bots/api/do_edit.php
 """
 
 import json
-import requests
 import logging
-from typing import Any
 import urllib.parse
+from typing import Any
+
+import requests
 
 from ..config import settings
 from .oauth_client import post_params

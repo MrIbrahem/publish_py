@@ -16,26 +16,26 @@ Retrieves publish reports with optional filtering.
 
 #### Query Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `year` | number | Filter by year extracted from date (e.g., `2026`) |
-| `month` | number | Filter by month extracted from date (e.g., `1` for January) |
-| `title` | string | Filter by page title |
-| `user` | string | Filter by username |
-| `lang` | string | Filter by language code (e.g., `ar`, `en`) |
-| `sourcetitle` | string | Filter by source title |
-| `result` | string | Filter by result status |
-| `select` | string | Comma-separated list of fields to return |
-| `limit` | number | Maximum number of results to return |
+| Parameter     | Type   | Description                                                 |
+| ------------- | ------ | ----------------------------------------------------------- |
+| `year`        | number | Filter by year extracted from date (e.g., `2026`)           |
+| `month`       | number | Filter by month extracted from date (e.g., `1` for January) |
+| `title`       | string | Filter by page title                                        |
+| `user`        | string | Filter by username                                          |
+| `lang`        | string | Filter by language code (e.g., `ar`, `en`)                  |
+| `sourcetitle` | string | Filter by source title                                      |
+| `result`      | string | Filter by result status                                     |
+| `select`      | string | Comma-separated list of fields to return                    |
+| `limit`       | number | Maximum number of results to return                         |
 
 #### Special Filter Values
 
-| Value | Behavior |
-|-------|----------|
-| `not_mt` / `not_empty` | Field is not empty |
-| `mt` / `empty` | Field is empty |
-| `>0` | Field is greater than 0 |
-| `all` | Skip this filter (return all values) |
+| Value                  | Behavior                             |
+| ---------------------- | ------------------------------------ |
+| `not_mt` / `not_empty` | Field is not empty                   |
+| `mt` / `empty`         | Field is empty                       |
+| `>0`                   | Field is greater than 0              |
+| `all`                  | Skip this filter (return all values) |
 
 #### Response Format
 
@@ -70,31 +70,37 @@ Retrieves publish reports with optional filtering.
 #### Example Requests
 
 **Get all reports for a specific user:**
+
 ```
 GET /api/publish_reports?user=JohnDoe
 ```
 
 **Get reports for a specific year and month:**
+
 ```
 GET /api/publish_reports?year=2026&month=1
 ```
 
 **Get reports for a specific language and user:**
+
 ```
 GET /api/publish_reports?lang=ar&user=MrIbrahem
 ```
 
 **Get reports with non-empty results:**
+
 ```
 GET /api/publish_reports?result=not_empty
 ```
 
 **Get specific fields only:**
+
 ```
 GET /api/publish_reports?user=Admin&select=title,date,result
 ```
 
 **Combined filters with limit:**
+
 ```
 GET /api/publish_reports?year=2026&lang=en&limit=100
 ```
@@ -104,8 +110,9 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 ## CORS
 
 The API supports CORS for the following domains (configurable via environment):
-- `medwiki.toolforge.org`
-- `mdwikicx.toolforge.org`
+
+-   `medwiki.toolforge.org`
+-   `mdwikicx.toolforge.org`
 
 Preflight requests (OPTIONS) are handled automatically.
 

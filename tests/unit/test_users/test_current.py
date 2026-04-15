@@ -6,7 +6,6 @@ Tests for current user helpers and authentication decorators.
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.users.current import (
     CurrentUser,
     _resolve_user_id,

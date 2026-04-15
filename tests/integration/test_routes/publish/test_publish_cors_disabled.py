@@ -3,9 +3,9 @@
 import json
 from unittest.mock import MagicMock, patch
 
-from flask.testing import FlaskClient
 import pytest
 from flask import Flask
+from flask.testing import FlaskClient
 
 
 @pytest.fixture

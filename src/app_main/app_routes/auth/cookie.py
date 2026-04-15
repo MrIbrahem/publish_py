@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+
 from itsdangerous import BadSignature, BadTimeSignature, URLSafeTimedSerializer
 
 from ...config import settings

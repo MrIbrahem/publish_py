@@ -8,7 +8,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 
 import pytest
-
 from src.app_main.config import DbConfig
 from src.app_main.db.db_qids import (
     QidsDB,

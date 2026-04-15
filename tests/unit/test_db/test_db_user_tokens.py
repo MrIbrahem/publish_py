@@ -6,7 +6,6 @@ Tests for UserToken database operations.
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.config import DbConfig
 from src.app_main.db.db_user_tokens import (
     UserTokenDB,

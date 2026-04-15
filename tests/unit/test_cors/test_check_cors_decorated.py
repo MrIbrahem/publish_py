@@ -114,7 +114,9 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         )
         app.config["CORS_DISABLED"] = False
         mocker.patch("src.app_main.cors._load_request", return_value=response)
-        mocker.patch("src.app_main.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com.net", "z.wikipedia.org"])
+        mocker.patch(
+            "src.app_main.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com.net", "z.wikipedia.org"]
+        )
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()

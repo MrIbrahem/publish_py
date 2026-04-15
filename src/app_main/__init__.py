@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import os
 from datetime import datetime
-from typing import Tuple, Type, Any
+from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request
 
@@ -19,11 +19,11 @@ from .app_routes import (
 )
 from .config import settings
 from .cookies import CookieHeaderClient
-from .services import close_cached_db
 from .db import ensure_qids_table
 from .extensions import csrf
-from .users.current import current_user
+from .services import close_cached_db
 from .services.users_services import ensure_user_token_table
+from .users.current import current_user
 
 logger = logging.getLogger(__name__)
 

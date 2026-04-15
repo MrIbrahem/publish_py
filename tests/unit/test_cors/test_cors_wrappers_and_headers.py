@@ -5,8 +5,7 @@ Tests for cors wrappers module, to test response.headers["Access-Control-Allow-O
 from unittest.mock import MagicMock
 
 import pytest
-
-from src.app_main.cors import validate_access, check_cors
+from src.app_main.cors import check_cors, validate_access
 
 
 def _make_response_with_headers():
@@ -69,9 +68,7 @@ class TestValidateAccessControlAllowOrigin:
         assert result.headers.get("Access-Control-Allow-Origin") == "https://secret-host.com"
         # assert "Access-Control-Allow-Origin" not in result.headers
 
-    def test_all_results_none(
-        self, app, mock_load_request, mock_is_denied, mock_check_secret
-    ):
+    def test_all_results_none(self, app, mock_load_request, mock_is_denied, mock_check_secret):
         mock_check_secret.return_value = None
         response = _make_response_with_headers()
         decorated = validate_access(lambda: response)
