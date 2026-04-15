@@ -9,12 +9,25 @@ from __future__ import annotations
 
 import logging
 from functools import lru_cache
-from typing import Any
 
 from ..config import DbConfig
 from .db_class import Database
 
 logger = logging.getLogger(__name__)
+
+table_creation_sql_categories = """
+CREATE TABLE
+    IF NOT EXISTS categories (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        category varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        category2 varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        display varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        campaign varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        depth int DEFAULT NULL,
+        def int NOT NULL DEFAULT '0',
+        PRIMARY KEY (id)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+"""
 
 
 class CategoriesDB:
@@ -22,6 +35,10 @@ class CategoriesDB:
 
     def __init__(self, db_data: DbConfig):
         self.db = Database(db_data)
+        self._ensure_table()
+
+    def _ensure_table(self) -> None:
+        self.db.execute_query_safe(table_creation_sql_categories)
 
     def retrieve_campaign_categories(self) -> dict[str, str]:
         """Retrieve campaign to category mapping from database.

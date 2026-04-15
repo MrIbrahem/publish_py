@@ -14,16 +14,17 @@ from . import Database
 
 logger = logging.getLogger(__name__)
 
-qids_table_creation_sql = """
-CREATE TABLE IF NOT EXISTS `qids` (
-    `id` int unsigned NOT NULL AUTO_INCREMENT,
-    `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `qid` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `title` (`title`),
-    KEY `qid` (`qid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+qids_table_creation_sql_qids = """
+CREATE TABLE
+    IF NOT EXISTS qids (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+        qid varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+        add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY title (title),
+        KEY qid (qid)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 """
 
 
@@ -38,7 +39,7 @@ def ensure_qids_table(db_data: DbConfig) -> bool:
     """
     try:
         db = Database(db_data)
-        db.execute_query_safe(qids_table_creation_sql)
+        db.execute_query_safe(qids_table_creation_sql_qids)
         logger.debug("qids table ensured")
         return True
     except Exception as e:
@@ -54,7 +55,7 @@ class QidsDB:
         self._ensure_table()
 
     def _ensure_table(self) -> None:
-        self.db.execute_query_safe(qids_table_creation_sql)
+        self.db.execute_query_safe(qids_table_creation_sql_qids)
 
     def get_qid_by_title(self, title: str) -> str | None:
         """Get QID for a given title.
@@ -93,5 +94,5 @@ class QidsDB:
 __all__ = [
     "QidsDB",
     "ensure_qids_table",
-    "qids_table_creation_sql",
+    "qids_table_creation_sql_qids",
 ]

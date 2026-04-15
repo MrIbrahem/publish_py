@@ -13,6 +13,21 @@ from ..db import get_db, has_db_config
 logger = logging.getLogger(__name__)
 
 
+qids_table_creation_sql_user_tokens = """
+CREATE TABLE
+    IF NOT EXISTS user_tokens (
+        user_id INT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL,
+        access_token VARBINARY(1024) NOT NULL,
+        access_secret VARBINARY(1024) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        last_used_at DATETIME DEFAULT NULL,
+        rotated_at DATETIME DEFAULT NULL
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4
+"""
+
+
 def _current_ts() -> str:
     # Store in UTC. MySQL DATETIME has no TZ; keep application-level UTC.
     """
@@ -77,20 +92,7 @@ def ensure_user_token_table() -> None:
         return
 
     db = get_db()
-    db.execute_query_safe(
-        """
-        CREATE TABLE IF NOT EXISTS user_tokens (
-            user_id INT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL,
-            access_token VARBINARY(1024) NOT NULL,
-            access_secret VARBINARY(1024) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            last_used_at DATETIME DEFAULT NULL,
-            rotated_at DATETIME DEFAULT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    """
-    )
+    db.execute_query_safe(qids_table_creation_sql_user_tokens)
 
     # Ensure username index exists
     existing_idx = db.fetch_query_safe(

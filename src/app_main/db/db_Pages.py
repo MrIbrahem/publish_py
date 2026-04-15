@@ -15,44 +15,48 @@ from . import Database
 
 logger = logging.getLogger(__name__)
 
-table_creation_sql = """
-CREATE TABLE IF NOT EXISTS `pages` (
-    `id` int unsigned NOT NULL AUTO_INCREMENT,
-    `title` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `word` int DEFAULT NULL,
-    `translate_type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `cat` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `lang` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `user` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `target` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `date` date DEFAULT NULL,
-    `pupdate` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` int DEFAULT '0',
-    `mdwiki_revid` int DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `idx_title` (`title`),
-    KEY `target` (`target`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+table_creation_sql_pages = """
+CREATE TABLE
+    IF NOT EXISTS pages (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        word int DEFAULT NULL,
+        translate_type varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        cat varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        lang varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        user varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        target varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        date date DEFAULT NULL,
+        pupdate varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        deleted int DEFAULT '0',
+        mdwiki_revid int DEFAULT NULL,
+        PRIMARY KEY (id),
+        KEY idx_title (title),
+        KEY target (target)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+"""
 
-CREATE TABLE IF NOT EXISTS `pages_users` (
-    `id` int unsigned NOT NULL AUTO_INCREMENT,
-    `title` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `word` int DEFAULT NULL,
-    `translate_type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `cat` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `lang` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `user` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `target` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `date` date DEFAULT NULL,
-    `pupdate` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `deleted` int DEFAULT '0',
-    `mdwiki_revid` int DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `idx_title` (`title`),
-    KEY `target` (`target`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+table_creation_sql_pages_users = """
+CREATE TABLE
+    IF NOT EXISTS pages_users (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        word int DEFAULT NULL,
+        translate_type varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        cat varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        lang varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        user varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        target varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        date date DEFAULT NULL,
+        pupdate varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        deleted int DEFAULT '0',
+        mdwiki_revid int DEFAULT NULL,
+        PRIMARY KEY (id),
+        KEY idx_title (title),
+        KEY target (target)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 """
 
 
@@ -83,7 +87,8 @@ class PagesDB:
         self._ensure_table()
 
     def _ensure_table(self) -> None:
-        self.db.execute_query_safe(table_creation_sql)
+        self.db.execute_query_safe(table_creation_sql_pages)
+        self.db.execute_query_safe(table_creation_sql_pages_users)
 
     def _row_to_record(self, row: dict[str, Any]) -> PageRecord:
         return PageRecord(**row)
