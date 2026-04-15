@@ -17,7 +17,7 @@ class TestQueryWithFilters:
     @pytest.fixture
     def mock_db(self):
         """Create a mock database for testing."""
-        with patch("src.app_main.shared.db.db_publish_reports.Database") as MockDatabase:
+        with patch("src.app_main.shared.domain.db.db_publish_reports.Database") as MockDatabase:
             mock_db_instance = MagicMock()
             MockDatabase.return_value = mock_db_instance
             # Mock the table creation
@@ -275,7 +275,7 @@ class TestReportsDBCore:
     @pytest.fixture
     def mock_db(self):
         """Create a mock database for testing."""
-        with patch("src.app_main.shared.db.db_publish_reports.Database") as MockDatabase:
+        with patch("src.app_main.shared.domain.db.db_publish_reports.Database") as MockDatabase:
             mock_db_instance = MagicMock()
             MockDatabase.return_value = mock_db_instance
             mock_db_instance.execute_query_safe.return_value = None

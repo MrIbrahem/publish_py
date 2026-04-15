@@ -21,7 +21,7 @@ class TestDatabaseIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_class.pymysql.connect") as mock_connect:
+        with patch("src.app_main.shared.domain.db.db_class.pymysql.connect") as mock_connect:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn
 
@@ -47,7 +47,7 @@ class TestDatabaseIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_class.pymysql.connect") as mock_connect:
+        with patch("src.app_main.shared.domain.db.db_class.pymysql.connect") as mock_connect:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn
 
@@ -76,7 +76,7 @@ class TestPagesDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_pages.Database") as MockDB:
+        with patch("src.app_main.shared.domain.db.db_pages.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -104,7 +104,7 @@ class TestUserTokenDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_user_tokens.Database") as MockDB:
+        with patch("src.app_main.shared.domain.db.db_user_tokens.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -131,7 +131,7 @@ class TestQidsDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_qids.Database") as MockDB:
+        with patch("src.app_main.shared.domain.db.db_qids.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -158,7 +158,7 @@ class TestReportsDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_publish_reports.Database") as MockDB:
+        with patch("src.app_main.shared.domain.db.db_publish_reports.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -185,7 +185,7 @@ class TestCategoriesDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.db.db_categories.Database") as MockDB:
+        with patch("src.app_main.shared.domain.db.db_categories.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 

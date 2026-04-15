@@ -4,9 +4,11 @@ Mirrors: php_src/endpoints/index.php?get=publish_reports
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from flask import Blueprint, Response, jsonify, request
+
+from ....shared.utils.web_utils import parse_select_fields
 
 from ....config import settings
 from ....shared.core.cors import check_cors
@@ -14,13 +16,6 @@ from ....shared.domain.db.db_publish_reports import ReportsDB
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
-
-
-def _parse_select_fields(select_param: Optional[str]) -> Optional[List[str]]:
-    """Parse the select parameter into a list of field names."""
-    if not select_param:
-        return None
-    return [f.strip() for f in select_param.split(",") if f.strip()]
 
 
 @bp_api.route("/publish_reports", methods=["OPTIONS"])
@@ -78,7 +73,7 @@ def get_publish_reports() -> Response:
 
     # Extract select fields
     select_param = request.args.get("select")
-    select_fields = _parse_select_fields(select_param)
+    select_fields = parse_select_fields(select_param)
 
     # Extract limit
     limit = request.args.get("limit", type=int)

@@ -194,7 +194,7 @@ bp_api = Blueprint("api", __name__)
 logger = logging.getLogger(__name__)
 
 
-def _parse_select_fields(select_param: Optional[str]) -> Optional[List[str]]:
+def parse_select_fields(select_param: Optional[str]) -> Optional[List[str]]:
     """Parse the select parameter into a list of field names."""
     if not select_param:
         return None
@@ -263,7 +263,7 @@ def get_publish_reports() -> Response:
 
         # Extract select fields
         select_param = request.args.get("select")
-        select_fields = _parse_select_fields(select_param)
+        select_fields = parse_select_fields(select_param)
 
         # Extract limit
         limit = request.args.get("limit", type=int)
