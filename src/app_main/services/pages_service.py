@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from .config import settings
-from .db import has_db_config
-from .db.db_Pages import PageRecord, PagesDB
+from ..config import settings
+from ..services import has_db_config
+from ..db.db_Pages import PageRecord, PagesDB
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def get_pages_db() -> PagesDB:
     if _PAGE_STORE is None:
         if not has_db_config():
             raise RuntimeError(
-                "Template administration requires database configuration; no fallback store is available."
+                "PagesDB requires database configuration; no fallback store is available."
             )
 
         try:

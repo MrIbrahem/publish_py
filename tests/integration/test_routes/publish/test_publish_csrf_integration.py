@@ -327,8 +327,12 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 class TestComplexWorkflows(BasePublishTest):
     def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
-        with patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add:
+        with (
+            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.app_main.app_routes.publish.worker.get_campaign_category") as mock_get_campaign,
+        ):
             mock_should_add.return_value = True
+            mock_get_campaign.return_value = ""
 
             # أول استدعاء يفشل، الثاني ينجح عبر fallback user
             common_patches["link"].side_effect = [
@@ -346,7 +350,11 @@ class TestComplexWorkflows(BasePublishTest):
 
             self.mock_get_token.side_effect = get_token_side_effect
 
-            response = self._post(csrf_client, self._default_payload())
+            with patch(
+                "src.app_main.app_routes.publish.worker.get_user_token_by_username",
+                side_effect=get_token_side_effect,
+            ):
+                response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200
         data = response.get_json()

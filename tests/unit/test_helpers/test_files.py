@@ -34,7 +34,7 @@ class TestGetReportsDir:
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
-                log_dir=Path(tmpdir),
+                flask_data_dir=Path(tmpdir),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
             monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
@@ -48,7 +48,7 @@ class TestGetReportsDir:
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
-                log_dir=Path(tmpdir),
+                flask_data_dir=Path(tmpdir),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
             monkeypatch.setattr("src.app_main.helpers.files.settings", mock_settings)
@@ -72,7 +72,7 @@ class TestToDo:
         """Test that to_do writes to the log file."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
-                log_dir=Path(tmpdir),
+                flask_data_dir=Path(tmpdir),
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
@@ -83,7 +83,7 @@ class TestToDo:
 
             # Check log file exists
             today = datetime.now().strftime("%Y-%m-%d")
-            log_file = Path(tmpdir) / f"publish_{today}.json"
+            log_file = Path(tmpdir) / f"publishes/publish_{today}.json"
             assert log_file.exists()
 
             # Check content
@@ -100,7 +100,7 @@ class TestToDo:
         """Test that to_do writes to reports_by_day directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
-                log_dir=Path(tmpdir),
+                flask_data_dir=Path(tmpdir),
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
@@ -134,7 +134,7 @@ class TestToDo:
         """Test that to_do adds time and time_date fields."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
-                log_dir=Path(tmpdir),
+                flask_data_dir=Path(tmpdir),
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
@@ -144,7 +144,7 @@ class TestToDo:
             to_do(tab, "test")
 
             today = datetime.now().strftime("%Y-%m-%d")
-            log_file = Path(tmpdir) / f"publish_{today}.json"
+            log_file = Path(tmpdir) / f"publishes/publish_{today}.json"
 
             with open(log_file, "r") as f:
                 entry = json.loads(f.read().strip())

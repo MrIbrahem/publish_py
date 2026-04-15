@@ -1,5 +1,5 @@
 from .current import CurrentUser
-from .store import UserTokenRecord
+from ..services.users_services import UserTokenRecord
 
 __all__ = [
     "CurrentUser",

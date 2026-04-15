@@ -11,7 +11,7 @@ from flask import Blueprint, Response, jsonify, request
 
 from ...cors import check_cors, validate_access
 from ...helpers.format import format_title, format_user
-from ...users.store import get_user_token_by_username
+from ...services.users_services import get_user_token_by_username
 
 from .worker import _process_edit, _handle_no_access
 

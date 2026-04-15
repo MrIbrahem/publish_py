@@ -6,10 +6,7 @@ Mirrors: php_src/bots/wd.php
 import json
 import logging
 from typing import Any
-
-import requests
-
-from ..db import get_db
+from ..services import get_db
 from ..config import settings
 from .oauth_client import post_params
 
@@ -72,7 +69,11 @@ def _link_it(
         api_params["title"] = sourcetitle
         api_params["site"] = "enwiki"
 
-    response = post_params(api_params, https_domain, access_key, access_secret)
+    try:
+        response = post_params(api_params, https_domain, access_key, access_secret)
+    except Exception:
+        logger.error(f"Failed to parse Wikidata response: {response}")
+        return {}
 
     try:
         result = json.loads(response) if response else {}

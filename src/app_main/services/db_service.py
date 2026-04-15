@@ -6,7 +6,7 @@ import logging
 from typing import Any, Optional
 
 from ..config import settings
-from .db_class import Database
+from ..db.db_class import Database
 
 _db: Database | None = None
 
@@ -21,7 +21,7 @@ def has_db_config() -> bool:
 
 
 def get_db() -> Database:
-    """Return a lazily-instantiated :class:`Database` using ``db_data``."""
+    """Return a lazily-instantiated :class:`Database` using ``database_data``."""
     global _db
 
     if not has_db_config():
