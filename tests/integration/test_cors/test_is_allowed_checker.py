@@ -5,30 +5,16 @@ Tests for is_allowed — grouped by behavior branch.
 from typing import Generator, Any
 import pytest
 from flask import Flask
-import os
 
 
 @pytest.fixture
 def app() -> Generator[Flask, Any, None]:
     """Create a test Flask application."""
-    from cryptography.fernet import Fernet
-    from unittest.mock import patch
-
-    test_env = {
-        "FLASK_SECRET_KEY": "test_secret_key_12345678901234567890",
-        "OAUTH_MWURI": "https://en.wikipedia.org/w/index.php",
-        "OAUTH_CONSUMER_KEY": "test",
-        "OAUTH_CONSUMER_SECRET": "test",
-    }
-    if not os.environ.get("OAUTH_ENCRYPTION_KEY"):
-        test_env["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
-
-    with patch.dict(os.environ, test_env, clear=False):
-        app = Flask(__name__)
-        app.url_map.strict_slashes = False
-        app.config["TESTING"] = True
-        app.config["CORS_DISABLED"] = False
-        yield app
+    app = Flask(__name__)
+    app.url_map.strict_slashes = False
+    app.config["TESTING"] = True
+    app.config["CORS_DISABLED"] = False
+    yield app
 
 
 # ------------------------------------------------------------------

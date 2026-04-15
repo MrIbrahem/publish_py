@@ -7,27 +7,14 @@ using a configuration similar to ProductionConfig.
 import json
 from unittest.mock import MagicMock, patch
 
+from flask.app import Flask
 import pytest
 
 
 @pytest.fixture
-def csrf_app():
+def csrf_app() -> Flask:
     """Create a Flask app with CSRF protection enabled (like Production)."""
     import os
-
-    os.environ.setdefault("FLASK_SECRET_KEY", "test-secret-key-for-csrf-integration-tests")
-    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test_consumer_key")
-    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test_consumer_secret")
-    os.environ.setdefault("WIKIDATA_DOMAIN", "www.wikidata.org")
-    os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
-    os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
-    os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
-    os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
-    os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
-    os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
-    os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
-    os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
 
