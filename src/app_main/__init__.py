@@ -21,8 +21,8 @@ from .config import settings
 from ..new_app.shared.cookies import CookieHeaderClient
 from .db import ensure_qids_table
 from .extensions import csrf
-from .services import close_cached_db
-from .services.users_services import ensure_user_token_table
+from ..new_app.shared.services import close_cached_db
+from ..new_app.shared.services.users_services import ensure_user_token_table
 from ..new_app.shared.auth.identity import current_user
 
 logger = logging.getLogger(__name__)

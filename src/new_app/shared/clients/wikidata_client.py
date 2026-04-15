@@ -8,7 +8,7 @@ import logging
 from typing import Any
 
 from ....app_main.config import settings
-from ....app_main.services import get_db
+from ..services import get_db
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)

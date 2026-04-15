@@ -20,8 +20,8 @@ from ....new_app.shared.clients.mediawiki_api import get_title_info, publish_do_
 from ....new_app.shared.clients.revids_service import get_revid, get_revid_db
 from ....new_app.shared.clients.text_processor import do_changes_to_text
 from ....new_app.shared.clients.wikidata_client import link_to_wikidata
-from ...services.pages_service import find_exists_or_update, insert_page_target
-from ...services.users_services import get_user_token_by_username
+from ....new_app.shared.services.pages_service import find_exists_or_update, insert_page_target
+from ....new_app.shared.services.users_services import get_user_token_by_username
 
 logger = logging.getLogger(__name__)
 

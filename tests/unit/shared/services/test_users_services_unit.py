@@ -18,7 +18,7 @@ The service layer provides:
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.services.users_services import (
+from src.new_app.shared.services.users_services import (
     delete_user_token,
     delete_user_token_by_username,
     ensure_user_token_table,
@@ -35,8 +35,8 @@ class TestGetStore:
     def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
         """Test that singleton pattern returns same instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.services.users_services._user_db", mock_db)
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+        monkeypatch.setattr("src.new_app.shared.services.users_services._user_db", mock_db)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
         result = get_store()
 
@@ -44,19 +44,19 @@ class TestGetStore:
 
     def test_raises_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when DB config is missing."""
-        monkeypatch.setattr("src.app_main.services.users_services._user_db", None)
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: False)
+        monkeypatch.setattr("src.new_app.shared.services.users_services._user_db", None)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: False)
 
         with pytest.raises(RuntimeError, match="UserTokenDB requires database configuration"):
             get_store()
 
     def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
         """Test that new UserTokenDB is created when none cached."""
-        monkeypatch.setattr("src.app_main.services.users_services._user_db", None)
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+        monkeypatch.setattr("src.new_app.shared.services.users_services._user_db", None)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
         mock_db_instance = MagicMock()
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.return_value = mock_db_instance
 
             result = get_store()
@@ -66,11 +66,11 @@ class TestGetStore:
 
     def test_caches_instance_after_first_creation(self, monkeypatch):
         """Test that created instance is cached for reuse."""
-        monkeypatch.setattr("src.app_main.services.users_services._user_db", None)
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+        monkeypatch.setattr("src.new_app.shared.services.users_services._user_db", None)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
         mock_db_instance = MagicMock()
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.return_value = mock_db_instance
 
             # First call
@@ -90,7 +90,7 @@ class TestEnsureUserTokenTable:
         """Test that table creation is skipped when no DB config."""
         import logging
 
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: False)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: False)
 
         with caplog.at_level(logging.DEBUG):
             ensure_user_token_table()
@@ -100,8 +100,8 @@ class TestEnsureUserTokenTable:
     def test_calls_ensure_table_when_config_exists(self, monkeypatch):
         """Test that _ensure_table is called when config exists."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         ensure_user_token_table()
 
@@ -114,7 +114,7 @@ class TestUpsertUserToken:
     def test_delegates_to_store_upsert(self, monkeypatch):
         """Test that function delegates to store.upsert."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         upsert_user_token(
             user_id=12345,
@@ -147,7 +147,7 @@ class TestGetUserToken:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store._fetch_by_id.return_value = mock_record
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         result = get_user_token(12345)
 
@@ -158,7 +158,7 @@ class TestGetUserToken:
         """Test that None is returned when user not found."""
         mock_store = MagicMock()
         mock_store._fetch_by_id.side_effect = LookupError("Not found")
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         result = get_user_token(99999)
 
@@ -171,7 +171,7 @@ class TestDeleteUserToken:
     def test_returns_none_for_empty_user_id(self, monkeypatch):
         """Test that None is returned for empty user_id."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         result = delete_user_token("")
         assert result is None
@@ -182,7 +182,7 @@ class TestDeleteUserToken:
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function delegates to store.delete."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         delete_user_token(12345)
 
@@ -204,7 +204,7 @@ class TestGetUserTokenByUsername:
         """Test that username is stripped of whitespace."""
         mock_store = MagicMock()
         mock_store._fetch_by_username.return_value = MagicMock()
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         get_user_token_by_username("  TestUser  ")
 
@@ -215,7 +215,7 @@ class TestGetUserTokenByUsername:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store._fetch_by_username.return_value = mock_record
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         result = get_user_token_by_username("TestUser")
 
@@ -225,7 +225,7 @@ class TestGetUserTokenByUsername:
         """Test that None is returned when user not found."""
         mock_store = MagicMock()
         mock_store._fetch_by_username.side_effect = LookupError("Not found")
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         result = get_user_token_by_username("NonExistent")
 
@@ -238,7 +238,7 @@ class TestDeleteUserTokenByUsername:
     def test_returns_none_for_empty_username(self, monkeypatch):
         """Test that None is returned for empty username."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         result = delete_user_token_by_username("")
         assert result is None
@@ -250,7 +250,7 @@ class TestDeleteUserTokenByUsername:
         """Test that token is deleted by user_id when username found."""
         mock_store = MagicMock()
         mock_store.get_user_id.return_value = 12345
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         delete_user_token_by_username("TestUser")
 
@@ -261,7 +261,7 @@ class TestDeleteUserTokenByUsername:
         """Test that delete is skipped when username not found."""
         mock_store = MagicMock()
         mock_store.get_user_id.return_value = None
-        monkeypatch.setattr("src.app_main.services.users_services.get_store", lambda: mock_store)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.get_store", lambda: mock_store)
 
         delete_user_token_by_username("NonExistent")
 

@@ -5,8 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from ..config import settings
-from ..db.db_class import Database
+from ....app_main.config import settings
+from ....app_main.db.db_class import Database
 
 _db: Database | None = None
 

@@ -19,7 +19,7 @@ The actual DB operations are mocked to avoid requiring a real database.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.services.users_services import (
+from src.new_app.shared.services.users_services import (
     delete_user_token,
     delete_user_token_by_username,
     get_store,
@@ -35,7 +35,7 @@ class TestUserServiceIntegration:
     @pytest.fixture(autouse=True)
     def reset_singleton(self, monkeypatch):
         """Reset the singleton before each test."""
-        monkeypatch.setattr("src.app_main.services.users_services._user_db", None)
+        monkeypatch.setattr("src.new_app.shared.services.users_services._user_db", None)
 
     def test_full_token_lifecycle(self, monkeypatch):
         """Test complete CRUD lifecycle through service layer."""
@@ -45,9 +45,9 @@ class TestUserServiceIntegration:
         mock_record.user_id = 12345
         mock_record.username = "TestUser"
 
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.return_value = mock_db
-            monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+            monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
             # 1. Create token
             mock_db.upsert.return_value = mock_record
@@ -76,9 +76,9 @@ class TestUserServiceIntegration:
         """Test that service reuses DB instance across operations."""
         mock_db = MagicMock()
 
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.return_value = mock_db
-            monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+            monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
             # Multiple operations
             get_user_token(1)
@@ -94,9 +94,9 @@ class TestUserServiceIntegration:
         mock_record = MagicMock()
         mock_record.user_id = 12345
 
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.return_value = mock_db
-            monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+            monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
             # Setup mock responses
             mock_db._fetch_by_username.return_value = mock_record
@@ -114,9 +114,9 @@ class TestUserServiceIntegration:
         """Test service handles empty usernames gracefully."""
         mock_db = MagicMock()
 
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.return_value = mock_db
-            monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+            monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
             # These should not call the DB
             result = get_user_token_by_username("")
@@ -131,9 +131,9 @@ class TestUserServiceIntegration:
         """Test service handles LookupError from DB layer."""
         mock_db = MagicMock()
 
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.return_value = mock_db
-            monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+            monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
             # Setup DB to raise LookupError
             mock_db._fetch_by_id.side_effect = LookupError("User not found")
@@ -149,10 +149,10 @@ class TestServiceErrorHandling:
 
     def test_handles_db_initialization_failure(self, monkeypatch):
         """Test service handles DB initialization failure."""
-        monkeypatch.setattr("src.app_main.services.users_services._user_db", None)
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: True)
+        monkeypatch.setattr("src.new_app.shared.services.users_services._user_db", None)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: True)
 
-        with patch("src.app_main.services.users_services.UserTokenDB") as MockUserTokenDB:
+        with patch("src.new_app.shared.services.users_services.UserTokenDB") as MockUserTokenDB:
             MockUserTokenDB.side_effect = Exception("DB Connection Failed")
 
             with pytest.raises(RuntimeError, match="Unable to initialize UserTokenDB"):
@@ -160,8 +160,8 @@ class TestServiceErrorHandling:
 
     def test_validates_config_before_db_access(self, monkeypatch):
         """Test service validates config before attempting DB operations."""
-        monkeypatch.setattr("src.app_main.services.users_services._user_db", None)
-        monkeypatch.setattr("src.app_main.services.users_services.has_db_config", lambda: False)
+        monkeypatch.setattr("src.new_app.shared.services.users_services._user_db", None)
+        monkeypatch.setattr("src.new_app.shared.services.users_services.has_db_config", lambda: False)
 
         with pytest.raises(RuntimeError, match="UserTokenDB requires database configuration"):
             get_store()
