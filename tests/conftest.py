@@ -9,6 +9,11 @@ from flask.app import Flask
 from flask.testing import FlaskClient
 import pytest
 
+os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
+os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
+os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
+os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
+
 # Set environment variables before any imports that might need them
 os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
 os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
@@ -21,6 +26,11 @@ TEST_ENCRYPTION_KEY = "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI="
 os.environ.setdefault("OAUTH_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
 
 os.environ.setdefault("WIKIDATA_DOMAIN", "test.wikidata.org")
+
+os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
+os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
+os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
+os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
 
 # Get the project root directory (parent of pytests folder)
 project_root = Path(__file__).parent.parent
