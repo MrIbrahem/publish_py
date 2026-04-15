@@ -18,7 +18,7 @@ from .app_routes import (
     bp_publish,
 )
 from .config import settings
-from .cookies import CookieHeaderClient
+from ..new_app.shared.cookies import CookieHeaderClient
 from .db import ensure_qids_table
 from .extensions import csrf
 from .services import close_cached_db
