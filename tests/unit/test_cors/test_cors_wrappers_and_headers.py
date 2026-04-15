@@ -9,23 +9,6 @@ import pytest
 from src.app_main.cors import validate_access, check_cors
 
 
-@pytest.fixture
-def mock_is_allowed(mocker):
-    return mocker.patch("src.app_main.cors.is_allowed", return_value=None)
-
-
-@pytest.fixture
-def mock_check_secret(mocker):
-    return mocker.patch("src.app_main.cors.check_publish_secret_code", return_value=None)
-
-
-@pytest.fixture
-def mock_load_request(mocker):
-    mock_req = MagicMock()
-    mocker.patch("src.app_main.cors._load_request", return_value=mock_req)
-    return mock_req
-
-
 def _make_response_with_headers():
     """Create a mock response with a real dict headers attribute."""
     response = MagicMock()
