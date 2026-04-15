@@ -206,3 +206,114 @@ class TestQueryWithFilters:
         call_args = mock_db.fetch_query_safe.call_args
         query = call_args[0][0]
         assert "invalid_field" not in query
+
+
+
+class TestReportRecord:
+    """Tests for ReportRecord dataclass."""
+
+    def test_create_with_required_fields(self):
+        """Test creating ReportRecord with required fields."""
+        from datetime import datetime
+        from src.app_main.db.db_publish_reports import ReportRecord
+
+        record = ReportRecord(
+            id=1,
+            date=datetime.now(),
+            title="Test",
+            user="User",
+            lang="ar",
+            sourcetitle="Source",
+            result="success",
+            data="{}",
+        )
+        assert record.id == 1
+        assert record.title == "Test"
+
+    def test_to_dict_converts_date_to_iso(self):
+        """Test that to_dict converts date to ISO format."""
+        from datetime import datetime
+        from src.app_main.db.db_publish_reports import ReportRecord
+
+        record = ReportRecord(
+            id=1,
+            date=datetime(2024, 1, 1, 12, 0, 0),
+            title="Test",
+            user="User",
+            lang="ar",
+            sourcetitle="Source",
+            result="success",
+            data="{}",
+        )
+        result = record.to_dict()
+
+        assert result["date"] == "2024-01-01T12:00:00"
+        assert result["id"] == 1
+        assert result["title"] == "Test"
+
+    def test_to_dict_handles_none_date(self):
+        """Test that to_dict handles None date."""
+        from src.app_main.db.db_publish_reports import ReportRecord
+
+        record = ReportRecord(
+            id=1,
+            date=None,
+            title="Test",
+            user="User",
+            lang="ar",
+            sourcetitle="Source",
+            result="success",
+            data="{}",
+        )
+        result = record.to_dict()
+        assert result["date"] == ""
+
+
+class TestReportsDBCore:
+    """Core tests for ReportsDB class."""
+
+    @pytest.fixture
+    def mock_db(self):
+        """Create a mock database for testing."""
+        with patch("src.app_main.db.db_publish_reports.Database") as MockDatabase:
+            mock_db_instance = MagicMock()
+            MockDatabase.return_value = mock_db_instance
+            mock_db_instance.execute_query_safe.return_value = None
+            yield mock_db_instance
+
+    def test_init_creates_database(self, mock_db):
+        """Test that initialization creates a Database instance."""
+        from src.app_main.db.db_publish_reports import ReportsDB
+
+        reports_db = ReportsDB({"host": "test"})
+
+        assert reports_db.db is mock_db
+        mock_db.execute_query_safe.assert_called_once()
+
+    def test_fetch_by_id_raises_lookup_error_when_not_found(self, mock_db):
+        """Test that _fetch_by_id raises LookupError when report not found."""
+        mock_db.fetch_query_safe.return_value = []
+
+        from src.app_main.db.db_publish_reports import ReportsDB
+
+        reports_db = ReportsDB({"host": "test"})
+        with pytest.raises(LookupError, match="Report id 999 was not found"):
+            reports_db._fetch_by_id(999)
+
+
+class TestValidColumns:
+    """Tests for _VALID_COLUMNS constant."""
+
+    def test_contains_expected_columns(self):
+        """Test that _VALID_COLUMNS contains expected column names."""
+        from src.app_main.db.db_publish_reports import _VALID_COLUMNS
+
+        expected = {"id", "date", "title", "user", "lang", "sourcetitle", "result", "data", "YEAR(date)", "MONTH(date)"}
+        assert _VALID_COLUMNS == expected
+
+    def test_all_param_columns_are_valid(self):
+        """Test that all columns referenced in PUBLISH_REPORTS_PARAMS are valid."""
+        from src.app_main.db.db_publish_reports import PUBLISH_REPORTS_PARAMS, _VALID_COLUMNS
+
+        for param in PUBLISH_REPORTS_PARAMS:
+            assert param["column"] in _VALID_COLUMNS
