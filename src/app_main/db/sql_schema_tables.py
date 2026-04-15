@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS user_tokens (
     rotated_at datetime DEFAULT NULL,
     PRIMARY KEY (user_id),
     KEY idx_user_tokens_username (username)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 """
 
 # sql_tables
