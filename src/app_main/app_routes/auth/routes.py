@@ -11,7 +11,6 @@ from functools import wraps
 from typing import Any, Callable, cast
 from urllib.parse import urlencode
 
-import mwoauth
 import pymysql
 from flask import (
     Blueprint,
