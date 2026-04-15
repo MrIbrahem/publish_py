@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional, TypeVar, cast
 
 from flask import g, redirect, request, session, url_for
 
-from ..app_routes.auth.cookie import extract_user_id
+from ..cookies.cookie import extract_user_id
 from ..config import settings
 from ..services.users_services import UserTokenRecord, get_user_token
 

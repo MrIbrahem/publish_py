@@ -1,5 +1,5 @@
 """
-Central configuration for the SVG Translate web application.
+Central configuration for the web application.
 
 This module handles loading environment variables from .env files.
 It should be imported and initialized at application startup.
