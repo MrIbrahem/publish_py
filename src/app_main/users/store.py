@@ -1,62 +1,46 @@
-"""Persistence helpers for storing encrypted OAuth tokens."""
+"""
+Persistence helpers for storing encrypted OAuth tokens.
+"""
 
 from __future__ import annotations
 
-import datetime
 import logging
-from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from ..config import settings
 
-from ..crypto import decrypt_value, encrypt_value
 from ..db import has_db_config
-from ..db import UserTokenDB, UserTokenRecord
+from ..db.db_user_tokens import UserTokenDB, UserTokenRecord
 
 logger = logging.getLogger(__name__)
 
 _user_db: UserTokenDB | None = None
 
 
-def _current_ts() -> str:
-    # Store in UTC. MySQL DATETIME has no TZ; keep application-level UTC.
-    """
-    Return the current UTC timestamp formatted for MySQL DATETIME.
-
-    Returns:
-        A string of the current UTC time in the format "YYYY-MM-DD HH:MM:SS".
-    """
-    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-
-
 def get_store() -> UserTokenDB:
-    """Return a lazily-instantiated :class:`UserTokenDB` using ``database_data``."""
     global _user_db
 
-    if not has_db_config():
-        logger.error("MySQL configuration is not available for the user token store.")
-
     if _user_db is None:
-        _user_db = UserTokenDB(settings.database_data)
+        if not has_db_config():
+            raise RuntimeError(
+                "Template administration requires database configuration; no fallback store is available."
+            )
+
+        try:
+            _user_db = UserTokenDB(settings.database_data)
+        except Exception as exc:  # pragma: no cover - defensive guard for startup failures
+            logger.exception("Failed to initialize UserTokenDB")
+            raise RuntimeError("Unable to initialize UserTokenDB") from exc
+
     return _user_db
-
-
-def _coerce_bytes(value: Any) -> bytes:
-    if isinstance(value, bytes):
-        return value
-    if isinstance(value, bytearray):
-        return bytes(value)
-    if isinstance(value, memoryview):
-        return value.tobytes()
-    raise TypeError("Expected bytes-compatible value for encrypted token")
 
 
 def mark_token_used(user_id: int) -> None:
     """Update the last-used timestamp for the given user token."""
 
-    db = get_store()
+    store = get_store()
     try:
-        db.execute_query(
+        store.execute_query(
             "UPDATE user_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE user_id = %s",
             (user_id,),
         )
@@ -71,92 +55,35 @@ def ensure_user_token_table() -> None:
         logger.debug("Skipping user token table creation; MySQL configuration missing.")
         return
 
-    db = get_store()
-    db._ensure_table()
+    store = get_store()
+    store._ensure_table()
 
 
 def upsert_user_token(*, user_id: int, username: str, access_key: str, access_secret: str) -> None:
     """Insert or update the encrypted OAuth credentials for a user."""
 
-    db = get_db()
-    now = _current_ts()
-    encrypted_token = encrypt_value(access_key)
-    encrypted_secret = encrypt_value(access_secret)
-    return db.execute_query_safe(
-        """
-            INSERT INTO user_tokens (
-                user_id,
-                username,
-                access_token,
-                access_secret,
-                created_at,
-                updated_at,
-                last_used_at,
-                rotated_at
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, NULL)
-            ON DUPLICATE KEY UPDATE
-                username = VALUES(username),
-                access_token = VALUES(access_token),
-                access_secret = VALUES(access_secret),
-                updated_at = VALUES(updated_at),
-                last_used_at = VALUES(last_used_at),
-                rotated_at = CURRENT_TIMESTAMP
-            """,
-        (
-            user_id,
-            username,
-            encrypted_token,
-            encrypted_secret,
-            now,
-            now,
-            now,
-        ),
-    )
+    store = get_store()
+    return store.upsert(user_id, username, access_key, access_secret)
 
 
 def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
     """Fetch the encrypted OAuth credentials for a user."""
-    user_id = int(user_id) if isinstance(user_id, str) else user_id
 
-    db = get_db()
-    rows: list[Dict[str, Any]] = db.fetch_query_safe(
-        """
-        SELECT
-            user_id,
-            username,
-            access_token,
-            access_secret,
-            created_at,
-            updated_at,
-            last_used_at,
-            rotated_at
-        FROM user_tokens
-        WHERE user_id = %s
-        """,
-        (user_id,),
-    )
-    if not rows:
+    if not user_id:
         return None
 
-    row = rows[0]
-    return UserTokenRecord(
-        user_id=row["user_id"],
-        username=row["username"],
-        access_token=_coerce_bytes(row["access_token"]),
-        access_secret=_coerce_bytes(row["access_secret"]),
-        created_at=row.get("created_at"),
-        updated_at=row.get("updated_at"),
-        last_used_at=row.get("last_used_at"),
-        rotated_at=row.get("rotated_at"),
-    )
+    store = get_store()
+    return store._fetch_by_id(user_id)
 
 
 def delete_user_token(user_id: int) -> None:
     """Remove the stored OAuth credentials for the given user id."""
 
-    db = get_db()
-    db.execute_query_safe("DELETE FROM user_tokens WHERE user_id = %s", (user_id,))
+    if not user_id:
+        return None
+
+    store = get_store()
+    store.delete(user_id)
 
 
 def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
@@ -169,43 +96,15 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
 
     Returns:
         UserTokenRecord if found, None otherwise
+
     """
     username = username.strip()
 
     if not username:
         return None
 
-    db = get_db()
-    rows: list[Dict[str, Any]] = db.fetch_query_safe(
-        """
-        SELECT
-            user_id,
-            username,
-            access_token,
-            access_secret,
-            created_at,
-            updated_at,
-            last_used_at,
-            rotated_at
-        FROM user_tokens
-        WHERE username = %s
-        """,
-        (username,),
-    )
-    if not rows:
-        return None
-
-    row = rows[0]
-    return UserTokenRecord(
-        user_id=row["user_id"],
-        username=row["username"],
-        access_token=_coerce_bytes(row["access_token"]),
-        access_secret=_coerce_bytes(row["access_secret"]),
-        created_at=row.get("created_at"),
-        updated_at=row.get("updated_at"),
-        last_used_at=row.get("last_used_at"),
-        rotated_at=row.get("rotated_at"),
-    )
+    store = get_store()
+    return store._fetch_by_username(username)
 
 
 def delete_user_token_by_username(username: str) -> None:
@@ -218,5 +117,11 @@ def delete_user_token_by_username(username: str) -> None:
     """
     username = username.strip()
 
-    db = get_db()
-    db.execute_query_safe("DELETE FROM user_tokens WHERE username = %s", (username,))
+    if not username:
+        return None
+
+    store = get_store()
+
+    user_id = store.get_user_id(username)
+    if user_id:
+        store.delete(user_id)
