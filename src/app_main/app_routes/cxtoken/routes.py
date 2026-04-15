@@ -12,7 +12,7 @@ from flask import Blueprint, Response, jsonify, request
 
 from ...config import settings
 from ....new_app.shared.cors import check_cors
-from ...clients.oauth_client import get_cxtoken
+from ....new_app.shared.clients.oauth_client import get_cxtoken
 from ...services.users_services import delete_user_token_by_username, get_user_token_by_username
 from .cache import get_from_store, store_jwt
 
