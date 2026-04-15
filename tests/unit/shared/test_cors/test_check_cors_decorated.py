@@ -4,7 +4,7 @@ Tests for cors wrappers module, to test response.headers["Access-Control-Allow-O
 
 from unittest.mock import MagicMock
 
-from src.app_main.cors import check_cors
+from src.new_app.shared.cors import check_cors
 
 
 def _make_response_with_headers() -> MagicMock:

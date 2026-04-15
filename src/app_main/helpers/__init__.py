@@ -1,6 +1,6 @@
 """Helper utilities for the application."""
 
-from ..cors import is_allowed
+from ...new_app.shared.cors import is_allowed
 from .files import get_reports_dir, to_do
 from .format import (
     determine_hashtag,

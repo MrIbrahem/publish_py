@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 from flask import Blueprint, Response, jsonify, request
 
 from ...config import settings
-from ...cors import check_cors
+from ....new_app.shared.cors import check_cors
 from ...db.db_publish_reports import ReportsDB
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")

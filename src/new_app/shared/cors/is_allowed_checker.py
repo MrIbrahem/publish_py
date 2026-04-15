@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 from flask import current_app
 from flask.wrappers import Request
 
-from ..config import settings
+from ....app_main.config import settings
 
 logger = logging.getLogger(__name__)
 
