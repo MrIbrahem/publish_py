@@ -12,7 +12,7 @@ tree: str = DisplayTree(
     header=False,
     maxDepth=float('inf'),
     showHidden=False,
-    ignoreList=["__pycache__", "old", "app1.py", "example.env"],
+    ignoreList=["__pycache__", "old", "app1.py", "example.env", "*.html"],
     onlyFiles=False,
     onlyDirs=False,
     sortBy=0,
@@ -22,4 +22,4 @@ tree: str = DisplayTree(
 
 print(tree)
 
-tree_save_path.write_text(tree)
+tree_save_path.write_text(tree, encoding="utf-8")

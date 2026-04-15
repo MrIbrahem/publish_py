@@ -1,8 +1,6 @@
-PS I:\MD_TOOLS\mdwikipy_publish\publish_py\src> python -m directory_tree --ignore-list __pycache__
 src/
 ├── __init__.py
 ├── app.py
-├── app1.py
 ├── app_main/
 │   ├── __init__.py
 │   ├── admin/
@@ -92,12 +90,6 @@ src/
 │           │   └── words.py
 │           └── web_utils.py
 ├── env_config.py
-├── example.env
 ├── logger_config.py
 ├── static/
 └── templates/
-    ├── base.html
-    ├── fix-refs.html
-    ├── index.html
-    └── reports.html
-PS I:\MD_TOOLS\mdwikipy_publish\publish_py\src>
