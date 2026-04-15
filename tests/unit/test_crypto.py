@@ -3,8 +3,9 @@
 Tests for encryption/decryption helpers used for OAuth token storage.
 """
 
+from __future__ import annotations
+
 import pytest
-from cryptography.fernet import Fernet
 
 from src.app_main.crypto import decrypt_value, encrypt_value, _require_fernet
 
@@ -12,15 +13,15 @@ from src.app_main.crypto import decrypt_value, encrypt_value, _require_fernet
 class TestEncryptValue:
     """Tests for encrypt_value function."""
 
-    def test_encrypts_string_to_bytes(self):
+    def test_encrypts_string_to_bytes(self) -> None:
         """Test that a string is encrypted to bytes."""
-        original = "test_secret_value"
-        encrypted = encrypt_value(original)
+        original: str = "test_secret_value"
+        encrypted: bytes = encrypt_value(original)
 
         assert isinstance(encrypted, bytes)
         assert encrypted != original.encode()
 
-    def test_encrypts_unicode_string(self):
+    def test_encrypts_unicode_string(self) -> None:
         """Test that unicode strings are handled correctly."""
         original = "héllo wörld 日本語"
         encrypted = encrypt_value(original)

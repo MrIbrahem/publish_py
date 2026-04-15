@@ -62,14 +62,16 @@ class TestAuthRouteIntegration:
         response = client.get("/auth/login")
 
         # Route may return various status codes depending on configuration
-        assert response.status_code in [200, 302, 404, 500]
+        # Note: 500 is not allowed - server errors should fail the test
+        assert response.status_code in [200, 302, 404]
 
     def test_logout_route_exists(self, client):
         """Test that logout route is accessible."""
         response = client.get("/auth/logout")
 
         # Should redirect after logout or succeed
-        assert response.status_code in [302, 200, 404, 500]
+        # Note: 500 is not allowed - server errors should fail the test
+        assert response.status_code in [302, 200, 404]
 
 
 class TestMainRouteIntegration:

@@ -5,8 +5,6 @@ These tests verify the integration of Database class with the various DB modules
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 
 class TestDatabaseIntegration:
     """Integration tests for Database class with DB modules."""
@@ -84,8 +82,11 @@ class TestPagesDBIntegration:
 
             PagesDB(config)
 
-            # Should execute table creation queries
-            assert mock_db_instance.execute_query_safe.call_count == 2
+            # Should execute table creation queries for pages and pages_users tables
+            calls = mock_db_instance.execute_query_safe.mock_calls
+            create_statements = [str(call) for call in calls]
+            assert any("CREATE TABLE IF NOT EXISTS pages" in s for s in create_statements)
+            assert any("CREATE TABLE IF NOT EXISTS pages_users" in s for s in create_statements)
 
 
 class TestUserTokenDBIntegration:
@@ -109,8 +110,10 @@ class TestUserTokenDBIntegration:
 
             UserTokenDB(config)
 
-            # Should execute table creation query
-            mock_db_instance.execute_query_safe.assert_called_once()
+            # Should execute table creation query for user_tokens table
+            calls = mock_db_instance.execute_query_safe.mock_calls
+            create_statements = [str(call) for call in calls]
+            assert any("CREATE TABLE IF NOT EXISTS user_tokens" in s for s in create_statements)
 
 
 class TestQidsDBIntegration:
@@ -134,8 +137,10 @@ class TestQidsDBIntegration:
 
             QidsDB(config)
 
-            # Should execute table creation query
-            mock_db_instance.execute_query_safe.assert_called_once()
+            # Should execute table creation query for qids table
+            calls = mock_db_instance.execute_query_safe.mock_calls
+            create_statements = [str(call) for call in calls]
+            assert any("CREATE TABLE IF NOT EXISTS qids" in s for s in create_statements)
 
 
 class TestReportsDBIntegration:
@@ -159,8 +164,10 @@ class TestReportsDBIntegration:
 
             ReportsDB(config)
 
-            # Should execute table creation query
-            mock_db_instance.execute_query_safe.assert_called_once()
+            # Should execute table creation query for publish_reports table
+            calls = mock_db_instance.execute_query_safe.mock_calls
+            create_statements = [str(call) for call in calls]
+            assert any("CREATE TABLE IF NOT EXISTS publish_reports" in s for s in create_statements)
 
 
 class TestCategoriesDBIntegration:
@@ -184,5 +191,7 @@ class TestCategoriesDBIntegration:
 
             CategoriesDB(config)
 
-            # Should execute table creation query
-            mock_db_instance.execute_query_safe.assert_called_once()
+            # Should execute table creation query for categories table
+            calls = mock_db_instance.execute_query_safe.mock_calls
+            create_statements = [str(call) for call in calls]
+            assert any("CREATE TABLE IF NOT EXISTS categories" in s for s in create_statements)

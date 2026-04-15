@@ -3,6 +3,8 @@
 Tests for cookie signing and verification helpers.
 """
 
+from __future__ import annotations
+
 from unittest.mock import patch
 
 import pytest
@@ -16,6 +18,7 @@ from src.app_main.app_routes.auth.cookie import (
 )
 
 
+@pytest.mark.unit
 class TestSignUserId:
     """Tests for sign_user_id function."""
 
@@ -42,6 +45,7 @@ class TestSignUserId:
         assert extract_user_id(signed1) == extract_user_id(signed2) == 12345
 
 
+@pytest.mark.unit
 class TestExtractUserId:
     """Tests for extract_user_id function."""
 
@@ -89,20 +93,19 @@ class TestExtractUserId:
 
     def test_returns_none_for_expired_token(self, monkeypatch):
         """Test that None is returned for expired token."""
-        import time
-
-        # Create a token that will immediately be considered expired
+        # Create a token
         signed = sign_user_id(12345)
 
-        # Wait a tiny bit and then patch max_age to be very small
+        # Patch max_age to be 0 to expire immediately
         with patch("src.app_main.app_routes.auth.cookie.settings") as mock_settings:
             mock_settings.cookie.max_age = 0  # Expire immediately
 
             result = extract_user_id(signed)
-            # Note: This might not actually expire due to test timing,
-            # but the test structure is correct
+            # Should return None for expired token
+            assert result is None
 
 
+@pytest.mark.unit
 class TestSignStateToken:
     """Tests for sign_state_token function."""
 
@@ -122,6 +125,7 @@ class TestSignStateToken:
         assert signed1 != signed2
 
 
+@pytest.mark.unit
 class TestVerifyStateToken:
     """Tests for verify_state_token function."""
 
@@ -167,6 +171,7 @@ class TestVerifyStateToken:
         assert result is None
 
 
+@pytest.mark.unit
 class TestRoundTrip:
     """Tests for sign/verify round-trip scenarios."""
 
