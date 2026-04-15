@@ -38,6 +38,7 @@ class TestValidateAccessDecorated:
         result = decorated()
 
         mock_func.assert_called_once()
+        assert result == "ok"
 
     def test_neither_valid_returns_403(self, app, mock_load_request, mock_is_denied, mock_check_secret):
 
