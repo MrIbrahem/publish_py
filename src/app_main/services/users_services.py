@@ -35,19 +35,6 @@ def get_store() -> UserTokenDB:
     return _user_db
 
 
-def mark_token_used(user_id: int) -> None:
-    """Update the last-used timestamp for the given user token."""
-
-    store = get_store()
-    try:
-        store.execute_query(
-            "UPDATE user_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE user_id = %s",
-            (user_id,),
-        )
-    except Exception:
-        logger.exception("Failed to update last_used_at for user %s", user_id)
-
-
 def ensure_user_token_table() -> None:
     """Create the user_tokens table if it does not already exist."""
 
@@ -73,7 +60,10 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
         return None
 
     store = get_store()
-    return store._fetch_by_id(user_id)
+    try:
+        return store._fetch_by_id(user_id)
+    except LookupError:
+        return None
 
 
 def delete_user_token(user_id: int) -> None:
@@ -104,7 +94,10 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
         return None
 
     store = get_store()
-    return store._fetch_by_username(username)
+    try:
+        return store._fetch_by_username(username)
+    except LookupError:
+        return None
 
 
 def delete_user_token_by_username(username: str) -> None:

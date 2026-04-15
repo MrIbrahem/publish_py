@@ -56,12 +56,12 @@ class TestPublishEndpointWithDenyCSRF:
         with (
             patch("src.app_main.cors.is_allowed_checker.is_allowed") as mock_deny,
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
         ):
             mock_deny.return_value = None
             mock_get_token.return_value = None
-            mock_reports_db_instance = MagicMock()
-            mock_reports_db.return_value = mock_reports_db_instance
+            mock_load_reports_db_instance = MagicMock()
+            mock_load_reports_db.return_value = mock_load_reports_db_instance
 
             response = csrf_client.post(
                 "/publish",
@@ -100,12 +100,12 @@ class TestPublishEndpointWithCSRF2:
         with (
             patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
 
             mock_reports_instance = MagicMock()
-            mock_reports_db.return_value = mock_reports_instance
+            mock_load_reports_db.return_value = mock_reports_instance
 
             response = csrf_client.post(
                 "/publish",
@@ -154,9 +154,10 @@ class BasePublishTest:
             patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
-            patch("src.app_main.app_routes.publish.worker.PagesDB") as mock_pages_db,
+            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
             patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.app_main.app_routes.publish.worker.find_exists_or_update") as mock_find_exists,
+            patch("src.app_main.app_routes.publish.worker.insert_page_target") as mock_insert_page,
         ):
             # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
@@ -165,11 +166,10 @@ class BasePublishTest:
             mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
             mock_link.return_value = {"result": "success", "qid": "Q123"}
             mock_should_add.return_value = True
+            mock_find_exists.return_value = False
+            mock_insert_page.return_value = True
 
-            mock_reports_db.return_value = MagicMock()
-            pages = MagicMock()
-            pages.insert_page_target.return_value = {"execute_query": True}
-            mock_pages_db.return_value = pages
+            mock_load_reports_db.return_value = MagicMock()
 
             yield {
                 "get_revid": mock_get_revid,
@@ -178,10 +178,10 @@ class BasePublishTest:
                 "edit": mock_edit,
                 "link": mock_link,
                 "to_do": mock_to_do,
-                "reports_db": mock_reports_db,
-                "pages_db": mock_pages_db,
-                "pages": pages,
+                "load_reports_db": mock_load_reports_db,
                 "should_add": mock_should_add,
+                "find_exists_or_update": mock_find_exists,
+                "insert_page_target": mock_insert_page,
             }
 
     # ── helper ──────────────────────────────────────────────────────────────
@@ -250,7 +250,7 @@ class TestMetadataLogic(BasePublishTest):
         response = self._post(csrf_client, self._default_payload(tr_type="section"))
 
         assert response.status_code == 200
-        calls = common_patches["pages"].insert_page_target.call_args_list
+        calls = common_patches["insert_page_target"].call_args_list
         if calls:
             assert calls[0].kwargs.get("tr_type") == "section"
 

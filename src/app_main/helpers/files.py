@@ -55,7 +55,7 @@ def to_do(tab: dict[str, Any], status: str) -> None:
         status: Status string (e.g., "noaccess", "success", "error")
 
     This function writes to two locations:
-    1. JSON lines log file in log_dir (for backwards compatibility)
+    1. JSON lines log file in flask_data_dir/publishes
     2. Individual JSON file in reports_by_day/YYYY/MM/DD/{rand_id}/ (PHP-style)
     """
     now = datetime.now()
