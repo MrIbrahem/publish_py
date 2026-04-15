@@ -131,9 +131,9 @@ class UserTokenDB:
         if not kwargs:
             return self._fetch_by_id(user_id)
 
-        unknown = set(kwargs) - self._ALLOWED_COLUMNS
+        unknown = (set(kwargs) - self._ALLOWED_COLUMNS) | (set(kwargs) & {"user_id", "created_at"})
         if unknown:
-            raise ValueError(f"Unknown columns for user_tokens: {sorted(unknown)}")
+            raise ValueError(f"Unknown or immutable columns for user_tokens: {sorted(unknown)}")
 
         set_parts: list[str] = []
         values: list[Any] = []
