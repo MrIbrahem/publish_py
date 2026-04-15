@@ -7,7 +7,7 @@ Tests for current user helpers.
 from unittest.mock import MagicMock
 
 import pytest
-from src.new_app.shared.auth.identity import (
+from src.app_main.shared.auth.identity import (
     CurrentUser,
     _resolve_user_id,
     current_user,
@@ -98,7 +98,7 @@ class TestCurrentUserFunction:
                 return mock_user
             return None
 
-        monkeypatch.setattr("src.new_app.shared.auth.identity.get_user_token", mock_get_user_token)
+        monkeypatch.setattr("src.app_main.shared.auth.identity.get_user_token", mock_get_user_token)
 
         with app.test_request_context():
             from flask import session
@@ -114,7 +114,7 @@ class TestCurrentUserFunction:
         mock_user = MagicMock()
         mock_user.username = "UpdatedName"
 
-        monkeypatch.setattr("src.new_app.shared.auth.identity.get_user_token", lambda uid: mock_user)
+        monkeypatch.setattr("src.app_main.shared.auth.identity.get_user_token", lambda uid: mock_user)
 
         with app.test_request_context():
             from flask import session

@@ -11,8 +11,8 @@ class TestDatabaseIntegration:
 
     def test_database_initialization(self):
         """Test that Database initializes with correct parameters."""
-        from src.new_app.config import DbConfig
-        from src.new_app.shared.db.db_class import Database
+        from src.app_main.config import DbConfig
+        from src.app_main.shared.db.db_class import Database
 
         config = DbConfig(
             db_name="test_db",
@@ -21,7 +21,7 @@ class TestDatabaseIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.new_app.shared.db.db_class.pymysql.connect") as mock_connect:
+        with patch("src.app_main.shared.db.db_class.pymysql.connect") as mock_connect:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn
 
@@ -37,8 +37,8 @@ class TestDatabaseIntegration:
 
     def test_database_context_manager(self):
         """Test that Database works as context manager."""
-        from src.new_app.config import DbConfig
-        from src.new_app.shared.db.db_class import Database
+        from src.app_main.config import DbConfig
+        from src.app_main.shared.db.db_class import Database
 
         config = DbConfig(
             db_name="test_db",
@@ -47,7 +47,7 @@ class TestDatabaseIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.new_app.shared.db.db_class.pymysql.connect") as mock_connect:
+        with patch("src.app_main.shared.db.db_class.pymysql.connect") as mock_connect:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn
 
@@ -66,8 +66,8 @@ class TestPagesDBIntegration:
 
     def test_pages_db_creates_tables_on_init(self):
         """Test that PagesDB creates tables on initialization."""
-        from src.new_app.config import DbConfig
-        from src.new_app.shared.db.db_Pages import PagesDB
+        from src.app_main.config import DbConfig
+        from src.app_main.shared.db.db_Pages import PagesDB
 
         config = DbConfig(
             db_name="test_db",
@@ -76,7 +76,7 @@ class TestPagesDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.new_app.shared.db.db_Pages.Database") as MockDB:
+        with patch("src.app_main.shared.db.db_Pages.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -94,8 +94,8 @@ class TestUserTokenDBIntegration:
 
     def test_user_token_db_creates_table_on_init(self):
         """Test that UserTokenDB creates table on initialization."""
-        from src.new_app.config import DbConfig
-        from src.new_app.shared.db.db_user_tokens import UserTokenDB
+        from src.app_main.config import DbConfig
+        from src.app_main.shared.db.db_user_tokens import UserTokenDB
 
         config = DbConfig(
             db_name="test_db",
@@ -104,7 +104,7 @@ class TestUserTokenDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.new_app.shared.db.db_user_tokens.Database") as MockDB:
+        with patch("src.app_main.shared.db.db_user_tokens.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -121,8 +121,8 @@ class TestQidsDBIntegration:
 
     def test_qids_db_creates_table_on_init(self):
         """Test that QidsDB creates table on initialization."""
-        from src.new_app.config import DbConfig
-        from src.new_app.shared.db.db_qids import QidsDB
+        from src.app_main.config import DbConfig
+        from src.app_main.shared.db.db_qids import QidsDB
 
         config = DbConfig(
             db_name="test_db",
@@ -131,7 +131,7 @@ class TestQidsDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.new_app.shared.db.db_qids.Database") as MockDB:
+        with patch("src.app_main.shared.db.db_qids.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -148,8 +148,8 @@ class TestReportsDBIntegration:
 
     def test_reports_db_creates_table_on_init(self):
         """Test that ReportsDB creates table on initialization."""
-        from src.new_app.config import DbConfig
-        from src.new_app.shared.db.db_publish_reports import ReportsDB
+        from src.app_main.config import DbConfig
+        from src.app_main.shared.db.db_publish_reports import ReportsDB
 
         config = DbConfig(
             db_name="test_db",
@@ -158,7 +158,7 @@ class TestReportsDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.new_app.shared.db.db_publish_reports.Database") as MockDB:
+        with patch("src.app_main.shared.db.db_publish_reports.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 
@@ -175,8 +175,8 @@ class TestCategoriesDBIntegration:
 
     def test_categories_db_creates_table_on_init(self):
         """Test that CategoriesDB creates table on initialization."""
-        from src.new_app.config import DbConfig
-        from src.new_app.shared.db.db_categories import CategoriesDB
+        from src.app_main.config import DbConfig
+        from src.app_main.shared.db.db_categories import CategoriesDB
 
         config = DbConfig(
             db_name="test_db",
@@ -185,7 +185,7 @@ class TestCategoriesDBIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.new_app.shared.db.db_categories.Database") as MockDB:
+        with patch("src.app_main.shared.db.db_categories.Database") as MockDB:
             mock_db_instance = MagicMock()
             MockDB.return_value = mock_db_instance
 

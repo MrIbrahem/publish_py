@@ -19,7 +19,7 @@ These tests complement the unit tests by verifying the service-to-DB integration
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.new_app.shared.services.pages_service import (
+from src.app_main.shared.services.pages_service import (
     add_or_update_page,
     add_page,
     delete_page,
@@ -37,7 +37,7 @@ class TestPagesServiceIntegration:
     @pytest.fixture(autouse=True)
     def reset_singleton(self, monkeypatch):
         """Reset the singleton before each test."""
-        monkeypatch.setattr("src.new_app.shared.services.pages_service._PAGE_STORE", None)
+        monkeypatch.setattr("src.app_main.shared.services.pages_service._PAGE_STORE", None)
 
     def test_full_page_lifecycle(self, monkeypatch):
         """Test complete CRUD lifecycle through service layer."""
@@ -46,9 +46,9 @@ class TestPagesServiceIntegration:
         mock_record.id = 1
         mock_record.title = "TestPage"
 
-        with patch("src.new_app.shared.services.pages_service.PagesDB") as MockPagesDB:
+        with patch("src.app_main.shared.services.pages_service.PagesDB") as MockPagesDB:
             MockPagesDB.return_value = mock_db
-            monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: True)
+            monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: True)
 
             # 1. Add page
             mock_db.add.return_value = mock_record
@@ -74,9 +74,9 @@ class TestPagesServiceIntegration:
         """Test that service reuses DB instance across operations."""
         mock_db = MagicMock()
 
-        with patch("src.new_app.shared.services.pages_service.PagesDB") as MockPagesDB:
+        with patch("src.app_main.shared.services.pages_service.PagesDB") as MockPagesDB:
             MockPagesDB.return_value = mock_db
-            monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: True)
+            monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: True)
 
             # Multiple operations
             list_pages()
@@ -91,9 +91,9 @@ class TestPagesServiceIntegration:
         mock_db = MagicMock()
         mock_record = MagicMock()
 
-        with patch("src.new_app.shared.services.pages_service.PagesDB") as MockPagesDB:
+        with patch("src.app_main.shared.services.pages_service.PagesDB") as MockPagesDB:
             MockPagesDB.return_value = mock_db
-            monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: True)
+            monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: True)
 
             mock_db.add_or_update.return_value = mock_record
 
@@ -106,9 +106,9 @@ class TestPagesServiceIntegration:
         """Test find_exists_or_update through service layer."""
         mock_db = MagicMock()
 
-        with patch("src.new_app.shared.services.pages_service.PagesDB") as MockPagesDB:
+        with patch("src.app_main.shared.services.pages_service.PagesDB") as MockPagesDB:
             MockPagesDB.return_value = mock_db
-            monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: True)
+            monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: True)
 
             # Test when record exists
             mock_db._find_exists_or_update.return_value = True
@@ -124,9 +124,9 @@ class TestPagesServiceIntegration:
         """Test insert_page_target through service layer."""
         mock_db = MagicMock()
 
-        with patch("src.new_app.shared.services.pages_service.PagesDB") as MockPagesDB:
+        with patch("src.app_main.shared.services.pages_service.PagesDB") as MockPagesDB:
             MockPagesDB.return_value = mock_db
-            monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: True)
+            monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: True)
 
             mock_db.insert_page_target.return_value = True
 
@@ -158,10 +158,10 @@ class TestPagesServiceErrorHandling:
 
     def test_handles_db_initialization_failure(self, monkeypatch):
         """Test service handles DB initialization failure."""
-        monkeypatch.setattr("src.new_app.shared.services.pages_service._PAGE_STORE", None)
-        monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.shared.services.pages_service._PAGE_STORE", None)
+        monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: True)
 
-        with patch("src.new_app.shared.services.pages_service.PagesDB") as MockPagesDB:
+        with patch("src.app_main.shared.services.pages_service.PagesDB") as MockPagesDB:
             MockPagesDB.side_effect = Exception("DB Connection Failed")
 
             with pytest.raises(RuntimeError, match="Unable to initialize page store"):
@@ -169,8 +169,8 @@ class TestPagesServiceErrorHandling:
 
     def test_validates_config_before_db_access(self, monkeypatch):
         """Test service validates config before attempting DB operations."""
-        monkeypatch.setattr("src.new_app.shared.services.pages_service._PAGE_STORE", None)
-        monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.shared.services.pages_service._PAGE_STORE", None)
+        monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: False)
 
         with pytest.raises(RuntimeError, match="PagesDB requires database configuration"):
             get_pages_db()
@@ -179,9 +179,9 @@ class TestPagesServiceErrorHandling:
         """Test that errors from DB are returned through service."""
         mock_db = MagicMock()
 
-        with patch("src.new_app.shared.services.pages_service.PagesDB") as MockPagesDB:
+        with patch("src.app_main.shared.services.pages_service.PagesDB") as MockPagesDB:
             MockPagesDB.return_value = mock_db
-            monkeypatch.setattr("src.new_app.shared.services.pages_service.has_db_config", lambda: True)
+            monkeypatch.setattr("src.app_main.shared.services.pages_service.has_db_config", lambda: True)
 
             # Simulate error from DB
             mock_db.insert_page_target.return_value = "Error: Duplicate entry"

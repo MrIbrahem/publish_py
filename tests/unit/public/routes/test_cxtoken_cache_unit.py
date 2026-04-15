@@ -7,7 +7,7 @@ import time
 from unittest.mock import patch
 
 import pytest
-from src.new_app.public.routes.cxtoken.cache import (
+from src.app_main.public.routes.cxtoken.cache import (
     CxToken,
     cache,
     get_from_store,

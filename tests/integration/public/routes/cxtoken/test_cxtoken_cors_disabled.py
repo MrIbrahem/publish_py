@@ -18,7 +18,7 @@ def app() -> Flask:
     app.config["CORS_DISABLED"] = True
 
     # Import and register the blueprint
-    from src.new_app.public.routes.cxtoken.routes import bp_cxtoken
+    from src.app_main.public.routes.cxtoken.routes import bp_cxtoken
 
     app.register_blueprint(bp_cxtoken)
     return app
@@ -35,7 +35,7 @@ class TestCxtokenEndpoint:
 
     def test_cors_not_allowed_without_origin(self, client):
 
-        with (patch("src.new_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
+        with (patch("src.app_main.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
             mock_get_token.return_value = None
 
             """Test that requests without allowed origin are rejected."""
@@ -67,7 +67,7 @@ class TestCxtokenEndpoint:
 
     def test_returns_no_access_when_user_not_found(self, client):
         """Test that no access error is returned when user not found in DB."""
-        with (patch("src.new_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
+        with (patch("src.app_main.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
             mock_get_token.return_value = None
 
             response = client.get("/cxtoken?wiki=en&user=UnknownUser")
@@ -83,8 +83,8 @@ class TestCxtokenEndpoint:
     def test_returns_cxtoken_on_success(self, client):
         """Test that cxtoken is returned on success."""
         with (
-            patch("src.new_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.new_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
+            patch("src.app_main.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
 
             # Mock user token
@@ -116,9 +116,9 @@ class TestCxtokenEndpoint:
     def test_deletes_access_on_invalid_authorization(self, client):
         """Test that access is deleted on invalid authorization error."""
         with (
-            patch("src.new_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.new_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
-            patch("src.new_app.public.routes.cxtoken.routes.delete_user_token_by_username") as mock_delete,
+            patch("src.app_main.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.app_main.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
+            patch("src.app_main.public.routes.cxtoken.routes.delete_user_token_by_username") as mock_delete,
         ):
             # Mock user token
             mock_token = MagicMock()

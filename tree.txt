@@ -66,7 +66,7 @@ src/
 │       └── current.py
 ├── env_config.py
 ├── logger_config.py
-├── new_app/
+├── app_main/
 │   ├── __init__.py
 │   ├── admin/
 │   │   ├── __init__.py

@@ -42,8 +42,8 @@ sys.path.insert(0, str(python_src_path))
 
 
 # Import after environment setup
-from src.new_app import create_app  # noqa: E402
-from src.new_app.config import TestingConfig  # noqa: E402
+from src.app_main import create_app  # noqa: E402
+from src.app_main.config import TestingConfig  # noqa: E402
 
 
 @pytest.fixture
@@ -109,21 +109,21 @@ def auth_client(app):
 
 @pytest.fixture
 def mock_is_denied(mocker):
-    return mocker.patch("src.new_app.shared.cors.is_allowed", return_value=None)
+    return mocker.patch("src.app_main.shared.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_is_allowed(mocker):
-    return mocker.patch("src.new_app.shared.cors.is_allowed", return_value=None)
+    return mocker.patch("src.app_main.shared.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_check_secret(mocker):
-    return mocker.patch("src.new_app.shared.cors.check_publish_secret_code", return_value=None)
+    return mocker.patch("src.app_main.shared.cors.check_publish_secret_code", return_value=None)
 
 
 @pytest.fixture
 def mock_load_request(mocker):
     mock_req = MagicMock()
-    mocker.patch("src.new_app.shared.cors._load_request", return_value=mock_req)
+    mocker.patch("src.app_main.shared.cors._load_request", return_value=mock_req)
     return mock_req

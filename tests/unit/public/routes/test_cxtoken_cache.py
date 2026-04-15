@@ -5,13 +5,13 @@ Tests for app_routes.cxtoken.cache module.
 import time
 
 import pytest
-from src.new_app.public.routes.cxtoken.cache import CxToken, get_from_store, store_jwt
+from src.app_main.public.routes.cxtoken.cache import CxToken, get_from_store, store_jwt
 
 
 @pytest.fixture(autouse=True)
 def clear_cache():
     """Clear the cache before each test."""
-    from src.new_app.public.routes.cxtoken.cache import cache
+    from src.app_main.public.routes.cxtoken.cache import cache
 
     cache.clear()
     yield

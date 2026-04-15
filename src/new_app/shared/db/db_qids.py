@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 
 from ...config import DbConfig
-from ....new_app.shared.db import Database
+from ....app_main.shared.db import Database
 from .sql_schema_tables import sql_tables
 
 logger = logging.getLogger(__name__)

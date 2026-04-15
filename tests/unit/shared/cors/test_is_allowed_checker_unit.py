@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from src.new_app.shared.cors.is_allowed_checker import get_host
+from src.app_main.shared.cors.is_allowed_checker import get_host
 
 
 class TestGetHost:

@@ -21,8 +21,8 @@ class TestPublishRouteIntegration:
 
     def test_publish_rejects_missing_csrf(self, app):
         """Test that publish route rejects requests without CSRF token when enabled."""
-        from src.new_app import create_app
-        from src.new_app.config import Config
+        from src.app_main import create_app
+        from src.app_main.config import Config
 
         class TestConfigWithCSRF(Config):
             WTF_CSRF_ENABLED = True
@@ -98,8 +98,8 @@ class TestCorsIntegration:
     def test_cors_headers_on_allowed_origin(self, client, monkeypatch):
         """Test that CORS headers are set for allowed origins."""
         # Mock is_allowed to return an allowed origin
-        monkeypatch.setattr("src.new_app.shared.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com")
-        monkeypatch.setattr("src.new_app.shared.cors.is_allowed", lambda req: "https://example.com")
+        monkeypatch.setattr("src.app_main.shared.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com")
+        monkeypatch.setattr("src.app_main.shared.cors.is_allowed", lambda req: "https://example.com")
 
         response = client.get("/", headers={"Origin": "https://example.com"})
 

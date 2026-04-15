@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 
 import pymysql
 import pytest
-from src.new_app.config import DbConfig
-from src.new_app.shared.db.db_Pages import (
+from src.app_main.config import DbConfig
+from src.app_main.shared.db.db_Pages import (
     PageRecord,
     PagesDB,
 )
@@ -72,7 +72,7 @@ class TestPagesDB:
     def test_init_creates_database(self, monkeypatch, db_config):
         """Test that initialization creates a Database instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
 
@@ -85,7 +85,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [sample_page_row, {**sample_page_row, "id": 2, "title": "Page2"}]
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         result = pages_db.list()
@@ -99,7 +99,7 @@ class TestPagesDB:
     def test_add_requires_non_empty_title(self, monkeypatch, db_config):
         """Test that add requires non-empty title."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         with pytest.raises(ValueError, match="Title is required"):
@@ -113,7 +113,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"id": 1, "title": "TestPage"}]
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         pages_db.add("  TestPage  ")
@@ -128,7 +128,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.execute_query.side_effect = pymysql.err.IntegrityError(1062, "Duplicate entry")
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         with pytest.raises(ValueError, match="Page 'TestPage' already exists"):
@@ -139,7 +139,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         with pytest.raises(LookupError, match="Page id 999 was not found"):
@@ -150,7 +150,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         with pytest.raises(LookupError, match="Page 'MissingPage' was not found"):
@@ -161,7 +161,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [sample_page_row]
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         # Reset mock to ignore calls made during initialization (_ensure_table)
@@ -177,7 +177,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [sample_page_row]
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         pages_db.update(1, title="NewTitle", word=200)
@@ -193,7 +193,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         with pytest.raises(LookupError, match="Page id 999 was not found"):
@@ -204,7 +204,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [sample_page_row]
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         result = pages_db.delete(1)
@@ -220,7 +220,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"id": 1, "title": "TestPage"}]
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         pages_db.add_or_update("TestPage", word=100)
@@ -234,7 +234,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"id": 1, "title": "Test"}]
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         result = pages_db._find_exists_or_update("Test", "ar", "User", "Target", False)
@@ -248,7 +248,7 @@ class TestPagesDB:
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         result = pages_db._find_exists_or_update("Test", "ar", "User", "Target", False)
@@ -259,7 +259,7 @@ class TestPagesDB:
         """Test that insert_page_target executes correct INSERT query."""
         mock_db = MagicMock()
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         result = pages_db.insert_page_target(
@@ -290,7 +290,7 @@ class TestPagesDB:
         """Test that insert_page_target returns True on success."""
         mock_db = MagicMock()
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         result = pages_db.insert_page_target(
@@ -309,7 +309,7 @@ class TestPagesDB:
         """Test that insert_page_target returns error string on failure."""
         mock_db = MagicMock()
 
-        monkeypatch.setattr("src.new_app.shared.db.db_Pages.Database", lambda db_data: mock_db)
+        monkeypatch.setattr("src.app_main.shared.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
         # Now set the side_effect to raise an exception for subsequent calls

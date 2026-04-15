@@ -1,7 +1,7 @@
 """Tests for clients.text_processor module."""
 
 import pytest
-from src.new_app.shared.clients.text_processor import DoChangesToText1, do_changes_to_text
+from src.app_main.shared.clients.text_processor import DoChangesToText1, do_changes_to_text
 
 
 @pytest.mark.skip
