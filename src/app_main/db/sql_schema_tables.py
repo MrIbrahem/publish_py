@@ -99,15 +99,17 @@ CREATE TABLE IF NOT EXISTS qids (
 
 user_tokens = """
 CREATE TABLE IF NOT EXISTS user_tokens (
-    user_id INT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    access_token VARBINARY(1024) NOT NULL,
-    access_secret VARBINARY(1024) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_used_at DATETIME DEFAULT NULL,
-    rotated_at DATETIME DEFAULT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4
+    user_id int NOT NULL,
+    username varchar(255) NOT NULL,
+    access_token varbinary(1024) NOT NULL,
+    access_secret varbinary(1024) NOT NULL,
+    created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_used_at datetime DEFAULT NULL,
+    rotated_at datetime DEFAULT NULL,
+    PRIMARY KEY (user_id),
+    KEY idx_user_tokens_username (username)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 """
 
 # sql_tables
