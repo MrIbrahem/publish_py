@@ -68,11 +68,12 @@ def to_do(tab: dict[str, Any], status: str) -> None:
     log_entry["status"] = status
 
     # Write to JSON lines log file (existing behavior)
-    log_dir: Path = settings.paths.log_dir
+    flask_data_dir: Path = settings.paths.flask_data_dir
     today = now.strftime("%Y-%m-%d")
-    log_file = log_dir / f"publish_{today}.json"
+    log_file = flask_data_dir / "publishes" / f"publish_{today}.json"
 
     try:
+        log_file.parent.mkdir(parents=True, exist_ok=True)
         with open(log_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
     except Exception as e:

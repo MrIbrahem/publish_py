@@ -350,7 +350,11 @@ class TestComplexWorkflows(BasePublishTest):
 
             self.mock_get_token.side_effect = get_token_side_effect
 
-            response = self._post(csrf_client, self._default_payload())
+            with patch(
+                "src.app_main.app_routes.publish.worker.get_user_token_by_username",
+                side_effect=get_token_side_effect,
+            ):
+                response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200
         data = response.get_json()
