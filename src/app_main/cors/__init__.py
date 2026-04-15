@@ -21,11 +21,11 @@ def _validate_url(text) -> str:
     if not text or not isinstance(text, str):
         return ""
 
+    # this include when text == "*"
     if not is_domain(text):
         return text
 
-    # if text == "*" or text.startswith(("http://", "https://")):
-    if text == "*" or urlparse(text).scheme:
+    if urlparse(text).scheme:
         return text
 
     return f"https://{text}"
@@ -41,11 +41,10 @@ def validate_access(func):
         if has_valid_secret_code or allowed:
             response = func(*args, **kwargs)
             # uncomment next after testing TestValidateAccessControlAllowOrigin
-            # allowed_url = has_valid_secret_code or allowed
-            allowed_url = allowed
+            allowed_url = _validate_url(allowed or has_valid_secret_code)
 
-            if hasattr(response, "headers"):
-                response.headers["Access-Control-Allow-Origin"] = _validate_url(allowed_url)
+            if hasattr(response, "headers") and allowed_url:
+                response.headers["Access-Control-Allow-Origin"] = allowed_url
 
             return response
 
@@ -87,8 +86,10 @@ def check_cors(func):
             return response
 
         response = func(*args, **kwargs)
-        if hasattr(response, "headers"):
-            response.headers["Access-Control-Allow-Origin"] = _validate_url(allowed)
+
+        allowed_url = _validate_url(allowed)
+        if hasattr(response, "headers") and allowed_url:
+            response.headers["Access-Control-Allow-Origin"] = allowed_url
 
         return response
 
