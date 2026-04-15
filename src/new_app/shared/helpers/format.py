@@ -3,7 +3,7 @@
 Mirrors: php_src/endpoints/post.php (formatTitle, formatUser, determineHashtag, make_summary)
 """
 
-from ..config import settings
+from ....app_main.config import settings
 
 
 def format_title(title: str) -> str:

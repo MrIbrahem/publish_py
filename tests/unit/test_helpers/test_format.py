@@ -2,7 +2,7 @@
 
 import pytest
 from src.app_main.config import settings
-from src.app_main.helpers.format import (
+from src.new_app.shared.helpers.format import (
     determine_hashtag,
     format_title,
     format_user,

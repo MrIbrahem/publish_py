@@ -10,12 +10,12 @@ from typing import Any
 from ...config import settings
 from ...db.db_categories import get_campaign_category
 from ...db.db_publish_reports import ReportsDB
-from ...helpers.files import to_do
-from ...helpers.format import (
+from ....new_app.shared.helpers.files import to_do
+from ....new_app.shared.helpers.format import (
     determine_hashtag,
     make_summary,
 )
-from ...helpers.words import get_word_count
+from ....new_app.shared.helpers.words import get_word_count
 from ...clients.mediawiki_api import get_title_info, publish_do_edit
 from ...clients.revids_service import get_revid, get_revid_db
 from ...clients.text_processor import do_changes_to_text

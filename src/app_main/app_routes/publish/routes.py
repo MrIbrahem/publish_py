@@ -10,7 +10,7 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 
 from ....new_app.shared.cors import check_cors, validate_access
-from ...helpers.format import format_title, format_user
+from ....new_app.shared.helpers.format import format_title, format_user
 from ...services.users_services import get_user_token_by_username
 from .worker import _handle_no_access, _process_edit
 

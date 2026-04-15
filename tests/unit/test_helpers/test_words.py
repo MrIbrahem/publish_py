@@ -6,7 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from src.app_main.helpers.words import clear_words_cache, get_word_count
+from src.new_app.shared.helpers.words import clear_words_cache, get_word_count
 
 
 class TestGetWordCount:
@@ -23,7 +23,7 @@ class TestGetWordCount:
                 words_json_path=Path(f"{tmpdir}/nonexistent/words.json"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.new_app.shared.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("NonExistent Title")
@@ -43,7 +43,7 @@ class TestGetWordCount:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.new_app.shared.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("Test Article")
@@ -59,7 +59,7 @@ class TestGetWordCount:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.new_app.shared.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("Missing Article")
@@ -75,7 +75,7 @@ class TestGetWordCount:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.new_app.shared.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("Custom Article")
@@ -97,7 +97,7 @@ class TestClearWordsCache:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.new_app.shared.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             assert get_word_count("Test") == 100
