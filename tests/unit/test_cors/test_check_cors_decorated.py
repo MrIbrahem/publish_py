@@ -4,10 +4,7 @@ Tests for cors wrappers module, to test response.headers["Access-Control-Allow-O
 
 from unittest.mock import MagicMock
 
-import pytest
-from pytest_flask.plugin import JSONResponse
-
-from src.app_main.cors import validate_access, check_cors
+from src.app_main.cors import check_cors
 
 
 def _make_response_with_headers() -> MagicMock:
