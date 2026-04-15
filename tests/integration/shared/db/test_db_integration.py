@@ -11,7 +11,7 @@ class TestDatabaseIntegration:
 
     def test_database_initialization(self):
         """Test that Database initializes with correct parameters."""
-        from src.app_main.config import DbConfig
+        from src.new_app.config import DbConfig
         from src.new_app.shared.db.db_class import Database
 
         config = DbConfig(
@@ -37,7 +37,7 @@ class TestDatabaseIntegration:
 
     def test_database_context_manager(self):
         """Test that Database works as context manager."""
-        from src.app_main.config import DbConfig
+        from src.new_app.config import DbConfig
         from src.new_app.shared.db.db_class import Database
 
         config = DbConfig(
@@ -66,7 +66,7 @@ class TestPagesDBIntegration:
 
     def test_pages_db_creates_tables_on_init(self):
         """Test that PagesDB creates tables on initialization."""
-        from src.app_main.config import DbConfig
+        from src.new_app.config import DbConfig
         from src.new_app.shared.db.db_Pages import PagesDB
 
         config = DbConfig(
@@ -94,7 +94,7 @@ class TestUserTokenDBIntegration:
 
     def test_user_token_db_creates_table_on_init(self):
         """Test that UserTokenDB creates table on initialization."""
-        from src.app_main.config import DbConfig
+        from src.new_app.config import DbConfig
         from src.new_app.shared.db.db_user_tokens import UserTokenDB
 
         config = DbConfig(
@@ -121,7 +121,7 @@ class TestQidsDBIntegration:
 
     def test_qids_db_creates_table_on_init(self):
         """Test that QidsDB creates table on initialization."""
-        from src.app_main.config import DbConfig
+        from src.new_app.config import DbConfig
         from src.new_app.shared.db.db_qids import QidsDB
 
         config = DbConfig(
@@ -148,7 +148,7 @@ class TestReportsDBIntegration:
 
     def test_reports_db_creates_table_on_init(self):
         """Test that ReportsDB creates table on initialization."""
-        from src.app_main.config import DbConfig
+        from src.new_app.config import DbConfig
         from src.new_app.shared.db.db_publish_reports import ReportsDB
 
         config = DbConfig(
@@ -175,7 +175,7 @@ class TestCategoriesDBIntegration:
 
     def test_categories_db_creates_table_on_init(self):
         """Test that CategoriesDB creates table on initialization."""
-        from src.app_main.config import DbConfig
+        from src.new_app.config import DbConfig
         from src.new_app.shared.db.db_categories import CategoriesDB
 
         config = DbConfig(

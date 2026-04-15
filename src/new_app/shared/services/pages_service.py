@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
-from ....app_main.config import settings
+from ...config import settings
 from ..db.db_Pages import PageRecord, PagesDB
 from . import has_db_config
 

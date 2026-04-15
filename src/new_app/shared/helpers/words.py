@@ -17,7 +17,7 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 
-from ....app_main.config import settings
+from ...config import settings
 
 logger = logging.getLogger(__name__)
 

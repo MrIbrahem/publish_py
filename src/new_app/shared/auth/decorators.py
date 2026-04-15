@@ -9,7 +9,7 @@ from typing import Any, Callable, TypeVar, cast
 
 from flask import redirect, request, session, url_for
 
-from ....app_main.config import settings
+from ...config import settings
 
 from .identity import current_user
 

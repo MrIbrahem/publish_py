@@ -10,7 +10,7 @@ from typing import Any
 import requests
 from requests_oauthlib import OAuth1
 
-from ....app_main.config import settings
+from ...config import settings
 
 logger = logging.getLogger(__name__)
 

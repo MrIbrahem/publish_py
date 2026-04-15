@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from src.app_main.config import DbConfig
+from src.new_app.config import DbConfig
 from src.new_app.shared.db.db_categories import (
     CategoriesDB,
     clear_categories_cache,

@@ -6,7 +6,7 @@ import logging
 
 from itsdangerous import BadSignature, BadTimeSignature, URLSafeTimedSerializer
 
-from ....app_main.config import settings
+from ...config import settings
 
 logger = logging.getLogger(__name__)
 

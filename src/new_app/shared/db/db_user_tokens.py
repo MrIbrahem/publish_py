@@ -9,7 +9,7 @@ from typing import Any, List
 
 import pymysql
 
-from ....app_main.config import DbConfig
+from ...config import DbConfig
 from ..crypto import decrypt_value, encrypt_value
 from ....new_app.shared.db import Database
 from .sql_schema_tables import sql_tables

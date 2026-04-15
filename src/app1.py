@@ -10,7 +10,7 @@ import logging
 from env_config import load_environment  # auto-load load_environment()
 
 from app_main import create_app  # noqa: E402
-from app_main.config import DevelopmentConfig  # noqa: E402
+from src.new_app.config import DevelopmentConfig  # noqa: E402
 from logger_config import configure_logging
 
 configure_logging(logging.DEBUG)

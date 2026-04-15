@@ -7,7 +7,7 @@ import json
 import logging
 from typing import Any
 
-from ...config import settings
+from ....new_app.config import settings
 from ....new_app.shared.db.db_categories import get_campaign_category
 from ....new_app.shared.db.db_publish_reports import ReportsDB
 from ....new_app.shared.helpers.files import to_do

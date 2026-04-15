@@ -16,7 +16,7 @@ class TestOAuthRequired:
 
     def test_redirects_when_no_user_and_oauth_enabled(self, app, monkeypatch):
         """Test that decorator redirects when no user and OAuth enabled."""
-        from src.app_main.config import OAuthConfig, Settings
+        from src.new_app.config import OAuthConfig, Settings
 
         monkeypatch.setattr("src.new_app.shared.auth.decorators.current_user", lambda: None)
         # Create a mock Settings object with OAuth enabled
@@ -46,7 +46,7 @@ class TestOAuthRequired:
 
     def test_allows_access_when_user_present(self, app, monkeypatch):
         """Test that decorator allows access when user is present."""
-        from src.app_main.config import OAuthConfig
+        from src.new_app.config import OAuthConfig
 
         mock_user = MagicMock()
         monkeypatch.setattr("src.new_app.shared.auth.decorators.current_user", lambda: mock_user)
@@ -72,7 +72,7 @@ class TestOAuthRequired:
 
     def test_allows_access_when_oauth_disabled(self, app, monkeypatch):
         """Test that decorator allows access when OAuth is disabled."""
-        from src.app_main.config import OAuthConfig
+        from src.new_app.config import OAuthConfig
 
         # Create a mock Settings object with OAuth disabled
         mock_settings = MagicMock()
@@ -96,7 +96,7 @@ class TestOAuthRequired:
 
     def test_allows_access_when_oauth_null(self, app, monkeypatch):
         """Test that decorator allows access when OAuth is None (disabled)."""
-        from src.app_main.config import OAuthConfig
+        from src.new_app.config import OAuthConfig
 
         # Create a mock Settings object with oauth=None
         mock_settings = MagicMock()

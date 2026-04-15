@@ -7,7 +7,7 @@ import json
 import logging
 from typing import Any
 
-from ....app_main.config import settings
+from ...config import settings
 from ..services import get_db
 from .oauth_client import post_params
 

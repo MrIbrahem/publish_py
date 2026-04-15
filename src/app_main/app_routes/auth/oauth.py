@@ -8,7 +8,7 @@ from typing import Tuple
 import mwoauth
 from flask import url_for
 
-from ...config import settings
+from ....new_app.config import settings
 
 logger = logging.getLogger(__name__)
 

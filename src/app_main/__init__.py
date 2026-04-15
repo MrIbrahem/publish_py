@@ -9,7 +9,7 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request
 
-from .app_routes import (
+from ..new_app.public.routes import (
     bp_api,
     bp_auth,
     bp_cxtoken,
@@ -17,10 +17,10 @@ from .app_routes import (
     bp_main,
     bp_publish,
 )
-from .config import settings
+from ..new_app.config import settings
 from ..new_app.shared.cookies import CookieHeaderClient
 from ..new_app.shared.db import ensure_qids_table
-from .extensions import csrf
+from ..new_app.shared.extensions import csrf_init_app, csrf_exempt
 from ..new_app.shared.services import close_cached_db
 from ..new_app.shared.services.users_services import ensure_user_token_table
 from ..new_app.shared.auth.identity import current_user
@@ -102,7 +102,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.config["USE_MW_OAUTH"] = oauth_enabled
 
     # Initialize CSRF protection
-    csrf.init_app(app)
+    csrf_init_app(app)
 
     if oauth_enabled and settings.database_data.db_host:
         ensure_user_token_table()
@@ -115,8 +115,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
 
-    if app.config.get("WTF_CSRF_ENABLED"):
-        csrf.exempt(bp_publish)
+    csrf_exempt(app)
 
     @app.context_processor
     def _inject_data():  # pragma: no cover - trivial wrapper

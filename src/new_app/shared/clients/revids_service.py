@@ -9,7 +9,7 @@ from pathlib import Path
 
 import requests
 
-from ....app_main.config import settings
+from ...config import settings
 
 logger = logging.getLogger(__name__)
 

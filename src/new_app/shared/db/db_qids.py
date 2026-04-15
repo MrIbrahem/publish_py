@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 
-from ....app_main.config import DbConfig
+from ...config import DbConfig
 from ....new_app.shared.db import Database
 from .sql_schema_tables import sql_tables
 

@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pymysql
 import pytest
-from src.app_main.config import DbConfig
+from src.new_app.config import DbConfig
 from src.new_app.shared.db.db_Pages import (
     PageRecord,
     PagesDB,

@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from flask import Blueprint, Response, jsonify, request
 
-from ...config import settings
+from ....new_app.config import settings
 from ....new_app.shared.cors import check_cors
 from ....new_app.shared.db.db_publish_reports import ReportsDB
 
