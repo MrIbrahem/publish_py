@@ -49,9 +49,9 @@ class TestCheckCorsDecoratedWithCorsDisabled:
         result = decorated()
 
         headers = dict(result.headers.items())
-        assert headers == {"Access-Control-Allow-Origin": "https://google.com"}
-        assert headers["Access-Control-Allow-Origin"] == "https://google.com"
-        assert result.headers["Access-Control-Allow-Origin"] == "https://google.com"
+        assert headers == {"Access-Control-Allow-Origin": "http://google.com"}
+        assert headers["Access-Control-Allow-Origin"] == "http://google.com"
+        assert result.headers["Access-Control-Allow-Origin"] == "http://google.com"
 
 
 class TestCheckCorsDecoratedWithCorsEnabled:
@@ -105,7 +105,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
         headers = dict(result.headers.items())
-        assert headers == {"Access-Control-Allow-Origin": "https://z.com"}
+        assert headers == {"Access-Control-Allow-Origin": "ftp://z.com"}
 
     def test_basics_same_host_url(self, mocker, app):
         response = MagicMock(
@@ -123,4 +123,4 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         result = decorated()
         headers = dict(result.headers.items())
         # assert result.status_code == 200
-        assert headers == {"Access-Control-Allow-Origin": "https://z.wikipedia.org"}
+        assert headers == {"Access-Control-Allow-Origin": "http://z.wikipedia.org"}

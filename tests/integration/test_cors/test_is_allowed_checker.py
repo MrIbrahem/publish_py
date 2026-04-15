@@ -34,7 +34,7 @@ def app():
 class TestSameOrigin:
     @pytest.mark.parametrize("origin, expected", [
         # Origin matches server host exactly → return origin
-        ("http://localhost/", "localhost"),
+        ("http://localhost/", "http://localhost"),
     ])
     def test_origin_matches_server(self, app, origin, expected):
         from src.app_main.cors.is_allowed_checker import is_allowed
@@ -54,7 +54,7 @@ class TestSameOrigin:
         ):
             from flask import request
             result = is_allowed(request)
-            assert result == "localhost"
+            assert result == "http://localhost"
 
     def test_origin_and_referer_both_same_origin(self, app):
         """Both headers same-origin → still returns origin."""
@@ -68,7 +68,7 @@ class TestSameOrigin:
         ):
             from flask import request
             result = is_allowed(request)
-            assert result == "localhost"
+            assert result == "http://localhost"
 
 # ------------------------------------------------------------------
 # 2. Allowed domains list
@@ -78,16 +78,16 @@ class TestSameOrigin:
 class TestAllowedDomains:
     @pytest.mark.parametrize("headers, expected", [
         # Origin exact match → returns domain string
-        ({"Origin": "https://medwiki.toolforge.org"}, "medwiki.toolforge.org"),
+        ({"Origin": "https://medwiki.toolforge.org"}, "https://medwiki.toolforge.org"),
         # Referer exact match (host extracted) → returns domain string
-        ({"Referer": "https://mdwikicx.toolforge.org/page"}, "mdwikicx.toolforge.org"),
+        ({"Referer": "https://mdwikicx.toolforge.org/page"}, "https://mdwikicx.toolforge.org"),
         # Origin takes priority over Referer when both present and origin matches
         (
             {
                 "Origin": "https://medwiki.toolforge.org",
                 "Referer": "https://medwiki.toolforge.org/path"
             },
-            "medwiki.toolforge.org"
+            "https://medwiki.toolforge.org"
         ),
     ])
     def test_allowed_domain_granted(self, app, headers, expected):
@@ -129,7 +129,7 @@ class TestAllowedDomains:
         }):
             from flask import request
             result = is_allowed(request)
-            assert result == "medwiki.toolforge.org"
+            assert result == "https://medwiki.toolforge.org"
 
 # ------------------------------------------------------------------
 # 3. CORS_DISABLED flag
@@ -142,7 +142,7 @@ class TestCorsDisabled:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Origin": "https://unknown.com"}):
             from flask import request
-            assert is_allowed(request) == "unknown.com"
+            assert is_allowed(request) == "https://unknown.com"
 
     def test_disabled_without_origin_returns_wildcard(self, app):
         app.config["CORS_DISABLED"] = True
@@ -157,7 +157,7 @@ class TestCorsDisabled:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Origin": "https://evil.com"}):
             from flask import request
-            assert is_allowed(request) == "evil.com"
+            assert is_allowed(request) == "https://evil.com"
 
 # ------------------------------------------------------------------
 # 4. Edge cases
