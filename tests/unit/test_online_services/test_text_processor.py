@@ -1,7 +1,7 @@
 """Tests for services.text_processor module."""
 
 import pytest
-from src.app_main.services.text_processor import DoChangesToText1, do_changes_to_text
+from src.app_main.online_services.text_processor import DoChangesToText1, do_changes_to_text
 
 
 @pytest.mark.skip
