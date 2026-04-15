@@ -43,7 +43,7 @@ class TestCheckCorsOnCxtokenGet:
 
     def test_get_disallowed_origin_returns_403(self, client):
         """GET from disallowed origin returns 403."""
-        with patch("src.app_main.cors.is_allowed", return_value=None):
+        with patch("src.new_app.shared.cors.is_allowed", return_value=None):
             response = client.get(
                 "/cxtoken?wiki=en&user=TestUser",
                 headers={"Origin": "https://evil.com"},
@@ -56,7 +56,7 @@ class TestCheckCorsOnCxtokenGet:
     def test_get_allowed_origin_proceeds(self, client):
         """GET from allowed origin passes CORS check and reaches handler."""
         with (
-            patch("src.app_main.cors.is_allowed", return_value=ALLOWED_DOMAIN),
+            patch("src.new_app.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch(
                 "src.app_main.app_routes.cxtoken.routes.get_user_token_by_username",
                 return_value=None,
@@ -73,7 +73,7 @@ class TestCheckCorsOnCxtokenGet:
 
     def test_get_no_origin_returns_403(self, client):
         """GET with no Origin header returns 403."""
-        with patch("src.app_main.cors.is_allowed", return_value=None):
+        with patch("src.new_app.shared.cors.is_allowed", return_value=None):
             response = client.get("/cxtoken?wiki=en&user=TestUser")
             assert response.status_code == 403
             data = response.get_json()
@@ -82,7 +82,7 @@ class TestCheckCorsOnCxtokenGet:
     def test_get_allowed_origin_returns_cxtoken(self, client):
         """GET from allowed origin returns cxtoken on success."""
         with (
-            patch("src.app_main.cors.is_allowed", return_value=ALLOWED_DOMAIN),
+            patch("src.new_app.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.app_routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
@@ -106,7 +106,7 @@ class TestCheckCorsOnCxtokenOptions:
 
     def test_options_allowed_origin_returns_200(self, client):
         """OPTIONS preflight from allowed origin returns 200 with CORS headers."""
-        with patch("src.app_main.cors.is_allowed", return_value=ALLOWED_DOMAIN):
+        with patch("src.new_app.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN):
             response = client.options(
                 "/cxtoken",
                 headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
@@ -117,7 +117,7 @@ class TestCheckCorsOnCxtokenOptions:
 
     def test_options_disallowed_origin_returns_403(self, client):
         """OPTIONS preflight from disallowed origin returns 403."""
-        with patch("src.app_main.cors.is_allowed", return_value=None):
+        with patch("src.new_app.shared.cors.is_allowed", return_value=None):
             response = client.options(
                 "/cxtoken",
                 headers={"Origin": "https://evil.com"},
@@ -128,7 +128,7 @@ class TestCheckCorsOnCxtokenOptions:
 
     def test_options_no_origin_returns_403(self, client):
         """OPTIONS preflight with no Origin header returns 403."""
-        with patch("src.app_main.cors.is_allowed", return_value=None):
+        with patch("src.new_app.shared.cors.is_allowed", return_value=None):
             response = client.options("/cxtoken")
             assert response.status_code == 403
 

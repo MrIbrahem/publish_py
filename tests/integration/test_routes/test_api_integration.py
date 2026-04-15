@@ -98,8 +98,8 @@ class TestCorsIntegration:
     def test_cors_headers_on_allowed_origin(self, client, monkeypatch):
         """Test that CORS headers are set for allowed origins."""
         # Mock is_allowed to return an allowed origin
-        monkeypatch.setattr("src.app_main.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com")
-        monkeypatch.setattr("src.app_main.cors.is_allowed", lambda req: "https://example.com")
+        monkeypatch.setattr("src.new_app.shared.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com")
+        monkeypatch.setattr("src.new_app.shared.cors.is_allowed", lambda req: "https://example.com")
 
         response = client.get("/", headers={"Origin": "https://example.com"})
 

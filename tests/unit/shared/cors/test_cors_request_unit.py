@@ -13,15 +13,15 @@ def mock_request(mocker):
     mock_req.host_url = "https://mysite.com/"
     mock_req.headers = {}
 
-    mocker.patch("src.app_main.cors.request", mock_req)
+    mocker.patch("src.new_app.shared.cors.request", mock_req)
 
     mock_app = MagicMock()
     mock_app.config = {"CORS_DISABLED": False}
-    mocker.patch("src.app_main.cors.is_allowed_checker.current_app", mock_app)
+    mocker.patch("src.new_app.shared.cors.is_allowed_checker.current_app", mock_app)
 
     mock_settings = MagicMock()
     mock_settings.cors.allowed_domains = ["trusted.com", "api.partner.net"]
-    mocker.patch("src.app_main.cors.is_allowed_checker.settings", mock_settings)
+    mocker.patch("src.new_app.shared.cors.is_allowed_checker.settings", mock_settings)
 
     return mock_req, mock_app
 
