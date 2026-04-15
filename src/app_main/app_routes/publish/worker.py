@@ -16,10 +16,10 @@ from ...helpers.format import (
     make_summary,
 )
 from ...helpers.words import get_word_count
-from ...online_services.mediawiki_api import get_title_info, publish_do_edit
-from ...online_services.revids_service import get_revid, get_revid_db
-from ...online_services.text_processor import do_changes_to_text
-from ...online_services.wikidata_client import link_to_wikidata
+from ...clients.mediawiki_api import get_title_info, publish_do_edit
+from ...clients.revids_service import get_revid, get_revid_db
+from ...clients.text_processor import do_changes_to_text
+from ...clients.wikidata_client import link_to_wikidata
 from ...services.pages_service import find_exists_or_update, insert_page_target
 from ...services.users_services import get_user_token_by_username
 

@@ -146,7 +146,7 @@ def is_allowed() -> str | None:
     return None
 ```
 
-#### 2. Create [src/app/services/oauth_client.py](../src/app_main/online_services/oauth_client.py)
+#### 2. Create [src/app/services/oauth_client.py](../src/app_main/clients/oauth_client.py)
 
 ```python
 """MediaWiki OAuth client wrapper."""
@@ -403,7 +403,7 @@ def make_summary(revid: str, sourcetitle: str, target_lang: str, hashtag: str = 
     return f"Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{target_lang} {hashtag}"
 ```
 
-#### 2. Create [src/app/services/mediawiki_api.py](../src/app_main/online_services/mediawiki_api.py)
+#### 2. Create [src/app/services/mediawiki_api.py](../src/app_main/clients/mediawiki_api.py)
 
 ```python
 """MediaWiki API client for edit operations."""
@@ -433,7 +433,7 @@ def publish_do_edit(api_params: dict, wiki: str, access_key: str, access_secret:
     return result
 ```
 
-#### 3. Create [src/app/services/revids_service.py](../src/app_main/online_services/revids_service.py)
+#### 3. Create [src/app/services/revids_service.py](../src/app_main/clients/revids_service.py)
 
 ```python
 """Revision ID lookup service."""
@@ -487,7 +487,7 @@ def get_revid_db(sourcetitle: str) -> str:
         return ""
 ```
 
-#### 4. Create [src/app/services/wikidata_client.py](../src/app_main/online_services/wikidata_client.py)
+#### 4. Create [src/app/services/wikidata_client.py](../src/app_main/clients/wikidata_client.py)
 
 ```python
 """Wikidata integration service."""
@@ -628,7 +628,7 @@ def to_do(tab: dict[str, Any], file_name: str) -> None:
         logger.error(f"Error writing to file {file_path}: {e}")
 ```
 
-#### 6. Create [src/app/services/text_processor.py](../src/app_main/online_services/text_processor.py)
+#### 6. Create [src/app/services/text_processor.py](../src/app_main/clients/text_processor.py)
 
 ```python
 """Text processing utilities for page content."""
