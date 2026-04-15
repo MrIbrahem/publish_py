@@ -22,6 +22,7 @@ def check_publish_secret_code() -> str | None:
 
     received_secret = request.headers.get("X-Secret-Key")
 
+    # Timing attack
     if not received_secret or not hmac.compare_digest(received_secret, expected_secret):
         return None
 
