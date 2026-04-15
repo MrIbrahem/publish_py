@@ -1,8 +1,15 @@
 """Tests for db.db_publish_reports module."""
 
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
+
+from src.app_main.db.db_publish_reports import (
+    PUBLISH_REPORTS_PARAMS,
+    ReportRecord,
+    _VALID_COLUMNS,
+)
 
 
 class TestQueryWithFilters:
