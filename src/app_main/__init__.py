@@ -22,7 +22,7 @@ from .cookies import CookieHeaderClient
 from .db import close_cached_db, ensure_qids_table
 from .extensions import csrf
 from .users.current import current_user
-from .users.store import ensure_user_token_table
+from .services.users_services import ensure_user_token_table
 
 logger = logging.getLogger(__name__)
 
