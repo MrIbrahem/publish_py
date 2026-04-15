@@ -32,7 +32,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
 
-        assert result.headers["Access-Control-Allow-Origin"] == "https://*"
+        assert result.headers["Access-Control-Allow-Origin"] == "*"
 
     def test_with_headers(self, mocker, app):
         response = MagicMock(
