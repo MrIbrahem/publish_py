@@ -104,3 +104,8 @@ def auth_client(app):
         sess["username"] = "TestUser"
 
     return client
+
+
+@pytest.fixture
+def mock_is_denied(mocker):
+    return mocker.patch("src.app_main.cors.is_allowed", return_value=None)
