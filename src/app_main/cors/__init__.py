@@ -1,15 +1,20 @@
 import functools
 
 from flask import jsonify, request
+from flask.wrappers import Request
 
 from .is_allowed_checker import is_allowed
 from .publish_secret_checks import check_publish_secret_code
 
 
+def _load_request() -> Request:
+    return request
+
+
 def validate_access(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-
+        request = _load_request()
         allowed = is_allowed(request)
         has_valid_secret_code = check_publish_secret_code()
 
@@ -42,7 +47,7 @@ def validate_access(func):
 def check_cors(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-
+        request = _load_request()
         allowed = is_allowed(request)
         if not allowed:
             return jsonify({
