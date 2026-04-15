@@ -2,28 +2,33 @@
 Tests for is_allowed — grouped by behavior branch.
 """
 
+from typing import Generator, Any
 import pytest
 from flask import Flask
 import os
 
 
 @pytest.fixture
-def app():
+def app() -> Generator[Flask, Any, None]:
     """Create a test Flask application."""
-    os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
-    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
-    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
-
     from cryptography.fernet import Fernet
-    if not os.environ.get("OAUTH_ENCRYPTION_KEY"):
-        os.environ["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
+    from unittest.mock import patch
 
-    app = Flask(__name__)
-    app.url_map.strict_slashes = False
-    app.config["TESTING"] = True
-    app.config["CORS_DISABLED"] = False
-    return app
+    test_env = {
+        "FLASK_SECRET_KEY": "test_secret_key_12345678901234567890",
+        "OAUTH_MWURI": "https://en.wikipedia.org/w/index.php",
+        "OAUTH_CONSUMER_KEY": "test",
+        "OAUTH_CONSUMER_SECRET": "test",
+    }
+    if not os.environ.get("OAUTH_ENCRYPTION_KEY"):
+        test_env["OAUTH_ENCRYPTION_KEY"] = Fernet.generate_key().decode()
+
+    with patch.dict(os.environ, test_env, clear=False):
+        app = Flask(__name__)
+        app.url_map.strict_slashes = False
+        app.config["TESTING"] = True
+        app.config["CORS_DISABLED"] = False
+        yield app
 
 
 # ------------------------------------------------------------------
@@ -36,7 +41,7 @@ class TestSameOrigin:
         # Origin matches server host exactly → return origin
         ("http://localhost/", "http://localhost"),
     ])
-    def test_origin_matches_server(self, app, origin, expected):
+    def test_origin_matches_server(self, app: Flask, origin, expected) -> None:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(
             base_url=origin,
@@ -45,7 +50,7 @@ class TestSameOrigin:
             from flask import request
             assert is_allowed(request) == expected
 
-    def test_referer_matches_server(self, app):
+    def test_referer_matches_server(self, app: Flask) -> None:
         """Referer pointing to same server → return host_url stripped."""
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(
@@ -56,7 +61,7 @@ class TestSameOrigin:
             result = is_allowed(request)
             assert result == "http://localhost"
 
-    def test_origin_and_referer_both_same_origin(self, app):
+    def test_origin_and_referer_both_same_origin(self, app: Flask) -> None:
         """Both headers same-origin → still returns origin."""
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(
@@ -90,7 +95,7 @@ class TestAllowedDomains:
             "https://medwiki.toolforge.org"
         ),
     ])
-    def test_allowed_domain_granted(self, app, headers, expected):
+    def test_allowed_domain_granted(self, app: Flask, headers: dict[str, str], expected) -> None:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers=headers):
             from flask import request
@@ -110,13 +115,13 @@ class TestAllowedDomains:
         # No headers at all
         {},
     ])
-    def test_not_allowed_domain_denied(self, app, headers):
+    def test_not_allowed_domain_denied(self, app: Flask, headers: dict[str, str]) -> None:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers=headers):
             from flask import request
             assert is_allowed(request) is None
 
-    def test_referer_allowed_but_origin_denied(self, app):
+    def test_referer_allowed_but_origin_denied(self, app: Flask) -> None:
         """
         Origin is untrusted but Referer is allowed.
         Current logic: iterates domains and checks both independently.
@@ -137,21 +142,21 @@ class TestAllowedDomains:
 
 
 class TestCorsDisabled:
-    def test_disabled_with_origin_returns_origin(self, app):
+    def test_disabled_with_origin_returns_origin(self, app: Flask) -> None:
         app.config["CORS_DISABLED"] = True
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Origin": "https://unknown.com"}):
             from flask import request
             assert is_allowed(request) == "https://unknown.com"
 
-    def test_disabled_without_origin_returns_wildcard(self, app):
+    def test_disabled_without_origin_returns_wildcard(self, app: Flask) -> None:
         app.config["CORS_DISABLED"] = True
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={}):
             from flask import request
             assert is_allowed(request) == "*"
 
-    def test_disabled_bypasses_denied_domain(self, app):
+    def test_disabled_bypasses_denied_domain(self, app: Flask) -> None:
         """Even a normally-denied domain passes when CORS_DISABLED."""
         app.config["CORS_DISABLED"] = True
         from src.app_main.cors.is_allowed_checker import is_allowed
@@ -165,26 +170,26 @@ class TestCorsDisabled:
 
 
 class TestEdgeCases:
-    def test_malformed_origin_denied(self, app):
+    def test_malformed_origin_denied(self, app: Flask) -> None:
         """Malformed URL → get_host returns '' → denied."""
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Origin": "not-a-valid-url"}):
             from flask import request
             assert is_allowed(request) is None
 
-    def test_malformed_referer_denied(self, app):
+    def test_malformed_referer_denied(self, app: Flask) -> None:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Referer": ":::bad-url"}):
             from flask import request
             assert is_allowed(request) is None
 
-    def test_empty_origin_header(self, app):
+    def test_empty_origin_header(self, app: Flask) -> None:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Origin": ""}):
             from flask import request
             assert is_allowed(request) is None
 
-    def test_origin_with_port_not_in_allowed(self, app):
+    def test_origin_with_port_not_in_allowed(self, app: Flask) -> None:
         """medwiki.toolforge.org:8080 ≠ medwiki.toolforge.org → denied."""
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(

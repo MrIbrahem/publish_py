@@ -2,13 +2,13 @@
 
 from unittest.mock import MagicMock, patch
 
+from flask.testing import FlaskClient
 import pytest
 from flask import Flask
-from src.app_main.app_routes.cxtoken import routes
 
 
 @pytest.fixture
-def app():
+def app() -> Flask:
     """Create a test Flask application."""
     # Environment variables are set in conftest.py
     app = Flask(__name__)
@@ -25,7 +25,7 @@ def app():
 
 
 @pytest.fixture
-def client(app):
+def client(app: Flask) -> FlaskClient:
     """Create a test client."""
     return app.test_client()
 

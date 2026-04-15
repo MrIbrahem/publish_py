@@ -3,7 +3,10 @@
 import os
 import sys
 from pathlib import Path
+from typing import Generator, Any
 
+from flask.app import Flask
+from flask.testing import FlaskClient
 import pytest
 
 # Set environment variables before any imports that might need them
@@ -31,7 +34,7 @@ from src.app_main.config import TestingConfig  # noqa: E402
 
 
 @pytest.fixture
-def app():
+def app() -> Generator[Flask, Any, None]:
     """Create and configure a test Flask application.
 
     Yields:
@@ -44,7 +47,7 @@ def app():
 
 
 @pytest.fixture
-def client(app):
+def client(app: Flask) -> FlaskClient:
     """Create a test client for the app.
 
     Args:
