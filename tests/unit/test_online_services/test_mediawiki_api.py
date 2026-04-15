@@ -1,4 +1,4 @@
-"""Tests for services.mediawiki_api module."""
+"""Tests for online_services.mediawiki_api module."""
 
 from unittest.mock import MagicMock, patch
 

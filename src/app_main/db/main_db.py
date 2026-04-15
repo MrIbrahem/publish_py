@@ -21,7 +21,7 @@ def has_db_config() -> bool:
 
 
 def get_db() -> Database:
-    """Return a lazily-instantiated :class:`Database` using ``db_data``."""
+    """Return a lazily-instantiated :class:`Database` using ``database_data``."""
     global _db
 
     if not has_db_config():

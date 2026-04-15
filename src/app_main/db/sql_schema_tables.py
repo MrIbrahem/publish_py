@@ -14,8 +14,7 @@ class TablesCreatesSql:
 
 
 categories = """
-CREATE TABLE
-    IF NOT EXISTS categories (
+CREATE TABLE IF NOT EXISTS categories (
         id int unsigned NOT NULL AUTO_INCREMENT,
         category varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
         category2 varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -28,8 +27,7 @@ CREATE TABLE
 """
 
 pages = """
-CREATE TABLE
-    IF NOT EXISTS pages (
+CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
         word int DEFAULT NULL,
@@ -50,8 +48,7 @@ CREATE TABLE
 """
 
 pages_users = """
-CREATE TABLE
-    IF NOT EXISTS pages_users (
+CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
         word int DEFAULT NULL,
@@ -72,8 +69,7 @@ CREATE TABLE
 """
 
 publish_reports = """
-CREATE TABLE
-    IF NOT EXISTS publish_reports (
+CREATE TABLE IF NOT EXISTS publish_reports (
         id int NOT NULL AUTO_INCREMENT,
         date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -90,8 +86,7 @@ CREATE TABLE
 """
 
 qids = """
-CREATE TABLE
-    IF NOT EXISTS qids (
+CREATE TABLE IF NOT EXISTS qids (
         id int unsigned NOT NULL AUTO_INCREMENT,
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
         qid varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -103,8 +98,7 @@ CREATE TABLE
 """
 
 user_tokens = """
-CREATE TABLE
-    IF NOT EXISTS user_tokens (
+CREATE TABLE IF NOT EXISTS user_tokens (
         user_id INT PRIMARY KEY,
         username VARCHAR(255) NOT NULL,
         access_token VARBINARY(1024) NOT NULL,
@@ -115,7 +109,6 @@ CREATE TABLE
         rotated_at DATETIME DEFAULT NULL
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4
 """
-
 
 # sql_tables
 sql_tables = TablesCreatesSql(

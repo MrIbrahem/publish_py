@@ -1,4 +1,4 @@
-"""Tests for services.text_processor module."""
+"""Tests for online_services.text_processor module."""
 
 import pytest
 from src.app_main.online_services.text_processor import DoChangesToText1, do_changes_to_text

@@ -7,10 +7,15 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
+from ..config import settings
+
 from ..crypto import decrypt_value, encrypt_value
-from ..db import get_db, has_db_config
+from ..db import has_db_config
+from ..db import UserTokenDB, UserTokenRecord
 
 logger = logging.getLogger(__name__)
+
+_user_db: UserTokenDB | None = None
 
 
 def _current_ts() -> str:
@@ -22,6 +27,18 @@ def _current_ts() -> str:
         A string of the current UTC time in the format "YYYY-MM-DD HH:MM:SS".
     """
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def get_store() -> UserTokenDB:
+    """Return a lazily-instantiated :class:`UserTokenDB` using ``database_data``."""
+    global _user_db
+
+    if not has_db_config():
+        logger.error("MySQL configuration is not available for the user token store.")
+
+    if _user_db is None:
+        _user_db = UserTokenDB(settings.database_data)
+    return _user_db
 
 
 def _coerce_bytes(value: Any) -> bytes:
@@ -37,7 +54,7 @@ def _coerce_bytes(value: Any) -> bytes:
 def mark_token_used(user_id: int) -> None:
     """Update the last-used timestamp for the given user token."""
 
-    db = get_db()
+    db = get_store()
     try:
         db.execute_query(
             "UPDATE user_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE user_id = %s",
@@ -47,28 +64,6 @@ def mark_token_used(user_id: int) -> None:
         logger.exception("Failed to update last_used_at for user %s", user_id)
 
 
-@dataclass
-class UserTokenRecord:
-    """Decrypted OAuth credential bundle stored in the database."""
-
-    user_id: int
-    username: str
-    access_token: bytes
-    access_secret: bytes
-    created_at: Any | None = None
-    updated_at: Any | None = None
-    last_used_at: Any | None = None
-    rotated_at: Any | None = None
-
-    def decrypted(self) -> tuple[str, str]:
-        """Return the decrypted access token and secret."""
-
-        access_key = decrypt_value(self.access_token)
-        access_secret = decrypt_value(self.access_secret)
-        mark_token_used(self.user_id)
-        return access_key, access_secret
-
-
 def ensure_user_token_table() -> None:
     """Create the user_tokens table if it does not already exist."""
 
@@ -76,20 +71,8 @@ def ensure_user_token_table() -> None:
         logger.debug("Skipping user token table creation; MySQL configuration missing.")
         return
 
-    db = get_db()
-    db.execute_query_safe(sql_tables.user_tokens)
-
-    # Ensure username index exists
-    existing_idx = db.fetch_query_safe(
-        "SHOW INDEX FROM user_tokens WHERE Key_name = %s",
-        ("idx_user_tokens_username",),
-    )
-    if not existing_idx:
-        db.execute_query_safe(
-            """
-            CREATE INDEX /*IF NOT EXISTS*/ idx_user_tokens_username ON user_tokens(username)
-            """
-        )
+    db = get_store()
+    db._ensure_table()
 
 
 def upsert_user_token(*, user_id: int, username: str, access_key: str, access_secret: str) -> None:

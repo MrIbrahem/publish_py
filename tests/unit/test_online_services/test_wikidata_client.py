@@ -1,4 +1,4 @@
-"""Tests for services.wikidata_client module."""
+"""Tests for online_services.wikidata_client module."""
 
 from unittest.mock import MagicMock, patch
 

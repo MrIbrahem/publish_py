@@ -1,4 +1,4 @@
-"""Tests for services.oauth_client module."""
+"""Tests for online_services.oauth_client module."""
 
 from unittest.mock import MagicMock, patch
 
