@@ -55,8 +55,8 @@ class TestPublishEndpointWithDenyCSRF:
         """Test that CORS validation is applied before CSRF check."""
         with (
             patch("src.new_app.shared.cors.is_allowed_checker.is_allowed") as mock_deny,
-            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.new_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.new_app.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
         ):
             mock_deny.return_value = None
             mock_get_token.return_value = None
@@ -98,9 +98,9 @@ class TestPublishEndpointWithCSRF2:
     def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
         """Test that no access error returns 403 even with CSRF enabled."""
         with (
-            patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.new_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.new_app.public.routes.publish.worker.to_do") as mock_to_do,
+            patch("src.new_app.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
 
@@ -137,7 +137,7 @@ class BasePublishTest:
 
     @pytest.fixture(autouse=True)
     def mock_token(self):
-        with patch("src.app_main.app_routes.publish.routes.get_user_token_by_username") as mock_get_token:
+        with patch("src.new_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
             token = MagicMock()
             token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = token
@@ -148,16 +148,16 @@ class BasePublishTest:
     def common_patches(self):
         """Patch the full happy-path stack and expose mocks as a dict."""
         with (
-            patch("src.app_main.app_routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.app_main.app_routes.publish.worker.get_revid_db") as mock_get_revid_db,
-            patch("src.app_main.app_routes.publish.worker.do_changes_to_text") as mock_changes,
-            patch("src.app_main.app_routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.app_main.app_routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.app_main.app_routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.app_routes.publish.worker.load_reports_db") as mock_load_reports_db,
-            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.app_main.app_routes.publish.worker.find_exists_or_update") as mock_find_exists,
-            patch("src.app_main.app_routes.publish.worker.insert_page_target") as mock_insert_page,
+            patch("src.new_app.public.routes.publish.worker.get_revid") as mock_get_revid,
+            patch("src.new_app.public.routes.publish.worker.get_revid_db") as mock_get_revid_db,
+            patch("src.new_app.public.routes.publish.worker.do_changes_to_text") as mock_changes,
+            patch("src.new_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
+            patch("src.new_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
+            patch("src.new_app.public.routes.publish.worker.to_do") as mock_to_do,
+            patch("src.new_app.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.new_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.new_app.public.routes.publish.worker.find_exists_or_update") as mock_find_exists,
+            patch("src.new_app.public.routes.publish.worker.insert_page_target") as mock_insert_page,
         ):
             # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
@@ -255,7 +255,7 @@ class TestMetadataLogic(BasePublishTest):
             assert calls[0].kwargs.get("tr_type") == "section"
 
     def test_words_field_in_tab(self, csrf_client, common_patches):
-        with patch("src.app_main.app_routes.publish.worker.get_word_count") as mock_word_count:
+        with patch("src.new_app.public.routes.publish.worker.get_word_count") as mock_word_count:
             mock_word_count.return_value = 500
 
             response = self._post(csrf_client, self._default_payload())
@@ -328,8 +328,8 @@ class TestErrorAndEdgeCases(BasePublishTest):
 class TestComplexWorkflows(BasePublishTest):
     def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
         with (
-            patch("src.app_main.app_routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.app_main.app_routes.publish.worker.get_campaign_category") as mock_get_campaign,
+            patch("src.new_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.new_app.public.routes.publish.worker.get_campaign_category") as mock_get_campaign,
         ):
             mock_should_add.return_value = True
             mock_get_campaign.return_value = ""
@@ -351,7 +351,7 @@ class TestComplexWorkflows(BasePublishTest):
             self.mock_get_token.side_effect = get_token_side_effect
 
             with patch(
-                "src.app_main.app_routes.publish.worker.get_user_token_by_username",
+                "src.new_app.public.routes.publish.worker.get_user_token_by_username",
                 side_effect=get_token_side_effect,
             ):
                 response = self._post(csrf_client, self._default_payload())

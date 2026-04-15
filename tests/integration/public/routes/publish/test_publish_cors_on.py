@@ -109,10 +109,10 @@ class TestValidateAccessOnPublish:
         with (
             patch("src.new_app.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch(
-                "src.app_main.app_routes.publish.routes.get_user_token_by_username",
+                "src.new_app.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.new_app.public.routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
             mock_reports_db.return_value = MagicMock()
 
@@ -140,10 +140,10 @@ class TestValidateAccessOnPublish:
             patch("src.new_app.shared.cors.is_allowed", return_value=None),
             patch("src.new_app.shared.cors.check_publish_secret_code", return_value="evil.com"),
             patch(
-                "src.app_main.app_routes.publish.routes.get_user_token_by_username",
+                "src.new_app.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.new_app.public.routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
             mock_reports_db.return_value = MagicMock()
 
@@ -172,10 +172,10 @@ class TestValidateAccessOnPublish:
             patch("src.new_app.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch("src.new_app.shared.cors.check_publish_secret_code", return_value=None),
             patch(
-                "src.app_main.app_routes.publish.routes.get_user_token_by_username",
+                "src.new_app.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.app_main.app_routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.new_app.public.routes.publish.worker.ReportsDB") as mock_reports_db,
         ):
             mock_reports_db.return_value = MagicMock()
 

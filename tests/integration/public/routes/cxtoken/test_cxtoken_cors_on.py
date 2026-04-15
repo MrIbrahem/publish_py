@@ -58,7 +58,7 @@ class TestCheckCorsOnCxtokenGet:
         with (
             patch("src.new_app.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch(
-                "src.app_main.app_routes.cxtoken.routes.get_user_token_by_username",
+                "src.new_app.public.routes.cxtoken.routes.get_user_token_by_username",
                 return_value=None,
             ),
         ):
@@ -83,8 +83,8 @@ class TestCheckCorsOnCxtokenGet:
         """GET from allowed origin returns cxtoken on success."""
         with (
             patch("src.new_app.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
-            patch("src.app_main.app_routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.app_routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
+            patch("src.new_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.new_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
@@ -139,7 +139,7 @@ class TestCxtokenCorsOnIntegration:
     def test_get_same_origin_passes_real_cors(self, app, client):
         """GET from same origin passes real CORS check."""
         with patch(
-            "src.app_main.app_routes.cxtoken.routes.get_user_token_by_username",
+            "src.new_app.public.routes.cxtoken.routes.get_user_token_by_username",
             return_value=None,
         ):
             response = client.get(
