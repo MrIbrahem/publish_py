@@ -136,14 +136,16 @@ class TestEnsureQidsTable:
 
         assert result is False
 
-    def test_logs_error_on_failure(self, monkeypatch, db_config):
+    def test_logs_error_on_failure(self, monkeypatch, db_config, caplog):
         """Test that errors are logged when table creation fails."""
+        import logging
+
         mock_db = MagicMock()
         mock_db.execute_query_safe.side_effect = Exception("DB Connection Failed")
 
         monkeypatch.setattr("src.app_main.db.db_qids.Database", lambda db_data: mock_db)
 
-        with pytest.raises(Exception):
-            # The function catches the exception and returns False
+        with caplog.at_level(logging.ERROR):
             result = ensure_qids_table(db_config)
             assert result is False
+            assert "Failed to ensure qids table" in caplog.text
