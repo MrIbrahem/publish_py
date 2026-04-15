@@ -280,9 +280,12 @@ class TestPagesDB:
         params = call_args[0][1]
         assert params[0] == "Source"  # sourcetitle
         assert params[1] == 100  # word
+        assert params[2] == "Lead"  # tr_type
+        assert params[3] == "Category:Health"  # cat
         assert params[4] == "ar"  # lang
-        assert params[7] == "Target"  # target
-        assert params[8] == 12345  # mdwiki_revid
+        assert params[5] == "TestUser"  # user
+        assert params[6] == "Target"  # target
+        assert params[7] == 12345  # mdwiki_revid
 
     def test_insert_page_target_returns_true_on_success(self, monkeypatch, db_config):
         """Test that insert_page_target returns True on success."""
@@ -306,11 +309,13 @@ class TestPagesDB:
     def test_insert_page_target_returns_error_on_failure(self, monkeypatch, db_config):
         """Test that insert_page_target returns error string on failure."""
         mock_db = MagicMock()
-        mock_db.execute_query_safe.side_effect = Exception("DB Error")
 
         monkeypatch.setattr("src.app_main.db.db_Pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
+        # Now set the side_effect to raise an exception for subsequent calls
+        mock_db.execute_query_safe.side_effect = Exception("DB Error")
+
         result = pages_db.insert_page_target(
             sourcetitle="Source",
             tr_type="Lead",
