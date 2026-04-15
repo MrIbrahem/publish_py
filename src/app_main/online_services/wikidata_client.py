@@ -6,10 +6,7 @@ Mirrors: php_src/bots/wd.php
 import json
 import logging
 from typing import Any
-
-import requests
-
-from ..db import get_db
+from ..services import get_db
 from ..config import settings
 from .oauth_client import post_params
 

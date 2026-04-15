@@ -9,7 +9,7 @@ from typing import Optional
 
 from ..config import settings
 
-from ..db import has_db_config
+from ..services import has_db_config
 from ..db.db_user_tokens import UserTokenDB, UserTokenRecord
 
 logger = logging.getLogger(__name__)

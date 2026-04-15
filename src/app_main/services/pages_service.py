@@ -6,7 +6,7 @@ import logging
 from typing import List
 
 from ..config import settings
-from ..db import has_db_config
+from ..services import has_db_config
 from ..db.db_Pages import PageRecord, PagesDB
 
 logger = logging.getLogger(__name__)
