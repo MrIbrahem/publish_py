@@ -8,7 +8,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.helpers.words import (
     _load_words_table,
     clear_words_cache,

@@ -25,8 +25,8 @@ from flask import (
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from ...config import settings
-from ...users.current import CurrentUser
 from ...services.users_services import delete_user_token, upsert_user_token
+from ...users.current import CurrentUser
 from .cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
 from .oauth import (
     OAuthIdentityError,

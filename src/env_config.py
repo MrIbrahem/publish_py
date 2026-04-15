@@ -6,6 +6,7 @@ It should be imported and initialized at application startup.
 """
 
 import logging
+
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)

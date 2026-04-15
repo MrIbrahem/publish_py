@@ -4,10 +4,10 @@ Content Translation token endpoint cache.
 
 import logging
 import time
+from dataclasses import dataclass, field
 from typing import Any
 
-from cachetools import cached, TTLCache
-from dataclasses import dataclass, field
+from cachetools import TTLCache, cached
 
 logger = logging.getLogger(__name__)
 

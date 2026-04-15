@@ -1,9 +1,9 @@
-"""
+""" """
 
-"""
 import hmac
 import logging
 from urllib.parse import urlparse
+
 from flask import request
 
 from ..config import settings

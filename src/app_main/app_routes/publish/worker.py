@@ -6,6 +6,7 @@ import functools
 import json
 import logging
 from typing import Any
+
 from ...config import settings
 from ...db.db_categories import get_campaign_category
 from ...db.db_publish_reports import ReportsDB
@@ -15,7 +16,7 @@ from ...helpers.format import (
     make_summary,
 )
 from ...helpers.words import get_word_count
-from ...online_services.mediawiki_api import publish_do_edit, get_title_info
+from ...online_services.mediawiki_api import get_title_info, publish_do_edit
 from ...online_services.revids_service import get_revid, get_revid_db
 from ...online_services.text_processor import do_changes_to_text
 from ...online_services.wikidata_client import link_to_wikidata

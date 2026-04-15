@@ -6,12 +6,11 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.app_routes.publish.worker import (
+    _get_errors_file,
     _get_revid,
     _handle_no_access,
     _process_edit,
-    _get_errors_file,
 )
 
 

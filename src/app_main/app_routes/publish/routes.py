@@ -12,8 +12,7 @@ from flask import Blueprint, Response, jsonify, request
 from ...cors import check_cors, validate_access
 from ...helpers.format import format_title, format_user
 from ...services.users_services import get_user_token_by_username
-
-from .worker import _process_edit, _handle_no_access
+from .worker import _handle_no_access, _process_edit
 
 bp_publish = Blueprint("publish", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
@@ -103,12 +102,7 @@ def index() -> Response:
         elif isinstance(json_data, dict):
             request_data = json_data
         else:
-            response = jsonify({
-                "error": {
-                    "code": "request_error",
-                    "info": "JSON body must be an object"
-                }
-            })
+            response = jsonify({"error": {"code": "request_error", "info": "JSON body must be an object"}})
             response.status_code = 400
             return response
 

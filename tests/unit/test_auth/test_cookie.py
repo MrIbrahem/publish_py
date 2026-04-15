@@ -9,7 +9,6 @@ from unittest.mock import patch
 
 import pytest
 from itsdangerous import BadSignature, BadTimeSignature, URLSafeTimedSerializer
-
 from src.app_main.app_routes.auth.cookie import (
     extract_user_id,
     sign_state_token,

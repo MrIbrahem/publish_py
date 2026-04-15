@@ -18,7 +18,6 @@ The service layer provides:
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.services.users_services import (
     delete_user_token,
     delete_user_token_by_username,

@@ -14,7 +14,7 @@ from ...config import settings
 from ...cors import check_cors
 from ...online_services.oauth_client import get_cxtoken
 from ...services.users_services import delete_user_token_by_username, get_user_token_by_username
-from .cache import store_jwt, get_from_store
+from .cache import get_from_store, store_jwt
 
 bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
 logger = logging.getLogger(__name__)

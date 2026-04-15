@@ -19,7 +19,6 @@ The actual DB operations are mocked to avoid requiring a real database.
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.services.users_services import (
     delete_user_token,
     delete_user_token_by_username,

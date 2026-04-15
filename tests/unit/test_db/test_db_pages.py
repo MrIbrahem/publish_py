@@ -5,9 +5,8 @@ Tests for Pages database operations.
 
 from unittest.mock import MagicMock, patch
 
-import pytest
 import pymysql
-
+import pytest
 from src.app_main.config import DbConfig
 from src.app_main.db.db_Pages import (
     PageRecord,

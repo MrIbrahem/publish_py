@@ -19,7 +19,6 @@ These tests complement the unit tests by verifying the service-to-DB integration
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.services.pages_service import (
     add_or_update_page,
     add_page,

@@ -8,9 +8,8 @@ import logging
 from typing import Optional
 
 from ..config import settings
-
-from ..services import has_db_config
 from ..db.db_user_tokens import UserTokenDB, UserTokenRecord
+from ..services import has_db_config
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +21,7 @@ def get_store() -> UserTokenDB:
 
     if _user_db is None:
         if not has_db_config():
-            raise RuntimeError(
-                "UserTokenDB requires database configuration; no fallback store is available."
-            )
+            raise RuntimeError("UserTokenDB requires database configuration; no fallback store is available.")
 
         try:
             _user_db = UserTokenDB(settings.database_data)

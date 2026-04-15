@@ -3,12 +3,12 @@
 import os
 import sys
 from pathlib import Path
-from typing import Generator, Any
+from typing import Any, Generator
 from unittest.mock import MagicMock
 
+import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-import pytest
 
 os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
 os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")

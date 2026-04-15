@@ -7,8 +7,8 @@ using a configuration similar to ProductionConfig.
 import json
 from unittest.mock import MagicMock, patch
 
-from flask.app import Flask
 import pytest
+from flask.app import Flask
 
 
 @pytest.fixture
