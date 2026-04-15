@@ -40,6 +40,7 @@ class TestResolveUserId:
         """Test that int uid from session is returned."""
         with app.test_request_context():
             from flask import session
+
             session["uid"] = 12345
 
             result = _resolve_user_id()
@@ -51,6 +52,7 @@ class TestResolveUserId:
         """Test that string uid is converted to int."""
         with app.test_request_context():
             from flask import session
+
             session["uid"] = "12345"
 
             result = _resolve_user_id()
@@ -69,6 +71,7 @@ class TestResolveUserId:
         """Test that None is returned for invalid uid."""
         with app.test_request_context():
             from flask import session
+
             session["uid"] = "not_a_number"
 
             result = _resolve_user_id()
@@ -100,6 +103,7 @@ class TestCurrentUserFunction:
 
         with app.test_request_context():
             from flask import session
+
             session["uid"] = 12345
 
             result = current_user()
@@ -115,6 +119,7 @@ class TestCurrentUserFunction:
 
         with app.test_request_context():
             from flask import session
+
             session["uid"] = 12345
             session["username"] = "OldName"
 
@@ -128,8 +133,18 @@ class TestOAuthRequired:
 
     def test_redirects_when_no_user_and_oauth_enabled(self, app, monkeypatch):
         """Test that decorator redirects when no user and OAuth enabled."""
+        from src.app_main.config import OAuthConfig
+
         monkeypatch.setattr("src.app_main.users.current.current_user", lambda: None)
-        monkeypatch.setattr("src.app_main.users.current.settings.oauth.enabled", True)
+        # Create a mock OAuth config with enabled=True
+        mock_oauth = OAuthConfig(
+            mw_uri="https://test.com",
+            consumer_key="test_key",
+            consumer_secret="test_secret",
+            encryption_key="test_encryption_key",
+            enabled=True,
+        )
+        monkeypatch.setattr("src.app_main.users.current.settings.oauth", mock_oauth)
 
         @oauth_required
         def protected_view():
@@ -137,6 +152,7 @@ class TestOAuthRequired:
 
         with app.test_request_context():
             from flask import session
+
             session["uid"] = None
 
             result = protected_view()
@@ -145,9 +161,19 @@ class TestOAuthRequired:
 
     def test_allows_access_when_user_present(self, app, monkeypatch):
         """Test that decorator allows access when user is present."""
+        from src.app_main.config import OAuthConfig
+
         mock_user = MagicMock()
         monkeypatch.setattr("src.app_main.users.current.current_user", lambda: mock_user)
-        monkeypatch.setattr("src.app_main.users.current.settings.oauth.enabled", True)
+        # Create a mock OAuth config with enabled=True
+        mock_oauth = OAuthConfig(
+            mw_uri="https://test.com",
+            consumer_key="test_key",
+            consumer_secret="test_secret",
+            encryption_key="test_encryption_key",
+            enabled=True,
+        )
+        monkeypatch.setattr("src.app_main.users.current.settings.oauth", mock_oauth)
 
         @oauth_required
         def protected_view():
@@ -160,7 +186,17 @@ class TestOAuthRequired:
 
     def test_allows_access_when_oauth_disabled(self, app, monkeypatch):
         """Test that decorator allows access when OAuth is disabled."""
-        monkeypatch.setattr("src.app_main.users.current.settings.oauth.enabled", False)
+        from src.app_main.config import OAuthConfig
+
+        # Create a mock OAuth config with enabled=False
+        mock_oauth = OAuthConfig(
+            mw_uri="https://test.com",
+            consumer_key="test_key",
+            consumer_secret="test_secret",
+            encryption_key="test_encryption_key",
+            enabled=False,
+        )
+        monkeypatch.setattr("src.app_main.users.current.settings.oauth", mock_oauth)
 
         @oauth_required
         def protected_view():

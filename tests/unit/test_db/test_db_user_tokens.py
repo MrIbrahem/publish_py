@@ -215,7 +215,7 @@ class TestUserTokenDB:
         monkeypatch.setattr("src.app_main.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
-        with pytest.raises(ValueError, match="Unknown columns for user_tokens"):
+        with pytest.raises(ValueError, match="Unknown or immutable columns for user_tokens"):
             token_db.update(1, unknown_column="value")
 
     @patch("src.app_main.db.db_user_tokens.encrypt_value")
