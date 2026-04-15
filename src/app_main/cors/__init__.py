@@ -11,13 +11,6 @@ def _load_request() -> Request:
     return request
 
 
-def _validate_url(text):
-    if text == "*" or text.startswith(("http://", "https://")):
-        return text
-
-    return f"https://{text}"
-
-
 def validate_access(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):

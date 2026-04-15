@@ -34,7 +34,7 @@ def app():
 class TestSameOrigin:
     @pytest.mark.parametrize("origin, expected", [
         # Origin matches server host exactly → return origin
-        ("http://localhost/", "http://localhost"),
+        ("http://localhost/", "localhost"),
     ])
     def test_origin_matches_server(self, app, origin, expected):
         from src.app_main.cors.is_allowed_checker import is_allowed
@@ -54,7 +54,7 @@ class TestSameOrigin:
         ):
             from flask import request
             result = is_allowed(request)
-            assert result == "http://localhost"
+            assert result == "localhost"
 
     def test_origin_and_referer_both_same_origin(self, app):
         """Both headers same-origin → still returns origin."""
@@ -68,7 +68,7 @@ class TestSameOrigin:
         ):
             from flask import request
             result = is_allowed(request)
-            assert result == "http://localhost"
+            assert result == "localhost"
 
 # ------------------------------------------------------------------
 # 2. Allowed domains list
@@ -142,7 +142,7 @@ class TestCorsDisabled:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Origin": "https://unknown.com"}):
             from flask import request
-            assert is_allowed(request) == "https://unknown.com"
+            assert is_allowed(request) == "unknown.com"
 
     def test_disabled_without_origin_returns_wildcard(self, app):
         app.config["CORS_DISABLED"] = True
@@ -157,7 +157,7 @@ class TestCorsDisabled:
         from src.app_main.cors.is_allowed_checker import is_allowed
         with app.test_request_context(headers={"Origin": "https://evil.com"}):
             from flask import request
-            assert is_allowed(request) == "https://evil.com"
+            assert is_allowed(request) == "evil.com"
 
 # ------------------------------------------------------------------
 # 4. Edge cases

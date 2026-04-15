@@ -18,7 +18,7 @@ def get_host(url: str) -> str:
     return urlparse(url).netloc
 
 
-def _get_allowed_domains() -> tuple[str, ...]:
+def _get_allowed_domains() -> list[str]:
     return settings.cors.allowed_domains
 
 
@@ -30,6 +30,7 @@ def is_allowed(request: Request) -> str | None:
     # Extract the host (netloc) from our current server URL
     # e.g., 'example.com' or 'localhost:5000'
     server_host = get_host(request.host_url)
+    # server_host = request.host or get_host(request.host_url)
 
     # Helper function to extract host from a URL string
 
@@ -37,16 +38,17 @@ def is_allowed(request: Request) -> str | None:
 
     if current_app.config.get("CORS_DISABLED"):
         logger.warning(f"CORS is disabled. Access allowed: referer={referer}, origin={origin}")
-        return origin or "*"
+        return origin_host or "*"
 
     referer_host = get_host(referer) if referer else ""
 
     # 1. Check for Same-Origin (Exact Host Match)
     if (origin_host and origin_host == server_host) or (referer_host and referer_host == server_host):
-        return origin or request.host_url.rstrip('/')
+        # return origin or request.host_url.rstrip('/')
+        return origin_host or server_host
 
     if not _get_allowed_domains():
-        logger.warning(f"Access denied: referer={referer}, origin={origin}")
+        logger.warning(f"Access denied: referer={referer}, origin={origin}, no allowed_domains available")
         return None
 
     # 2. Check for Exact Match in allowed domains list
@@ -56,5 +58,6 @@ def is_allowed(request: Request) -> str | None:
             # return origin or f"https://{domain}"
             return domain
 
-    logger.warning(f"Access denied: referer={referer}, origin={origin}")
+    # Access denied: referer_host='google.com', origin_host='google.com'
+    logger.warning(f"Access denied: {referer_host=}, {origin_host=}")
     return None

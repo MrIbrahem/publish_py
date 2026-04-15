@@ -30,7 +30,7 @@ def mock_request(mocker):
 class TestCORSValidation:
     @pytest.mark.parametrize("headers, expected", [
         # Allowed
-        ({"Origin": "https://mysite.com"}, "https://mysite.com"),
+        ({"Origin": "https://mysite.com"}, "mysite.com"),
         ({"Origin": "https://trusted.com"}, "trusted.com"),
         ({"Referer": "https://api.partner.net/dashboard"}, "api.partner.net"),
 
@@ -52,4 +52,4 @@ class TestCORSValidation:
         mock_req.headers = {"Origin": "https://unknown-site.com"}
 
         # When CORS is disabled, returns origin or "*"
-        assert is_allowed(mock_req) == "https://unknown-site.com"
+        assert is_allowed(mock_req) == "unknown-site.com"

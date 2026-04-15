@@ -20,7 +20,8 @@ class TestGetHost:
         pytest.param("example.com/path", "", id="no_scheme_returns_empty"),
         pytest.param("", "", id="empty_string"),
         pytest.param("not-a-url", "", id="not-a-url"),
-        pytest.param("https://user:pass@example.com", "user:pass@example.com", id="userinfo"),
+        pytest.param("sip://user:pass@example.com", "user:pass@example.com", id="userinfo"),
+        pytest.param("ftp://ar.wikipedia.org", "ar.wikipedia.org", id="ar.wikipedia.org"),
     ])
     def test_get_host(self, url, expected):
         assert get_host(url) == expected
