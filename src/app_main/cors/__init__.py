@@ -20,27 +20,28 @@ def validate_access(func):
 
         if has_valid_secret_code or allowed:
             response = func(*args, **kwargs)
+            # uncomment next after testing TestValidateAccessControlAllowOrigin
+            # domain = allowed or has_valid_secret_code
 
             if hasattr(response, "headers"):
                 response.headers["Access-Control-Allow-Origin"] = f"https://{allowed}"
 
             return response
 
-        if not allowed:
+        if not has_valid_secret_code:
             response = jsonify({
                 "error": {
                     "code": "access_denied",
-                    "info": "Access denied. Requests are only allowed from authorized domains."
+                    "info": "Access denied. Invalid or missing secret key."
                 }
             })
             response.status_code = 403
             return response
 
-        # if not has_valid_secret_code:
         response = jsonify({
             "error": {
                 "code": "access_denied",
-                "info": "Access denied. Invalid or missing secret key."
+                "info": "Access denied. Requests are only allowed from authorized domains."
             }
         })
         response.status_code = 403
