@@ -95,7 +95,7 @@ class TestExtractUserId:
 
         # Patch max_age to be -1 to expire immediately
         # (itsdangerous uses age > max_age check, so -1 expires all tokens)
-        with patch("src.app_main.shared.cookies.cookie.settings") as mock_settings:
+        with patch("src.app_main.shared.core.cookies.cookie.settings") as mock_settings:
             mock_settings.cookie.max_age = -1  # Expire immediately
 
             result = extract_user_id(signed)

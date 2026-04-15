@@ -23,7 +23,7 @@ class TestGetWordCount:
                 words_json_path=Path(f"{tmpdir}/nonexistent/words.json"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.shared.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.shared.utils.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("NonExistent Title")
@@ -43,7 +43,7 @@ class TestGetWordCount:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.shared.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.shared.utils.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("Test Article")
@@ -59,7 +59,7 @@ class TestGetWordCount:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.shared.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.shared.utils.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("Missing Article")
@@ -75,7 +75,7 @@ class TestGetWordCount:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.shared.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.shared.utils.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             result = get_word_count("Custom Article")
@@ -97,7 +97,7 @@ class TestClearWordsCache:
 
             mock_paths = SimpleNamespace(words_json_path=words_file)
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.app_main.shared.helpers.words.settings", mock_settings)
+            monkeypatch.setattr("src.app_main.shared.utils.helpers.words.settings", mock_settings)
 
             clear_words_cache()
             assert get_word_count("Test") == 100

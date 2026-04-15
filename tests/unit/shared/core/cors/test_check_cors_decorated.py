@@ -24,7 +24,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
             host_url="",
         )
         app.config["CORS_DISABLED"] = True
-        mocker.patch("src.app_main.shared.cors._load_request", return_value=response)
+        mocker.patch("src.app_main.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -40,7 +40,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
             host_url="https://books.google.com",
         )
         app.config["CORS_DISABLED"] = True
-        mocker.patch("src.app_main.shared.cors._load_request", return_value=response)
+        mocker.patch("src.app_main.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -61,8 +61,8 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="http://localhost",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.app_main.shared.cors._load_request", return_value=response)
-        mocker.patch("src.app_main.shared.cors.is_allowed_checker._get_allowed_domains", return_value=[])
+        mocker.patch("src.app_main.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.app_main.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=[])
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -79,7 +79,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="https://books.google.com",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.app_main.shared.cors._load_request", return_value=response)
+        mocker.patch("src.app_main.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -96,8 +96,8 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="https://ar.wikipedia.org",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.app_main.shared.cors._load_request", return_value=response)
-        mocker.patch("src.app_main.shared.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com"])
+        mocker.patch("src.app_main.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.app_main.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com"])
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -113,9 +113,9 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="http://localhost",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.app_main.shared.cors._load_request", return_value=response)
+        mocker.patch("src.app_main.shared.core.cors._load_request", return_value=response)
         mocker.patch(
-            "src.app_main.shared.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com.net", "z.wikipedia.org"]
+            "src.app_main.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com.net", "z.wikipedia.org"]
         )
 
         decorated = check_cors(lambda: _make_response_with_headers())

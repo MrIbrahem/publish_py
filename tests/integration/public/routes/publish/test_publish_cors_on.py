@@ -44,7 +44,7 @@ class TestCheckCorsOnPublish:
 
     def test_options_allowed_origin_returns_200(self, client):
         """OPTIONS preflight from allowed origin returns 200 with CORS headers."""
-        with patch("src.app_main.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN):
+        with patch("src.app_main.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN):
             response = client.options(
                 "/publish/",
                 headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
@@ -55,7 +55,7 @@ class TestCheckCorsOnPublish:
 
     def test_options_disallowed_origin_returns_403(self, client):
         """OPTIONS preflight from disallowed origin returns 403."""
-        with patch("src.app_main.shared.cors.is_allowed", return_value=None):
+        with patch("src.app_main.shared.core.cors.is_allowed", return_value=None):
             response = client.options(
                 "/publish/",
                 headers={"Origin": "https://evil.com"},
@@ -67,7 +67,7 @@ class TestCheckCorsOnPublish:
 
     def test_options_no_origin_returns_403(self, client):
         """OPTIONS preflight with no Origin returns 403."""
-        with patch("src.app_main.shared.cors.is_allowed", return_value=None):
+        with patch("src.app_main.shared.core.cors.is_allowed", return_value=None):
             response = client.options("/publish/")
             assert response.status_code == 403
             data = response.get_json()
@@ -75,7 +75,7 @@ class TestCheckCorsOnPublish:
 
     def test_options_same_origin_passes_cors(self, client):
         """OPTIONS from same origin (origin matches server host) passes CORS check."""
-        with patch("src.app_main.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN):
+        with patch("src.app_main.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN):
             response = client.options(
                 "/publish/",
                 base_url=f"https://{ALLOWED_DOMAIN}",
@@ -91,8 +91,8 @@ class TestValidateAccessOnPublish:
     def test_post_disallowed_origin_returns_403(self, client):
         """POST from disallowed origin without secret key returns 403."""
         with (
-            patch("src.app_main.shared.cors.is_allowed", return_value=None),
-            patch("src.app_main.shared.cors.check_publish_secret_code", return_value=None),
+            patch("src.app_main.shared.core.cors.is_allowed", return_value=None),
+            patch("src.app_main.shared.core.cors.check_publish_secret_code", return_value=None),
         ):
             response = client.post(
                 "/publish/",
@@ -107,7 +107,7 @@ class TestValidateAccessOnPublish:
     def test_post_allowed_origin_proceeds_past_cors(self, client):
         """POST from allowed origin passes CORS and reaches handler logic."""
         with (
-            patch("src.app_main.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
+            patch("src.app_main.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch(
                 "src.app_main.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
@@ -137,8 +137,8 @@ class TestValidateAccessOnPublish:
     def test_post_with_valid_secret_key_bypasses_cors(self, client):
         """POST with valid secret key bypasses CORS even from disallowed origin."""
         with (
-            patch("src.app_main.shared.cors.is_allowed", return_value=None),
-            patch("src.app_main.shared.cors.check_publish_secret_code", return_value="evil.com"),
+            patch("src.app_main.shared.core.cors.is_allowed", return_value=None),
+            patch("src.app_main.shared.core.cors.check_publish_secret_code", return_value="evil.com"),
             patch(
                 "src.app_main.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
@@ -169,8 +169,8 @@ class TestValidateAccessOnPublish:
     def test_post_allowed_origin_with_invalid_secret_key(self, client):
         """POST from allowed origin succeeds even if secret key is invalid."""
         with (
-            patch("src.app_main.shared.cors.is_allowed", return_value=ALLOWED_DOMAIN),
-            patch("src.app_main.shared.cors.check_publish_secret_code", return_value=None),
+            patch("src.app_main.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN),
+            patch("src.app_main.shared.core.cors.check_publish_secret_code", return_value=None),
             patch(
                 "src.app_main.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
@@ -199,8 +199,8 @@ class TestValidateAccessOnPublish:
     def test_post_disallowed_origin_and_no_secret_key(self, client):
         """POST from disallowed origin without secret key returns specific error info."""
         with (
-            patch("src.app_main.shared.cors.is_allowed", return_value=None),
-            patch("src.app_main.shared.cors.check_publish_secret_code", return_value=None),
+            patch("src.app_main.shared.core.cors.is_allowed", return_value=None),
+            patch("src.app_main.shared.core.cors.check_publish_secret_code", return_value=None),
         ):
             response = client.post(
                 "/publish/",
