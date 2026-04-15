@@ -1,4 +1,5 @@
-"""CORS validation helpers.
+"""
+CORS validation helpers.
 
 Mirrors: php_src/bots/cors.php
 
