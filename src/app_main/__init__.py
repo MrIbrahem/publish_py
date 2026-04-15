@@ -117,7 +117,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
 
-    csrf_exempt(app)
+    csrf_exempt(app, bp_publish)
 
     @app.context_processor
     def _inject_data():  # pragma: no cover - trivial wrapper

@@ -5,7 +5,7 @@ This module centralizes Flask extensions to prevent circular imports
 and enable proper initialization order with the application factory pattern.
 """
 
-from flask import Flask
+from flask import Blueprint, Flask
 from flask_wtf.csrf import CSRFProtect
 
 # Initialize extensions without binding to app
@@ -22,7 +22,7 @@ def csrf_init_app(app: Flask) -> None:
     csrf.init_app(app)
 
 
-def csrf_exempt(app, bp_publish) -> None:
+def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
     if app.config.get("WTF_CSRF_ENABLED"):
         csrf.exempt(bp_publish)
 
