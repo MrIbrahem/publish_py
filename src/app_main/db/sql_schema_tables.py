@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS user_tokens (
     last_used_at datetime DEFAULT NULL,
     rotated_at datetime DEFAULT NULL,
     PRIMARY KEY (user_id),
-    KEY idx_user_tokens_username (username)
+    UNIQUE KEY uq_user_tokens_username (username)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 """
 

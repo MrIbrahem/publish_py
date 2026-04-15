@@ -71,8 +71,8 @@ def _link_it(
 
     try:
         response = post_params(api_params, https_domain, access_key, access_secret)
-    except Exception:
-        logger.error(f"Failed to parse Wikidata response: {response}")
+    except Exception as exc:
+        logger.exception("Failed to call Wikidata API: %s", exc)
         return {}
 
     try:
