@@ -19,8 +19,18 @@ def get_host(url: str) -> str:
 
 
 def make_url(url) -> str:
+    if not url or not isinstance(url, str):
+        return None
+
     url_obj = urlparse(url)
-    return f"{url_obj.scheme}://{url_obj.netloc}" if url_obj else ""
+    result = f"{url_obj.scheme}://{url_obj.netloc}"
+
+    if not url_obj.scheme or not url_obj.netloc or result == "://":
+        logger.warning(f"bad urlparse: {url=}")
+        logger.warning(url_obj)
+        return ""
+
+    return result
 
 
 def _get_allowed_domains() -> list[str]:
