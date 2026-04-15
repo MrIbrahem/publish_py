@@ -20,6 +20,8 @@ os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
 TEST_ENCRYPTION_KEY = "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI="
 os.environ.setdefault("OAUTH_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
 
+os.environ.setdefault("WIKIDATA_DOMAIN", "test.wikidata.org")
+
 # Get the project root directory (parent of pytests folder)
 project_root = Path(__file__).parent.parent
 
