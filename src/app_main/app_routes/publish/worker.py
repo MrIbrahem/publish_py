@@ -2,6 +2,7 @@
 Post/Publish endpoint worker for Content Translation.
 """
 
+import functools
 import json
 import logging
 from typing import Any
@@ -22,6 +23,18 @@ from ...services.wikidata_client import link_to_wikidata
 from ...users.store import get_user_token_by_username
 
 logger = logging.getLogger(__name__)
+
+
+@functools.lru_cache(maxsize=1)
+def load_pages_db() -> PagesDB:
+    pages_db = PagesDB(settings.database_data)
+    return pages_db
+
+
+@functools.lru_cache(maxsize=1)
+def load_reports_db() -> ReportsDB:
+    reports_db = ReportsDB(settings.database_data)
+    return reports_db
 
 
 def _get_revid(sourcetitle) -> str:
@@ -187,7 +200,7 @@ def _handle_successful_edit(
         to_do(tab3, file_name)
 
         # Insert to reports
-        reports_db = ReportsDB(settings.database_data)
+        reports_db = load_reports_db()
         reports_db.add(
             title=title,
             user=user,
@@ -293,7 +306,7 @@ def insert_to_db_2(
     Returns:
         Dictionary with operation result
     """
-    pages_db = PagesDB(settings.database_data)
+    pages_db = load_pages_db()
 
     result: dict[str, Any] = {
         "use_user_sql": False,
@@ -445,7 +458,7 @@ def _process_edit(
     to_do(tab, to_do_file)
 
     # Insert to reports
-    reports_db = ReportsDB(settings.database_data)
+    reports_db = load_reports_db()
 
     reports_db.add(
         title=title,
@@ -479,7 +492,7 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
     to_do(tab, "noaccess")
 
     # Insert to reports
-    reports_db = ReportsDB(settings.database_data)
+    reports_db = load_reports_db()
 
     reports_db.add(
         title=tab["title"],

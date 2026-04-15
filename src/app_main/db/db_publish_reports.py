@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from ..config import DbConfig
+from .sql_schema_tables import sql_tables
 from . import Database
 
 logger = logging.getLogger(__name__)
@@ -42,25 +43,6 @@ _VALID_COLUMNS = frozenset(
         "MONTH(date)",
     }
 )
-
-table_creation_sql_publish_reports = """
-CREATE TABLE
-    IF NOT EXISTS publish_reports (
-        id int NOT NULL AUTO_INCREMENT,
-        date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        user varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        lang varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        sourcetitle varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        result varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        data longtext CHARACTER
-        SET
-            utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-            PRIMARY KEY (id),
-            CONSTRAINT publish_reports_chk_1 CHECK (json_valid (data))
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-"""
-
 
 @dataclass
 class ReportRecord:
@@ -105,7 +87,7 @@ class ReportsDB:
         self._ensure_table()
 
     def _ensure_table(self) -> None:
-        self.db.execute_query_safe(table_creation_sql_publish_reports)
+        self.db.execute_query_safe(sql_tables.publish_reports)
 
     def _row_to_record(self, row: dict[str, Any]) -> ReportRecord:
         return ReportRecord(
