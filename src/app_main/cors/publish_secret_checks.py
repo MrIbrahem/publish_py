@@ -11,8 +11,12 @@ from ..config import settings
 logger = logging.getLogger(__name__)
 
 
+def _get_publish_secret_code() -> str:
+    return settings.publish_secret_code
+
+
 def check_publish_secret_code() -> str | None:
-    expected_secret = settings.publish_secret_code
+    expected_secret = _get_publish_secret_code()
     if not expected_secret:
         return None
 
