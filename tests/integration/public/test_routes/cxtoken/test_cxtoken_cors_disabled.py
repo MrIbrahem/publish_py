@@ -18,7 +18,7 @@ def app() -> Flask:
     app.config["CORS_DISABLED"] = True
 
     # Import and register the blueprint
-    from src.app_main.app_routes.cxtoken.routes import bp_cxtoken
+    from src.new_app.public.routes.cxtoken.routes import bp_cxtoken
 
     app.register_blueprint(bp_cxtoken)
     return app

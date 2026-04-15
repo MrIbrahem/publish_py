@@ -34,7 +34,7 @@ def csrf_app() -> Flask:
     app.url_map.strict_slashes = False
 
     csrf = CSRFProtect(app)
-    from src.app_main.app_routes.publish.routes import bp_publish
+    from src.new_app.public.routes.publish.routes import bp_publish
 
     app.register_blueprint(bp_publish)
     csrf.exempt(bp_publish)

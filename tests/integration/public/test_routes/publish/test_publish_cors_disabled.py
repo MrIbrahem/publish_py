@@ -22,7 +22,7 @@ def app() -> Flask:
     app.config["TESTING"] = True
     app.config["CORS_DISABLED"] = True
 
-    from src.app_main.app_routes.publish.routes import bp_publish
+    from src.new_app.public.routes.publish.routes import bp_publish
 
     app.register_blueprint(bp_publish)
     return app

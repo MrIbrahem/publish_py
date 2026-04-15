@@ -8,9 +8,9 @@ from typing import Any, Dict, List, Optional
 
 from flask import Blueprint, Response, jsonify, request
 
-from ....new_app.config import settings
-from ....new_app.shared.cors import check_cors
-from ....new_app.shared.db.db_publish_reports import ReportsDB
+from ....config import settings
+from ....shared.cors import check_cors
+from ....shared.db.db_publish_reports import ReportsDB
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
