@@ -16,6 +16,10 @@ def get_host(url: str) -> str:
     return urlparse(url).netloc
 
 
+def get_allowed_domains() -> tuple[str, ...]:
+    return settings.cors.allowed_domains
+
+
 def is_allowed(request: Request) -> str | None:
     """Check if request is from an exact allowed domain or same origin."""
     referer = request.headers.get("Referer", "")
@@ -39,13 +43,13 @@ def is_allowed(request: Request) -> str | None:
     if (origin_host and origin_host == server_host) or (referer_host and referer_host == server_host):
         return origin or request.host_url.rstrip('/')
 
-    if not settings.cors.allowed_domains:
+    if not get_allowed_domains():
         logger.warning(f"Access denied: referer={referer}, origin={origin}")
         return None
 
     # 2. Check for Exact Match in allowed domains list
     # Assuming allowed_domains contains: ['mysite.com', 'api.mysite.com']
-    for domain in settings.cors.allowed_domains:
+    for domain in get_allowed_domains():
         if (origin_host == domain) or (referer_host == domain):
             # return origin or f"https://{domain}"
             return domain
