@@ -1,0 +1,93 @@
+PS I:\MD_TOOLS\mdwikipy_publish\publish_py\src> python -m directory_tree --ignore-list __pycache__
+src/
+├── app.py
+├── app_main/
+│   ├── __init__.py
+│   ├── app_routes/
+│   │   ├── __init__.py
+│   │   ├── auth/
+│   │   │   ├── __init__.py
+│   │   │   ├── cookie.py
+│   │   │   ├── oauth.py
+│   │   │   ├── rate_limit.py
+│   │   │   └── routes.py
+│   │   ├── cxtoken/
+│   │   │   ├── __init__.py
+│   │   │   ├── cache.py
+│   │   │   └── routes.py
+│   │   ├── main/
+│   │   │   ├── __init__.py
+│   │   │   └── routes.py
+│   │   ├── publish/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── worker.py
+│   │   └── refs/
+│   │       ├── __init__.py
+│   │       └── routes.py
+│   ├── config.py
+│   ├── cookies/
+│   │   └── __init__.py
+│   ├── cors/
+│   │   ├── __init__.py
+│   │   ├── is_allowed_checker.py
+│   │   └── publish_secret_checks.py
+│   ├── crypto.py
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── db_categories.py
+│   │   ├── db_class.py
+│   │   ├── db_Pages.py
+│   │   ├── db_publish_reports.py
+│   │   ├── db_qids.py
+│   │   ├── db_user_tokens.py
+│   │   └── sql_schema_tables.py
+│   ├── extensions.py
+│   ├── helpers/
+│   │   ├── __init__.py
+│   │   ├── files.py
+│   │   ├── format.py
+│   │   └── words.py
+│   ├── online_services/
+│   │   ├── __init__.py
+│   │   ├── mediawiki_api.py
+│   │   ├── oauth_client.py
+│   │   ├── revids_service.py
+│   │   ├── text_processor.py
+│   │   └── wikidata_client.py
+│   ├── routes_utils.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── db_service.py
+│   │   ├── pages_service.py
+│   │   └── users_services.py
+│   └── users/
+│       ├── __init__.py
+│       └── current.py
+├── env_config.py
+├── logger_config.py
+├── new_app/
+│   ├── __init__.py
+│   ├── admin/
+│   │   ├── __init__.py
+│   │   ├── routes/
+│   │   │   └── __init__.py
+│   │   └── services/
+│   │       └── __init__.py
+│   ├── config.py
+│   ├── public/
+│   │   ├── __init__.py
+│   │   ├── routes/
+│   │   │   └── __init__.py
+│   │   └── services/
+│   │       └── __init__.py
+│   └── shared/
+│       ├── __init__.py
+│       ├── db/
+│       │   └── __init__.py
+│       ├── models/
+│       │   └── __init__.py
+│       └── utils/
+│           └── __init__.py
+├── static/
+└── templates/
