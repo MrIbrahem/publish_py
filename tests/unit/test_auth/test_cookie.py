@@ -94,9 +94,10 @@ class TestExtractUserId:
         # Create a token
         signed = sign_user_id(12345)
 
-        # Patch max_age to be 0 to expire immediately
+        # Patch max_age to be -1 to expire immediately
+        # (itsdangerous uses age > max_age check, so -1 expires all tokens)
         with patch("src.app_main.app_routes.auth.cookie.settings") as mock_settings:
-            mock_settings.cookie.max_age = 0  # Expire immediately
+            mock_settings.cookie.max_age = -1  # Expire immediately
 
             result = extract_user_id(signed)
             # Should return None for expired token
