@@ -211,19 +211,14 @@ class TestOAuthRequired:
 
             assert result == "success"
 
-    def test_allows_access_when_oauth_disabled(self, app, monkeypatch):
-        """Test that decorator allows access when OAuth is disabled."""
+    def test_allows_access_when_oauth_null(self, app, monkeypatch):
+        """Test that decorator allows access when OAuth is None (disabled)."""
         from src.app_main.config import OAuthConfig
 
-        # Create a mock OAuth config with enabled=False
-        mock_oauth = OAuthConfig(
-            mw_uri="https://test.com",
-            consumer_key="test_key",
-            consumer_secret="test_secret",
-            encryption_key="test_encryption_key",
-            enabled=False,
-        )
-        monkeypatch.setattr("src.app_main.users.current.settings.oauth", mock_oauth)
+        # Create a mock Settings object with oauth=None
+        mock_settings = MagicMock()
+        mock_settings.oauth = None
+        monkeypatch.setattr("src.app_main.users.current.settings", mock_settings)
 
         @oauth_required
         def protected_view():
