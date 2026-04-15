@@ -18,7 +18,6 @@ from src.app_main.app_routes.auth.cookie import (
 )
 
 
-@pytest.mark.unit
 class TestSignUserId:
     """Tests for sign_user_id function."""
 
@@ -45,7 +44,6 @@ class TestSignUserId:
         assert extract_user_id(signed1) == extract_user_id(signed2) == 12345
 
 
-@pytest.mark.unit
 class TestExtractUserId:
     """Tests for extract_user_id function."""
 
@@ -105,7 +103,6 @@ class TestExtractUserId:
             assert result is None
 
 
-@pytest.mark.unit
 class TestSignStateToken:
     """Tests for sign_state_token function."""
 
@@ -125,7 +122,6 @@ class TestSignStateToken:
         assert signed1 != signed2
 
 
-@pytest.mark.unit
 class TestVerifyStateToken:
     """Tests for verify_state_token function."""
 
@@ -171,7 +167,6 @@ class TestVerifyStateToken:
         assert result is None
 
 
-@pytest.mark.unit
 class TestRoundTrip:
     """Tests for sign/verify round-trip scenarios."""
 

@@ -15,7 +15,7 @@ from src.app_main.cors.publish_secret_checks import (
 )
 
 
-@pytest.mark.unit
+
 class TestGetPublishSecretCode:
     """Tests for _get_publish_secret_code function."""
 
@@ -42,7 +42,7 @@ class TestGetPublishSecretCode:
         assert result == ""
 
 
-@pytest.mark.unit
+
 class TestCheckPublishSecretCode:
     """Tests for check_publish_secret_code function."""
 
