@@ -12,16 +12,16 @@ This audit assesses the Flask application against the SKILL.md standards. The ap
 
 ### Overall Compliance Score: **C+ (70%)**
 
-| Category | Score | Status |
-|----------|-------|--------|
-| Application Factory | A- (90%) | Compliant with minor issues |
-| Blueprints | B+ (85%) | Well-structured but missing `__init__.py` patterns |
-| Extensions | C (60%) | No dedicated extensions.py file |
-| Database Pattern | B (75%) | Custom pattern instead of Flask-SQLAlchemy |
-| Security/CSRF | B (80%) | CSRF enabled but configuration gaps |
-| Configuration | C+ (70%) | Uses dataclasses instead of config classes |
-| Testing | B (80%) | Good pytest setup, missing some fixtures |
-| Known Issues Prevention | A (95%) | No active violations detected |
+| Category                | Score    | Status                                             |
+| ----------------------- | -------- | -------------------------------------------------- |
+| Application Factory     | A- (90%) | Compliant with minor issues                        |
+| Blueprints              | B+ (85%) | Well-structured but missing `__init__.py` patterns |
+| Extensions              | C (60%)  | No dedicated extensions.py file                    |
+| Database Pattern        | B (75%)  | Custom pattern instead of Flask-SQLAlchemy         |
+| Security/CSRF           | B (80%)  | CSRF enabled but configuration gaps                |
+| Configuration           | C+ (70%) | Uses dataclasses instead of config classes         |
+| Testing                 | B (80%)  | Good pytest setup, missing some fixtures           |
+| Known Issues Prevention | A (95%)  | No active violations detected                      |
 
 ---
 
@@ -32,6 +32,7 @@ This audit assesses the Flask application against the SKILL.md standards. The ap
 **Status**: Acceptable with minor issues
 
 **Current Implementation**:
+
 ```python
 # src/app_main/__init__.py
 def create_app() -> Flask:
@@ -41,9 +42,10 @@ def create_app() -> Flask:
 ```
 
 **Strengths**:
-- Uses application factory pattern correctly
-- Supports multiple configurations via environment variables
-- Properly separates app creation from entry point (`src/app.py`)
+
+-   Uses application factory pattern correctly
+-   Supports multiple configurations via environment variables
+-   Properly separates app creation from entry point (`src/app.py`)
 
 **Issues**:
 
@@ -54,6 +56,7 @@ def create_app() -> Flask:
 **Problem**: The template and static folder paths use `"../templates"` and `"../static"` which assumes a specific directory structure that may break in different deployment scenarios.
 
 **Recommendation**:
+
 ```python
 # Use absolute paths based on the module location
 import os
@@ -73,6 +76,7 @@ app = Flask(
 **Status**: Does not follow SKILL.md recommended pattern
 
 **Current Implementation**: Extensions are created directly in `create_app()`:
+
 ```python
 # src/app_main/__init__.py:67
 csrf = CSRFProtect(app)  # Created inline, not in extensions.py
@@ -83,6 +87,7 @@ csrf = CSRFProtect(app)  # Created inline, not in extensions.py
 > **Why separate file?**: Prevents circular imports - models can import `db` without importing `app`.
 
 **Recommendation**:
+
 ```python
 # src/app_main/extensions.py
 from flask_wtf.csrf import CSRFProtect
@@ -108,6 +113,7 @@ def create_app():
 **Status**: Good overall structure with minor deviations
 
 **Current Structure**:
+
 ```
 src/app_main/app_routes/
 ├── api/routes.py       # bp_api
@@ -120,9 +126,10 @@ src/app_main/app_routes/
 ```
 
 **Strengths**:
-- Blueprints are properly separated by functionality
-- Good naming convention with `bp_` prefix
-- Routes use correct HTTP methods (`@bp.get`, `@bp.route`)
+
+-   Blueprints are properly separated by functionality
+-   Good naming convention with `bp_` prefix
+-   Routes use correct HTTP methods (`@bp.get`, `@bp.route`)
 
 **Issues**:
 
@@ -131,12 +138,14 @@ src/app_main/app_routes/
 **Location**: Multiple route files
 
 **Problem**: Blueprints are created directly in route files instead of in `__init__.py` files:
+
 ```python
 # src/app_main/app_routes/auth/routes.py:40
 bp_auth = Blueprint("auth", __name__)
 ```
 
 **SKILL.md Recommendation**:
+
 ```python
 # app/auth/__init__.py
 from flask import Blueprint
@@ -153,6 +162,7 @@ from app.auth import routes  # Import routes after bp is created!
 **Problem**: Subdirectories like `api/`, `auth/`, `cxtoken/` don't have their own `__init__.py` files that export their blueprints. Instead, all exports are centralized in `app_routes/__init__.py`.
 
 **Recommendation**: Each blueprint directory should have its own `__init__.py`:
+
 ```python
 # src/app_main/app_routes/auth/__init__.py
 from flask import Blueprint
@@ -169,6 +179,7 @@ from . import routes  # Import after bp creation
 **Status**: Uses dataclasses instead of config classes
 
 **Current Implementation**:
+
 ```python
 # src/app_main/config.py
 @dataclass(frozen=True)
@@ -181,6 +192,7 @@ def get_settings() -> Settings:
 ```
 
 **SKILL.md Recommendation**:
+
 ```python
 # config.py
 class Config:
@@ -205,6 +217,7 @@ class TestingConfig(Config):
 **Problem**: There's no dedicated testing configuration that disables CSRF, making form testing difficult.
 
 **Recommendation**:
+
 ```python
 # Add to config.py
 class TestingConfig:
@@ -232,6 +245,7 @@ def get_settings(config_class=None):
 **Status**: Uses custom PyMySQL wrapper instead of Flask-SQLAlchemy
 
 **Current Implementation**:
+
 ```python
 # src/app_main/db/db_class.py
 class Database:
@@ -241,6 +255,7 @@ class Database:
 ```
 
 **SKILL.md Recommendation**: Use Flask-SQLAlchemy with the `db` pattern:
+
 ```python
 # app/extensions.py
 from flask_sqlalchemy import SQLAlchemy
@@ -249,9 +264,10 @@ db = SQLAlchemy()
 ```
 
 **Analysis**:
-- The custom `Database` class provides retry logic, connection pooling via thread-local cache
-- This is a deliberate choice for direct PyMySQL control
-- Not a violation per se, but deviates from Flask ecosystem standards
+
+-   The custom `Database` class provides retry logic, connection pooling via thread-local cache
+-   This is a deliberate choice for direct PyMySQL control
+-   Not a violation per se, but deviates from Flask ecosystem standards
 
 **Issues**:
 
@@ -260,6 +276,7 @@ db = SQLAlchemy()
 **Problem**: Cannot use Flask-SQLAlchemy ORM features, migrations (Flask-Migrate), or model relationships.
 
 **Recommendation**: Consider adding Flask-SQLAlchemy alongside the custom database class for ORM capabilities:
+
 ```python
 # For complex queries, keep using Database
 # For ORM operations, use Flask-SQLAlchemy models
@@ -270,6 +287,7 @@ db = SQLAlchemy()
 **Location**: `src/app_main/db/main_db.py`
 
 **Problem**: The global `_db` variable with `get_db()` pattern is not thread-safe for Flask's request handling:
+
 ```python
 _db: Database | None = None
 
@@ -289,14 +307,17 @@ def get_db() -> Database:
 **Status**: CSRF is enabled globally with Flask-WTF
 
 **Current Implementation**:
+
 ```python
 # src/app_main/__init__.py:67
 csrf = CSRFProtect(app)
 ```
 
 **Strengths**:
-- CSRF protection is enabled globally
-- Cookie security settings are configured:
+
+-   CSRF protection is enabled globally
+-   Cookie security settings are configured:
+
 ```python
 app.config.update(
     SESSION_COOKIE_HTTPONLY=settings.cookie.httponly,
@@ -312,6 +333,7 @@ app.config.update(
 **Problem**: No `WTF_CSRF_TIME_LIMIT` configuration, which could cause issues with cached pages (Issue #6 from SKILL.md).
 
 **Recommendation**:
+
 ```python
 # In config.py or create_app()
 app.config.update(
@@ -323,6 +345,7 @@ app.config.update(
 #### 6.2 No Cache Control Headers for Forms ⚠️ MEDIUM
 
 **SKILL.md Issue #6 Prevention**:
+
 ```python
 # Add to create_app()
 @app.after_request
@@ -339,6 +362,7 @@ def add_cache_headers(response):
 **Status**: Good pytest setup but missing Flask-specific test fixtures
 
 **Current Implementation**:
+
 ```python
 # tests/conftest.py
 import os
@@ -352,6 +376,7 @@ os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_...")
 **Problem**: No pytest fixture that creates a Flask app with test configuration:
 
 **SKILL.md Recommendation**:
+
 ```python
 # tests/conftest.py
 import pytest
@@ -375,6 +400,7 @@ def client(app):
 **Problem**: Without Flask-SQLAlchemy or proper transaction handling, database state may leak between tests.
 
 **Recommendation**:
+
 ```python
 @pytest.fixture
 def app():
@@ -391,23 +417,24 @@ def app():
 
 **Status**: No active violations of the 9 documented Flask issues
 
-| Issue | Status | Notes |
-|-------|--------|-------|
-| #1 stream_with_context teardown | ✅ Not applicable | Not using streaming responses |
-| #2 Async/gevent incompatibility | ✅ Not applicable | Not using async views |
-| #3 Test client session redirect | ✅ Compliant | Using Flask 3.x |
-| #4 App context lost in threads | ⚠️ Review needed | See section 8.1 |
-| #5 Flask-Login session protection | N/A | Not using Flask-Login |
-| #6 CSRF cache interference | ⚠️ See 6.2 | Needs cache headers |
-| #7 Per-request max_content_length | ✅ Not applicable | Not using file uploads |
-| #8 SECRET_KEY rotation | ⚠️ See 8.2 | Not implemented |
-| #9 Werkzeug dependency conflict | ✅ Compliant | Uses modern Flask |
+| Issue                             | Status            | Notes                         |
+| --------------------------------- | ----------------- | ----------------------------- |
+| #1 stream_with_context teardown   | ✅ Not applicable | Not using streaming responses |
+| #2 Async/gevent incompatibility   | ✅ Not applicable | Not using async views         |
+| #3 Test client session redirect   | ✅ Compliant      | Using Flask 3.x               |
+| #4 App context lost in threads    | ⚠️ Review needed  | See section 8.1               |
+| #5 Flask-Login session protection | N/A               | Not using Flask-Login         |
+| #6 CSRF cache interference        | ⚠️ See 6.2        | Needs cache headers           |
+| #7 Per-request max_content_length | ✅ Not applicable | Not using file uploads        |
+| #8 SECRET_KEY rotation            | ⚠️ See 8.2        | Not implemented               |
+| #9 Werkzeug dependency conflict   | ✅ Compliant      | Uses modern Flask             |
 
 #### 8.1 Threading Context Risk ⚠️ LOW
 
 **Location**: `src/app_main/services/` (potential)
 
 **Analysis**: If any external API calls use threading, they should follow:
+
 ```python
 # Correct pattern for background threads
 def background_task(app):
@@ -426,6 +453,7 @@ def start_task():
 #### 8.2 SECRET_KEY_FALLBACKS Not Implemented ⚠️ LOW
 
 **SKILL.md Issue #8**:
+
 ```python
 # Flask 3.1.0 feature for key rotation
 class Config:
@@ -442,6 +470,7 @@ class Config:
 **Status**: env_config.py must be imported first, but implementation is fragile
 
 **Current Implementation**:
+
 ```python
 # src/app.py
 from env_config import _env_file_path  # type: ignore # Triggers environment configuration
@@ -450,6 +479,7 @@ from env_config import _env_file_path  # type: ignore # Triggers environment con
 **Problem**: Relies on side effects during import, which is fragile.
 
 **Recommendation**:
+
 ```python
 # src/app.py
 import os
@@ -471,6 +501,7 @@ from app_main import create_app
 **Status**: Good error handling patterns
 
 **Current Implementation**:
+
 ```python
 # src/app_main/__init__.py:91-103
 @app.errorhandler(404)
@@ -487,9 +518,10 @@ def internal_server_error(e: Exception) -> Tuple[str, int]:
 ```
 
 **Strengths**:
-- Proper use of `@app.errorhandler`
-- User-friendly flash messages
-- Error logging
+
+-   Proper use of `@app.errorhandler`
+-   User-friendly flash messages
+-   Error logging
 
 ---
 
@@ -606,29 +638,29 @@ The application does not have any critical security issues or active violations 
 
 ### Completed Fixes (2026-02-23)
 
-| Issue | Status | Notes |
-|-------|--------|-------|
-| Template/Static Folder Paths | ✅ **FIXED** | Changed to absolute paths using `os.path.abspath()` |
-| extensions.py Module | ✅ **CREATED** | New file at `src/app_main/extensions.py` with CSRF extension |
-| Config Classes | ✅ **ADDED** | `Config`, `DevelopmentConfig`, `TestingConfig`, `ProductionConfig` classes added |
-| Test Fixtures | ✅ **ADDED** | `app`, `client`, `runner`, `auth_client` fixtures in conftest.py |
-| CSRF Cache Control | ✅ **IMPLEMENTED** | `add_cache_headers` after_request handler added to create_app |
-| CSRF Time Limit | ✅ **CONFIGURED** | `WTF_CSRF_TIME_LIMIT` attribute in Config class (default: None) |
-| Blueprint `__init__.py` | ✅ **POPULATED** | All blueprint directories have proper `__init__.py` exports |
-| SECRET_KEY_FALLBACKS | ✅ **IMPLEMENTED** | Support for `FLASK_SECRET_KEY_FALLBACKS` env variable |
-| env_config Import Pattern | ✅ **REFACTORED** | Now uses explicit `load_environment()` function |
+| Issue                        | Status             | Notes                                                                            |
+| ---------------------------- | ------------------ | -------------------------------------------------------------------------------- |
+| Template/Static Folder Paths | ✅ **FIXED**       | Changed to absolute paths using `os.path.abspath()`                              |
+| extensions.py Module         | ✅ **CREATED**     | New file at `src/app_main/extensions.py` with CSRF extension                     |
+| Config Classes               | ✅ **ADDED**       | `Config`, `DevelopmentConfig`, `TestingConfig`, `ProductionConfig` classes added |
+| Test Fixtures                | ✅ **ADDED**       | `app`, `client`, `runner`, `auth_client` fixtures in conftest.py                 |
+| CSRF Cache Control           | ✅ **IMPLEMENTED** | `add_cache_headers` after_request handler added to create_app                    |
+| CSRF Time Limit              | ✅ **CONFIGURED**  | `WTF_CSRF_TIME_LIMIT` attribute in Config class (default: None)                  |
+| Blueprint `__init__.py`      | ✅ **POPULATED**   | All blueprint directories have proper `__init__.py` exports                      |
+| SECRET_KEY_FALLBACKS         | ✅ **IMPLEMENTED** | Support for `FLASK_SECRET_KEY_FALLBACKS` env variable                            |
+| env_config Import Pattern    | ✅ **REFACTORED**  | Now uses explicit `load_environment()` function                                  |
 
 ### Updated Compliance Score: **B+ (85%)**
 
-| Category | New Score | Improvement |
-|----------|-----------|-------------|
-| Application Factory | A (95%) | Fixed template paths, added config_class support |
-| Blueprints | A- (90%) | Proper `__init__.py` files throughout |
-| Extensions | B+ (85%) | Created extensions.py module |
-| Security/CSRF | A- (90%) | Added cache control and time limit configuration |
-| Configuration | B+ (85%) | Added Flask-style config classes |
-| Testing | A- (90%) | Added proper pytest fixtures |
+| Category            | New Score | Improvement                                      |
+| ------------------- | --------- | ------------------------------------------------ |
+| Application Factory | A (95%)   | Fixed template paths, added config_class support |
+| Blueprints          | A- (90%)  | Proper `__init__.py` files throughout            |
+| Extensions          | B+ (85%)  | Created extensions.py module                     |
+| Security/CSRF       | A- (90%)  | Added cache control and time limit configuration |
+| Configuration       | B+ (85%)  | Added Flask-style config classes                 |
+| Testing             | A- (90%)  | Added proper pytest fixtures                     |
 
 ---
 
-*Report generated based on SKILL.md Flask standards v2.0.0*
+_Report generated based on SKILL.md Flask standards v2.0.0_
