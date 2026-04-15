@@ -113,14 +113,14 @@ class UserTokenDB:
         rows = self.db.fetch_query_safe("SELECT * FROM user_tokens ORDER BY user_id ASC")
         return [self._row_to_record(row) for row in rows]
 
-    def add(self, title: str, **kwargs) -> UserTokenRecord:
-        title = title.strip()
-        if not title:
-            raise ValueError("Title is required")
+    def add(self, username: str, **kwargs) -> UserTokenRecord:
+        username = username.strip()
+        if not username:
+            raise ValueError("Username is required")
 
-        cols = ["title"] + list(kwargs.keys())
+        cols = ["username"] + list(kwargs.keys())
         placeholders = ", ".join(["%s"] * len(cols))
-        values = [title] + list(kwargs.values())
+        values = [username] + list(kwargs.values())
 
         try:
             self.db.execute_query(
@@ -128,9 +128,9 @@ class UserTokenDB:
                 tuple(values),
             )
         except pymysql.err.IntegrityError:
-            raise ValueError(f"User '{title}' already exists") from None
+            raise ValueError(f"User '{username}' already exists") from None
 
-        return self._fetch_by_username(title)
+        return self._fetch_by_username(username)
 
     def update(self, user_id: int, **kwargs) -> UserTokenRecord:
         _ = self._fetch_by_id(user_id)
