@@ -1,4 +1,6 @@
-"""Flask application factory."""
+"""
+Flask application factory.
+"""
 
 from __future__ import annotations
 
@@ -9,7 +11,8 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request
 
-from .app_routes import (
+from .config import settings
+from .public.routes import (
     bp_api,
     bp_auth,
     bp_cxtoken,
@@ -17,13 +20,11 @@ from .app_routes import (
     bp_main,
     bp_publish,
 )
-from .config import settings
-from .cookies import CookieHeaderClient
-from .db import ensure_qids_table
-from .extensions import csrf
-from .services import close_cached_db
-from .services.users_services import ensure_user_token_table
-from .users.current import current_user
+from .shared.auth.identity import current_user
+from .shared.core.cookies import CookieHeaderClient
+from .shared.core.extensions import csrf_exempt, csrf_init_app
+from .shared.domain import ensure_db_tables
+from .shared.domain.services import close_cached_db
 
 logger = logging.getLogger(__name__)
 
@@ -102,11 +103,10 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.config["USE_MW_OAUTH"] = oauth_enabled
 
     # Initialize CSRF protection
-    csrf.init_app(app)
+    csrf_init_app(app)
 
     if oauth_enabled and settings.database_data.db_host:
-        ensure_user_token_table()
-        ensure_qids_table(settings.database_data)
+        ensure_db_tables(settings.database_data)
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)
@@ -115,8 +115,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
 
-    if app.config.get("WTF_CSRF_ENABLED"):
-        csrf.exempt(bp_publish)
+    csrf_exempt(app, bp_publish)
 
     @app.context_processor
     def _inject_data():  # pragma: no cover - trivial wrapper

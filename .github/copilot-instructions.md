@@ -104,14 +104,14 @@ src/
 │   │   ├── main/          # Main routes
 │   │   └── post/          # Publishing endpoints
 │   ├── db/                # Database modules
-│   │   ├── db_class.py    # Base database class
+│   │   ├── db_driver.py    # Base database class
 │   │   ├── db_publish_reports.py
-│   │   ├── db_Pages.py
+│   │   ├── db_pages.py
 │   │   └── db_qids.py
 │   ├── services/          # Business logic services
 │   │   ├── mediawiki_api.py
 │   │   ├── oauth_client.py
-│   │   ├── revids_service.py
+│   │   ├── revids_client.py
 │   │   ├── text_processor.py
 │   │   └── wikidata_client.py
 │   ├── helpers/           # Utility functions
@@ -157,7 +157,7 @@ db_config = settings.database_data
 
 ### Database Pattern
 
-Database classes inherit from a base class in `db_class.py`. Each table has its own class:
+Database classes inherit from a base class in `db_driver.py`. Each table has its own class:
 
 - `DbPublishReports`: Manages publish reports
 - `DbPages`: Handles page data

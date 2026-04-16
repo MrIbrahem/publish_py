@@ -1,0 +1,209 @@
+"""
+Database handler for publish_reports table.
+
+Mirrors: php_src/bots/sql/db_publish_reports.php
+"""
+
+from __future__ import annotations
+
+import logging
+from typing import Any, Dict, List, Optional
+
+from ....config import DbConfig
+from ...core.db_driver import Database
+from ..models.report import ReportRecord
+
+logger = logging.getLogger(__name__)
+
+PUBLISH_REPORTS_PARAMS = [
+    {"name": "year", "column": "YEAR(date)", "type": "number"},
+    {"name": "month", "column": "MONTH(date)", "type": "number"},
+    {"name": "title", "column": "title", "type": "text"},
+    {"name": "user", "column": "user", "type": "text"},
+    {"name": "lang", "column": "lang", "type": "text"},
+    {"name": "sourcetitle", "column": "sourcetitle", "type": "text"},
+    {"name": "result", "column": "result", "type": "text"},
+]
+
+ReportsDB_VALID_COLUMNS = frozenset(
+    {
+        "id",
+        "date",
+        "title",
+        "user",
+        "lang",
+        "sourcetitle",
+        "result",
+        "data",
+        "YEAR(date)",
+        "MONTH(date)",
+    }
+)
+
+
+class ReportsDB:
+    """MySQL-backed"""
+
+    def __init__(self, db_data: DbConfig):
+        self.db = Database(db_data)
+
+    def _row_to_record(self, row: dict[str, Any]) -> ReportRecord:
+        return ReportRecord(
+            id=int(row["id"]),
+            date=row["date"],
+            title=row["title"],
+            user=row["user"],
+            lang=row["lang"],
+            sourcetitle=row["sourcetitle"],
+            result=row["result"],
+            data=row["data"],
+        )
+
+    def _fetch_by_id(self, report_id: int) -> ReportRecord:
+        rows = self.db.fetch_query_safe(
+            """
+            SELECT id, date, title, user, lang, sourcetitle, result, data
+            FROM publish_reports
+            WHERE id = %s
+            """,
+            (report_id,),
+        )
+        if not rows:
+            raise LookupError(f"Report id {report_id} was not found")
+        return self._row_to_record(rows[0])
+
+    def list(self) -> List[ReportRecord]:
+        rows = self.db.fetch_query_safe(
+            """
+            SELECT id, date, title, user, lang, sourcetitle, result, data
+            FROM publish_reports
+            ORDER BY id DESC
+            """
+        )
+        return [self._row_to_record(row) for row in rows]
+
+    def add(
+        self,
+        title: str,
+        user: str,
+        lang: str,
+        sourcetitle: str,
+        result: str,
+        data: str,
+    ) -> ReportRecord:
+        last_id = self.db.execute_query_safe(
+            """
+            INSERT INTO publish_reports (title, user, lang, sourcetitle, result, data)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (title, user, lang, sourcetitle, result, data),
+        )
+        return self._fetch_by_id(last_id)
+
+    def delete(self, report_id: int) -> ReportRecord:
+        record = self._fetch_by_id(report_id)
+        self.db.execute_query_safe(
+            "DELETE FROM publish_reports WHERE id = %s",
+            (report_id,),
+        )
+        return record
+
+    def query_with_filters(
+        self,
+        filters: Dict[str, Any],
+        select_fields: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+    ) -> List[ReportRecord]:
+        """Query reports with dynamic filtering.
+
+        Args:
+            filters: Dictionary of filter parameters
+            select_fields: Optional list of fields to return
+            limit: Optional result limit
+
+        Returns:
+            List of matching ReportRecord objects
+        """
+        # Build SELECT clause
+        valid_fields = {"id", "date", "title", "user", "lang", "sourcetitle", "result", "data"}
+        if select_fields:
+            fields = [f for f in select_fields if f in valid_fields]
+            # Always include 'id' for record mapping
+            if "id" not in fields:
+                fields.insert(0, "id")
+            select_clause = ", ".join(fields)
+        else:
+            select_clause = "id, date, title, user, lang, sourcetitle, result, data"
+
+        query = f"SELECT DISTINCT {select_clause} FROM publish_reports"
+
+        params, conditions = self._load_params_and_conditions(filters)
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += " ORDER BY id DESC"
+
+        if limit:
+            # Use parameterized query for LIMIT
+            query += " LIMIT %s"
+            params.append(int(limit))
+
+        rows = self.db.fetch_query_safe(query, tuple(params) if params else None)
+
+        # Handle partial field selection by providing defaults
+        result_records = []
+        for row in rows:
+            record = ReportRecord(
+                id=int(row.get("id", 0)),
+                date=row.get("date", ""),
+                title=row.get("title", ""),
+                user=row.get("user", ""),
+                lang=row.get("lang", ""),
+                sourcetitle=row.get("sourcetitle", ""),
+                result=row.get("result", ""),
+                data=row.get("data", ""),
+            )
+            result_records.append(record)
+
+        return result_records
+
+    def _load_params_and_conditions(self, filters) -> tuple[List[Any], List[str]]:
+        params: List[Any] = []
+        conditions: List[str] = []
+
+        for param_def in PUBLISH_REPORTS_PARAMS:
+            name = param_def["name"]
+            column = param_def["column"]
+
+            # Validate column is in the trusted allowlist (defense in depth)
+            if column not in ReportsDB_VALID_COLUMNS:
+                logger.warning(f"Skipping unrecognized column: {column}")
+                continue
+
+            if name not in filters:
+                continue
+
+            value = filters[name]
+
+            # Handle special values
+            if value in ("not_mt", "not_empty"):
+                conditions.append(f"({column} != '' AND {column} IS NOT NULL)")
+            elif value in ("mt", "empty"):
+                conditions.append(f"({column} = '' OR {column} IS NULL)")
+            elif value in (">0", "&#62;0"):
+                conditions.append(f"{column} > 0")
+            elif str(value).lower() == "all":
+                continue  # Skip this filter
+            else:
+                conditions.append(f"{column} = %s")
+                params.append(value)
+
+        return params, conditions
+
+
+__all__ = [
+    "ReportsDB",
+    "ReportRecord",
+    "PUBLISH_REPORTS_PARAMS",
+]

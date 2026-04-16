@@ -247,7 +247,7 @@ def get_settings(config_class=None):
 **Current Implementation**:
 
 ```python
-# src/app_main/db/db_class.py
+# src/app_main/db/db_driver.py
 class Database:
     """Thin wrapper around a PyMySQL connection"""
     def __init__(self, db_data: DbConfig):

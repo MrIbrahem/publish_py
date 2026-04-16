@@ -46,7 +46,7 @@ app = create_app()
 
 ### Key Directories
 - `src/app_main/app_routes/` - Flask blueprints: `bp_api`, `bp_auth`, `bp_cxtoken`, `bp_main`, `bp_post`, `bp_fixrefs`
-- `src/app_main/db/` - Database classes inheriting from `db_class.py` (`DbPublishReports`, `DbPages`, `DbQids`)
+- `src/app_main/db/` - Database classes inheriting from `db_driver.py` (`DbPublishReports`, `DbPages`, `DbQids`)
 - `src/app_main/services/` - External integrations (mediawiki_api, wikidata_client, oauth_client, text_processor)
 - `src/app_main/users/` - User context (`current.py`) and storage (`store.py`)
 
@@ -54,7 +54,7 @@ app = create_app()
 Frozen dataclasses with `@lru_cache` singletons in `src/app_main/config.py`. Access via `from app_main.config import settings`.
 
 ### Database Pattern
-Base `Database` class in `db_class.py` provides:
+Base `Database` class in `db_driver.py` provides:
 - Context manager support (`with Database(config) as db:`)
 - Automatic retry with exponential backoff for transient errors
 - Connection pooling via thread-local cache

@@ -3,6 +3,7 @@ src/all_pages_revids.json
 .github/workflows/snorkell-auto-documentation.yml
 *.txt
 !requirements.txt
+!tree.txt
 fix_refs_repo1
 src/publish_reports/**/*.json
 src/publish_reports/index2.php
@@ -34,3 +35,4 @@ coverage.xml
 /php_publish
 app2.py
 */__pycache__/*
+*.zip

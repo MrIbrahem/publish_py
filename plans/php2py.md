@@ -33,7 +33,7 @@ php_src/
 │   ├── cors.php            # CORS validation
 │   ├── sql/
 │   │   ├── access_helps.php # Access key management
-│   │   ├── db_Pages.php     # Pages table operations
+│   │   ├── db_pages.php     # Pages table operations
 │   │   └── db_publish_reports.php # Reports table
 │   ├── files_helps.php     # File logging
 │   ├── helps.php           # Encryption helpers
@@ -57,7 +57,7 @@ src/app/
 │   ├── oauth_client.py     # ✅ CREATED: OAuth client wrapper
 │   ├── mediawiki_api.py    # ✅ CREATED: MediaWiki API client
 │   ├── wikidata_client.py  # ✅ CREATED: Wikidata integration
-│   ├── revids_service.py   # ✅ CREATED: Revision ID lookup
+│   ├── revids_client.py   # ✅ CREATED: Revision ID lookup
 │   └── text_processor.py   # ✅ CREATED: Text processing
 ├── helpers/
 │   ├── __init__.py         # ✅ CREATED
@@ -80,13 +80,13 @@ src/app/
 | `Publish\AccessHelps\get_access_from_db()` | `users/store.py:get_user_token_by_username()` | ✅ DONE |
 | `Publish\AccessHelps\del_access_from_db()` | `users/store.py:delete_user_token_by_username()` | ✅ DONE |
 | `Publish\FilesHelps\to_do()` | `helpers/files.py:to_do()` | ✅ DONE |
-| `Publish\Revids\get_revid()` | `services/revids_service.py:get_revid()` | ✅ DONE |
-| `Publish\Revids\get_revid_db()` | `services/revids_service.py:get_revid_db()` | ✅ DONE |
+| `Publish\Revids\get_revid()` | `services/revids_client.py:get_revid()` | ✅ DONE |
+| `Publish\Revids\get_revid_db()` | `services/revids_client.py:get_revid_db()` | ✅ DONE |
 | `Publish\DoEdit\publish_do_edit()` | `services/mediawiki_api.py:publish_do_edit()` | ✅ DONE |
 | `Publish\EditProcess\processEdit()` | `app_routes/post/routes.py:_process_edit()` | ✅ DONE |
 | `Publish\WD\LinkToWikidata()` | `services/wikidata_client.py:link_to_wikidata()` | ✅ DONE |
 | `Publish\AddToDb\InsertPublishReports()` | `db/db_publish_reports.py:ReportsDB.add()` | ✅ DONE |
-| `Publish\AddToDb\InsertPageTarget()` | `db/db_Pages.py:PagesDB.insert_page_target()` | ✅ DONE |
+| `Publish\AddToDb\InsertPageTarget()` | `db/db_pages.py:PagesDB.insert_page_target()` | ✅ DONE |
 
 ---
 
@@ -146,7 +146,7 @@ def is_allowed() -> str | None:
     return None
 ```
 
-#### 2. Create [src/app/services/oauth_client.py](../src/app_main/online_services/oauth_client.py)
+#### 2. Create [src/app/services/oauth_client.py](../src/app_main/clients/oauth_client.py)
 
 ```python
 """MediaWiki OAuth client wrapper."""
@@ -403,7 +403,7 @@ def make_summary(revid: str, sourcetitle: str, target_lang: str, hashtag: str = 
     return f"Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{target_lang} {hashtag}"
 ```
 
-#### 2. Create [src/app/services/mediawiki_api.py](../src/app_main/online_services/mediawiki_api.py)
+#### 2. Create [src/app/services/mediawiki_api.py](../src/app_main/clients/mediawiki_api.py)
 
 ```python
 """MediaWiki API client for edit operations."""
@@ -433,7 +433,7 @@ def publish_do_edit(api_params: dict, wiki: str, access_key: str, access_secret:
     return result
 ```
 
-#### 3. Create [src/app/services/revids_service.py](../src/app_main/online_services/revids_service.py)
+#### 3. Create [src/app/services/revids_client.py](../src/app_main/clients/revids_client.py)
 
 ```python
 """Revision ID lookup service."""
@@ -487,7 +487,7 @@ def get_revid_db(sourcetitle: str) -> str:
         return ""
 ```
 
-#### 4. Create [src/app/services/wikidata_client.py](../src/app_main/online_services/wikidata_client.py)
+#### 4. Create [src/app/services/wikidata_client.py](../src/app_main/clients/wikidata_client.py)
 
 ```python
 """Wikidata integration service."""
@@ -628,7 +628,7 @@ def to_do(tab: dict[str, Any], file_name: str) -> None:
         logger.error(f"Error writing to file {file_path}: {e}")
 ```
 
-#### 6. Create [src/app/services/text_processor.py](../src/app_main/online_services/text_processor.py)
+#### 6. Create [src/app/services/text_processor.py](../src/app_main/clients/text_processor.py)
 
 ```python
 """Text processing utilities for page content."""
@@ -668,12 +668,12 @@ from flask import Blueprint, jsonify, request
 from ...users.store import get_user_token, get_user_token_by_username
 from ...users.current import current_user
 from ...db.db_publish_reports import ReportsDB
-from ...db.db_Pages import PagesDB
+from ...db.db_pages import PagesDB
 from ..helpers.format import format_title, format_user, determine_hashtag, make_summary
 from ..helpers.files import to_do
 from ..services.oauth_client import post_params
 from ..services.mediawiki_api import publish_do_edit
-from ..services.revids_service import get_revid, get_revid_db
+from ..services.revids_client import get_revid, get_revid_db
 from ..services.wikidata_client import link_to_wikidata
 from ..services.text_processor import do_changes_to_text
 from ...config import settings
@@ -958,7 +958,7 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
 The PHP code uses an `access_keys` table, while Python uses `user_tokens`.
 - use `user_tokens` insted of `access_keys` Table
 
-### 3. Extend [src/app/db/db_Pages.py](../src/app_main/db/db_Pages.py)
+### 3. Extend [src/app/db/db_pages.py](../src/app_main/db/db_pages.py)
 
 Add `insert_page_target` method:
 
@@ -1162,7 +1162,7 @@ def test_post_requires_auth(client):
 
 2. **Update database layer**
    - [x] Add `get_user_token_by_username()` to `users/store.py`
-   - [x] Add `insert_page_target()` to `db/db_Pages.py`
+   - [x] Add `insert_page_target()` to `db/db_pages.py`
    - [x] Ensure `qids` table exists
 
 3. **Add dependencies**
@@ -1181,7 +1181,7 @@ def test_post_requires_auth(client):
      - `publish_do_edit()`
 
 3. **Create revision ID service**
-   - [x] `services/revids_service.py` with:
+   - [x] `services/revids_client.py` with:
      - `get_revid()`
      - `get_revid_db()`
 
@@ -1251,7 +1251,7 @@ def test_post_requires_auth(client):
 - [x] `src/app/services/__init__.py`
 - [x] `src/app/services/oauth_client.py`
 - [x] `src/app/services/mediawiki_api.py`
-- [x] `src/app/services/revids_service.py`
+- [x] `src/app/services/revids_client.py`
 - [x] `src/app/services/wikidata_client.py`
 - [x] `src/app/services/text_processor.py`
 - [x] `tests/test_helpers/test_cors.py`
@@ -1267,7 +1267,7 @@ def test_post_requires_auth(client):
 - [x] `src/app/app_routes/cxtoken/routes.py` - Full implementation
 - [x] `src/app/app_routes/post/routes.py` - Full implementation
 - [x] `src/app/users/store.py` - Add `get_user_token_by_username()`
-- [x] `src/app/db/db_Pages.py` - Add `insert_page_target()`
+- [x] `src/app/db/db_pages.py` - Add `insert_page_target()`
 - [x] `src/app/config.py` - Add CORS domains config
 - [x] `requirements.txt` or `pyproject.toml` - Add dependencies
 - [x] `src/app/__init__.py` - Register new blueprints if needed
