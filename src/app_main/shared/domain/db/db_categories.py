@@ -12,7 +12,6 @@ from functools import lru_cache
 
 from ....config import DbConfig
 from ...core.db_driver import Database
-from .schema import sql_tables
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +21,6 @@ class CategoriesDB:
 
     def __init__(self, db_data: DbConfig):
         self.db = Database(db_data)
-        self._ensure_table()
-
-    def _ensure_table(self) -> None:
-        self.db.execute_query_safe(sql_tables.categories)
 
     def retrieve_campaign_categories(self) -> dict[str, str]:
         """Retrieve campaign to category mapping from database.
