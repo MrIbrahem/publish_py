@@ -72,13 +72,12 @@ class TestAddQid:
         """Test that add_qid adds a QID and returns the record."""
         mock_store = MagicMock()
         mock_record = MagicMock()
-        mock_store.fetch_by_title.return_value = mock_record
+        mock_store.add.return_value = mock_record
         monkeypatch.setattr("src.app_main.shared.domain.services.qids_service.get_qids_db", lambda: mock_store)
 
         result = add_qid("TestArticle", "Q12345")
 
         mock_store.add.assert_called_once_with("TestArticle", "Q12345")
-        mock_store.fetch_by_title.assert_called_once_with("TestArticle")
         assert result is mock_record
 
 
