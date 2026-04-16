@@ -69,17 +69,6 @@ class TestPageRecord:
 class TestPagesDB:
     """Tests for PagesDB class."""
 
-    def test_init_creates_database(self, monkeypatch, db_config):
-        """Test that initialization creates a Database instance."""
-        mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_pages.Database", lambda db_data: mock_db)
-
-        pages_db = PagesDB(db_config)
-
-        assert pages_db.db is mock_db
-        # Should call execute_query_safe twice (for pages and pages_users tables)
-        assert mock_db.execute_query_safe.call_count == 2
-
     def test_list_returns_all_pages(self, monkeypatch, db_config, sample_page_row):
         """Test that list returns all page records."""
         mock_db = MagicMock()

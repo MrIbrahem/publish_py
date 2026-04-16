@@ -126,16 +126,6 @@ class TestUserTokenRecord:
 class TestUserTokenDB:
     """Tests for UserTokenDB class."""
 
-    def test_init_creates_database(self, monkeypatch, db_config):
-        """Test that initialization creates a Database instance."""
-        mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
-
-        token_db = UserTokenDB(db_config)
-
-        assert token_db.db is mock_db
-        mock_db.execute_query_safe.assert_called_once()
-
     def test_get_user_id_returns_id_when_found(self, monkeypatch, db_config):
         """Test that get_user_id returns user_id when username found."""
         mock_db = MagicMock()

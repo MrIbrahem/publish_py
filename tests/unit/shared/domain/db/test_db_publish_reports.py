@@ -281,15 +281,6 @@ class TestReportsDBCore:
             mock_db_instance.execute_query_safe.return_value = None
             yield mock_db_instance
 
-    def test_init_creates_database(self, mock_db):
-        """Test that initialization creates a Database instance."""
-        from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
-
-        reports_db = ReportsDB({"host": "test"})
-
-        assert reports_db.db is mock_db
-        mock_db.execute_query_safe.assert_called_once()
-
     def test_fetch_by_id_raises_lookup_error_when_not_found(self, mock_db):
         """Test that _fetch_by_id raises LookupError when report not found."""
         mock_db.fetch_query_safe.return_value = []

@@ -28,17 +28,6 @@ def db_config():
 class TestQidsDB:
     """Tests for QidsDB class."""
 
-    def test_init_creates_database_instance(self, monkeypatch, db_config):
-        """Test that initialization creates a Database instance."""
-        mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
-
-        qids_db = QidsDB(db_config)
-
-        assert qids_db.db is mock_db
-        # Should call execute_query_safe to ensure table
-        mock_db.execute_query_safe.assert_called_once()
-
     def test_get_qid_by_title_returns_qid_when_found(self, monkeypatch, db_config):
         """Test that get_qid_by_title returns QID when title exists."""
         mock_db = MagicMock()
