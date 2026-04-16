@@ -6,16 +6,16 @@ from dataclasses import dataclass
 
 @dataclass
 class TablesCreatesSql:
-    coordinator: str
+    coordinators: str
     full_translators: str
     language_settings: str
     settings: str
     users_no_inprocess: str
 
 
-coordinator= """
+coordinators= """
 
-CREATE TABLE IF NOT EXISTS coordinator (
+CREATE TABLE IF NOT EXISTS coordinators (
     id int unsigned NOT NULL AUTO_INCREMENT,
     user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
     active int NOT NULL DEFAULT '1',
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS users_no_inprocess (
 """
 
 admin_sql_tables = TablesCreatesSql(
-    coordinator=coordinator,
+    coordinators=coordinators,
     full_translators=full_translators,
     language_settings=language_settings,
     settings=settings,

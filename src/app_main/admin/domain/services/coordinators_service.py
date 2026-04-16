@@ -40,7 +40,7 @@ def list_coordinators() -> List[CoordinatorRecord]:
 def active_coordinators() -> List[CoordinatorRecord]:
     """Return all active coordinator records."""
     store = get_coordinators_db()
-    return store.list_active()
+    return [u.user for u in store.list() if u.active]
 
 
 def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
