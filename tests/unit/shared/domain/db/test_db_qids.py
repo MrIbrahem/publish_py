@@ -32,16 +32,16 @@ class TestQidsDB:
     def test_fetch_by_title_returns_qid_when_found(self, monkeypatch, db_config):
         """Test that fetch_by_title returns QID when title exists."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"qid": "Q12345"}]
+        mock_db.fetch_query_safe.return_value = [{"id": 5, "qid": "Q12345", "title": "TestArticle", "add_date": "2024-01-01"}]
 
         monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
         result = qids_db.fetch_by_title("TestArticle")
 
-        assert result == "Q12345"
+        assert result.qid == "Q12345"
         mock_db.fetch_query_safe.assert_called_with(
-            "SELECT qid FROM qids WHERE title = %s",
+            "SELECT id, title, qid, add_date FROM qids WHERE title = %s",
             ("TestArticle",),
         )
 
