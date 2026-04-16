@@ -10,7 +10,7 @@ from typing import Any, List
 
 import pymysql
 
-from .....config import DbConfig
+from ....config import DbConfig
 from ....shared.core.db_driver import Database
 from ..models.setting import SettingRecord
 

@@ -10,7 +10,7 @@ from typing import Any, List
 
 import pymysql
 
-from .....config import DbConfig
+from ....config import DbConfig
 from ....shared.core.db_driver import Database
 from ..models.in_process import InProcessRecord
 
@@ -102,7 +102,7 @@ class InProcessDB:
 
         record = self.fetch_by_title_user_lang(title, user, lang)
         if not record:
-            raise RuntimeError(f"Failed to fetch newly created in-process record")
+            raise RuntimeError("Failed to fetch newly created in-process record")
         return record
 
     def update(self, process_id: int, **kwargs) -> InProcessRecord:

@@ -6,7 +6,7 @@ import logging
 from typing import List
 
 from ....config import settings
-from ...shared.domain.services.db_service import has_db_config
+from ....shared.domain.services.db_service import has_db_config
 from ..db.db_langs import LangsDB
 from ..models.lang import LangRecord
 
