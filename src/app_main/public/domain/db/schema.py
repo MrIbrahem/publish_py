@@ -186,8 +186,7 @@ CREATE TABLE
   )
 """
 
-# sql_tables
-sql_tables = PublicSqlSchema(
+public_sql_tables = PublicSqlSchema(
     assessments=assessments,
     enwiki_pageviews=enwiki_pageviews,
     in_process=in_process,

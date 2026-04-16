@@ -79,8 +79,8 @@ CREATE TABLE
   )
 
 """
-# sql_tables
-sql_tables = TablesCreatesSql(
+
+admin_sql_tables = TablesCreatesSql(
     coordinator=coordinator,
     full_translators=full_translators,
     language_settings=language_settings,
