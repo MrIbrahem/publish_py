@@ -1,4 +1,8 @@
-"""Utilities for managing settings."""
+"""
+
+Utilities for managing settings.
+TODO: this is copy of settings_service.py and should be work with the new SettingsDB1 and SettingRecord1.
+"""
 
 from __future__ import annotations
 

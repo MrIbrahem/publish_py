@@ -1,4 +1,7 @@
-"""Admin-only routes for managing application settings."""
+"""
+Admin-only routes for managing application settings.
+TODO: service should moved to settings1_service.py and should be work with the new SettingsDB1 and SettingRecord1.
+"""
 
 from __future__ import annotations
 

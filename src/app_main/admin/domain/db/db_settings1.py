@@ -1,3 +1,8 @@
+"""
+
+TODO: should use SettingRecord1, and `SettingsDB1` class should have the same functions as `SettingsDB` but with the new table structure.
+
+"""
 from __future__ import annotations
 
 import json
