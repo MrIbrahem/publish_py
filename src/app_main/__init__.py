@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from typing import Any, Tuple, Type
 
-from flask import Flask, flash, render_template, request
+from flask import Flask, flash, render_template, request  # , g
 
 from .admin.domain.db_ensure_tables import ensure_admin_db_tables
 from .admin.domain.services.coordinators_service import active_coordinators
@@ -167,4 +167,5 @@ def create_app(config_class: Type | None = None) -> Flask:
             response.headers["Expires"] = "0"
         return response
 
+    # g.settings = settings  # Make settings available in Flask's global context
     return app
