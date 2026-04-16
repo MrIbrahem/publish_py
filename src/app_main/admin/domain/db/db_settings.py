@@ -1,4 +1,4 @@
-"""Database handler for settings1 table.
+"""Database handler for settings table.
 
 Stores application settings with key-value structure supporting multiple value types.
 """
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class SettingsDB:
-    """MySQL-backed application settings1 store."""
+    """MySQL-backed application settings store."""
 
     def __init__(self, database_data: DbConfig):
         self.db = Database(database_data)
@@ -29,7 +29,7 @@ class SettingsDB:
     def fetch_by_id(self, setting_id: int) -> SettingRecord | None:
         """Get a setting record by ID."""
         rows = self.db.fetch_query_safe(
-            "SELECT * FROM `settings1` WHERE `id` = %s",
+            "SELECT * FROM `settings` WHERE `id` = %s",
             (setting_id,),
         )
         if not rows:
@@ -40,7 +40,7 @@ class SettingsDB:
     def fetch_by_key(self, key: str) -> SettingRecord | None:
         """Get a setting record by key."""
         rows = self.db.fetch_query_safe(
-            "SELECT * FROM `settings1` WHERE `key` = %s",
+            "SELECT * FROM `settings` WHERE `key` = %s",
             (key,),
         )
         if not rows:
@@ -49,7 +49,7 @@ class SettingsDB:
 
     def list(self) -> List[SettingRecord]:
         """Return all setting records."""
-        rows = self.db.fetch_query_safe("SELECT * FROM `settings1` ORDER BY `id` ASC")
+        rows = self.db.fetch_query_safe("SELECT * FROM `settings` ORDER BY `id` ASC")
         return [self._row_to_record(row) for row in rows]
 
     def add(
@@ -78,7 +78,7 @@ class SettingsDB:
         try:
             self.db.execute_query(
                 """
-                INSERT INTO `settings1` (`key`, `title`, `value_type`, `value`)
+                INSERT INTO `settings` (`key`, `title`, `value_type`, `value`)
                 VALUES (%s, %s, %s, %s)
                 """,
                 (data.key, data.title, data.value_type, data.value),
@@ -100,7 +100,7 @@ class SettingsDB:
         record.value = value
 
         self.db.execute_query_safe(
-            "UPDATE `settings1` SET `value` = %s WHERE `id` = %s",
+            "UPDATE `settings` SET `value` = %s WHERE `id` = %s",
             (record.value, setting_id),
         )
         updated = self.fetch_by_id(setting_id)
@@ -115,7 +115,7 @@ class SettingsDB:
             raise ValueError(f"Setting record with ID {setting_id} not found")
 
         self.db.execute_query_safe(
-            "DELETE FROM `settings1` WHERE `id` = %s",
+            "DELETE FROM `settings` WHERE `id` = %s",
             (setting_id,),
         )
         return record

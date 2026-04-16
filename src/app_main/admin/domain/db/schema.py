@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS language_settings (
 
 # Type -> form_type
 settings = """
-    CREATE TABLE IF NOT EXISTS settings1 (
+    CREATE TABLE IF NOT EXISTS settings (
         `id` INT NOT NULL AUTO_INCREMENT,
         `key` VARCHAR(190) NOT NULL,
         `title` VARCHAR(500) NOT NULL,

@@ -1,4 +1,4 @@
-"""Utilities for managing settings1 (key-value settings with type support)."""
+"""Utilities for managing settings (key-value settings with type support)."""
 
 from __future__ import annotations
 
