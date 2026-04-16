@@ -127,3 +127,15 @@ def mock_load_request(mocker):
     mock_req = MagicMock()
     mocker.patch("src.app_main.shared.core.cors._load_request", return_value=mock_req)
     return mock_req
+
+
+@pytest.fixture
+def db_config():
+    """Fixture for DbConfig instance."""
+    from src.app_main.config import DbConfig
+    return DbConfig(
+        db_name="test_db",
+        db_host="localhost",
+        db_user="user",
+        db_password="pass",
+    )

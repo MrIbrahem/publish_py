@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS categories (
     is_default int NOT NULL DEFAULT '0',
     PRIMARY KEY (id),
     UNIQUE KEY category (category)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+)
 """
 
 pages = """
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS pages (
     PRIMARY KEY (id),
     KEY idx_title (title),
     KEY target (target)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+)
 """
 
 pages_users = """
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS pages_users (
     PRIMARY KEY (id),
     KEY idx_title (title),
     KEY target (target)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+)
 """
 
 publish_reports = """
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS publish_reports (
         utf8mb4 COLLATE utf8mb4_bin NOT NULL,
         PRIMARY KEY (id),
         CONSTRAINT publish_reports_chk_1 CHECK (json_valid (data))
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+)
 """
 
 qids = """
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS qids (
     PRIMARY KEY (id),
     UNIQUE KEY title (title),
     KEY qid (qid)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+)
 """
 
 user_tokens = """
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS user_tokens (
     rotated_at datetime DEFAULT NULL,
     PRIMARY KEY (user_id),
     UNIQUE KEY uq_user_tokens_username (username)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+)
 """
 
 # sql_tables

@@ -17,6 +17,8 @@ class TestEnsureDbTables:
         """Create a mock database for testing."""
         mock_db_instance = MagicMock()
         mock_db_instance.execute_query_safe.return_value = None
+        mock_db_instance.__enter__ = MagicMock(return_value=mock_db_instance)
+        mock_db_instance.__exit__ = MagicMock(return_value=False)
 
         def mock_database_init(config):
             return mock_db_instance

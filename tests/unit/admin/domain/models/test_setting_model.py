@@ -22,7 +22,7 @@ class TestSettingRecord:
         assert record.id == 1
         assert record.title == "test_setting"
         assert record.displayed == "Test Setting"
-        assert record.Type == "check"  # Default value
+        assert record.form_type == "check"  # Default value
         assert record.value == 0
         assert record.ignored == 0
 
@@ -32,14 +32,14 @@ class TestSettingRecord:
             id=1,
             title="test_setting",
             displayed="Test Setting",
-            Type="text",
+            form_type="text",
             value=1,
             ignored=1,
         )
         assert record.id == 1
         assert record.title == "test_setting"
         assert record.displayed == "Test Setting"
-        assert record.Type == "text"
+        assert record.form_type == "text"
         assert record.value == 1
         assert record.ignored == 1
 
@@ -49,7 +49,7 @@ class TestSettingRecord:
             id=1,
             title="test_setting",
             displayed="Test Setting",
-            Type="check",
+            form_type="check",
             value=1,
             ignored=0,
         )
@@ -58,7 +58,7 @@ class TestSettingRecord:
             "id": 1,
             "title": "test_setting",
             "displayed": "Test Setting",
-            "Type": "check",
+            "form_type": "check",
             "value": 1,
             "ignored": 0,
         }
