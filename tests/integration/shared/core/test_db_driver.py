@@ -21,7 +21,7 @@ class TestDatabaseIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.domain.db.db_driver.pymysql.connect") as mock_connect:
+        with patch("src.app_main.shared.core.db_driver.pymysql.connect") as mock_connect:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn
 
@@ -47,7 +47,7 @@ class TestDatabaseIntegration:
             db_password="test_pass",
         )
 
-        with patch("src.app_main.shared.domain.db.db_driver.pymysql.connect") as mock_connect:
+        with patch("src.app_main.shared.core.db_driver.pymysql.connect") as mock_connect:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn
 
