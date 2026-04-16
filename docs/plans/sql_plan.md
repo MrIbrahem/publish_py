@@ -1,6 +1,6 @@
 # for each table in
 
-## src/app_main/public/domain/db/schema.py
+## src/app_main/admin/domain/db/schema.py
 
 -   coordinator
 -   full_translators
@@ -8,12 +8,12 @@
 -   settings
 -   users_no_inprocess
 
-## src/app_main/admin/domain/db/schema.py
+## src/app_main/public/domain/db/schema.py
 
+-   langs
 -   assessments
 -   enwiki_pageviews
 -   in_process
--   langs
 -   mdwiki_revids
 -   pages_users_to_main
 -   projects
@@ -25,10 +25,24 @@
 
 # create models
 
--   src/app_main/public/domain/models
--   src/app_main/admin/domain/models
+## src/app_main/admin/domain/models
 
-models tests
+-   coordinator.py
+-   ...
 
--   tests/unit/public/domain/models
--   tests/unit/admin/domain/models
+## src/app_main/public/domain/models
+
+-   lang.py
+-   ...
+
+# models tests
+
+## tests/unit/admin/domain/models
+
+-   test_coordinator_model.py
+-   ...
+
+## tests/unit/public/domain/models
+
+-   test_lang_model.py
+-   ...
