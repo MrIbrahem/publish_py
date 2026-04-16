@@ -1,4 +1,5 @@
-"""Unit tests for db.db_qids module.
+"""
+Unit tests for db.db_qids module.
 
 Tests for Qids database operations.
 """
