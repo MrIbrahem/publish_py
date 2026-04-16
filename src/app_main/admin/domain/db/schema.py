@@ -16,10 +16,10 @@ coordinators = """
 
 CREATE TABLE IF NOT EXISTS coordinators (
     id int unsigned NOT NULL AUTO_INCREMENT,
-    user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-    active int NOT NULL DEFAULT '1',
+    username varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+    is_active int NOT NULL DEFAULT '1',
     PRIMARY KEY (id),
-    UNIQUE KEY user (user)
+    UNIQUE KEY username (username)
   )
 """
 

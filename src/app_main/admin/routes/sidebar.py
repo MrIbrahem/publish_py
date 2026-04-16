@@ -114,9 +114,9 @@ def create_side(active_route):
         ],
         "Users": [
             SidebarItem(
-                id="admins",
+                id="coordinators",
                 admin=1,
-                href="admins",
+                href="coordinators",
                 title="Coordinators",
                 icon="bi-person-gear",
             ),

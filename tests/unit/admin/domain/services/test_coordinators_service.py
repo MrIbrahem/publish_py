@@ -174,9 +174,9 @@ class TestUpdateCoordinator:
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
         )
 
-        result = update_coordinator(1, user="UpdatedUser", active=0)
+        result = update_coordinator(1, username="UpdatedUser", active=0)
 
-        mock_store.update.assert_called_once_with(1, user="UpdatedUser", active=0)
+        mock_store.update.assert_called_once_with(1, username="UpdatedUser", active=0)
         assert result is mock_record
 
 
@@ -213,7 +213,7 @@ class TestIsCoordinator:
         assert result is True
 
     def test_returns_false_when_user_not_coordinator(self, monkeypatch):
-        """Test that is_coordinator returns False when user not found."""
+        """Test that is_coordinator returns False when username not found."""
         mock_store = MagicMock()
         mock_store.fetch_by_user.return_value = None
         monkeypatch.setattr(

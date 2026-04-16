@@ -8,15 +8,15 @@ class CoordinatorRecord:
     """Representation of a coordinator record."""
 
     id: int
-    user: str
-    active: int = 1
+    username: str
+    is_active: int = 1
 
     def to_dict(self) -> dict:
         """Convert record to dictionary."""
         return {
             "id": self.id,
-            "user": self.user,
-            "active": self.active,
+            "username": self.username,
+            "is_active": self.is_active,
         }
 
 

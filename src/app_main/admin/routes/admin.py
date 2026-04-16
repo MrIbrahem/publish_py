@@ -12,14 +12,16 @@ from flask import (
     url_for,
 )
 
+from .coordinators import Coordinators
+
 # from ..admin_routes import (
 #     Coordinators,
 #     Jobs,
 #     OwidCharts,
-#     SettingsRoutes,
 #     Templates,
 # )
 from .decorators import admin_required
+from .settings import SettingsRoutes
 from .sidebar import create_side
 
 logger = logging.getLogger(__name__)
@@ -42,12 +44,12 @@ def index():
     return render_template("admins/index.html")
 
 
-# def register_blueprints(bp_admin) -> None:
-#     Coordinators(bp_admin)
-#     Templates(bp_admin)
-#     SettingsRoutes(bp_admin)
-#     Jobs(bp_admin)
-#     OwidCharts(bp_admin)
+def register_blueprints(bp_admin) -> None:
+    Coordinators(bp_admin)
+    # Templates(bp_admin)
+    SettingsRoutes(bp_admin)
+    # Jobs(bp_admin)
+    # OwidCharts(bp_admin)
 
 
-# register_blueprints(bp_admin)
+register_blueprints(bp_admin)

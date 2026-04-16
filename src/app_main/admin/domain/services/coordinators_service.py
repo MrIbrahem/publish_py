@@ -40,7 +40,7 @@ def list_coordinators() -> List[CoordinatorRecord]:
 def active_coordinators() -> List[CoordinatorRecord]:
     """Return all active coordinator records."""
     store = get_coordinators_db()
-    return [u.user for u in store.list() if u.active]
+    return [u.username for u in store.list() if u.is_active]
 
 
 def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
@@ -49,22 +49,22 @@ def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
     return store.fetch_by_id(coordinator_id)
 
 
-def get_coordinator_by_user(user: str) -> CoordinatorRecord | None:
+def get_coordinator_by_user(username: str) -> CoordinatorRecord | None:
     """Get a coordinator record by username."""
     store = get_coordinators_db()
-    return store.fetch_by_user(user)
+    return store.fetch_by_user(username)
 
 
-def add_coordinator(user: str, active: int = 1) -> CoordinatorRecord:
+def add_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
     """Add a new coordinator record."""
     store = get_coordinators_db()
-    return store.add(user, active)
+    return store.add(username, is_active)
 
 
-def add_or_update_coordinator(user: str, active: int = 1) -> CoordinatorRecord:
+def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
     """Add or update a coordinator record."""
     store = get_coordinators_db()
-    return store.add_or_update(user, active)
+    return store.add_or_update(username, is_active)
 
 
 def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
@@ -79,11 +79,11 @@ def delete_coordinator(coordinator_id: int) -> CoordinatorRecord:
     return store.delete(coordinator_id)
 
 
-def is_coordinator(user: str) -> bool:
-    """Check if a user is a coordinator."""
+def is_coordinator(username: str) -> bool:
+    """Check if a username is a coordinator."""
     store = get_coordinators_db()
-    record = store.fetch_by_user(user)
-    return record is not None and record.active == 1
+    record = store.fetch_by_user(username)
+    return record is not None and record.is_active == 1
 
 
 __all__ = [
