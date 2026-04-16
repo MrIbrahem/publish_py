@@ -8,6 +8,11 @@ src/
 │   │   ├── domain/
 │   │   │   ├── db/
 │   │   │   │   ├── __init__.py
+│   │   │   │   ├── db_coordinators.py
+│   │   │   │   ├── db_full_translators.py
+│   │   │   │   ├── db_language_settings.py
+│   │   │   │   ├── db_settings.py
+│   │   │   │   ├── db_users_no_inprocess.py
 │   │   │   │   └── schema.py
 │   │   │   ├── db_ensure_tables.py
 │   │   │   ├── models/
@@ -18,7 +23,12 @@ src/
 │   │   │   │   ├── setting.py
 │   │   │   │   └── users_no_inprocess.py
 │   │   │   └── services/
-│   │   │       └── __init__.py
+│   │   │       ├── __init__.py
+│   │   │       ├── coordinators_service.py
+│   │   │       ├── full_translators_service.py
+│   │   │       ├── language_settings_service.py
+│   │   │       ├── settings_service.py
+│   │   │       └── users_no_inprocess_service.py
 │   │   └── routes/
 │   │       └── __init__.py
 │   ├── config.py
@@ -27,6 +37,18 @@ src/
 │   │   ├── domain/
 │   │   │   ├── db/
 │   │   │   │   ├── __init__.py
+│   │   │   │   ├── db_assessments.py
+│   │   │   │   ├── db_enwiki_pageviews.py
+│   │   │   │   ├── db_in_process.py
+│   │   │   │   ├── db_langs.py
+│   │   │   │   ├── db_mdwiki_revids.py
+│   │   │   │   ├── db_pages_users_to_main.py
+│   │   │   │   ├── db_projects.py
+│   │   │   │   ├── db_refs_counts.py
+│   │   │   │   ├── db_translate_type.py
+│   │   │   │   ├── db_users.py
+│   │   │   │   ├── db_views_new.py
+│   │   │   │   ├── db_words.py
 │   │   │   │   └── schema.py
 │   │   │   ├── db_ensure_tables.py
 │   │   │   ├── models/
@@ -44,7 +66,19 @@ src/
 │   │   │   │   ├── views_new.py
 │   │   │   │   └── word.py
 │   │   │   └── services/
-│   │   │       └── __init__.py
+│   │   │       ├── __init__.py
+│   │   │       ├── assessments_service.py
+│   │   │       ├── enwiki_pageviews_service.py
+│   │   │       ├── in_process_service.py
+│   │   │       ├── langs_service.py
+│   │   │       ├── mdwiki_revids_service.py
+│   │   │       ├── pages_users_to_main_service.py
+│   │   │       ├── projects_service.py
+│   │   │       ├── refs_counts_service.py
+│   │   │       ├── translate_type_service.py
+│   │   │       ├── users_service.py
+│   │   │       ├── views_new_service.py
+│   │   │       └── words_service.py
 │   │   └── routes/
 │   │       ├── __init__.py
 │   │       ├── api/
