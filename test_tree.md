@@ -50,22 +50,6 @@ tests/
     │       │   ├── test_settings_service.py
     │       │   └── test_users_no_inprocess_service.py
     │       └── test_admin_db_ensure_tables.py
-    ├── app_main/
-    │   ├── admin/
-    │   │   └── domain/
-    │   │       ├── db/
-    │   │       ├── models/
-    │   │       └── services/
-    │   ├── public/
-    │   │   └── domain/
-    │   │       ├── db/
-    │   │       ├── models/
-    │   │       └── services/
-    │   └── shared/
-    │       └── domain/
-    │           ├── db/
-    │           ├── models/
-    │           └── services/
     ├── public/
     │   ├── domain/
     │   │   ├── db/
