@@ -48,13 +48,14 @@ CREATE TABLE IF NOT EXISTS language_settings (
   )
 """
 
+# Type -> form_type
 settings= """
 
 CREATE TABLE IF NOT EXISTS settings (
     id int NOT NULL AUTO_INCREMENT,
     title varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
     displayed varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-    Type varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'check',
+    form_type varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'check',
     value int NOT NULL DEFAULT '0',
     ignored int NOT NULL DEFAULT '0',
     PRIMARY KEY (id),

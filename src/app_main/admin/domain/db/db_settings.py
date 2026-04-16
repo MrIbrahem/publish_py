@@ -61,7 +61,7 @@ class SettingsDB:
         self,
         title: str,
         displayed: str,
-        Type: str = "check",
+        form_type: str = "check",
         value: int = 0,
         ignored: int = 0,
     ) -> SettingRecord:
@@ -73,10 +73,10 @@ class SettingsDB:
         try:
             self.db.execute_query(
                 """
-                INSERT INTO settings (title, displayed, Type, value, ignored)
+                INSERT INTO settings (title, displayed, form_type, value, ignored)
                 VALUES (%s, %s, %s, %s, %s)
                 """,
-                (title, displayed, Type, value, ignored),
+                (title, displayed, form_type, value, ignored),
             )
         except pymysql.err.IntegrityError:
             raise ValueError(f"Setting '{title}' already exists") from None
@@ -123,7 +123,7 @@ class SettingsDB:
         self,
         title: str,
         displayed: str,
-        Type: str = "check",
+        form_type: str = "check",
         value: int = 0,
         ignored: int = 0,
     ) -> SettingRecord:
@@ -134,15 +134,15 @@ class SettingsDB:
 
         self.db.execute_query_safe(
             """
-            INSERT INTO settings (title, displayed, Type, value, ignored)
+            INSERT INTO settings (title, displayed, form_type, value, ignored)
             VALUES (%s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 displayed = VALUES(displayed),
-                Type = VALUES(Type),
+                form_type = VALUES(form_type),
                 value = VALUES(value),
                 ignored = VALUES(ignored)
             """,
-            (title, displayed, Type, value, ignored),
+            (title, displayed, form_type, value, ignored),
         )
         record = self.fetch_by_title(title)
         if not record:

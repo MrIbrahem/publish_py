@@ -10,7 +10,7 @@ class SettingRecord:
     id: int
     title: str
     displayed: str
-    Type: str = "check"
+    form_type: str = "check"
     value: int = 0
     ignored: int = 0
 
@@ -20,7 +20,7 @@ class SettingRecord:
             "id": self.id,
             "title": self.title,
             "displayed": self.displayed,
-            "Type": self.Type,
+            "form_type": self.form_type,
             "value": self.value,
             "ignored": self.ignored,
         }

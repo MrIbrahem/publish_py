@@ -25,7 +25,7 @@ class TestSettingsDB:
         """Test that fetch_by_id returns record when ID exists."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "test_setting", "displayed": "Test Setting", "Type": "check", "value": 1, "ignored": 0}
+            {"id": 1, "title": "test_setting", "displayed": "Test Setting", "form_type": "check", "value": 1, "ignored": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
@@ -53,7 +53,7 @@ class TestSettingsDB:
         """Test that fetch_by_title returns record when title exists."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "my_setting", "displayed": "My Setting", "Type": "text", "value": 0, "ignored": 0}
+            {"id": 1, "title": "my_setting", "displayed": "My Setting", "form_type": "text", "value": 0, "ignored": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
@@ -68,8 +68,8 @@ class TestSettingsDB:
         """Test that list returns all setting records."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "setting1", "displayed": "Setting 1", "Type": "check", "value": 1, "ignored": 0},
-            {"id": 2, "title": "setting2", "displayed": "Setting 2", "Type": "text", "value": 0, "ignored": 1},
+            {"id": 1, "title": "setting1", "displayed": "Setting 1", "form_type": "check", "value": 1, "ignored": 0},
+            {"id": 2, "title": "setting2", "displayed": "Setting 2", "form_type": "text", "value": 0, "ignored": 1},
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
@@ -84,7 +84,7 @@ class TestSettingsDB:
         """Test that list_active returns only non-ignored records."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "active_setting", "displayed": "Active", "Type": "check", "value": 1, "ignored": 0},
+            {"id": 1, "title": "active_setting", "displayed": "Active", "form_type": "check", "value": 1, "ignored": 0},
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
@@ -99,7 +99,7 @@ class TestSettingsDB:
         """Test that add inserts a new setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "new_setting", "displayed": "New Setting", "Type": "check", "value": 0, "ignored": 0}
+            {"id": 1, "title": "new_setting", "displayed": "New Setting", "form_type": "check", "value": 0, "ignored": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
@@ -123,14 +123,14 @@ class TestSettingsDB:
         """Test that update modifies a setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.side_effect = [
-            [{"id": 1, "title": "old", "displayed": "Old", "Type": "check", "value": 0, "ignored": 0}],
-            [{"id": 1, "title": "new", "displayed": "New", "Type": "text", "value": 1, "ignored": 1}],
+            [{"id": 1, "title": "old", "displayed": "Old", "form_type": "check", "value": 0, "ignored": 0}],
+            [{"id": 1, "title": "new", "displayed": "New", "form_type": "text", "value": 1, "ignored": 1}],
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
 
         settings_db = SettingsDB(db_config)
-        result = settings_db.update(1, title="new", displayed="New", Type="text", value=1, ignored=1)
+        result = settings_db.update(1, title="new", displayed="New", form_type="text", value=1, ignored=1)
 
         assert isinstance(result, SettingRecord)
         assert result.title == "new"
@@ -139,7 +139,7 @@ class TestSettingsDB:
         """Test that delete removes a setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "test", "displayed": "Test", "Type": "check", "value": 0, "ignored": 0}
+            {"id": 1, "title": "test", "displayed": "Test", "form_type": "check", "value": 0, "ignored": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
@@ -153,7 +153,7 @@ class TestSettingsDB:
         """Test that add_or_update upserts a setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "upserted", "displayed": "Upserted", "Type": "check", "value": 1, "ignored": 0}
+            {"id": 1, "title": "upserted", "displayed": "Upserted", "form_type": "check", "value": 1, "ignored": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
