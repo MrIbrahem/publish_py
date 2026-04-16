@@ -174,9 +174,9 @@ class TestUpdateCoordinator:
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
         )
 
-        result = update_coordinator(1, username="UpdatedUser", active=0)
+        result = update_coordinator(1, username="UpdatedUser", is_active=0)
 
-        mock_store.update.assert_called_once_with(1, username="UpdatedUser", active=0)
+        mock_store.update.assert_called_once_with(1, username="UpdatedUser", is_active=0)
         assert result is mock_record
 
 
@@ -202,7 +202,7 @@ class TestIsCoordinator:
         """Test that is_coordinator returns True for active coordinator."""
         mock_store = MagicMock()
         mock_record = MagicMock()
-        mock_record.active = 1
+        mock_record.is_active = 1
         mock_store.fetch_by_user.return_value = mock_record
         monkeypatch.setattr(
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
@@ -228,7 +228,7 @@ class TestIsCoordinator:
         """Test that is_coordinator returns False for inactive coordinator."""
         mock_store = MagicMock()
         mock_record = MagicMock()
-        mock_record.active = 0
+        mock_record.is_active = 0
         mock_store.fetch_by_user.return_value = mock_record
         monkeypatch.setattr(
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
