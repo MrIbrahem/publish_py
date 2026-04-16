@@ -9,9 +9,15 @@ import os
 from datetime import datetime
 from typing import Any, Tuple, Type
 
-from flask import Flask, flash, render_template, request
+from flask import Flask, flash, render_template, request  # , g
 
+from .admin.domain.db_ensure_tables import ensure_admin_db_tables
+from .admin.domain.services.coordinators_service import active_coordinators
+from .admin.routes.admin import (
+    bp_admin,
+)
 from .config import settings
+from .public.domain.db_ensure_tables import ensure_public_db_tables
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -30,10 +36,14 @@ logger = logging.getLogger(__name__)
 
 
 def context_data() -> dict[str, Any]:
+    """
+    used in @app.context_processor
+    """
     user = current_user()
     return {
         "current_user": user,
         "is_authenticated": user is not None,
+        "is_admin": bool(user and user.username in active_coordinators()),
         "username": user.username if user else None,
         "oauth_enabled": bool(settings.oauth),
     }
@@ -107,6 +117,8 @@ def create_app(config_class: Type | None = None) -> Flask:
 
     if oauth_enabled and settings.database_data.db_host:
         ensure_db_tables(settings.database_data)
+        ensure_public_db_tables(settings.database_data)
+        ensure_admin_db_tables(settings.database_data)
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)
@@ -114,6 +126,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_publish)
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
+    app.register_blueprint(bp_admin)
 
     csrf_exempt(app, bp_publish)
 
@@ -154,4 +167,5 @@ def create_app(config_class: Type | None = None) -> Flask:
             response.headers["Expires"] = "0"
         return response
 
+    # g.settings = settings  # Make settings available in Flask's global context
     return app

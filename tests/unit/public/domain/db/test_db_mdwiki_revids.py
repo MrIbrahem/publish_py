@@ -10,12 +10,9 @@ import pymysql
 import pytest
 from src.app_main.config import DbConfig
 from src.app_main.public.domain.db.db_mdwiki_revids import (
-    MdwikiRevidsDB,
     MdwikiRevidRecord,
+    MdwikiRevidsDB,
 )
-
-
-
 
 
 @pytest.fixture

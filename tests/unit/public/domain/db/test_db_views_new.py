@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_views_new import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_views_row():
     """Fixture for a sample views_new row from database."""

@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.config import DbConfig
-from src.app_main.public.domain.db_ensure_tables import ensure_db_tables
+from src.app_main.public.domain.db_ensure_tables import ensure_public_db_tables
 
 
 class TestEnsureDbTables:
@@ -23,7 +23,7 @@ class TestEnsureDbTables:
         with patch("src.app_main.public.domain.db_ensure_tables.Database") as MockDatabase:
             MockDatabase.return_value = mock_db_instance
 
-            ensure_db_tables(db_config)
+            ensure_public_db_tables(db_config)
 
             assert mock_db_instance.execute_query_safe.call_count == 12
 
@@ -36,7 +36,7 @@ class TestEnsureDbTables:
         with patch("src.app_main.public.domain.db_ensure_tables.Database") as MockDatabase:
             MockDatabase.return_value = mock_db_instance
 
-            ensure_db_tables(db_config)
+            ensure_public_db_tables(db_config)
 
             calls = mock_db_instance.execute_query_safe.call_args_list
             call_queries = [str(c) for c in calls]
@@ -51,7 +51,7 @@ class TestEnsureDbTables:
         with patch("src.app_main.public.domain.db_ensure_tables.Database") as MockDatabase:
             MockDatabase.return_value = mock_db_instance
 
-            ensure_db_tables(db_config)
+            ensure_public_db_tables(db_config)
 
             calls = mock_db_instance.execute_query_safe.call_args_list
             call_queries = [str(c) for c in calls]
@@ -66,7 +66,7 @@ class TestEnsureDbTables:
         with patch("src.app_main.public.domain.db_ensure_tables.Database") as MockDatabase:
             MockDatabase.return_value = mock_db_instance
 
-            ensure_db_tables(db_config)
+            ensure_public_db_tables(db_config)
 
             MockDatabase.assert_called_once()
             mock_db_instance.__enter__.assert_called_once()

@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_users import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_user_row():
     """Fixture for a sample user row from database."""

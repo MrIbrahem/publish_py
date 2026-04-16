@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_translate_type import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_translate_type_row():
     """Fixture for a sample translate_type row from database."""

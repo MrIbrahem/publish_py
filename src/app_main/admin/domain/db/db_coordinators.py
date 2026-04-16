@@ -37,11 +37,11 @@ class CoordinatorsDB:
             return None
         return self._row_to_record(rows[0])
 
-    def fetch_by_user(self, user: str) -> CoordinatorRecord | None:
+    def fetch_by_user(self, username: str) -> CoordinatorRecord | None:
         """Get a coordinator record by username."""
         rows = self.db.fetch_query_safe(
-            "SELECT * FROM coordinators WHERE user = %s",
-            (user,),
+            "SELECT * FROM coordinators WHERE username = %s",
+            (username,),
         )
         if not rows:
             return None
@@ -54,26 +54,26 @@ class CoordinatorsDB:
 
     def list_active(self) -> List[CoordinatorRecord]:
         """Return all active coordinator records."""
-        rows = self.db.fetch_query_safe("SELECT * FROM coordinators WHERE active = 1 ORDER BY id ASC")
+        rows = self.db.fetch_query_safe("SELECT * FROM coordinators WHERE is_active = 1 ORDER BY id ASC")
         return [self._row_to_record(row) for row in rows]
 
-    def add(self, user: str, active: int = 1) -> CoordinatorRecord:
+    def add(self, username: str, is_active: int = 1) -> CoordinatorRecord:
         """Add a new coordinator record."""
-        user = user.strip()
-        if not user:
+        username = username.strip()
+        if not username:
             raise ValueError("User is required")
 
         try:
             self.db.execute_query(
-                "INSERT INTO coordinators (user, active) VALUES (%s, %s)",
-                (user, active),
+                "INSERT INTO coordinators (username, is_active) VALUES (%s, %s)",
+                (username, is_active),
             )
         except pymysql.err.IntegrityError:
-            raise ValueError(f"Coordinator '{user}' already exists") from None
+            raise ValueError(f"Coordinator '{username}' already exists") from None
 
-        record = self.fetch_by_user(user)
+        record = self.fetch_by_user(username)
         if not record:
-            raise RuntimeError(f"Failed to fetch newly created coordinator '{user}'")
+            raise RuntimeError(f"Failed to fetch newly created coordinator '{username}'")
         return record
 
     def update(self, coordinator_id: int, **kwargs) -> CoordinatorRecord:
@@ -109,25 +109,33 @@ class CoordinatorsDB:
         )
         return record
 
-    def add_or_update(self, user: str, active: int = 1) -> CoordinatorRecord:
+    def add_or_update(self, username: str, is_active: int = 1) -> CoordinatorRecord:
         """Add or update a coordinator record."""
-        user = user.strip()
-        if not user:
+        username = username.strip()
+        if not username:
             raise ValueError("User is required")
 
         self.db.execute_query_safe(
             """
-            INSERT INTO coordinators (user, active)
+            INSERT INTO coordinators (username, is_active)
             VALUES (%s, %s)
             ON DUPLICATE KEY UPDATE
-                active = VALUES(active)
+                is_active = VALUES(is_active)
             """,
-            (user, active),
+            (username, is_active),
         )
-        record = self.fetch_by_user(user)
+        record = self.fetch_by_user(username)
         if not record:
-            raise RuntimeError(f"Failed to fetch coordinator '{user}' after add_or_update")
+            raise RuntimeError(f"Failed to fetch coordinator '{username}' after add_or_update")
         return record
+
+    def set_active(self, coordinator_id: int, is_active: bool) -> CoordinatorRecord:
+        _ = self.fetch_by_id(coordinator_id)
+        self.db.execute_query_safe(
+            "UPDATE coordinators SET is_active = %s WHERE id = %s",
+            (1 if is_active else 0, coordinator_id),
+        )
+        return self.fetch_by_id(coordinator_id)
 
 
 __all__ = [

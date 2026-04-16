@@ -1,9 +1,9 @@
-"""Utilities for managing settings."""
+"""Utilities for managing settings (key-value settings with type support)."""
 
 from __future__ import annotations
 
 import logging
-from typing import List
+from typing import Any, List
 
 from ....config import settings
 from ....shared.domain.services.db_service import has_db_config
@@ -37,52 +37,33 @@ def list_settings() -> List[SettingRecord]:
     return store.list()
 
 
-def list_active_settings() -> List[SettingRecord]:
-    """Return all non-ignored setting records."""
-    store = get_settings_db()
-    return store.list_active()
-
-
 def get_setting(setting_id: int) -> SettingRecord | None:
     """Get a setting record by ID."""
     store = get_settings_db()
     return store.fetch_by_id(setting_id)
 
 
-def get_setting_by_title(title: str) -> SettingRecord | None:
-    """Get a setting record by title."""
+def get_setting_by_key(key: str) -> SettingRecord | None:
+    """Get a setting record by key."""
     store = get_settings_db()
-    return store.fetch_by_title(title)
+    return store.fetch_by_key(key)
 
 
 def add_setting(
+    key: str,
     title: str,
-    displayed: str,
-    form_type: str = "check",
-    value: int = 0,
-    ignored: int = 0,
+    value_type: str = "boolean",
+    value: Any = None,
 ) -> SettingRecord:
     """Add a new setting record."""
     store = get_settings_db()
-    return store.add(title, displayed, form_type, value, ignored)
+    return store.add(key, title, value_type, value)
 
 
-def add_or_update_setting(
-    title: str,
-    displayed: str,
-    form_type: str = "check",
-    value: int = 0,
-    ignored: int = 0,
-) -> SettingRecord:
-    """Add or update a setting record."""
-    store = get_settings_db()
-    return store.add_or_update(title, displayed, form_type, value, ignored)
-
-
-def update_setting(setting_id: int, **kwargs) -> SettingRecord:
+def update_value(setting_id: int, value: Any) -> SettingRecord:
     """Update a setting record."""
     store = get_settings_db()
-    return store.update(setting_id, **kwargs)
+    return store.update_value(setting_id, value)
 
 
 def delete_setting(setting_id: int) -> SettingRecord:
@@ -91,22 +72,12 @@ def delete_setting(setting_id: int) -> SettingRecord:
     return store.delete(setting_id)
 
 
-def get_setting_value(title: str, default: int = 0) -> int:
-    """Get the value of a setting by title."""
-    store = get_settings_db()
-    record = store.fetch_by_title(title)
-    return record.value if record else default
-
-
 __all__ = [
     "get_settings_db",
     "list_settings",
-    "list_active_settings",
     "get_setting",
-    "get_setting_by_title",
+    "get_setting_by_key",
     "add_setting",
-    "add_or_update_setting",
-    "update_setting",
+    "update_value",
     "delete_setting",
-    "get_setting_value",
 ]

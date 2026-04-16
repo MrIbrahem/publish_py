@@ -263,9 +263,7 @@ class TestMetadataLogic(BasePublishTest):
             assert calls[0].kwargs.get("tr_type") == "section"
 
     def test_words_field_in_tab(self, csrf_client, common_patches):
-        with (
-            patch("src.app_main.public.routes.publish.worker.get_word_count") as mock_word_count,
-        ):
+        with (patch("src.app_main.public.routes.publish.worker.get_word_count") as mock_word_count,):
             mock_word_count.return_value = 500
 
             response = self._post(csrf_client, self._default_payload())
@@ -338,9 +336,7 @@ class TestErrorAndEdgeCases(BasePublishTest):
 class TestComplexWorkflows(BasePublishTest):
 
     def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
-        with (
-            patch("src.app_main.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-        ):
+        with (patch("src.app_main.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,):
             mock_should_add.return_value = True
 
             # أول استدعاء يفشل، الثاني ينجح عبر fallback user
@@ -359,7 +355,10 @@ class TestComplexWorkflows(BasePublishTest):
 
             self.mock_get_token.side_effect = get_token_side_effect
 
-            with (patch("src.app_main.public.routes.publish.worker.get_user_token_by_username", side_effect=get_token_side_effect, )):
+            with patch(
+                "src.app_main.public.routes.publish.worker.get_user_token_by_username",
+                side_effect=get_token_side_effect,
+            ):
                 response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200

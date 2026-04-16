@@ -10,12 +10,9 @@ import pymysql
 import pytest
 from src.app_main.config import DbConfig
 from src.app_main.public.domain.db.db_enwiki_pageviews import (
-    EnwikiPageviewsDB,
     EnwikiPageviewRecord,
+    EnwikiPageviewsDB,
 )
-
-
-
 
 
 @pytest.fixture

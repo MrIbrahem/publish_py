@@ -8,14 +8,11 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
 import pymysql
-from src.app_main.config import DbConfig
+import pytest
 from src.app_main.admin.domain.db.db_coordinators import CoordinatorsDB
 from src.app_main.admin.domain.models.coordinator import CoordinatorRecord
-
-
-
+from src.app_main.config import DbConfig
 
 
 class TestCoordinatorsDB:
@@ -24,7 +21,7 @@ class TestCoordinatorsDB:
     def test_fetch_by_id_returns_record_when_found(self, monkeypatch, db_config):
         """Test that fetch_by_id returns record when ID exists."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"id": 1, "user": "TestUser", "active": 1}]
+        mock_db.fetch_query_safe.return_value = [{"id": 1, "username": "TestUser", "is_active": 1}]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
@@ -33,8 +30,8 @@ class TestCoordinatorsDB:
 
         assert isinstance(result, CoordinatorRecord)
         assert result.id == 1
-        assert result.user == "TestUser"
-        assert result.active == 1
+        assert result.username == "TestUser"
+        assert result.is_active == 1
 
     def test_fetch_by_id_returns_none_when_not_found(self, monkeypatch, db_config):
         """Test that fetch_by_id returns None when ID not found."""
@@ -49,9 +46,9 @@ class TestCoordinatorsDB:
         assert result is None
 
     def test_fetch_by_user_returns_record_when_found(self, monkeypatch, db_config):
-        """Test that fetch_by_user returns record when user exists."""
+        """Test that fetch_by_user returns record when username exists."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"id": 1, "user": "TestUser", "active": 1}]
+        mock_db.fetch_query_safe.return_value = [{"id": 1, "username": "TestUser", "is_active": 1}]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
@@ -59,10 +56,10 @@ class TestCoordinatorsDB:
         result = coordinators_db.fetch_by_user("TestUser")
 
         assert isinstance(result, CoordinatorRecord)
-        assert result.user == "TestUser"
+        assert result.username == "TestUser"
 
     def test_fetch_by_user_returns_none_when_not_found(self, monkeypatch, db_config):
-        """Test that fetch_by_user returns None when user not found."""
+        """Test that fetch_by_user returns None when username not found."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
@@ -77,8 +74,8 @@ class TestCoordinatorsDB:
         """Test that list returns all coordinator records."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "user": "User1", "active": 1},
-            {"id": 2, "user": "User2", "active": 0},
+            {"id": 1, "username": "User1", "is_active": 1},
+            {"id": 2, "username": "User2", "is_active": 0},
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
@@ -90,10 +87,10 @@ class TestCoordinatorsDB:
         assert all(isinstance(r, CoordinatorRecord) for r in result)
 
     def test_list_active_returns_only_active_records(self, monkeypatch, db_config):
-        """Test that list_active returns only active records."""
+        """Test that list_active returns only is_active records."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "user": "User1", "active": 1},
+            {"id": 1, "username": "User1", "is_active": 1},
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
@@ -102,12 +99,12 @@ class TestCoordinatorsDB:
         result = coordinators_db.list_active()
 
         assert len(result) == 1
-        assert result[0].active == 1
+        assert result[0].is_active == 1
 
     def test_add_inserts_new_record(self, monkeypatch, db_config):
         """Test that add inserts a new coordinator record."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"id": 1, "user": "NewUser", "active": 1}]
+        mock_db.fetch_query_safe.return_value = [{"id": 1, "username": "NewUser", "is_active": 1}]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
@@ -116,10 +113,10 @@ class TestCoordinatorsDB:
 
         mock_db.execute_query.assert_called_once()
         assert isinstance(result, CoordinatorRecord)
-        assert result.user == "NewUser"
+        assert result.username == "NewUser"
 
     def test_add_raises_error_when_user_empty(self, monkeypatch, db_config):
-        """Test that add raises ValueError when user is empty."""
+        """Test that add raises ValueError when username is empty."""
         mock_db = MagicMock()
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
@@ -128,7 +125,7 @@ class TestCoordinatorsDB:
             coordinators_db.add("")
 
     def test_add_raises_error_on_duplicate(self, monkeypatch, db_config):
-        """Test that add raises ValueError on duplicate user."""
+        """Test that add raises ValueError on duplicate username."""
         mock_db = MagicMock()
         mock_db.execute_query.side_effect = pymysql.err.IntegrityError(1062, "Duplicate entry")
 
@@ -142,18 +139,18 @@ class TestCoordinatorsDB:
         """Test that update modifies a coordinator record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.side_effect = [
-            [{"id": 1, "user": "OldUser", "active": 1}],
-            [{"id": 1, "user": "UpdatedUser", "active": 0}],
+            [{"id": 1, "username": "OldUser", "is_active": 1}],
+            [{"id": 1, "username": "UpdatedUser", "is_active": 0}],
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
         coordinators_db = CoordinatorsDB(db_config)
-        result = coordinators_db.update(1, user="UpdatedUser", active=0)
+        result = coordinators_db.update(1, username="UpdatedUser", is_active=0)
 
         assert isinstance(result, CoordinatorRecord)
-        assert result.user == "UpdatedUser"
-        assert result.active == 0
+        assert result.username == "UpdatedUser"
+        assert result.is_active == 0
 
     def test_update_raises_error_when_record_not_found(self, monkeypatch, db_config):
         """Test that update raises ValueError when record not found."""
@@ -164,12 +161,12 @@ class TestCoordinatorsDB:
 
         coordinators_db = CoordinatorsDB(db_config)
         with pytest.raises(ValueError, match="Coordinator record with ID 999 not found"):
-            coordinators_db.update(999, user="NewUser")
+            coordinators_db.update(999, username="NewUser")
 
     def test_delete_removes_record(self, monkeypatch, db_config):
         """Test that delete removes a coordinator record."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"id": 1, "user": "TestUser", "active": 1}]
+        mock_db.fetch_query_safe.return_value = [{"id": 1, "username": "TestUser", "is_active": 1}]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
@@ -196,7 +193,7 @@ class TestCoordinatorsDB:
     def test_add_or_update_upserts_record(self, monkeypatch, db_config):
         """Test that add_or_update upserts a coordinator record."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"id": 1, "user": "TestUser", "active": 1}]
+        mock_db.fetch_query_safe.return_value = [{"id": 1, "username": "TestUser", "is_active": 1}]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
@@ -204,4 +201,4 @@ class TestCoordinatorsDB:
         result = coordinators_db.add_or_update("TestUser", 1)
 
         assert isinstance(result, CoordinatorRecord)
-        assert result.user == "TestUser"
+        assert result.username == "TestUser"

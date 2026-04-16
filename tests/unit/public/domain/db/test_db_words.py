@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_words import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_word_row():
     """Fixture for a sample word row from database."""

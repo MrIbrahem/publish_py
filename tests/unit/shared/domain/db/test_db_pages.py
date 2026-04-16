@@ -15,9 +15,6 @@ from src.app_main.shared.domain.db.db_pages import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_page_row():
     """Fixture for a sample page row from database."""

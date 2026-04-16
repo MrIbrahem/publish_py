@@ -11,6 +11,7 @@ class CategoryRecord:
     """
     Category records.
     """
+
     id: int
     category: str
     campaign: str

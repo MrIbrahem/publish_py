@@ -1,14 +1,13 @@
 import logging
 
-from ...shared.core.db_driver import Database
-
 from ...config import DbConfig
+from ...shared.core.db_driver import Database
 from .db.schema import public_sql_tables
 
 logger = logging.getLogger(__name__)
 
 
-def ensure_db_tables(db_data: DbConfig) -> None:
+def ensure_public_db_tables(db_data: DbConfig) -> None:
     with Database(db_data) as db:
         db.execute_query_safe(public_sql_tables.assessments)
         db.execute_query_safe(public_sql_tables.enwiki_pageviews)
