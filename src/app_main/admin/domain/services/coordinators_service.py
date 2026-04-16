@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import logging
 from typing import List
 
@@ -37,6 +38,7 @@ def list_coordinators() -> List[CoordinatorRecord]:
     return store.list()
 
 
+@functools.lru_cache(maxsize=1)
 def active_coordinators() -> List[CoordinatorRecord]:
     """Return all active coordinator records."""
     store = get_coordinators_db()
@@ -58,25 +60,33 @@ def get_coordinator_by_user(username: str) -> CoordinatorRecord | None:
 def add_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
     """Add a new coordinator record."""
     store = get_coordinators_db()
-    return store.add(username, is_active)
+    record = store.add(username, is_active)
+    active_coordinators.cache_clear()  # Clear the cache to ensure active coordinators list is updated
+    return record
 
 
 def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
     """Add or update a coordinator record."""
     store = get_coordinators_db()
-    return store.add_or_update(username, is_active)
+    record = store.add_or_update(username, is_active)
+    active_coordinators.cache_clear()  # Clear the cache to ensure active coordinators list is updated
+    return record
 
 
 def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
     """Update a coordinator record."""
     store = get_coordinators_db()
-    return store.update(coordinator_id, **kwargs)
+    record = store.update(coordinator_id, **kwargs)
+    active_coordinators.cache_clear()  # Clear the cache to ensure active coordinators list is updated
+    return record
 
 
 def delete_coordinator(coordinator_id: int) -> CoordinatorRecord:
     """Delete a coordinator record by ID."""
     store = get_coordinators_db()
-    return store.delete(coordinator_id)
+    record = store.delete(coordinator_id)
+    active_coordinators.cache_clear()  # Clear the cache to ensure active coordinators list is updated
+    return record
 
 
 def is_coordinator(username: str) -> bool:
@@ -91,7 +101,7 @@ def set_coordinator_active(coordinator_id: int, is_active: bool) -> CoordinatorR
 
     store = get_coordinators_db()
     record = store.set_active(coordinator_id, is_active)
-
+    active_coordinators.cache_clear()  # Clear the cache to ensure active coordinators list is updated
     return record
 
 
