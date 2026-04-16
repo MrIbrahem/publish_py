@@ -7,16 +7,14 @@ Mirrors: php_src/bots/sql/db_publish_reports.php
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from ....config import DbConfig
 from ...core.db_driver import Database
+from ..models.report import ReportRecord
 
 logger = logging.getLogger(__name__)
 
-# Parameter configuration matching PHP endpoint_params
-# These are hardcoded and trusted - column names are NOT from user input
 PUBLISH_REPORTS_PARAMS = [
     {"name": "year", "column": "YEAR(date)", "type": "number"},
     {"name": "month", "column": "MONTH(date)", "type": "number"},
@@ -27,7 +25,6 @@ PUBLISH_REPORTS_PARAMS = [
     {"name": "result", "column": "result", "type": "text"},
 ]
 
-# Valid columns that can be used in SELECT and WHERE clauses (for validation)
 _VALID_COLUMNS = frozenset(
     {
         "id",
@@ -42,41 +39,6 @@ _VALID_COLUMNS = frozenset(
         "MONTH(date)",
     }
 )
-
-
-@dataclass
-class ReportRecord:
-    """Representation of a report record."""
-
-    id: int
-    date: Any
-    title: str
-    user: str
-    lang: str
-    sourcetitle: str
-    result: str
-    data: str
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert a ReportRecord to a dictionary."""
-        # Handle date conversion with None safety
-        if self.date is None:
-            date_str = ""
-        elif hasattr(self.date, "isoformat"):
-            date_str = self.date.isoformat()
-        else:
-            date_str = str(self.date)
-
-        return {
-            "id": self.id,
-            "date": date_str,
-            "title": self.title,
-            "user": self.user,
-            "lang": self.lang,
-            "sourcetitle": self.sourcetitle,
-            "result": self.result,
-            "data": self.data,
-        }
 
 
 class ReportsDB:
