@@ -25,18 +25,20 @@ PUBLISH_REPORTS_PARAMS = [
     {"name": "result", "column": "result", "type": "text"},
 ]
 
-ReportsDB_VALID_COLUMNS = frozenset({
-    "id",
-    "date",
-    "title",
-    "user",
-    "lang",
-    "sourcetitle",
-    "result",
-    "data",
-    "YEAR(date)",
-    "MONTH(date)",
-})
+ReportsDB_VALID_COLUMNS = frozenset(
+    {
+        "id",
+        "date",
+        "title",
+        "user",
+        "lang",
+        "sourcetitle",
+        "result",
+        "data",
+        "YEAR(date)",
+        "MONTH(date)",
+    }
+)
 
 
 class ReportsDB:

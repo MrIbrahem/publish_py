@@ -5,7 +5,6 @@ Integration tests for database operations.
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.app_main.config import DbConfig
 from src.app_main.shared.domain.db_ensure_service import ensure_db_tables
 

@@ -5,10 +5,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.shared.domain.db.db_publish_reports import (
-    ReportsDB_VALID_COLUMNS,
     PUBLISH_REPORTS_PARAMS,
+    ReportsDB,
+    ReportsDB_VALID_COLUMNS,
 )
-from src.app_main.shared.domain.db.db_publish_reports import ReportsDB
 
 
 class TestQueryWithFilters:

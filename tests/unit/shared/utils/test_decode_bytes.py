@@ -2,7 +2,6 @@
 Tests for shared.utils.decode_bytes module.
 """
 
-
 import pytest
 from src.app_main.shared.utils.decode_bytes import coerce_bytes
 
