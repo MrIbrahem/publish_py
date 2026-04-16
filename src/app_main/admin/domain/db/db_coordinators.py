@@ -129,6 +129,14 @@ class CoordinatorsDB:
             raise RuntimeError(f"Failed to fetch coordinator '{username}' after add_or_update")
         return record
 
+    def set_active(self, coordinator_id: int, is_active: bool) -> CoordinatorRecord:
+        _ = self.fetch_by_id(coordinator_id)
+        self.db.execute_query_safe(
+            "UPDATE coordinators SET is_active = %s WHERE id = %s",
+            (1 if is_active else 0, coordinator_id),
+        )
+        return self.fetch_by_id(coordinator_id)
+
 
 __all__ = [
     "CoordinatorsDB",

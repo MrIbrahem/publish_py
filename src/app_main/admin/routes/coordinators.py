@@ -25,14 +25,14 @@ def _coordinators_dashboard():
 
     coordinators = coordinators_service.list_coordinators()
     total = len(coordinators)
-    active = sum(1 for coord in coordinators if coord.active)
+    is_active = sum(1 for coord in coordinators if coord.is_active)
 
     return render_template(
         "admins/coordinators.html",
         coordinators=coordinators,
         total_coordinators=total,
-        active_coordinators=active,
-        inactive_coordinators=total - active,
+        active_coordinators=is_active,
+        inactive_coordinators=total - is_active,
     )
 
 
@@ -61,7 +61,7 @@ def _add_coordinator() -> ResponseReturnValue:
 def _update_coordinator_active(coordinator_id: int) -> ResponseReturnValue:
     """Toggle the active flag for a coordinator."""
 
-    desired = request.form.get("active", "0") == "1"
+    desired = request.form.get("is_active", "0") == "1"
     try:
         record = coordinators_service.set_coordinator_active(coordinator_id, desired)
     except LookupError as exc:
@@ -71,7 +71,7 @@ def _update_coordinator_active(coordinator_id: int) -> ResponseReturnValue:
         logger.exception("Unable to update coordinator.")
         flash("Unable to update coordinator status. Please try again.", "danger")
     else:
-        state = "activated" if record.active else "deactivated"
+        state = "activated" if record.is_active else "deactivated"
         flash(f"Coordinator '{record.username}' {state}.", "success")
 
     return redirect(url_for("admin.coordinators_dashboard"))

@@ -86,6 +86,15 @@ def is_coordinator(username: str) -> bool:
     return record is not None and record.is_active == 1
 
 
+def set_coordinator_active(coordinator_id: int, is_active: bool) -> CoordinatorRecord:
+    """Toggle coordinator activity and refresh settings."""
+
+    store = get_coordinators_db()
+    record = store.set_active(coordinator_id, is_active)
+
+    return record
+
+
 __all__ = [
     "get_coordinators_db",
     "list_coordinators",
@@ -97,4 +106,5 @@ __all__ = [
     "update_coordinator",
     "delete_coordinator",
     "is_coordinator",
+    "set_coordinator_active",
 ]
