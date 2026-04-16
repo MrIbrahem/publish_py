@@ -21,7 +21,7 @@ from .coordinators import Coordinators
 #     Templates,
 # )
 from .decorators import admin_required
-from .settings import SettingsRoutes
+from .settings1 import SettingsRoutes1
 from .sidebar import create_side
 
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def index():
 def register_blueprints(bp_admin) -> None:
     Coordinators(bp_admin)
     # Templates(bp_admin)
-    SettingsRoutes(bp_admin)
+    SettingsRoutes1(bp_admin)
     # Jobs(bp_admin)
     # OwidCharts(bp_admin)
 

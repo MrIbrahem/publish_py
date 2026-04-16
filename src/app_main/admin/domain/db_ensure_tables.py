@@ -13,4 +13,5 @@ def ensure_admin_db_tables(db_data: DbConfig) -> None:
         db.execute_query_safe(admin_sql_tables.full_translators)
         db.execute_query_safe(admin_sql_tables.language_settings)
         db.execute_query_safe(admin_sql_tables.settings)
+        db.execute_query_safe(admin_sql_tables.settings1)
         db.execute_query_safe(admin_sql_tables.users_no_inprocess)

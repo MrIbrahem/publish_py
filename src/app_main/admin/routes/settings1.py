@@ -11,21 +11,21 @@ from ...config import settings
 from .decorators import admin_required
 
 
-class SettingsRoutes:
+class SettingsRoutes1:
     def __init__(self, bp_admin: Blueprint):
-        from ..domain.db.db_settings import SettingsDB
+        from ..domain.db.db_settings1 import SettingsDB1
 
         @bp_admin.get("/settings")
         @admin_required
         def settings_view():
-            db_settings = SettingsDB(settings.database_data)
+            db_settings = SettingsDB1(settings.database_data)
             all_settings = db_settings.get_raw_all()
             return render_template("admins/settings.html", settings_list=all_settings)
 
         @bp_admin.post("/settings/create")
         @admin_required
         def settings_create():
-            db_settings = SettingsDB(settings.database_data)
+            db_settings = SettingsDB1(settings.database_data)
             key = request.form.get("key", "").strip()
             title = request.form.get("title", "").strip()
             value_type = request.form.get("value_type", "boolean").strip()
@@ -77,7 +77,7 @@ class SettingsRoutes:
         @bp_admin.post("/settings/update")
         @admin_required
         def settings_update():
-            db_settings = SettingsDB(settings.database_data)
+            db_settings = SettingsDB1(settings.database_data)
             all_settings = db_settings.get_raw_all()
             failed_keys: list[str] = []
             deleted_keys: list[str] = []
@@ -109,7 +109,6 @@ class SettingsRoutes:
 
             # Invalidate runtime cache only if all updates succeeded
             if not failed_keys:
-                settings.dynamic.invalidate()
                 if deleted_keys:
                     flash(f"Deleted settings: {', '.join(deleted_keys)}. ", "success")
 

@@ -8,6 +8,7 @@ class TablesCreatesSql:
     coordinators: str
     full_translators: str
     language_settings: str
+    settings1: str
     settings: str
     users_no_inprocess: str
 
@@ -48,6 +49,18 @@ CREATE TABLE IF NOT EXISTS language_settings (
 """
 
 # Type -> form_type
+settings1 = """
+    CREATE TABLE IF NOT EXISTS settings1 (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `key` VARCHAR(190) NOT NULL,
+        `title` VARCHAR(500) NOT NULL,
+        `value` text DEFAULT NULL,
+        `value_type` enum ('boolean', 'string', 'integer', 'json') NOT NULL DEFAULT 'boolean',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY unique_key (`key`)
+    )
+"""
+
 settings = """
 
 CREATE TABLE IF NOT EXISTS settings (
@@ -78,6 +91,7 @@ admin_sql_tables = TablesCreatesSql(
     coordinators=coordinators,
     full_translators=full_translators,
     language_settings=language_settings,
+    settings1=settings1,
     settings=settings,
     users_no_inprocess=users_no_inprocess,
 )
