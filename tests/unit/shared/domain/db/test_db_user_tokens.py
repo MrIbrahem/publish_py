@@ -24,13 +24,13 @@ def db_config() -> DbConfig:
     )
 
 
-class TestUserTokenDBUpdate:
+class TestUserTokenDBMarkTokenUsed:
     """
-    Tests for UserTokenDB class update method.
+    Tests for UserTokenDB class mark_token_used method.
     """
 
-    def test_update_with_unknown_columns_raises_error(self, monkeypatch, db_config):
-        """Test that update raises error for unknown columns."""
+    def test_mark_token_used_updates_timestamp(self, monkeypatch, db_config):
+        """Test that mark_token_used updates the last_used_at timestamp."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
             {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
@@ -39,27 +39,13 @@ class TestUserTokenDBUpdate:
         monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
-        with pytest.raises(ValueError, match="Unknown or immutable columns for user_tokens"):
-            token_db.update(1, unknown_column="value")
+        result = token_db.mark_token_used(1)
 
-    @patch("src.app_main.shared.domain.db.db_user_tokens.encrypt_value")
-    def test_update_encrypts_token_columns(self, mock_encrypt, monkeypatch, db_config):
-        """Test that update encrypts access_token and access_secret columns."""
-        mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [
-            {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
-        ]
-        mock_encrypt.return_value = b"encrypted_value"
-
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
-
-        token_db = UserTokenDB(db_config)
-        token_db.update(1, access_token="new_token")
-
-        mock_encrypt.assert_called_with("new_token")
-        # Check that encrypted value was passed to execute_query_safe
-        call_args = mock_db.execute_query_safe.call_args
-        assert b"encrypted_value" in call_args[0][1]
+        mock_db.execute_query.assert_called_with(
+            "UPDATE user_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE user_id = %s",
+            (1,),
+        )
+        assert result is None
 
 
 class TestUserTokenDBGetUserId:
