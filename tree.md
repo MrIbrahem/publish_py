@@ -1,3 +1,4 @@
+```
 src/
 ├── __init__.py
 ├── app.py
@@ -168,3 +169,5 @@ src/
 ├── logger_config.py
 ├── static/
 └── templates/
+
+```
