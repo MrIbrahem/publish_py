@@ -42,13 +42,13 @@ def generate_domain_test_placeholders(src_root, test_root):
                 internal_path = "/".join(parts[domain_index:])
 
                 content = f'"""\nUnit tests for {internal_path}/{file} module.\n"""\n'
-                content_new = f'"""\nUnit tests for {internal_path}/{file} module.\nTODO: write tests"""\n'
+                content_new = f'"""\nUnit tests for {internal_path}/{file} module.\nTODO: write tests\n"""\n'
 
                 if test_file_path.exists():
                     text = test_file_path.read_text(encoding="utf-8")
                     if content.strip() == text.strip():
                         with open(test_file_path, "w", encoding="utf-8") as f:
-                            f.write("\n" + content_new)
+                            f.write(content_new)
 
 
 if __name__ == "__main__":
