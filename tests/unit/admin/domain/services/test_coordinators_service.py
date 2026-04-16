@@ -2,9 +2,10 @@
 Unit tests for coordinators_service module.
 """
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
+from src.app_main.admin.domain.models.coordinator import CoordinatorRecord
 from src.app_main.admin.domain.services.coordinators_service import (
     active_coordinators,
     add_coordinator,
@@ -65,26 +66,24 @@ class TestListActiveCoordinators:
 
     def test_returns_active_usernames(self, monkeypatch):
         """Test that active_coordinators returns active coordinator usernames."""
-        from src.app_main.admin.domain.services import coordinators_service
-        from src.app_main.admin.domain.models.coordinator import CoordinatorRecord
-
-        # Clear cache and global store before test
-        coordinators_service.active_coordinators.cache_clear()
-        monkeypatch.setattr("src.app_main.admin.domain.services.coordinators_service._COORDINATORS_STORE", None)
-
         mock_store = MagicMock()
-        mock_store.list.return_value = [
+        mock_store.list_active.return_value = [
             CoordinatorRecord(id=1, username="ActiveUser", is_active=1),
-            CoordinatorRecord(id=2, username="InactiveUser", is_active=0),
         ]
+
+        # Patch both the global store and the get_coordinators_db function
+        monkeypatch.setattr("src.app_main.admin.domain.services.coordinators_service._COORDINATORS_STORE", None)
         monkeypatch.setattr(
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
         )
 
-        result = coordinators_service.active_coordinators()
+        # Clear the cache
+        active_coordinators.cache_clear()
+
+        result = active_coordinators()
 
         assert result == ["ActiveUser"]
-        mock_store.list.assert_called_once()
+        mock_store.list_active.assert_called_once()
 
 
 class TestGetCoordinator:
