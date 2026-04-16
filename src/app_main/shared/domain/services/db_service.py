@@ -6,7 +6,7 @@ import logging
 from typing import Any, Optional
 
 from ....config import settings
-from ..db.db_class import Database
+from ..db.db_driver import Database
 
 _db: Database | None = None
 

@@ -12,7 +12,7 @@ class TestDatabaseIntegration:
     def test_database_initialization(self):
         """Test that Database initializes with correct parameters."""
         from src.app_main.config import DbConfig
-        from src.app_main.shared.domain.db.db_class import Database
+        from src.app_main.shared.domain.db.db_driver import Database
 
         config = DbConfig(
             db_name="test_db",
@@ -38,7 +38,7 @@ class TestDatabaseIntegration:
     def test_database_context_manager(self):
         """Test that Database works as context manager."""
         from src.app_main.config import DbConfig
-        from src.app_main.shared.domain.db.db_class import Database
+        from src.app_main.shared.domain.db.db_driver import Database
 
         config = DbConfig(
             db_name="test_db",

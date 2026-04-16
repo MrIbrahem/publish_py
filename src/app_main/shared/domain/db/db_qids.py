@@ -10,7 +10,7 @@ import logging
 
 from ....config import DbConfig
 from . import Database
-from .sql_schema_tables import sql_tables
+from .schema import sql_tables
 
 logger = logging.getLogger(__name__)
 

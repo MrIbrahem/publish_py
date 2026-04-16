@@ -11,8 +11,8 @@ import logging
 from functools import lru_cache
 
 from ....config import DbConfig
-from .db_class import Database
-from .sql_schema_tables import sql_tables
+from .db_driver import Database
+from .schema import sql_tables
 
 logger = logging.getLogger(__name__)
 

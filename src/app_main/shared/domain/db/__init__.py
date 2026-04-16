@@ -3,7 +3,7 @@ Shared dbs, used in both admin and public blueprints
 """
 
 from .db_categories import CategoriesDB, clear_categories_cache, get_campaign_category
-from .db_class import Database
+from .db_driver import Database
 from .db_qids import QidsDB, ensure_qids_table
 from .db_user_tokens import UserTokenDB
 

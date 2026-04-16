@@ -12,7 +12,7 @@ import pymysql
 from ....config import DbConfig
 from ...core.crypto import decrypt_value, encrypt_value
 from . import Database
-from .sql_schema_tables import sql_tables
+from .schema import sql_tables
 
 logger = logging.getLogger(__name__)
 
