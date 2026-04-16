@@ -14,16 +14,16 @@ class QidRecord:
     """
 
     id: int
-    title: str
     qid: str
+    title: str
     add_date: str
 
     def to_dict(self) -> dict:
         """Convert the QidRecord to a dictionary."""
         return {
             "id": self.id,
-            "title": self.title,
             "qid": self.qid,
+            "title": self.title,
             "add_date": self.add_date,
         }
 
