@@ -14,11 +14,6 @@ from ..models.user_token import UserTokenRecord
 logger = logging.getLogger(__name__)
 
 
-def current_ts() -> str:
-    """Return the current UTC timestamp formatted for MySQL DATETIME."""
-    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-
-
 class UserTokenDB:
     """MySQL-backed"""
 
@@ -107,7 +102,8 @@ class UserTokenDB:
             raise ValueError("Username is required")
 
         user_id = int(user_id) if isinstance(user_id, str) else user_id
-        now = current_ts()
+        now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
         encrypted_token = encrypt_value(access_key)
         encrypted_secret = encrypt_value(access_secret)
 
@@ -164,6 +160,5 @@ class UserTokenDB:
 
 
 __all__ = [
-    "current_ts",
     "UserTokenDB",
 ]
