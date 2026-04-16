@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_langs import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_lang_row():
     """Fixture for a sample lang row from database."""
@@ -58,7 +55,7 @@ class TestLangsDB:
     def test_add_strips_whitespace(self, monkeypatch, db_config):
         """Test that add strips whitespace from code."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"lang_id": 1, "code": "ar"}]
+        mock_db.fetch_query_safe.return_value = [{"lang_id": 1, "code": "ar", "autonym": "العربية", "name": "Arabic"}]
 
         monkeypatch.setattr("src.app_main.public.domain.db.db_langs.Database", lambda db_data: mock_db)
 
