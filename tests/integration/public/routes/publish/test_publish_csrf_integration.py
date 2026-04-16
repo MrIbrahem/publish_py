@@ -130,6 +130,12 @@ class BasePublishTest:
     """Base class with shared fixtures for publish endpoint tests."""
 
     @pytest.fixture(autouse=True)
+    def mock_get_campaign_category(mocker):
+        with patch("src.app_main.public.routes.publish.worker.get_campaign_category") as mocked:
+            mocked.return_value = None
+            yield mocked
+
+    @pytest.fixture(autouse=True)
     def mock_is_allowed(self):
         with patch("src.app_main.shared.core.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
@@ -204,6 +210,7 @@ class BasePublishTest:
 
 
 class TestSuccessFlows(BasePublishTest):
+
     def test_successful_edit(self, csrf_client, common_patches):
         # common_patches يغطي الـ happy-path بالكامل — لا شيء إضافي هنا
         response = self._post(
@@ -246,6 +253,7 @@ class TestSuccessFlows(BasePublishTest):
 
 
 class TestMetadataLogic(BasePublishTest):
+
     def test_tr_type_passed_correctly(self, csrf_client, common_patches):
         response = self._post(csrf_client, self._default_payload(tr_type="section"))
 
@@ -255,7 +263,9 @@ class TestMetadataLogic(BasePublishTest):
             assert calls[0].kwargs.get("tr_type") == "section"
 
     def test_words_field_in_tab(self, csrf_client, common_patches):
-        with patch("src.app_main.public.routes.publish.worker.get_word_count") as mock_word_count:
+        with (
+            patch("src.app_main.public.routes.publish.worker.get_word_count") as mock_word_count,
+        ):
             mock_word_count.return_value = 500
 
             response = self._post(csrf_client, self._default_payload())
@@ -326,13 +336,12 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 
 class TestComplexWorkflows(BasePublishTest):
+
     def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
         with (
             patch("src.app_main.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.app_main.public.routes.publish.worker.get_campaign_category") as mock_get_campaign,
         ):
             mock_should_add.return_value = True
-            mock_get_campaign.return_value = None
 
             # أول استدعاء يفشل، الثاني ينجح عبر fallback user
             common_patches["link"].side_effect = [
@@ -350,10 +359,7 @@ class TestComplexWorkflows(BasePublishTest):
 
             self.mock_get_token.side_effect = get_token_side_effect
 
-            with patch(
-                "src.app_main.public.routes.publish.worker.get_user_token_by_username",
-                side_effect=get_token_side_effect,
-            ):
+            with (patch("src.app_main.public.routes.publish.worker.get_user_token_by_username", side_effect=get_token_side_effect, )):
                 response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200

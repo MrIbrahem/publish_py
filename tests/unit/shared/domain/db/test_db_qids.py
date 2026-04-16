@@ -81,7 +81,8 @@ class TestQidsDB:
             """
             INSERT INTO qids (title, qid)
             VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE qid = VALUES(qid)
+            ON DUPLICATE KEY UPDATE
+                qid = VALUES(qid)
             """,
             ("TestArticle", "Q12345"),
         )

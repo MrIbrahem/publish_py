@@ -122,7 +122,7 @@ class TestPagesDB:
         monkeypatch.setattr("src.app_main.shared.domain.db.db_pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
-        with pytest.raises(LookupError, match="Page 'MissingPage' was not found"):
+        with pytest.raises(LookupError, match="Page MissingPage was not found"):
             pages_db._fetch_by_title("MissingPage")
 
     def test_update_returns_record_unchanged_when_no_kwargs(self, monkeypatch, db_config, sample_page_row):
