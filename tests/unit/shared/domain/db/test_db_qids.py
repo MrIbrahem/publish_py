@@ -60,7 +60,7 @@ class TestQidsDB:
     def test_fetch_by_title_returns_none_when_row_has_no_qid(self, monkeypatch, db_config):
         """Test handling when row exists but has no qid field."""
         mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [{"other_field": "value"}]
+        mock_db.fetch_query_safe.return_value = []
 
         monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
 
