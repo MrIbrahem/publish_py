@@ -27,6 +27,7 @@ class SettingRecord1:
         """Convert record to dictionary."""
         return {
             "id": self.id,
+            "key": self.key,
             "title": self.title,
             "value": self.value,
             "value_type": self.value_type,
