@@ -78,3 +78,7 @@ publish_py/
 │       │           ├── test_langs_service.py
 │       │           ├── ...
 ```
+
+# Note:
+
+-   models and models tests already created start creating db files then services
