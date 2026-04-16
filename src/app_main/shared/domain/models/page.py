@@ -22,5 +22,22 @@ class PageRecord:
     deleted: int = 0
     mdwiki_revid: int | None = None
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "word": self.word,
+            "translate_type": self.translate_type,
+            "cat": self.cat,
+            "lang": self.lang,
+            "user": self.user,
+            "target": self.target,
+            "date": self.date,
+            "pupdate": self.pupdate,
+            "add_date": self.add_date,
+            "deleted": self.deleted,
+            "mdwiki_revid": self.mdwiki_revid,
+        }
+
 
 __all__ = ["PageRecord"]

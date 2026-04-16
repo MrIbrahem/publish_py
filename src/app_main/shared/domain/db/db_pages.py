@@ -67,6 +67,7 @@ class PagesDB:
         return self._fetch_by_title(title)
 
     def update(self, page_id: int, **kwargs) -> PageRecord:
+        # Validate that the record exists before attempting update
         _ = self._fetch_by_id(page_id)
         if not kwargs:
             return self._fetch_by_id(page_id)

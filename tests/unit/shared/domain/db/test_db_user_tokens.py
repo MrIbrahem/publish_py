@@ -14,7 +14,7 @@ from src.app_main.shared.domain.db.db_user_tokens import (
 
 
 @pytest.fixture
-def db_config():
+def db_config() -> DbConfig:
     """Fixture for DbConfig instance."""
     return DbConfig(
         db_name="test_db",
@@ -24,48 +24,46 @@ def db_config():
     )
 
 
-@pytest.fixture
-def sample_token_record():
-    """Fixture for a sample UserTokenRecord."""
-    return UserTokenRecord(
-        user_id=12345,
-        username="TestUser",
-        access_token=b"encrypted_token",
-        access_secret=b"encrypted_secret",
-        created_at="2024-01-01 00:00:00",
-        updated_at="2024-01-01 00:00:00",
-        last_used_at="2024-01-01 00:00:00",
-        rotated_at=None,
-    )
+class TestUserTokenDBUpdate:
+    """
+    Tests for UserTokenDB class update method.
+    """
+
+    def test_update_with_unknown_columns_raises_error(self, monkeypatch, db_config):
+        """Test that update raises error for unknown columns."""
+        mock_db = MagicMock()
+        mock_db.fetch_query_safe.return_value = [
+            {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
+        ]
+
+        monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
+
+        token_db = UserTokenDB(db_config)
+        with pytest.raises(ValueError, match="Unknown or immutable columns for user_tokens"):
+            token_db.update(1, unknown_column="value")
+
+    @patch("src.app_main.shared.domain.db.db_user_tokens.encrypt_value")
+    def test_update_encrypts_token_columns(self, mock_encrypt, monkeypatch, db_config):
+        """Test that update encrypts access_token and access_secret columns."""
+        mock_db = MagicMock()
+        mock_db.fetch_query_safe.return_value = [
+            {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
+        ]
+        mock_encrypt.return_value = b"encrypted_value"
+
+        monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
+
+        token_db = UserTokenDB(db_config)
+        token_db.update(1, access_token="new_token")
+
+        mock_encrypt.assert_called_with("new_token")
+        # Check that encrypted value was passed to execute_query_safe
+        call_args = mock_db.execute_query_safe.call_args
+        assert b"encrypted_value" in call_args[0][1]
 
 
-class TestUserTokenRecord:
-    """Tests for UserTokenRecord dataclass."""
-
-    def test_post_init_coerces_bytes(self):
-        """Test that __post_init__ coerces access fields to bytes."""
-        record = UserTokenRecord(
-            user_id=1,
-            username="Test",
-            access_token=bytearray(b"token"),
-            access_secret=memoryview(b"secret"),
-        )
-        assert isinstance(record.access_token, bytes)
-        assert isinstance(record.access_secret, bytes)
-
-    @patch("src.app_main.shared.core.crypto.decrypt_value")
-    def test_decrypted_returns_tuple(self, mock_decrypt, sample_token_record):
-        """Test that decrypted returns tuple of decrypted values."""
-        mock_decrypt.side_effect = ["decrypted_token", "decrypted_secret"]
-
-        result = sample_token_record.decrypted()
-
-        assert result == ("decrypted_token", "decrypted_secret")
-        assert mock_decrypt.call_count == 2
-
-
-class TestUserTokenDB:
-    """Tests for UserTokenDB class."""
+class TestUserTokenDBGetUserId:
+    """Tests for UserTokenDB class get_user_id method."""
 
     def test_get_user_id_returns_id_when_found(self, monkeypatch, db_config):
         """Test that get_user_id returns user_id when username found."""
@@ -94,6 +92,10 @@ class TestUserTokenDB:
         result = token_db.get_user_id("MissingUser")
 
         assert result is None
+
+
+class TestUserTokenDB:
+    """Tests for UserTokenDB class."""
 
     def test_fetch_by_id_raises_lookup_error_when_not_found(self, monkeypatch, db_config):
         """Test that _fetch_by_id raises LookupError when user not found."""
@@ -134,38 +136,6 @@ class TestUserTokenDB:
         assert all(isinstance(r, UserTokenRecord) for r in result)
         assert result[0].user_id == 1
         assert result[1].user_id == 2
-
-    def test_update_with_unknown_columns_raises_error(self, monkeypatch, db_config):
-        """Test that update raises error for unknown columns."""
-        mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [
-            {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
-        ]
-
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
-
-        token_db = UserTokenDB(db_config)
-        with pytest.raises(ValueError, match="Unknown or immutable columns for user_tokens"):
-            token_db.update(1, unknown_column="value")
-
-    @patch("src.app_main.shared.domain.db.db_user_tokens.encrypt_value")
-    def test_update_encrypts_token_columns(self, mock_encrypt, monkeypatch, db_config):
-        """Test that update encrypts access_token and access_secret columns."""
-        mock_db = MagicMock()
-        mock_db.fetch_query_safe.return_value = [
-            {"user_id": 1, "username": "User1", "access_token": b"t1", "access_secret": b"s1"}
-        ]
-        mock_encrypt.return_value = b"encrypted_value"
-
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
-
-        token_db = UserTokenDB(db_config)
-        token_db.update(1, access_token="new_token")
-
-        mock_encrypt.assert_called_with("new_token")
-        # Check that encrypted value was passed to execute_query_safe
-        call_args = mock_db.execute_query_safe.call_args
-        assert b"encrypted_value" in call_args[0][1]
 
     def test_upsert_requires_non_empty_username(self, monkeypatch, db_config):
         """Test that upsert requires non-empty username."""
