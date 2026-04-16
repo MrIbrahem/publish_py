@@ -25,17 +25,6 @@ class CategoriesDB:
     def retrieve_campaign_categories(self) -> dict[str, str]:
         """Retrieve campaign to category mapping from database.
 
-        Mirrors PHP function:
-        ```php
-        function retrieveCampaignCategories() {
-            $camp_to_cats = [];
-            foreach (fetch_query('select id, category, category2, campaign, depth, def from categories;') as $k => $tab) {
-                $camp_to_cats[$tab['campaign']] = $tab['category'];
-            };
-            return $camp_to_cats;
-        }
-        ```
-
         Returns:
             Dictionary mapping campaign names to category names
         """
