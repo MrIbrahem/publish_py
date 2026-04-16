@@ -37,7 +37,7 @@ def list_coordinators() -> List[CoordinatorRecord]:
     return store.list()
 
 
-def list_active_coordinators() -> List[CoordinatorRecord]:
+def active_coordinators() -> List[CoordinatorRecord]:
     """Return all active coordinator records."""
     store = get_coordinators_db()
     return store.list_active()
@@ -89,7 +89,7 @@ def is_coordinator(user: str) -> bool:
 __all__ = [
     "get_coordinators_db",
     "list_coordinators",
-    "list_active_coordinators",
+    "active_coordinators",
     "get_coordinator",
     "get_coordinator_by_user",
     "add_coordinator",

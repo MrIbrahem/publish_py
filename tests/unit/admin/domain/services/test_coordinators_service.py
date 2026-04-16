@@ -13,7 +13,7 @@ from src.app_main.admin.domain.services.coordinators_service import (
     get_coordinator_by_user,
     get_coordinators_db,
     is_coordinator,
-    list_active_coordinators,
+    active_coordinators,
     list_coordinators,
     update_coordinator,
 )
@@ -61,10 +61,10 @@ class TestListCoordinators:
 
 
 class TestListActiveCoordinators:
-    """Tests for list_active_coordinators function."""
+    """Tests for active_coordinators function."""
 
     def test_returns_active_records(self, monkeypatch):
-        """Test that list_active_coordinators returns active records."""
+        """Test that active_coordinators returns active records."""
         mock_store = MagicMock()
         mock_records = [MagicMock()]
         mock_store.list_active.return_value = mock_records
@@ -72,7 +72,7 @@ class TestListActiveCoordinators:
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
         )
 
-        result = list_active_coordinators()
+        result = active_coordinators()
 
         assert result == mock_records
         mock_store.list_active.assert_called_once()

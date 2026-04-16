@@ -11,7 +11,14 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request
 
+from .admin.domain.db_ensure_tables import ensure_admin_db_tables
+
+from .public.domain.db_ensure_tables import ensure_public_db_tables
+
 from .config import settings
+from .admin.routes.routes import (
+    bp_admin,
+)
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -107,6 +114,8 @@ def create_app(config_class: Type | None = None) -> Flask:
 
     if oauth_enabled and settings.database_data.db_host:
         ensure_db_tables(settings.database_data)
+        ensure_public_db_tables(settings.database_data)
+        ensure_admin_db_tables(settings.database_data)
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)
@@ -114,6 +123,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.register_blueprint(bp_publish)
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
+    app.register_blueprint(bp_admin)
 
     csrf_exempt(app, bp_publish)
 

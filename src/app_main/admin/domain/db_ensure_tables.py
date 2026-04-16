@@ -7,7 +7,7 @@ from ...shared.core.db_driver import Database
 logger = logging.getLogger(__name__)
 
 
-def ensure_db_tables(db_data: DbConfig) -> None:
+def ensure_admin_db_tables(db_data: DbConfig) -> None:
     with Database(db_data) as db:
         db.execute_query_safe(admin_sql_tables.coordinator)
         db.execute_query_safe(admin_sql_tables.full_translators)
