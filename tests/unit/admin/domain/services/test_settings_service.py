@@ -9,8 +9,10 @@ from src.app_main.admin.domain.services.settings_service import (
     add_setting,
     delete_setting,
     get_setting,
+    get_setting_by_key,
     get_settings_db,
     list_settings,
+    update_value,
 )
 
 
@@ -66,6 +68,22 @@ class TestGetSetting:
         assert result is mock_record
 
 
+class TestGetSettingByKey:
+    """Tests for get_setting_by_key function."""
+
+    def test_returns_setting_by_key(self, monkeypatch):
+        """Test that function returns a SettingRecord by key."""
+        mock_store = MagicMock()
+        mock_record = MagicMock()
+        mock_store.fetch_by_key.return_value = mock_record
+        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+
+        result = get_setting_by_key("test_key")
+
+        assert result is mock_record
+        mock_store.fetch_by_key.assert_called_once_with("test_key")
+
+
 class TestAddSetting:
     """Tests for add_setting function."""
 
@@ -76,9 +94,25 @@ class TestAddSetting:
         mock_store.add.return_value = mock_record
         monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
 
-        result = add_setting("new_setting", "New Setting", "check", 1, 0)
+        result = add_setting("test_key", "Test Setting", "boolean", "true")
 
-        mock_store.add.assert_called_once_with("new_setting", "New Setting", "check", 1, 0)
+        mock_store.add.assert_called_once_with("test_key", "Test Setting", "boolean", "true")
+        assert result is mock_record
+
+
+class TestUpdateValue:
+    """Tests for update_value function."""
+
+    def test_updates_setting_value(self, monkeypatch):
+        """Test that update_value updates the setting value."""
+        mock_store = MagicMock()
+        mock_record = MagicMock()
+        mock_store.update_value.return_value = mock_record
+        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+
+        result = update_value(1, "new_value")
+
+        mock_store.update_value.assert_called_once_with(1, "new_value")
         assert result is mock_record
 
 

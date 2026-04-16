@@ -39,10 +39,11 @@ def list_coordinators() -> List[CoordinatorRecord]:
 
 
 @functools.lru_cache(maxsize=1)
-def active_coordinators() -> List[CoordinatorRecord]:
+def active_coordinators() -> List[str]:
     """Return all active coordinator records."""
     store = get_coordinators_db()
-    return [u.username for u in store.list() if u.is_active]
+    # return [u.username for u in store.list() if u.is_active]
+    return [u.username for u in store.list_active()]
 
 
 def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
