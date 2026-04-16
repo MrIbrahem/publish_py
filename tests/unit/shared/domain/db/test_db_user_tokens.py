@@ -102,7 +102,7 @@ class TestUserTokenDB:
         monkeypatch.setattr("src.app_main.shared.domain.db.db_user_tokens.Database", lambda db_data: mock_db)
 
         token_db = UserTokenDB(db_config)
-        with pytest.raises(LookupError, match="User 'MissingUser' was not found"):
+        with pytest.raises(LookupError, match="User MissingUser was not found"):
             token_db._fetch_by_username("MissingUser")
 
     def test_list_returns_all_records(self, monkeypatch, db_config):
