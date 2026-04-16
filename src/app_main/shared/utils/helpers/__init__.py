@@ -8,10 +8,12 @@ from .format import (
     format_user,
     make_summary,
 )
+from .text_processor import do_changes_to_text
 from .words import clear_words_cache, get_word_count
 
 __all__ = [
     "clear_words_cache",
+    "do_changes_to_text",
     "determine_hashtag",
     "format_title",
     "format_user",

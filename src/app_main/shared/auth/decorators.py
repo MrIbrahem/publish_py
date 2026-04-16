@@ -10,7 +10,6 @@ from typing import Any, Callable, TypeVar, cast
 from flask import redirect, request, session, url_for
 
 from ...config import settings
-
 from .identity import current_user
 
 F = TypeVar("F", bound=Callable[..., Any])

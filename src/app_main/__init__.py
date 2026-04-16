@@ -11,6 +11,7 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request
 
+from .config import settings
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -19,12 +20,11 @@ from .public.routes import (
     bp_main,
     bp_publish,
 )
-from .config import settings
-from .shared.core.cookies import CookieHeaderClient
-from .shared.domain import ensure_db_tables
-from .shared.core.extensions import csrf_init_app, csrf_exempt
-from .shared.domain.services import close_cached_db
 from .shared.auth.identity import current_user
+from .shared.core.cookies import CookieHeaderClient
+from .shared.core.extensions import csrf_exempt, csrf_init_app
+from .shared.domain import ensure_db_tables
+from .shared.domain.services import close_cached_db
 
 logger = logging.getLogger(__name__)
 

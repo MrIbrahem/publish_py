@@ -1,16 +1,19 @@
-
 import logging
 
-from .db.schema import sql_tables
-
-from ..core.db_driver import Database
 from ...config import DbConfig
-
+from ..core.db_driver import Database
+from .db.schema import sql_tables
 
 logger = logging.getLogger(__name__)
 
 
-def ensure_db_tables(db_data: DbConfig):
+def ensure_db_tables(db_data: DbConfig) -> None:
     db = Database(db_data)
-    logger.debug("Skipping user token table creation; MySQL configuration missing.")
-    tables = sql_tables
+
+    db.execute_query_safe(sql_tables.categories)
+    db.execute_query_safe(sql_tables.pages)
+    db.execute_query_safe(sql_tables.pages_users)
+
+    db.execute_query_safe(sql_tables.user_tokens)
+    db.execute_query_safe(sql_tables.qids)
+    db.execute_query_safe(sql_tables.publish_reports)

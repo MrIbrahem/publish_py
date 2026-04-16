@@ -8,20 +8,26 @@ import logging
 from typing import Any
 
 from ....config import settings
-from ....shared.domain.db.db_categories import get_campaign_category
-from ....shared.domain.db.db_publish_reports import ReportsDB
-from ....shared.utils.helpers.files import to_do
-from ....shared.utils.helpers.format import (
-    determine_hashtag,
-    make_summary,
+from ....shared.clients import (
+    get_revid,
+    get_revid_db,
+    get_title_info,
+    link_to_wikidata,
+    publish_do_edit,
 )
-from ....shared.utils.helpers.words import get_word_count
-from ....shared.clients.mediawiki_api import get_title_info, publish_do_edit
-from ....shared.clients.revids_client import get_revid, get_revid_db
-from ....shared.utils.helpers.text_processor import do_changes_to_text
-from ....shared.clients.wikidata_client import link_to_wikidata
-from ....shared.domain.services.pages_service import find_exists_or_update, insert_page_target
-from ....shared.domain.services.users_services import get_user_token_by_username
+from ....shared.domain.db import ReportsDB, get_campaign_category
+from ....shared.domain.services import (
+    find_exists_or_update,
+    get_user_token_by_username,
+    insert_page_target,
+)
+from ....shared.utils.helpers import (
+    determine_hashtag,
+    do_changes_to_text,
+    get_word_count,
+    make_summary,
+    to_do,
+)
 
 logger = logging.getLogger(__name__)
 

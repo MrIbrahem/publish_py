@@ -98,7 +98,9 @@ class TestCheckPublishSecretCode:
 
     def test_uses_timing_safe_comparison(self, app, monkeypatch):
         """Test that timing-safe comparison is used (hmac.compare_digest)."""
-        monkeypatch.setattr("src.app_main.shared.core.cors.publish_secret_checks._get_publish_secret_code", lambda: "secret")
+        monkeypatch.setattr(
+            "src.app_main.shared.core.cors.publish_secret_checks._get_publish_secret_code", lambda: "secret"
+        )
 
         with patch("src.app_main.shared.core.cors.publish_secret_checks.hmac.compare_digest") as mock_compare:
             mock_compare.return_value = True

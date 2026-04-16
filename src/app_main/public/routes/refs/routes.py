@@ -12,8 +12,8 @@ from flask import (
     request,
 )
 
-from ....shared.utils.helpers.text_processor import do_changes_to_text
 from ....shared.auth.identity import current_user
+from ....shared.utils.helpers.text_processor import do_changes_to_text
 
 bp_fixrefs = Blueprint("fixrefs", __name__, url_prefix="/fixrefs")
 logger = logging.getLogger(__name__)

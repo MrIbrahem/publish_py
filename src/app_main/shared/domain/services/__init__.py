@@ -1,6 +1,7 @@
 """
 Shared db services, used in both admin and public blueprints
 """
+
 from .db_service import (
     close_cached_db,
     fetch_query_safe,
@@ -13,6 +14,9 @@ from .pages_service import (
     insert_page_target,
     list_pages,
 )
+from .users_services import (
+    get_user_token_by_username,
+)
 
 __all__ = [
     "close_cached_db",
@@ -23,4 +27,5 @@ __all__ = [
     "get_pages_db",
     "insert_page_target",
     "list_pages",
+    "get_user_token_by_username",
 ]
