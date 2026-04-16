@@ -13,7 +13,7 @@ from flask import Flask, flash, render_template, request
 
 from .admin.domain.db_ensure_tables import ensure_admin_db_tables
 from .admin.domain.services.coordinators_service import active_coordinators
-from .admin.routes.routes import (
+from .admin.routes.admin import (
     bp_admin,
 )
 from .config import settings
