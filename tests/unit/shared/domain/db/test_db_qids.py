@@ -29,15 +29,15 @@ def db_config():
 class TestQidsDB:
     """Tests for QidsDB class."""
 
-    def test_get_qid_by_title_returns_qid_when_found(self, monkeypatch, db_config):
-        """Test that get_qid_by_title returns QID when title exists."""
+    def test_fetch_by_title_returns_qid_when_found(self, monkeypatch, db_config):
+        """Test that fetch_by_title returns QID when title exists."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"qid": "Q12345"}]
 
         monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
-        result = qids_db.get_qid_by_title("TestArticle")
+        result = qids_db.fetch_by_title("TestArticle")
 
         assert result == "Q12345"
         mock_db.fetch_query_safe.assert_called_with(
@@ -45,19 +45,19 @@ class TestQidsDB:
             ("TestArticle",),
         )
 
-    def test_get_qid_by_title_returns_none_when_not_found(self, monkeypatch, db_config):
-        """Test that get_qid_by_title returns None when title not found."""
+    def test_fetch_by_title_returns_none_when_not_found(self, monkeypatch, db_config):
+        """Test that fetch_by_title returns None when title not found."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = []
 
         monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
-        result = qids_db.get_qid_by_title("MissingArticle")
+        result = qids_db.fetch_by_title("MissingArticle")
 
         assert result is None
 
-    def test_get_qid_by_title_returns_none_when_row_has_no_qid(self, monkeypatch, db_config):
+    def test_fetch_by_title_returns_none_when_row_has_no_qid(self, monkeypatch, db_config):
         """Test handling when row exists but has no qid field."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [{"other_field": "value"}]
@@ -65,7 +65,7 @@ class TestQidsDB:
         monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
 
         qids_db = QidsDB(db_config)
-        result = qids_db.get_qid_by_title("TestArticle")
+        result = qids_db.fetch_by_title("TestArticle")
 
         assert result is None
 
