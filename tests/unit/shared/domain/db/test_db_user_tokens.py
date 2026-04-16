@@ -13,17 +13,6 @@ from src.app_main.shared.domain.db.db_user_tokens import (
 )
 
 
-@pytest.fixture
-def db_config() -> DbConfig:
-    """Fixture for DbConfig instance."""
-    return DbConfig(
-        db_name="test_db",
-        db_host="localhost",
-        db_user="user",
-        db_password="pass",
-    )
-
-
 class TestUserTokenDBMarkTokenUsed:
     """
     Tests for UserTokenDB class mark_token_used method.

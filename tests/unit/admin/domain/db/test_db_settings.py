@@ -15,15 +15,7 @@ from src.app_main.admin.domain.db.db_settings import SettingsDB
 from src.app_main.admin.domain.models.setting import SettingRecord
 
 
-@pytest.fixture
-def db_config():
-    """Fixture for DbConfig instance."""
-    return DbConfig(
-        db_name="test_db",
-        db_host="localhost",
-        db_user="user",
-        db_password="pass",
-    )
+
 
 
 class TestSettingsDB:

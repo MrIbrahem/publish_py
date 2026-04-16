@@ -15,15 +15,7 @@ from src.app_main.admin.domain.db.db_language_settings import LanguageSettingsDB
 from src.app_main.admin.domain.models.language_setting import LanguageSettingRecord
 
 
-@pytest.fixture
-def db_config():
-    """Fixture for DbConfig instance."""
-    return DbConfig(
-        db_name="test_db",
-        db_host="localhost",
-        db_user="user",
-        db_password="pass",
-    )
+
 
 
 class TestLanguageSettingsDB:

@@ -16,15 +16,7 @@ from src.app_main.shared.domain.db.db_qids import (
 from src.app_main.shared.domain.models import QidRecord
 
 
-@pytest.fixture
-def db_config():
-    """Fixture for DbConfig instance."""
-    return DbConfig(
-        db_name="test_db",
-        db_host="localhost",
-        db_user="user",
-        db_password="pass",
-    )
+
 
 
 class TestQidsDB:

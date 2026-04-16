@@ -15,15 +15,7 @@ from src.app_main.shared.domain.db.db_pages import (
 )
 
 
-@pytest.fixture
-def db_config():
-    """Fixture for DbConfig instance."""
-    return DbConfig(
-        db_name="test_db",
-        db_host="localhost",
-        db_user="user",
-        db_password="pass",
-    )
+
 
 
 @pytest.fixture
