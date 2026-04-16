@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
+import datetime
 import logging
 from typing import Any, List
 
 from ....config import DbConfig
 from ...core.crypto import encrypt_value
 from ...core.db_driver import Database
-from ..models.user_token import UserTokenRecord, current_ts
+from ..models.user_token import UserTokenRecord
 
 logger = logging.getLogger(__name__)
+
+
+def current_ts() -> str:
+    """Return the current UTC timestamp formatted for MySQL DATETIME."""
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 
 class UserTokenDB:
@@ -160,5 +166,4 @@ class UserTokenDB:
 __all__ = [
     "current_ts",
     "UserTokenDB",
-    "UserTokenRecord",
 ]

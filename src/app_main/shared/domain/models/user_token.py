@@ -1,26 +1,12 @@
 from __future__ import annotations
 
-import datetime
 import logging
 from dataclasses import dataclass
 from typing import Any
 
+from ...utils.decode_bytes import coerce_bytes
+
 logger = logging.getLogger(__name__)
-
-
-def current_ts() -> str:
-    """Return the current UTC timestamp formatted for MySQL DATETIME."""
-    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-
-
-def _coerce_bytes(value: Any) -> bytes:
-    if isinstance(value, bytes):
-        return value
-    if isinstance(value, bytearray):
-        return bytes(value)
-    if isinstance(value, memoryview):
-        return value.tobytes()
-    raise TypeError("Expected bytes-compatible value for encrypted token")
 
 
 @dataclass
@@ -45,11 +31,10 @@ class UserTokenRecord:
         return access_key, access_secret
 
     def __post_init__(self) -> None:
-        self.access_token = _coerce_bytes(self.access_token)
-        self.access_secret = _coerce_bytes(self.access_secret)
+        self.access_token = coerce_bytes(self.access_token)
+        self.access_secret = coerce_bytes(self.access_secret)
 
 
 __all__ = [
     "UserTokenRecord",
-    "current_ts",
 ]
