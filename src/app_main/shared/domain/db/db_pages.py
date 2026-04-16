@@ -5,34 +5,15 @@ TODO: should be updated to match php_src/bots/sql/db_Pages.php
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import Any, List
 
 import pymysql
 
 from ....config import DbConfig
 from ...core.db_driver import Database
+from ..models.page import PageRecord
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class PageRecord:
-    """Representation of a page."""
-
-    id: int
-    title: str
-    word: int | None = None
-    translate_type: str | None = None
-    cat: str | None = None
-    lang: str | None = None
-    user: str | None = None
-    target: str | None = None
-    date: Any | None = None
-    pupdate: str | None = None
-    add_date: Any | None = None
-    deleted: int = 0
-    mdwiki_revid: int | None = None
 
 
 class PagesDB:
