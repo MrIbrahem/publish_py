@@ -25,20 +25,18 @@ PUBLISH_REPORTS_PARAMS = [
     {"name": "result", "column": "result", "type": "text"},
 ]
 
-_VALID_COLUMNS = frozenset(
-    {
-        "id",
-        "date",
-        "title",
-        "user",
-        "lang",
-        "sourcetitle",
-        "result",
-        "data",
-        "YEAR(date)",
-        "MONTH(date)",
-    }
-)
+ReportsDB_VALID_COLUMNS = frozenset({
+    "id",
+    "date",
+    "title",
+    "user",
+    "lang",
+    "sourcetitle",
+    "result",
+    "data",
+    "YEAR(date)",
+    "MONTH(date)",
+})
 
 
 class ReportsDB:
@@ -136,35 +134,8 @@ class ReportsDB:
             select_clause = "id, date, title, user, lang, sourcetitle, result, data"
 
         query = f"SELECT DISTINCT {select_clause} FROM publish_reports"
-        params: List[Any] = []
-        conditions: List[str] = []
 
-        for param_def in PUBLISH_REPORTS_PARAMS:
-            name = param_def["name"]
-            column = param_def["column"]
-
-            # Validate column is in the trusted allowlist (defense in depth)
-            if column not in _VALID_COLUMNS:
-                logger.warning(f"Skipping unrecognized column: {column}")
-                continue
-
-            if name not in filters:
-                continue
-
-            value = filters[name]
-
-            # Handle special values
-            if value in ("not_mt", "not_empty"):
-                conditions.append(f"({column} != '' AND {column} IS NOT NULL)")
-            elif value in ("mt", "empty"):
-                conditions.append(f"({column} = '' OR {column} IS NULL)")
-            elif value in (">0", "&#62;0"):
-                conditions.append(f"{column} > 0")
-            elif str(value).lower() == "all":
-                continue  # Skip this filter
-            else:
-                conditions.append(f"{column} = %s")
-                params.append(value)
+        params, conditions = self._load_params_and_conditions(filters)
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
@@ -194,6 +165,39 @@ class ReportsDB:
             result_records.append(record)
 
         return result_records
+
+    def _load_params_and_conditions(self, filters) -> tuple[List[Any], List[str]]:
+        params: List[Any] = []
+        conditions: List[str] = []
+
+        for param_def in PUBLISH_REPORTS_PARAMS:
+            name = param_def["name"]
+            column = param_def["column"]
+
+            # Validate column is in the trusted allowlist (defense in depth)
+            if column not in ReportsDB_VALID_COLUMNS:
+                logger.warning(f"Skipping unrecognized column: {column}")
+                continue
+
+            if name not in filters:
+                continue
+
+            value = filters[name]
+
+            # Handle special values
+            if value in ("not_mt", "not_empty"):
+                conditions.append(f"({column} != '' AND {column} IS NOT NULL)")
+            elif value in ("mt", "empty"):
+                conditions.append(f"({column} = '' OR {column} IS NULL)")
+            elif value in (">0", "&#62;0"):
+                conditions.append(f"{column} > 0")
+            elif str(value).lower() == "all":
+                continue  # Skip this filter
+            else:
+                conditions.append(f"{column} = %s")
+                params.append(value)
+
+        return params, conditions
 
 
 __all__ = [

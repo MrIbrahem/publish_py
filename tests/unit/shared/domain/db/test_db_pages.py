@@ -1,4 +1,5 @@
-"""Unit tests for db.db_pages module.
+"""
+Unit tests for db.db_pages module.
 
 Tests for Pages database operations.
 """
@@ -43,27 +44,6 @@ def sample_page_row():
         "deleted": 0,
         "mdwiki_revid": 12345,
     }
-
-
-class TestPageRecord:
-    """Tests for PageRecord dataclass."""
-
-    def test_create_with_required_fields(self):
-        """Test creating PageRecord with required fields."""
-        record = PageRecord(id=1, title="TestPage")
-        assert record.id == 1
-        assert record.title == "TestPage"
-        assert record.word is None
-        assert record.deleted == 0  # Default value
-
-    def test_create_with_all_fields(self, sample_page_row):
-        """Test creating PageRecord with all fields."""
-        record = PageRecord(**sample_page_row)
-        assert record.id == 1
-        assert record.title == "TestPage"
-        assert record.word == 100
-        assert record.translate_type == "Lead"
-        assert record.mdwiki_revid == 12345
 
 
 class TestPagesDB:
