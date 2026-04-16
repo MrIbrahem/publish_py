@@ -89,8 +89,8 @@ CREATE TABLE IF NOT EXISTS publish_reports (
 qids = """
 CREATE TABLE IF NOT EXISTS qids (
     id int unsigned NOT NULL AUTO_INCREMENT,
-    title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     qid varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY title (title),
