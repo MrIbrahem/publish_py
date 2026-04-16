@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.config import DbConfig
-from src.app_main.shared.domain.db_ensure_service import ensure_db_tables
+from src.app_main.shared.domain.db_ensure_tables import ensure_db_tables
 
 
 class TestEnsureDbTables:
@@ -21,7 +21,7 @@ class TestEnsureDbTables:
         def mock_database_init(config):
             return mock_db_instance
 
-        monkeypatch.setattr("src.app_main.shared.domain.db_ensure_service.Database", mock_database_init)
+        monkeypatch.setattr("src.app_main.shared.domain.db_ensure_tables.Database", mock_database_init)
         return mock_db_instance
 
     @pytest.fixture
@@ -93,7 +93,7 @@ class TestEnsureDbTables:
         def get_mock_database(db_config):
             return mock_db
 
-        import src.app_main.shared.domain.db_ensure_service as db_module
+        import src.app_main.shared.domain.db_ensure_tables as db_module
 
         original_database = db_module.Database
         db_module.Database = get_mock_database
