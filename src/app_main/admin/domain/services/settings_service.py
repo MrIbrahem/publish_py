@@ -67,18 +67,6 @@ def add_setting(
     return store.add(title, displayed, form_type, value, ignored)
 
 
-def add_or_update_setting(
-    title: str,
-    displayed: str,
-    form_type: str = "check",
-    value: int = 0,
-    ignored: int = 0,
-) -> SettingRecord:
-    """Add or update a setting record."""
-    store = get_settings_db()
-    return store.add_or_update(title, displayed, form_type, value, ignored)
-
-
 def update_setting(setting_id: int, **kwargs) -> SettingRecord:
     """Update a setting record."""
     store = get_settings_db()
@@ -105,7 +93,6 @@ __all__ = [
     "get_setting",
     "get_setting_by_title",
     "add_setting",
-    "add_or_update_setting",
     "update_setting",
     "delete_setting",
     "get_setting_value",

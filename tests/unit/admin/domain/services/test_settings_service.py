@@ -6,7 +6,6 @@ from unittest.mock import MagicMock
 
 import pytest
 from src.app_main.admin.domain.services.settings_service import (
-    add_or_update_setting,
     add_setting,
     delete_setting,
     get_setting,
@@ -115,22 +114,6 @@ class TestAddSetting:
         result = add_setting("new_setting", "New Setting", "check", 1, 0)
 
         mock_store.add.assert_called_once_with("new_setting", "New Setting", "check", 1, 0)
-        assert result is mock_record
-
-
-class TestAddOrUpdateSetting:
-    """Tests for add_or_update_setting function."""
-
-    def test_upserts_setting(self, monkeypatch):
-        """Test that add_or_update_setting upserts the record."""
-        mock_store = MagicMock()
-        mock_record = MagicMock()
-        mock_store.add_or_update.return_value = mock_record
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
-
-        result = add_or_update_setting("test_setting", "Test Setting", "text", 0, 0)
-
-        mock_store.add_or_update.assert_called_once_with("test_setting", "Test Setting", "text", 0, 0)
         assert result is mock_record
 
 

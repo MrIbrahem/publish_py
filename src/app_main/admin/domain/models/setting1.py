@@ -14,7 +14,7 @@ class SettingRecord1:
     `key` VARCHAR(190) NOT NULL,
     `title` VARCHAR(500) NOT NULL,
     `value` text DEFAULT NULL,
-    `value_type` enum ('boolean', 'string', 'integer', 'json') NOT NULL DEFAULT 'boolean',
+    `value_type` enum ('boolean', 'string', 'integer') NOT NULL DEFAULT 'boolean',
     """
 
     id: int
@@ -47,12 +47,8 @@ class SettingRecord1:
                 return int(value)
             except ValueError:
                 return 0
-        elif value_type == "json":
-            try:
-                return json.loads(value)
-            except Exception:
-                return None
-        return value  # string
+
+        return str(value)  # string
 
 
 __all__ = ["SettingRecord1"]

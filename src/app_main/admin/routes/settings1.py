@@ -1,34 +1,57 @@
-"""
-Admin-only routes for managing application settings.
-TODO: service should moved to settings1_service.py and should be work with the new SettingsDB1 and SettingRecord1.
-"""
+"""Admin-only routes for managing application settings."""
 
 from __future__ import annotations
 
 import json
 import re
+from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from ...config import settings
 from .decorators import admin_required
+
+
+def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
+    """Parse a setting value from form input.
+
+    Returns:
+        tuple of (parsed_value, success)
+    """
+    if v_type == "boolean":
+        return raw_val == "on", True
+    elif v_type == "integer":
+        try:
+            return int(raw_val), True
+        except ValueError:
+            return 0, True
+    elif v_type == "json":
+        try:
+            return json.loads(raw_val), True
+        except Exception:
+            return None, False
+    else:
+        return raw_val, True
 
 
 class SettingsRoutes1:
     def __init__(self, bp_admin: Blueprint):
-        from ..domain.db.db_settings1 import SettingsDB1
+        from ..domain.services import settings1_service as service
 
         @bp_admin.get("/settings")
         @admin_required
         def settings_view():
-            db_settings = SettingsDB1(settings.database_data)
-            all_settings = db_settings.get_raw_all()
-            return render_template("admins/settings.html", settings_list=all_settings)
+            all_settings = service.list_settings()
+            # Convert records to dicts for template compatibility
+            settings_list = [s.to_dict() for s in all_settings]
+            # Add key and value_type to dict for template
+            for i, s in enumerate(all_settings):
+                settings_list[i]["key"] = s.key
+                settings_list[i]["value_type"] = s.value_type
+            return render_template("admins/settings.html", settings_list=settings_list)
 
         @bp_admin.post("/settings/create")
         @admin_required
         def settings_create():
-            db_settings = SettingsDB1(settings.database_data)
             key = request.form.get("key", "").strip()
             title = request.form.get("title", "").strip()
             value_type = request.form.get("value_type", "boolean").strip()
@@ -50,52 +73,37 @@ class SettingsRoutes1:
                 value = ""
 
             if key and title:
-                success = db_settings.create_setting(key, title, value_type, value)
-                if success:
+                try:
+                    service.add_setting(key, title, value_type, value)
                     flash("Setting created successfully.", "success")
-                else:
-                    flash("Setting could not be created or already exists.", "danger")
+                except ValueError as e:
+                    flash(f"Setting could not be created: {e}", "danger")
             else:
                 flash("Key and Title are required.", "danger")
 
             return redirect(url_for("admin.settings_view"))
 
-        def _parse_setting_value(v_type: str, raw_val: str) -> tuple[any, bool]:
-            """Returns (value, success)"""
-            if v_type == "boolean":
-                return raw_val == "on", True
-            elif v_type == "integer":
-                try:
-                    return int(raw_val), True
-                except ValueError:
-                    return 0, True
-            elif v_type == "json":
-                try:
-                    return json.loads(raw_val), True
-                except Exception:
-                    return None, False
-            else:
-                return raw_val, True
-
         @bp_admin.post("/settings/update")
         @admin_required
         def settings_update():
-            db_settings = SettingsDB1(settings.database_data)
-            all_settings = db_settings.get_raw_all()
+            from ..domain.services import settings1_service as service
+
+            all_settings = service.list_settings()
             failed_keys: list[str] = []
             deleted_keys: list[str] = []
 
-            for s in all_settings:
-                key = s["key"]
-                v_type = s["value_type"]
+            for setting in all_settings:
+                key = setting.key
+                v_type = setting.value_type
                 form_key = f"setting_{key}"
                 delete_key = f"delete_{key}"
 
                 # Check if marked for deletion
                 if request.form.get(delete_key) == "on":
-                    if db_settings.delete_setting(key):
+                    try:
+                        service.delete_setting(setting.id)
                         deleted_keys.append(key)
-                    else:
+                    except Exception:
                         failed_keys.append(key)
                     continue
 
@@ -107,14 +115,18 @@ class SettingsRoutes1:
                     continue
 
                 value, success = _parse_setting_value(v_type, raw_val)
-                if not success or not db_settings.update_setting(key, value, v_type):
+                if not success:
+                    failed_keys.append(key)
+                    continue
+
+                try:
+                    service.update_value(setting.id, value=value)
+                except Exception:
                     failed_keys.append(key)
 
-            # Invalidate runtime cache only if all updates succeeded
             if not failed_keys:
                 if deleted_keys:
                     flash(f"Deleted settings: {', '.join(deleted_keys)}. ", "success")
-
                 flash("Settings updated successfully.", "success")
             else:
                 flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
