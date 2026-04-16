@@ -52,7 +52,7 @@ def generate_domain_test_placeholders(src_root, test_root):
 
 
 if __name__ == "__main__":
-    SOURCE_DIR = "src"
+    SOURCE_DIR = "src/app_main"
     TEST_DIR = "tests/unit"
 
     generate_domain_test_placeholders(SOURCE_DIR, TEST_DIR)
