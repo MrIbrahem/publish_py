@@ -79,7 +79,7 @@ class CategoriesDB:
         if not record:
             raise ValueError(f"Category with ID {category_id} not found")
 
-        self.db.execute_query_safe("DELETE FROM categories WHERE id = %s", (category_id,), self.db.commit)
+        self.db.execute_query_safe("DELETE FROM categories WHERE id = %s", (category_id,))
 
     def add(
         self,
@@ -103,6 +103,13 @@ class CategoriesDB:
             (category, campaign, display, category2, depth),
         )
         return self.fetch_by_category(category)
+
+    def set_default(self, category_id: int) -> None:
+        """Set a category as default by unsetting default flag on all other categories."""
+        self.db.execute_query_safe(
+            "UPDATE categories SET is_default = CASE WHEN id = %s THEN 1 ELSE 0 END",
+            (category_id,),
+        )
 
 
 __all__ = [

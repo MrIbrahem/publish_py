@@ -108,10 +108,10 @@ def get_camp_to_cats() -> dict[str, str]:
 
 
 __all__ = [
-    "list_categories",
     "add_category",
     "update_category",
     "delete_category",
     "get_campaign_category",
+    "list_categories",
     "get_camp_to_cats",
 ]

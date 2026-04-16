@@ -11,7 +11,6 @@ class CategoryRecord:
     """
     Category records.
     """
-
     id: int
     category: str
     campaign: str
@@ -31,6 +30,17 @@ class CategoryRecord:
             "depth": self.depth,
             "is_default": self.is_default,
         }
+
+    def __post_init__(self) -> None:
+        # Validate that required fields are not empty
+        if not self.category:
+            raise ValueError("Category name cannot be empty")
+
+        if not self.campaign:
+            raise ValueError("Campaign name cannot be empty")
+
+        self.depth = int(self.depth) or 0
+        self.is_default = int(self.is_default) or 0
 
 
 __all__ = [

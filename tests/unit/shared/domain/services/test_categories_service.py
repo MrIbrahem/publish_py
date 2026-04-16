@@ -13,6 +13,7 @@ from src.app_main.shared.domain.services.categories_service import (
     get_campaign_category,
     list_categories,
     update_category,
+    get_camp_to_cats,
 )
 
 
@@ -32,3 +33,28 @@ class TestGetCampaignCategory:
 
         assert result is mock_category
         mock_store.fetch_by_campaign.assert_called_once_with("TestCampaign")
+
+
+class TestAddCategory:
+    """Tests for add_category function."""
+    ...
+
+
+class TestListCategories:
+    """Tests for list_categories function."""
+    ...
+
+
+class TestDeleteCategory:
+    """Tests for delete_category function."""
+    ...
+
+
+class TestUpdateCategory:
+    """Tests for update_category function."""
+    ...
+
+
+class TestGetCampToCats:
+    """Tests for get_camp_to_cats function."""
+    ...
