@@ -8,11 +8,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.shared.domain.services.qids_service import (
-    add_qid,
-    delete_qid,
-    get_campaign_qid,
-    list_qids,
-    update_qid,
+    get_qids_db,
+    # add_qid,
+    # delete_qid,
+    # list_qids,
+    # update_qid,
+    # get_page_qid,
 )
 
 
