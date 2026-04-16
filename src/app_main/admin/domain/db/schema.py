@@ -62,8 +62,7 @@ CREATE TABLE
     value int NOT NULL DEFAULT '0',
     ignored int NOT NULL DEFAULT '0',
     PRIMARY KEY (id),
-    UNIQUE KEY title (title),
-    KEY idx_title (title)
+    UNIQUE KEY title (title)
   )
 """
 

@@ -28,8 +28,7 @@ CREATE TABLE
     title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
     importance varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY title (title),
-    KEY idx_assessments_title (title)
+    UNIQUE KEY title (title)
   )
 """
 
@@ -41,8 +40,7 @@ CREATE TABLE
     title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
     en_views int DEFAULT '0',
     PRIMARY KEY (id),
-    UNIQUE KEY title (title),
-    KEY idx_enwiki_pageviews_title (title)
+    UNIQUE KEY title (title)
   )
 """
 
