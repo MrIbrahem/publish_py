@@ -66,18 +66,17 @@ class TestListActiveCoordinators:
     def test_returns_active_usernames(self, monkeypatch):
         """Test that active_coordinators returns active coordinator usernames."""
         from src.app_main.admin.domain.services import coordinators_service
+        from src.app_main.admin.domain.models.coordinator import CoordinatorRecord
 
-        # Clear cache before test
+        # Clear cache and global store before test
         coordinators_service.active_coordinators.cache_clear()
+        monkeypatch.setattr("src.app_main.admin.domain.services.coordinators_service._COORDINATORS_STORE", None)
 
         mock_store = MagicMock()
-        mock_active_record = MagicMock()
-        mock_active_record.username = "ActiveUser"
-        mock_active_record.is_active = 1
-        mock_inactive_record = MagicMock()
-        mock_inactive_record.username = "InactiveUser"
-        mock_inactive_record.is_active = 0
-        mock_store.list.return_value = [mock_active_record, mock_inactive_record]
+        mock_store.list.return_value = [
+            CoordinatorRecord(id=1, username="ActiveUser", is_active=1),
+            CoordinatorRecord(id=2, username="InactiveUser", is_active=0),
+        ]
         monkeypatch.setattr(
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
         )
