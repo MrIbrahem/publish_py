@@ -33,9 +33,9 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
         return raw_val, True
 
 
-class SettingsRoutes1:
+class SettingsRoutes:
     def __init__(self, bp_admin: Blueprint):
-        from ..domain.services import settings1_service as service
+        from ..domain.services import settings_service as service
 
         @bp_admin.get("/settings")
         @admin_required
@@ -86,7 +86,7 @@ class SettingsRoutes1:
         @bp_admin.post("/settings/update")
         @admin_required
         def settings_update():
-            from ..domain.services import settings1_service as service
+            from ..domain.services import settings_service as service
 
             all_settings = service.list_settings()
             failed_keys: list[str] = []

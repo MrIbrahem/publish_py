@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 
 @dataclass
-class SettingRecord1:
+class SettingRecord:
     """
     Representation of a setting1 record.
 
@@ -51,4 +51,4 @@ class SettingRecord1:
         return str(value)  # string
 
 
-__all__ = ["SettingRecord1"]
+__all__ = ["SettingRecord"]
