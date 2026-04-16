@@ -112,7 +112,7 @@ class TestUserTokenRecord:
         assert isinstance(record.access_token, bytes)
         assert isinstance(record.access_secret, bytes)
 
-    @patch("src.app_main.shared.domain.db.db_user_tokens.decrypt_value")
+    @patch("src.app_main.shared.core.crypto.decrypt_value")
     def test_decrypted_returns_tuple(self, mock_decrypt, sample_token_record):
         """Test that decrypted returns tuple of decrypted values."""
         mock_decrypt.side_effect = ["decrypted_token", "decrypted_secret"]
