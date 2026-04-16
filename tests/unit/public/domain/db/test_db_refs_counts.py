@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_refs_counts import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_refs_row():
     """Fixture for a sample refs_count row from database."""

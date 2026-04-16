@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from dataclasses import dataclass
 
@@ -13,7 +12,7 @@ class TablesCreatesSql:
     users_no_inprocess: str
 
 
-coordinators= """
+coordinators = """
 
 CREATE TABLE IF NOT EXISTS coordinators (
     id int unsigned NOT NULL AUTO_INCREMENT,
@@ -24,7 +23,7 @@ CREATE TABLE IF NOT EXISTS coordinators (
   )
 """
 
-full_translators= """
+full_translators = """
 
 CREATE TABLE IF NOT EXISTS full_translators (
     id int unsigned NOT NULL AUTO_INCREMENT,
@@ -35,7 +34,7 @@ CREATE TABLE IF NOT EXISTS full_translators (
   )
 """
 
-language_settings= """
+language_settings = """
 CREATE TABLE IF NOT EXISTS language_settings (
     id int NOT NULL AUTO_INCREMENT,
     lang_code varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -49,7 +48,7 @@ CREATE TABLE IF NOT EXISTS language_settings (
 """
 
 # Type -> form_type
-settings= """
+settings = """
 
 CREATE TABLE IF NOT EXISTS settings (
     id int NOT NULL AUTO_INCREMENT,
@@ -63,7 +62,7 @@ CREATE TABLE IF NOT EXISTS settings (
   )
 """
 
-users_no_inprocess= """
+users_no_inprocess = """
 
 CREATE TABLE IF NOT EXISTS users_no_inprocess (
     id int unsigned NOT NULL AUTO_INCREMENT,

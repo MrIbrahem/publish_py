@@ -8,14 +8,11 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
 import pymysql
-from src.app_main.config import DbConfig
+import pytest
 from src.app_main.admin.domain.db.db_settings import SettingsDB
 from src.app_main.admin.domain.models.setting import SettingRecord
-
-
-
+from src.app_main.config import DbConfig
 
 
 class TestSettingsDB:
@@ -25,7 +22,14 @@ class TestSettingsDB:
         """Test that fetch_by_id returns record when ID exists."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "test_setting", "displayed": "Test Setting", "form_type": "check", "value": 1, "ignored": 0}
+            {
+                "id": 1,
+                "title": "test_setting",
+                "displayed": "Test Setting",
+                "form_type": "check",
+                "value": 1,
+                "ignored": 0,
+            }
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)
@@ -99,7 +103,14 @@ class TestSettingsDB:
         """Test that add inserts a new setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "title": "new_setting", "displayed": "New Setting", "form_type": "check", "value": 0, "ignored": 0}
+            {
+                "id": 1,
+                "title": "new_setting",
+                "displayed": "New Setting",
+                "form_type": "check",
+                "value": 0,
+                "ignored": 0,
+            }
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_settings.Database", lambda db_data: mock_db)

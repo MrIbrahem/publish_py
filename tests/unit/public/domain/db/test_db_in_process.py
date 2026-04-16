@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_in_process import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_in_process_row():
     """Fixture for a sample in_process row from database."""

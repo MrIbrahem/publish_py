@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_projects import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_project_row():
     """Fixture for a sample project row from database."""

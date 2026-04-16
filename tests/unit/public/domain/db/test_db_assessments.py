@@ -15,9 +15,6 @@ from src.app_main.public.domain.db.db_assessments import (
 )
 
 
-
-
-
 @pytest.fixture
 def sample_assessment_row():
     """Fixture for a sample assessment row from database."""

@@ -1,8 +1,8 @@
 import logging
 
 from ...config import DbConfig
-from .db.schema import admin_sql_tables
 from ...shared.core.db_driver import Database
+from .db.schema import admin_sql_tables
 
 logger = logging.getLogger(__name__)
 

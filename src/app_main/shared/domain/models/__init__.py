@@ -1,8 +1,8 @@
 from .category import CategoryRecord
 from .page import PageRecord
+from .qid import QidRecord
 from .report import ReportRecord
 from .user_token import UserTokenRecord
-from .qid import QidRecord
 
 __all__ = [
     "PageRecord",

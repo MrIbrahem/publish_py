@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from src.app_main.admin.domain.services.coordinators_service import (
+    active_coordinators,
     add_coordinator,
     add_or_update_coordinator,
     delete_coordinator,
@@ -13,7 +14,6 @@ from src.app_main.admin.domain.services.coordinators_service import (
     get_coordinator_by_user,
     get_coordinators_db,
     is_coordinator,
-    active_coordinators,
     list_coordinators,
     update_coordinator,
 )

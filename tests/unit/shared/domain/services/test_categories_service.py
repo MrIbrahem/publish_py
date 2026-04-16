@@ -8,10 +8,10 @@ import pytest
 from src.app_main.shared.domain.services.categories_service import (
     add_category,
     delete_category,
+    get_camp_to_cats,
     get_campaign_category,
     list_categories,
     update_category,
-    get_camp_to_cats,
 )
 
 

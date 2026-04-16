@@ -11,16 +11,13 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request
 
-from .admin.domain.services.coordinators_service import active_coordinators
-
 from .admin.domain.db_ensure_tables import ensure_admin_db_tables
-
-from .public.domain.db_ensure_tables import ensure_public_db_tables
-
-from .config import settings
+from .admin.domain.services.coordinators_service import active_coordinators
 from .admin.routes.routes import (
     bp_admin,
 )
+from .config import settings
+from .public.domain.db_ensure_tables import ensure_public_db_tables
 from .public.routes import (
     bp_api,
     bp_auth,

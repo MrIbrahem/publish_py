@@ -10,9 +10,9 @@ from src.app_main.shared.domain.services.qids_service import (
     delete_qid,
     get_page_qid,
     get_qids_db,
+    get_title_to_qid,
     list_qids,
     update_qid,
-    get_title_to_qid,
 )
 
 

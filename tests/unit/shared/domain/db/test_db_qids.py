@@ -16,9 +16,6 @@ from src.app_main.shared.domain.db.db_qids import (
 from src.app_main.shared.domain.models import QidRecord
 
 
-
-
-
 class TestQidsDB:
     """Tests for QidsDB class."""
 

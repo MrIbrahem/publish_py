@@ -133,6 +133,7 @@ def mock_load_request(mocker):
 def db_config():
     """Fixture for DbConfig instance."""
     from src.app_main.config import DbConfig
+
     return DbConfig(
         db_name="test_db",
         db_host="localhost",

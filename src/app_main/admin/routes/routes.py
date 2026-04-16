@@ -41,6 +41,7 @@ def inject_sidebar():
 def index():
     return render_template("admins/index.html")
 
+
 # def register_blueprints(bp_admin) -> None:
 #     Coordinators(bp_admin)
 #     Templates(bp_admin)

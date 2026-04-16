@@ -8,14 +8,11 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
 import pymysql
-from src.app_main.config import DbConfig
+import pytest
 from src.app_main.admin.domain.db.db_users_no_inprocess import UsersNoInprocessDB
 from src.app_main.admin.domain.models.users_no_inprocess import UsersNoInprocessRecord
-
-
-
+from src.app_main.config import DbConfig
 
 
 class TestUsersNoInprocessDB:
