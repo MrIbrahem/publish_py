@@ -48,7 +48,8 @@ class QidsDB:
             """
             INSERT INTO qids (title, qid)
             VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE qid = VALUES(qid)
+            ON DUPLICATE KEY UPDATE
+                qid = VALUES(qid)
             """,
             (title, qid),
         )

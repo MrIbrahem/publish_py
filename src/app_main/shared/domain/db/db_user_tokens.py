@@ -50,7 +50,7 @@ class UserTokenDB:
             (username,),
         )
         if not rows:
-            raise LookupError(f"User {username!r} was not found")
+            raise LookupError(f"User {username} was not found")
 
         return self._row_to_record(rows[0])
 

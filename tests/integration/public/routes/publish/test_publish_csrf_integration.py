@@ -332,7 +332,7 @@ class TestComplexWorkflows(BasePublishTest):
             patch("src.app_main.public.routes.publish.worker.get_campaign_category") as mock_get_campaign,
         ):
             mock_should_add.return_value = True
-            mock_get_campaign.return_value = ""
+            mock_get_campaign.return_value = None
 
             # أول استدعاء يفشل، الثاني ينجح عبر fallback user
             common_patches["link"].side_effect = [

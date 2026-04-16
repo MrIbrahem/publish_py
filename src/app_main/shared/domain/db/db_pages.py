@@ -40,7 +40,7 @@ class PagesDB:
             (title,),
         )
         if not rows:
-            raise LookupError(f"Page {title!r} was not found")
+            raise LookupError(f"Page {title} was not found")
         return self._row_to_record(rows[0])
 
     def list(self) -> List[PageRecord]:

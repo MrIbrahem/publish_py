@@ -7,6 +7,8 @@ import json
 import logging
 from typing import Any
 
+from ....shared.domain.services.categories_service import get_campaign_category
+
 from ....config import settings
 from ....shared.clients import (
     get_revid,
@@ -15,7 +17,7 @@ from ....shared.clients import (
     link_to_wikidata,
     publish_do_edit,
 )
-from ....shared.domain.db import ReportsDB, get_campaign_category
+from ....shared.domain.db import ReportsDB
 from ....shared.domain.services import (
     find_exists_or_update,
     get_user_token_by_username,
@@ -240,7 +242,8 @@ def _add_to_db(
     """
     # Get category from campaign using database lookup
     # This mirrors the PHP retrieveCampaignCategories() function
-    cat = get_campaign_category(campaign, settings.database_data)
+    cat_object = get_campaign_category(campaign)
+    cat = cat_object.category if cat_object else ""
 
     # Check if abuse filter warning was triggered
     to_users_table = "abusefilter-warning-39" in json.dumps(wd_result)

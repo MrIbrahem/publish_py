@@ -17,11 +17,11 @@ categories = """
 CREATE TABLE IF NOT EXISTS categories (
     id int unsigned NOT NULL AUTO_INCREMENT,
     category varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-    category2 varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-    display varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
     campaign varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+    display varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+    category2 varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
     depth int DEFAULT NULL,
-    def int NOT NULL DEFAULT '0',
+    is_default int NOT NULL DEFAULT '0',
     PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 """

@@ -13,11 +13,11 @@ class CategoryRecord:
     """
 
     id: int
-    category: str | None = None
-    category2: str | None = ""
+    category: str
+    campaign: str
     display: str | None = ""
-    campaign: str | None = ""
-    depth: int | None = None
+    category2: str | None = ""
+    depth: int = 0
     is_default: int = 0
 
     def to_dict(self) -> dict:
@@ -25,9 +25,9 @@ class CategoryRecord:
         return {
             "id": self.id,
             "category": self.category,
-            "category2": self.category2,
-            "display": self.display,
             "campaign": self.campaign,
+            "display": self.display,
+            "category2": self.category2,
             "depth": self.depth,
             "is_default": self.is_default,
         }
