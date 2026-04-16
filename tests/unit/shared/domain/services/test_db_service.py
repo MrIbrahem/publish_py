@@ -14,40 +14,7 @@ from src.app_main.shared.domain.services.db_service import (
     fetch_query,
     fetch_query_safe,
     get_db,
-    has_db_config,
 )
-
-
-class TestHasDbConfig:
-    """Tests for has_db_config function."""
-
-    def test_returns_true_when_db_host_set(self, monkeypatch):
-        """Test that function returns True when db_host is configured."""
-        mock_db_config = MagicMock()
-        mock_db_config.db_host = "localhost"
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service.settings.database_data", mock_db_config)
-
-        result = has_db_config()
-
-        assert result is True
-
-    def test_returns_false_when_db_host_empty(self, monkeypatch):
-        """Test that function returns False when db_host is empty."""
-        mock_db_config = MagicMock()
-        mock_db_config.db_host = ""
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service.settings.database_data", mock_db_config)
-
-        result = has_db_config()
-
-        assert result is False
-
-    def test_returns_false_when_db_config_none(self, monkeypatch):
-        """Test that function returns False when database_data is None."""
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service.settings.database_data", None)
-
-        result = has_db_config()
-
-        assert result is False
 
 
 class TestGetDb:
@@ -86,7 +53,9 @@ class TestCloseCachedDb:
         close_cached_db()
 
         mock_db.close.assert_called_once()
-        assert monkeypatch.get("src.app_main.shared.domain.services.db_service._db") is None
+        from src.app_main.shared.domain.services import db_service
+
+        assert db_service._db is None
 
     def test_does_nothing_when_no_db_cached(self, monkeypatch):
         """Test that function does nothing when no db is cached."""
@@ -94,7 +63,9 @@ class TestCloseCachedDb:
 
         close_cached_db()
 
-        assert monkeypatch.get("src.app_main.shared.domain.services.db_service._db") is None
+        from src.app_main.shared.domain.services import db_service
+
+        assert db_service._db is None
 
 
 class TestExecuteQuery:
@@ -103,6 +74,8 @@ class TestExecuteQuery:
     def test_delegates_to_db_execute_query(self, monkeypatch):
         """Test that function delegates to db.execute_query."""
         mock_db = MagicMock()
+        mock_db.__enter__ = MagicMock(return_value=mock_db)
+        mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.execute_query.return_value = True
         monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
 
@@ -118,6 +91,8 @@ class TestFetchQuery:
     def test_delegates_to_db_fetch_query(self, monkeypatch):
         """Test that function delegates to db.fetch_query."""
         mock_db = MagicMock()
+        mock_db.__enter__ = MagicMock(return_value=mock_db)
+        mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.fetch_query.return_value = [{"id": 1}]
         monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
 
@@ -133,6 +108,8 @@ class TestExecuteQuerySafe:
     def test_delegates_to_db_execute_query_safe(self, monkeypatch):
         """Test that function delegates to db.execute_query_safe."""
         mock_db = MagicMock()
+        mock_db.__enter__ = MagicMock(return_value=mock_db)
+        mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.execute_query_safe.return_value = True
         monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
 
@@ -148,6 +125,8 @@ class TestFetchQuerySafe:
     def test_delegates_to_db_fetch_query_safe(self, monkeypatch):
         """Test that function delegates to db.fetch_query_safe."""
         mock_db = MagicMock()
+        mock_db.__enter__ = MagicMock(return_value=mock_db)
+        mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.fetch_query_safe.return_value = []
         monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
 

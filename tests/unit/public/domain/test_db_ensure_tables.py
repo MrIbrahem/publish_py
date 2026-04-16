@@ -25,7 +25,7 @@ class TestEnsureDbTables:
 
             ensure_db_tables(db_config)
 
-            assert mock_db_instance.execute_query_safe.call_count == 11
+            assert mock_db_instance.execute_query_safe.call_count == 12
 
     def test_calls_assessments_table(self, db_config):
         """Test that assessments table is created."""
