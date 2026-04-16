@@ -104,7 +104,7 @@ src/
 │   │   ├── main/          # Main routes
 │   │   └── post/          # Publishing endpoints
 │   ├── db/                # Database modules
-│   │   ├── db_class.py    # Base database class
+│   │   ├── db_driver.py    # Base database class
 │   │   ├── db_publish_reports.py
 │   │   ├── db_pages.py
 │   │   └── db_qids.py
@@ -157,7 +157,7 @@ db_config = settings.database_data
 
 ### Database Pattern
 
-Database classes inherit from a base class in `db_class.py`. Each table has its own class:
+Database classes inherit from a base class in `db_driver.py`. Each table has its own class:
 
 - `DbPublishReports`: Manages publish reports
 - `DbPages`: Handles page data
