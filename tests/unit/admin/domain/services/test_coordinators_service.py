@@ -65,8 +65,10 @@ class TestListActiveCoordinators:
 
     def test_returns_active_usernames(self, monkeypatch):
         """Test that active_coordinators returns active coordinator usernames."""
+        from src.app_main.admin.domain.services import coordinators_service
+
         # Clear cache before test
-        active_coordinators.cache_clear()
+        coordinators_service.active_coordinators.cache_clear()
 
         mock_store = MagicMock()
         mock_active_record = MagicMock()
@@ -80,7 +82,7 @@ class TestListActiveCoordinators:
             "src.app_main.admin.domain.services.coordinators_service.get_coordinators_db", lambda: mock_store
         )
 
-        result = active_coordinators()
+        result = coordinators_service.active_coordinators()
 
         assert result == ["ActiveUser"]
         mock_store.list.assert_called_once()
