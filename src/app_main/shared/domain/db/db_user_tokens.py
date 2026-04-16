@@ -6,12 +6,9 @@ import datetime
 import logging
 from dataclasses import dataclass
 from typing import Any, List
-
-import pymysql
-
 from ....config import DbConfig
 from ...core.crypto import decrypt_value, encrypt_value
-from . import Database
+from ...core.db_driver import Database
 from .schema import sql_tables
 
 logger = logging.getLogger(__name__)

@@ -113,30 +113,3 @@ class TestReportsDBIntegration:
             calls = mock_db_instance.execute_query_safe.mock_calls
             create_statements = [str(call) for call in calls]
             assert any("CREATE TABLE IF NOT EXISTS publish_reports" in s for s in create_statements)
-
-
-class TestCategoriesDBIntegration:
-    """Integration tests for CategoriesDB with Database class."""
-
-    def test_categories_db_creates_table_on_init(self):
-        """Test that CategoriesDB creates table on initialization."""
-        from src.app_main.config import DbConfig
-        from src.app_main.shared.domain.db.db_categories import CategoriesDB
-
-        config = DbConfig(
-            db_name="test_db",
-            db_host="localhost",
-            db_user="test_user",
-            db_password="test_pass",
-        )
-
-        with patch("src.app_main.shared.domain.db.db_categories.Database") as MockDB:
-            mock_db_instance = MagicMock()
-            MockDB.return_value = mock_db_instance
-
-            CategoriesDB(config)
-
-            # Should execute table creation query for categories table
-            calls = mock_db_instance.execute_query_safe.mock_calls
-            create_statements = [str(call) for call in calls]
-            assert any("CREATE TABLE IF NOT EXISTS categories" in s for s in create_statements)

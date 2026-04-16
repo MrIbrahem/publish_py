@@ -11,7 +11,6 @@ import pytest
 from src.app_main.config import DbConfig
 from src.app_main.shared.domain.db.db_qids import (
     QidsDB,
-    ensure_qids_table,
 )
 
 
@@ -110,43 +109,3 @@ class TestQidsDB:
         # Should use upsert pattern
         call_args = mock_db.execute_query_safe.call_args
         assert "ON DUPLICATE KEY UPDATE" in call_args[0][0]
-
-
-class TestEnsureQidsTable:
-    """Tests for ensure_qids_table function."""
-
-    def test_returns_true_on_success(self, monkeypatch, db_config):
-        """Test that function returns True when table creation succeeds."""
-        mock_db = MagicMock()
-
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
-
-        result = ensure_qids_table(db_config)
-
-        assert result is True
-        mock_db.execute_query_safe.assert_called_once()
-
-    def test_returns_false_on_exception(self, monkeypatch, db_config):
-        """Test that function returns False when an exception occurs."""
-        mock_db = MagicMock()
-        mock_db.execute_query_safe.side_effect = Exception("DB Error")
-
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
-
-        result = ensure_qids_table(db_config)
-
-        assert result is False
-
-    def test_logs_error_on_failure(self, monkeypatch, db_config, caplog):
-        """Test that errors are logged when table creation fails."""
-        import logging
-
-        mock_db = MagicMock()
-        mock_db.execute_query_safe.side_effect = Exception("DB Connection Failed")
-
-        monkeypatch.setattr("src.app_main.shared.domain.db.db_qids.Database", lambda db_data: mock_db)
-
-        with caplog.at_level(logging.ERROR):
-            result = ensure_qids_table(db_config)
-            assert result is False
-            assert "Failed to ensure qids table" in caplog.text

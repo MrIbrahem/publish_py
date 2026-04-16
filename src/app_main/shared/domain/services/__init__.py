@@ -1,7 +1,12 @@
 """
 Shared db services, used in both admin and public blueprints
 """
-from .db_service import close_cached_db, fetch_query_safe, get_db, has_db_config
+from .db_service import (
+    close_cached_db,
+    fetch_query_safe,
+    get_db,
+    has_db_config,
+)
 from .pages_service import (
     find_exists_or_update,
     get_pages_db,

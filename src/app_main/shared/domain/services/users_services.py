@@ -32,17 +32,6 @@ def get_store() -> UserTokenDB:
     return _user_db
 
 
-def ensure_user_token_table() -> None:
-    """Create the user_tokens table if it does not already exist."""
-
-    if not has_db_config():
-        logger.debug("Skipping user token table creation; MySQL configuration missing.")
-        return
-
-    store = get_store()
-    store._ensure_table()
-
-
 def upsert_user_token(*, user_id: int, username: str, access_key: str, access_secret: str) -> None:
     """Insert or update the encrypted OAuth credentials for a user."""
 

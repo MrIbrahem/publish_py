@@ -21,10 +21,9 @@ from .public.routes import (
 )
 from .config import settings
 from .shared.core.cookies import CookieHeaderClient
-from .shared.domain.db import ensure_qids_table
+from .shared.domain import ensure_db_tables
 from .shared.core.extensions import csrf_init_app, csrf_exempt
 from .shared.domain.services import close_cached_db
-from .shared.domain.services.users_services import ensure_user_token_table
 from .shared.auth.identity import current_user
 
 logger = logging.getLogger(__name__)
@@ -107,8 +106,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     csrf_init_app(app)
 
     if oauth_enabled and settings.database_data.db_host:
-        ensure_user_token_table()
-        ensure_qids_table(settings.database_data)
+        ensure_db_tables(settings.database_data)
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_auth)

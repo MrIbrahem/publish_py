@@ -21,7 +21,6 @@ import pytest
 from src.app_main.shared.domain.services.users_services import (
     delete_user_token,
     delete_user_token_by_username,
-    ensure_user_token_table,
     get_store,
     get_user_token,
     get_user_token_by_username,
@@ -81,31 +80,6 @@ class TestGetStore:
             assert result1 is result2 is mock_db_instance
             # UserTokenDB should only be instantiated once
             MockUserTokenDB.assert_called_once()
-
-
-class TestEnsureUserTokenTable:
-    """Tests for ensure_user_token_table function."""
-
-    def test_skips_when_no_db_config(self, monkeypatch, caplog):
-        """Test that table creation is skipped when no DB config."""
-        import logging
-
-        monkeypatch.setattr("src.app_main.shared.domain.services.users_services.has_db_config", lambda: False)
-
-        with caplog.at_level(logging.DEBUG):
-            ensure_user_token_table()
-
-        assert "Skipping user token table creation" in caplog.text
-
-    def test_calls_ensure_table_when_config_exists(self, monkeypatch):
-        """Test that _ensure_table is called when config exists."""
-        mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.services.users_services.has_db_config", lambda: True)
-        monkeypatch.setattr("src.app_main.shared.domain.services.users_services.get_store", lambda: mock_store)
-
-        ensure_user_token_table()
-
-        mock_store._ensure_table.assert_called_once()
 
 
 class TestUpsertUserToken:

@@ -9,29 +9,10 @@ from __future__ import annotations
 import logging
 
 from ....config import DbConfig
-from . import Database
+from ...core.db_driver import Database
 from .schema import sql_tables
 
 logger = logging.getLogger(__name__)
-
-
-def ensure_qids_table(db_data: DbConfig) -> bool:
-    """Create the qids table if it does not already exist.
-
-    Args:
-        db_data: Database connection configuration
-
-    Returns:
-        True if table was ensured successfully, False otherwise
-    """
-    try:
-        db = Database(db_data)
-        db.execute_query_safe(sql_tables.qids)
-        logger.debug("qids table ensured")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to ensure qids table: {e}")
-        return False
 
 
 class QidsDB:
@@ -80,5 +61,4 @@ class QidsDB:
 
 __all__ = [
     "QidsDB",
-    "ensure_qids_table",
 ]
