@@ -36,12 +36,12 @@ def generate_list_item(href, title, icon=None, target=None):
 def create_side(active_route):
     """Generate sidebar HTML structure based on menu definitions."""
     main_menu_icons = {
-        "Translations" : "bi-translate",
-        "Pages" : "bi-file-text",
-        "Qids" : "bi-database",
-        "Users" : "bi-people",
-        "Others" : "bi-three-dots",
-        "Tools" : "bi-tools",
+        "Translations": "bi-translate",
+        "Pages": "bi-file-text",
+        "Qids": "bi-database",
+        "Users": "bi-people",
+        "Others": "bi-three-dots",
+        "Tools": "bi-tools",
     }
 
     main_menu = {
@@ -52,14 +52,150 @@ def create_side(active_route):
                 href="last_coord",
                 title="Recent",
                 icon="bi-clock-history",
-            )
+            ),
+            SidebarItem(
+                id="process",
+                admin=0,
+                href="process",
+                title="In Process",
+                icon="bi-hourglass",
+            ),
+            SidebarItem(
+                id="process_total",
+                admin=0,
+                href="process_total",
+                title="In Process (Total)",
+                icon="bi-hourglass-split",
+            ),
+            SidebarItem(
+                id="reports",
+                admin=0,
+                href="reports",
+                title="Publish Reports",
+                icon="bi-file-earmark-text",
+            ),
         ],
         "Pages": [
+            SidebarItem(
+                id="tt_load",
+                admin=1,
+                href="tt",
+                title="Translate Type",
+                icon="bi-translate",
+            ),
+            SidebarItem(
+                id="translated",
+                admin=1,
+                href="translated",
+                title="Translated Pages",
+                icon="bi-check2-square",
+            ),
+            SidebarItem(
+                id="pages_users_to_main",
+                admin=1,
+                href="pages_users_to_main",
+                title="Pages to check",
+                icon="bi-check",
+            ),
+            SidebarItem(
+                id="add",
+                admin=1,
+                href="add",
+                title="Add translations",
+                icon="bi-plus-square",
+            ),
+            SidebarItem(
+                id="qidsload",
+                admin=1,
+                href="qids",
+                title="Qids",
+                icon="bi-list-ul",
+            ),
         ],
         "Users": [
+            SidebarItem(
+                id="admins",
+                admin=1,
+                href="admins",
+                title="Coordinators",
+                icon="bi-person-gear",
+            ),
+            SidebarItem(
+                id="Emails",
+                admin=1,
+                href="Emails",
+                title="Emails",
+                icon="bi-envelope",
+            ),
+            SidebarItem(
+                id="full_tr",
+                admin=1,
+                href="full_translators",
+                title="Full translators",
+                icon="bi-person-check",
+            ),
+            SidebarItem(
+                id="user_inp",
+                admin=1,
+                href="users_no_inprocess",
+                title="Not in process",
+                icon="bi-hourglass",
+            ),
         ],
-        "Others": [],
-        "Tools": [],
+        "Others": [
+            SidebarItem(
+                id="projects",
+                admin=1,
+                href="projects",
+                title="Projects",
+                icon="bi-kanban",
+            ),
+            SidebarItem(
+                id="Campaigns",
+                admin=1,
+                href="Campaigns",
+                title="Campaigns",
+                icon="bi-megaphone",
+            ),
+            SidebarItem(
+                id="settings",
+                admin=1,
+                href="settings",
+                title="Settings",
+                icon="bi-gear",
+            ),
+            SidebarItem(
+                id="categories",
+                admin=0,
+                href="categories",
+                title="Categories",
+                icon="bi-tags",
+            ),
+        ],
+        "Tools": [
+            SidebarItem(
+                id="stat",
+                admin=0,
+                href="stat",
+                title="Status",
+                icon="bi-graph-up",
+            ),
+            SidebarItem(
+                id="wikirefs_options",
+                admin=1,
+                href="wikirefs_options",
+                title="Fix refs (Options)",
+                icon="bi-wrench-adjustable",
+            ),
+            SidebarItem(
+                id="fixwikirefs",
+                admin=0,
+                href="/fixwikirefs.php",
+                title="Fixwikirefs",
+                target="_blank",
+                icon="bi-wrench",
+            ),
+        ],
     }
 
     sidebar = ["<ul class='list-unstyled'>"]
