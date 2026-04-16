@@ -7,6 +7,7 @@ import logging
 from flask import (
     Blueprint,
     redirect,
+    render_template,
     request,
     url_for,
 )
@@ -37,9 +38,8 @@ def inject_sidebar():
 
 @bp_admin.get("/")
 @admin_required
-def admin_dashboard():
-    return redirect(url_for("admin.templates_dashboard"))
-
+def index():
+    return render_template("admins/index.html")
 
 # def register_blueprints(bp_admin) -> None:
 #     Coordinators(bp_admin)

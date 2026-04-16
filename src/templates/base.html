@@ -1,12 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+{% set cdn_base = "https://tools-static.wmflabs.org/cdnjs/ajax/libs" %}
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Publish</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Publish{% endblock %}</title>
+    <link rel='stylesheet' href='{{ cdn_base }}/bootstrap/5.3.3/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='{{ cdn_base }}/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css'>
+    <link rel='stylesheet' href='{{ cdn_base }}/jqueryui/1.14.1/themes/base/jquery-ui.min.css'>
+    <link rel="stylesheet" href="{{ cdn_base }}/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+
+    <link rel='stylesheet' href='{{ cdn_base }}/datatables.net-bs5/2.3.4/dataTables.bootstrap5.min.css'>
+    <link rel='stylesheet' href='{{ cdn_base }}/datatables.net-responsive-bs5/3.0.4/responsive.bootstrap5.min.css'>
+    {% block extra_head %}{% endblock %}
     <style>
         pre.json-data {
             background-color: #f8f9fa;
@@ -16,42 +26,11 @@
             overflow: auto;
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">PublishPy</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/fixrefs">Fix Refs</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/reports">Publish Reports</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="https://mdwiki.toolforge.org/" target="_blank" rel="noopener">MDWiki</a>
-                </li>
-            </ul>
-            <span class="navbar-text">
-                <!-- User info or login/logout links can go here -->
-                {% if oauth_enabled %}
-                {% if current_user %}
-                <a href="/profile" class="btn btn-outline-primary">{{ current_user.username }}</a>
-                <a href="/logout" class="btn btn-outline-primary">Logout</a>
-                {% else %}
-                <a href="/login" class="btn btn-outline-primary">Login</a>
-                {% endif %}
-                {% else %}
-                -
-                {% endif %}
-            </span>
-        </div>
-    </div>
-</nav>
+
+<body>
+    {% include "_navbar.html" %}
 
 {% with messages = get_flashed_messages(with_categories=True) %}
 {% if messages %}
@@ -68,9 +47,32 @@
 {% endif %}
 {% endwith %}
 
-<body>
-    {% block content %}{% endblock %}
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="py-1">
+        {% block content %}{% endblock %}
+    </div>
+    <script src='{{ cdn_base }}/jquery/3.7.1/jquery.min.js'></script>
+    <script src='{{ cdn_base }}/jqueryui/1.14.1/jquery-ui.min.js'></script>
+    <script src='{{ cdn_base }}/bootstrap/5.3.3/js/bootstrap.bundle.min.js'></script>
+
+    <script src='{{ cdn_base }}/datatables.net/2.3.4/dataTables.min.js'></script>
+    <script src='{{ cdn_base }}/datatables.net-bs5/2.3.4/dataTables.bootstrap5.min.js'></script>
+    <script src='{{ cdn_base }}/datatables-responsive/3.0.4/dataTables.responsive.min.js'></script>
+    <!-- Autocomplete script -->
+    <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+    <!-- Dark mode toggle script -->
+    <script src="{{ url_for('static', filename='js/dark-mode.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/card-tools.js') }}"></script>
+
+    {% block extra_js %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.DataTable').DataTable({
+                responsive: true,
+                pageLength: 100,
+            });
+        });
+    </script>
 </body>
+
+</html>

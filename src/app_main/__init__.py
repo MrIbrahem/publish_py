@@ -11,6 +11,8 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request
 
+from .admin.domain.services.coordinators_service import active_coordinators
+
 from .admin.domain.db_ensure_tables import ensure_admin_db_tables
 
 from .public.domain.db_ensure_tables import ensure_public_db_tables
@@ -37,10 +39,14 @@ logger = logging.getLogger(__name__)
 
 
 def context_data() -> dict[str, Any]:
+    """
+    used in @app.context_processor
+    """
     user = current_user()
     return {
         "current_user": user,
         "is_authenticated": user is not None,
+        "is_admin": bool(user and user.username in active_coordinators()),
         "username": user.username if user else None,
         "oauth_enabled": bool(settings.oauth),
     }

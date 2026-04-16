@@ -36,100 +36,30 @@ def generate_list_item(href, title, icon=None, target=None):
 def create_side(active_route):
     """Generate sidebar HTML structure based on menu definitions."""
     main_menu_icons = {
-        "Translations": "bi-translate",
-        "Main": "bi-file-text",
-        "Fix Nested Tasks": "bi-database",
-        "Others": "bi-three-dots",
-        "Tools": "bi-tools",
-        "Jobs": "bi-gear-fill",
-        "Settings": "bi-sliders",
+        "Translations" : "bi-translate",
+        "Pages" : "bi-file-text",
+        "Qids" : "bi-database",
+        "Users" : "bi-people",
+        "Others" : "bi-three-dots",
+        "Tools" : "bi-tools",
     }
 
     main_menu = {
-        "Main": [
+        "Translations": [
             SidebarItem(
-                id="admins",
+                id="last_coord",
                 admin=1,
-                href="coordinators",
-                title="Coordinators",
-                icon="bi-person-gear",
-            ),
-            SidebarItem(
-                id="templates",
-                admin=1,
-                href="templates",
-                title="Templates",
-                icon="bi-list-columns",
-            ),
-            SidebarItem(
-                id="templates_need_update",
-                admin=1,
-                href="templates-need-update",
-                title="Templates Need Update",
-                icon="bi-arrow-repeat",
-            ),
-            SidebarItem(
-                id="owid_charts",
-                admin=1,
-                href="owid-charts",
-                title="OWID Charts",
-                icon="bi-graph-up",
-            ),
+                href="last_coord",
+                title="Recent",
+                icon="bi-clock-history",
+            )
         ],
-        "Jobs": [
-            SidebarItem(
-                id="collect_main_files",
-                admin=1,
-                href="collect_main_files/list",
-                title="Collect Templates data",
-                icon="bi-kanban",
-            ),
-            SidebarItem(
-                id="crop_main_files",
-                admin=1,
-                href="crop_main_files/list",
-                title="Crop Newest World Files",
-                icon="bi-crop",
-            ),
-            SidebarItem(
-                id="create_owid_pages",
-                admin=1,
-                href="create_owid_pages/list",
-                title="Create OWID Pages",
-                icon="bi-file-earmark-text",
-            ),
-            SidebarItem(
-                id="add_svglanguages_template",
-                admin=1,
-                href="add_svglanguages_template/list",
-                title="Add {{SVGLanguages}}",
-                icon="bi-file-earmark-text",
-            ),
-            SidebarItem(
-                id="fix_nested_main_files",
-                admin=1,
-                href="fix_nested_main_files/list",
-                title="Fix Nested Main Files",
-                icon="bi-tools",
-            ),
-            SidebarItem(
-                id="download_main_files",
-                admin=1,
-                href="download_main_files/list",
-                title="Download Main Files",
-                icon="bi-download",
-                disabled=True,
-            ),
+        "Pages": [
         ],
-        "Settings": [
-            SidebarItem(
-                id="settings",
-                admin=1,
-                href="settings",
-                title="Settings",
-                icon="bi-gear",
-            ),
+        "Users": [
         ],
+        "Others": [],
+        "Tools": [],
     }
 
     sidebar = ["<ul class='list-unstyled'>"]
