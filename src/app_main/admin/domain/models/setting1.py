@@ -41,7 +41,7 @@ class SettingRecord1:
         if value is None:
             return None
         if value_type == "boolean":
-            return value.lower() in ("1", "true", "yes", "on")
+            return "true" if value.lower() in ("1", "true", "yes", "on") else "false"
         elif value_type == "integer":
             try:
                 return int(value)
