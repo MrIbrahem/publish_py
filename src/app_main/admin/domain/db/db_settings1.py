@@ -3,16 +3,16 @@
 TODO: should use SettingRecord1, and `SettingsDB1` class should have the same functions as `SettingsDB` but with the new table structure.
 
 """
+
 from __future__ import annotations
 
 import json
 import logging
 from typing import Any, Dict, List, Optional
 
-from ..models import SettingRecord1
-
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
+from ..models import SettingRecord1
 
 logger = logging.getLogger(__name__)
 
