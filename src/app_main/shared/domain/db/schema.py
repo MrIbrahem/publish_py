@@ -20,9 +20,10 @@ CREATE TABLE IF NOT EXISTS categories (
     campaign varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
     display varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
     category2 varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-    depth int DEFAULT NULL,
+    depth int NOT NULL DEFAULT '0',
     is_default int NOT NULL DEFAULT '0',
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY category (category)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 """
 

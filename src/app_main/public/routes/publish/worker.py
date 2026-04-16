@@ -7,8 +7,6 @@ import json
 import logging
 from typing import Any
 
-from ....shared.domain.services.categories_service import get_campaign_category
-
 from ....config import settings
 from ....shared.clients import (
     get_revid,
@@ -23,6 +21,7 @@ from ....shared.domain.services import (
     get_user_token_by_username,
     insert_page_target,
 )
+from ....shared.domain.services.categories_service import get_campaign_category
 from ....shared.utils.helpers import (
     determine_hashtag,
     do_changes_to_text,

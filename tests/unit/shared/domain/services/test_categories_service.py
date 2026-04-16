@@ -8,11 +8,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.shared.domain.services.categories_service import (
+    add_category,
+    delete_category,
     get_campaign_category,
     list_categories,
-    add_category,
     update_category,
-    delete_category,
 )
 
 
@@ -24,7 +24,9 @@ class TestGetCampaignCategory:
         mock_store = MagicMock()
         mock_category = MagicMock()
         mock_store.fetch_by_campaign.return_value = mock_category
-        monkeypatch.setattr("src.app_main.shared.domain.services.categories_service.get_categories_db", lambda: mock_store)
+        monkeypatch.setattr(
+            "src.app_main.shared.domain.services.categories_service.get_categories_db", lambda: mock_store
+        )
 
         result = get_campaign_category("TestCampaign")
 

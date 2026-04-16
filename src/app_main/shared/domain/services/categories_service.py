@@ -7,9 +7,8 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ..db.db_categories import CategoriesDB
-
 from ....config import settings
+from ..db.db_categories import CategoriesDB
 from ..models import CategoryRecord
 from .db_service import has_db_config
 
@@ -104,11 +103,7 @@ def get_camp_to_cats() -> dict[str, str]:
 
     categories = list_categories()
 
-    camp_to_cats: dict[str, str] = {
-        record.campaign: record.category or ""
-        for record in categories if
-        record.campaign
-    }
+    camp_to_cats: dict[str, str] = {record.campaign: record.category or "" for record in categories if record.campaign}
     return camp_to_cats
 
 
