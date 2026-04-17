@@ -1,16 +1,18 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.sqlalchemy_db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.public.domain.models.assessment import AssessmentRecord, _AssessmentRecord
 from src.app_main.public.domain.sqlalchemy_services.assessment_service import (
-    list_assessments,
-    get_assessment,
-    get_assessment_by_title,
     add_assessment,
     add_or_update_assessment,
+    delete_assessment,
+    get_assessment,
+    get_assessment_by_title,
+    list_assessments,
     update_assessment,
-    delete_assessment
 )
-from src.app_main.public.domain.models.assessment import AssessmentRecord, _AssessmentRecord
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -19,9 +21,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_assessment_workflow():
     # Test add

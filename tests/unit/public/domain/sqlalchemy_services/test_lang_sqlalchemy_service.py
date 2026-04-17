@@ -1,16 +1,18 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.sqlalchemy_db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.public.domain.models.lang import LangRecord, _LangRecord
 from src.app_main.public.domain.sqlalchemy_services.lang_service import (
-    list_langs,
-    get_lang,
-    get_lang_by_code,
     add_lang,
     add_or_update_lang,
+    delete_lang,
+    get_lang,
+    get_lang_by_code,
+    list_langs,
     update_lang,
-    delete_lang
 )
-from src.app_main.public.domain.models.lang import LangRecord, _LangRecord
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -19,9 +21,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_lang_workflow():
     # Test add

@@ -40,12 +40,7 @@ def add_pages_users_to_main(
 ) -> PagesUsersToMainRecord:
     """Add a new pages_users_to_main record."""
     with get_session() as session:
-        orm_obj = _PagesUsersToMainRecord(
-            id=id,
-            new_target=new_target,
-            new_user=new_user,
-            new_qid=new_qid
-        )
+        orm_obj = _PagesUsersToMainRecord(id=id, new_target=new_target, new_user=new_user, new_qid=new_qid)
         session.add(orm_obj)
         try:
             session.commit()

@@ -26,10 +26,7 @@ def get_top_enwiki_pageviews(limit: int = 100) -> List[EnwikiPageviewRecord]:
     """Return top enwiki pageview records by view count."""
     with get_session() as session:
         orm_objs = (
-            session.query(_EnwikiPageviewRecord)
-            .order_by(_EnwikiPageviewRecord.en_views.desc())
-            .limit(limit)
-            .all()
+            session.query(_EnwikiPageviewRecord).order_by(_EnwikiPageviewRecord.en_views.desc()).limit(limit).all()
         )
         return [EnwikiPageviewRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 

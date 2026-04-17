@@ -1,16 +1,18 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.sqlalchemy_db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.public.domain.models.mdwiki_revid import MdwikiRevidRecord, _MdwikiRevidRecord
 from src.app_main.public.domain.sqlalchemy_services.mdwiki_revid_service import (
-    list_mdwiki_revids,
-    get_mdwiki_revid_by_title,
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
-    update_mdwiki_revid,
     delete_mdwiki_revid,
-    get_revid_for_title
+    get_mdwiki_revid_by_title,
+    get_revid_for_title,
+    list_mdwiki_revids,
+    update_mdwiki_revid,
 )
-from src.app_main.public.domain.models.mdwiki_revid import MdwikiRevidRecord, _MdwikiRevidRecord
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -19,9 +21,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_mdwiki_revid_workflow():
     # Test add

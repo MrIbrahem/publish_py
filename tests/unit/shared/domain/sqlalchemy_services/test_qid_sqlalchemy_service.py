@@ -1,15 +1,17 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.sqlalchemy_db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.shared.domain.models.qid import QidRecord, _QidRecord
 from src.app_main.shared.domain.sqlalchemy_services.qid_service import (
     add_qid,
-    update_qid,
     delete_qid,
     get_page_qid,
+    get_title_to_qid,
     list_qids,
-    get_title_to_qid
+    update_qid,
 )
-from src.app_main.shared.domain.models.qid import QidRecord, _QidRecord
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -18,9 +20,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_qid_workflow():
     # Test add

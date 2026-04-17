@@ -5,6 +5,7 @@ engine.py
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
@@ -19,13 +20,21 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDb(DeclarativeBase):
-    pass
+    """
+    Base class for database models.
+    Provides common functionality like to_dict.
+    """
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert ORM object to dictionary."""
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 
 # ---------------------------------------------------------------------------
 # 2. Database connection — replaces db_driver.py entirely
 #    pool_pre_ping=True handles reconnect + retry automatically
 # ---------------------------------------------------------------------------
+
 
 def build_engine(db_url: str) -> Engine:
     """
@@ -36,17 +45,20 @@ def build_engine(db_url: str) -> Engine:
     }
 
     if not db_url.startswith("sqlite"):
-        kwargs.update({
-            "pool_size": 5,
-            "max_overflow": 10,
-            "pool_recycle": 3600,  # recycle connections after 1 hour
-            "connect_args": {
-                "connect_timeout": 5,
-                "init_command": "SET time_zone = \"+00:00\"",
-                "charset": "utf8mb4",
-            },
-        })
+        kwargs.update(
+            {
+                "pool_size": 5,
+                "max_overflow": 10,
+                "pool_recycle": 3600,  # recycle connections after 1 hour
+                "connect_args": {
+                    "connect_timeout": 5,
+                    "init_command": 'SET time_zone = "+00:00"',
+                    "charset": "utf8mb4",
+                },
+            }
+        )
     return create_engine(db_url, **kwargs)
+
 
 # ---------------------------------------------------------------------------
 # 3. SessionFactory singleton — replaces _COORDINATORS_STORE
