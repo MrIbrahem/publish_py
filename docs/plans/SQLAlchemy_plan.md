@@ -38,7 +38,7 @@ For each .py file in the models directories:
 
 4.  **Imports:** Add required imports at the top:
 
--   from ...shared.db.engine import BaseDb (adjust relative path depth).
+-   from ...shared.sqlalchemy_db.engine import BaseDb (adjust relative path depth).
 -   from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
 -   from sqlalchemy.orm import relationship
 

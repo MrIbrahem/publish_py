@@ -9,8 +9,7 @@ from unittest.mock import MagicMock
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Integer, String
 
 if sys:
     os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
