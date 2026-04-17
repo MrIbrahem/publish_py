@@ -10,6 +10,9 @@ import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
 
+from sqlalchemy import Column, Integer, String, DateTime
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb
+
 os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
 os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
 os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
@@ -140,3 +143,13 @@ def db_config():
         db_user="user",
         db_password="pass",
     )
+
+
+class _PagesUsersRecord(BaseDb):
+    __tablename__ = "pages_users"
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255))
+    lang = Column(String(30))
+    user = Column(String(120))
+    target = Column(String(120))
+    pupdate = Column(DateTime)
