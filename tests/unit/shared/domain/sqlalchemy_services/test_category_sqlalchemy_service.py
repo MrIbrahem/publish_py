@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 from src.app_main.shared.domain.models.category import CategoryRecord, _CategoryRecord
 from src.app_main.shared.domain.sqlalchemy_services.category_service import (
     add_category,
@@ -11,6 +10,7 @@ from src.app_main.shared.domain.sqlalchemy_services.category_service import (
     list_categories,
     update_category,
 )
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)

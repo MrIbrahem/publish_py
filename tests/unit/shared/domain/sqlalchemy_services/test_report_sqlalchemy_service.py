@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 from src.app_main.shared.domain.models.report import ReportRecord, _ReportRecord
 from src.app_main.shared.domain.sqlalchemy_services.report_service import (
     add_report,
@@ -9,6 +8,7 @@ from src.app_main.shared.domain.sqlalchemy_services.report_service import (
     list_reports,
     query_reports_with_filters,
 )
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
