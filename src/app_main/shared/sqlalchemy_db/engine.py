@@ -7,6 +7,7 @@ from __future__ import annotations
 import logging
 
 from sqlalchemy import create_engine
+from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 logger = logging.getLogger(__name__)
@@ -26,31 +27,31 @@ class BaseDb(DeclarativeBase):
 #    pool_pre_ping=True handles reconnect + retry automatically
 # ---------------------------------------------------------------------------
 
-
-def build_engine(db_url: str):
+def build_engine(db_url: str) -> Engine:
     """
     Create a SQLAlchemy engine.
-
-    Example db_url:
-        "mysql+pymysql://user:pass@host/dbname?charset=utf8mb4"
     """
-    return create_engine(
-        db_url,
-        pool_pre_ping=True,  # replaces _ensure_connection and retry logic
-        pool_size=5,
-        max_overflow=10,
-        pool_recycle=3600,  # recycle connections after 1 hour
-        connect_args={
-            "connect_timeout": 5,
-            "init_command": "SET time_zone = '+00:00'",
-            "charset": "utf8mb4",
-        },
-    )
+    kwargs = {
+        "pool_pre_ping": True,  # replaces _ensure_connection and retry logic
+    }
 
+    if not db_url.startswith("sqlite"):
+        kwargs.update({
+            "pool_size": 5,
+            "max_overflow": 10,
+            "pool_recycle": 3600,  # recycle connections after 1 hour
+            "connect_args": {
+                "connect_timeout": 5,
+                "init_command": "SET time_zone = \"+00:00\"",
+                "charset": "utf8mb4",
+            },
+        })
+    return create_engine(db_url, **kwargs)
 
 # ---------------------------------------------------------------------------
 # 3. SessionFactory singleton — replaces _COORDINATORS_STORE
 # ---------------------------------------------------------------------------
+
 
 _SessionFactory: sessionmaker | None = None
 
