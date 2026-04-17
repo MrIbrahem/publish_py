@@ -27,7 +27,7 @@ class _CoordinatorRecord(BaseDb):
     __tablename__ = "coordinators"
 
     id: int = Column(Integer, primary_key=True, autoincrement=True)
-    username: str = Column(String(120, collation="utf8mb4_unicode_ci"), unique=True, nullable=False)
+    username: str = Column(String(120), unique=True, nullable=False)
     is_active: int = Column(Integer, nullable=False, default=1)
 
     def to_dict(self) -> dict:
