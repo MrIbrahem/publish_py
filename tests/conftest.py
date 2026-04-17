@@ -9,7 +9,6 @@ from unittest.mock import MagicMock
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-from sqlalchemy import Column, DateTime, Integer, String
 
 if sys:
     os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
@@ -143,13 +142,3 @@ def db_config():
         db_user="user",
         db_password="pass",
     )
-
-
-class _PagesUsersRecord(BaseDb):
-    __tablename__ = "pages_users"
-    id = Column(Integer, primary_key=True)
-    title = Column(String(255))
-    lang = Column(String(30))
-    user = Column(String(120))
-    target = Column(String(120))
-    pupdate = Column(DateTime)
