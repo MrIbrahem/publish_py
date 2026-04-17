@@ -13,6 +13,5 @@ __all__ = [
     "FullTranslatorRecord",
     "LanguageSettingRecord",
     "SettingRecord",
-    "SettingRecord",
     "UsersNoInprocessRecord",
 ]

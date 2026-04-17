@@ -5,12 +5,26 @@ from dataclasses import dataclass
 
 from sqlalchemy import Column, Integer, String
 
-from ...db.engine import BaseDb
+from ....shared.sqlalchemy_db.engine import BaseDb
 
 logger = logging.getLogger(__name__)
 
 
 class _CategoryRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS categories (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        category varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        campaign varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        display varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        category2 varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        depth int NOT NULL DEFAULT '0',
+        is_default int NOT NULL DEFAULT '0',
+        PRIMARY KEY (id),
+        UNIQUE KEY category (category)
+    )
+    """
+
     __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

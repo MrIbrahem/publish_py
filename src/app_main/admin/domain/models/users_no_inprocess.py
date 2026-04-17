@@ -8,6 +8,17 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _UsersNoInprocessRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS users_no_inprocess (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        active int NOT NULL DEFAULT '1',
+        PRIMARY KEY (id),
+        UNIQUE KEY user (user)
+    )
+
+    """
+
     __tablename__ = "users_no_inprocess"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

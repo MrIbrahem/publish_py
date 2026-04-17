@@ -12,28 +12,19 @@ import colorlog
 
 
 def prepare_log_file(log_file: str | None, project_logger: logging.Logger) -> Path | None:
-    """Prepare the log file path and create parent directories if needed.
-
-    Parameters
-    ----------
-    log_file : str | None
-        Path to the log file.
-    project_logger : logging.Logger
-        Logger instance for error reporting.
-
-    Returns
-    -------
-    Path | None
-        The expanded log file path, or None if creation failed.
     """
-    if log_file is None:
+    Prepare the log file path and create parent directories if needed.
+    """
+    if not log_file:
         return None
-    log_file_path = Path(log_file).expanduser()
+    log_file_path = os.path.expandvars(str(log_file))
+    log_file_path = Path(log_file_path).expanduser()
+
     try:
         log_file_path.parent.mkdir(parents=True, exist_ok=True)
     except Exception as e:
         project_logger.error(f"Failed to create log directory: {e}")
-        return None
+        log_file_path = None
     return log_file_path
 
 
@@ -99,11 +90,10 @@ def setup_file_handler(project_logger: logging.Logger, log_file: Path, level: in
 
 def configure_logging(level) -> None:
     # Create log directory if needed
+    main_dir = os.getenv("FLASK_DATA_DIR") or "~/data"
+    main_dir = Path(os.path.expandvars(main_dir)).expanduser()
 
-    flask_data_dir = os.getenv("FLASK_DATA_DIR") or "~/data"
-    flask_data_dir = Path(os.path.expandvars(flask_data_dir)).expanduser()
-
-    log_dir = Path(flask_data_dir) / "logs"
+    log_dir = Path(main_dir) / "logs"
     try:
         log_dir.mkdir(parents=True, exist_ok=True)
     except OSError as exc:

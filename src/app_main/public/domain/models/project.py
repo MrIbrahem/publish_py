@@ -8,6 +8,15 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _ProjectRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS projects (
+        g_id int unsigned NOT NULL AUTO_INCREMENT,
+        g_title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        PRIMARY KEY (g_id),
+        UNIQUE KEY g_title (g_title)
+    )
+    """
+
     __tablename__ = "projects"
 
     g_id = Column(Integer, primary_key=True, autoincrement=True)

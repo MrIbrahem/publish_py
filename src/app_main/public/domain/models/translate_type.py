@@ -8,6 +8,17 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _TranslateTypeRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS translate_type (
+        tt_id int unsigned NOT NULL AUTO_INCREMENT,
+        tt_title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        tt_lead int NOT NULL DEFAULT '1',
+        tt_full int NOT NULL DEFAULT '0',
+        PRIMARY KEY (tt_id),
+        UNIQUE KEY tt_title (tt_title)
+    )
+    """
+
     __tablename__ = "translate_type"
 
     tt_id = Column(Integer, primary_key=True, autoincrement=True)

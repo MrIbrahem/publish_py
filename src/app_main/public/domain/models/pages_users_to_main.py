@@ -8,6 +8,17 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _PagesUsersToMainRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS pages_users_to_main (
+        id int unsigned NOT NULL,
+        new_target varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        new_user varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        new_qid varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        KEY id (id),
+        CONSTRAINT pages_users_to_main_ibfk_1 FOREIGN KEY (id) REFERENCES pages_users (id)
+    )
+    """
+
     __tablename__ = "pages_users_to_main"
 
     id = Column(Integer, ForeignKey("pages_users.id"), primary_key=True)

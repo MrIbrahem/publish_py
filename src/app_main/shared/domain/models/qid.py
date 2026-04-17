@@ -5,12 +5,24 @@ from dataclasses import dataclass
 
 from sqlalchemy import Column, DateTime, Integer, String
 
-from ...db.engine import BaseDb
+from ....shared.sqlalchemy_db.engine import BaseDb
 
 logger = logging.getLogger(__name__)
 
 
 class _QidRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS qids (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        qid varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+        title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+        add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY title (title),
+        KEY qid (qid)
+    )
+    """
+
     __tablename__ = "qids"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

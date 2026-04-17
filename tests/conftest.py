@@ -9,41 +9,44 @@ from unittest.mock import MagicMock
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
+from sqlalchemy import Column, DateTime, Integer, String
 
-os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
-os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
-os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
-os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
+if sys:
+    os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
+    os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
+    os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
+    os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
 
-# Set environment variables before any imports that might need them
-os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
-os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
-os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
+    # Set environment variables before any imports that might need them
+    os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
+    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
+    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
+    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
 
-# Use a fixed encryption key for test reproducibility
-# This is a valid Fernet key for testing only - DO NOT use in production
-TEST_ENCRYPTION_KEY = "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI="
-os.environ.setdefault("OAUTH_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
+    # Use a fixed encryption key for test reproducibility
+    # This is a valid Fernet key for testing only - DO NOT use in production
+    TEST_ENCRYPTION_KEY = "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI="
+    os.environ.setdefault("OAUTH_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
 
-os.environ.setdefault("WIKIDATA_DOMAIN", "test.wikidata.org")
+    os.environ.setdefault("WIKIDATA_DOMAIN", "test.wikidata.org")
 
-os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
-os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
-os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
-os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
+    os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
+    os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
+    os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
+    os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
 
-# Get the project root directory (parent of pytests folder)
-project_root = Path(__file__).parent.parent
+    # Get the project root directory (parent of pytests folder)
+    project_root = Path(__file__).parent.parent
 
-# Add python_src to sys.path so we can import from 'src' as a package
-python_src_path = project_root  # / "python_src"
-sys.path.insert(0, str(python_src_path))
+    # Add python_src to sys.path so we can import from 'src' as a package
+    python_src_path = project_root  # / "python_src"
+    sys.path.insert(0, str(python_src_path))
 
 
 # Import after environment setup
-from src.app_main import create_app  # noqa: E402
-from src.app_main.config import TestingConfig  # noqa: E402
+from src.app_main import create_app
+from src.app_main.config import TestingConfig
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb
 
 
 @pytest.fixture
@@ -140,3 +143,13 @@ def db_config():
         db_user="user",
         db_password="pass",
     )
+
+
+class _PagesUsersRecord(BaseDb):
+    __tablename__ = "pages_users"
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255))
+    lang = Column(String(30))
+    user = Column(String(120))
+    target = Column(String(120))
+    pupdate = Column(DateTime)

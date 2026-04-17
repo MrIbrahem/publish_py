@@ -8,6 +8,16 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _AssessmentRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS assessments (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        importance varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY title (title)
+      )
+    """
+
     __tablename__ = "assessments"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

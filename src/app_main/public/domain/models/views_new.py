@@ -8,6 +8,19 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _ViewsNewRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS views_new (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        target varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        lang varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+        year int NOT NULL,
+        views int DEFAULT '0',
+        PRIMARY KEY (id),
+        UNIQUE KEY target_lang_year (target, lang, year),
+        KEY target (target)
+    )
+    """
+
     __tablename__ = "views_new"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

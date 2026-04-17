@@ -10,6 +10,18 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _SettingRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS settings (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `key` VARCHAR(190) NOT NULL,
+        `title` VARCHAR(500) NOT NULL,
+        `value` text DEFAULT NULL,
+        `value_type` enum ('boolean', 'string', 'integer', 'json') NOT NULL DEFAULT 'boolean',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY unique_key (`key`)
+    )
+    """
+
     __tablename__ = "settings"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

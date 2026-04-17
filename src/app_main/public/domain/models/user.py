@@ -9,6 +9,18 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _UserRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS users (
+        user_id int NOT NULL AUTO_INCREMENT,
+        username varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+        email varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        wiki varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        user_group varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Uncategorized',
+        reg_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id)
+    )
+    """
+
     __tablename__ = "users"
 
     user_id = Column(Integer, primary_key=True, autoincrement=True)

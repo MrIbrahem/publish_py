@@ -6,13 +6,28 @@ from typing import Any
 
 from sqlalchemy import Column, DateTime, Integer, LargeBinary, String
 
-from ...db.engine import BaseDb
+from ....shared.sqlalchemy_db.engine import BaseDb
 from ...utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 
 
 class _UserTokenRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS user_tokens (
+        user_id int NOT NULL,
+        username varchar(255) NOT NULL,
+        access_token varbinary(1024) NOT NULL,
+        access_secret varbinary(1024) NOT NULL,
+        created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        last_used_at datetime DEFAULT NULL,
+        rotated_at datetime DEFAULT NULL,
+        PRIMARY KEY (user_id),
+        UNIQUE KEY uq_user_tokens_username (username)
+    )
+    """
+
     __tablename__ = "user_tokens"
 
     user_id = Column(Integer, primary_key=True)

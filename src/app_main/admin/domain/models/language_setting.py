@@ -8,6 +8,19 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _LanguageSettingRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS language_settings (
+        id int NOT NULL AUTO_INCREMENT,
+        lang_code varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        move_dots tinyint DEFAULT '0',
+        expend tinyint DEFAULT '0',
+        add_en_lang tinyint DEFAULT '0',
+        add_en_lng tinyint DEFAULT '0',
+        PRIMARY KEY (id),
+        UNIQUE KEY lang_code (lang_code)
+    )
+    """
+
     __tablename__ = "language_settings"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

@@ -8,6 +8,16 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _LangRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS langs (
+        lang_id int NOT NULL AUTO_INCREMENT,
+        code varchar(20) NOT NULL,
+        autonym varchar(70) NOT NULL,
+        name varchar(70) NOT NULL,
+        PRIMARY KEY (lang_id)
+    )
+    """
+
     __tablename__ = "langs"
 
     lang_id = Column(Integer, primary_key=True, autoincrement=True)
