@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.admin.domain.models.setting import SettingRecord
-from src.app_main.admin.domain.sqlalchemy_models.setting import _SettingRecord
-from src.app_main.admin.domain.sqlalchemy_services.setting_service import (
+from src.app_main.admin.sqlalchemy_db.models.setting import _SettingRecord
+from src.app_main.admin.sqlalchemy_db.services.setting_service import (
     add_setting,
     delete_setting,
     get_setting,

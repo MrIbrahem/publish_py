@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.shared.domain.models.page import PageRecord
-from src.app_main.shared.domain.sqlalchemy_models.page import _PageRecord
-from src.app_main.shared.domain.sqlalchemy_services.page_service import (
+from src.app_main.shared.sqlalchemy_db.models.page import _PageRecord
+from src.app_main.shared.sqlalchemy_db.services.page_service import (
     add_or_update_page,
     add_page,
     delete_page,

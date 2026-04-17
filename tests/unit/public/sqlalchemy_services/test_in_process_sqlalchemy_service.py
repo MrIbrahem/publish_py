@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.public.domain.models.in_process import InProcessRecord
-from src.app_main.public.domain.sqlalchemy_models.in_process import _InProcessRecord
-from src.app_main.public.domain.sqlalchemy_services.in_process_service import (
+from src.app_main.public.sqlalchemy_db.models.in_process import _InProcessRecord
+from src.app_main.public.sqlalchemy_db.services.in_process_service import (
     add_in_process,
     delete_in_process,
     delete_in_process_by_title_user_lang,
