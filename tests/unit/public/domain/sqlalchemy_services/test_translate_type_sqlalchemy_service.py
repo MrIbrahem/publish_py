@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.models.translate_type import TranslateTypeRecord, _TranslateTypeRecord
+from src.app_main.public.domain.models.translate_type import TranslateTypeRecord
+from src.app_main.public.domain.sqlalchemy_models.translate_type import _TranslateTypeRecord
 from src.app_main.public.domain.sqlalchemy_services.translate_type_service import (
     add_or_update_translate_type,
     add_translate_type,

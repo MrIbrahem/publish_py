@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.models.views_new import ViewsNewRecord, _ViewsNewRecord
+from src.app_main.public.domain.models.views_new import ViewsNewRecord
+from src.app_main.public.domain.sqlalchemy_models.views_new import _ViewsNewRecord
 from src.app_main.public.domain.sqlalchemy_services.views_new_service import (
     add_or_update_views_new,
     add_views_new,

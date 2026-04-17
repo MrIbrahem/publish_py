@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.models.qid import QidRecord, _QidRecord
+from src.app_main.shared.domain.models.qid import QidRecord
+from src.app_main.shared.domain.sqlalchemy_models.qid import _QidRecord
 from src.app_main.shared.domain.sqlalchemy_services.qid_service import (
     add_qid,
     delete_qid,

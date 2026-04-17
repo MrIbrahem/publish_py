@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.admin.domain.models.users_no_inprocess import UsersNoInprocessRecord, _UsersNoInprocessRecord
+from src.app_main.admin.domain.models.users_no_inprocess import UsersNoInprocessRecord
+from src.app_main.admin.domain.sqlalchemy_models.users_no_inprocess import _UsersNoInprocessRecord
 from src.app_main.admin.domain.sqlalchemy_services.users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,

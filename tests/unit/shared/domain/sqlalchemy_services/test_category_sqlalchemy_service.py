@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.models.category import CategoryRecord, _CategoryRecord
+from src.app_main.shared.domain.models.category import CategoryRecord
+from src.app_main.shared.domain.sqlalchemy_models.category import _CategoryRecord
 from src.app_main.shared.domain.sqlalchemy_services.category_service import (
     add_category,
     delete_category,
