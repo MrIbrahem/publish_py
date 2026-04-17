@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+
 
 from sqlalchemy import Column, Integer, String
 
@@ -28,19 +28,4 @@ class _MdwikiRevidRecord(BaseDb):
         }
 
 
-@dataclass
-class MdwikiRevidRecord:
-    """Representation of an mdwiki_revids record."""
-
-    title: str
-    revid: int
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "title": self.title,
-            "revid": self.revid,
-        }
-
-
-__all__ = ["MdwikiRevidRecord"]
+__all__ = ["_MdwikiRevidRecord"]

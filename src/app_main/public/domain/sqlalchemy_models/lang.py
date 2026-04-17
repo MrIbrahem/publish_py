@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+
 
 from sqlalchemy import Column, Integer, String
 
@@ -34,23 +34,4 @@ class _LangRecord(BaseDb):
         }
 
 
-@dataclass
-class LangRecord:
-    """Representation of a language record."""
-
-    lang_id: int
-    code: str
-    autonym: str
-    name: str
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "lang_id": self.lang_id,
-            "code": self.code,
-            "autonym": self.autonym,
-            "name": self.name,
-        }
-
-
-__all__ = ["LangRecord"]
+__all__ = ["_LangRecord"]

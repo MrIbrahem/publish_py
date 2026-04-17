@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+
 
 from sqlalchemy import Column, Integer, String
 
@@ -32,21 +32,4 @@ class _FullTranslatorRecord(BaseDb):
         }
 
 
-@dataclass
-class FullTranslatorRecord:
-    """Representation of a full translator record."""
-
-    id: int
-    user: str
-    active: int = 1
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "id": self.id,
-            "user": self.user,
-            "active": self.active,
-        }
-
-
-__all__ = ["FullTranslatorRecord"]
+__all__ = ["_FullTranslatorRecord"]

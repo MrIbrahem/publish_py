@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+
 
 from sqlalchemy import Column, Integer, String
 
@@ -41,26 +41,6 @@ class _CoordinatorRecord(BaseDb):
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
-@dataclass
-class CoordinatorRecord:
-    """Representation of a coordinator record."""
-
-    id: int
-    username: str
-    is_active: int = 1
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "id": self.id,
-            "username": self.username,
-            "is_active": self.is_active,
-        }
-
-
 __all__ = [
-    # Model
-    # "Coordinator",
     "_CoordinatorRecord",
-    "CoordinatorRecord",
 ]
