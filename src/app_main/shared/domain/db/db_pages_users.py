@@ -147,7 +147,6 @@ class UserPagesDB:
             lang: Target language
             user: Username
             target: Target page title
-            table_name:
             mdwiki_revid: MDWiki revision ID
             word: Word count
 
