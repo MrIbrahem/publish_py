@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 # 1. Model — replaces coordinator_model.py + CREATE TABLE
 # ---------------------------------------------------------------------------
 
+
 class BaseDb(DeclarativeBase):
     pass
 
@@ -27,6 +28,7 @@ class BaseDb(DeclarativeBase):
 # 2. Database connection — replaces db_driver.py entirely
 #    pool_pre_ping=True handles reconnect + retry automatically
 # ---------------------------------------------------------------------------
+
 
 def build_engine(db_url: str):
     """
@@ -37,10 +39,10 @@ def build_engine(db_url: str):
     """
     return create_engine(
         db_url,
-        pool_pre_ping=True,       # replaces _ensure_connection and retry logic
+        pool_pre_ping=True,  # replaces _ensure_connection and retry logic
         pool_size=5,
         max_overflow=10,
-        pool_recycle=3600,        # recycle connections after 1 hour
+        pool_recycle=3600,  # recycle connections after 1 hour
         connect_args={
             "connect_timeout": 5,
             "init_command": "SET time_zone = '+00:00'",
