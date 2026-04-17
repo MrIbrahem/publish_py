@@ -9,43 +9,43 @@ import pymysql
 
 from ....config import DbConfig
 from ...core.db_driver import Database
-from ..models.page import PageRecord
+from ..models.user_page import UserPageRecord
 
 logger = logging.getLogger(__name__)
 
 
-class PagesDB:
+class UserPagesDB:
     """MySQL-backed"""
 
     def __init__(self, db_data: DbConfig):
         self.db = Database(db_data)
 
-    def _row_to_record(self, row: dict[str, Any]) -> PageRecord:
-        return PageRecord(**row)
+    def _row_to_record(self, row: dict[str, Any]) -> UserPageRecord:
+        return UserPageRecord(**row)
 
-    def _fetch_by_id(self, page_id: int) -> PageRecord:
+    def _fetch_by_id(self, page_id: int) -> UserPageRecord:
         rows = self.db.fetch_query_safe(
-            "SELECT * FROM pages WHERE id = %s",
+            "SELECT * FROM pages_users WHERE id = %s",
             (page_id,),
         )
         if not rows:
             raise LookupError(f"Page id {page_id} was not found")
         return self._row_to_record(rows[0])
 
-    def _fetch_by_title(self, title: str) -> PageRecord:
+    def _fetch_by_title(self, title: str) -> UserPageRecord:
         rows = self.db.fetch_query_safe(
-            "SELECT * FROM pages WHERE title = %s",
+            "SELECT * FROM pages_users WHERE title = %s",
             (title,),
         )
         if not rows:
             raise LookupError(f"Page {title} was not found")
         return self._row_to_record(rows[0])
 
-    def list(self) -> List[PageRecord]:
-        rows = self.db.fetch_query_safe("SELECT * FROM pages ORDER BY id ASC")
+    def list(self) -> List[UserPageRecord]:
+        rows = self.db.fetch_query_safe("SELECT * FROM pages_users ORDER BY id ASC")
         return [self._row_to_record(row) for row in rows]
 
-    def add(self, title: str, **kwargs) -> PageRecord:
+    def add(self, title: str, **kwargs) -> UserPageRecord:
         title = title.strip()
         if not title:
             raise ValueError("Title is required")
@@ -56,7 +56,7 @@ class PagesDB:
 
         try:
             self.db.execute_query(
-                f"INSERT INTO pages ({', '.join(cols)}) VALUES ({placeholders})",
+                f"INSERT INTO pages_users ({', '.join(cols)}) VALUES ({placeholders})",
                 tuple(values),
             )
         except pymysql.err.IntegrityError:
@@ -64,7 +64,7 @@ class PagesDB:
 
         return self._fetch_by_title(title)
 
-    def update(self, page_id: int, **kwargs) -> PageRecord:
+    def update(self, page_id: int, **kwargs) -> UserPageRecord:
         # Validate that the record exists before attempting update
         _ = self._fetch_by_id(page_id)
         if not kwargs:
@@ -74,20 +74,20 @@ class PagesDB:
         values = list(kwargs.values()) + [page_id]
 
         self.db.execute_query_safe(
-            f"UPDATE pages SET {set_clause} WHERE id = %s",
+            f"UPDATE pages_users SET {set_clause} WHERE id = %s",
             tuple(values),
         )
         return self._fetch_by_id(page_id)
 
-    def delete(self, page_id: int) -> PageRecord:
+    def delete(self, page_id: int) -> UserPageRecord:
         record = self._fetch_by_id(page_id)
         self.db.execute_query_safe(
-            "DELETE FROM pages WHERE id = %s",
+            "DELETE FROM pages_users WHERE id = %s",
             (page_id,),
         )
         return record
 
-    def add_or_update(self, title: str, **kwargs) -> PageRecord:
+    def add_or_update(self, title: str, **kwargs) -> UserPageRecord:
         title = title.strip()
         if not title:
             raise ValueError("Title is required")
@@ -97,7 +97,7 @@ class PagesDB:
         updates = ", ".join([f"`{col}` = VALUES(`{col}`)" for col in kwargs.keys()])
         values = [title] + list(kwargs.values())
 
-        sql = f"INSERT INTO pages ({', '.join(cols)}) VALUES ({placeholders})"
+        sql = f"INSERT INTO pages_users ({', '.join(cols)}) VALUES ({placeholders})"
         if updates:
             sql += f" ON DUPLICATE KEY UPDATE {updates}"
 
@@ -112,12 +112,12 @@ class PagesDB:
         target: str,
     ) -> bool:
         """Check if record exists and update target if empty."""
-        query = "SELECT * FROM pages WHERE title = %s AND lang = %s AND user = %s"
+        query = "SELECT * FROM pages_users WHERE title = %s AND lang = %s AND user = %s"
         result = self.db.fetch_query_safe(query, (title, lang, user))
 
         if result:
             update_query = """
-                UPDATE pages SET target = %s, pupdate = DATE(NOW())
+                UPDATE pages_users SET target = %s, pupdate = DATE(NOW())
                 WHERE title = %s AND lang = %s AND user = %s AND (target = '' OR target IS NULL)
             """
             self.db.execute_query_safe(update_query, (target, title, lang, user))
@@ -155,7 +155,7 @@ class PagesDB:
         """
 
         query = """
-            INSERT INTO pages (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
+            INSERT INTO pages_users (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
             VALUES (%s, %s, %s, %s, %s, %s, DATE(NOW()), %s, %s)
         """
         params = (sourcetitle, word, tr_type, cat, lang, user, target, mdwiki_revid)
@@ -169,5 +169,5 @@ class PagesDB:
 
 
 __all__ = [
-    "PagesDB",
+    "UserPagesDB",
 ]

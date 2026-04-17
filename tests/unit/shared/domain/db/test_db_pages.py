@@ -195,7 +195,7 @@ class TestPagesDB:
         monkeypatch.setattr("src.app_main.shared.domain.db.db_pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
-        result = pages_db._find_exists_or_update("Test", "ar", "User", "Target", False)
+        result = pages_db._find_exists_or_update("Test", "ar", "User", "Target")
 
         assert result is True
         # Should also execute update query
@@ -209,7 +209,7 @@ class TestPagesDB:
         monkeypatch.setattr("src.app_main.shared.domain.db.db_pages.Database", lambda db_data: mock_db)
 
         pages_db = PagesDB(db_config)
-        result = pages_db._find_exists_or_update("Test", "ar", "User", "Target", False)
+        result = pages_db._find_exists_or_update("Test", "ar", "User", "Target")
 
         assert result is False
 
@@ -227,7 +227,6 @@ class TestPagesDB:
             lang="ar",
             user="TestUser",
             target="Target",
-            table_name="pages",
             mdwiki_revid=12345,
             word=100,
         )
@@ -258,7 +257,6 @@ class TestPagesDB:
             lang="ar",
             user="User",
             target="Target",
-            table_name="pages",
         )
 
         assert result is True
@@ -280,7 +278,6 @@ class TestPagesDB:
             lang="ar",
             user="User",
             target="Target",
-            table_name="pages",
         )
 
-        assert "DB Error" in result
+        assert result is False

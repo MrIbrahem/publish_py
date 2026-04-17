@@ -5,7 +5,7 @@ from typing import Any
 
 
 @dataclass
-class PageRecord:
+class UserPageRecord:
     """Representation of a page."""
 
     id: int
@@ -41,5 +41,5 @@ class PageRecord:
 
 
 __all__ = [
-    "PageRecord",
+    "UserPageRecord",
 ]

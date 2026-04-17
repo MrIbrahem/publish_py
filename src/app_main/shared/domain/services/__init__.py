@@ -14,6 +14,9 @@ from .pages_service import (
     insert_page_target,
     list_pages,
 )
+from .pages_users_service import (
+    insert_user_page_target,
+)
 from .users_services import (
     get_user_token_by_username,
 )
@@ -26,6 +29,7 @@ __all__ = [
     "find_exists_or_update",
     "get_pages_db",
     "insert_page_target",
+    "insert_user_page_target",
     "list_pages",
     "get_user_token_by_username",
 ]

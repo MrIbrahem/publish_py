@@ -1,4 +1,4 @@
-"""Utilities for managing pages and page targets."""
+"""Utilities for managing pages_users and user_page targets."""
 
 from __future__ import annotations
 
@@ -6,33 +6,33 @@ import logging
 from typing import Any, List
 
 from ....config import settings
-from ..db.db_pages import PagesDB
-from ..models.page import PageRecord
+from ..db.db_pages_users import UserPagesDB
+from ..models.user_page import UserPageRecord
 from .db_service import has_db_config
 
 logger = logging.getLogger(__name__)
 
-_PAGE_STORE: PagesDB | None = None
+_USER_PAGE_STORE: UserPagesDB | None = None
 
 
-def get_pages_db() -> PagesDB:
-    global _PAGE_STORE
+def get_pages_db() -> UserPagesDB:
+    global _USER_PAGE_STORE
 
-    if _PAGE_STORE is None:
+    if _USER_PAGE_STORE is None:
         if not has_db_config():
-            raise RuntimeError("PagesDB requires database configuration; no fallback store is available.")
+            raise RuntimeError("UserPagesDB requires database configuration; no fallback store is available.")
 
         try:
-            _PAGE_STORE = PagesDB(settings.database_data)
+            _USER_PAGE_STORE = UserPagesDB(settings.database_data)
         except Exception as exc:  # pragma: no cover - defensive guard for startup failures
             logger.exception("Failed to initialize MySQL page store")
             raise RuntimeError("Unable to initialize page store") from exc
 
-    return _PAGE_STORE
+    return _USER_PAGE_STORE
 
 
-def list_pages() -> List[PageRecord]:
-    """Return all pages while keeping settings.admins in sync."""
+def list_pages() -> List[UserPageRecord]:
+    """Return all pages_users while keeping settings.admins in sync."""
 
     store = get_pages_db()
 
@@ -40,7 +40,7 @@ def list_pages() -> List[PageRecord]:
     return coords
 
 
-def add_page(title: str, main_file: str) -> PageRecord:
+def add_page(title: str, main_file: str) -> UserPageRecord:
     """Add a page."""
 
     store = get_pages_db()
@@ -49,7 +49,7 @@ def add_page(title: str, main_file: str) -> PageRecord:
     return record
 
 
-def add_or_update_page(title: str, main_file: str) -> PageRecord:
+def add_or_update_page(title: str, main_file: str) -> UserPageRecord:
     """Add a page."""
 
     store = get_pages_db()
@@ -58,7 +58,7 @@ def add_or_update_page(title: str, main_file: str) -> PageRecord:
     return record
 
 
-def update_page(page_id: int, title: str, main_file: str) -> PageRecord:
+def update_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
     """Update page."""
 
     store = get_pages_db()
@@ -67,7 +67,7 @@ def update_page(page_id: int, title: str, main_file: str) -> PageRecord:
     return record
 
 
-def delete_page(page_id: int) -> PageRecord:
+def delete_page(page_id: int) -> UserPageRecord:
     """Delete a page."""
 
     store = get_pages_db()
@@ -82,13 +82,13 @@ def find_exists_or_update(
     user: str,
     target: str,
 ) -> bool:
-    """Check if a page record exists and update target if empty."""
+    """Check if a user_page record exists and update target if empty."""
 
     store = get_pages_db()
     return store._find_exists_or_update(title, lang, user, target)
 
 
-def insert_page_target(
+def insert_user_page_target(
     sourcetitle: str,
     tr_type: str,
     cat: str,
@@ -98,7 +98,7 @@ def insert_page_target(
     mdwiki_revid: int | None = None,
     word: int = 0,
 ) -> dict[str, Any]:
-    """Insert a page target record."""
+    """Insert a user_page target record."""
 
     store = get_pages_db()
     return store.insert_page_target(
@@ -121,5 +121,5 @@ __all__ = [
     "update_page",
     "delete_page",
     "find_exists_or_update",
-    "insert_page_target",
+    "insert_user_page_target",
 ]
