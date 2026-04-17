@@ -13,3 +13,5 @@ requests_oauthlib
 cryptography
 cachetools
 validators
+sqlalchemy
+flask-sqlalchemy
