@@ -15,7 +15,7 @@ from sqlalchemy import Column, Integer, String, create_engine, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from .engine import get_session
+from .engine import get_session, BaseDb
 
 logger = logging.getLogger(__name__)
 
