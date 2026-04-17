@@ -13,7 +13,7 @@ from src.app_main.admin.domain.sqlalchemy_services.full_translator_service impor
     list_full_translators,
     update_full_translator,
 )
-from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -21,7 +21,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....shared.db.engine import get_session
+from ....shared.sqlalchemy_db.engine import get_session
 from ..models.category import CategoryRecord, _CategoryRecord
 
 logger = logging.getLogger(__name__)

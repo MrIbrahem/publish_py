@@ -5,7 +5,7 @@ from typing import Any
 
 from sqlalchemy import Column, DateTime, Integer, String
 
-from ....shared.db.engine import BaseDb
+from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _UserRecord(BaseDb):

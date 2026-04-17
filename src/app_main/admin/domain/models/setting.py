@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from sqlalchemy import Column, Enum, Integer, String, Text
 
-from ....shared.db.engine import BaseDb
+from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _SettingRecord(BaseDb):

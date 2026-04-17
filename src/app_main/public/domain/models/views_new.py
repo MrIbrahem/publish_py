@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from sqlalchemy import Column, Integer, String, UniqueConstraint
 
-from ....shared.db.engine import BaseDb
+from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _ViewsNewRecord(BaseDb):

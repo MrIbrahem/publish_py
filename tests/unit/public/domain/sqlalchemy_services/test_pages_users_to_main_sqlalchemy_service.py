@@ -9,7 +9,7 @@ from src.app_main.public.domain.sqlalchemy_services.pages_users_to_main_service 
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
-from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -22,7 +22,7 @@ def setup_db():
     pages_users = Table("pages_users", meta, Column("id", Integer, primary_key=True), Column("title", String(255)))
     pages_users.create(engine)
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)
@@ -32,7 +32,7 @@ def setup_db():
 
 def test_pages_users_to_main_workflow():
     from sqlalchemy import text
-    from src.app_main.shared.db.engine import get_session
+    from src.app_main.shared.sqlalchemy_db.engine import get_session
 
     with get_session() as session:
         session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'test')"))
