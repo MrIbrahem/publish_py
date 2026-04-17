@@ -8,6 +8,16 @@ from ....shared.sqlalchemy_db.engine import BaseDb
 
 
 class _FullTranslatorRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS full_translators (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        active int NOT NULL DEFAULT '1',
+        PRIMARY KEY (id),
+        UNIQUE KEY user (user)
+    )
+    """
+
     __tablename__ = "full_translators"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from __future__ import annotations
 
@@ -11,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
 from .coordinator import Coordinator
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------

@@ -1,10 +1,8 @@
-"""
-"""
+""" """
 
 from __future__ import annotations
 
 import logging
-
 from dataclasses import dataclass
 
 from sqlalchemy import Column, Integer, String
@@ -15,7 +13,16 @@ logger = logging.getLogger(__name__)
 
 
 class _CoordinatorRecord(BaseDb):
-    """ORM model for the coordinators table."""
+    """
+    ORM model for the coordinators table.
+    CREATE TABLE IF NOT EXISTS coordinators (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        username varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        is_active int NOT NULL DEFAULT '1',
+        PRIMARY KEY (id),
+        UNIQUE KEY username (username)
+      )
+    """
 
     __tablename__ = "coordinators"
 

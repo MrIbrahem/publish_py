@@ -8,14 +8,14 @@ from sqlalchemy import Column, DateTime, Integer, String
 from ....shared.sqlalchemy_db.engine import BaseDb
 
 
-class _PageRecord(BaseDb):
+class _UserPageRecord(BaseDb):
     """
-    CREATE TABLE IF NOT EXISTS pages (
+    CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
         word int DEFAULT NULL,
         translate_type varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        cat varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        cat varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         lang varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         user varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         target varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -65,7 +65,7 @@ class _PageRecord(BaseDb):
 
 
 @dataclass
-class PageRecord:
+class UserPageRecord:
     """Representation of a page."""
 
     id: int
@@ -101,6 +101,6 @@ class PageRecord:
 
 
 __all__ = [
-    "PageRecord",
-    "_PageRecord",
+    "UserPageRecord",
+    "_UserPageRecord",
 ]
