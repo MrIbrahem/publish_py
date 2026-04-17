@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 
-
 from sqlalchemy import Column, DateTime, Integer, String, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb

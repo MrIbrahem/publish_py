@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from sqlalchemy import Column, Integer, String
 
 from ....shared.sqlalchemy_db.engine import BaseDb

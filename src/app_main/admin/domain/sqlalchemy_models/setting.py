@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-
 from typing import Any, Optional
 
 from sqlalchemy import Column, Enum, Integer, String, Text
