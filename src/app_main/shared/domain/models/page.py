@@ -42,5 +42,4 @@ class PageRecord:
 
 __all__ = [
     "PageRecord",
-    "_PageRecord",
 ]

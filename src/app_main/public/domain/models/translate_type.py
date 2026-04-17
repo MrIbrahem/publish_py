@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+
 @dataclass
 class TranslateTypeRecord:
     """Representation of a translate_type record."""

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+
 @dataclass
 class EnwikiPageviewRecord:
     """Representation of an enwiki pageview record."""

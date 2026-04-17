@@ -42,5 +42,4 @@ class UserPageRecord:
 
 __all__ = [
     "UserPageRecord",
-    "_UserPageRecord",
 ]

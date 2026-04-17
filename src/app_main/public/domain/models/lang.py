@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+
 @dataclass
 class LangRecord:
     """Representation of a language record."""

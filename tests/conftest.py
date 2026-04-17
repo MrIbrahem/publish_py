@@ -45,7 +45,6 @@ if sys:
 # Import after environment setup
 from src.app_main import create_app
 from src.app_main.config import TestingConfig
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb
 
 
 @pytest.fixture

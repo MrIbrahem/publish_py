@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+
 @dataclass
 class PagesUsersToMainRecord:
     """Representation of a pages_users_to_main record."""
