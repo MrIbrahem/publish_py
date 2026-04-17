@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.shared.domain.models.qid import QidRecord
+from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 from src.app_main.shared.sqlalchemy_db.models.qid import _QidRecord
 from src.app_main.shared.sqlalchemy_db.services.qid_service import (
     add_qid,
@@ -11,7 +12,6 @@ from src.app_main.shared.sqlalchemy_db.services.qid_service import (
     list_qids,
     update_qid,
 )
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)

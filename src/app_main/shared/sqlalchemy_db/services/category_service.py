@@ -7,8 +7,8 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ..engine import get_session
 from ...domain.models.category import CategoryRecord
+from ..engine import get_session
 from ..models.category import _CategoryRecord
 
 logger = logging.getLogger(__name__)
