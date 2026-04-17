@@ -1,6 +1,37 @@
+"""
+"""
+
 from __future__ import annotations
 
+import logging
+
 from dataclasses import dataclass
+
+from sqlalchemy import Column, Integer, String
+
+from ....shared.sqlalchemy_db.engine import BaseDb
+
+logger = logging.getLogger(__name__)
+
+
+class _CoordinatorRecord(BaseDb):
+    """ORM model for the coordinators table."""
+
+    __tablename__ = "coordinators"
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    username: str = Column(String(120, collation="utf8mb4_unicode_ci"), unique=True, nullable=False)
+    is_active: int = Column(Integer, nullable=False, default=1)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "username": self.username,
+            "is_active": self.is_active,
+        }
+
+    def __repr__(self) -> str:
+        return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
 @dataclass
@@ -20,4 +51,9 @@ class CoordinatorRecord:
         }
 
 
-__all__ = ["CoordinatorRecord"]
+__all__ = [
+    # Model
+    # "Coordinator",
+    "_CoordinatorRecord",
+    "CoordinatorRecord",
+]
