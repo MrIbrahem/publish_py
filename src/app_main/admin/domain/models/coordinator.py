@@ -1,3 +1,5 @@
+""" """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,4 +22,6 @@ class CoordinatorRecord:
         }
 
 
-__all__ = ["CoordinatorRecord"]
+__all__ = [
+    "CoordinatorRecord",
+]
