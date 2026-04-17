@@ -5,7 +5,7 @@ from typing import Any
 
 from sqlalchemy import Column, DateTime, Integer, String, text
 
-from ....shared.sqlalchemy_db.engine import BaseDb
+from ...sqlalchemy_db.engine import BaseDb
 
 
 class _UserPageRecord(BaseDb):
@@ -30,7 +30,7 @@ class _UserPageRecord(BaseDb):
     )
     """
 
-    __tablename__ = "pages"
+    __tablename__ = "pages_users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(120), nullable=False)

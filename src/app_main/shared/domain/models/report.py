@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, String, text, Text
+from sqlalchemy import Column, DateTime, Integer, String, Text, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 

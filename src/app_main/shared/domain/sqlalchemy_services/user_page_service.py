@@ -1,5 +1,5 @@
 """
-SQLAlchemy-based service for managing pages and page targets.
+SQLAlchemy-based service for managing pages_users and page targets.
 """
 
 from __future__ import annotations
@@ -11,26 +11,26 @@ from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.page import PageRecord, _PageRecord
+from ..models.user_page import UserPageRecord, _UserPageRecord
 
 logger = logging.getLogger(__name__)
 
 
-def list_pages() -> List[PageRecord]:
-    """Return all pages."""
+def list_pages() -> List[UserPageRecord]:
+    """Return all pages_users."""
     with get_session() as session:
-        orm_objs = session.query(_PageRecord).order_by(_PageRecord.id.asc()).all()
-        return [PageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        orm_objs = session.query(_UserPageRecord).order_by(_UserPageRecord.id.asc()).all()
+        return [UserPageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
-def add_page(title: str, main_file: str) -> PageRecord:
+def add_page(title: str, main_file: str) -> UserPageRecord:
     """Add a page."""
     title = title.strip()
     if not title:
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = _PageRecord(title=title, target=main_file)
+        orm_obj = _UserPageRecord(title=title, target=main_file)
         session.add(orm_obj)
         try:
             session.commit()
@@ -39,32 +39,32 @@ def add_page(title: str, main_file: str) -> PageRecord:
             raise ValueError(f"Page '{title}' already exists") from None
 
         session.refresh(orm_obj)
-        return PageRecord(**orm_obj.to_dict())
+        return UserPageRecord(**orm_obj.to_dict())
 
 
-def add_or_update_page(title: str, main_file: str) -> PageRecord:
+def add_or_update_page(title: str, main_file: str) -> UserPageRecord:
     """Add or update a page."""
     title = title.strip()
     if not title:
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = session.query(_PageRecord).filter(_PageRecord.title == title).first()
+        orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.title == title).first()
         if orm_obj:
             orm_obj.target = main_file
         else:
-            orm_obj = _PageRecord(title=title, target=main_file)
+            orm_obj = _UserPageRecord(title=title, target=main_file)
             session.add(orm_obj)
 
         session.commit()
         session.refresh(orm_obj)
-        return PageRecord(**orm_obj.to_dict())
+        return UserPageRecord(**orm_obj.to_dict())
 
 
-def update_page(page_id: int, title: str, main_file: str) -> PageRecord:
+def update_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
     """Update page."""
     with get_session() as session:
-        orm_obj = session.query(_PageRecord).filter(_PageRecord.id == page_id).first()
+        orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.id == page_id).first()
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
@@ -73,17 +73,17 @@ def update_page(page_id: int, title: str, main_file: str) -> PageRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return PageRecord(**orm_obj.to_dict())
+        return UserPageRecord(**orm_obj.to_dict())
 
 
-def delete_page(page_id: int) -> PageRecord:
+def delete_page(page_id: int) -> UserPageRecord:
     """Delete a page."""
     with get_session() as session:
-        orm_obj = session.query(_PageRecord).filter(_PageRecord.id == page_id).first()
+        orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.id == page_id).first()
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
-        record = PageRecord(**orm_obj.to_dict())
+        record = UserPageRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
         return record
@@ -99,13 +99,13 @@ def find_exists_or_update(
 
     with get_session() as session:
         # Check existence
-        query = text("SELECT * FROM pages WHERE title = :title AND lang = :lang AND user = :user")
+        query = text("SELECT * FROM pages_users WHERE title = :title AND lang = :lang AND user = :user")
         result = session.execute(query, {"title": title, "lang": lang, "user": user}).fetchall()
 
         if result:
             update_query = text(
                 """
-                UPDATE pages SET target = :target, pupdate = CURRENT_DATE
+                UPDATE pages_users SET target = :target, pupdate = CURRENT_DATE
                 WHERE title = :title AND lang = :lang AND user = :user AND (target = '' OR target IS NULL)
                 """
             )
@@ -128,7 +128,7 @@ def insert_page_target(
     """Insert a page target record."""
     query = text(
         """
-        INSERT INTO pages (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
+        INSERT INTO pages_users (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
         VALUES (:title, :word, :tr_type, :cat, :lang, :user, CURRENT_DATE, :target, :mdwiki_revid)
         """
     )
