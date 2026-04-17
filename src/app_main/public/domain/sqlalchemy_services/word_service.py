@@ -10,7 +10,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.word import WordRecord, _WordRecord
+from ..models.word import WordRecord
+from ..sqlalchemy_models.word import _WordRecord
 
 logger = logging.getLogger(__name__)
 

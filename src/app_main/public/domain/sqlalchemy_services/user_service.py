@@ -11,7 +11,8 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.user import UserRecord, _UserRecord
+from ..models.user import UserRecord
+from ..sqlalchemy_models.user import _UserRecord
 
 logger = logging.getLogger(__name__)
 

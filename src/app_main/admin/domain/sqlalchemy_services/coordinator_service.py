@@ -11,7 +11,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.coordinator import CoordinatorRecord, _CoordinatorRecord
+from ..models.coordinator import CoordinatorRecord
+from ..sqlalchemy_models.coordinator import _CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 

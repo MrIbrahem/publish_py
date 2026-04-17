@@ -11,7 +11,8 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.in_process import InProcessRecord, _InProcessRecord
+from ..models.in_process import InProcessRecord
+from ..sqlalchemy_models.in_process import _InProcessRecord
 
 logger = logging.getLogger(__name__)
 

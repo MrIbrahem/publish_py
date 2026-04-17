@@ -11,7 +11,8 @@ from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.user_page import UserPageRecord, _UserPageRecord
+from ..models.user_page import UserPageRecord
+from ..sqlalchemy_models.user_page import _UserPageRecord
 
 logger = logging.getLogger(__name__)
 

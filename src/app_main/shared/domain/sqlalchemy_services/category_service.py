@@ -8,7 +8,8 @@ import logging
 from typing import List
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.category import CategoryRecord, _CategoryRecord
+from ..models.category import CategoryRecord
+from ..sqlalchemy_models.category import _CategoryRecord
 
 logger = logging.getLogger(__name__)
 

@@ -10,7 +10,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.project import ProjectRecord, _ProjectRecord
+from ..models.project import ProjectRecord
+from ..sqlalchemy_models.project import _ProjectRecord
 
 logger = logging.getLogger(__name__)
 

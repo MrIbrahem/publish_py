@@ -10,7 +10,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.full_translator import FullTranslatorRecord, _FullTranslatorRecord
+from ..models.full_translator import FullTranslatorRecord
+from ..sqlalchemy_models.full_translator import _FullTranslatorRecord
 
 logger = logging.getLogger(__name__)
 

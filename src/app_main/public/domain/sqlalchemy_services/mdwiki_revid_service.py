@@ -10,7 +10,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.mdwiki_revid import MdwikiRevidRecord, _MdwikiRevidRecord
+from ..models.mdwiki_revid import MdwikiRevidRecord
+from ..sqlalchemy_models.mdwiki_revid import _MdwikiRevidRecord
 
 logger = logging.getLogger(__name__)
 

@@ -10,7 +10,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ..models.refs_count import RefsCountRecord, _RefsCountRecord
+from ..models.refs_count import RefsCountRecord
+from ..sqlalchemy_models.refs_count import _RefsCountRecord
 
 logger = logging.getLogger(__name__)
 
