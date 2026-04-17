@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, LargeBinary, String
+from sqlalchemy import Column, DateTime, Integer, LargeBinary, String, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 from ...utils.decode_bytes import coerce_bytes
@@ -34,8 +34,8 @@ class _UserTokenRecord(BaseDb):
     username = Column(String(255), unique=True, nullable=False)
     access_token = Column(LargeBinary(1024), nullable=False)
     access_secret = Column(LargeBinary(1024), nullable=False)
-    created_at = Column(DateTime, nullable=True, server_default="CURRENT_TIMESTAMP")
-    updated_at = Column(DateTime, nullable=True, server_default="CURRENT_TIMESTAMP")
+    created_at = Column(DateTime, nullable=True, server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(DateTime, nullable=True, server_default=text("CURRENT_TIMESTAMP"))
     last_used_at = Column(DateTime, nullable=True)
     rotated_at = Column(DateTime, nullable=True)
 

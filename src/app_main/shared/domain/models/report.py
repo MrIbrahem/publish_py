@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import Column, DateTime, Integer, String, text, Text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 
@@ -29,7 +29,7 @@ class _ReportRecord(BaseDb):
     __tablename__ = "publish_reports"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(DateTime, nullable=False, server_default="CURRENT_TIMESTAMP")
+    date = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     title = Column(String(255), nullable=False)
     user = Column(String(255), nullable=False)
     lang = Column(String(255), nullable=False)

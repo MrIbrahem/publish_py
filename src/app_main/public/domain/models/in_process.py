@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String, text, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 
@@ -33,7 +33,7 @@ class _InProcessRecord(BaseDb):
     cat = Column(String(255), default="RTT")
     translate_type = Column(String(20), default="lead")
     word = Column(Integer, default=0)
-    add_date = Column(DateTime, nullable=False, server_default="CURRENT_TIMESTAMP")
+    add_date = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
     def to_dict(self) -> dict:
         return {
