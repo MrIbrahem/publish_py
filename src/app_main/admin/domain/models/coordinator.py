@@ -2,6 +2,25 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from sqlalchemy import Column, Integer, String
+
+from ....shared.db.engine import BaseDb
+
+
+class _CoordinatorRecord(BaseDb):
+    __tablename__ = "coordinators"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(120), unique=True, nullable=False)
+    is_active = Column(Integer, nullable=False, default=1)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "username": self.username,
+            "is_active": self.is_active,
+        }
+
 
 @dataclass
 class CoordinatorRecord:

@@ -4,9 +4,37 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
+from sqlalchemy import Column, DateTime, Integer, LargeBinary, String
+
+from ...db.engine import BaseDb
 from ...utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
+
+
+class _UserTokenRecord(BaseDb):
+    __tablename__ = "user_tokens"
+
+    user_id = Column(Integer, primary_key=True)
+    username = Column(String(255), unique=True, nullable=False)
+    access_token = Column(LargeBinary(1024), nullable=False)
+    access_secret = Column(LargeBinary(1024), nullable=False)
+    created_at = Column(DateTime, nullable=True, server_default="CURRENT_TIMESTAMP")
+    updated_at = Column(DateTime, nullable=True, server_default="CURRENT_TIMESTAMP")
+    last_used_at = Column(DateTime, nullable=True)
+    rotated_at = Column(DateTime, nullable=True)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "access_token": self.access_token,
+            "access_secret": self.access_secret,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "last_used_at": self.last_used_at,
+            "rotated_at": self.rotated_at,
+        }
 
 
 @dataclass

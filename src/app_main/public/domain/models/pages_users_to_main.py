@@ -2,6 +2,27 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from sqlalchemy import Column, ForeignKey, Integer, String
+
+from ....shared.db.engine import BaseDb
+
+
+class _PagesUsersToMainRecord(BaseDb):
+    __tablename__ = "pages_users_to_main"
+
+    id = Column(Integer, ForeignKey("pages_users.id"), primary_key=True)
+    new_target = Column(String(255), nullable=False, default="")
+    new_user = Column(String(255), nullable=False, default="")
+    new_qid = Column(String(255), nullable=False, default="")
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "new_target": self.new_target,
+            "new_user": self.new_user,
+            "new_qid": self.new_qid,
+        }
+
 
 @dataclass
 class PagesUsersToMainRecord:

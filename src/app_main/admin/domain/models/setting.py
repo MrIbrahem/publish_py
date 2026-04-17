@@ -4,6 +4,29 @@ import json
 from dataclasses import dataclass
 from typing import Any, Optional
 
+from sqlalchemy import Column, Enum, Integer, String, Text
+
+from ....shared.db.engine import BaseDb
+
+
+class _SettingRecord(BaseDb):
+    __tablename__ = "settings"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    key = Column(String(190), unique=True, nullable=False)
+    title = Column(String(500), nullable=False)
+    value = Column(Text, nullable=True)
+    value_type = Column(Enum("boolean", "string", "integer", "json"), nullable=False, default="boolean")
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "key": self.key,
+            "title": self.title,
+            "value": self.value,
+            "value_type": self.value_type,
+        }
+
 
 @dataclass
 class SettingRecord:

@@ -3,7 +3,28 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
+from sqlalchemy import Column, DateTime, Integer, String
+
+from ...db.engine import BaseDb
+
 logger = logging.getLogger(__name__)
+
+
+class _QidRecord(BaseDb):
+    __tablename__ = "qids"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    qid = Column(String(20), nullable=False)
+    title = Column(String(255), unique=True, nullable=False)
+    add_date = Column(DateTime, nullable=False, server_default="CURRENT_TIMESTAMP")
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "title": self.title,
+            "add_date": self.add_date,
+        }
 
 
 @dataclass

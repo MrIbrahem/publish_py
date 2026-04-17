@@ -2,6 +2,27 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from sqlalchemy import Column, Integer, String
+
+from ....shared.db.engine import BaseDb
+
+
+class _LangRecord(BaseDb):
+    __tablename__ = "langs"
+
+    lang_id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(20), nullable=False)
+    autonym = Column(String(70), nullable=False)
+    name = Column(String(70), nullable=False)
+
+    def to_dict(self) -> dict:
+        return {
+            "lang_id": self.lang_id,
+            "code": self.code,
+            "autonym": self.autonym,
+            "name": self.name,
+        }
+
 
 @dataclass
 class LangRecord:
