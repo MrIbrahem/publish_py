@@ -1,31 +1,36 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db
+
+import pytest
+from src.app_main.admin.domain.models.coordinator import CoordinatorRecord, _CoordinatorRecord
 from src.app_main.admin.domain.sqlalchemy_services.coordinator_service import (
-    list_coordinators,
     active_coordinators,
     add_coordinator,
+    add_or_update_coordinator,
+    delete_coordinator,
     get_coordinator,
     get_coordinator_by_user,
-    add_or_update_coordinator,
-    update_coordinator,
-    delete_coordinator,
     is_coordinator,
-    set_coordinator_active
+    list_coordinators,
+    set_coordinator_active,
+    update_coordinator,
 )
-from src.app_main.admin.domain.models.coordinator import CoordinatorRecord, _CoordinatorRecord
+from src.app_main.shared.db.engine import init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
     init_db("sqlite:///:memory:")
     from src.app_main.shared.db.engine import BaseDb, build_engine
+
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_coordinator_workflow():
     # Test add

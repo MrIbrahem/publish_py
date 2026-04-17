@@ -14,6 +14,7 @@ class BaseDb(DeclarativeBase):
     Base class for database models.
     Provides common functionality like to_dict.
     """
+
     def to_dict(self) -> dict[str, Any]:
         """Convert ORM object to dictionary."""
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
@@ -27,16 +28,18 @@ def build_engine(db_url: str):
         "pool_pre_ping": True,
     }
     if not db_url.startswith("sqlite"):
-        kwargs.update({
-            "pool_size": 5,
-            "max_overflow": 10,
-            "pool_recycle": 3600,
-            "connect_args": {
-                "connect_timeout": 5,
-                "init_command": "SET time_zone = \"+00:00\"",
-                "charset": "utf8mb4",
-            },
-        })
+        kwargs.update(
+            {
+                "pool_size": 5,
+                "max_overflow": 10,
+                "pool_recycle": 3600,
+                "connect_args": {
+                    "connect_timeout": 5,
+                    "init_command": 'SET time_zone = "+00:00"',
+                    "charset": "utf8mb4",
+                },
+            }
+        )
     return create_engine(db_url, **kwargs)
 
 

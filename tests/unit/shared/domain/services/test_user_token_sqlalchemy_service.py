@@ -1,14 +1,16 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
-from src.app_main.shared.domain.sqlalchemy_services.user_token_service import (
-    upsert_user_token,
-    get_user_token,
-    delete_user_token,
-    get_user_token_by_username,
-    delete_user_token_by_username
-)
+
+import pytest
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
 from src.app_main.shared.domain.models.user_token import UserTokenRecord, _UserTokenRecord
+from src.app_main.shared.domain.sqlalchemy_services.user_token_service import (
+    delete_user_token,
+    delete_user_token_by_username,
+    get_user_token,
+    get_user_token_by_username,
+    upsert_user_token,
+)
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -17,9 +19,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_user_token_workflow():
     upsert_user_token(user_id=1, username="test_user", access_key="key", access_secret="secret")

@@ -1,36 +1,39 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
-from src.app_main.public.domain.sqlalchemy_services.pages_users_to_main_service import (
-    list_pages_users_to_main,
-    get_pages_users_to_main,
-    add_pages_users_to_main,
-    update_pages_users_to_main,
-    delete_pages_users_to_main
-)
+
+import pytest
 from src.app_main.public.domain.models.pages_users_to_main import PagesUsersToMainRecord, _PagesUsersToMainRecord
+from src.app_main.public.domain.sqlalchemy_services.pages_users_to_main_service import (
+    add_pages_users_to_main,
+    delete_pages_users_to_main,
+    get_pages_users_to_main,
+    list_pages_users_to_main,
+    update_pages_users_to_main,
+)
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
-    from sqlalchemy import Table, Column, Integer, String, MetaData
+    from sqlalchemy import Column, Integer, MetaData, String, Table
+
     meta = MetaData()
-    pages_users = Table('pages_users', meta,
-        Column('id', Integer, primary_key=True),
-        Column('title', String(255))
-    )
+    pages_users = Table("pages_users", meta, Column("id", Integer, primary_key=True), Column("title", String(255)))
     pages_users.create(engine)
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
 
+
 def test_pages_users_to_main_workflow():
-    from src.app_main.shared.db.engine import get_session
     from sqlalchemy import text
+    from src.app_main.shared.db.engine import get_session
+
     with get_session() as session:
         session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'test')"))
         session.commit()

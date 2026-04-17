@@ -1,15 +1,17 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+from src.app_main.shared.domain.models.category import CategoryRecord, _CategoryRecord
 from src.app_main.shared.domain.sqlalchemy_services.category_service import (
     add_category,
-    update_category,
     delete_category,
+    get_camp_to_cats,
     get_campaign_category,
     list_categories,
-    get_camp_to_cats
+    update_category,
 )
-from src.app_main.shared.domain.models.category import CategoryRecord, _CategoryRecord
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -18,9 +20,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_category_workflow():
     c = add_category("test_cat", "Display Name", "test_campaign", "cat2", 1, 1)

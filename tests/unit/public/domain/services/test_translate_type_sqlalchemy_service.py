@@ -1,20 +1,22 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.public.domain.models.translate_type import TranslateTypeRecord, _TranslateTypeRecord
 from src.app_main.public.domain.sqlalchemy_services.translate_type_service import (
-    list_translate_types,
-    list_lead_enabled_types,
-    list_full_enabled_types,
+    add_or_update_translate_type,
+    add_translate_type,
+    can_translate_full,
+    can_translate_lead,
+    delete_translate_type,
     get_translate_type,
     get_translate_type_by_title,
-    add_translate_type,
-    add_or_update_translate_type,
+    list_full_enabled_types,
+    list_lead_enabled_types,
+    list_translate_types,
     update_translate_type,
-    delete_translate_type,
-    can_translate_lead,
-    can_translate_full
 )
-from src.app_main.public.domain.models.translate_type import TranslateTypeRecord, _TranslateTypeRecord
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -23,9 +25,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_translate_type_workflow():
     tt = add_translate_type("test_type", 1, 0)

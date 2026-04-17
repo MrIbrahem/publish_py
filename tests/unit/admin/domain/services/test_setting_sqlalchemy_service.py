@@ -1,15 +1,17 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.admin.domain.models.setting import SettingRecord, _SettingRecord
 from src.app_main.admin.domain.sqlalchemy_services.setting_service import (
-    list_settings,
+    add_setting,
+    delete_setting,
     get_setting,
     get_setting_by_key,
-    add_setting,
+    list_settings,
     update_value,
-    delete_setting
 )
-from src.app_main.admin.domain.models.setting import SettingRecord, _SettingRecord
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -18,9 +20,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_setting_workflow():
     s = add_setting("test_key", "Test Title", "string", "test_value")

@@ -1,16 +1,18 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb, get_session
+
+import pytest
+from src.app_main.shared.db.engine import BaseDb, build_engine, get_session, init_db
+from src.app_main.shared.domain.models.page import PageRecord, _PageRecord
 from src.app_main.shared.domain.sqlalchemy_services.page_service import (
-    list_pages,
-    add_page,
     add_or_update_page,
-    update_page,
+    add_page,
     delete_page,
     find_exists_or_update,
-    insert_page_target
+    insert_page_target,
+    list_pages,
+    update_page,
 )
-from src.app_main.shared.domain.models.page import PageRecord, _PageRecord
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -19,9 +21,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_page_workflow():
     p = add_page("test_page", "target_file")

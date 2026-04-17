@@ -1,18 +1,20 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.admin.domain.models.users_no_inprocess import UsersNoInprocessRecord, _UsersNoInprocessRecord
 from src.app_main.admin.domain.sqlalchemy_services.users_no_inprocess_service import (
-    list_users_no_inprocess,
-    list_active_users_no_inprocess,
+    add_or_update_users_no_inprocess,
+    add_users_no_inprocess,
+    delete_users_no_inprocess,
     get_users_no_inprocess,
     get_users_no_inprocess_by_user,
-    add_users_no_inprocess,
-    add_or_update_users_no_inprocess,
+    list_active_users_no_inprocess,
+    list_users_no_inprocess,
+    should_hide_from_inprocess,
     update_users_no_inprocess,
-    delete_users_no_inprocess,
-    should_hide_from_inprocess
 )
-from src.app_main.admin.domain.models.users_no_inprocess import UsersNoInprocessRecord, _UsersNoInprocessRecord
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -21,9 +23,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_users_no_inprocess_workflow():
     rec = add_users_no_inprocess("test_user", 1)

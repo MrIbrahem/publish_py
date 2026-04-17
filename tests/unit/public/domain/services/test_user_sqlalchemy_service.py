@@ -1,18 +1,20 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.public.domain.models.user import UserRecord, _UserRecord
 from src.app_main.public.domain.sqlalchemy_services.user_service import (
-    list_users,
-    list_users_by_group,
+    add_or_update_user,
+    add_user,
+    delete_user,
     get_user,
     get_user_by_username,
-    add_user,
-    add_or_update_user,
+    list_users,
+    list_users_by_group,
     update_user,
-    delete_user,
-    user_exists
+    user_exists,
 )
-from src.app_main.public.domain.models.user import UserRecord, _UserRecord
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -21,9 +23,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_user_workflow():
     u = add_user("test_user", "test@example.com", "enwiki", "Editor")

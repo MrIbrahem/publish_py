@@ -1,6 +1,7 @@
 import pytest
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Integer, String
 from src.app_main.shared.db.engine import BaseDb
+
 
 class _PagesUsersRecord(BaseDb):
     __tablename__ = "pages_users"

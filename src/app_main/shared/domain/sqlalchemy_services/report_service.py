@@ -40,7 +40,7 @@ def add_report(
             sourcetitle=sourcetitle,
             result=result,
             data=data,
-            date=func.now()
+            date=func.now(),
         )
         session.add(orm_obj)
         session.commit()

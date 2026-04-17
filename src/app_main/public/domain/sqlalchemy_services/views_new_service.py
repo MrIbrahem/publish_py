@@ -38,10 +38,7 @@ def list_views_by_lang(lang: str) -> List[ViewsNewRecord]:
     """Return views_new records for a specific language."""
     with get_session() as session:
         orm_objs = (
-            session.query(_ViewsNewRecord)
-            .filter(_ViewsNewRecord.lang == lang)
-            .order_by(_ViewsNewRecord.id.asc())
-            .all()
+            session.query(_ViewsNewRecord).filter(_ViewsNewRecord.lang == lang).order_by(_ViewsNewRecord.id.asc()).all()
         )
         return [ViewsNewRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 

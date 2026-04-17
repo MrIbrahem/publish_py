@@ -1,13 +1,15 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+from src.app_main.shared.domain.models.report import ReportRecord, _ReportRecord
 from src.app_main.shared.domain.sqlalchemy_services.report_service import (
-    list_reports,
     add_report,
     delete_report,
-    query_reports_with_filters
+    list_reports,
+    query_reports_with_filters,
 )
-from src.app_main.shared.domain.models.report import ReportRecord, _ReportRecord
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -16,9 +18,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_report_workflow():
     r = add_report("title", "user", "en", "sourcetitle", "success", "data")

@@ -15,7 +15,7 @@ from sqlalchemy import Column, Integer, String, create_engine, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from .engine import get_session, BaseDb
+from .engine import BaseDb, get_session
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,7 @@ class Coordinator(BaseDb):
 # ---------------------------------------------------------------------------
 # 4. Service functions — replace coordinators_service.py + db_coordinators.py
 # ---------------------------------------------------------------------------
+
 
 def list_coordinators() -> List[Coordinator]:
     """Return all coordinator records."""
@@ -172,5 +173,4 @@ __all__ = [
     "delete_coordinator",
     "is_coordinator",
     "set_coordinator_active",
-  ]
-                             
+]

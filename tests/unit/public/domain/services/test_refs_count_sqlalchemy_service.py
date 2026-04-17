@@ -1,17 +1,19 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+
+import pytest
+from src.app_main.public.domain.models.refs_count import RefsCountRecord, _RefsCountRecord
 from src.app_main.public.domain.sqlalchemy_services.refs_count_service import (
-    list_refs_counts,
+    add_or_update_refs_count,
+    add_refs_count,
+    delete_refs_count,
+    get_ref_counts_for_title,
     get_refs_count,
     get_refs_count_by_title,
-    add_refs_count,
-    add_or_update_refs_count,
+    list_refs_counts,
     update_refs_count,
-    delete_refs_count,
-    get_ref_counts_for_title
 )
-from src.app_main.public.domain.models.refs_count import RefsCountRecord, _RefsCountRecord
+from src.app_main.shared.db.engine import BaseDb, build_engine, init_db
+
 
 @pytest.fixture(autouse=True)
 def setup_db():
@@ -20,9 +22,11 @@ def setup_db():
     BaseDb.metadata.create_all(engine)
     with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
+
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
         yield
+
 
 def test_refs_count_workflow():
     r = add_refs_count("test_page", 10, 50)
