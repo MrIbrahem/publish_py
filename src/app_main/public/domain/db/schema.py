@@ -57,20 +57,13 @@ CREATE TABLE IF NOT EXISTS in_process (
 """
 
 langs = """
-
 CREATE TABLE IF NOT EXISTS langs (
     lang_id int NOT NULL AUTO_INCREMENT,
-    code varchar(20) CHARACTER
-    SET
-      utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-      autonym varchar(70) CHARACTER
-    SET
-      utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-      name varchar(70) CHARACTER
-    SET
-      utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-      PRIMARY KEY (lang_id)
-  )
+    code varchar(20) NOT NULL,
+    autonym varchar(70) NOT NULL,
+    name varchar(70) NOT NULL,
+    PRIMARY KEY (lang_id)
+)
 """
 
 mdwiki_revids = """

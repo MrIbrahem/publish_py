@@ -1,6 +1,4 @@
-"""
-TODO: should be updated to match php_src/bots/sql/db_Pages.php
-"""
+""" """
 
 from __future__ import annotations
 
@@ -112,16 +110,14 @@ class PagesDB:
         lang: str,
         user: str,
         target: str,
-        use_user_sql: bool,
     ) -> bool:
         """Check if record exists and update target if empty."""
-        table_name = "pages_users" if use_user_sql else "pages"
-        query = f"SELECT * FROM {table_name} WHERE title = %s AND lang = %s AND user = %s"
+        query = "SELECT * FROM pages WHERE title = %s AND lang = %s AND user = %s"
         result = self.db.fetch_query_safe(query, (title, lang, user))
 
         if result:
-            update_query = f"""
-                UPDATE {table_name} SET target = %s, pupdate = DATE(NOW())
+            update_query = """
+                UPDATE pages SET target = %s, pupdate = DATE(NOW())
                 WHERE title = %s AND lang = %s AND user = %s AND (target = '' OR target IS NULL)
             """
             self.db.execute_query_safe(update_query, (target, title, lang, user))
@@ -136,7 +132,6 @@ class PagesDB:
         lang: str,
         user: str,
         target: str,
-        table_name: str,
         mdwiki_revid: int | None = None,
         word: int = 0,
     ) -> dict[str, Any]:
@@ -160,8 +155,8 @@ class PagesDB:
             Dictionary with operation result
         """
 
-        query = f"""
-            INSERT INTO {table_name} (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
+        query = """
+            INSERT INTO pages (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
             VALUES (%s, %s, %s, %s, %s, %s, DATE(NOW()), %s, %s)
         """
         params = (sourcetitle, word, tr_type, cat, lang, user, target, mdwiki_revid)
@@ -171,10 +166,9 @@ class PagesDB:
             return True
         except Exception as e:
             logger.error(f"Failed to insert page target: {e}")
-            return str(e)
+            return False
 
 
 __all__ = [
     "PagesDB",
-    "PageRecord",
 ]

@@ -283,4 +283,4 @@ class TestPagesDB:
             table_name="pages",
         )
 
-        assert "DB Error" in result
+        assert result is False

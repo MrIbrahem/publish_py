@@ -20,6 +20,7 @@ from ....shared.domain.services import (
     find_exists_or_update,
     get_user_token_by_username,
     insert_page_target,
+    insert_user_page_target,
 )
 from ....shared.domain.services.categories_service import get_campaign_category
 from ....shared.utils.helpers import (
@@ -346,20 +347,32 @@ def insert_to_db_2(
         result["exists"] = "already_in"
         return result
 
-    table_name = "pages_users" if use_user_sql else "pages"
+    table_sql = "pages_users" if use_user_sql else "pages"
 
-    # Insert new record
-    add_done = insert_page_target(
-        sourcetitle=sourcetitle,
-        tr_type=tr_type,
-        cat=cat,
-        lang=lang,
-        user=user,
-        target=target,
-        table_name=table_name,
-        mdwiki_revid=mdwiki_revid,
-        word=word,
-    )
+    if table_sql == "pages":
+        # Insert new record
+        add_done = insert_page_target(
+            sourcetitle=sourcetitle,
+            tr_type=tr_type,
+            cat=cat,
+            lang=lang,
+            user=user,
+            target=target,
+            mdwiki_revid=mdwiki_revid,
+            word=word,
+        )
+    else:
+        # Insert new record
+        add_done = insert_user_page_target(
+            sourcetitle=sourcetitle,
+            tr_type=tr_type,
+            cat=cat,
+            lang=lang,
+            user=user,
+            target=target,
+            mdwiki_revid=mdwiki_revid,
+            word=word,
+        )
 
     result["execute_query"] = add_done is True
 

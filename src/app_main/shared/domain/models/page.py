@@ -40,4 +40,6 @@ class PageRecord:
         }
 
 
-__all__ = ["PageRecord"]
+__all__ = [
+    "PageRecord",
+]

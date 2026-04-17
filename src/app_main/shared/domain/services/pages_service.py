@@ -96,7 +96,6 @@ def insert_page_target(
     lang: str,
     user: str,
     target: str,
-    table_name: str,
     mdwiki_revid: int | None = None,
     word: int = 0,
 ) -> dict[str, Any]:
@@ -110,7 +109,6 @@ def insert_page_target(
         lang=lang,
         user=user,
         target=target,
-        table_name=table_name,
         mdwiki_revid=mdwiki_revid,
         word=word,
     )
@@ -118,8 +116,6 @@ def insert_page_target(
 
 __all__ = [
     "get_pages_db",
-    "PageRecord",
-    "PagesDB",
     "list_pages",
     "add_or_update_page",
     "add_page",
