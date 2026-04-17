@@ -72,6 +72,9 @@ def init_db(db_url: str, create_tables: bool = False) -> None:
 def get_session() -> Session:
     """Return a new session. Always use inside a `with` block."""
     if _SessionFactory is None:
+        # For migration purposes, if not initialized, we might need a way to initialize it
+        # But according to instructions, we should just use it.
+        # In a real app, init_db would be called at startup.
         raise RuntimeError("Call init_db() before using the database.")
     return _SessionFactory()
 
