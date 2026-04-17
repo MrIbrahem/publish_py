@@ -112,12 +112,12 @@ class TestPagesServiceIntegration:
 
             # Test when record exists
             mock_db._find_exists_or_update.return_value = True
-            result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target", False)
+            result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target")
             assert result is True
 
             # Test when record doesn't exist
             mock_db._find_exists_or_update.return_value = False
-            result = find_exists_or_update("NewTitle", "ar", "TestUser", "Target", False)
+            result = find_exists_or_update("NewTitle", "ar", "TestUser", "Target")
             assert result is False
 
     def test_insert_page_target_integration(self, monkeypatch):
@@ -137,7 +137,6 @@ class TestPagesServiceIntegration:
                 lang="ar",
                 user="TestUser",
                 target="TargetTitle",
-                table_name="pages",
                 mdwiki_revid=12345,
                 word=500,
             )
@@ -193,7 +192,6 @@ class TestPagesServiceErrorHandling:
                 lang="ar",
                 user="User",
                 target="Target",
-                table_name="pages",
             )
 
             # Error message should be passed through

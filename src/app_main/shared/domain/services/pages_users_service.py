@@ -81,12 +81,11 @@ def find_exists_or_update(
     lang: str,
     user: str,
     target: str,
-    use_user_sql: bool,
 ) -> bool:
     """Check if a user_page record exists and update target if empty."""
 
     store = get_pages_db()
-    return store._find_exists_or_update(title, lang, user, target, use_user_sql)
+    return store._find_exists_or_update(title, lang, user, target)
 
 
 def insert_user_page_target(

@@ -174,10 +174,10 @@ class TestFindExistsOrUpdate:
         mock_store._find_exists_or_update.return_value = True
         monkeypatch.setattr("src.app_main.shared.domain.services.pages_service.get_pages_db", lambda: mock_store)
 
-        result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target", False)
+        result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target")
 
         assert result is True
-        mock_store._find_exists_or_update.assert_called_once_with("TestTitle", "ar", "TestUser", "Target", False)
+        mock_store._find_exists_or_update.assert_called_once_with("TestTitle", "ar", "TestUser", "Target")
 
     def test_returns_false_when_not_exists(self, monkeypatch):
         """Test that function returns False when record not found."""
@@ -185,7 +185,7 @@ class TestFindExistsOrUpdate:
         mock_store._find_exists_or_update.return_value = False
         monkeypatch.setattr("src.app_main.shared.domain.services.pages_service.get_pages_db", lambda: mock_store)
 
-        result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target", False)
+        result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target")
 
         assert result is False
 
@@ -206,7 +206,6 @@ class TestInsertPageTarget:
             lang="ar",
             user="TestUser",
             target="Target",
-            table_name="pages",
             mdwiki_revid=12345,
             word=100,
         )
@@ -219,7 +218,6 @@ class TestInsertPageTarget:
             lang="ar",
             user="TestUser",
             target="Target",
-            table_name="pages",
             mdwiki_revid=12345,
             word=100,
         )
@@ -238,7 +236,6 @@ class TestInsertPageTarget:
             lang="ar",
             user="TestUser",
             target="Target",
-            table_name="pages",
         )
 
         assert result is True
