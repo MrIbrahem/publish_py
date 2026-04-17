@@ -30,17 +30,37 @@ def setup_db():
 
 
 def test_full_translator_workflow():
+    # Test add
     ft = add_full_translator("test_ft", 1)
     assert ft.user == "test_ft"
     assert ft.active == 1
-    assert get_full_translator(ft.id).user == "test_ft"
-    assert get_full_translator_by_user("test_ft").id == ft.id
-    assert any(x.user == "test_ft" for x in list_full_translators())
-    assert any(x.user == "test_ft" for x in list_active_full_translators())
+
+    # Test get
+    ft2 = get_full_translator(ft.id)
+    assert ft2.user == "test_ft"
+
+    # Test get by user
+    ft3 = get_full_translator_by_user("test_ft")
+    assert ft3.id == ft.id
+
+    # Test list
+    all_ft = list_full_translators()
+    assert any(x.user == "test_ft" for x in all_ft)
+
+    # Test active
+    active = list_active_full_translators()
+    assert any(x.user == "test_ft" for x in active)
+
+    # Test update
     updated = update_full_translator(ft.id, active=0)
     assert updated.active == 0
     assert is_full_translator("test_ft") is False
+
+    # Test add_or_update
     ft4 = add_or_update_full_translator("test_ft", 1)
     assert ft4.active == 1
+    assert is_full_translator("test_ft") is True
+
+    # Test delete
     delete_full_translator(ft.id)
     assert get_full_translator(ft.id) is None

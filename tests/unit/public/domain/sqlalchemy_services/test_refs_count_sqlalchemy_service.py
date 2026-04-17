@@ -29,16 +29,36 @@ def setup_db():
 
 
 def test_refs_count_workflow():
+    # Test add
     r = add_refs_count("test_page", 10, 50)
     assert r.r_title == "test_page"
-    assert get_refs_count(r.r_id).r_title == "test_page"
-    assert get_refs_count_by_title("test_page").r_id == r.r_id
+    assert r.r_lead_refs == 10
+
+    # Test get
+    r2 = get_refs_count(r.r_id)
+    assert r2.r_title == "test_page"
+
+    # Test get by title
+    r3 = get_refs_count_by_title("test_page")
+    assert r3.r_id == r.r_id
+
+    # Test get_ref_counts_for_title
     lead, all_refs = get_ref_counts_for_title("test_page")
     assert lead == 10
-    assert any(x.r_title == "test_page" for x in list_refs_counts())
+    assert all_refs == 50
+
+    # Test list
+    all_r = list_refs_counts()
+    assert any(x.r_title == "test_page" for x in all_r)
+
+    # Test update
     updated = update_refs_count(r.r_id, r_lead_refs=20)
     assert updated.r_lead_refs == 20
+
+    # Test add_or_update
     r4 = add_or_update_refs_count("test_page", 30, 60)
     assert r4.r_lead_refs == 30
+
+    # Test delete
     delete_refs_count(r.r_id)
     assert get_refs_count(r.r_id) is None

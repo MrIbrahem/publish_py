@@ -28,14 +28,31 @@ def setup_db():
 
 
 def test_assessment_workflow():
+    # Test add
     a = add_assessment("test_page", "High")
     assert a.title == "test_page"
-    assert get_assessment(a.id).title == "test_page"
-    assert get_assessment_by_title("test_page").id == a.id
-    assert any(x.title == "test_page" for x in list_assessments())
+    assert a.importance == "High"
+
+    # Test get
+    a2 = get_assessment(a.id)
+    assert a2.title == "test_page"
+
+    # Test get by title
+    a3 = get_assessment_by_title("test_page")
+    assert a3.id == a.id
+
+    # Test list
+    all_a = list_assessments()
+    assert any(x.title == "test_page" for x in all_a)
+
+    # Test update
     updated = update_assessment(a.id, importance="Low")
     assert updated.importance == "Low"
+
+    # Test add_or_update
     a4 = add_or_update_assessment("test_page", "Mid")
     assert a4.importance == "Mid"
+
+    # Test delete
     delete_assessment(a.id)
     assert get_assessment(a.id) is None

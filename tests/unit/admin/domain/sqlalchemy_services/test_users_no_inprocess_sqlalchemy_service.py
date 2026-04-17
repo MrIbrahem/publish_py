@@ -30,16 +30,37 @@ def setup_db():
 
 
 def test_users_no_inprocess_workflow():
+    # Test add
     rec = add_users_no_inprocess("test_user", 1)
     assert rec.user == "test_user"
-    assert get_users_no_inprocess(rec.id).user == "test_user"
-    assert get_users_no_inprocess_by_user("test_user").id == rec.id
-    assert any(x.user == "test_user" for x in list_users_no_inprocess())
-    assert any(x.user == "test_user" for x in list_active_users_no_inprocess())
+    assert rec.active == 1
+
+    # Test get
+    rec2 = get_users_no_inprocess(rec.id)
+    assert rec2.user == "test_user"
+
+    # Test get by user
+    rec3 = get_users_no_inprocess_by_user("test_user")
+    assert rec3.id == rec.id
+
+    # Test list
+    all_rec = list_users_no_inprocess()
+    assert any(x.user == "test_user" for x in all_rec)
+
+    # Test active
+    active = list_active_users_no_inprocess()
+    assert any(x.user == "test_user" for x in active)
+
+    # Test update
     updated = update_users_no_inprocess(rec.id, active=0)
     assert updated.active == 0
     assert should_hide_from_inprocess("test_user") is False
+
+    # Test add_or_update
     rec4 = add_or_update_users_no_inprocess("test_user", 1)
     assert rec4.active == 1
+    assert should_hide_from_inprocess("test_user") is True
+
+    # Test delete
     delete_users_no_inprocess(rec.id)
     assert get_users_no_inprocess(rec.id) is None

@@ -28,14 +28,32 @@ def setup_db():
 
 
 def test_language_setting_workflow():
+    # Test add
     ls = add_language_setting("en", 1, 0, 1, 0)
     assert ls.lang_code == "en"
-    assert get_language_setting(ls.id).lang_code == "en"
-    assert get_language_setting_by_code("en").id == ls.id
-    assert any(x.lang_code == "en" for x in list_language_settings())
+    assert ls.move_dots == 1
+
+    # Test get
+    ls2 = get_language_setting(ls.id)
+    assert ls2.lang_code == "en"
+
+    # Test get by code
+    ls3 = get_language_setting_by_code("en")
+    assert ls3.id == ls.id
+
+    # Test list
+    all_ls = list_language_settings()
+    assert any(x.lang_code == "en" for x in all_ls)
+
+    # Test update
     updated = update_language_setting(ls.id, move_dots=0)
     assert updated.move_dots == 0
+
+    # Test add_or_update
     ls4 = add_or_update_language_setting("en", 1, 1, 1, 1)
+    assert ls4.move_dots == 1
     assert ls4.expend == 1
+
+    # Test delete
     delete_language_setting(ls.id)
     assert get_language_setting(ls.id) is None

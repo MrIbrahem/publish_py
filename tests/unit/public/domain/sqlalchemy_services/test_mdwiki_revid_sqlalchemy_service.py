@@ -28,14 +28,31 @@ def setup_db():
 
 
 def test_mdwiki_revid_workflow():
+    # Test add
     r = add_mdwiki_revid("test_page", 12345)
     assert r.title == "test_page"
-    assert get_mdwiki_revid_by_title("test_page").revid == 12345
-    assert get_revid_for_title("test_page") == 12345
-    assert any(x.title == "test_page" for x in list_mdwiki_revids())
+    assert r.revid == 12345
+
+    # Test get by title
+    r2 = get_mdwiki_revid_by_title("test_page")
+    assert r2.revid == 12345
+
+    # Test get_revid_for_title
+    revid = get_revid_for_title("test_page")
+    assert revid == 12345
+
+    # Test list
+    all_r = list_mdwiki_revids()
+    assert any(x.title == "test_page" for x in all_r)
+
+    # Test update
     updated = update_mdwiki_revid("test_page", 67890)
     assert updated.revid == 67890
+
+    # Test add_or_update
     r3 = add_or_update_mdwiki_revid("test_page", 11111)
     assert r3.revid == 11111
+
+    # Test delete
     delete_mdwiki_revid("test_page")
     assert get_mdwiki_revid_by_title("test_page") is None

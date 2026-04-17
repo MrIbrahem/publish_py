@@ -28,14 +28,30 @@ def setup_db():
 
 
 def test_project_workflow():
+    # Test add
     p = add_project("test_project")
     assert p.g_title == "test_project"
-    assert get_project(p.g_id).g_title == "test_project"
-    assert get_project_by_title("test_project").g_id == p.g_id
-    assert any(x.g_title == "test_project" for x in list_projects())
+
+    # Test get
+    p2 = get_project(p.g_id)
+    assert p2.g_title == "test_project"
+
+    # Test get by title
+    p3 = get_project_by_title("test_project")
+    assert p3.g_id == p.g_id
+
+    # Test list
+    all_p = list_projects()
+    assert any(x.g_title == "test_project" for x in all_p)
+
+    # Test update
     updated = update_project(p.g_id, g_title="new_title")
     assert updated.g_title == "new_title"
+
+    # Test add_or_update
     p4 = add_or_update_project("new_title")
     assert p4.g_id == p.g_id
+
+    # Test delete
     delete_project(p.g_id)
     assert get_project(p.g_id) is None

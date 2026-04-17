@@ -27,12 +27,27 @@ def setup_db():
 
 
 def test_setting_workflow():
+    # Test add
     s = add_setting("test_key", "Test Title", "string", "test_value")
     assert s.key == "test_key"
-    assert get_setting(s.id).key == "test_key"
-    assert get_setting_by_key("test_key").id == s.id
-    assert any(x.key == "test_key" for x in list_settings())
+    assert s.value == "test_value"
+
+    # Test get
+    s2 = get_setting(s.id)
+    assert s2.key == "test_key"
+
+    # Test get by key
+    s3 = get_setting_by_key("test_key")
+    assert s3.id == s.id
+
+    # Test list
+    all_s = list_settings()
+    assert any(x.key == "test_key" for x in all_s)
+
+    # Test update
     updated = update_value(s.id, "new_value")
     assert updated.value == "new_value"
+
+    # Test delete
     delete_setting(s.id)
     assert get_setting(s.id) is None

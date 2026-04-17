@@ -31,17 +31,41 @@ def setup_db():
 
 
 def test_views_new_workflow():
+    # Test add
     v = add_views_new("target1", "en", 2023, 1000)
     assert v.target == "target1"
-    assert get_views_new(v.id).target == "target1"
-    assert get_views_by_target_lang_year("target1", "en", 2023).id == v.id
-    assert any(x.target == "target1" for x in list_views_new())
-    assert len(list_views_by_target("target1")) >= 1
-    assert len(list_views_by_lang("en")) >= 1
+    assert v.views == 1000
+
+    # Test get
+    v2 = get_views_new(v.id)
+    assert v2.target == "target1"
+
+    # Test get by target, lang, year
+    v3 = get_views_by_target_lang_year("target1", "en", 2023)
+    assert v3.id == v.id
+
+    # Test list
+    all_v = list_views_new()
+    assert any(x.target == "target1" for x in all_v)
+
+    # Test list by target/lang
+    by_target = list_views_by_target("target1")
+    assert len(by_target) >= 1
+    by_lang = list_views_by_lang("en")
+    assert len(by_lang) >= 1
+
+    # Test update
     updated = update_views_new(v.id, views=2000)
     assert updated.views == 2000
-    assert get_total_views_for_target("target1") == 2000
+
+    # Test total views
+    total = get_total_views_for_target("target1")
+    assert total == 2000
+
+    # Test add_or_update
     v4 = add_or_update_views_new("target1", "en", 2023, 3000)
     assert v4.views == 3000
+
+    # Test delete
     delete_views_new(v.id)
     assert get_views_new(v.id) is None

@@ -29,15 +29,35 @@ def setup_db():
 
 
 def test_enwiki_pageview_workflow():
+    # Test add
     p = add_enwiki_pageview("test_page", 100)
     assert p.title == "test_page"
-    assert get_enwiki_pageview(p.id).title == "test_page"
-    assert get_enwiki_pageview_by_title("test_page").id == p.id
-    assert any(x.title == "test_page" for x in list_enwiki_pageviews())
-    assert get_top_enwiki_pageviews(1)[0].title == "test_page"
+    assert p.en_views == 100
+
+    # Test get
+    p2 = get_enwiki_pageview(p.id)
+    assert p2.title == "test_page"
+
+    # Test get by title
+    p3 = get_enwiki_pageview_by_title("test_page")
+    assert p3.id == p.id
+
+    # Test list
+    all_p = list_enwiki_pageviews()
+    assert any(x.title == "test_page" for x in all_p)
+
+    # Test top views
+    top = get_top_enwiki_pageviews(1)
+    assert top[0].title == "test_page"
+
+    # Test update
     updated = update_enwiki_pageview(p.id, en_views=200)
     assert updated.en_views == 200
+
+    # Test add_or_update
     p4 = add_or_update_enwiki_pageview("test_page", 300)
     assert p4.en_views == 300
+
+    # Test delete
     delete_enwiki_pageview(p.id)
     assert get_enwiki_pageview(p.id) is None

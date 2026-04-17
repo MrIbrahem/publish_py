@@ -27,12 +27,27 @@ def setup_db():
 
 
 def test_qid_workflow():
+    # Test add
     q = add_qid("test_page", "Q123")
     assert q.title == "test_page"
-    assert get_page_qid("test_page").qid == "Q123"
-    assert any(x.title == "test_page" for x in list_qids())
-    assert get_title_to_qid()["test_page"] == "Q123"
+    assert q.qid == "Q123"
+
+    # Test get
+    q2 = get_page_qid("test_page")
+    assert q2.qid == "Q123"
+
+    # Test list
+    all_q = list_qids()
+    assert any(x.title == "test_page" for x in all_q)
+
+    # Test mapping
+    mapping = get_title_to_qid()
+    assert mapping["test_page"] == "Q123"
+
+    # Test update
     updated = update_qid(q.id, "new_title", "Q456")
     assert updated.qid == "Q456"
+
+    # Test delete
     delete_qid(q.id)
     assert get_page_qid("new_title") is None

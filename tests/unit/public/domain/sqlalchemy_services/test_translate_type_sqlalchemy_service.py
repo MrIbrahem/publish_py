@@ -32,17 +32,42 @@ def setup_db():
 
 
 def test_translate_type_workflow():
+    # Test add
     tt = add_translate_type("test_type", 1, 0)
     assert tt.tt_title == "test_type"
-    assert get_translate_type(tt.tt_id).tt_title == "test_type"
-    assert get_translate_type_by_title("test_type").tt_id == tt.tt_id
-    assert any(x.tt_title == "test_type" for x in list_translate_types())
-    assert any(x.tt_title == "test_type" for x in list_lead_enabled_types())
+    assert tt.tt_lead == 1
+
+    # Test get
+    tt2 = get_translate_type(tt.tt_id)
+    assert tt2.tt_title == "test_type"
+
+    # Test get by title
+    tt3 = get_translate_type_by_title("test_type")
+    assert tt3.tt_id == tt.tt_id
+
+    # Test list
+    all_tt = list_translate_types()
+    assert any(x.tt_title == "test_type" for x in all_tt)
+
+    # Test enabled lists
+    leads = list_lead_enabled_types()
+    assert any(x.tt_title == "test_type" for x in leads)
+    fulls = list_full_enabled_types()
+    assert not any(x.tt_title == "test_type" for x in fulls)
+
+    # Test can_translate
     assert can_translate_lead("test_type") is True
     assert can_translate_full("test_type") is False
+
+    # Test update
     updated = update_translate_type(tt.tt_id, tt_full=1)
     assert updated.tt_full == 1
+    assert can_translate_full("test_type") is True
+
+    # Test add_or_update
     tt4 = add_or_update_translate_type("test_type", 0, 1)
     assert tt4.tt_lead == 0
+
+    # Test delete
     delete_translate_type(tt.tt_id)
     assert get_translate_type(tt.tt_id) is None

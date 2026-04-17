@@ -28,14 +28,31 @@ def setup_db():
 
 
 def test_lang_workflow():
+    # Test add
     l = add_lang("en", "English", "English")
     assert l.code == "en"
-    assert get_lang(l.lang_id).code == "en"
-    assert get_lang_by_code("en").lang_id == l.lang_id
-    assert any(x.code == "en" for x in list_langs())
+    assert l.autonym == "English"
+
+    # Test get
+    l2 = get_lang(l.lang_id)
+    assert l2.code == "en"
+
+    # Test get by code
+    l3 = get_lang_by_code("en")
+    assert l3.lang_id == l.lang_id
+
+    # Test list
+    all_l = list_langs()
+    assert any(x.code == "en" for x in all_l)
+
+    # Test update
     updated = update_lang(l.lang_id, autonym="Eng")
     assert updated.autonym == "Eng"
+
+    # Test add_or_update
     l4 = add_or_update_lang("en", "English", "English Lang")
     assert l4.name == "English Lang"
+
+    # Test delete
     delete_lang(l.lang_id)
     assert get_lang(l.lang_id) is None
