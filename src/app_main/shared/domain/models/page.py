@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String, func, text
 
 from ...db.engine import BaseDb
 
@@ -21,7 +21,7 @@ class _PageRecord(BaseDb):
     target = Column(String(120), nullable=True)
     date = Column(DateTime, nullable=True)
     pupdate = Column(String(120), nullable=True)
-    add_date = Column(DateTime, nullable=False, server_default="CURRENT_TIMESTAMP")
+    add_date = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, default=0)
     mdwiki_revid = Column(Integer, nullable=True)
 

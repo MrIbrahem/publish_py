@@ -1,0 +1,44 @@
+import pytest
+from unittest.mock import MagicMock, patch
+from src.app_main.shared.db.engine import init_db, build_engine, BaseDb
+from src.app_main.public.domain.sqlalchemy_services.pages_users_to_main_service import (
+    list_pages_users_to_main,
+    get_pages_users_to_main,
+    add_pages_users_to_main,
+    update_pages_users_to_main,
+    delete_pages_users_to_main
+)
+from src.app_main.public.domain.models.pages_users_to_main import PagesUsersToMainRecord, _PagesUsersToMainRecord
+
+@pytest.fixture(autouse=True)
+def setup_db():
+    init_db("sqlite:///:memory:")
+    engine = build_engine("sqlite:///:memory:")
+    from sqlalchemy import Table, Column, Integer, String, MetaData
+    meta = MetaData()
+    pages_users = Table('pages_users', meta,
+        Column('id', Integer, primary_key=True),
+        Column('title', String(255))
+    )
+    pages_users.create(engine)
+    BaseDb.metadata.create_all(engine)
+    with patch("src.app_main.shared.db.engine._SessionFactory") as mock_session_factory:
+        from sqlalchemy.orm import sessionmaker
+        Session = sessionmaker(bind=engine)
+        mock_session_factory.return_value = Session()
+        yield
+
+def test_pages_users_to_main_workflow():
+    from src.app_main.shared.db.engine import get_session
+    from sqlalchemy import text
+    with get_session() as session:
+        session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'test')"))
+        session.commit()
+    p = add_pages_users_to_main(id=1, new_target="target", new_user="user", new_qid="qid")
+    assert p.id == 1
+    assert get_pages_users_to_main(1).new_target == "target"
+    assert any(x.id == 1 for x in list_pages_users_to_main())
+    updated = update_pages_users_to_main(1, new_target="new_target")
+    assert updated.new_target == "new_target"
+    delete_pages_users_to_main(1)
+    assert get_pages_users_to_main(1) is None
