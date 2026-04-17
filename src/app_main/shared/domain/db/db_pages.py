@@ -171,7 +171,7 @@ class PagesDB:
             return True
         except Exception as e:
             logger.error(f"Failed to insert page target: {e}")
-            return str(e)
+            return False
 
 
 __all__ = [

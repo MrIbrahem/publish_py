@@ -154,7 +154,7 @@ def insert_page_target(
         except Exception as e:
             logger.error(f"Failed to insert page target: {e}")
             session.rollback()
-            return str(e)
+            return False
 
 
 __all__ = [
