@@ -11,7 +11,7 @@ from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import extract
 
-from ...domain.models import ReportRecord
+from ...domain_models import ReportRecord
 from ..engine import get_session
 from ..models import _ReportRecord
 

@@ -22,7 +22,7 @@ from ....shared.sqlalchemy_db.services import (
     insert_page_target,
     insert_user_page_target,
 )
-from ....shared.domain.services.categories_service import get_campaign_category
+from ....shared.sqlalchemy_db.services.category_service import get_campaign_category
 from ....shared.utils.helpers import (
     determine_hashtag,
     do_changes_to_text,

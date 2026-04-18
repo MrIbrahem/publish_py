@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ...domain.models import LanguageSettingRecord
+from ...domain_models import LanguageSettingRecord
 from ..models import _LanguageSettingRecord
 
 logger = logging.getLogger(__name__)

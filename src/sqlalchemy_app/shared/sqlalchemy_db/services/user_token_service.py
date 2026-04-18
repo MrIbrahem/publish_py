@@ -11,7 +11,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ...core.crypto import encrypt_value
-from ...domain.models import UserTokenRecord
+from ...domain_models import UserTokenRecord
 from ..engine import get_session
 from ..models import _UserTokenRecord
 

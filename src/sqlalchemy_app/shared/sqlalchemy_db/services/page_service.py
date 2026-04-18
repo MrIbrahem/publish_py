@@ -10,7 +10,7 @@ from typing import Any, List
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...domain.models import PageRecord
+from ...domain_models import PageRecord
 from ..engine import get_session
 from ..models import _PageRecord
 
