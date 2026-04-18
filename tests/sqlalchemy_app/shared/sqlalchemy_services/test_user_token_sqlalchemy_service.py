@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.shared.domain.models import UserTokenRecord
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
-from src.app_main.shared.sqlalchemy_db.models import _UserTokenRecord
-from src.app_main.shared.sqlalchemy_db.services.user_token_service import (
+from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.sqlalchemy_db.models import _UserTokenRecord
+from src.sqlalchemy_app.shared.sqlalchemy_db.services.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,
     get_user_token,
@@ -18,7 +18,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

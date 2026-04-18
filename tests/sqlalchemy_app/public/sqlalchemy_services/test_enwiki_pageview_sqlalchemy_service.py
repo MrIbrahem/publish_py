@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.public.domain.models import EnwikiPageviewRecord
-from src.app_main.public.sqlalchemy_db.models import _EnwikiPageviewRecord
-from src.app_main.public.sqlalchemy_db.services.enwiki_pageview_service import (
+from src.sqlalchemy_app.public.sqlalchemy_db.models import _EnwikiPageviewRecord
+from src.sqlalchemy_app.public.sqlalchemy_db.services.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
     delete_enwiki_pageview,
@@ -13,7 +13,7 @@ from src.app_main.public.sqlalchemy_db.services.enwiki_pageview_service import (
     list_enwiki_pageviews,
     update_enwiki_pageview,
 )
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -21,7 +21,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

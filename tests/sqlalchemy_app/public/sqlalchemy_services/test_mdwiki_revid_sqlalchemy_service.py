@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.public.domain.models import MdwikiRevidRecord
-from src.app_main.public.sqlalchemy_db.models import _MdwikiRevidRecord
-from src.app_main.public.sqlalchemy_db.services.mdwiki_revid_service import (
+from src.sqlalchemy_app.public.sqlalchemy_db.models import _MdwikiRevidRecord
+from src.sqlalchemy_app.public.sqlalchemy_db.services.mdwiki_revid_service import (
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
     delete_mdwiki_revid,
@@ -12,7 +12,7 @@ from src.app_main.public.sqlalchemy_db.services.mdwiki_revid_service import (
     list_mdwiki_revids,
     update_mdwiki_revid,
 )
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -20,7 +20,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

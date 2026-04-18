@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.public.domain.models import WordRecord
-from src.app_main.public.sqlalchemy_db.models import _WordRecord
-from src.app_main.public.sqlalchemy_db.services.word_service import (
+from src.sqlalchemy_app.public.sqlalchemy_db.models import _WordRecord
+from src.sqlalchemy_app.public.sqlalchemy_db.services.word_service import (
     add_or_update_word,
     add_word,
     delete_word,
@@ -13,7 +13,7 @@ from src.app_main.public.sqlalchemy_db.services.word_service import (
     list_words,
     update_word,
 )
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -21,7 +21,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

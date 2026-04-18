@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.app_main.shared.domain.models import ReportRecord
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
-from src.app_main.shared.sqlalchemy_db.models import _ReportRecord
-from src.app_main.shared.sqlalchemy_db.services.report_service import (
+from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.sqlalchemy_db.models import _ReportRecord
+from src.sqlalchemy_app.shared.sqlalchemy_db.services.report_service import (
     add_report,
     delete_report,
     list_reports,
@@ -17,7 +17,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

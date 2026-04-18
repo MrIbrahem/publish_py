@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 # from src.app_main.admin.domain.models import UsersNoInprocessRecord
-# from src.app_main.admin.sqlalchemy_db.models import _UsersNoInprocessRecord
-from src.app_main.admin.sqlalchemy_db.services.users_no_inprocess_service import (
+# from src.sqlalchemy_app.admin.sqlalchemy_db.models import _UsersNoInprocessRecord
+from src.sqlalchemy_app.admin.sqlalchemy_db.services.users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,
     delete_users_no_inprocess,
@@ -14,7 +14,7 @@ from src.app_main.admin.sqlalchemy_db.services.users_no_inprocess_service import
     should_hide_from_inprocess,
     update_users_no_inprocess,
 )
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -22,7 +22,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

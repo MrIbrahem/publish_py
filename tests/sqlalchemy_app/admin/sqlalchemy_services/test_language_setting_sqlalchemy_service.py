@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 # from src.app_main.admin.domain.models import LanguageSettingRecord
-# from src.app_main.admin.sqlalchemy_db.models import _LanguageSettingRecord
-from src.app_main.admin.sqlalchemy_db.services.language_setting_service import (
+# from src.sqlalchemy_app.admin.sqlalchemy_db.models import _LanguageSettingRecord
+from src.sqlalchemy_app.admin.sqlalchemy_db.services.language_setting_service import (
     add_language_setting,
     add_or_update_language_setting,
     delete_language_setting,
@@ -12,7 +12,7 @@ from src.app_main.admin.sqlalchemy_db.services.language_setting_service import (
     list_language_settings,
     update_language_setting,
 )
-from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -20,7 +20,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.app_main.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)
