@@ -5,17 +5,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....config import settings
-
+from ....config import has_db_config, settings
 from ..db.db_projects import ProjectsDB
 from ..models import ProjectRecord
 
 logger = logging.getLogger(__name__)
 
 _PROJECTS_STORE: ProjectsDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_projects_db() -> ProjectsDB:

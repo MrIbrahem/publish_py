@@ -5,16 +5,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....config import settings
+from ....config import has_db_config, settings
 from ..db.db_users_no_inprocess import UsersNoInprocessDB
 from ..models import UsersNoInprocessRecord
 
 logger = logging.getLogger(__name__)
 
 _USERS_NO_INPROCESS_STORE: UsersNoInprocessDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_users_no_inprocess_db() -> UsersNoInprocessDB:

@@ -5,17 +5,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....config import settings
-
+from ....config import has_db_config, settings
 from ..db.db_full_translators import FullTranslatorsDB
 from ..models import FullTranslatorRecord
 
 logger = logging.getLogger(__name__)
 
 _FULL_TRANSLATORS_STORE: FullTranslatorsDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_full_translators_db() -> FullTranslatorsDB:

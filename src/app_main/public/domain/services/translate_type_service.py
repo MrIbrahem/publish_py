@@ -5,17 +5,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....config import settings
-
+from ....config import has_db_config, settings
 from ..db.db_translate_type import TranslateTypeDB
 from ..models import TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
 
 _TRANSLATE_TYPE_STORE: TranslateTypeDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_translate_type_db() -> TranslateTypeDB:
