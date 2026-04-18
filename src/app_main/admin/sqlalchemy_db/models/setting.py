@@ -27,7 +27,12 @@ class _SettingRecord(BaseDb):
     key = Column(String(190), unique=True, nullable=False)
     title = Column(String(500), nullable=False)
     value = Column(Text, nullable=True)
-    value_type = Column(Enum("boolean", "string", "integer", "json"), nullable=False, default="boolean")
+    # value_type = Column(Enum("boolean", "string", "integer", "json"), nullable=False, default="boolean")
+    value_type = Column(
+        Enum("boolean", "string", "integer", name="setting_value_type"),
+        nullable=False,
+        default="boolean",
+    )
 
     def to_dict(self) -> dict:
         return {

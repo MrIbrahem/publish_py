@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import Column, Date, Integer, String, Text, text
+from sqlalchemy import Column, Date, Integer, String, Text, func
 
 from ..engine import BaseDb
 
@@ -28,7 +28,7 @@ class _ReportRecord(BaseDb):
     __tablename__ = "publish_reports"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(Date, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    date = Column(Date, nullable=False, server_default=func.current_timestamp())
     title = Column(String(255), nullable=False)
     user = Column(String(255), nullable=False)
     lang = Column(String(255), nullable=False)
@@ -39,7 +39,8 @@ class _ReportRecord(BaseDb):
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
-            "date": self.date.isoformat() if hasattr(self.date, "isoformat") else str(self.date),
+            # "date": self.date.isoformat() if hasattr(self.date, "isoformat") else str(self.date),
+            "date": self.date,
             "title": self.title,
             "user": self.user,
             "lang": self.lang,
