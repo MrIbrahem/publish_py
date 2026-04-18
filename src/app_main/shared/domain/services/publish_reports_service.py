@@ -49,7 +49,7 @@ def add_report(
     return record
 
 
-def publish_reports_query_with_filters(
+def query_reports_with_filters(
     filters: Dict[str, Any],
     select_fields: Optional[List[str]] = None,
     limit: Optional[int] = None,
@@ -67,7 +67,7 @@ def delete_report(report_id: int) -> None:
     store.delete(report_id)
 
 
-def list_publish_reports() -> List[ReportRecord]:
+def list_reports() -> List[ReportRecord]:
     """Return all publish_reports."""
 
     store = get_publish_reports_db()
@@ -79,6 +79,6 @@ def list_publish_reports() -> List[ReportRecord]:
 __all__ = [
     "add_report",
     "delete_report",
-    "list_publish_reports",
-    "publish_reports_query_with_filters",
+    "list_reports",
+    "query_reports_with_filters",
 ]

@@ -14,7 +14,8 @@ from ....shared.clients import (
     link_to_wikidata,
     publish_do_edit,
 )
-from ....shared.domain.services import (
+# from ..sqlalchemy_db.services.user_token_service import UserTokenRecord, get_user_token
+from ....shared.sqlalchemy_db.services import (
     add_report,
     find_exists_or_update_page,
     get_user_token_by_username,

@@ -8,7 +8,7 @@ import logging
 from typing import Any
 
 from ...config import settings
-from ..domain.services import get_db
+from ..sqlalchemy_db.services.qid_service import get_page_qid
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)
@@ -23,15 +23,9 @@ def get_qid_for_mdtitle(title: str) -> str | None:
     Returns:
         QID string or None if not found
     """
-    db = get_db()
-    query = "SELECT qid FROM qids WHERE title = %s"
-
-    try:
-        result = db.fetch_query_safe(query, (title,))
-        if result:
-            return result[0].get("qid")
-    except Exception as e:
-        logger.error(f"Error fetching QID for {title}: {e}")
+    qid_obj = get_page_qid(title)
+    if qid_obj:
+        return qid_obj.qid
 
     return None
 

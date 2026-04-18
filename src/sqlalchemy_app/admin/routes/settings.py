@@ -86,7 +86,7 @@ class SettingsRoutes:
         @bp_admin.post("/settings/update")
         @admin_required
         def settings_update():
-            from ..domain.services import settings_service as service
+            from ..sqlalchemy_db.services import setting_service as service
 
             all_settings = service.list_settings()
             failed_keys: list[str] = []

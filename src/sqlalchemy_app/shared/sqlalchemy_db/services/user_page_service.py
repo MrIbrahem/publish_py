@@ -17,14 +17,14 @@ from ..models import _UserPageRecord
 logger = logging.getLogger(__name__)
 
 
-def list_pages() -> List[UserPageRecord]:
+def list_user_pages() -> List[UserPageRecord]:
     """Return all pages_users."""
     with get_session() as session:
         orm_objs = session.query(_UserPageRecord).order_by(_UserPageRecord.id.asc()).all()
         return [UserPageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
-def add_page(title: str, main_file: str) -> UserPageRecord:
+def add_user_page(title: str, main_file: str) -> UserPageRecord:
     """Add a page."""
     title = title.strip()
     if not title:
@@ -43,7 +43,7 @@ def add_page(title: str, main_file: str) -> UserPageRecord:
         return UserPageRecord(**orm_obj.to_dict())
 
 
-def add_or_update_page(title: str, main_file: str) -> UserPageRecord:
+def add_or_update_user_page(title: str, main_file: str) -> UserPageRecord:
     """Add or update a page."""
     title = title.strip()
     if not title:
@@ -62,7 +62,7 @@ def add_or_update_page(title: str, main_file: str) -> UserPageRecord:
         return UserPageRecord(**orm_obj.to_dict())
 
 
-def update_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
+def update_user_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
     """Update page."""
     with get_session() as session:
         orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.id == page_id).first()
@@ -77,7 +77,7 @@ def update_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
         return UserPageRecord(**orm_obj.to_dict())
 
 
-def delete_page(page_id: int) -> UserPageRecord:
+def delete_user_page(page_id: int) -> UserPageRecord:
     """Delete a page."""
     with get_session() as session:
         orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.id == page_id).first()
@@ -90,7 +90,7 @@ def delete_page(page_id: int) -> UserPageRecord:
         return record
 
 
-def find_exists_or_update_page(
+def find_exists_or_update_user_page(
     title: str,
     lang: str,
     user: str,
@@ -116,7 +116,7 @@ def find_exists_or_update_page(
         return len(result) > 0
 
 
-def insert_page_target(
+def insert_user_page_target(
     sourcetitle: str,
     tr_type: str,
     cat: str,
@@ -156,11 +156,11 @@ def insert_page_target(
 
 
 __all__ = [
-    "list_pages",
-    "add_page",
-    "add_or_update_page",
-    "update_page",
-    "delete_page",
-    "find_exists_or_update_page",
-    "insert_page_target",
+    "list_user_pages",
+    "add_or_update_user_page",
+    "add_user_page",
+    "update_user_page",
+    "delete_user_page",
+    "find_exists_or_update_user_page",
+    "insert_user_page_target",
 ]
