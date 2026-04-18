@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from sqlalchemy import Column, Date, Integer, String, func
+from sqlalchemy import Column, DateTime, Integer, String, func
 
 from ..engine import BaseDb
 
@@ -27,7 +27,7 @@ class _QidRecord(BaseDb):
     id = Column(Integer, primary_key=True, autoincrement=True)
     qid = Column(String(20), nullable=False)
     title = Column(String(255), unique=True, nullable=False)
-    add_date = Column(Date, nullable=False, server_default=func.current_timestamp())
+    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
     def to_dict(self) -> dict:
         return {

@@ -26,7 +26,7 @@ def upsert_user_token(*, user_id: int, username: str, access_key: str, access_se
 
     encrypted_token = encrypt_value(access_key)
     encrypted_secret = encrypt_value(access_secret)
-    now = func.now()
+    now = func.current_timestamp()
 
     with get_session() as session:
         orm_obj = session.query(_UserTokenRecord).filter(_UserTokenRecord.user_id == user_id).first()

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import Column, Date, Integer, LargeBinary, String, func
+from sqlalchemy import Column, Integer, LargeBinary, String, func, DateTime
 
 from ...utils.decode_bytes import coerce_bytes
 from ..engine import BaseDb
@@ -33,16 +33,16 @@ class _UserTokenRecord(BaseDb):
     username = Column(String(255), unique=True, nullable=False)
     access_token = Column(LargeBinary(1024), nullable=False)
     access_secret = Column(LargeBinary(1024), nullable=False)
-    created_at = Column(Date, nullable=True, server_default=func.current_timestamp())
 
+    created_at = Column(DateTime, nullable=False, server_default=func.current_timestamp())
     updated_at = Column(
-        Date,
-        nullable=True,
+        DateTime,
+        nullable=False,
         server_default=func.current_timestamp(),
         server_onupdate=func.current_timestamp(),
     )
-    last_used_at = Column(Date, nullable=True)
-    rotated_at = Column(Date, nullable=True)
+    last_used_at = Column(DateTime, nullable=True, server_default=func.current_timestamp())
+    rotated_at = Column(DateTime, nullable=True)
 
     def to_dict(self) -> dict[str, Any]:
         return {

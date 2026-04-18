@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
-
-from sqlalchemy import Column, Date, Integer, String, func, text
+from sqlalchemy import Column, DateTime, Integer, String, func, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 
@@ -29,10 +27,10 @@ class _InProcessRecord(BaseDb):
     title = Column(String(255), nullable=False)
     user = Column(String(255), nullable=False)
     lang = Column(String(30), nullable=False)
-    cat = Column(String(255), default="RTT", server_default=text("'RTT"))
+    cat = Column(String(255), default="RTT", server_default=text("'RTT'"))
     translate_type = Column(String(20), default="lead", server_default=text("'lead'"))
     word = Column(Integer, default=0, server_default=text("0"))
-    add_date = Column(Date, nullable=False, server_default=func.current_timestamp())
+    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
     def to_dict(self) -> dict:
         return {

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import Column, Date, Integer, String, func, text
+from sqlalchemy import Column, DateTime, Integer, String, func, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 
@@ -26,8 +26,8 @@ class _UserRecord(BaseDb):
     username = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, default="")
     wiki = Column(String(255), nullable=False, default="")
-    user_group = Column(String(120), nullable=False, default="Uncategorized", server_default="Uncategorized")
-    reg_date = Column(Date, nullable=False, server_default=func.current_timestamp())
+    user_group = Column(String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'"))
+    reg_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
     def to_dict(self) -> dict:
         return {

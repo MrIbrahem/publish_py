@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import Column, Date, Integer, String, Text, func
+from sqlalchemy import Column, DateTime, Integer, String, Text, func
 # from sqlalchemy.dialects.mysql import LONGTEXT
 
 from ..engine import BaseDb, LONGTEXT
@@ -29,7 +29,7 @@ class _ReportRecord(BaseDb):
     __tablename__ = "publish_reports"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(Date, nullable=False, server_default=func.current_timestamp())
+    date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
     title = Column(String(255), nullable=False)
     user = Column(String(255), nullable=False)
     lang = Column(String(255), nullable=False)

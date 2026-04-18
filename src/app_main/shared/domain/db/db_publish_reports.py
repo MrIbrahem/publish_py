@@ -191,6 +191,8 @@ class ReportsDB:
                 conditions.append(f"({column} != '' AND {column} IS NOT NULL)")
             elif value in ("mt", "empty"):
                 conditions.append(f"({column} = '' OR {column} IS NULL)")
+            elif value in (">0", "&#62;0"):
+                conditions.append(f"{column} > 0")
             elif str(value).lower() == "all":
                 continue  # Skip this filter
             else:
