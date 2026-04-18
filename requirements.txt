@@ -15,3 +15,5 @@ cachetools
 validators
 sqlalchemy
 flask-sqlalchemy
+ConfigParser
+MySQL-python
