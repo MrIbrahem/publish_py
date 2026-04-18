@@ -63,21 +63,36 @@ def _add_coordinator() -> ResponseReturnValue:
     return redirect(url_for("admin.coordinators_dashboard"))
 
 
-def _update_coordinator_active(coordinator_id: int) -> ResponseReturnValue:
-    """Toggle the active flag for a coordinator."""
+def _activate_coordinator(coordinator_id: int) -> ResponseReturnValue:
+    """Activate a coordinator."""
 
-    desired = request.form.get("is_active", "0") == "1"
     try:
-        record = set_coordinator_active(coordinator_id, desired)
+        record = set_coordinator_active(coordinator_id, True)
     except LookupError as exc:
-        logger.exception("Unable to update coordinator.")
+        logger.exception("Unable to activate coordinator.")
         flash(str(exc), "warning")
     except Exception:  # pragma: no cover - defensive guard
-        logger.exception("Unable to update coordinator.")
-        flash("Unable to update coordinator status. Please try again.", "danger")
+        logger.exception("Unable to activate coordinator.")
+        flash("Unable to activate coordinator. Please try again.", "danger")
     else:
-        state = "activated" if record.is_active else "deactivated"
-        flash(f"Coordinator '{record.username}' {state}.", "success")
+        flash(f"Coordinator '{record.username}' activated.", "success")
+
+    return redirect(url_for("admin.coordinators_dashboard"))
+
+
+def _deactivate_coordinator(coordinator_id: int) -> ResponseReturnValue:
+    """Deactivate a coordinator."""
+
+    try:
+        record = set_coordinator_active(coordinator_id, False)
+    except LookupError as exc:
+        logger.exception("Unable to deactivate coordinator.")
+        flash(str(exc), "warning")
+    except Exception:  # pragma: no cover - defensive guard
+        logger.exception("Unable to deactivate coordinator.")
+        flash("Unable to deactivate coordinator. Please try again.", "danger")
+    else:
+        flash(f"Coordinator '{record.username}' deactivated.", "success")
 
     return redirect(url_for("admin.coordinators_dashboard"))
 
@@ -111,10 +126,15 @@ class Coordinators:
         def add_coordinator() -> ResponseReturnValue:
             return _add_coordinator()
 
-        @bp_admin.post("/coordinators/<int:coordinator_id>/active")
+        @bp_admin.post("/coordinators/<int:coordinator_id>/activate")
         @admin_required
-        def update_coordinator_active(coordinator_id: int) -> ResponseReturnValue:
-            return _update_coordinator_active(coordinator_id)
+        def activate_coordinator(coordinator_id: int) -> ResponseReturnValue:
+            return _activate_coordinator(coordinator_id)
+
+        @bp_admin.post("/coordinators/<int:coordinator_id>/deactivate")
+        @admin_required
+        def deactivate_coordinator(coordinator_id: int) -> ResponseReturnValue:
+            return _deactivate_coordinator(coordinator_id)
 
         @bp_admin.post("/coordinators/<int:coordinator_id>/delete")
         @admin_required
