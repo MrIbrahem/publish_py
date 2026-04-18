@@ -9,8 +9,8 @@ from typing import Optional
 
 from ....config import settings
 from ..db.db_user_tokens import UserTokenDB
-from ..models import UserTokenRecord
 from ..db_service import has_db_config
+from ..models import UserTokenRecord
 
 logger = logging.getLogger(__name__)
 
