@@ -105,3 +105,12 @@ def delete_user_token_by_username(username: str) -> None:
     user_id = store.get_user_id(username)
     if user_id:
         store.delete(user_id)
+
+
+__all__ = [
+    "upsert_user_token",
+    "get_user_token",
+    "delete_user_token",
+    "get_user_token_by_username",
+    "delete_user_token_by_username",
+]

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 _USER_PAGE_STORE: UserPagesDB | None = None
 
 
-def get_pages_db() -> UserPagesDB:
+def get_user_pages_db() -> UserPagesDB:
     global _USER_PAGE_STORE
 
     if _USER_PAGE_STORE is None:
@@ -31,52 +31,52 @@ def get_pages_db() -> UserPagesDB:
     return _USER_PAGE_STORE
 
 
-def list_pages() -> List[UserPageRecord]:
+def list_user_pages() -> List[UserPageRecord]:
     """Return all pages_users while keeping settings.admins in sync."""
 
-    store = get_pages_db()
+    store = get_user_pages_db()
 
     coords = store.list()
     return coords
 
 
-def add_page(title: str, main_file: str) -> UserPageRecord:
+def add_user_page(title: str, main_file: str) -> UserPageRecord:
     """Add a page."""
 
-    store = get_pages_db()
+    store = get_user_pages_db()
     record = store.add(title, main_file)
 
     return record
 
 
-def add_or_update_page(title: str, main_file: str) -> UserPageRecord:
+def add_or_update_user_page(title: str, main_file: str) -> UserPageRecord:
     """Add a page."""
 
-    store = get_pages_db()
+    store = get_user_pages_db()
     record = store.add_or_update(title, main_file)
 
     return record
 
 
-def update_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
+def update_user_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
     """Update page."""
 
-    store = get_pages_db()
+    store = get_user_pages_db()
     record = store.update(page_id, title, main_file)
 
     return record
 
 
-def delete_page(page_id: int) -> UserPageRecord:
+def delete_user_page(page_id: int) -> UserPageRecord:
     """Delete a page."""
 
-    store = get_pages_db()
+    store = get_user_pages_db()
     record = store.delete(page_id)
 
     return record
 
 
-def find_exists_or_update(
+def find_exists_or_update_user_page(
     title: str,
     lang: str,
     user: str,
@@ -84,7 +84,7 @@ def find_exists_or_update(
 ) -> bool:
     """Check if a user_page record exists and update target if empty."""
 
-    store = get_pages_db()
+    store = get_user_pages_db()
     return store._find_exists_or_update(title, lang, user, target)
 
 
@@ -100,7 +100,7 @@ def insert_user_page_target(
 ) -> dict[str, Any]:
     """Insert a user_page target record."""
 
-    store = get_pages_db()
+    store = get_user_pages_db()
     return store.insert_page_target(
         sourcetitle=sourcetitle,
         tr_type=tr_type,
@@ -114,12 +114,11 @@ def insert_user_page_target(
 
 
 __all__ = [
-    "get_pages_db",
-    "list_pages",
-    "add_or_update_page",
-    "add_page",
-    "update_page",
-    "delete_page",
-    "find_exists_or_update",
+    "list_user_pages",
+    "add_or_update_user_page",
+    "add_user_page",
+    "update_user_page",
+    "delete_user_page",
+    "find_exists_or_update_user_page",
     "insert_user_page_target",
 ]
