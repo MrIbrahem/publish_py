@@ -11,7 +11,7 @@ from unittest.mock import MagicMock
 import pymysql
 import pytest
 from src.app_main.admin.domain.db.db_full_translators import FullTranslatorsDB
-from src.app_main.admin.domain.models import FullTranslatorRecord
+from src.app_main.admin.domain.admin_models import FullTranslatorRecord
 from src.app_main.config import DbConfig
 
 

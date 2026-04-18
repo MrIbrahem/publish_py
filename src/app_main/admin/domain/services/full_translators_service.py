@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_full_translators import FullTranslatorsDB
-from ..models import FullTranslatorRecord
+from ..admin_models import FullTranslatorRecord
 
 logger = logging.getLogger(__name__)
 

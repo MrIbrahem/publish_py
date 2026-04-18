@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models import LanguageSettingRecord
+from ..admin_models import LanguageSettingRecord
 
 logger = logging.getLogger(__name__)
 

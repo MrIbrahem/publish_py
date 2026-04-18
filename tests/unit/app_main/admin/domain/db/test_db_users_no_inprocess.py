@@ -11,7 +11,7 @@ from unittest.mock import MagicMock
 import pymysql
 import pytest
 from src.app_main.admin.domain.db.db_users_no_inprocess import UsersNoInprocessDB
-from src.app_main.admin.domain.models import UsersNoInprocessRecord
+from src.app_main.admin.domain.admin_models import UsersNoInprocessRecord
 from src.app_main.config import DbConfig
 
 

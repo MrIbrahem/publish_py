@@ -4,7 +4,7 @@ Unit tests for domain.models.coordinator module.
 Tests for CoordinatorRecord.
 """
 
-from src.app_main.admin.domain.models import (
+from src.app_main.admin.domain.admin_models import (
     CoordinatorRecord,
 )
 
