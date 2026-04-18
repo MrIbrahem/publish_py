@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from ....config import DbConfig
 from ...core.db_driver import Database
-from ..models.report import ReportRecord
+from ..models import ReportRecord
 
 logger = logging.getLogger(__name__)
 

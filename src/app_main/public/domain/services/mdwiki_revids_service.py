@@ -8,7 +8,7 @@ from typing import List
 from ....config import settings
 from ....shared.domain.db_service import has_db_config
 from ..db.db_mdwiki_revids import MdwikiRevidsDB
-from ..models.mdwiki_revid import MdwikiRevidRecord
+from ..models import MdwikiRevidRecord
 
 logger = logging.getLogger(__name__)
 

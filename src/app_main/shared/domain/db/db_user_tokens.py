@@ -9,7 +9,7 @@ from typing import Any, List
 from ....config import DbConfig
 from ...core.crypto import encrypt_value
 from ...core.db_driver import Database
-from ..models.user_token import UserTokenRecord
+from ..models import UserTokenRecord
 
 logger = logging.getLogger(__name__)
 
