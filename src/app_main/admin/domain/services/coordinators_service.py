@@ -9,7 +9,7 @@ from typing import List
 from ....config import settings
 from ....shared.domain.db_service import has_db_config
 from ..db.db_coordinators import CoordinatorsDB
-from ..models.coordinator import CoordinatorRecord
+from ..models import CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 

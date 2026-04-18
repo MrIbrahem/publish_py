@@ -8,7 +8,7 @@ from typing import Any, List
 from ....config import settings
 from ....shared.domain.db_service import has_db_config
 from ..db.db_settings import SettingsDB
-from ..models.setting import SettingRecord
+from ..models import SettingRecord
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ Unit tests for domain.models.setting module.
 Tests for SettingRecord.
 """
 
-from src.app_main.admin.domain.models.setting import (
+from src.app_main.admin.domain.models import (
     SettingRecord,
 )
 
