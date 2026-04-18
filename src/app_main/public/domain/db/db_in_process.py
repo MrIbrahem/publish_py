@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models.in_process import InProcessRecord
+from ..models import InProcessRecord
 
 logger = logging.getLogger(__name__)
 
