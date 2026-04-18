@@ -20,6 +20,14 @@ class DbConfig:
     db_user: str | None
     db_password: str | None
 
+    def to_dict(self) -> dict:
+        return {
+            "db_name": self.db_name,
+            "db_host": self.db_host,
+            "db_user": self.db_user,
+            "db_password": self.db_password,
+        }
+
 
 @dataclass(frozen=True)
 class Paths:
