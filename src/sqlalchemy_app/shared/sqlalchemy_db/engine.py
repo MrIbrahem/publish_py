@@ -63,10 +63,7 @@ def build_db_url(db_data: dict[str, str]) -> str:
     db_password = db_data["db_password"]
     db_host = db_data["db_host"]
     db_name = db_data["db_name"]
-    # return f"mysql+mysqldb://{db_user}:{db_password}@{db_host}/{db_name}"
-    return f"mysql://{db_user}:{db_password}@{db_host}/{db_name}"
-
-
+    return f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
 
 
 def build_engine(db_url: str) -> Engine:
