@@ -165,6 +165,13 @@ def create_side(active_route):
                 icon="bi-gear",
             ),
             SidebarItem(
+                id="lang_settings",
+                admin=1,
+                href="language_settings",
+                title="Language Settings",
+                icon="bi-translate",
+            ),
+            SidebarItem(
                 id="categories",
                 admin=0,
                 href="categories",
