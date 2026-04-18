@@ -7,7 +7,7 @@ Tests for db_service compatibility functions.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.services.db_service import (
+from src.app_main.shared.domain.db_service import (
     close_cached_db,
     execute_query,
     execute_query_safe,
@@ -53,7 +53,7 @@ class TestCloseCachedDb:
         close_cached_db()
 
         mock_db.close.assert_called_once()
-        from src.app_main.shared.domain.services import db_service
+        from src.app_main.shared.domain import db_service
 
         assert db_service._db is None
 
@@ -63,7 +63,7 @@ class TestCloseCachedDb:
 
         close_cached_db()
 
-        from src.app_main.shared.domain.services import db_service
+        from src.app_main.shared.domain import db_service
 
         assert db_service._db is None
 

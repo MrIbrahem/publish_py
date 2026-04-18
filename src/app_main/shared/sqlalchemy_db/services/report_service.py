@@ -69,6 +69,15 @@ def query_reports_with_filters(
     limit: Optional[int] = None,
 ) -> List[ReportRecord]:
     """Query reports with dynamic filtering."""
+
+    COLUMN_MAP = {
+        "title": _ReportRecord.title,
+        "user": _ReportRecord.user,
+        "lang": _ReportRecord.lang,
+        "sourcetitle": _ReportRecord.sourcetitle,
+        "result": _ReportRecord.result,
+    }
+
     with get_session() as session:
         query = session.query(_ReportRecord)
 
@@ -84,29 +93,19 @@ def query_reports_with_filters(
             elif name == "month":
                 # query = query.filter(func.month(_ReportRecord.date) == value)
                 query = query.filter(extract('month', _ReportRecord.date) == value)
-
-            elif name == "title":
-                query = query.filter(_ReportRecord.title == value)
-
-            elif name == "user":
-                query = query.filter(_ReportRecord.user == value)
-
-            elif name == "lang":
-                query = query.filter(_ReportRecord.lang == value)
-
-            elif name == "sourcetitle":
-                query = query.filter(_ReportRecord.sourcetitle == value)
-
-            elif name == "result":
+            elif name in COLUMN_MAP:
+                # to match ReportsDB methods
+                column = COLUMN_MAP[name]
                 if value in ("not_mt", "not_empty"):
-                    query = query.filter(_ReportRecord.result != "", _ReportRecord.result.isnot(None))
+                    query = query.filter(column != "", column.isnot(None))
                 elif value in ("mt", "empty"):
-                    query = query.filter((_ReportRecord.result == "") | (_ReportRecord.result.is_(None)))
+                    query = query.filter((column == "") | (column.is_(None)))
                 elif value in (">0", "&#62;0"):
+                    # query = query.filter(column > 0)
                     # This seems to be for numeric results if any?
                     pass
                 else:
-                    query = query.filter(_ReportRecord.result == value)
+                    query = query.filter(column == value)
 
         query = query.order_by(_ReportRecord.id.desc())
 

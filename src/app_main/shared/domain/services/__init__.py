@@ -2,7 +2,7 @@
 Shared db services, used in both admin and public blueprints
 """
 
-from .db_service import (
+from ..db_service import (
     close_cached_db,
     fetch_query_safe,
     get_db,
