@@ -35,6 +35,7 @@ from .publish_reports_service import (
     add_report,
     delete_report,
     list_publish_reports,
+    publish_reports_query_with_filters,
 )
 
 __all__ = [
@@ -60,6 +61,7 @@ __all__ = [
     "add_report",
     "delete_report",
     "list_publish_reports",
+    "publish_reports_query_with_filters",
 
     # pages_users_service
     "list_user_pages",

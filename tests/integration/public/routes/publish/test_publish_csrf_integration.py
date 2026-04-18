@@ -56,7 +56,7 @@ class TestPublishEndpointWithDenyCSRF:
         with (
             patch("src.app_main.shared.core.cors.is_allowed_checker.is_allowed") as mock_deny,
             patch("src.app_main.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.app_main.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
             mock_deny.return_value = None
             mock_get_token.return_value = None
@@ -100,7 +100,7 @@ class TestPublishEndpointWithCSRF2:
         with (
             patch("src.app_main.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
 
@@ -160,7 +160,7 @@ class BasePublishTest:
             patch("src.app_main.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.app_main.public.routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.app_main.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_load_reports_db,
             patch("src.app_main.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
             patch("src.app_main.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
             patch("src.app_main.public.routes.publish.worker.insert_page_target") as mock_insert_page,
@@ -186,7 +186,7 @@ class BasePublishTest:
                 "edit": mock_edit,
                 "link": mock_link,
                 "to_do": mock_to_do,
-                "load_reports_db": mock_load_reports_db,
+                "add_report": mock_load_reports_db,
                 "should_add": mock_should_add,
                 "find_exists_or_update_page": mock_find_exists,
                 "insert_page_target": mock_insert_page,

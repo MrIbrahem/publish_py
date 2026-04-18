@@ -2,7 +2,6 @@
 Post/Publish endpoint worker for Content Translation.
 """
 
-import functools
 import json
 import logging
 from typing import Any
@@ -15,8 +14,8 @@ from ....shared.clients import (
     link_to_wikidata,
     publish_do_edit,
 )
-from ....shared.domain.db import ReportsDB
 from ....shared.domain.services import (
+    add_report,
     find_exists_or_update_page,
     get_user_token_by_username,
     insert_page_target,
@@ -32,12 +31,6 @@ from ....shared.utils.helpers import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-@functools.lru_cache(maxsize=1)
-def load_reports_db() -> ReportsDB:
-    reports_db = ReportsDB(settings.database_data)
-    return reports_db
 
 
 def _get_revid(sourcetitle) -> str:
@@ -200,8 +193,7 @@ def _handle_successful_edit(
         to_do(tab3, file_name)
 
         # Insert to reports
-        reports_db = load_reports_db()
-        reports_db.add(
+        add_report(
             title=title,
             user=user,
             lang=lang,
@@ -488,10 +480,7 @@ def _process_edit(
     tab["result_to_cx"] = editit
     to_do(tab, to_do_file)
 
-    # Insert to reports
-    reports_db = load_reports_db()
-
-    reports_db.add(
+    add_report(
         title=title,
         user=user,
         lang=lang,
@@ -522,10 +511,7 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
     tab["result_to_cx"] = editit
     to_do(tab, "noaccess")
 
-    # Insert to reports
-    reports_db = load_reports_db()
-
-    reports_db.add(
+    add_report(
         title=tab["title"],
         user=user,
         lang=tab["lang"],

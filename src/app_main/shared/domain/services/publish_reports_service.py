@@ -5,7 +5,7 @@ Utilities for managing publish_reports
 from __future__ import annotations
 
 import logging
-from typing import List
+from typing import Any, Dict, List, Optional
 
 from ....config import settings
 from ..db.db_publish_reports import ReportsDB
@@ -49,6 +49,17 @@ def add_report(
     return record
 
 
+def publish_reports_query_with_filters(
+    filters: Dict[str, Any],
+    select_fields: Optional[List[str]] = None,
+    limit: Optional[int] = None,
+) -> List[ReportRecord]:
+    store = get_publish_reports_db()
+    records = store.query_with_filters(filters, select_fields, limit)
+
+    return records
+
+
 def delete_report(report_id: int) -> None:
     """Delete a report."""
 
@@ -69,4 +80,5 @@ __all__ = [
     "add_report",
     "delete_report",
     "list_publish_reports",
+    "publish_reports_query_with_filters",
 ]
