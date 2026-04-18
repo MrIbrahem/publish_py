@@ -4,7 +4,7 @@ Unit tests for domain.models.views_new module.
 Tests for ViewsNewRecord.
 """
 
-from src.app_main.public.domain.models.views_new import (
+from src.app_main.public.domain.models import (
     ViewsNewRecord,
 )
 

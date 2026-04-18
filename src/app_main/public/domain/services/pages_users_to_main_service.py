@@ -6,9 +6,9 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.services.db_service import has_db_config
+from ....shared.domain.db_service import has_db_config
 from ..db.db_pages_users_to_main import PagesUsersToMainDB
-from ..models.pages_users_to_main import PagesUsersToMainRecord
+from ..models import PagesUsersToMainRecord
 
 logger = logging.getLogger(__name__)
 

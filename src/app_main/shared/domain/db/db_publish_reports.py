@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from ....config import DbConfig
 from ...core.db_driver import Database
-from ..models.report import ReportRecord
+from ..models import ReportRecord
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ PUBLISH_REPORTS_PARAMS = [
     {"name": "result", "column": "result", "type": "text"},
 ]
 
-ReportsDB_VALID_COLUMNS = frozenset(
+ReportsDB_COLUMNS = frozenset(
     {
         "id",
         "date",
@@ -177,7 +177,7 @@ class ReportsDB:
             column = param_def["column"]
 
             # Validate column is in the trusted allowlist (defense in depth)
-            if column not in ReportsDB_VALID_COLUMNS:
+            if column not in ReportsDB_COLUMNS:
                 logger.warning(f"Skipping unrecognized column: {column}")
                 continue
 

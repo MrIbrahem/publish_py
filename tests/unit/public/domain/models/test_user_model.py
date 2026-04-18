@@ -6,7 +6,7 @@ Tests for UserRecord.
 
 from datetime import datetime
 
-from src.app_main.public.domain.models.user import (
+from src.app_main.public.domain.models import (
     UserRecord,
 )
 

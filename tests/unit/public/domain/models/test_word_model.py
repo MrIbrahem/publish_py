@@ -4,7 +4,7 @@ Unit tests for domain.models.word module.
 Tests for WordRecord.
 """
 
-from src.app_main.public.domain.models.word import (
+from src.app_main.public.domain.models import (
     WordRecord,
 )
 

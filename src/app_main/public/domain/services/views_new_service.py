@@ -6,9 +6,9 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.services.db_service import has_db_config
+from ....shared.domain.db_service import has_db_config
 from ..db.db_views_new import ViewsNewDB
-from ..models.views_new import ViewsNewRecord
+from ..models import ViewsNewRecord
 
 logger = logging.getLogger(__name__)
 

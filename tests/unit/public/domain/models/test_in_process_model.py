@@ -6,7 +6,7 @@ Tests for InProcessRecord.
 
 from datetime import datetime
 
-from src.app_main.public.domain.models.in_process import (
+from src.app_main.public.domain.models import (
     InProcessRecord,
 )
 

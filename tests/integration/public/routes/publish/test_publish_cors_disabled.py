@@ -55,13 +55,10 @@ class TestPostEndpoint:
         with (
             patch("src.app_main.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.app_main.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
-
-            # Mock database
-            mock_reports_instance = MagicMock()
-            mock_load_reports_db.return_value = mock_reports_instance
+            mock_load_reports_db.return_value = None
 
             response = client.post(
                 "/publish",
@@ -106,9 +103,9 @@ class TestPostEndpoint:
             patch("src.app_main.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.app_main.public.routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.app_main.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_load_reports_db,
             patch("src.app_main.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.app_main.public.routes.publish.worker.find_exists_or_update") as mock_find_exists,
+            patch("src.app_main.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
             patch("src.app_main.public.routes.publish.worker.insert_page_target") as mock_insert_page,
             patch("src.app_main.public.routes.publish.worker.get_campaign_category") as mock_get_campaign_category,
         ):
@@ -130,9 +127,7 @@ class TestPostEndpoint:
             # Mock Wikidata link
             mock_link.return_value = {"result": "success", "qid": "Q123"}
 
-            # Mock database operations
-            mock_reports_instance = MagicMock()
-            mock_load_reports_db.return_value = mock_reports_instance
+            mock_load_reports_db.return_value = None
 
             response = client.post(
                 "/publish",
@@ -160,7 +155,7 @@ class TestPostEndpoint:
             patch("src.app_main.public.routes.publish.worker.do_changes_to_text") as mock_changes,
             patch("src.app_main.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.app_main.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.app_main.public.routes.publish.worker.load_reports_db") as mock_load_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
             # Mock user token
             mock_token = MagicMock()
@@ -176,9 +171,7 @@ class TestPostEndpoint:
             # Mock captcha response
             mock_edit.return_value = {"edit": {"captcha": {"id": "123", "type": "image"}}}
 
-            # Mock database
-            mock_reports_instance = MagicMock()
-            mock_load_reports_db.return_value = mock_reports_instance
+            mock_load_reports_db.return_value = None
 
             response = client.post(
                 "/publish",

@@ -4,7 +4,7 @@ Unit tests for domain.models.translate_type module.
 Tests for TranslateTypeRecord.
 """
 
-from src.app_main.public.domain.models.translate_type import (
+from src.app_main.public.domain.models import (
     TranslateTypeRecord,
 )
 

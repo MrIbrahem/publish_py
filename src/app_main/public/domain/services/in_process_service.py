@@ -6,9 +6,9 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.services.db_service import has_db_config
+from ....shared.domain.db_service import has_db_config
 from ..db.db_in_process import InProcessDB
-from ..models.in_process import InProcessRecord
+from ..models import InProcessRecord
 
 logger = logging.getLogger(__name__)
 

@@ -23,7 +23,7 @@ from src.app_main.shared.domain.services.pages_service import (
     add_or_update_page,
     add_page,
     delete_page,
-    find_exists_or_update,
+    find_exists_or_update_page,
     get_pages_db,
     insert_page_target,
     list_pages,
@@ -103,7 +103,7 @@ class TestPagesServiceIntegration:
             mock_db.add_or_update.assert_called_once_with("TestPage", "TestFile")
 
     def test_find_exists_or_update_integration(self, monkeypatch):
-        """Test find_exists_or_update through service layer."""
+        """Test find_exists_or_update_page through service layer."""
         mock_db = MagicMock()
 
         with patch("src.app_main.shared.domain.services.pages_service.PagesDB") as MockPagesDB:
@@ -112,12 +112,12 @@ class TestPagesServiceIntegration:
 
             # Test when record exists
             mock_db._find_exists_or_update.return_value = True
-            result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target")
+            result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
             assert result is True
 
             # Test when record doesn't exist
             mock_db._find_exists_or_update.return_value = False
-            result = find_exists_or_update("NewTitle", "ar", "TestUser", "Target")
+            result = find_exists_or_update_page("NewTitle", "ar", "TestUser", "Target")
             assert result is False
 
     def test_insert_page_target_integration(self, monkeypatch):

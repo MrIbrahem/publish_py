@@ -5,8 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from ....config import settings
-from ...core.db_driver import Database
+from ...config import settings
+from ..core.db_driver import Database
 
 _db: Database | None = None
 

@@ -112,9 +112,9 @@ class TestValidateAccessOnPublish:
                 "src.app_main.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.app_main.public.routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_reports_db,
         ):
-            mock_reports_db.return_value = MagicMock()
+            mock_reports_db.return_value = None
 
             response = client.post(
                 "/publish/",
@@ -143,9 +143,9 @@ class TestValidateAccessOnPublish:
                 "src.app_main.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.app_main.public.routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_reports_db,
         ):
-            mock_reports_db.return_value = MagicMock()
+            mock_reports_db.return_value = None
 
             response = client.post(
                 "/publish/",
@@ -175,9 +175,9 @@ class TestValidateAccessOnPublish:
                 "src.app_main.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.app_main.public.routes.publish.worker.ReportsDB") as mock_reports_db,
+            patch("src.app_main.public.routes.publish.worker.add_report") as mock_reports_db,
         ):
-            mock_reports_db.return_value = MagicMock()
+            mock_reports_db.return_value = None
 
             response = client.post(
                 "/publish/",

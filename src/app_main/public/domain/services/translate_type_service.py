@@ -6,9 +6,9 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.services.db_service import has_db_config
+from ....shared.domain.db_service import has_db_config
 from ..db.db_translate_type import TranslateTypeDB
-from ..models.translate_type import TranslateTypeRecord
+from ..models import TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
 

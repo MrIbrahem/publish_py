@@ -10,7 +10,7 @@ from typing import List
 from ....config import settings
 from ..db.db_categories import CategoriesDB
 from ..models import CategoryRecord
-from .db_service import has_db_config
+from ..db_service import has_db_config
 
 logger = logging.getLogger(__name__)
 
@@ -90,8 +90,8 @@ def list_categories() -> List[CategoryRecord]:
 
     store = get_categories_db()
 
-    coords = store.list()
-    return coords
+    pages = store.list()
+    return pages
 
 
 def get_camp_to_cats() -> dict[str, str]:

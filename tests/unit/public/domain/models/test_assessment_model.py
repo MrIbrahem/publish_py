@@ -4,7 +4,7 @@ Unit tests for domain.models.assessment module.
 Tests for AssessmentRecord.
 """
 
-from src.app_main.public.domain.models.assessment import (
+from src.app_main.public.domain.models import (
     AssessmentRecord,
 )
 

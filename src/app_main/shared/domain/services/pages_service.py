@@ -7,8 +7,8 @@ from typing import Any, List
 
 from ....config import settings
 from ..db.db_pages import PagesDB
-from ..models.page import PageRecord
-from .db_service import has_db_config
+from ..models import PageRecord
+from ..db_service import has_db_config
 
 logger = logging.getLogger(__name__)
 
@@ -32,12 +32,12 @@ def get_pages_db() -> PagesDB:
 
 
 def list_pages() -> List[PageRecord]:
-    """Return all pages while keeping settings.admins in sync."""
+    """Return all pages records."""
 
     store = get_pages_db()
 
-    coords = store.list()
-    return coords
+    pages = store.list()
+    return pages
 
 
 def add_page(title: str, main_file: str) -> PageRecord:
@@ -76,7 +76,7 @@ def delete_page(page_id: int) -> PageRecord:
     return record
 
 
-def find_exists_or_update(
+def find_exists_or_update_page(
     title: str,
     lang: str,
     user: str,
@@ -120,6 +120,6 @@ __all__ = [
     "add_page",
     "update_page",
     "delete_page",
-    "find_exists_or_update",
+    "find_exists_or_update_page",
     "insert_page_target",
 ]

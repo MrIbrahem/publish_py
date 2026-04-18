@@ -9,7 +9,7 @@ import pymysql
 
 from ....config import DbConfig
 from ...core.db_driver import Database
-from ..models.user_page import UserPageRecord
+from ..models import UserPageRecord
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +134,7 @@ class UserPagesDB:
         target: str,
         mdwiki_revid: int | None = None,
         word: int = 0,
-    ) -> dict[str, Any]:
+    ) -> bool:
         """
         Insert a page target record.
 
