@@ -111,12 +111,19 @@ def find_exists_or_update_user_page(
         )
 
         if orm_objs:
+            changed = False
             for obj in orm_objs:
                 # Update target if it's empty or NULL
                 if not obj.target:
                     obj.target = target
                     obj.pupdate = func.current_date()
-            session.commit()
+                    changed = True
+            if changed:
+                try:
+                    session.commit()
+                except Exception as e:
+                    logger.error(f"Failed to update page target: {e}")
+                    session.rollback()
 
         return len(orm_objs) > 0
 
