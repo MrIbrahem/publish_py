@@ -8,7 +8,7 @@ from typing import List
 from ....config import settings
 from ....shared.domain.db_service import has_db_config
 from ..db.db_users_no_inprocess import UsersNoInprocessDB
-from ..models.users_no_inprocess import UsersNoInprocessRecord
+from ..models import UsersNoInprocessRecord
 
 logger = logging.getLogger(__name__)
 

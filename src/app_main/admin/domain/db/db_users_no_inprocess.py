@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models.users_no_inprocess import UsersNoInprocessRecord
+from ..models import UsersNoInprocessRecord
 
 logger = logging.getLogger(__name__)
 
