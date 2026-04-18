@@ -13,6 +13,8 @@ from flask import (
 )
 
 from .coordinators import Coordinators
+from .full_translators import FullTranslators
+from .language_settings import LanguageSettings
 
 # from ..admin_routes import (
 #     Coordinators,
@@ -22,6 +24,7 @@ from .coordinators import Coordinators
 # )
 from .decorators import admin_required
 from .settings import SettingsRoutes
+from .users_no_inprocess import UsersNoInprocess
 from .sidebar import create_side
 
 logger = logging.getLogger(__name__)
@@ -46,6 +49,9 @@ def index():
 
 def register_blueprints(bp_admin) -> None:
     Coordinators(bp_admin)
+    FullTranslators(bp_admin)
+    UsersNoInprocess(bp_admin)
+    LanguageSettings(bp_admin)
     # Templates(bp_admin)
     SettingsRoutes(bp_admin)
     # Jobs(bp_admin)
