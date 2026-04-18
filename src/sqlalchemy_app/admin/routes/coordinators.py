@@ -63,38 +63,32 @@ def _add_coordinator() -> ResponseReturnValue:
     return redirect(url_for("admin.coordinators_dashboard"))
 
 
-def _activate_coordinator(coordinator_id: int) -> ResponseReturnValue:
-    """Activate a coordinator."""
-
+def _set_coordinator_active_status(coordinator_id: int, is_active: bool) -> ResponseReturnValue:
+    """Shared helper to update coordinator active status."""
+    action = "activate" if is_active else "deactivate"
+    past_tense = "activated" if is_active else "deactivated"
     try:
-        record = set_coordinator_active(coordinator_id, True)
+        record = set_coordinator_active(coordinator_id, is_active)
     except LookupError as exc:
-        logger.exception("Unable to activate coordinator.")
+        logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
     except Exception:  # pragma: no cover - defensive guard
-        logger.exception("Unable to activate coordinator.")
-        flash("Unable to activate coordinator. Please try again.", "danger")
+        logger.exception(f"Unable to {action} coordinator.")
+        flash(f"Unable to {action} coordinator. Please try again.", "danger")
     else:
-        flash(f"Coordinator '{record.username}' activated.", "success")
+        flash(f"Coordinator '{record.username}' {past_tense}.", "success")
 
     return redirect(url_for("admin.coordinators_dashboard"))
+
+
+def _activate_coordinator(coordinator_id: int) -> ResponseReturnValue:
+    """Activate a coordinator."""
+    return _set_coordinator_active_status(coordinator_id, True)
 
 
 def _deactivate_coordinator(coordinator_id: int) -> ResponseReturnValue:
     """Deactivate a coordinator."""
-
-    try:
-        record = set_coordinator_active(coordinator_id, False)
-    except LookupError as exc:
-        logger.exception("Unable to deactivate coordinator.")
-        flash(str(exc), "warning")
-    except Exception:  # pragma: no cover - defensive guard
-        logger.exception("Unable to deactivate coordinator.")
-        flash("Unable to deactivate coordinator. Please try again.", "danger")
-    else:
-        flash(f"Coordinator '{record.username}' deactivated.", "success")
-
-    return redirect(url_for("admin.coordinators_dashboard"))
+    return _set_coordinator_active_status(coordinator_id, False)
 
 
 def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
