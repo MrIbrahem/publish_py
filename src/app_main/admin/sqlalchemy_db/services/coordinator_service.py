@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
 from ...domain.models.coordinator import CoordinatorRecord
-from ..models.coordinator import _CoordinatorRecord
+from ..models import _CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 

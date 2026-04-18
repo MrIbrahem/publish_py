@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
 from ...domain.models.full_translator import FullTranslatorRecord
-from ..models.full_translator import _FullTranslatorRecord
+from ..models import _FullTranslatorRecord
 
 logger = logging.getLogger(__name__)
 

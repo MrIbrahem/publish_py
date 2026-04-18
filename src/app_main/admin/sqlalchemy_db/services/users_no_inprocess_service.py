@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
 from ...domain.models.users_no_inprocess import UsersNoInprocessRecord
-from ..models.users_no_inprocess import _UsersNoInprocessRecord
+from ..models import _UsersNoInprocessRecord
 
 logger = logging.getLogger(__name__)
 
