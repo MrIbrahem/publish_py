@@ -6,7 +6,6 @@ from typing import Any
 
 from ..utils.decode_bytes import coerce_bytes
 
-
 logger = logging.getLogger(__name__)
 
 

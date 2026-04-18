@@ -9,8 +9,8 @@ from typing import List
 
 from ....config import settings
 from ..db.db_categories import CategoriesDB
-from ..models import CategoryRecord
 from ..db_service import has_db_config
+from ..models import CategoryRecord
 
 logger = logging.getLogger(__name__)
 

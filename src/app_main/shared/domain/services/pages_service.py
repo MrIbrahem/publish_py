@@ -7,8 +7,8 @@ from typing import Any, List
 
 from ....config import settings
 from ..db.db_pages import PagesDB
-from ..models import PageRecord
 from ..db_service import has_db_config
+from ..models import PageRecord
 
 logger = logging.getLogger(__name__)
 

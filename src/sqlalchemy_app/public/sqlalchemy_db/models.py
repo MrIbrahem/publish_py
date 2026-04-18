@@ -1,10 +1,10 @@
 """
 Public domain models.
 """
+
 from __future__ import annotations
 
-
-from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint, func, text, DateTime
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, func, text
 
 from ...shared.sqlalchemy_db.engine import BaseDb
 

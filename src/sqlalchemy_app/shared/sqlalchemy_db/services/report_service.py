@@ -7,9 +7,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import func, text
+from sqlalchemy import extract, func, text
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import extract
 
 from ...domain_models import ReportRecord
 from ..engine import get_session
@@ -88,11 +87,11 @@ def query_reports_with_filters(
             # Year/Month filters
             if name == "year":
                 # query = query.filter(func.year(_ReportRecord.date) == value)
-                query = query.filter(extract('year', _ReportRecord.date) == value)
+                query = query.filter(extract("year", _ReportRecord.date) == value)
 
             elif name == "month":
                 # query = query.filter(func.month(_ReportRecord.date) == value)
-                query = query.filter(extract('month', _ReportRecord.date) == value)
+                query = query.filter(extract("month", _ReportRecord.date) == value)
             elif name in COLUMN_MAP:
                 # to match ReportsDB methods
                 column = COLUMN_MAP[name]

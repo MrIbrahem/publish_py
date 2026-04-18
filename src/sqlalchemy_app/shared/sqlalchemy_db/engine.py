@@ -7,11 +7,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import create_engine
+from sqlalchemy import Text, create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
-
-from sqlalchemy import Text
 from sqlalchemy.types import TypeDecorator
 
 logger = logging.getLogger(__name__)
@@ -19,14 +17,17 @@ logger = logging.getLogger(__name__)
 
 class LONGTEXT(TypeDecorator):
     """LONGTEXT for MySQL, Text for everything else."""
+
     impl = Text
     cache_ok = True
 
     def load_dialect_impl(self, dialect):
         if dialect.name == "mysql":
             from sqlalchemy.dialects.mysql import LONGTEXT
+
             return dialect.type_descriptor(LONGTEXT())
         return dialect.type_descriptor(Text())
+
 
 # ---------------------------------------------------------------------------
 # 1. Model — replaces coordinator_model.py + CREATE TABLE

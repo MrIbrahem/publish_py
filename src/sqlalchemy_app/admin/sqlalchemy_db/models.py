@@ -3,11 +3,13 @@ Admin domain models.
 """
 
 from __future__ import annotations
+
 import logging
 
 from sqlalchemy import Column, Enum, Integer, String, text
+
 # from sqlalchemy.dialects.mysql import LONGTEXT
-from ...shared.sqlalchemy_db.engine import BaseDb, LONGTEXT
+from ...shared.sqlalchemy_db.engine import LONGTEXT, BaseDb
 
 logger = logging.getLogger(__name__)
 

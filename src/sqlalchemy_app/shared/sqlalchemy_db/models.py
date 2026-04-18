@@ -3,12 +3,10 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import Column, Date, Integer, LargeBinary, String, func, text, DateTime
-
-from .engine import BaseDb, LONGTEXT
+from sqlalchemy import Column, Date, DateTime, Integer, LargeBinary, String, func, text
 
 from ..utils.decode_bytes import coerce_bytes
-
+from .engine import LONGTEXT, BaseDb
 
 logger = logging.getLogger(__name__)
 

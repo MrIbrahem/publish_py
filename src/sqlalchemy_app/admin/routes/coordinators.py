@@ -15,10 +15,10 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ..sqlalchemy_db.services.coordinator_service import (
-    list_coordinators,
     add_coordinator,
-    set_coordinator_active,
     delete_coordinator,
+    list_coordinators,
+    set_coordinator_active,
 )
 from .decorators import admin_required
 

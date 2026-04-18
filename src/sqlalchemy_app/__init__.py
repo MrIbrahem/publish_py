@@ -11,11 +11,10 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request  # , g
 
-from .shared.sqlalchemy_db.engine import init_db, build_db_url
-from .admin.sqlalchemy_db.services.coordinator_service import active_coordinators
 from .admin.routes.admin import (
     bp_admin,
 )
+from .admin.sqlalchemy_db.services.coordinator_service import active_coordinators
 from .config import settings
 from .public.routes import (
     bp_api,
@@ -28,6 +27,7 @@ from .public.routes import (
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
+from .shared.sqlalchemy_db.engine import build_db_url, init_db
 
 logger = logging.getLogger(__name__)
 
