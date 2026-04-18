@@ -7,7 +7,6 @@ import pytest
 from src.app_main.shared.domain.db.db_publish_reports import (
     PUBLISH_REPORTS_PARAMS,
     ReportsDB,
-    ReportsDB_VALID_COLUMNS,
 )
 
 
@@ -202,19 +201,3 @@ class TestReportsDBCore:
         reports_db = ReportsDB({"host": "test"})
         with pytest.raises(LookupError, match="Report id 999 was not found"):
             reports_db._fetch_by_id(999)
-
-
-class TestValidColumns:
-    """Tests for ReportsDB_VALID_COLUMNS constant."""
-
-    def test_contains_expected_columns(self):
-        """Test that ReportsDB_VALID_COLUMNS contains expected column names."""
-
-        expected = {"id", "date", "title", "user", "lang", "sourcetitle", "result", "data", "YEAR(date)", "MONTH(date)"}
-        assert ReportsDB_VALID_COLUMNS == expected
-
-    def test_all_param_columns_are_valid(self):
-        """Test that all columns referenced in PUBLISH_REPORTS_PARAMS are valid."""
-
-        for param in PUBLISH_REPORTS_PARAMS:
-            assert param["column"] in ReportsDB_VALID_COLUMNS

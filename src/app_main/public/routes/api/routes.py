@@ -8,9 +8,8 @@ from typing import Any, Dict
 
 from flask import Blueprint, Response, jsonify, request
 
-from ....config import settings
+from ....shared.domain.services.publish_reports_service import publish_reports_query_with_filters
 from ....shared.core.cors import check_cors
-from ....shared.domain.db.db_publish_reports import ReportsDB
 from ....shared.utils.web_utils import parse_select_fields
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
@@ -79,10 +78,9 @@ def get_publish_reports() -> Response:
 
     try:
         # Query database
-        db = ReportsDB(settings.database_data)
-        records = db.query_with_filters(filters, select_fields, limit)
+        records = publish_reports_query_with_filters(filters, select_fields, limit)
 
-    except Exception as e:
+    except Exception:
         logger.exception("Error fetching publish_reports")
         # Return generic error message to avoid exposing internal details
         return jsonify({"error": "An internal error occurred while fetching reports"}), 500
