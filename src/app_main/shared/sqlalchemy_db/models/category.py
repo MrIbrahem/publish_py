@@ -31,7 +31,7 @@ class _CategoryRecord(BaseDb):
     campaign = Column(String(120), nullable=False, default="")
     display = Column(String(120), nullable=False, default="")
     category2 = Column(String(120), nullable=False, default="")
-    depth = Column(Integer, nullable=False, default=0)
+    depth = Column(Integer, nullable=False, default=0, server_default=text("0"))
     is_default = Column(Integer, nullable=False, default=0)
 
     def to_dict(self) -> dict:

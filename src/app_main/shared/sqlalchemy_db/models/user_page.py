@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import Column, Date, Integer, String, func
+from sqlalchemy import Column, Date, Integer, String, func, text
+from sqlalchemy.dialects.mysql import INTEGER
 
 from ..engine import BaseDb
 
@@ -14,7 +15,7 @@ class _UserPageRecord(BaseDb):
         title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
         word int DEFAULT NULL,
         translate_type varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-        cat varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        cat varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         lang varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         user varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         target varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -42,7 +43,7 @@ class _UserPageRecord(BaseDb):
     date = Column(Date, nullable=True)
     pupdate = Column(String(120), nullable=True)
     add_date = Column(Date, nullable=False, server_default=func.current_timestamp())
-    deleted = Column(Integer, default=0)
+    deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
     mdwiki_revid = Column(Integer, nullable=True)
 
     def to_dict(self) -> dict[str, Any]:
