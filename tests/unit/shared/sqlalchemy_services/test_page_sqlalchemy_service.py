@@ -8,7 +8,7 @@ from src.app_main.shared.sqlalchemy_db.services.page_service import (
     add_or_update_page,
     add_page,
     delete_page,
-    find_exists_or_update,
+    find_exists_or_update_page,
     insert_page_target,
     list_pages,
     update_page,
@@ -42,7 +42,7 @@ def test_page_workflow():
         orm_p.user = "user1"
         orm_p.target = ""
         session.commit()
-    assert find_exists_or_update("new_title", "en", "user1", "found_target") is True
+    assert find_exists_or_update_page("new_title", "en", "user1", "found_target") is True
     success = insert_page_target("new_p", "lead", "cat", "fr", "user2", "target_fr", "pages")
     assert success is True
     delete_page(p.id)

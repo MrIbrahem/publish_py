@@ -23,7 +23,7 @@ from src.app_main.shared.domain.services.pages_service import (
     add_or_update_page,
     add_page,
     delete_page,
-    find_exists_or_update,
+    find_exists_or_update_page,
     get_pages_db,
     insert_page_target,
     list_pages,
@@ -166,7 +166,7 @@ class TestDeletePage:
 
 
 class TestFindExistsOrUpdate:
-    """Tests for find_exists_or_update function."""
+    """Tests for find_exists_or_update_page function."""
 
     def test_delegates_to_store_find_exists_or_update(self, monkeypatch):
         """Test that function delegates to store._find_exists_or_update."""
@@ -174,7 +174,7 @@ class TestFindExistsOrUpdate:
         mock_store._find_exists_or_update.return_value = True
         monkeypatch.setattr("src.app_main.shared.domain.services.pages_service.get_pages_db", lambda: mock_store)
 
-        result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target")
+        result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
 
         assert result is True
         mock_store._find_exists_or_update.assert_called_once_with("TestTitle", "ar", "TestUser", "Target")
@@ -185,7 +185,7 @@ class TestFindExistsOrUpdate:
         mock_store._find_exists_or_update.return_value = False
         monkeypatch.setattr("src.app_main.shared.domain.services.pages_service.get_pages_db", lambda: mock_store)
 
-        result = find_exists_or_update("TestTitle", "ar", "TestUser", "Target")
+        result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
 
         assert result is False
 

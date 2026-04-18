@@ -76,7 +76,7 @@ def delete_page(page_id: int) -> PageRecord:
     return record
 
 
-def find_exists_or_update(
+def find_exists_or_update_page(
     title: str,
     lang: str,
     user: str,
@@ -120,6 +120,6 @@ __all__ = [
     "add_page",
     "update_page",
     "delete_page",
-    "find_exists_or_update",
+    "find_exists_or_update_page",
     "insert_page_target",
 ]

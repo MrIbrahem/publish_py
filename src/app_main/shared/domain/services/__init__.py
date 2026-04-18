@@ -9,7 +9,7 @@ from ..db_service import (
     has_db_config,
 )
 from .pages_service import (
-    find_exists_or_update,
+    find_exists_or_update_page,
     insert_page_target,
     list_pages,
 )
@@ -45,7 +45,7 @@ __all__ = [
     "has_db_config",
 
     # pages_service
-    "find_exists_or_update",
+    "find_exists_or_update_page",
     "insert_page_target",
     "list_pages",
 

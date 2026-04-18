@@ -23,7 +23,7 @@ class TestGetDb:
     def test_returns_cached_db_instance(self, monkeypatch):
         """Test that function returns cached instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", mock_db)
 
         result = get_db()
 
@@ -31,10 +31,10 @@ class TestGetDb:
 
     def test_creates_new_instance_when_none(self, monkeypatch):
         """Test that function creates new instance when none cached."""
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", None)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", None)
 
         mock_db_instance = MagicMock()
-        with patch("src.app_main.shared.domain.services.db_service.Database") as MockDatabase:
+        with patch("src.app_main.shared.domain.db_service.Database") as MockDatabase:
             MockDatabase.return_value = mock_db_instance
 
             result = get_db()
@@ -48,7 +48,7 @@ class TestCloseCachedDb:
     def test_closes_and_clears_cached_db(self, monkeypatch):
         """Test that function closes and clears cached db."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", mock_db)
 
         close_cached_db()
 
@@ -59,7 +59,7 @@ class TestCloseCachedDb:
 
     def test_does_nothing_when_no_db_cached(self, monkeypatch):
         """Test that function does nothing when no db is cached."""
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", None)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", None)
 
         close_cached_db()
 
@@ -77,7 +77,7 @@ class TestExecuteQuery:
         mock_db.__enter__ = MagicMock(return_value=mock_db)
         mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.execute_query.return_value = True
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", mock_db)
 
         result = execute_query("SELECT 1")
 
@@ -94,7 +94,7 @@ class TestFetchQuery:
         mock_db.__enter__ = MagicMock(return_value=mock_db)
         mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.fetch_query.return_value = [{"id": 1}]
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", mock_db)
 
         result = fetch_query("SELECT * FROM users")
 
@@ -111,7 +111,7 @@ class TestExecuteQuerySafe:
         mock_db.__enter__ = MagicMock(return_value=mock_db)
         mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.execute_query_safe.return_value = True
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", mock_db)
 
         result = execute_query_safe("INSERT INTO users VALUES (%s)", ("test",))
 
@@ -128,7 +128,7 @@ class TestFetchQuerySafe:
         mock_db.__enter__ = MagicMock(return_value=mock_db)
         mock_db.__exit__ = MagicMock(return_value=False)
         mock_db.fetch_query_safe.return_value = []
-        monkeypatch.setattr("src.app_main.shared.domain.services.db_service._db", mock_db)
+        monkeypatch.setattr("src.app_main.shared.domain.db_service._db", mock_db)
 
         result = fetch_query_safe("SELECT * FROM users")
 
