@@ -6,13 +6,15 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
 from ..db.db_pages_users_to_main import PagesUsersToMainDB
 from ..models import PagesUsersToMainRecord
 
 logger = logging.getLogger(__name__)
 
 _PAGES_USERS_TO_MAIN_STORE: PagesUsersToMainDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_pages_users_to_main_db() -> PagesUsersToMainDB:

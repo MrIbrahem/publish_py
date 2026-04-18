@@ -6,13 +6,15 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
 from ..db.db_in_process import InProcessDB
 from ..models import InProcessRecord
 
 logger = logging.getLogger(__name__)
 
 _IN_PROCESS_STORE: InProcessDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_in_process_db() -> InProcessDB:

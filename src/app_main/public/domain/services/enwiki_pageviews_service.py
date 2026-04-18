@@ -6,13 +6,15 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
 from ..db.db_enwiki_pageviews import EnwikiPageviewsDB
 from ..models import EnwikiPageviewRecord
 
 logger = logging.getLogger(__name__)
 
 _ENWIKI_PAGEVIEWS_STORE: EnwikiPageviewsDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_enwiki_pageviews_db() -> EnwikiPageviewsDB:

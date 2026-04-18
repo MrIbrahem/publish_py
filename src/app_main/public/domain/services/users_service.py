@@ -6,13 +6,15 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
 from ..db.db_users import UsersDB
 from ..models import UserRecord
 
 logger = logging.getLogger(__name__)
 
 _USERS_STORE: UsersDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_users_db() -> UsersDB:

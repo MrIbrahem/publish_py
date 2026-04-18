@@ -7,12 +7,14 @@ from typing import Any, List
 
 from ....config import settings
 from ..db.db_pages import PagesDB
-from ..db_service import has_db_config
 from ..models import PageRecord
 
 logger = logging.getLogger(__name__)
 
 _PAGE_STORE: PagesDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_pages_db() -> PagesDB:

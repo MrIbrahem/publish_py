@@ -9,12 +9,14 @@ from typing import List
 
 from ....config import settings
 from ..db.db_qids import QidsDB
-from ..db_service import has_db_config
 from ..models import QidRecord
 
 logger = logging.getLogger(__name__)
 
 _qid_STORE: QidsDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_qids_db() -> QidsDB:

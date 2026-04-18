@@ -30,7 +30,6 @@ from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
 from .shared.domain import ensure_db_tables
-from .shared.domain.services import close_cached_db
 
 logger = logging.getLogger(__name__)
 
@@ -137,9 +136,8 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.jinja_env.globals.setdefault("USE_MW_OAUTH", oauth_enabled)
     app.jinja_env.filters["format_stage_timestamp"] = format_stage_timestamp
 
-    @app.teardown_appcontext
-    def _cleanup_connections(exception: Exception | None) -> None:  # pragma: no cover - teardown
-        close_cached_db()
+    # @app.teardown_appcontext
+    # def _cleanup_connections(exception: Exception | None) -> None:  # pragma: no cover - teardown
 
     @app.errorhandler(404)
     def page_not_found(e: Exception) -> Tuple[str, int]:

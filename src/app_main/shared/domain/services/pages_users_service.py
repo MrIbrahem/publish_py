@@ -7,12 +7,14 @@ from typing import Any, List
 
 from ....config import settings
 from ..db.db_pages_users import UserPagesDB
-from ..db_service import has_db_config
 from ..models import UserPageRecord
 
 logger = logging.getLogger(__name__)
 
 _USER_PAGE_STORE: UserPagesDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_user_pages_db() -> UserPagesDB:

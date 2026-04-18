@@ -9,12 +9,14 @@ from typing import Any, Dict, List, Optional
 
 from ....config import settings
 from ..db.db_publish_reports import ReportsDB
-from ..db_service import has_db_config
 from ..models import ReportRecord
 
 logger = logging.getLogger(__name__)
 
 _REPORTS_STORE: ReportsDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_publish_reports_db() -> ReportsDB:

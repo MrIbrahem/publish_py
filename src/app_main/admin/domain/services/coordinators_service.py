@@ -7,13 +7,15 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
 from ..db.db_coordinators import CoordinatorsDB
 from ..models import CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 
 _COORDINATORS_STORE: CoordinatorsDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_coordinators_db() -> CoordinatorsDB:

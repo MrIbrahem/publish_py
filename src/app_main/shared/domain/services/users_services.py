@@ -9,12 +9,14 @@ from typing import Optional
 
 from ....config import settings
 from ..db.db_user_tokens import UserTokenDB
-from ..db_service import has_db_config
 from ..models import UserTokenRecord
 
 logger = logging.getLogger(__name__)
 
 _user_db: UserTokenDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_store() -> UserTokenDB:
