@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.public_models import TranslateTypeRecord
 from ....config import has_db_config, settings
 from ..db.db_translate_type import TranslateTypeDB
-from .....db_models.public_models import TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
 

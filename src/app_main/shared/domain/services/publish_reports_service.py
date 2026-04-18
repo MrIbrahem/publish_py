@@ -7,9 +7,9 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
+from .....db_models.shared_models import ReportRecord
 from ....config import has_db_config, settings
 from ..db.db_publish_reports import ReportsDB
-from .....db_models.shared_models import ReportRecord
 
 logger = logging.getLogger(__name__)
 

@@ -10,9 +10,9 @@ from typing import Any, List
 
 import pymysql
 
+from .....db_models.admin_models import LanguageSettingRecord
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from .....db_models.admin_models import LanguageSettingRecord
 
 logger = logging.getLogger(__name__)
 

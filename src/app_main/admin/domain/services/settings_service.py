@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import Any, List
 
+from .....db_models.admin_models import SettingRecord
 from ....config import has_db_config, settings
 from ..db.db_settings import SettingsDB
-from .....db_models.admin_models import SettingRecord
 
 logger = logging.getLogger(__name__)
 

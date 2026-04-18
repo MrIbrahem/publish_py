@@ -11,8 +11,8 @@ from unittest.mock import MagicMock
 import pymysql
 import pytest
 from src.app_main.admin.domain.db.db_coordinators import CoordinatorsDB
-from src.db_models.admin_models import CoordinatorRecord
 from src.app_main.config import DbConfig
+from src.db_models.admin_models import CoordinatorRecord
 
 
 class TestCoordinatorsDB:

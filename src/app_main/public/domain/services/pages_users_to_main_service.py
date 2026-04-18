@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.public_models import PagesUsersToMainRecord
 from ....config import has_db_config, settings
 from ..db.db_pages_users_to_main import PagesUsersToMainDB
-from .....db_models.public_models import PagesUsersToMainRecord
 
 logger = logging.getLogger(__name__)
 

@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.public_models import ProjectRecord
 from ....config import has_db_config, settings
 from ..db.db_projects import ProjectsDB
-from .....db_models.public_models import ProjectRecord
 
 logger = logging.getLogger(__name__)
 

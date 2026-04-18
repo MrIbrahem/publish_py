@@ -7,9 +7,9 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+from .....db_models.shared_models import UserTokenRecord
 from ....config import has_db_config, settings
 from ..db.db_user_tokens import UserTokenDB
-from .....db_models.shared_models import UserTokenRecord
 
 logger = logging.getLogger(__name__)
 

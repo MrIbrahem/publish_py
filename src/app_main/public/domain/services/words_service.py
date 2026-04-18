@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.public_models import WordRecord
 from ....config import has_db_config, settings
 from ..db.db_words import WordsDB
-from .....db_models.public_models import WordRecord
 
 logger = logging.getLogger(__name__)
 

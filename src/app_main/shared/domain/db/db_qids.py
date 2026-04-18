@@ -8,9 +8,9 @@ from __future__ import annotations
 import logging
 from typing import Any, List
 
+from .....db_models.shared_models import QidRecord
 from ....config import DbConfig
 from ...core.db_driver import Database
-from .....db_models.shared_models import QidRecord
 
 logger = logging.getLogger(__name__)
 

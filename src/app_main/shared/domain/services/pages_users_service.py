@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import Any, List
 
+from .....db_models.shared_models import UserPageRecord
 from ....config import has_db_config, settings
 from ..db.db_pages_users import UserPagesDB
-from .....db_models.shared_models import UserPageRecord
 
 logger = logging.getLogger(__name__)
 

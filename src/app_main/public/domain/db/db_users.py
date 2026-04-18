@@ -10,9 +10,9 @@ from typing import Any, List
 
 import pymysql
 
+from .....db_models.public_models import UserRecord
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from .....db_models.public_models import UserRecord
 
 logger = logging.getLogger(__name__)
 

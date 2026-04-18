@@ -6,10 +6,10 @@ import datetime
 import logging
 from typing import Any, List
 
+from .....db_models.shared_models import UserTokenRecord
 from ....config import DbConfig
 from ...core.crypto import encrypt_value
 from ...core.db_driver import Database
-from .....db_models.shared_models import UserTokenRecord
 
 logger = logging.getLogger(__name__)
 

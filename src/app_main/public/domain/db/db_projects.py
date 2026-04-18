@@ -10,9 +10,9 @@ from typing import Any, List
 
 import pymysql
 
+from .....db_models.public_models import ProjectRecord
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from .....db_models.public_models import ProjectRecord
 
 logger = logging.getLogger(__name__)
 

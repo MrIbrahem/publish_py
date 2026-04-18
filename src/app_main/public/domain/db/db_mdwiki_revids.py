@@ -10,9 +10,9 @@ from typing import Any, List
 
 import pymysql
 
+from .....db_models.public_models import MdwikiRevidRecord
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from .....db_models.public_models import MdwikiRevidRecord
 
 logger = logging.getLogger(__name__)
 

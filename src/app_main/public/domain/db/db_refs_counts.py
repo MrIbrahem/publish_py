@@ -10,9 +10,9 @@ from typing import Any, List
 
 import pymysql
 
+from .....db_models.public_models import RefsCountRecord
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from .....db_models.public_models import RefsCountRecord
 
 logger = logging.getLogger(__name__)
 

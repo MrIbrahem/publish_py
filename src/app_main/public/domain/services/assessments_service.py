@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.public_models import AssessmentRecord
 from ....config import has_db_config, settings
 from ..db.db_assessments import AssessmentsDB
-from .....db_models.public_models import AssessmentRecord
 
 logger = logging.getLogger(__name__)
 

@@ -11,8 +11,8 @@ from unittest.mock import MagicMock
 import pymysql
 import pytest
 from src.app_main.admin.domain.db.db_language_settings import LanguageSettingsDB
-from src.db_models.admin_models import LanguageSettingRecord
 from src.app_main.config import DbConfig
+from src.db_models.admin_models import LanguageSettingRecord
 
 
 class TestLanguageSettingsDB:

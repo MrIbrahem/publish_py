@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.admin_models import UsersNoInprocessRecord
 from ....config import has_db_config, settings
 from ..db.db_users_no_inprocess import UsersNoInprocessDB
-from .....db_models.admin_models import UsersNoInprocessRecord
 
 logger = logging.getLogger(__name__)
 

@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.public_models import RefsCountRecord
 from ....config import has_db_config, settings
 from ..db.db_refs_counts import RefsCountsDB
-from .....db_models.public_models import RefsCountRecord
 
 logger = logging.getLogger(__name__)
 

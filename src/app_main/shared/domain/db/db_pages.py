@@ -7,9 +7,9 @@ from typing import Any, List
 
 import pymysql
 
+from .....db_models.shared_models import PageRecord
 from ....config import DbConfig
 from ...core.db_driver import Database
-from .....db_models.shared_models import PageRecord
 
 logger = logging.getLogger(__name__)
 

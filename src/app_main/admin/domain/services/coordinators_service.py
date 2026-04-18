@@ -6,9 +6,9 @@ import functools
 import logging
 from typing import List
 
+from .....db_models.admin_models import CoordinatorRecord
 from ....config import has_db_config, settings
 from ..db.db_coordinators import CoordinatorsDB
-from .....db_models.admin_models import CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 

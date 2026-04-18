@@ -5,7 +5,6 @@ Unit tests for coordinators_service module.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.admin_models import CoordinatorRecord
 from src.app_main.admin.domain.services.coordinators_service import (
     active_coordinators,
     add_coordinator,
@@ -18,6 +17,7 @@ from src.app_main.admin.domain.services.coordinators_service import (
     list_coordinators,
     update_coordinator,
 )
+from src.db_models.admin_models import CoordinatorRecord
 
 
 class TestGetCoordinatorsDb:

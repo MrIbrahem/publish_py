@@ -7,9 +7,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
+from .....db_models.shared_models import CategoryRecord
 from ....config import has_db_config, settings
 from ..db.db_categories import CategoriesDB
-from .....db_models.shared_models import CategoryRecord
 
 logger = logging.getLogger(__name__)
 
