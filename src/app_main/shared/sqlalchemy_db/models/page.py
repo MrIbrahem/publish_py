@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, String, text
+from sqlalchemy import Column, Date, Integer, String, text
 
 from ..engine import BaseDb
 
@@ -39,9 +39,9 @@ class _PageRecord(BaseDb):
     lang = Column(String(30), nullable=True)
     user = Column(String(120), nullable=True)
     target = Column(String(120), nullable=True)
-    date = Column(DateTime, nullable=True)
+    date = Column(Date, nullable=True)
     pupdate = Column(String(120), nullable=True)
-    add_date = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    add_date = Column(Date, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     deleted = Column(Integer, default=0)
     mdwiki_revid = Column(Integer, nullable=True)
 
