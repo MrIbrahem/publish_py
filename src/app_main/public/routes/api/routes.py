@@ -8,7 +8,7 @@ from typing import Any, Dict
 
 from flask import Blueprint, Response, jsonify, request
 
-from ....shared.domain.services.publish_reports_service import publish_reports_query_with_filters
+from ....shared.domain.services.publish_reports_service import query_reports_with_filters
 from ....shared.core.cors import check_cors
 from ....shared.utils.web_utils import parse_select_fields
 
@@ -78,7 +78,7 @@ def get_publish_reports() -> Response:
 
     try:
         # Query database
-        records = publish_reports_query_with_filters(filters, select_fields, limit)
+        records = query_reports_with_filters(filters, select_fields, limit)
 
     except Exception:
         logger.exception("Error fetching publish_reports")
