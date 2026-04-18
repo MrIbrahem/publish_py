@@ -5,7 +5,7 @@ Tests for QidRecord.
 """
 
 import pytest
-from src.app_main.shared.domain.models.qid import (
+from src.app_main.shared.domain.models import (
     QidRecord,
 )
 

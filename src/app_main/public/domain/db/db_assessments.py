@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models.assessment import AssessmentRecord
+from ..models import AssessmentRecord
 
 logger = logging.getLogger(__name__)
 

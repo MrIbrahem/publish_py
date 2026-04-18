@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.models.assessment import AssessmentRecord
-from src.app_main.public.sqlalchemy_db.models.assessment import _AssessmentRecord
+from src.app_main.public.domain.models import AssessmentRecord
+from src.app_main.public.sqlalchemy_db.models import _AssessmentRecord
 from src.app_main.public.sqlalchemy_db.services.assessment_service import (
     add_assessment,
     add_or_update_assessment,

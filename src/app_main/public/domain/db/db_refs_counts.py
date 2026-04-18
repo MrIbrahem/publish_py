@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models.refs_count import RefsCountRecord
+from ..models import RefsCountRecord
 
 logger = logging.getLogger(__name__)
 

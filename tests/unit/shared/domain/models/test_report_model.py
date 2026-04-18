@@ -6,7 +6,7 @@ Tests for ReportRecord.
 
 from datetime import datetime
 
-from src.app_main.shared.domain.models.report import (
+from src.app_main.shared.domain.models import (
     ReportRecord,
 )
 

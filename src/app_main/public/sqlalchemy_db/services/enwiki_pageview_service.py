@@ -10,8 +10,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ...domain.models.enwiki_pageview import EnwikiPageviewRecord
-from ..models.enwiki_pageview import _EnwikiPageviewRecord
+from ...domain.models import EnwikiPageviewRecord
+from ..models import _EnwikiPageviewRecord
 
 logger = logging.getLogger(__name__)
 

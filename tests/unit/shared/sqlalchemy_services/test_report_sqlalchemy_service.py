@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.models.report import ReportRecord
+from src.app_main.shared.domain.models import ReportRecord
 from src.app_main.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
-from src.app_main.shared.sqlalchemy_db.models.report import _ReportRecord
+from src.app_main.shared.sqlalchemy_db.models import _ReportRecord
 from src.app_main.shared.sqlalchemy_db.services.report_service import (
     add_report,
     delete_report,

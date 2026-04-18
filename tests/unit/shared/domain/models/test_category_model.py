@@ -5,7 +5,7 @@ Tests for CategoryRecord.
 """
 
 import pytest
-from src.app_main.shared.domain.models.category import (
+from src.app_main.shared.domain.models import (
     CategoryRecord,
 )
 

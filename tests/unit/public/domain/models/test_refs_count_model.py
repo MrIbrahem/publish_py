@@ -4,7 +4,7 @@ Unit tests for domain.models.refs_count module.
 Tests for RefsCountRecord.
 """
 
-from src.app_main.public.domain.models.refs_count import (
+from src.app_main.public.domain.models import (
     RefsCountRecord,
 )
 

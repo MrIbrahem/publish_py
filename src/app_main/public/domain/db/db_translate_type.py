@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models.translate_type import TranslateTypeRecord
+from ..models import TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
 

@@ -8,7 +8,7 @@ from typing import List
 from ....config import settings
 from ....shared.domain.db_service import has_db_config
 from ..db.db_words import WordsDB
-from ..models.word import WordRecord
+from ..models import WordRecord
 
 logger = logging.getLogger(__name__)
 

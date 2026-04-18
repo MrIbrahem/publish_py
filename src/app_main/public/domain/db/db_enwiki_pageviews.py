@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models.enwiki_pageview import EnwikiPageviewRecord
+from ..models import EnwikiPageviewRecord
 
 logger = logging.getLogger(__name__)
 

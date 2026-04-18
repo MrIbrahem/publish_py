@@ -4,7 +4,7 @@ Unit tests for domain.models.enwiki_pageview module.
 Tests for EnwikiPageviewRecord.
 """
 
-from src.app_main.public.domain.models.enwiki_pageview import (
+from src.app_main.public.domain.models import (
     EnwikiPageviewRecord,
 )
 

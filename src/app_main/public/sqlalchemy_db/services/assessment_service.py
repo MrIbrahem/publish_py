@@ -10,8 +10,8 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.sqlalchemy_db.engine import get_session
-from ...domain.models.assessment import AssessmentRecord
-from ..models.assessment import _AssessmentRecord
+from ...domain.models import AssessmentRecord
+from ..models import _AssessmentRecord
 
 logger = logging.getLogger(__name__)
 

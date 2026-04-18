@@ -7,7 +7,7 @@ from typing import Any, List
 
 from ....config import settings
 from ..db.db_pages_users import UserPagesDB
-from ..models.user_page import UserPageRecord
+from ..models import UserPageRecord
 from ..db_service import has_db_config
 
 logger = logging.getLogger(__name__)
