@@ -90,8 +90,8 @@ def list_categories() -> List[CategoryRecord]:
 
     store = get_categories_db()
 
-    coords = store.list()
-    return coords
+    pages = store.list()
+    return pages
 
 
 def get_camp_to_cats() -> dict[str, str]:

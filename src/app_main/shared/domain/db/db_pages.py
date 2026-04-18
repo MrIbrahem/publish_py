@@ -134,7 +134,7 @@ class PagesDB:
         target: str,
         mdwiki_revid: int | None = None,
         word: int = 0,
-    ) -> dict[str, Any]:
+    ) -> bool:
         """
         Insert a page target record.
 
@@ -149,9 +149,6 @@ class PagesDB:
             target: Target page title
             mdwiki_revid: MDWiki revision ID
             word: Word count
-
-        Returns:
-            Dictionary with operation result
         """
 
         query = """

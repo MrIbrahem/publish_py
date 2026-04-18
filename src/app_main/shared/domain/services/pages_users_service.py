@@ -32,12 +32,12 @@ def get_user_pages_db() -> UserPagesDB:
 
 
 def list_user_pages() -> List[UserPageRecord]:
-    """Return all pages_users while keeping settings.admins in sync."""
+    """Return all pages_users records."""
 
     store = get_user_pages_db()
 
-    coords = store.list()
-    return coords
+    pages = store.list()
+    return pages
 
 
 def add_user_page(title: str, main_file: str) -> UserPageRecord:
