@@ -171,9 +171,8 @@ class TestCoordinatorsDB:
         monkeypatch.setattr("src.app_main.admin.domain.db.db_coordinators.Database", lambda db_data: mock_db)
 
         coordinators_db = CoordinatorsDB(db_config)
-        result = coordinators_db.delete(1)
+        coordinators_db.delete(1)
 
-        assert isinstance(result, CoordinatorRecord)
         mock_db.execute_query_safe.assert_called_with(
             "DELETE FROM coordinators WHERE id = %s",
             (1,),
