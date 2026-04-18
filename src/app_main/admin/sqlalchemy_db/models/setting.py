@@ -4,9 +4,9 @@ import json
 from typing import Any, Optional
 
 from sqlalchemy import Column, Enum, Integer, String, Text
-from sqlalchemy.dialects.mysql import LONGTEXT
+# from sqlalchemy.dialects.mysql import LONGTEXT
 
-from ....shared.sqlalchemy_db.engine import BaseDb
+from ....shared.sqlalchemy_db.engine import BaseDb, LONGTEXT
 
 
 class _SettingRecord(BaseDb):
@@ -27,8 +27,10 @@ class _SettingRecord(BaseDb):
     id = Column(Integer, primary_key=True, autoincrement=True)
     key = Column(String(190), unique=True, nullable=False)
     title = Column(String(500), nullable=False)
+
+    # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
     value = Column(LONGTEXT, nullable=True)
-    # value_type = Column(Enum("boolean", "string", "integer", "json"), nullable=False, default="boolean")
+
     value_type = Column(
         Enum("boolean", "string", "integer", name="setting_value_type"),
         nullable=False,
