@@ -100,20 +100,32 @@ def find_exists_or_update_page(
 
     with get_session() as session:
         # Check existence
-        query = text("SELECT * FROM pages WHERE title = :title AND lang = :lang AND user = :user")
-        result = session.execute(query, {"title": title, "lang": lang, "user": user}).fetchall()
-
-        if result:
-            update_query = text(
-                """
-                UPDATE pages SET target = :target, pupdate = CURRENT_DATE
-                WHERE title = :title AND lang = :lang AND user = :user AND (target = '' OR target IS NULL)
-                """
+        orm_objs = (
+            session.query(_PageRecord)
+            .filter(
+                _PageRecord.title == title,
+                _PageRecord.lang == lang,
+                _PageRecord.user == user,
             )
-            session.execute(update_query, {"target": target, "title": title, "lang": lang, "user": user})
-            session.commit()
+            .all()
+        )
 
-        return len(result) > 0
+        if orm_objs:
+            changed = False
+            for obj in orm_objs:
+                # Update target if it's empty or NULL
+                if not obj.target:
+                    obj.target = target
+                    obj.pupdate = func.current_date()
+                    changed = True
+            if changed:
+                try:
+                    session.commit()
+                except Exception as e:
+                    logger.error(f"Failed to update page target: {e}")
+                    session.rollback()
+
+        return len(orm_objs) > 0
 
 
 def insert_page_target(
@@ -125,28 +137,22 @@ def insert_page_target(
     target: str,
     mdwiki_revid: int | None = None,
     word: int = 0,
-) -> bool | str:
+) -> bool:
     """Insert a page target record."""
-    query = text(
-        """
-        INSERT INTO pages (title, word, translate_type, cat, lang, user, pupdate, target, mdwiki_revid)
-        VALUES (:title, :word, :tr_type, :cat, :lang, :user, CURRENT_DATE, :target, :mdwiki_revid)
-        """
-    )
-    params = {
-        "title": sourcetitle,
-        "word": word,
-        "tr_type": tr_type,
-        "cat": cat,
-        "lang": lang,
-        "user": user,
-        "target": target,
-        "mdwiki_revid": mdwiki_revid,
-    }
-
     with get_session() as session:
+        orm_obj = _PageRecord(
+            title=sourcetitle,
+            word=word,
+            translate_type=tr_type,
+            cat=cat,
+            lang=lang,
+            user=user,
+            pupdate=func.current_date(),
+            target=target,
+            mdwiki_revid=mdwiki_revid,
+        )
+        session.add(orm_obj)
         try:
-            session.execute(query, params)
             session.commit()
             return True
         except Exception as e:
