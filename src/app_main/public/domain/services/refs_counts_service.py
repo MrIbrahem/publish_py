@@ -6,13 +6,16 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
+
 from ..db.db_refs_counts import RefsCountsDB
 from ..models import RefsCountRecord
 
 logger = logging.getLogger(__name__)
 
 _REFS_COUNTS_STORE: RefsCountsDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_refs_counts_db() -> RefsCountsDB:

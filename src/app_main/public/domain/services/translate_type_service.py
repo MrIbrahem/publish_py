@@ -6,13 +6,16 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
+
 from ..db.db_translate_type import TranslateTypeDB
 from ..models import TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
 
 _TRANSLATE_TYPE_STORE: TranslateTypeDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_translate_type_db() -> TranslateTypeDB:

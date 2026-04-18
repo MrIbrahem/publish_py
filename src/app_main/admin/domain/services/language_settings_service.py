@@ -6,13 +6,16 @@ import logging
 from typing import List
 
 from ....config import settings
-from ....shared.domain.db_service import has_db_config
+
 from ..db.db_language_settings import LanguageSettingsDB
 from ..models import LanguageSettingRecord
 
 logger = logging.getLogger(__name__)
 
 _LANGUAGE_SETTINGS_STORE: LanguageSettingsDB | None = None
+
+
+from ....config import has_db_config
 
 
 def get_language_settings_db() -> LanguageSettingsDB:
