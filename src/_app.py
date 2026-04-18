@@ -6,6 +6,7 @@ WSGI entry point for the Flask application for Production
 from __future__ import annotations
 import logging
 import pymysql
+
 pymysql.install_as_MySQLdb()
 
 # Load environment variables before any other imports
