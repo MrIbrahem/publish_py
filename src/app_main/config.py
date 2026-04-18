@@ -300,6 +300,11 @@ def get_settings() -> Settings:
 settings = get_settings()
 
 
+def has_db_config() -> bool:
+    """Return True when database connection details are configured."""
+    return bool(settings.database_data.db_host)
+
+
 # =============================================================================
 # Flask-style Configuration Classes
 # =============================================================================

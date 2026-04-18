@@ -2,12 +2,6 @@
 Shared db services, used in both admin and public blueprints
 """
 
-from ..db_service import (
-    close_cached_db,
-    fetch_query_safe,
-    get_db,
-    has_db_config,
-)
 from .pages_service import (
     find_exists_or_update_page,
     insert_page_target,
@@ -37,11 +31,6 @@ from .users_services import (
 )
 
 __all__ = [
-    # db_service
-    "close_cached_db",
-    "fetch_query_safe",
-    "get_db",
-    "has_db_config",
     # pages_service
     "find_exists_or_update_page",
     "insert_page_target",

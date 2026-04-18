@@ -5,9 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any, List
 
-from ....config import settings
+from ....config import has_db_config, settings
 from ..db.db_pages import PagesDB
-from ..db_service import has_db_config
 from ..models import PageRecord
 
 logger = logging.getLogger(__name__)
