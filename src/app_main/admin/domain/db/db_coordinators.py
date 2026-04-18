@@ -97,7 +97,7 @@ class CoordinatorsDB:
             raise RuntimeError(f"Failed to fetch updated coordinator with ID {coordinator_id}")
         return updated
 
-    def delete(self, coordinator_id: int) -> CoordinatorRecord:
+    def delete(self, coordinator_id: int) -> None:
         """Delete a coordinator record by ID."""
         record = self.fetch_by_id(coordinator_id)
         if not record:
@@ -107,7 +107,6 @@ class CoordinatorsDB:
             "DELETE FROM coordinators WHERE id = %s",
             (coordinator_id,),
         )
-        return record
 
     def add_or_update(self, username: str, is_active: int = 1) -> CoordinatorRecord:
         """Add or update a coordinator record."""

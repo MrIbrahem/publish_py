@@ -82,12 +82,11 @@ def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
     return record
 
 
-def delete_coordinator(coordinator_id: int) -> CoordinatorRecord:
+def delete_coordinator(coordinator_id: int) -> None:
     """Delete a coordinator record by ID."""
     store = get_coordinators_db()
-    record = store.delete(coordinator_id)
+    store.delete(coordinator_id)
     active_coordinators.cache_clear()  # Clear the cache to ensure active coordinators list is updated
-    return record
 
 
 def is_coordinator(username: str) -> bool:

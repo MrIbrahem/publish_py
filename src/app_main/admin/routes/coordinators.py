@@ -89,7 +89,7 @@ def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
         logger.exception("Unable to delete coordinator.")
         flash("Unable to delete coordinator. Please try again.", "danger")
     else:
-        flash(f"Coordinator '{record.username}' removed.", "success")
+        flash(f"Coordinator '{coordinator_id}' removed.", "success")
 
     return redirect(url_for("admin.coordinators_dashboard"))
 
