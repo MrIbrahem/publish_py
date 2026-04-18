@@ -30,7 +30,7 @@ class _InProcessRecord(BaseDb):
     user = Column(String(255), nullable=False)
     lang = Column(String(30), nullable=False)
     cat = Column(String(255), default="RTT", server_default=text("'RTT"))
-    translate_type = Column(String(20), default="lead", server_default=text("'lead"))
+    translate_type = Column(String(20), default="lead", server_default=text("'lead'"))
     word = Column(Integer, default=0, server_default=text("0"))
     add_date = Column(Date, nullable=False, server_default=func.current_timestamp())
 
