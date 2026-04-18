@@ -1,0 +1,159 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}Language Settings · Copy SVG Translation{% endblock %}
+
+{% block contents %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="headline">Language Settings</h3>
+    </div>
+    <div class="card-body">
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header text-bg-light">
+                <h5 class="mb-0 mt-1">Add Language Setting</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('admin.add_language_setting') }}"
+                    class="row g-3 align-items-end">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="col-md-3">
+                        <label class="form-label" for="new-lang-code">Language</label>
+                        <select name="lang_code" id="new-lang-code" class="form-select" required>
+                            <option value="" selected disabled>Select language...</option>
+                            {% for lang in languages %}
+                            <option value="{{ lang.code }}">{{ lang.name }} ({{ lang.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" name="move_dots"
+                                id="new-move-dots" value="1">
+                            <label class="form-check-label" for="new-move-dots">Move Dots</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" name="expend" id="new-expend"
+                                value="1">
+                            <label class="form-check-label" for="new-expend">Expend</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" name="add_en_lang"
+                                id="new-add-en-lang" value="1">
+                            <label class="form-check-label" for="new-add-en-lang">Add EN Lang</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" name="add_en_lng"
+                                id="new-add-en-lng" value="1">
+                            <label class="form-check-label" for="new-add-en-lng">Add EN Lng</label>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-lg"></i> Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive shadow-sm">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 15%">Language</th>
+                        <th scope="col" class="text-center">Move Dots</th>
+                        <th scope="col" class="text-center">Expend</th>
+                        <th scope="col" class="text-center">Add EN Lang</th>
+                        <th scope="col" class="text-center">Add EN Lng</th>
+                        <th scope="col" class="text-center" style="width: 10%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in settings %}
+                    <tr>
+                        <form method="post"
+                            action="{{ url_for('admin.update_language_setting_route', setting_id=s.id) }}"
+                            id="form-update-{{ s.id }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        </form>
+                        <td>
+                            <strong>{{ s.lang_code }}</strong>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input type="hidden" name="move_dots" id="move-dots-value-{{ s.id }}"
+                                    value="{{ 1 if s.move_dots else 0 }}" form="form-update-{{ s.id }}">
+                                <input class="form-check-input" type="checkbox" role="switch" id="move-dots-{{ s.id }}"
+                                    {% if s.move_dots %}checked{% endif %}
+                                    onchange="document.getElementById('move-dots-value-{{ s.id }}').value = this.checked ? '1' : '0';"
+                                    form="form-update-{{ s.id }}">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input type="hidden" name="expend" id="expend-value-{{ s.id }}"
+                                    value="{{ 1 if s.expend else 0 }}" form="form-update-{{ s.id }}">
+                                <input class="form-check-input" type="checkbox" role="switch" id="expend-{{ s.id }}"
+                                    {% if s.expend %}checked{% endif %}
+                                    onchange="document.getElementById('expend-value-{{ s.id }}').value = this.checked ? '1' : '0';"
+                                    form="form-update-{{ s.id }}">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input type="hidden" name="add_en_lang" id="add-en-lang-value-{{ s.id }}"
+                                    value="{{ 1 if s.add_en_lang else 0 }}" form="form-update-{{ s.id }}">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                    id="add-en-lang-{{ s.id }}" {% if s.add_en_lang %}checked{% endif %}
+                                    onchange="document.getElementById('add-en-lang-value-{{ s.id }}').value = this.checked ? '1' : '0';"
+                                    form="form-update-{{ s.id }}">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-switch d-inline-block">
+                                <input type="hidden" name="add_en_lng" id="add-en-lng-value-{{ s.id }}"
+                                    value="{{ 1 if s.add_en_lng else 0 }}" form="form-update-{{ s.id }}">
+                                <input class="form-check-input" type="checkbox" role="switch" id="add-en-lng-{{ s.id }}"
+                                    {% if s.add_en_lng %}checked{% endif %}
+                                    onchange="document.getElementById('add-en-lng-value-{{ s.id }}').value = this.checked ? '1' : '0';"
+                                    form="form-update-{{ s.id }}">
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-outline-success btn-sm" title="Save changes"
+                                    form="form-update-{{ s.id }}">
+                                    <i class="bi bi-save"></i>
+                                </button>
+                                <form method="post"
+                                    action="{{ url_for('admin.delete_language_setting_route', setting_id=s.id) }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Remove setting for {{ s.lang_code }}?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No language settings configured yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
