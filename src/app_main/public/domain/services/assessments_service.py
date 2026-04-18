@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_assessments import AssessmentsDB
-from ..models import AssessmentRecord
+from .....db_models.public_models import AssessmentRecord
 
 logger = logging.getLogger(__name__)
 

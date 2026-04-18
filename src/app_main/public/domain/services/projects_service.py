@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_projects import ProjectsDB
-from ..models import ProjectRecord
+from .....db_models.public_models import ProjectRecord
 
 logger = logging.getLogger(__name__)
 

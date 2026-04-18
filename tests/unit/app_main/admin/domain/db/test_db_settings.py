@@ -11,7 +11,7 @@ from unittest.mock import MagicMock
 import pymysql
 import pytest
 from src.app_main.admin.domain.db.db_settings import SettingsDB
-from src.app_main.admin.domain.admin_models import SettingRecord
+from src.db_models.admin_models import SettingRecord
 from src.app_main.config import DbConfig
 
 

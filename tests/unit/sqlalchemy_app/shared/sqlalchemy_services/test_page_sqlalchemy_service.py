@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.models import PageRecord
+from src.db_models.shared_models import PageRecord
 from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, get_session, init_db
 from src.sqlalchemy_app.shared.sqlalchemy_db.models import _PageRecord
 from src.sqlalchemy_app.shared.sqlalchemy_db.services.page_service import (

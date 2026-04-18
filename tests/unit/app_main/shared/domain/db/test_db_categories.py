@@ -9,7 +9,7 @@ from src.app_main.config import DbConfig
 from src.app_main.shared.domain.db.db_categories import (
     CategoriesDB,
 )
-from src.app_main.shared.domain.models import CategoryRecord
+from src.db_models.shared_models import CategoryRecord
 
 
 class TestCategoriesDB:

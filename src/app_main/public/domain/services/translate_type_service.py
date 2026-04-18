@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_translate_type import TranslateTypeDB
-from ..models import TranslateTypeRecord
+from .....db_models.public_models import TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
 

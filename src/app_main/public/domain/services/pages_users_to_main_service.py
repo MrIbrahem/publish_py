@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_pages_users_to_main import PagesUsersToMainDB
-from ..models import PagesUsersToMainRecord
+from .....db_models.public_models import PagesUsersToMainRecord
 
 logger = logging.getLogger(__name__)
 

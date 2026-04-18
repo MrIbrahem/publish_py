@@ -9,7 +9,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_qids import QidsDB
-from ..models import QidRecord
+from .....db_models.shared_models import QidRecord
 
 logger = logging.getLogger(__name__)
 

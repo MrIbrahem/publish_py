@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..models import MdwikiRevidRecord
+from .....db_models.public_models import MdwikiRevidRecord
 
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,7 @@ import pymysql
 
 from ....config import DbConfig
 from ...core.db_driver import Database
-from ..models import UserPageRecord
+from .....db_models.shared_models import UserPageRecord
 
 logger = logging.getLogger(__name__)
 

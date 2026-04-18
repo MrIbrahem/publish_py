@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from ....config import has_db_config, settings
 from ..db.db_publish_reports import ReportsDB
-from ..models import ReportRecord
+from .....db_models.shared_models import ReportRecord
 
 logger = logging.getLogger(__name__)
 

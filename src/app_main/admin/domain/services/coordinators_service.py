@@ -8,7 +8,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_coordinators import CoordinatorsDB
-from ..admin_models import CoordinatorRecord
+from .....db_models.admin_models import CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 

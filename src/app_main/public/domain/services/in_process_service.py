@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_in_process import InProcessDB
-from ..models import InProcessRecord
+from .....db_models.public_models import InProcessRecord
 
 logger = logging.getLogger(__name__)
 

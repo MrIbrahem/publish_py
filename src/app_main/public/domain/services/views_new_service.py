@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_views_new import ViewsNewDB
-from ..models import ViewsNewRecord
+from .....db_models.public_models import ViewsNewRecord
 
 logger = logging.getLogger(__name__)
 

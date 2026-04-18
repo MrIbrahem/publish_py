@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_users_no_inprocess import UsersNoInprocessDB
-from ..admin_models import UsersNoInprocessRecord
+from .....db_models.admin_models import UsersNoInprocessRecord
 
 logger = logging.getLogger(__name__)
 

@@ -7,7 +7,7 @@ Tests for UserTokenRecord.
 from unittest.mock import patch
 
 import pytest
-from src.app_main.shared.domain.models import (
+from src.db_models.shared_models import (
     UserTokenRecord,
 )
 

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.models import WordRecord
+from src.db_models.public_models import WordRecord
 from src.sqlalchemy_app.public.sqlalchemy_db.models import _WordRecord
 from src.sqlalchemy_app.public.sqlalchemy_db.services.word_service import (
     add_or_update_word,

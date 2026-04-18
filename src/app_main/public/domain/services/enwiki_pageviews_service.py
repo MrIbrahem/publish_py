@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_enwiki_pageviews import EnwikiPageviewsDB
-from ..models import EnwikiPageviewRecord
+from .....db_models.public_models import EnwikiPageviewRecord
 
 logger = logging.getLogger(__name__)
 

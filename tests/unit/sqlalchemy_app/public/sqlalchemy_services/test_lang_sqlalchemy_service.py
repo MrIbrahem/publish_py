@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.models import LangRecord
+from src.db_models.public_models import LangRecord
 from src.sqlalchemy_app.public.sqlalchemy_db.models import _LangRecord
 from src.sqlalchemy_app.public.sqlalchemy_db.services.lang_service import (
     add_lang,

@@ -12,7 +12,7 @@ from typing import Any, List
 
 from ....config import DbConfig
 from ...core.db_driver import Database
-from ..models import CategoryRecord
+from .....db_models.shared_models import CategoryRecord
 
 logger = logging.getLogger(__name__)
 

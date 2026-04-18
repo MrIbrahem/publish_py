@@ -7,7 +7,7 @@ from typing import List
 
 from ....config import has_db_config, settings
 from ..db.db_users import UsersDB
-from ..models import UserRecord
+from .....db_models.public_models import UserRecord
 
 logger = logging.getLogger(__name__)
 

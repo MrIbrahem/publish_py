@@ -12,7 +12,7 @@ import pymysql
 
 from ....config import DbConfig
 from ....shared.core.db_driver import Database
-from ..admin_models import CoordinatorRecord
+from .....db_models.admin_models import CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 

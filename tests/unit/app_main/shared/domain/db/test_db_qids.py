@@ -13,7 +13,7 @@ from src.app_main.config import DbConfig
 from src.app_main.shared.domain.db.db_qids import (
     QidsDB,
 )
-from src.app_main.shared.domain.models import QidRecord
+from src.db_models.shared_models import QidRecord
 
 
 class TestQidsDB:
