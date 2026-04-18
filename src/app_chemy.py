@@ -18,4 +18,4 @@ configure_logging(logging.DEBUG)
 app = create_app(DevelopmentConfig)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5500)
