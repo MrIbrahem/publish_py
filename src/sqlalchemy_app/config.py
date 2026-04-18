@@ -305,19 +305,6 @@ def has_db_config() -> bool:
     return bool(settings.database_data.db_host)
 
 
-# =============================================================================
-# Flask-style Configuration Classes
-# =============================================================================
-# These classes follow Flask's conventional configuration pattern and are
-# designed to work with create_app(config_class=ConfigClass).
-#
-# Example usage:
-#     from app_main import create_app
-#     from app_main.config import TestingConfig
-#     app = create_app(TestingConfig)
-# =============================================================================
-
-
 class Config:
     """Base configuration class for Flask applications.
 
