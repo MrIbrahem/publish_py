@@ -133,9 +133,8 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.jinja_env.globals.setdefault("USE_MW_OAUTH", oauth_enabled)
     app.jinja_env.filters["format_stage_timestamp"] = format_stage_timestamp
 
-    @app.teardown_appcontext
-    def _cleanup_connections(exception: Exception | None) -> None:  # pragma: no cover - teardown
-        ...
+    # @app.teardown_appcontext
+    # def _cleanup_connections(exception: Exception | None) -> None:  # pragma: no cover - teardown
 
     @app.errorhandler(404)
     def page_not_found(e: Exception) -> Tuple[str, int]:

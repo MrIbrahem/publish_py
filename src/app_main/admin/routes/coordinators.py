@@ -14,7 +14,12 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..domain.services import coordinators_service
+from ..domain.services.coordinators_service import (
+    add_coordinator,
+    delete_coordinator,
+    list_coordinators,
+    set_coordinator_active,
+)
 from .decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -23,7 +28,7 @@ logger = logging.getLogger(__name__)
 def _coordinators_dashboard():
     """Render the coordinator management dashboard."""
 
-    coordinators = coordinators_service.list_coordinators()
+    coordinators = list_coordinators()
     total = len(coordinators)
     is_active = sum(1 for coord in coordinators if coord.is_active)
 
@@ -45,7 +50,7 @@ def _add_coordinator() -> ResponseReturnValue:
         return redirect(url_for("admin.coordinators_dashboard"))
 
     try:
-        record = coordinators_service.add_coordinator(username)
+        record = add_coordinator(username)
     except (LookupError, ValueError) as exc:
         logger.exception("Unable to Add coordinator.")
         flash(str(exc), "warning")
@@ -63,7 +68,7 @@ def _update_coordinator_active(coordinator_id: int) -> ResponseReturnValue:
 
     desired = request.form.get("is_active", "0") == "1"
     try:
-        record = coordinators_service.set_coordinator_active(coordinator_id, desired)
+        record = set_coordinator_active(coordinator_id, desired)
     except LookupError as exc:
         logger.exception("Unable to update coordinator.")
         flash(str(exc), "warning")
@@ -81,7 +86,7 @@ def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
     """Remove a coordinator entirely."""
 
     try:
-        record = coordinators_service.delete_coordinator(coordinator_id)
+        record = delete_coordinator(coordinator_id)
     except LookupError as exc:
         logger.exception("Unable to delete coordinator.")
         flash(str(exc), "warning")
