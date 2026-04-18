@@ -5,16 +5,13 @@ from __future__ import annotations
 import logging
 from typing import Any, List
 
-from ....config import settings
+from ....config import has_db_config, settings
 from ..db.db_pages import PagesDB
 from ..models import PageRecord
 
 logger = logging.getLogger(__name__)
 
 _PAGE_STORE: PagesDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_pages_db() -> PagesDB:

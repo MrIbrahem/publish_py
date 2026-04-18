@@ -5,16 +5,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....config import settings
+from ....config import has_db_config, settings
 from ..db.db_mdwiki_revids import MdwikiRevidsDB
 from ..models import MdwikiRevidRecord
 
 logger = logging.getLogger(__name__)
 
 _MDWIKI_REVIDS_STORE: MdwikiRevidsDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_mdwiki_revids_db() -> MdwikiRevidsDB:

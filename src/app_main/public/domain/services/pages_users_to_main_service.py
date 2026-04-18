@@ -5,16 +5,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....config import settings
+from ....config import has_db_config, settings
 from ..db.db_pages_users_to_main import PagesUsersToMainDB
 from ..models import PagesUsersToMainRecord
 
 logger = logging.getLogger(__name__)
 
 _PAGES_USERS_TO_MAIN_STORE: PagesUsersToMainDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_pages_users_to_main_db() -> PagesUsersToMainDB:

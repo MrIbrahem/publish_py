@@ -7,16 +7,13 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ....config import settings
+from ....config import has_db_config, settings
 from ..db.db_categories import CategoriesDB
 from ..models import CategoryRecord
 
 logger = logging.getLogger(__name__)
 
 _category_STORE: CategoriesDB | None = None
-
-
-from ....config import has_db_config
 
 
 def get_categories_db() -> CategoriesDB:
