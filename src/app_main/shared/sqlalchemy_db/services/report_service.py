@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import extract
 
 from ...domain.models.report import ReportRecord
 from ..engine import get_session
@@ -77,17 +78,25 @@ def query_reports_with_filters(
 
             # Year/Month filters
             if name == "year":
-                query = query.filter(func.year(_ReportRecord.date) == value)
+                # query = query.filter(func.year(_ReportRecord.date) == value)
+                query = query.filter(extract('year', _ReportRecord.date) == value)
+
             elif name == "month":
-                query = query.filter(func.month(_ReportRecord.date) == value)
+                # query = query.filter(func.month(_ReportRecord.date) == value)
+                query = query.filter(extract('month', _ReportRecord.date) == value)
+
             elif name == "title":
                 query = query.filter(_ReportRecord.title == value)
+
             elif name == "user":
                 query = query.filter(_ReportRecord.user == value)
+
             elif name == "lang":
                 query = query.filter(_ReportRecord.lang == value)
+
             elif name == "sourcetitle":
                 query = query.filter(_ReportRecord.sourcetitle == value)
+
             elif name == "result":
                 if value in ("not_mt", "not_empty"):
                     query = query.filter(_ReportRecord.result != "", _ReportRecord.result.isnot(None))

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from sqlalchemy import Column, Date, Integer, String, Text, func
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 from ..engine import BaseDb
 
@@ -34,7 +35,7 @@ class _ReportRecord(BaseDb):
     lang = Column(String(255), nullable=False)
     sourcetitle = Column(String(255), nullable=False)
     result = Column(String(255), nullable=False)
-    data = Column(Text, nullable=False)
+    data = Column(LONGTEXT, nullable=False)
 
     def to_dict(self) -> dict[str, Any]:
         return {

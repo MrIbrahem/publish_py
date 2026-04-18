@@ -22,7 +22,7 @@ class _TranslateTypeRecord(BaseDb):
     tt_id = Column(Integer, primary_key=True, autoincrement=True)
     tt_title = Column(String(120), unique=True, nullable=False)
     tt_lead = Column(Integer, nullable=False, default=1)
-    tt_full = Column(Integer, nullable=False, default=0)
+    tt_full = Column(Integer, nullable=False, default=0, server_default=text("0"))
 
     def to_dict(self) -> dict:
         return {

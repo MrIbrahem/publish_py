@@ -4,6 +4,7 @@ import json
 from typing import Any, Optional
 
 from sqlalchemy import Column, Enum, Integer, String, Text
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 
@@ -26,7 +27,7 @@ class _SettingRecord(BaseDb):
     id = Column(Integer, primary_key=True, autoincrement=True)
     key = Column(String(190), unique=True, nullable=False)
     title = Column(String(500), nullable=False)
-    value = Column(Text, nullable=True)
+    value = Column(LONGTEXT, nullable=True)
     # value_type = Column(Enum("boolean", "string", "integer", "json"), nullable=False, default="boolean")
     value_type = Column(
         Enum("boolean", "string", "integer", name="setting_value_type"),

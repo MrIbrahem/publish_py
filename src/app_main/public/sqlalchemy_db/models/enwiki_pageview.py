@@ -20,7 +20,7 @@ class _EnwikiPageviewRecord(BaseDb):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(120), unique=True, nullable=False)
-    en_views = Column(Integer, default=0)
+    en_views = Column(Integer, default=0, server_default=text("0"))
 
     def to_dict(self) -> dict:
         return {

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, UniqueConstraint
+from sqlalchemy import Column, Integer, String, UniqueConstraint, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 
@@ -25,7 +25,7 @@ class _ViewsNewRecord(BaseDb):
     target = Column(String(120), nullable=False)
     lang = Column(String(30), nullable=False)
     year = Column(Integer, nullable=False)
-    views = Column(Integer, default=0)
+    views = Column(Integer, default=0, server_default=text("0"))
 
     __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 

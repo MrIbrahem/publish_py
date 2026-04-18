@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, text
 
 from ..engine import BaseDb
 
@@ -32,7 +32,7 @@ class _CategoryRecord(BaseDb):
     display = Column(String(120), nullable=False, default="")
     category2 = Column(String(120), nullable=False, default="")
     depth = Column(Integer, nullable=False, default=0, server_default=text("0"))
-    is_default = Column(Integer, nullable=False, default=0)
+    is_default = Column(Integer, nullable=False, default=0, server_default=text("0"))
 
     def to_dict(self) -> dict:
         return {

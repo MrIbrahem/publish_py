@@ -34,7 +34,13 @@ class _UserTokenRecord(BaseDb):
     access_token = Column(LargeBinary(1024), nullable=False)
     access_secret = Column(LargeBinary(1024), nullable=False)
     created_at = Column(Date, nullable=True, server_default=func.current_timestamp())
-    updated_at = Column(Date, nullable=True, server_default=func.current_timestamp())
+
+    updated_at = Column(
+        Date,
+        nullable=True,
+        server_default=func.current_timestamp(),
+        server_onupdate=func.current_timestamp(),
+    )
     last_used_at = Column(Date, nullable=True)
     rotated_at = Column(Date, nullable=True)
 

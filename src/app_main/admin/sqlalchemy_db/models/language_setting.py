@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, text
 
 from ....shared.sqlalchemy_db.engine import BaseDb
 
@@ -23,10 +23,10 @@ class _LanguageSettingRecord(BaseDb):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     lang_code = Column(String(20), unique=True, nullable=True)
-    move_dots = Column(Integer, default=0)
-    expend = Column(Integer, default=0)
-    add_en_lang = Column(Integer, default=0)
-    add_en_lng = Column(Integer, default=0)
+    move_dots = Column(Integer, default=0, server_default=text("0"))
+    expend = Column(Integer, default=0, server_default=text("0"))
+    add_en_lang = Column(Integer, default=0, server_default=text("0"))
+    add_en_lng = Column(Integer, default=0, server_default=text("0"))
 
     def to_dict(self) -> dict:
         return {
