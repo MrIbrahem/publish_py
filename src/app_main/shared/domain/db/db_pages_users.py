@@ -134,7 +134,7 @@ class UserPagesDB:
         target: str,
         mdwiki_revid: int | None = None,
         word: int = 0,
-    ) -> dict[str, Any]:
+    ) -> bool:
         """
         Insert a page target record.
 

@@ -14,23 +14,23 @@ from ..db_service import has_db_config
 
 logger = logging.getLogger(__name__)
 
-_publish_reports_STORE: ReportsDB | None = None
+_REPORTS_STORE: ReportsDB | None = None
 
 
 def get_publish_reports_db() -> ReportsDB:
-    global _publish_reports_STORE
+    global _REPORTS_STORE
 
-    if _publish_reports_STORE is None:
+    if _REPORTS_STORE is None:
         if not has_db_config():
             raise RuntimeError("ReportsDB requires database configuration; no fallback store is available.")
 
         try:
-            _publish_reports_STORE = ReportsDB(settings.database_data)
+            _REPORTS_STORE = ReportsDB(settings.database_data)
         except Exception as exc:  # pragma: no cover - defensive guard for startup failures
             logger.exception("Failed to initialize MySQL ReportsDB")
             raise RuntimeError("Unable to initialize ReportsDB") from exc
 
-    return _publish_reports_STORE
+    return _REPORTS_STORE
 
 
 def add_report(
@@ -72,8 +72,8 @@ def list_publish_reports() -> List[ReportRecord]:
 
     store = get_publish_reports_db()
 
-    coords = store.list()
-    return coords
+    pages = store.list()
+    return pages
 
 
 __all__ = [

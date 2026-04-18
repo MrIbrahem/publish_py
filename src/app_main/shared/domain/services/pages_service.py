@@ -32,12 +32,12 @@ def get_pages_db() -> PagesDB:
 
 
 def list_pages() -> List[PageRecord]:
-    """Return all pages while keeping settings.admins in sync."""
+    """Return all pages records."""
 
     store = get_pages_db()
 
-    coords = store.list()
-    return coords
+    pages = store.list()
+    return pages
 
 
 def add_page(title: str, main_file: str) -> PageRecord:
