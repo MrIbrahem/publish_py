@@ -4,7 +4,6 @@ from pathlib import Path
 
 def generate_domain_test_placeholders(src_root, test_root):
     """
-    ينشئ ملفات اختبار تجريبية مع نص وصفي داخلها للمسارات المحددة فقط.
     """
     src_path = Path(src_root)
     test_base = Path(test_root)
@@ -12,9 +11,7 @@ def generate_domain_test_placeholders(src_root, test_root):
     for root, dirs, files in os.walk(src_path):
         current_path = Path(root)
 
-        # التركيز فقط على مجلدات domain
-        if "domain" not in current_path.parts:
-            continue
+        # if "domain" not in current_path.parts: continue
 
         # استخراج المسار النسبي من بعد مجلد المشروع (مثلاً: admin/domain/db)
         # نستخدم current_path.relative_to(src_path) للحصول على المسار داخل src/x
@@ -38,8 +35,7 @@ def generate_domain_test_placeholders(src_root, test_root):
                 # المسار الذي سيظهر في النص الوصفي (مثلاً domain/models/user.py)
                 # نبحث عن موقع word "domain" وما بعدها
                 parts = current_path.parts
-                domain_index = parts.index("domain")
-                internal_path = "/".join(parts[domain_index:])
+                internal_path = "/".join(parts)  # parts[parts.index("domain"):]
 
                 content = f'"""\nUnit tests for {internal_path}/{file} module.\n"""\n'
                 content_new = f'"""\nUnit tests for {internal_path}/{file} module.\nTODO: write tests\n"""\n'
@@ -52,7 +48,8 @@ def generate_domain_test_placeholders(src_root, test_root):
 
 
 if __name__ == "__main__":
-    SOURCE_DIR = "src/app_main"
-    TEST_DIR = "tests/unit"
+    main_path = Path(__file__).parent.parent
+    SOURCE_DIR = main_path / "src/sqlalchemy_app"
+    TEST_DIR = main_path / "tests/unit"
 
     generate_domain_test_placeholders(SOURCE_DIR, TEST_DIR)

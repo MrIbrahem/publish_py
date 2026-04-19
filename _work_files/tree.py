@@ -2,8 +2,8 @@ from pathlib import Path
 
 from directory_tree import DisplayTree
 
-work_path = Path(__file__).parent / "src"
-tree_save_path = Path(__file__).parent / "tree.md"
+work_path = Path(__file__).parent.parent / "src"
+tree_save_path = Path(__file__).parent.parent / "tree.md"
 
 tree: str = DisplayTree(
     dirPath=str(work_path),
@@ -23,10 +23,10 @@ tree_save_path.write_text(f"```\n{tree}\n```", encoding="utf-8")
 
 # ---
 
-test_tree_save_path = Path(__file__).parent / "test_tree.md"
+test_tree_save_path = Path(__file__).parent.parent / "test_tree.md"
 
 test_tree: str = DisplayTree(
-    dirPath=str(Path(__file__).parent / "tests"),
+    dirPath=str(Path(__file__).parent.parent / "tests"),
     stringRep=True,
     header=False,
     maxDepth=float("inf"),
