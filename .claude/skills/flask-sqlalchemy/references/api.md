@@ -1,6 +1,6 @@
-# REST API احترافي مع Flask
+# Professional REST API with Flask
 
-## هيكل API كامل
+## Complete API Structure
 
 ```python
 from flask import Blueprint, jsonify, request
@@ -26,7 +26,7 @@ def paginate_query(query, page, per_page=20):
     }
 ```
 
-## CRUD كامل مع Pagination وSearch
+## Complete CRUD with Pagination and Search
 
 ```python
 @api.route('/users', methods=['GET'])
@@ -39,7 +39,7 @@ def get_users():
 
     query = User.query
 
-    # بحث
+    # Search
     if search:
         query = query.filter(
             or_(
@@ -48,7 +48,7 @@ def get_users():
             )
         )
 
-    # ترتيب
+    # Sort
     sort_column = getattr(User, sort_by, User.created_at)
     if order == 'desc':
         query = query.order_by(sort_column.desc())
@@ -62,7 +62,7 @@ def get_users():
 def get_user(id):
     user = db.session.get(User, id)
     if not user:
-        return {'error': 'المستخدم غير موجود'}, 404
+        return {'error': 'User not found'}, 404
     return jsonify(user.to_dict())
 
 
@@ -80,14 +80,14 @@ def create_user():
         return jsonify(user.to_dict()), 201
     except Exception as e:
         db.session.rollback()
-        return {'error': 'خطأ في الخادم'}, 500
+        return {'error': 'Server error'}, 500
 
 
 @api.route('/users/<int:id>', methods=['PUT', 'PATCH'])
 def update_user(id):
     user = db.session.get(User, id)
     if not user:
-        return {'error': 'المستخدم غير موجود'}, 404
+        return {'error': 'User not found'}, 404
 
     data = request.get_json()
     if 'username' in data:
@@ -103,7 +103,7 @@ def update_user(id):
 def delete_user(id):
     user = db.session.get(User, id)
     if not user:
-        return {'error': 'المستخدم غير موجود'}, 404
+        return {'error': 'User not found'}, 404
 
     db.session.delete(user)
     db.session.commit()
@@ -119,49 +119,49 @@ def validate_user_data(data, partial=False):
     if not partial or 'username' in data:
         username = data.get('username', '')
         if not username:
-            errors['username'] = 'اسم المستخدم مطلوب'
+            errors['username'] = 'Username is required'
         elif len(username) < 3:
-            errors['username'] = 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل'
+            errors['username'] = 'Username must be at least 3 characters'
         elif User.query.filter_by(username=username).first():
-            errors['username'] = 'اسم المستخدم مستخدم مسبقاً'
+            errors['username'] = 'Username already exists'
 
     if not partial or 'email' in data:
         email = data.get('email', '')
         if not email:
-            errors['email'] = 'البريد الإلكتروني مطلوب'
+            errors['email'] = 'Email is required'
         elif '@' not in email:
-            errors['email'] = 'البريد الإلكتروني غير صحيح'
+            errors['email'] = 'Invalid email'
 
     return errors
 ```
 
-## معالجة الأخطاء العامة
+## Global Error Handling
 
 ```python
-# في __init__.py أو ملف منفصل
+# in __init__.py or separate file
 @app.errorhandler(404)
 def not_found(e):
-    return {'error': 'المورد غير موجود'}, 404
+    return {'error': 'Resource not found'}, 404
 
 @app.errorhandler(405)
 def method_not_allowed(e):
-    return {'error': 'الطريقة غير مسموحة'}, 405
+    return {'error': 'Method not allowed'}, 405
 
 @app.errorhandler(422)
 def unprocessable(e):
-    return {'error': 'بيانات غير صالحة'}, 422
+    return {'error': 'Invalid data'}, 422
 
 @app.errorhandler(500)
 def server_error(e):
-    return {'error': 'خطأ في الخادم'}, 500
+    return {'error': 'Server error'}, 500
 ```
 
-## Flask-RESTful (الطريقة المنظمة)
+## Flask-RESTful (The Organized Way)
 
 ```python
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
 
-# تعريف شكل الاستجابة
+# Define response format
 user_fields = {
     'id': fields.Integer,
     'username': fields.String,
@@ -169,10 +169,10 @@ user_fields = {
     'created_at': fields.DateTime(dt_format='iso8601')
 }
 
-# Parser للتحقق من المدخلات
+# Parser for input validation
 user_parser = reqparse.RequestParser()
-user_parser.add_argument('username', type=str, required=True, help='اسم المستخدم مطلوب')
-user_parser.add_argument('email', type=str, required=True, help='البريد مطلوب')
+user_parser.add_argument('username', type=str, required=True, help='Username is required')
+user_parser.add_argument('email', type=str, required=True, help='Email is required')
 
 class UserListResource(Resource):
     @marshal_with(user_fields)
@@ -190,33 +190,33 @@ class UserListResource(Resource):
 class UserResource(Resource):
     @marshal_with(user_fields)
     def get(self, id):
-        return db.session.get(User, id) or ({'error': 'غير موجود'}, 404)
+        return db.session.get(User, id) or ({'error': 'Not found'}, 404)
 
     def delete(self, id):
         user = db.session.get(User, id)
         if not user:
-            return {'error': 'غير موجود'}, 404
+            return {'error': 'Not found'}, 404
         db.session.delete(user)
         db.session.commit()
         return '', 204
 
-# التسجيل
+# Registration
 api_ext = Api(api_blueprint)
 api_ext.add_resource(UserListResource, '/users')
 api_ext.add_resource(UserResource, '/users/<int:id>')
 ```
 
-## رموز HTTP الشائعة
+## Common HTTP Status Codes
 
-| الرمز | المعنى        | متى تستخدمه              |
-| ----- | ------------- | ------------------------ |
-| 200   | OK            | طلب ناجح                 |
-| 201   | Created       | إنشاء سجل جديد           |
-| 204   | No Content    | حذف ناجح                 |
-| 400   | Bad Request   | بيانات مفقودة أو خاطئة   |
-| 401   | Unauthorized  | يحتاج تسجيل دخول         |
-| 403   | Forbidden     | لا يملك الصلاحية         |
-| 404   | Not Found     | السجل غير موجود          |
-| 409   | Conflict      | تعارض (مثل بيانات مكررة) |
-| 422   | Unprocessable | فشل التحقق من البيانات   |
-| 500   | Server Error  | خطأ غير متوقع            |
+| Code | Meaning       | When to Use                |
+| ---- | ------------- | -------------------------- |
+| 200  | OK            | Successful request         |
+| 201  | Created       | New record created         |
+| 204  | No Content    | Successful deletion        |
+| 400  | Bad Request   | Missing or invalid data    |
+| 401  | Unauthorized  | Login required             |
+| 403  | Forbidden     | Insufficient permissions   |
+| 404  | Not Found     | Record does not exist      |
+| 409  | Conflict      | Conflict (e.g., duplicate) |
+| 422  | Unprocessable | Data validation failed     |
+| 500  | Server Error  | Unexpected error           |

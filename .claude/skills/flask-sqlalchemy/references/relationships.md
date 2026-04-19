@@ -1,6 +1,6 @@
-# العلاقات بين الجداول في SQLAlchemy
+# Relationships Between Tables in SQLAlchemy
 
-## One-to-One (واحد لواحد)
+## One-to-One
 
 ```python
 class User(db.Model):
@@ -13,12 +13,12 @@ class Profile(db.Model):
     bio = db.Column(db.Text)
     avatar_url = db.Column(db.String(255))
 
-# الاستخدام
-user.profile        # كائن Profile واحد
-profile.user        # كائن User
+# Usage
+user.profile        # Single Profile object
+profile.user        # User object
 ```
 
-## One-to-Many (واحد لكثير)
+## One-to-Many
 
 ```python
 class Category(db.Model):
@@ -32,17 +32,17 @@ class Product(db.Model):
     name = db.Column(db.String(100))
     price = db.Column(db.Float)
 
-# الاستخدام
-category.products.all()           # جميع المنتجات
-category.products.count()         # عدد المنتجات
-category.products.filter_by(price=...).all()  # فلترة (lazy='dynamic' مطلوب)
-product.category                  # التصنيف
+# Usage
+category.products.all()           # All products
+category.products.count()         # Product count
+category.products.filter_by(price=...).all()  # Filtering (requires lazy='dynamic')
+product.category                  # Category
 ```
 
-## Many-to-Many (كثير لكثير)
+## Many-to-Many
 
 ```python
-# الطريقة 1: جدول ربط بسيط
+# Method 1: Simple association table
 enrollments = db.Table('enrollments',
     db.Column('student_id', db.Integer, db.ForeignKey('students.id'), primary_key=True),
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True)
@@ -57,15 +57,15 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200))
 
-# الاستخدام
-student.courses.append(course)   # تسجيل
-student.courses.remove(course)   # إلغاء تسجيل
+# Usage
+student.courses.append(course)   # Enroll
+student.courses.remove(course)   # Unenroll
 db.session.commit()
-course.students                  # جميع الطلاب في الكورس
+course.students                  # All students in course
 ```
 
 ```python
-# الطريقة 2: موديل ربط (عند الحاجة لبيانات إضافية)
+# Method 2: Association model (when additional data needed)
 class Enrollment(db.Model):
     __tablename__ = 'enrollments'
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), primary_key=True)
@@ -76,20 +76,20 @@ class Enrollment(db.Model):
     student = db.relationship('Student', backref='enrollments')
     course = db.relationship('Course', backref='enrollments')
 
-# الاستخدام
+# Usage
 enrollment = Enrollment(student_id=1, course_id=2, grade=95.0)
 db.session.add(enrollment)
 db.session.commit()
 
-# جلب كل كورسات طالب مع الدرجات
+# Get all courses for a student with grades
 for e in student.enrollments:
     print(e.course.title, e.grade)
 ```
 
-## Self-Referential (علاقة مع نفس الجدول)
+## Self-Referential
 
 ```python
-# مثال: متابعة المستخدمين
+# Example: User followers
 followers = db.Table('followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('users.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('users.id'))
@@ -106,28 +106,28 @@ class User(db.Model):
         lazy='dynamic'
     )
 
-# الاستخدام
-user.follow(other_user)    # يتابع
-user.unfollow(other_user)  # يلغي متابعة
-user.followed.all()        # من يتابعهم
-user.followers.all()       # من يتابعونه
+# Usage
+user.follow(other_user)    # Follow
+user.unfollow(other_user)  # Unfollow
+user.followed.all()        # Who they follow
+user.followers.all()       # Who follows them
 ```
 
-## خيارات lazy Loading
+## Lazy Loading Options
 
-| القيمة       | الوصف                              | متى تستخدمها               |
-| ------------ | ---------------------------------- | -------------------------- |
-| `'select'`   | يحمّل البيانات عند الطلب (افتراضي) | معظم الحالات               |
-| `'dynamic'`  | يعيد query قابل للفلترة            | عند الحاجة لـ filter/count |
-| `'joined'`   | يحمّل مع الجدول الأصلي بـ JOIN     | عند الحاجة المتكررة        |
-| `'subquery'` | يحمّل بـ subquery منفصل            | قوائم كبيرة                |
+| Value        | Description                      | When to Use              |
+| ------------ | -------------------------------- | ------------------------ |
+| `'select'`   | Loads data on demand (default)   | Most cases               |
+| `'dynamic'`  | Returns a filterable query       | When using filter/count  |
+| `'joined'`   | Loads with parent table via JOIN | When frequently accessed |
+| `'subquery'` | Loads via separate subquery      | Large lists              |
 
-## Cascade — التأثير على السجلات المرتبطة
+## Cascade — Related Records Effect
 
 ```python
-# حذف تلقائي للسجلات المرتبطة
+# Auto-delete related records
 posts = db.relationship('Post', backref='author', cascade='all, delete-orphan')
 
-# لا تحذف السجلات المرتبطة (الافتراضي)
+# Don't delete related records (default)
 posts = db.relationship('Post', backref='author')
 ```

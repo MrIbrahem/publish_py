@@ -1,14 +1,14 @@
-# نظام المصادقة الكامل مع Flask
+# Complete Authentication System with Flask
 
-## الإعداد الأساسي
+## Basic Setup
 
 ```bash
 pip install flask-login flask-jwt-extended werkzeug
 ```
 
-## نظام Session-Based (للتطبيقات التقليدية)
+## Session-Based System (For Traditional Apps)
 
-### الموديل
+### Model
 
 ```python
 from flask_login import UserMixin
@@ -41,10 +41,10 @@ def load_user(user_id):
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return {'error': 'يجب تسجيل الدخول أولاً'}, 401
+    return {'error': 'Login required'}, 401
 ```
 
-### المسارات
+### Routes
 
 ```python
 from flask import Blueprint, request, jsonify
@@ -58,12 +58,12 @@ auth = Blueprint('auth', __name__)
 def register():
     data = request.get_json()
 
-    # التحقق من البيانات
+    # Validate data
     if not data.get('email') or not data.get('password'):
-        return {'error': 'البريد الإلكتروني وكلمة المرور مطلوبان'}, 400
+        return {'error': 'Email and password are required'}, 400
 
     if User.query.filter_by(email=data['email']).first():
-        return {'error': 'البريد الإلكتروني مستخدم مسبقاً'}, 409
+        return {'error': 'Email already in use'}, 409
 
     user = User(
         username=data['username'],
@@ -73,7 +73,7 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    return {'message': 'تم إنشاء الحساب بنجاح', 'user': user.to_dict()}, 201
+    return {'message': 'Account created successfully', 'user': user.to_dict()}, 201
 
 @auth.route('/login', methods=['POST'])
 def login():
@@ -81,19 +81,19 @@ def login():
     user = User.query.filter_by(email=data.get('email')).first()
 
     if not user or not user.check_password(data.get('password', '')):
-        return {'error': 'بيانات الدخول غير صحيحة'}, 401
+        return {'error': 'Invalid credentials'}, 401
 
     if not user.is_active:
-        return {'error': 'الحساب معطل'}, 403
+        return {'error': 'Account is disabled'}, 403
 
     login_user(user, remember=data.get('remember', False))
-    return {'message': 'تم تسجيل الدخول', 'user': user.to_dict()}
+    return {'message': 'Login successful', 'user': user.to_dict()}
 
 @auth.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
-    return {'message': 'تم تسجيل الخروج'}
+    return {'message': 'Logout successful'}
 
 @auth.route('/me', methods=['GET'])
 @login_required
@@ -103,23 +103,23 @@ def me():
 
 ---
 
-## نظام JWT (للـ APIs والتطبيقات المنفصلة)
+## JWT System (For APIs and Separate Apps)
 
-### الإعداد
+### Setup
 
 ```python
-# في config.py
+# in config.py
 JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret')
 JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
 JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 
-# في __init__.py
+# in __init__.py
 from flask_jwt_extended import JWTManager
 jwt = JWTManager()
 jwt.init_app(app)
 ```
 
-### المسارات
+### Routes
 
 ```python
 from flask_jwt_extended import (
@@ -133,7 +133,7 @@ def login_jwt():
     user = User.query.filter_by(email=data['email']).first()
 
     if not user or not user.check_password(data['password']):
-        return {'error': 'بيانات خاطئة'}, 401
+        return {'error': 'Invalid credentials'}, 401
 
     access_token = create_access_token(identity=user.id)
     refresh_token = create_refresh_token(identity=user.id)
@@ -161,7 +161,7 @@ def protected():
 
 ---
 
-## صلاحيات المستخدمين (RBAC)
+## User Permissions (RBAC)
 
 ```python
 from functools import wraps
@@ -171,11 +171,11 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin():
-            return {'error': 'صلاحيات غير كافية'}, 403
+            return {'error': 'Insufficient permissions'}, 403
         return f(*args, **kwargs)
     return decorated_function
 
-# الاستخدام
+# Usage
 @app.route('/admin/users')
 @login_required
 @admin_required
