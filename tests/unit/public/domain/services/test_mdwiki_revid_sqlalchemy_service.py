@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import MdwikiRevidRecord
+from src.sqlalchemy_app.public.domain_models import MdwikiRevidRecord
 from src.sqlalchemy_app.public.domain.models import _MdwikiRevidRecord
 from src.sqlalchemy_app.public.domain.services.mdwiki_revid_service import (
     add_mdwiki_revid,
@@ -59,60 +59,66 @@ def test_mdwiki_revid_workflow():
     assert get_mdwiki_revid_by_title("test_page") is None
 
 
-
-class TestGetMdwikiRevidsDb:
-    """Tests for get_mdwiki_revids_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new MdwikiRevidsDB is created when none cached."""
-
-
 class TestListMdwikiRevids:
     """Tests for list_mdwiki_revids function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_mdwiki_revid("t1", 1)
+        add_mdwiki_revid("t2", 2)
+        result = list_mdwiki_revids()
+        assert len(result) >= 2
 
 
 class TestGetMdwikiRevidByTitle:
     """Tests for get_mdwiki_revid_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_title."""
+        """Test that function returns record by title."""
+        add_mdwiki_revid("t1", 1)
+        result = get_mdwiki_revid_by_title("t1")
+        assert result.revid == 1
 
 
 class TestAddMdwikiRevid:
     """Tests for add_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_mdwiki_revid("t1", 1)
+        assert record.title == "t1"
+        assert record.revid == 1
 
 
 class TestAddOrUpdateMdwikiRevid:
     """Tests for add_or_update_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function upserts record."""
+        add_mdwiki_revid("t1", 1)
+        record = add_or_update_mdwiki_revid("t1", 2)
+        assert record.revid == 2
+        assert len(list_mdwiki_revids()) == 1
 
 
 class TestUpdateMdwikiRevid:
     """Tests for update_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        add_mdwiki_revid("t1", 1)
+        updated = update_mdwiki_revid("t1", 2)
+        assert updated.revid == 2
 
 
 class TestDeleteMdwikiRevid:
     """Tests for delete_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        add_mdwiki_revid("t1", 1)
+        delete_mdwiki_revid("t1")
+        assert get_mdwiki_revid_by_title("t1") is None
 
 
 class TestGetRevidForTitle:
@@ -120,6 +126,9 @@ class TestGetRevidForTitle:
 
     def test_returns_revid_when_record_exists(self, monkeypatch):
         """Test that function returns revid when record found."""
+        add_mdwiki_revid("t1", 1)
+        assert get_revid_for_title("t1") == 1
 
     def test_returns_none_when_record_not_found(self, monkeypatch):
         """Test that function returns None when record not found."""
+        assert get_revid_for_title("ghost") is None

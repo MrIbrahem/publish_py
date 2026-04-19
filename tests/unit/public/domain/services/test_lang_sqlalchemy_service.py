@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import LangRecord
+from src.sqlalchemy_app.public.domain_models import LangRecord
 from src.sqlalchemy_app.public.domain.models import _LangRecord
 from src.sqlalchemy_app.public.domain.services.lang_service import (
     add_lang,
@@ -59,63 +59,74 @@ def test_lang_workflow():
     assert get_lang(l.lang_id) is None
 
 
-class TestGetLangsDb:
-    """Tests for get_langs_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new LangsDB is created when none cached."""
-
-
 class TestListLangs:
     """Tests for list_langs function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_lang("en", "English", "English")
+        add_lang("fr", "Français", "French")
+        result = list_langs()
+        assert len(result) >= 2
 
 
 class TestGetLang:
     """Tests for get_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        l = add_lang("en", "English", "English")
+        result = get_lang(l.lang_id)
+        assert isinstance(result, LangRecord)
+        assert result.code == "en"
 
 
 class TestGetLangByCode:
     """Tests for get_lang_by_code function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_code."""
+        """Test that function returns record by code."""
+        add_lang("en", "English", "English")
+        result = get_lang_by_code("en")
+        assert result.code == "en"
 
 
 class TestAddLang:
     """Tests for add_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_lang("en", "English", "English")
+        assert record.code == "en"
 
 
 class TestAddOrUpdateLang:
     """Tests for add_or_update_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function upserts record."""
+        add_lang("en", "Old Autonym", "Old Name")
+        record = add_or_update_lang("en", "New Autonym", "New Name")
+        assert record.autonym == "New Autonym"
+        assert record.name == "New Name"
+        assert len(list_langs()) == 1
 
 
 class TestUpdateLang:
     """Tests for update_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        l = add_lang("en", "English", "English")
+        updated = update_lang(l.lang_id, autonym="Eng")
+        assert updated.autonym == "Eng"
 
 
 class TestDeleteLang:
     """Tests for delete_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        l = add_lang("en", "English", "English")
+        delete_lang(l.lang_id)
+        assert get_lang(l.lang_id) is None

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import ProjectRecord
+from src.sqlalchemy_app.public.domain_models import ProjectRecord
 from src.sqlalchemy_app.public.domain.models import _ProjectRecord
 from src.sqlalchemy_app.public.domain.services.project_service import (
     add_or_update_project,
@@ -58,64 +58,73 @@ def test_project_workflow():
     assert get_project(p.g_id) is None
 
 
-
-class TestGetProjectsDb:
-    """Tests for get_projects_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new ProjectsDB is created when none cached."""
-
-
 class TestListProjects:
     """Tests for list_projects function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_project("p1")
+        add_project("p2")
+        result = list_projects()
+        assert len(result) >= 2
 
 
 class TestGetProject:
     """Tests for get_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        p = add_project("p1")
+        result = get_project(p.g_id)
+        assert isinstance(result, ProjectRecord)
+        assert result.g_title == "p1"
 
 
 class TestGetProjectByTitle:
     """Tests for get_project_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_title."""
+        """Test that function returns record by title."""
+        add_project("p1")
+        result = get_project_by_title("p1")
+        assert result.g_title == "p1"
 
 
 class TestAddProject:
     """Tests for add_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_project("p1")
+        assert record.g_title == "p1"
 
 
 class TestAddOrUpdateProject:
     """Tests for add_or_update_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add_or_update."""
+        """Test that function upserts record."""
+        p = add_project("p1")
+        record = add_or_update_project("p1")
+        assert record.g_id == p.g_id
+        assert len(list_projects()) == 1
 
 
 class TestUpdateProject:
     """Tests for update_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        p = add_project("p1")
+        updated = update_project(p.g_id, g_title="p2")
+        assert updated.g_title == "p2"
 
 
 class TestDeleteProject:
     """Tests for delete_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        p = add_project("p1")
+        delete_project(p.g_id)
+        assert get_project(p.g_id) is None

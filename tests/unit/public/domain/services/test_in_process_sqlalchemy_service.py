@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import InProcessRecord
+from src.sqlalchemy_app.public.domain_models import InProcessRecord
 from src.sqlalchemy_app.public.domain.models import _InProcessRecord
 from src.sqlalchemy_app.public.domain.services.in_process_service import (
     add_in_process,
@@ -73,80 +73,101 @@ def test_in_process_workflow():
     assert get_in_process(ip_new.id) is None
 
 
-class TestGetInProcessDb:
-    """Tests for get_in_process_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new InProcessDB is created when none cached."""
-
-
 class TestListInProcess:
     """Tests for list_in_process function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_in_process("t1", "u1", "en")
+        add_in_process("t2", "u2", "en")
+        result = list_in_process()
+        assert len(result) >= 2
 
 
 class TestListInProcessByUser:
     """Tests for list_in_process_by_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function returns records by user."""
+        add_in_process("t1", "u1", "en")
+        add_in_process("t2", "u2", "en")
+        result = list_in_process_by_user("u1")
+        assert len(result) == 1
+        assert result[0].user == "u1"
 
 
 class TestListInProcessByLang:
     """Tests for list_in_process_by_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function returns records by language."""
+        add_in_process("t1", "u1", "en")
+        add_in_process("t2", "u1", "fr")
+        result = list_in_process_by_lang("fr")
+        assert len(result) == 1
+        assert result[0].lang == "fr"
 
 
 class TestGetInProcess:
     """Tests for get_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        ip = add_in_process("t1", "u1", "en")
+        result = get_in_process(ip.id)
+        assert isinstance(result, InProcessRecord)
+        assert result.title == "t1"
 
 
 class TestGetInProcessByTitleUserLang:
     """Tests for get_in_process_by_title_user_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function returns record by title, user, and language."""
+        add_in_process("t1", "u1", "en")
+        result = get_in_process_by_title_user_lang("t1", "u1", "en")
+        assert result.title == "t1"
 
 
 class TestAddInProcess:
     """Tests for add_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_in_process("t1", "u1", "en", word=100)
+        assert record.title == "t1"
+        assert record.word == 100
 
 
 class TestUpdateInProcess:
     """Tests for update_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        ip = add_in_process("t1", "u1", "en", word=10)
+        updated = update_in_process(ip.id, word=20)
+        assert updated.word == 20
 
 
 class TestDeleteInProcess:
     """Tests for delete_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        ip = add_in_process("t1", "u1", "en")
+        delete_in_process(ip.id)
+        assert get_in_process(ip.id) is None
 
 
 class TestDeleteInProcessByTitleUserLang:
     """Tests for delete_in_process_by_title_user_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function deletes by composite key."""
+        add_in_process("t1", "u1", "en")
+        success = delete_in_process_by_title_user_lang("t1", "u1", "en")
+        assert success is True
+        assert get_in_process_by_title_user_lang("t1", "u1", "en") is None
 
 
 class TestIsInProcess:
@@ -154,6 +175,9 @@ class TestIsInProcess:
 
     def test_returns_true_when_record_exists(self, monkeypatch):
         """Test that function returns True when record found."""
+        add_in_process("t1", "u1", "en")
+        assert is_in_process("t1", "u1", "en") is True
 
     def test_returns_false_when_record_not_found(self, monkeypatch):
         """Test that function returns False when record not found."""
+        assert is_in_process("ghost", "u1", "en") is False

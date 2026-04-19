@@ -1,11 +1,7 @@
-"""
-TODO: write tests
-"""
-
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import UserRecord
+from src.sqlalchemy_app.public.domain_models import UserRecord
 from src.sqlalchemy_app.public.domain.models import _UserRecord
 from src.sqlalchemy_app.public.domain.services.user_service import (
     add_or_update_user,
@@ -49,24 +45,16 @@ def test_user_workflow():
     delete_user(u.user_id)
     assert get_user(u.user_id) is None
 
-class TestGetUsersDb:
-    """Tests for get_users_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new UsersDB is created when none cached."""
-
 
 class TestListUsers:
     """Tests for list_users function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_user("u1")
+        add_user("u2")
+        result = list_users()
+        assert len(result) >= 2
 
 
 class TestListUsersByGroup:
@@ -74,48 +62,73 @@ class TestListUsersByGroup:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns filtered list from store."""
+        add_user("u1", user_group="GroupA")
+        add_user("u2", user_group="GroupB")
+        result = list_users_by_group("GroupA")
+        assert len(result) == 1
+        assert result[0].username == "u1"
 
 
 class TestGetUser:
     """Tests for get_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        u = add_user("u1")
+        result = get_user(u.user_id)
+        assert isinstance(result, UserRecord)
+        assert result.username == "u1"
 
 
 class TestGetUserByUsername:
     """Tests for get_user_by_username function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_username."""
+        """Test that function returns record by username."""
+        add_user("u1")
+        result = get_user_by_username("u1")
+        assert result.username == "u1"
 
 
 class TestAddUser:
     """Tests for add_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_user("u1", "e1", "w1", "g1")
+        assert record.username == "u1"
+        assert record.email == "e1"
 
 
 class TestAddOrUpdateUser:
     """Tests for add_or_update_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add_or_update."""
+        """Test that function upserts record."""
+        add_user("u1", email="old@e.com")
+        record = add_or_update_user("u1", email="new@e.com")
+        assert record.email == "new@e.com"
+        assert len(list_users()) == 1
 
 
 class TestUpdateUser:
     """Tests for update_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        u = add_user("u1", email="old")
+        updated = update_user(u.user_id, email="new")
+        assert updated.email == "new"
 
 
 class TestDeleteUser:
     """Tests for delete_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        u = add_user("u1")
+        delete_user(u.user_id)
+        assert get_user(u.user_id) is None
 
 
 class TestUserExists:
@@ -123,6 +136,9 @@ class TestUserExists:
 
     def test_returns_true_when_user_exists(self, monkeypatch):
         """Test that function returns True when user found."""
+        add_user("u1")
+        assert user_exists("u1") is True
 
     def test_returns_false_when_user_not_found(self, monkeypatch):
         """Test that function returns False when user not found."""
+        assert user_exists("ghost") is False

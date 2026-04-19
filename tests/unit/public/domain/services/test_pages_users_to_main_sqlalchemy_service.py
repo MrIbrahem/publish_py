@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import PagesUsersToMainRecord
+from src.sqlalchemy_app.public.domain_models import PagesUsersToMainRecord
 from src.sqlalchemy_app.public.domain.models import _PagesUsersToMainRecord
 from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service import (
     add_pages_users_to_main,
@@ -63,49 +63,84 @@ def test_pages_users_to_main_workflow():
     assert get_pages_users_to_main(1) is None
 
 
-class TestGetPagesUsersToMainDb:
-    """Tests for get_pages_users_to_main_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new PagesUsersToMainDB is created when none cached."""
-
-
 class TestListPagesUsersToMain:
     """Tests for list_pages_users_to_main function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        # Manual insert for pages_users
+        from sqlalchemy import text
+        from src.sqlalchemy_app.shared.domain.engine import get_session
+        with get_session() as session:
+            session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 't1'), (2, 't2')"))
+            session.commit()
+
+        add_pages_users_to_main(id=1)
+        add_pages_users_to_main(id=2)
+        result = list_pages_users_to_main()
+        assert len(result) >= 2
 
 
 class TestGetPagesUsersToMain:
     """Tests for get_pages_users_to_main function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        from sqlalchemy import text
+        from src.sqlalchemy_app.shared.domain.engine import get_session
+        with get_session() as session:
+            session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 't1')"))
+            session.commit()
+
+        add_pages_users_to_main(id=1)
+        result = get_pages_users_to_main(1)
+        assert isinstance(result, PagesUsersToMainRecord)
+        assert result.id == 1
 
 
 class TestAddPagesUsersToMain:
     """Tests for add_pages_users_to_main function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        from sqlalchemy import text
+        from src.sqlalchemy_app.shared.domain.engine import get_session
+        with get_session() as session:
+            session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 't1')"))
+            session.commit()
+
+        record = add_pages_users_to_main(id=1, new_target="target")
+        assert record.id == 1
+        assert record.new_target == "target"
 
 
 class TestUpdatePagesUsersToMain:
     """Tests for update_pages_users_to_main function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        from sqlalchemy import text
+        from src.sqlalchemy_app.shared.domain.engine import get_session
+        with get_session() as session:
+            session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 't1')"))
+            session.commit()
+
+        add_pages_users_to_main(id=1, new_target="old")
+        updated = update_pages_users_to_main(1, new_target="new")
+        assert updated.new_target == "new"
 
 
 class TestDeletePagesUsersToMain:
     """Tests for delete_pages_users_to_main function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        from sqlalchemy import text
+        from src.sqlalchemy_app.shared.domain.engine import get_session
+        with get_session() as session:
+            session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 't1')"))
+            session.commit()
+
+        add_pages_users_to_main(id=1)
+        delete_pages_users_to_main(1)
+        assert get_pages_users_to_main(1) is None

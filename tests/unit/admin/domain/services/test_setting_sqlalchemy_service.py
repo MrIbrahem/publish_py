@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.admin_models import SettingRecord
+from src.sqlalchemy_app.admin.domain_models import SettingRecord
 from src.sqlalchemy_app.admin.domain.models import _SettingRecord
 from src.sqlalchemy_app.admin.domain.services.setting_service import (
     add_setting,
@@ -53,21 +53,16 @@ def test_setting_workflow():
     delete_setting(s.id)
     assert get_setting(s.id) is None
 
-class TestGetSettingsDb:
-    """Tests for get_settings_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that the same instance is returned on multiple calls."""
-
-    def test_raises_error_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when database config is missing."""
-
 
 class TestListSettings:
     """Tests for list_settings function."""
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_settings returns all records."""
+        add_setting("k1", "t1")
+        add_setting("k2", "t2")
+        result = list_settings()
+        assert len(result) >= 2
 
 
 class TestGetSetting:
@@ -75,6 +70,10 @@ class TestGetSetting:
 
     def test_returns_setting_record(self, monkeypatch):
         """Test that function returns a SettingRecord."""
+        s = add_setting("k1", "t1")
+        result = get_setting(s.id)
+        assert isinstance(result, SettingRecord)
+        assert result.key == "k1"
 
 
 class TestGetSettingByKey:
@@ -82,6 +81,9 @@ class TestGetSettingByKey:
 
     def test_returns_setting_by_key(self, monkeypatch):
         """Test that function returns a SettingRecord by key."""
+        add_setting("k1", "t1")
+        result = get_setting_by_key("k1")
+        assert result.key == "k1"
 
 
 class TestAddSetting:
@@ -89,6 +91,8 @@ class TestAddSetting:
 
     def test_adds_setting_and_returns_record(self, monkeypatch):
         """Test that add_setting adds and returns the record."""
+        record = add_setting("k1", "t1")
+        assert record.key == "k1"
 
 
 class TestUpdateValue:
@@ -96,6 +100,9 @@ class TestUpdateValue:
 
     def test_updates_setting_value(self, monkeypatch):
         """Test that update_value updates the setting value."""
+        s = add_setting("k1", "t1", value_type="string", value="v1")
+        updated = update_value(s.id, "v2")
+        assert updated.value == "v2"
 
 
 class TestDeleteSetting:
@@ -103,3 +110,6 @@ class TestDeleteSetting:
 
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_setting calls store delete."""
+        s = add_setting("k1", "t1")
+        delete_setting(s.id)
+        assert get_setting(s.id) is None

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import ViewsNewRecord
+from src.sqlalchemy_app.public.domain_models import ViewsNewRecord
 from src.sqlalchemy_app.public.domain.models import _ViewsNewRecord
 from src.sqlalchemy_app.public.domain.services.views_new_service import (
     add_or_update_views_new,
@@ -72,80 +72,103 @@ def test_views_new_workflow():
     assert get_views_new(v.id) is None
 
 
-class TestGetViewsNewDb:
-    """Tests for get_views_new_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new ViewsNewDB is created when none cached."""
-
-
 class TestListViewsNew:
     """Tests for list_views_new function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_views_new("t1", "en", 2023)
+        add_views_new("t2", "en", 2023)
+        result = list_views_new()
+        assert len(result) >= 2
 
 
 class TestListViewsByTarget:
     """Tests for list_views_by_target function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function returns records by target."""
+        add_views_new("t1", "en", 2022)
+        add_views_new("t1", "en", 2023)
+        add_views_new("t2", "en", 2023)
+        result = list_views_by_target("t1")
+        assert len(result) == 2
+        assert all(r.target == "t1" for r in result)
 
 
 class TestListViewsByLang:
     """Tests for list_views_by_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function returns records by language."""
+        add_views_new("t1", "en", 2023)
+        add_views_new("t1", "fr", 2023)
+        result = list_views_by_lang("fr")
+        assert len(result) == 1
+        assert result[0].lang == "fr"
 
 
 class TestGetViewsNew:
     """Tests for get_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        v = add_views_new("t1", "en", 2023)
+        result = get_views_new(v.id)
+        assert isinstance(result, ViewsNewRecord)
+        assert result.target == "t1"
 
 
 class TestGetViewsByTargetLangYear:
     """Tests for get_views_by_target_lang_year function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function returns record by target, lang, and year."""
+        add_views_new("t1", "en", 2023)
+        result = get_views_by_target_lang_year("t1", "en", 2023)
+        assert result.target == "t1"
+        assert result.year == 2023
 
 
 class TestAddViewsNew:
     """Tests for add_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_views_new("t1", "en", 2023, 100)
+        assert record.target == "t1"
+        assert record.views == 100
 
 
 class TestAddOrUpdateViewsNew:
     """Tests for add_or_update_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function upserts record."""
+        add_views_new("t1", "en", 2023, 10)
+        record = add_or_update_views_new("t1", "en", 2023, 20)
+        assert record.views == 20
+        assert len(list_views_new()) == 1
 
 
 class TestUpdateViewsNew:
     """Tests for update_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        v = add_views_new("t1", "en", 2023, 10)
+        updated = update_views_new(v.id, views=20)
+        assert updated.views == 20
 
 
 class TestDeleteViewsNew:
     """Tests for delete_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        v = add_views_new("t1", "en", 2023)
+        delete_views_new(v.id)
+        assert get_views_new(v.id) is None
 
 
 class TestGetTotalViewsForTarget:
@@ -153,9 +176,15 @@ class TestGetTotalViewsForTarget:
 
     def test_returns_sum_of_views(self, monkeypatch):
         """Test that function returns sum of views."""
+        add_views_new("t1", "en", 2022, 100)
+        add_views_new("t1", "fr", 2023, 200)
+        assert get_total_views_for_target("t1") == 300
 
     def test_returns_zero_when_no_records(self, monkeypatch):
         """Test that function returns 0 when no records."""
+        assert get_total_views_for_target("ghost") == 0
 
     def test_handles_none_views(self, monkeypatch):
         """Test that function handles None views."""
+        add_views_new("t1", "en", 2022, None)
+        assert get_total_views_for_target("t1") == 0

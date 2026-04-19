@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.admin_models import LanguageSettingRecord
+from src.sqlalchemy_app.admin.domain_models import LanguageSettingRecord
 from src.sqlalchemy_app.admin.domain.models import _LanguageSettingRecord
 from src.sqlalchemy_app.admin.domain.services.language_setting_service import (
     add_language_setting,
@@ -60,21 +60,15 @@ def test_language_setting_workflow():
     assert get_language_setting(ls.id) is None
 
 
-class TestGetLanguageSettingsDb:
-    """Tests for get_language_settings_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that the same instance is returned on multiple calls."""
-
-    def test_raises_error_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when database config is missing."""
-
-
 class TestListLanguageSettings:
     """Tests for list_language_settings function."""
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_language_settings returns all records."""
+        add_language_setting("en")
+        add_language_setting("fr")
+        result = list_language_settings()
+        assert len(result) >= 2
 
 
 class TestGetLanguageSetting:
@@ -82,6 +76,10 @@ class TestGetLanguageSetting:
 
     def test_returns_setting_record(self, monkeypatch):
         """Test that function returns a LanguageSettingRecord."""
+        ls = add_language_setting("en")
+        result = get_language_setting(ls.id)
+        assert isinstance(result, LanguageSettingRecord)
+        assert result.lang_code == "en"
 
 
 class TestGetLanguageSettingByCode:
@@ -89,6 +87,9 @@ class TestGetLanguageSettingByCode:
 
     def test_returns_setting_by_lang_code(self, monkeypatch):
         """Test that function returns setting by language code."""
+        add_language_setting("en")
+        result = get_language_setting_by_code("en")
+        assert result.lang_code == "en"
 
 
 class TestAddLanguageSetting:
@@ -96,6 +97,8 @@ class TestAddLanguageSetting:
 
     def test_adds_setting_and_returns_record(self, monkeypatch):
         """Test that add_language_setting adds and returns the record."""
+        record = add_language_setting("en")
+        assert record.lang_code == "en"
 
 
 class TestAddOrUpdateLanguageSetting:
@@ -103,6 +106,10 @@ class TestAddOrUpdateLanguageSetting:
 
     def test_upserts_setting(self, monkeypatch):
         """Test that add_or_update_language_setting upserts the record."""
+        add_language_setting("en", move_dots=0)
+        record = add_or_update_language_setting("en", move_dots=1)
+        assert record.move_dots == 1
+        assert len(list_language_settings()) == 1
 
 
 class TestUpdateLanguageSetting:
@@ -110,6 +117,9 @@ class TestUpdateLanguageSetting:
 
     def test_updates_setting_and_returns_record(self, monkeypatch):
         """Test that update_language_setting updates and returns the record."""
+        ls = add_language_setting("en", move_dots=1)
+        updated = update_language_setting(ls.id, move_dots=0)
+        assert updated.move_dots == 0
 
 
 class TestDeleteLanguageSetting:
@@ -117,3 +127,6 @@ class TestDeleteLanguageSetting:
 
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_language_setting calls store delete."""
+        ls = add_language_setting("en")
+        delete_language_setting(ls.id)
+        assert get_language_setting(ls.id) is None

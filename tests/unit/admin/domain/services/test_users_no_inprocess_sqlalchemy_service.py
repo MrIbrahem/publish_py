@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.admin_models import UsersNoInprocessRecord
+from src.sqlalchemy_app.admin.domain_models import UsersNoInprocessRecord
 from src.sqlalchemy_app.admin.domain.models import _UsersNoInprocessRecord
 from src.sqlalchemy_app.admin.domain.services.users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
@@ -67,73 +67,88 @@ def test_users_no_inprocess_workflow():
     assert get_users_no_inprocess(rec.id) is None
 
 
-class TestGetUsersNoInprocessDb:
-    """Tests for get_users_no_inprocess_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new UsersNoInprocessDB is created when none cached."""
-
-
 class TestListUsersNoInprocess:
     """Tests for list_users_no_inprocess function."""
 
     def test_returns_list_from_store(self, monkeypatch):
-        """Test that function returns list from store."""
+        """Test that function returns all records."""
+        add_users_no_inprocess("u1")
+        add_users_no_inprocess("u2")
+        result = list_users_no_inprocess()
+        assert len(result) >= 2
 
 
 class TestListActiveUsersNoInprocess:
     """Tests for list_active_users_no_inprocess function."""
 
     def test_returns_list_from_store(self, monkeypatch):
-        """Test that function returns active records from store."""
+        """Test that function returns active records."""
+        add_users_no_inprocess("u1", active=1)
+        add_users_no_inprocess("u2", active=0)
+        active = list_active_users_no_inprocess()
+        assert len(active) == 1
+        assert active[0].user == "u1"
 
 
 class TestGetUsersNoInprocess:
     """Tests for get_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        rec = add_users_no_inprocess("u1")
+        result = get_users_no_inprocess(rec.id)
+        assert isinstance(result, UsersNoInprocessRecord)
+        assert result.user == "u1"
 
 
 class TestGetUsersNoInprocessByUser:
     """Tests for get_users_no_inprocess_by_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_user."""
+        """Test that function returns record by username."""
+        add_users_no_inprocess("u1")
+        result = get_users_no_inprocess_by_user("u1")
+        assert result.user == "u1"
 
 
 class TestAddUsersNoInprocess:
     """Tests for add_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns the record."""
+        record = add_users_no_inprocess("u1")
+        assert record.user == "u1"
 
 
 class TestAddOrUpdateUsersNoInprocess:
     """Tests for add_or_update_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function upserts the record."""
+        add_users_no_inprocess("u1", active=1)
+        record = add_or_update_users_no_inprocess("u1", active=0)
+        assert record.active == 0
+        assert len(list_users_no_inprocess()) == 1
 
 
 class TestUpdateUsersNoInprocess:
     """Tests for update_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns the record."""
+        rec = add_users_no_inprocess("u1", active=1)
+        updated = update_users_no_inprocess(rec.id, active=0)
+        assert updated.active == 0
 
 
 class TestDeleteUsersNoInprocess:
     """Tests for delete_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        rec = add_users_no_inprocess("u1")
+        delete_users_no_inprocess(rec.id)
+        assert get_users_no_inprocess(rec.id) is None
 
 
 class TestShouldHideFromInprocess:
@@ -141,9 +156,14 @@ class TestShouldHideFromInprocess:
 
     def test_returns_true_when_record_exists_and_active(self, monkeypatch):
         """Test that function returns True when record exists and is active."""
+        add_users_no_inprocess("u1", active=1)
+        assert should_hide_from_inprocess("u1") is True
 
     def test_returns_false_when_record_exists_but_inactive(self, monkeypatch):
         """Test that function returns False when record exists but is inactive."""
+        add_users_no_inprocess("u1", active=0)
+        assert should_hide_from_inprocess("u1") is False
 
     def test_returns_false_when_no_record(self, monkeypatch):
         """Test that function returns False when no record found."""
+        assert should_hide_from_inprocess("ghost") is False

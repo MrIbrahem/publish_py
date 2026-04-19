@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import AssessmentRecord
+from src.sqlalchemy_app.public.domain_models import AssessmentRecord
 from src.sqlalchemy_app.public.domain.models import _AssessmentRecord
 from src.sqlalchemy_app.public.domain.services.assessment_service import (
     add_assessment,
@@ -59,63 +59,74 @@ def test_assessment_workflow():
     assert get_assessment(a.id) is None
 
 
-class TestGetAssessmentsDb:
-    """Tests for get_assessments_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new AssessmentsDB is created when none cached."""
-
-
 class TestListAssessments:
     """Tests for list_assessments function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_assessment("p1")
+        add_assessment("p2")
+        result = list_assessments()
+        assert len(result) >= 2
 
 
 class TestGetAssessment:
     """Tests for get_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        a = add_assessment("p1")
+        result = get_assessment(a.id)
+        assert isinstance(result, AssessmentRecord)
+        assert result.title == "p1"
 
 
 class TestGetAssessmentByTitle:
     """Tests for get_assessment_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_title."""
+        """Test that function returns record by title."""
+        add_assessment("p1")
+        result = get_assessment_by_title("p1")
+        assert result.title == "p1"
 
 
 class TestAddAssessment:
     """Tests for add_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_assessment("p1", "High")
+        assert record.title == "p1"
+        assert record.importance == "High"
 
 
 class TestAddOrUpdateAssessment:
     """Tests for add_or_update_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function upserts record."""
+        add_assessment("p1", "Low")
+        record = add_or_update_assessment("p1", "High")
+        assert record.importance == "High"
+        assert len(list_assessments()) == 1
 
 
 class TestUpdateAssessment:
     """Tests for update_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        a = add_assessment("p1", "Low")
+        updated = update_assessment(a.id, importance="High")
+        assert updated.importance == "High"
 
 
 class TestDeleteAssessment:
     """Tests for delete_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        a = add_assessment("p1")
+        delete_assessment(a.id)
+        assert get_assessment(a.id) is None

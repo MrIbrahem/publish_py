@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.shared_models import UserTokenRecord
+from src.sqlalchemy_app.shared.domain_models import UserTokenRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 from src.sqlalchemy_app.shared.domain.models import _UserTokenRecord
 from src.sqlalchemy_app.shared.domain.services.user_token_service import (
@@ -42,8 +42,10 @@ class TestUpsertUserToken:
     """Tests for upsert_user_token function."""
 
     def test_delegates_to_store_upsert(self, monkeypatch):
-        """Test that function delegates to store.upsert."""
-        ...
+        """Test that function inserts a token."""
+        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
+        record = get_user_token(1)
+        assert record.username == "u1"
 
 
 class TestGetUserToken:
@@ -51,12 +53,19 @@ class TestGetUserToken:
 
     def test_returns_none_for_empty_user_id(self):
         """Test that None is returned for empty user_id."""
+        assert get_user_token(None) is None
+        assert get_user_token("") is None
 
     def test_returns_record_when_found(self, monkeypatch):
         """Test that record is returned when found."""
+        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
+        record = get_user_token(1)
+        assert isinstance(record, UserTokenRecord)
+        assert record.user_id == 1
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that None is returned when user not found."""
+        assert get_user_token(999) is None
 
 
 class TestDeleteUserToken:
@@ -64,9 +73,14 @@ class TestDeleteUserToken:
 
     def test_returns_none_for_empty_user_id(self, monkeypatch):
         """Test that None is returned for empty user_id."""
+        # Function returns None by default when empty user_id
+        assert delete_user_token(None) is None
 
     def test_delegates_to_store_delete(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the token."""
+        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
+        delete_user_token(1)
+        assert get_user_token(1) is None
 
 
 class TestGetUserTokenByUsername:
@@ -74,15 +88,22 @@ class TestGetUserTokenByUsername:
 
     def test_returns_none_for_empty_username(self):
         """Test that None is returned for empty username."""
+        assert get_user_token_by_username("") is None
+        assert get_user_token_by_username("   ") is None
 
     def test_strips_whitespace_from_username(self, monkeypatch):
         """Test that username is stripped of whitespace."""
+        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
+        assert get_user_token_by_username("  u1  ").user_id == 1
 
     def test_returns_record_when_found(self, monkeypatch):
         """Test that record is returned when found."""
+        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
+        assert get_user_token_by_username("u1").user_id == 1
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that None is returned when user not found."""
+        assert get_user_token_by_username("ghost") is None
 
 
 class TestDeleteUserTokenByUsername:
@@ -90,9 +111,15 @@ class TestDeleteUserTokenByUsername:
 
     def test_returns_none_for_empty_username(self, monkeypatch):
         """Test that None is returned for empty username."""
+        assert delete_user_token_by_username("") is None
 
     def test_deletes_by_user_id_when_found(self, monkeypatch):
         """Test that token is deleted by user_id when username found."""
+        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
+        delete_user_token_by_username("u1")
+        assert get_user_token(1) is None
 
     def test_skips_delete_when_user_not_found(self, monkeypatch):
         """Test that delete is skipped when username not found."""
+        # Should not raise error
+        delete_user_token_by_username("non_existent")

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import TranslateTypeRecord
+from src.sqlalchemy_app.public.domain_models import TranslateTypeRecord
 from src.sqlalchemy_app.public.domain.models import _TranslateTypeRecord
 from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     add_or_update_translate_type,
@@ -74,80 +74,102 @@ def test_translate_type_workflow():
     assert get_translate_type(tt.tt_id) is None
 
 
-class TestGetTranslateTypeDb:
-    """Tests for get_translate_type_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new TranslateTypeDB is created when none cached."""
-
-
 class TestListTranslateTypes:
     """Tests for list_translate_types function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_translate_type("t1")
+        add_translate_type("t2")
+        result = list_translate_types()
+        assert len(result) >= 2
 
 
 class TestListLeadEnabledTypes:
     """Tests for list_lead_enabled_types function."""
 
     def test_returns_list_from_store(self, monkeypatch):
-        """Test that function returns list from store."""
+        """Test that function returns list of lead enabled types."""
+        add_translate_type("t1", tt_lead=1)
+        add_translate_type("t2", tt_lead=0)
+        result = list_lead_enabled_types()
+        assert len(result) == 1
+        assert result[0].tt_title == "t1"
 
 
 class TestListFullEnabledTypes:
     """Tests for list_full_enabled_types function."""
 
     def test_returns_list_from_store(self, monkeypatch):
-        """Test that function returns list from store."""
+        """Test that function returns list of full enabled types."""
+        add_translate_type("t1", tt_full=1)
+        add_translate_type("t2", tt_full=0)
+        result = list_full_enabled_types()
+        assert len(result) == 1
+        assert result[0].tt_title == "t1"
 
 
 class TestGetTranslateType:
     """Tests for get_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        tt = add_translate_type("t1")
+        result = get_translate_type(tt.tt_id)
+        assert isinstance(result, TranslateTypeRecord)
+        assert result.tt_title == "t1"
 
 
 class TestGetTranslateTypeByTitle:
     """Tests for get_translate_type_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_title."""
+        """Test that function returns record by title."""
+        add_translate_type("t1")
+        result = get_translate_type_by_title("t1")
+        assert result.tt_title == "t1"
 
 
 class TestAddTranslateType:
     """Tests for add_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_translate_type("t1", 1, 0)
+        assert record.tt_title == "t1"
+        assert record.tt_lead == 1
 
 
 class TestAddOrUpdateTranslateType:
     """Tests for add_or_update_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add_or_update."""
+        """Test that function upserts record."""
+        add_translate_type("t1", 1, 0)
+        record = add_or_update_translate_type("t1", 0, 1)
+        assert record.tt_lead == 0
+        assert record.tt_full == 1
+        assert len(list_translate_types()) == 1
 
 
 class TestUpdateTranslateType:
     """Tests for update_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        tt = add_translate_type("t1", 1, 0)
+        updated = update_translate_type(tt.tt_id, tt_full=1)
+        assert updated.tt_full == 1
 
 
 class TestDeleteTranslateType:
     """Tests for delete_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        tt = add_translate_type("t1")
+        delete_translate_type(tt.tt_id)
+        assert get_translate_type(tt.tt_id) is None
 
 
 class TestCanTranslateLead:
@@ -155,12 +177,17 @@ class TestCanTranslateLead:
 
     def test_returns_true_when_tt_lead_is_1(self, monkeypatch):
         """Test that function returns True when tt_lead is 1."""
+        add_translate_type("t1", tt_lead=1)
+        assert can_translate_lead("t1") is True
 
     def test_returns_false_when_tt_lead_is_0(self, monkeypatch):
         """Test that function returns False when tt_lead is 0."""
+        add_translate_type("t1", tt_lead=0)
+        assert can_translate_lead("t1") is False
 
     def test_returns_true_when_no_record(self, monkeypatch):
         """Test that function returns True when no record found (default behavior)."""
+        assert can_translate_lead("ghost") is True
 
 
 class TestCanTranslateFull:
@@ -168,9 +195,14 @@ class TestCanTranslateFull:
 
     def test_returns_true_when_tt_full_is_1(self, monkeypatch):
         """Test that function returns True when tt_full is 1."""
+        add_translate_type("t1", tt_full=1)
+        assert can_translate_full("t1") is True
 
     def test_returns_false_when_tt_full_is_0(self, monkeypatch):
         """Test that function returns False when tt_full is 0."""
+        add_translate_type("t1", tt_full=0)
+        assert can_translate_full("t1") is False
 
     def test_returns_false_when_no_record(self, monkeypatch):
         """Test that function returns False when no record found (default behavior)."""
+        assert can_translate_full("ghost") is False

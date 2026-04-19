@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.public_models import EnwikiPageviewRecord
+from src.sqlalchemy_app.public.domain_models import EnwikiPageviewRecord
 from src.sqlalchemy_app.public.domain.models import _EnwikiPageviewRecord
 from src.sqlalchemy_app.public.domain.services.enwiki_pageview_service import (
     add_enwiki_pageview,
@@ -64,74 +64,91 @@ def test_enwiki_pageview_workflow():
     assert get_enwiki_pageview(p.id) is None
 
 
-
-class TestGetEnwikiPageviewsDb:
-    """Tests for get_enwiki_pageviews_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new EnwikiPageviewsDB is created when none cached."""
-
-
 class TestListEnwikiPageviews:
     """Tests for list_enwiki_pageviews function."""
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
+        add_enwiki_pageview("p1")
+        add_enwiki_pageview("p2")
+        result = list_enwiki_pageviews()
+        assert len(result) >= 2
 
 
 class TestGetTopEnwikiPageviews:
     """Tests for get_top_enwiki_pageviews function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.list_by_views."""
+        """Test that function returns top records by views."""
+        add_enwiki_pageview("p1", 10)
+        add_enwiki_pageview("p2", 100)
+        top = get_top_enwiki_pageviews(1)
+        assert len(top) == 1
+        assert top[0].title == "p2"
 
     def test_uses_default_limit(self, monkeypatch):
-        """Test that function uses default limit of 100."""
+        """Test that function uses default limit."""
+        # Just check it runs
+        get_top_enwiki_pageviews()
 
 
 class TestGetEnwikiPageview:
     """Tests for get_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_id."""
+        """Test that function returns record by ID."""
+        p = add_enwiki_pageview("p1")
+        result = get_enwiki_pageview(p.id)
+        assert isinstance(result, EnwikiPageviewRecord)
+        assert result.title == "p1"
 
 
 class TestGetEnwikiPageviewByTitle:
     """Tests for get_enwiki_pageview_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.fetch_by_title."""
+        """Test that function returns record by title."""
+        add_enwiki_pageview("p1")
+        result = get_enwiki_pageview_by_title("p1")
+        assert result.title == "p1"
 
 
 class TestAddEnwikiPageview:
     """Tests for add_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.add."""
+        """Test that function adds and returns record."""
+        record = add_enwiki_pageview("p1", 100)
+        assert record.title == "p1"
+        assert record.en_views == 100
 
 
 class TestAddOrUpdateEnwikiPageview:
     """Tests for add_or_update_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store."""
+        """Test that function upserts record."""
+        add_enwiki_pageview("p1", 10)
+        record = add_or_update_enwiki_pageview("p1", 20)
+        assert record.en_views == 20
+        assert len(list_enwiki_pageviews()) == 1
 
 
 class TestUpdateEnwikiPageview:
     """Tests for update_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.update."""
+        """Test that function updates and returns record."""
+        p = add_enwiki_pageview("p1", 10)
+        updated = update_enwiki_pageview(p.id, en_views=20)
+        assert updated.en_views == 20
 
 
 class TestDeleteEnwikiPageview:
     """Tests for delete_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function delegates to store.delete."""
+        """Test that function deletes the record."""
+        p = add_enwiki_pageview("p1")
+        delete_enwiki_pageview(p.id)
+        assert get_enwiki_pageview(p.id) is None
