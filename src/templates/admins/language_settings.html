@@ -19,13 +19,14 @@
                     class="row g-3 align-items-end">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="col-md-3">
-                        <label class="form-label" for="new-lang-code">Language</label>
-                        <select name="lang_code" id="new-lang-code" class="form-select" required>
-                            <option value="" selected disabled>Select language...</option>
+                        <label class="form-label" for="new-lang-code">Language Code</label>
+                        <input type="text" name="lang_code" id="new-lang-code" class="form-control" required placeholder="Enter language code (e.g., 'en', 'es')">
+                        <!-- <select name="lang_code" id="new-lang-code" class="form-select" required>
+                            <option value="" disabled>Select language...</option>
                             {% for lang in languages %}
                             <option value="{{ lang.code }}">{{ lang.name }} ({{ lang.code }})</option>
                             {% endfor %}
-                        </select>
+                        </select> -->
                     </div>
                     <div class="col-md-2">
                         <div class="form-check form-switch">

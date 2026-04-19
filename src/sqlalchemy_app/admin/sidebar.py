@@ -20,15 +20,17 @@ class SidebarItem:
     ready: bool = False
 
 
-def generate_list_item(href, title, icon=None, target=None):
+def generate_list_item(href, item) -> str:
     """Generate HTML for a single navigation link."""
-    icon_tag = f"<i class='bi {icon} me-1'></i>" if icon else ""
-    target_attr = "target='_blank'" if target else ""
+    icon_tag = f"<i class='bi {item.icon} me-1'></i>" if item.icon else ""
+    target_attr = "target='_blank'" if item.target else ""
+    span_class = "text-decoration-line-through" if not item.ready else ""
+
     link = f"""
-        <a {target_attr} class='link_nav rounded' href='{href}' title='{title}'
+        <a {target_attr} class='link_nav rounded' href='{href}' title='{item.title}'
            data-bs-toggle='tooltip' data-bs-placement='right'>
             {icon_tag}
-            <span class='hide-on-collapse-inline'>{title}</span>
+            <span class='hide-on-collapse-inline {span_class}'>{item.title}</span>
         </a>
     """
     return link.strip()
@@ -120,6 +122,7 @@ def create_side(active_route):
                 href="coordinators",
                 title="Coordinators",
                 icon="bi-person-gear",
+                ready=True,
             ),
             SidebarItem(
                 id="Emails",
@@ -134,6 +137,7 @@ def create_side(active_route):
                 href="full_translators",
                 title="Full translators",
                 icon="bi-person-check",
+                ready=True,
             ),
             SidebarItem(
                 id="user_inp",
@@ -141,6 +145,7 @@ def create_side(active_route):
                 href="users_no_inprocess",
                 title="Not in process",
                 icon="bi-hourglass",
+                ready=True,
             ),
         ],
         "Others": [
@@ -164,6 +169,7 @@ def create_side(active_route):
                 href="settings",
                 title="Settings",
                 icon="bi-gear",
+                ready=True,
             ),
             SidebarItem(
                 id="categories",
@@ -187,6 +193,7 @@ def create_side(active_route):
                 href="language_settings",
                 title="Fix refs (Options)",
                 icon="bi-wrench-adjustable",
+                ready=True,
             ),
             SidebarItem(
                 id="fixwikirefs",
@@ -195,6 +202,7 @@ def create_side(active_route):
                 title="Fixwikirefs",
                 target="_blank",
                 icon="bi-wrench",
+                ready=True,
             ),
         ],
     }
@@ -213,10 +221,7 @@ def create_side(active_route):
 
             css_class = "active" if (active_route == item.href or item.href.startswith(f"{active_route}/")) else ""
             href_full = item.href if item.target else f"/admin/{item.href}"
-            link = generate_list_item(href_full, item.title, item.icon, item.target)
-
-            if not item.ready:
-                link = f"<s>{link}</s>"
+            link = generate_list_item(href_full, item)
 
             lis.append(f"<li id='{item.id}' class='{css_class}'>{link}</li>")
 

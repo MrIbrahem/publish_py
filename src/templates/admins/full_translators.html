@@ -70,7 +70,7 @@
                         <td>{{ translator.id }}</td>
                         <td>{{ translator.user }}</td>
                         <td class="text-center">
-                            {% set endpoint_target = 'admin.deactivate_full_translator' if coordinator.is_active else 'admin.activate_full_translator' %}
+                            {% set endpoint_target = 'admin.deactivate_full_translator' if translator.is_active else 'admin.activate_full_translator' %}
                             <form method="post"
                                 action="{{ url_for(endpoint_target, translator_id=translator.id) }}"
                                 class="d-inline">
