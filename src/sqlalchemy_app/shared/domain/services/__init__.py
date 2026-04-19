@@ -41,7 +41,7 @@ __all__ = [
     "delete_user_token",
     "get_user_token_by_username",
     "delete_user_token_by_username",
-    # publish_reports_service
+    # report_service
     "add_report",
     "delete_report",
     "list_reports",
