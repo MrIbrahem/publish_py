@@ -7,7 +7,7 @@ Tests for pages_users_to_main service layer which provides cached access to Page
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.pages_users_to_main_service import (
+from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service import (
     add_pages_users_to_main,
     delete_pages_users_to_main,
     get_pages_users_to_main,

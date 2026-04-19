@@ -7,7 +7,7 @@ Tests for enwiki_pageviews service layer which provides cached access to EnwikiP
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.enwiki_pageview_service import (
+from src.sqlalchemy_app.public.domain.services.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
     delete_enwiki_pageview,

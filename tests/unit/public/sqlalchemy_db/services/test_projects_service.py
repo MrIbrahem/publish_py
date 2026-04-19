@@ -7,7 +7,7 @@ Tests for projects service layer which provides cached access to ProjectsDB.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.project_service import (
+from src.sqlalchemy_app.public.domain.services.project_service import (
     add_or_update_project,
     add_project,
     delete_project,

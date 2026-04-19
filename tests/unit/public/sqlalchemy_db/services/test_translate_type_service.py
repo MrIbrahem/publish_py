@@ -7,7 +7,7 @@ Tests for translate_type service layer which provides cached access to Translate
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.translate_type_service import (
+from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     add_or_update_translate_type,
     add_translate_type,
     can_translate_full,

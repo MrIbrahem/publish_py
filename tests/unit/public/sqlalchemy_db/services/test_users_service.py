@@ -7,7 +7,7 @@ Tests for users service layer which provides cached access to UsersDB.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.user_service import (
+from src.sqlalchemy_app.public.domain.services.user_service import (
     add_or_update_user,
     add_user,
     delete_user,

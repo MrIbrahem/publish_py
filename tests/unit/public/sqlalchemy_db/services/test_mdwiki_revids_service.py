@@ -7,7 +7,7 @@ Tests for mdwiki_revids service layer which provides cached access to MdwikiRevi
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.mdwiki_revid_service import (
+from src.sqlalchemy_app.public.domain.services.mdwiki_revid_service import (
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
     delete_mdwiki_revid,

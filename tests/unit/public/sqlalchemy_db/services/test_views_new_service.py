@@ -7,7 +7,7 @@ Tests for views_new service layer which provides cached access to ViewsNewDB.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.views_new_service import (
+from src.sqlalchemy_app.public.domain.services.views_new_service import (
     add_or_update_views_new,
     add_views_new,
     delete_views_new,

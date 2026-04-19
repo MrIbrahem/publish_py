@@ -7,7 +7,7 @@ Tests for in_process service layer which provides cached access to InProcessDB.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.in_process_service import (
+from src.sqlalchemy_app.public.domain.services.in_process_service import (
     add_in_process,
     delete_in_process,
     delete_in_process_by_title_user_lang,

@@ -7,13 +7,12 @@ Tests for assessments service layer which provides cached access to AssessmentsD
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.assessment_service import (
+from src.sqlalchemy_app.public.domain.services.assessment_service import (
     add_assessment,
     add_or_update_assessment,
     delete_assessment,
     get_assessment,
     get_assessment_by_title,
-    get_assessments_db,
     list_assessments,
     update_assessment,
 )

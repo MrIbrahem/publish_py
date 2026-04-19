@@ -7,7 +7,7 @@ Tests for words service layer which provides cached access to WordsDB.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.word_service import (
+from src.sqlalchemy_app.public.domain.services.word_service import (
     add_or_update_word,
     add_word,
     delete_word,

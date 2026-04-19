@@ -7,7 +7,7 @@ Tests for refs_counts service layer which provides cached access to RefsCountsDB
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.refs_count_service import (
+from src.sqlalchemy_app.public.domain.services.refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,
     delete_refs_count,

@@ -7,7 +7,7 @@ Tests for langs service layer which provides cached access to LangsDB.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.lang_service import (
+from src.sqlalchemy_app.public.domain.services.lang_service import (
     add_lang,
     add_or_update_lang,
     delete_lang,
