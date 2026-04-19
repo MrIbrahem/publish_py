@@ -10,11 +10,11 @@ class TestGetOauthClient:
 
     def test_creates_oauth1_object(self):
         """Test that OAuth1 object is created correctly."""
-        with patch("src.app_main.shared.clients.oauth_client.settings") as mock_settings:
+        with patch("src.sqlalchemy_app.shared.clients.oauth_client.settings") as mock_settings:
             mock_settings.oauth.consumer_key = "test_consumer_key"
             mock_settings.oauth.consumer_secret = "test_consumer_secret"
 
-            from src.app_main.shared.clients.oauth_client import get_oauth_client
+            from src.sqlalchemy_app.shared.clients.oauth_client import get_oauth_client
 
             result = get_oauth_client("access_key", "access_secret", "en.wikipedia.org")
 
@@ -29,8 +29,8 @@ class TestGetCsrfToken:
     def test_returns_token_response(self):
         """Test that CSRF token is retrieved from API."""
         with (
-            patch("src.app_main.shared.clients.oauth_client.requests") as mock_requests,
-            patch("src.app_main.shared.clients.oauth_client.settings") as mock_settings,
+            patch("src.sqlalchemy_app.shared.clients.oauth_client.requests") as mock_requests,
+            patch("src.sqlalchemy_app.shared.clients.oauth_client.settings") as mock_settings,
         ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
@@ -39,7 +39,7 @@ class TestGetCsrfToken:
             mock_response.json.return_value = {"query": {"tokens": {"csrftoken": "test_csrf_token+\\"}}}
             mock_requests.get.return_value = mock_response
 
-            from src.app_main.shared.clients.oauth_client import get_csrf_token
+            from src.sqlalchemy_app.shared.clients.oauth_client import get_csrf_token
 
             result = get_csrf_token("access_key", "access_secret", "en")
 
@@ -54,9 +54,9 @@ class TestPostParams:
     def test_includes_csrf_token_in_request(self):
         """Test that CSRF token is included in POST request."""
         with (
-            patch("src.app_main.shared.clients.oauth_client.get_csrf_token") as mock_get_token,
-            patch("src.app_main.shared.clients.oauth_client.requests") as mock_requests,
-            patch("src.app_main.shared.clients.oauth_client.settings") as mock_settings,
+            patch("src.sqlalchemy_app.shared.clients.oauth_client.get_csrf_token") as mock_get_token,
+            patch("src.sqlalchemy_app.shared.clients.oauth_client.requests") as mock_requests,
+            patch("src.sqlalchemy_app.shared.clients.oauth_client.settings") as mock_settings,
         ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
@@ -66,7 +66,7 @@ class TestPostParams:
             mock_response.text = '{"success": true}'
             mock_requests.post.return_value = mock_response
 
-            from src.app_main.shared.clients.oauth_client import post_params
+            from src.sqlalchemy_app.shared.clients.oauth_client import post_params
 
             result = post_params(
                 {"action": "edit"},
@@ -83,15 +83,15 @@ class TestPostParams:
     def test_returns_error_when_csrf_fails(self):
         """Test that error is returned when CSRF token retrieval fails."""
         with (
-            patch("src.app_main.shared.clients.oauth_client.get_csrf_token") as mock_get_token,
-            patch("src.app_main.shared.clients.oauth_client.settings") as mock_settings,
+            patch("src.sqlalchemy_app.shared.clients.oauth_client.get_csrf_token") as mock_get_token,
+            patch("src.sqlalchemy_app.shared.clients.oauth_client.settings") as mock_settings,
         ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
 
             mock_get_token.return_value = {"error": {"code": "mwoauth-invalid-authorization"}}
 
-            from src.app_main.shared.clients.oauth_client import post_params
+            from src.sqlalchemy_app.shared.clients.oauth_client import post_params
 
             result = post_params(
                 {"action": "edit"},
@@ -109,10 +109,10 @@ class TestGetCxtoken:
 
     def test_returns_cxtoken_response(self):
         """Test that cxtoken is retrieved successfully."""
-        with patch("src.app_main.shared.clients.oauth_client.post_params") as mock_post:
+        with patch("src.sqlalchemy_app.shared.clients.oauth_client.post_params") as mock_post:
             mock_post.return_value = '{"cxtoken": "some_cx_token"}'
 
-            from src.app_main.shared.clients.oauth_client import get_cxtoken
+            from src.sqlalchemy_app.shared.clients.oauth_client import get_cxtoken
 
             result = get_cxtoken("en", "access_key", "access_secret")
 
@@ -121,10 +121,10 @@ class TestGetCxtoken:
 
     def test_returns_error_on_invalid_json(self):
         """Test that error is returned on invalid JSON response."""
-        with patch("src.app_main.shared.clients.oauth_client.post_params") as mock_post:
+        with patch("src.sqlalchemy_app.shared.clients.oauth_client.post_params") as mock_post:
             mock_post.return_value = "not valid json"
 
-            from src.app_main.shared.clients.oauth_client import get_cxtoken
+            from src.sqlalchemy_app.shared.clients.oauth_client import get_cxtoken
 
             result = get_cxtoken("en", "access_key", "access_secret")
 
