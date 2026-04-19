@@ -181,9 +181,9 @@ def create_side(active_route):
                 icon="bi-graph-up",
             ),
             SidebarItem(
-                id="wikirefs_options",
+                id="language_settings",
                 admin=1,
-                href="wikirefs_options",
+                href="language_settings",
                 title="Fix refs (Options)",
                 icon="bi-wrench-adjustable",
             ),
