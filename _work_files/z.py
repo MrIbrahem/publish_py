@@ -42,9 +42,12 @@ def generate_domain_test_placeholders(src_root, test_root):
 
                 if test_file_path.exists():
                     text = test_file_path.read_text(encoding="utf-8")
-                    if content.strip() == text.strip():
+                    if content.strip() == text.strip() or not text.strip():
                         with open(test_file_path, "w", encoding="utf-8") as f:
                             f.write(content_new)
+                else:
+                    with open(test_file_path, "w", encoding="utf-8") as f:
+                        f.write(content_new)
 
 
 if __name__ == "__main__":
