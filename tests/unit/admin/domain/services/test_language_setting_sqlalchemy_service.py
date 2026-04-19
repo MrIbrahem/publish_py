@@ -30,28 +30,28 @@ def setup_db():
 
 def test_language_setting_workflow():
     # Test add
-    ls = add_language_setting("en", 1, 0, 1)
-    assert ls.lang_code == "en"
+    ls = add_language_setting("ar", 1, 0, 1)
+    assert ls.lang_code == "ar"
     assert ls.move_dots == 1
 
     # Test get
     ls2 = get_language_setting(ls.id)
-    assert ls2.lang_code == "en"
+    assert ls2.lang_code == "ar"
 
     # Test get by code
-    ls3 = get_language_setting_by_code("en")
+    ls3 = get_language_setting_by_code("ar")
     assert ls3.id == ls.id
 
     # Test list
     all_ls = list_language_settings()
-    assert any(x.lang_code == "en" for x in all_ls)
+    assert any(x.lang_code == "ar" for x in all_ls)
 
     # Test update
     updated = update_language_setting(ls.id, move_dots=0)
     assert updated.move_dots == 0
 
     # Test add_or_update
-    ls4 = add_or_update_language_setting("en", 1, 1, 1)
+    ls4 = add_or_update_language_setting("ar", 1, 1, 1)
     assert ls4.move_dots == 1
     assert ls4.expend == 1
 
@@ -65,7 +65,7 @@ class TestListLanguageSettings:
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_language_settings returns all records."""
-        add_language_setting("en")
+        add_language_setting("es")
         add_language_setting("fr")
         result = list_language_settings()
         assert len(result) >= 2
@@ -76,10 +76,10 @@ class TestGetLanguageSetting:
 
     def test_returns_setting_record(self, monkeypatch):
         """Test that function returns a LanguageSettingRecord."""
-        ls = add_language_setting("en")
+        ls = add_language_setting("zh")
         result = get_language_setting(ls.id)
         assert isinstance(result, LanguageSettingRecord)
-        assert result.lang_code == "en"
+        assert result.lang_code == "zh"
 
 
 class TestGetLanguageSettingByCode:
@@ -87,9 +87,9 @@ class TestGetLanguageSettingByCode:
 
     def test_returns_setting_by_lang_code(self, monkeypatch):
         """Test that function returns setting by language code."""
-        add_language_setting("en")
-        result = get_language_setting_by_code("en")
-        assert result.lang_code == "en"
+        add_language_setting("hi")
+        result = get_language_setting_by_code("hi")
+        assert result.lang_code == "hi"
 
 
 class TestAddLanguageSetting:
@@ -97,8 +97,8 @@ class TestAddLanguageSetting:
 
     def test_adds_setting_and_returns_record(self, monkeypatch):
         """Test that add_language_setting adds and returns the record."""
-        record = add_language_setting("en")
-        assert record.lang_code == "en"
+        record = add_language_setting("pt")
+        assert record.lang_code == "pt"
 
 
 class TestAddOrUpdateLanguageSetting:
@@ -106,8 +106,8 @@ class TestAddOrUpdateLanguageSetting:
 
     def test_upserts_setting(self, monkeypatch):
         """Test that add_or_update_language_setting upserts the record."""
-        add_language_setting("en", move_dots=0)
-        record = add_or_update_language_setting("en", move_dots=1)
+        add_language_setting("ru", move_dots=0)
+        record = add_or_update_language_setting("ru", move_dots=1)
         assert record.move_dots == 1
         assert len(list_language_settings()) == 1
 
@@ -117,7 +117,7 @@ class TestUpdateLanguageSetting:
 
     def test_updates_setting_and_returns_record(self, monkeypatch):
         """Test that update_language_setting updates and returns the record."""
-        ls = add_language_setting("en", move_dots=1)
+        ls = add_language_setting("ja", move_dots=1)
         updated = update_language_setting(ls.id, move_dots=0)
         assert updated.move_dots == 0
 
@@ -127,6 +127,6 @@ class TestDeleteLanguageSetting:
 
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_language_setting calls store delete."""
-        ls = add_language_setting("en")
+        ls = add_language_setting("de")
         delete_language_setting(ls.id)
         assert get_language_setting(ls.id) is None

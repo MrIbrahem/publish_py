@@ -30,33 +30,33 @@ def setup_db():
 
 def test_mdwiki_revid_workflow():
     # Test add
-    r = add_mdwiki_revid("test_page", 12345)
-    assert r.title == "test_page"
-    assert r.revid == 12345
+    r = add_mdwiki_revid("Cell biology", 1234567)
+    assert r.title == "Cell biology"
+    assert r.revid == 1234567
 
     # Test get by title
-    r2 = get_mdwiki_revid_by_title("test_page")
-    assert r2.revid == 12345
+    r2 = get_mdwiki_revid_by_title("Cell biology")
+    assert r2.revid == 1234567
 
     # Test get_revid_for_title
-    revid = get_revid_for_title("test_page")
-    assert revid == 12345
+    revid = get_revid_for_title("Cell biology")
+    assert revid == 1234567
 
     # Test list
     all_r = list_mdwiki_revids()
-    assert any(x.title == "test_page" for x in all_r)
+    assert any(x.title == "Cell biology" for x in all_r)
 
     # Test update
-    updated = update_mdwiki_revid("test_page", 67890)
-    assert updated.revid == 67890
+    updated = update_mdwiki_revid("Cell biology", 7654321)
+    assert updated.revid == 7654321
 
     # Test add_or_update
-    r3 = add_or_update_mdwiki_revid("test_page", 11111)
-    assert r3.revid == 11111
+    r3 = add_or_update_mdwiki_revid("Cell biology", 9999999)
+    assert r3.revid == 9999999
 
     # Test delete
-    delete_mdwiki_revid("test_page")
-    assert get_mdwiki_revid_by_title("test_page") is None
+    delete_mdwiki_revid("Cell biology")
+    assert get_mdwiki_revid_by_title("Cell biology") is None
 
 
 class TestListMdwikiRevids:
@@ -64,8 +64,8 @@ class TestListMdwikiRevids:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_mdwiki_revid("t1", 1)
-        add_mdwiki_revid("t2", 2)
+        add_mdwiki_revid("Vaccine", 1010101)
+        add_mdwiki_revid("Antibiotics", 2020202)
         result = list_mdwiki_revids()
         assert len(result) >= 2
 
@@ -75,9 +75,9 @@ class TestGetMdwikiRevidByTitle:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title."""
-        add_mdwiki_revid("t1", 1)
-        result = get_mdwiki_revid_by_title("t1")
-        assert result.revid == 1
+        add_mdwiki_revid("Aspirin", 3030303)
+        result = get_mdwiki_revid_by_title("Aspirin")
+        assert result.revid == 3030303
 
 
 class TestAddMdwikiRevid:
@@ -85,9 +85,9 @@ class TestAddMdwikiRevid:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_mdwiki_revid("t1", 1)
-        assert record.title == "t1"
-        assert record.revid == 1
+        record = add_mdwiki_revid("Penicillin", 4040404)
+        assert record.title == "Penicillin"
+        assert record.revid == 4040404
 
 
 class TestAddOrUpdateMdwikiRevid:
@@ -95,9 +95,9 @@ class TestAddOrUpdateMdwikiRevid:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts record."""
-        add_mdwiki_revid("t1", 1)
-        record = add_or_update_mdwiki_revid("t1", 2)
-        assert record.revid == 2
+        add_mdwiki_revid("Insulin", 5050505)
+        record = add_or_update_mdwiki_revid("Insulin", 6060606)
+        assert record.revid == 6060606
         assert len(list_mdwiki_revids()) == 1
 
 
@@ -106,9 +106,9 @@ class TestUpdateMdwikiRevid:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        add_mdwiki_revid("t1", 1)
-        updated = update_mdwiki_revid("t1", 2)
-        assert updated.revid == 2
+        add_mdwiki_revid("Paracetamol", 7070707)
+        updated = update_mdwiki_revid("Paracetamol", 8080808)
+        assert updated.revid == 8080808
 
 
 class TestDeleteMdwikiRevid:
@@ -116,9 +116,9 @@ class TestDeleteMdwikiRevid:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        add_mdwiki_revid("t1", 1)
-        delete_mdwiki_revid("t1")
-        assert get_mdwiki_revid_by_title("t1") is None
+        add_mdwiki_revid("Ibuprofen", 9090909)
+        delete_mdwiki_revid("Ibuprofen")
+        assert get_mdwiki_revid_by_title("Ibuprofen") is None
 
 
 class TestGetRevidForTitle:
@@ -126,9 +126,9 @@ class TestGetRevidForTitle:
 
     def test_returns_revid_when_record_exists(self, monkeypatch):
         """Test that function returns revid when record found."""
-        add_mdwiki_revid("t1", 1)
-        assert get_revid_for_title("t1") == 1
+        add_mdwiki_revid("Morphine", 1112223)
+        assert get_revid_for_title("Morphine") == 1112223
 
     def test_returns_none_when_record_not_found(self, monkeypatch):
         """Test that function returns None when record not found."""
-        assert get_revid_for_title("ghost") is None
+        assert get_revid_for_title("Ghost_Article") is None

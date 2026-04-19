@@ -34,39 +34,39 @@ def setup_db():
 
 def test_translate_type_workflow():
     # Test add
-    tt = add_translate_type("test_type", 1, 0)
-    assert tt.tt_title == "test_type"
+    tt = add_translate_type("Medical history", 1, 0)
+    assert tt.tt_title == "Medical history"
     assert tt.tt_lead == 1
 
     # Test get
     tt2 = get_translate_type(tt.tt_id)
-    assert tt2.tt_title == "test_type"
+    assert tt2.tt_title == "Medical history"
 
     # Test get by title
-    tt3 = get_translate_type_by_title("test_type")
+    tt3 = get_translate_type_by_title("Medical history")
     assert tt3.tt_id == tt.tt_id
 
     # Test list
     all_tt = list_translate_types()
-    assert any(x.tt_title == "test_type" for x in all_tt)
+    assert any(x.tt_title == "Medical history" for x in all_tt)
 
     # Test enabled lists
     leads = list_lead_enabled_types()
-    assert any(x.tt_title == "test_type" for x in leads)
+    assert any(x.tt_title == "Medical history" for x in leads)
     fulls = list_full_enabled_types()
-    assert not any(x.tt_title == "test_type" for x in fulls)
+    assert not any(x.tt_title == "Medical history" for x in fulls)
 
     # Test can_translate
-    assert can_translate_lead("test_type") is True
-    assert can_translate_full("test_type") is False
+    assert can_translate_lead("Medical history") is True
+    assert can_translate_full("Medical history") is False
 
     # Test update
     updated = update_translate_type(tt.tt_id, tt_full=1)
     assert updated.tt_full == 1
-    assert can_translate_full("test_type") is True
+    assert can_translate_full("Medical history") is True
 
     # Test add_or_update
-    tt4 = add_or_update_translate_type("test_type", 0, 1)
+    tt4 = add_or_update_translate_type("Medical history", 0, 1)
     assert tt4.tt_lead == 0
 
     # Test delete
@@ -79,8 +79,8 @@ class TestListTranslateTypes:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_translate_type("t1")
-        add_translate_type("t2")
+        add_translate_type("Clinical trial")
+        add_translate_type("Case study")
         result = list_translate_types()
         assert len(result) >= 2
 
@@ -90,11 +90,11 @@ class TestListLeadEnabledTypes:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list of lead enabled types."""
-        add_translate_type("t1", tt_lead=1)
-        add_translate_type("t2", tt_lead=0)
+        add_translate_type("Epidemiology study", tt_lead=1)
+        add_translate_type("In vitro study", tt_lead=0)
         result = list_lead_enabled_types()
         assert len(result) == 1
-        assert result[0].tt_title == "t1"
+        assert result[0].tt_title == "Epidemiology study"
 
 
 class TestListFullEnabledTypes:
@@ -102,11 +102,11 @@ class TestListFullEnabledTypes:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list of full enabled types."""
-        add_translate_type("t1", tt_full=1)
-        add_translate_type("t2", tt_full=0)
+        add_translate_type("Systematic review", tt_full=1)
+        add_translate_type("Meta-analysis", tt_full=0)
         result = list_full_enabled_types()
         assert len(result) == 1
-        assert result[0].tt_title == "t1"
+        assert result[0].tt_title == "Systematic review"
 
 
 class TestGetTranslateType:
@@ -114,10 +114,10 @@ class TestGetTranslateType:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        tt = add_translate_type("t1")
+        tt = add_translate_type("Cohort study")
         result = get_translate_type(tt.tt_id)
         assert isinstance(result, TranslateTypeRecord)
-        assert result.tt_title == "t1"
+        assert result.tt_title == "Cohort study"
 
 
 class TestGetTranslateTypeByTitle:
@@ -125,9 +125,9 @@ class TestGetTranslateTypeByTitle:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title."""
-        add_translate_type("t1")
-        result = get_translate_type_by_title("t1")
-        assert result.tt_title == "t1"
+        add_translate_type("Diagnostic test")
+        result = get_translate_type_by_title("Diagnostic test")
+        assert result.tt_title == "Diagnostic test"
 
 
 class TestAddTranslateType:
@@ -135,8 +135,8 @@ class TestAddTranslateType:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_translate_type("t1", 1, 0)
-        assert record.tt_title == "t1"
+        record = add_translate_type("Treatment guidelines", 1, 0)
+        assert record.tt_title == "Treatment guidelines"
         assert record.tt_lead == 1
 
 
@@ -145,8 +145,8 @@ class TestAddOrUpdateTranslateType:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts record."""
-        add_translate_type("t1", 1, 0)
-        record = add_or_update_translate_type("t1", 0, 1)
+        add_translate_type("Public health", 1, 0)
+        record = add_or_update_translate_type("Public health", 0, 1)
         assert record.tt_lead == 0
         assert record.tt_full == 1
         assert len(list_translate_types()) == 1
@@ -157,7 +157,7 @@ class TestUpdateTranslateType:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        tt = add_translate_type("t1", 1, 0)
+        tt = add_translate_type("Global health", 1, 0)
         updated = update_translate_type(tt.tt_id, tt_full=1)
         assert updated.tt_full == 1
 
@@ -167,7 +167,7 @@ class TestDeleteTranslateType:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        tt = add_translate_type("t1")
+        tt = add_translate_type("Pathology report")
         delete_translate_type(tt.tt_id)
         assert get_translate_type(tt.tt_id) is None
 
@@ -177,17 +177,17 @@ class TestCanTranslateLead:
 
     def test_returns_true_when_tt_lead_is_1(self, monkeypatch):
         """Test that function returns True when tt_lead is 1."""
-        add_translate_type("t1", tt_lead=1)
-        assert can_translate_lead("t1") is True
+        add_translate_type("Pharmacology article", tt_lead=1)
+        assert can_translate_lead("Pharmacology article") is True
 
     def test_returns_false_when_tt_lead_is_0(self, monkeypatch):
         """Test that function returns False when tt_lead is 0."""
-        add_translate_type("t1", tt_lead=0)
-        assert can_translate_lead("t1") is False
+        add_translate_type("In vivo study", tt_lead=0)
+        assert can_translate_lead("In vivo study") is False
 
     def test_returns_true_when_no_record(self, monkeypatch):
         """Test that function returns True when no record found (default behavior)."""
-        assert can_translate_lead("ghost") is True
+        assert can_translate_lead("Unknown Title") is True
 
 
 class TestCanTranslateFull:
@@ -195,14 +195,14 @@ class TestCanTranslateFull:
 
     def test_returns_true_when_tt_full_is_1(self, monkeypatch):
         """Test that function returns True when tt_full is 1."""
-        add_translate_type("t1", tt_full=1)
-        assert can_translate_full("t1") is True
+        add_translate_type("Expert review", tt_full=1)
+        assert can_translate_full("Expert review") is True
 
     def test_returns_false_when_tt_full_is_0(self, monkeypatch):
         """Test that function returns False when tt_full is 0."""
-        add_translate_type("t1", tt_full=0)
-        assert can_translate_full("t1") is False
+        add_translate_type("Draft article", tt_full=0)
+        assert can_translate_full("Draft article") is False
 
     def test_returns_false_when_no_record(self, monkeypatch):
         """Test that function returns False when no record found (default behavior)."""
-        assert can_translate_full("ghost") is False
+        assert can_translate_full("Unknown Title") is False

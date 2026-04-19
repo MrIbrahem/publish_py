@@ -29,21 +29,21 @@ def setup_db():
 
 
 def test_page_workflow():
-    p = add_page("test_page", "target_file")
-    assert p.title == "test_page"
-    assert any(x.title == "test_page" for x in list_pages())
-    updated = update_page(p.id, "new_title", "new_target")
-    assert updated.title == "new_title"
-    p2 = add_or_update_page("new_title", "final_target")
-    assert p2.target == "final_target"
+    p = add_page("COVID-19 pandemic", "COVID-19_pandemic.html")
+    assert p.title == "COVID-19 pandemic"
+    assert any(x.title == "COVID-19 pandemic" for x in list_pages())
+    updated = update_page(p.id, "COVID-19", "COVID-19.html")
+    assert updated.title == "COVID-19"
+    p2 = add_or_update_page("COVID-19", "Coronavirus_disease_2019.html")
+    assert p2.target == "Coronavirus_disease_2019.html"
     with get_session() as session:
         orm_p = session.query(_PageRecord).filter(_PageRecord.id == p.id).first()
         orm_p.lang = "en"
-        orm_p.user = "user1"
+        orm_p.user = "WikiUser"
         orm_p.target = ""
         session.commit()
-    assert find_exists_or_update_page("new_title", "en", "user1", "found_target") is True
-    success = insert_page_target("new_p", "lead", "cat", "fr", "user2", "target_fr", word=100)
+    assert find_exists_or_update_page("COVID-19", "en", "WikiUser", "Pandemic_target.html") is True
+    success = insert_page_target("Black Death", "lead", "History", "fr", "Historian", "Peste_noire.html", word=5000)
     assert success is True
     delete_page(p.id)
     assert not any(x.id == p.id for x in list_pages())
@@ -54,11 +54,11 @@ class TestListPages:
 
     def test_returns_list_of_pages(self, monkeypatch):
         """Test that function returns list from store."""
-        add_page("p1", "t1")
-        add_page("p2", "t2")
+        add_page("Evolution", "Evolution.html")
+        add_page("Genetics", "Genetics.html")
         result = list_pages()
         assert len(result) >= 2
-        assert any(p.title == "p1" for p in result)
+        assert any(p.title == "Evolution" for p in result)
 
 
 class TestAddPage:
@@ -66,9 +66,9 @@ class TestAddPage:
 
     def test_delegates_to_store_add(self, monkeypatch):
         """Test that function adds a page."""
-        record = add_page("p1", "t1")
-        assert record.title == "p1"
-        assert record.target == "t1"
+        record = add_page("Quantum mechanics", "Quantum_mechanics.html")
+        assert record.title == "Quantum mechanics"
+        assert record.target == "Quantum_mechanics.html"
 
 
 class TestAddOrUpdatePage:
@@ -76,9 +76,9 @@ class TestAddOrUpdatePage:
 
     def test_delegates_to_store_add_or_update(self, monkeypatch):
         """Test that function updates if exists."""
-        add_page("p1", "t1")
-        record = add_or_update_page("p1", "t2")
-        assert record.target == "t2"
+        add_page("Relativity", "Relativity.html")
+        record = add_or_update_page("Relativity", "General_relativity.html")
+        assert record.target == "General_relativity.html"
 
 
 class TestUpdatePage:
@@ -86,10 +86,10 @@ class TestUpdatePage:
 
     def test_delegates_to_store_update(self, monkeypatch):
         """Test that function updates the record."""
-        p = add_page("p1", "t1")
-        updated = update_page(p.id, "p2", "t2")
-        assert updated.title == "p2"
-        assert updated.target == "t2"
+        p = add_page("Sociology", "Sociology.html")
+        updated = update_page(p.id, "Social Science", "Social_Science.html")
+        assert updated.title == "Social Science"
+        assert updated.target == "Social_Science.html"
 
 
 class TestDeletePage:
@@ -97,7 +97,7 @@ class TestDeletePage:
 
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function deletes the record."""
-        p = add_page("p1", "t1")
+        p = add_page("Economics", "Economics.html")
         delete_page(p.id)
         assert not any(x.id == p.id for x in list_pages())
 
@@ -109,20 +109,20 @@ class TestFindExistsOrUpdate:
         """Test that function updates target if empty."""
         # Manual insert to set specific fields
         with get_session() as session:
-            session.add(_PageRecord(title="p1", lang="en", user="u1", target=""))
+            session.add(_PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
             session.commit()
 
-        result = find_exists_or_update_page("p1", "en", "u1", "new_t")
+        result = find_exists_or_update_page("Philosophy", "en", "PhilAuthor", "Philosophy_article.html")
         assert result is True
 
         # Verify update
         pages = list_pages()
-        p = next(p for p in pages if p.title == "p1")
-        assert p.target == "new_t"
+        p = next(p for p in pages if p.title == "Philosophy")
+        assert p.target == "Philosophy_article.html"
 
     def test_returns_false_when_not_exists(self, monkeypatch):
         """Test that function returns False when record not found."""
-        result = find_exists_or_update_page("non", "en", "u", "t")
+        result = find_exists_or_update_page("Nonexistent Article", "en", "GhostUser", "none.html")
         assert result is False
 
 
@@ -131,14 +131,14 @@ class TestInsertPageTarget:
 
     def test_delegates_to_store_insert_page_target(self, monkeypatch):
         """Test that function inserts correctly."""
-        success = insert_page_target("s1", "type", "cat", "en", "u1", "target")
+        success = insert_page_target("Global warming", "type", "Climate", "en", "Climatologist", "Global_warming_target.html")
         assert success is True
-        assert any(p.title == "s1" for p in list_pages())
+        assert any(p.title == "Global warming" for p in list_pages())
 
     def test_passes_optional_params(self, monkeypatch):
         """Test that optional parameters are passed correctly."""
-        success = insert_page_target("s2", "type", "cat", "en", "u1", "target", mdwiki_revid=123, word=50)
+        success = insert_page_target("Astrophysics", "type", "Science", "en", "Astronomer", "Astrophysics_target.html", mdwiki_revid=987654, word=1200)
         assert success is True
-        p = next(p for p in list_pages() if p.title == "s2")
-        assert p.mdwiki_revid == 123
-        assert p.word == 50
+        p = next(p for p in list_pages() if p.title == "Astrophysics")
+        assert p.mdwiki_revid == 987654
+        assert p.word == 1200

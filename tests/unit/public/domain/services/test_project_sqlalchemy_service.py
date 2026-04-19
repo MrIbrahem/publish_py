@@ -30,27 +30,27 @@ def setup_db():
 
 def test_project_workflow():
     # Test add
-    p = add_project("test_project")
-    assert p.g_title == "test_project"
+    p = add_project("WikiProject Medicine")
+    assert p.g_title == "WikiProject Medicine"
 
     # Test get
     p2 = get_project(p.g_id)
-    assert p2.g_title == "test_project"
+    assert p2.g_title == "WikiProject Medicine"
 
     # Test get by title
-    p3 = get_project_by_title("test_project")
+    p3 = get_project_by_title("WikiProject Medicine")
     assert p3.g_id == p.g_id
 
     # Test list
     all_p = list_projects()
-    assert any(x.g_title == "test_project" for x in all_p)
+    assert any(x.g_title == "WikiProject Medicine" for x in all_p)
 
     # Test update
-    updated = update_project(p.g_id, g_title="new_title")
-    assert updated.g_title == "new_title"
+    updated = update_project(p.g_id, g_title="WP:MED")
+    assert updated.g_title == "WP:MED"
 
     # Test add_or_update
-    p4 = add_or_update_project("new_title")
+    p4 = add_or_update_project("WP:MED")
     assert p4.g_id == p.g_id
 
     # Test delete
@@ -63,8 +63,8 @@ class TestListProjects:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_project("p1")
-        add_project("p2")
+        add_project("WikiProject History")
+        add_project("WikiProject Science")
         result = list_projects()
         assert len(result) >= 2
 
@@ -74,10 +74,10 @@ class TestGetProject:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        p = add_project("p1")
+        p = add_project("WikiProject Anatomy")
         result = get_project(p.g_id)
         assert isinstance(result, ProjectRecord)
-        assert result.g_title == "p1"
+        assert result.g_title == "WikiProject Anatomy"
 
 
 class TestGetProjectByTitle:
@@ -85,9 +85,9 @@ class TestGetProjectByTitle:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title."""
-        add_project("p1")
-        result = get_project_by_title("p1")
-        assert result.g_title == "p1"
+        add_project("WikiProject Physiology")
+        result = get_project_by_title("WikiProject Physiology")
+        assert result.g_title == "WikiProject Physiology"
 
 
 class TestAddProject:
@@ -95,8 +95,8 @@ class TestAddProject:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_project("p1")
-        assert record.g_title == "p1"
+        record = add_project("WikiProject Pharmacology")
+        assert record.g_title == "WikiProject Pharmacology"
 
 
 class TestAddOrUpdateProject:
@@ -104,8 +104,8 @@ class TestAddOrUpdateProject:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts record."""
-        p = add_project("p1")
-        record = add_or_update_project("p1")
+        p = add_project("WikiProject Health")
+        record = add_or_update_project("WikiProject Health")
         assert record.g_id == p.g_id
         assert len(list_projects()) == 1
 
@@ -115,9 +115,9 @@ class TestUpdateProject:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        p = add_project("p1")
-        updated = update_project(p.g_id, g_title="p2")
-        assert updated.g_title == "p2"
+        p = add_project("WikiProject Genetics")
+        updated = update_project(p.g_id, g_title="WP:GENETICS")
+        assert updated.g_title == "WP:GENETICS"
 
 
 class TestDeleteProject:
@@ -125,6 +125,6 @@ class TestDeleteProject:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        p = add_project("p1")
+        p = add_project("WikiProject Temporary")
         delete_project(p.g_id)
         assert get_project(p.g_id) is None

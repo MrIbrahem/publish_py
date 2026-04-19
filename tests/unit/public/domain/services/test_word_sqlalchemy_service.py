@@ -31,34 +31,34 @@ def setup_db():
 
 def test_word_workflow():
     # Test add
-    w = add_word("test_page", 100, 500)
-    assert w.w_title == "test_page"
-    assert w.w_lead_words == 100
+    w = add_word("Human anatomy", 500, 5000)
+    assert w.w_title == "Human anatomy"
+    assert w.w_lead_words == 500
 
     # Test get
     w2 = get_word(w.w_id)
-    assert w2.w_title == "test_page"
+    assert w2.w_title == "Human anatomy"
 
     # Test get by title
-    w3 = get_word_by_title("test_page")
+    w3 = get_word_by_title("Human anatomy")
     assert w3.w_id == w.w_id
 
     # Test get_word_counts_for_title
-    lead, all_words = get_word_counts_for_title("test_page")
-    assert lead == 100
-    assert all_words == 500
+    lead, all_words = get_word_counts_for_title("Human anatomy")
+    assert lead == 500
+    assert all_words == 5000
 
     # Test list
     all_w = list_words()
-    assert any(x.w_title == "test_page" for x in all_w)
+    assert any(x.w_title == "Human anatomy" for x in all_w)
 
     # Test update
-    updated = update_word(w.w_id, w_lead_words=150)
-    assert updated.w_lead_words == 150
+    updated = update_word(w.w_id, w_lead_words=600)
+    assert updated.w_lead_words == 600
 
     # Test add_or_update
-    w4 = add_or_update_word("test_page", 200, 600)
-    assert w4.w_lead_words == 200
+    w4 = add_or_update_word("Human anatomy", 700, 6000)
+    assert w4.w_lead_words == 700
 
     # Test delete
     delete_word(w.w_id)
@@ -70,8 +70,8 @@ class TestListWords:
 
     def test_returns_list_of_words(self, monkeypatch):
         """Test that function returns list from store."""
-        add_word("t1")
-        add_word("t2")
+        add_word("Microscope")
+        add_word("Stethoscope")
         result = list_words()
         assert len(result) >= 2
 
@@ -81,14 +81,14 @@ class TestGetWord:
 
     def test_delegates_to_store_fetch_by_id(self, monkeypatch):
         """Test that function returns record by ID."""
-        w = add_word("t1")
+        w = add_word("Cell structure")
         result = get_word(w.w_id)
         assert isinstance(result, WordRecord)
-        assert result.w_title == "t1"
+        assert result.w_title == "Cell structure"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that function returns None when word not found."""
-        assert get_word(999) is None
+        assert get_word(77777) is None
 
 
 class TestGetWordByTitle:
@@ -96,9 +96,9 @@ class TestGetWordByTitle:
 
     def test_delegates_to_store_fetch_by_title(self, monkeypatch):
         """Test that function returns record by title."""
-        add_word("t1")
-        result = get_word_by_title("t1")
-        assert result.w_title == "t1"
+        add_word("DNA replication")
+        result = get_word_by_title("DNA replication")
+        assert result.w_title == "DNA replication"
 
 
 class TestAddWord:
@@ -106,14 +106,9 @@ class TestAddWord:
 
     def test_delegates_to_store_add(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_word("t1", 100, 200)
-        assert record.w_title == "t1"
-        assert record.w_lead_words == 100
-
-    def test_passes_optional_params(self, monkeypatch):
-        """Test that optional params are passed correctly."""
-        record = add_word("t1", w_lead_words=50)
-        assert record.w_lead_words == 50
+        record = add_word("Protein folding", 300, 1500)
+        assert record.w_title == "Protein folding"
+        assert record.w_lead_words == 300
 
 
 class TestAddOrUpdateWord:
@@ -121,9 +116,9 @@ class TestAddOrUpdateWord:
 
     def test_delegates_to_store_add_or_update(self, monkeypatch):
         """Test that function upserts record."""
-        add_word("t1", 1, 2)
-        record = add_or_update_word("t1", 3, 4)
-        assert record.w_lead_words == 3
+        add_word("Antibody", 100, 1000)
+        record = add_or_update_word("Antibody", 150, 1200)
+        assert record.w_lead_words == 150
         assert len(list_words()) == 1
 
 
@@ -132,9 +127,9 @@ class TestUpdateWord:
 
     def test_delegates_to_store_update(self, monkeypatch):
         """Test that function updates and returns record."""
-        w = add_word("t1", 1, 2)
-        updated = update_word(w.w_id, w_lead_words=3)
-        assert updated.w_lead_words == 3
+        w = add_word("Antigen", 50, 500)
+        updated = update_word(w.w_id, w_lead_words=75)
+        assert updated.w_lead_words == 75
 
 
 class TestDeleteWord:
@@ -142,7 +137,7 @@ class TestDeleteWord:
 
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function deletes the record."""
-        w = add_word("t1")
+        w = add_word("T-cell")
         delete_word(w.w_id)
         assert get_word(w.w_id) is None
 
@@ -152,13 +147,13 @@ class TestGetWordCountsForTitle:
 
     def test_returns_counts_when_record_exists(self, monkeypatch):
         """Test that function returns word counts when record found."""
-        add_word("t1", 100, 200)
-        lead, all_w = get_word_counts_for_title("t1")
-        assert lead == 100
-        assert all_w == 200
+        add_word("B-cell", 80, 800)
+        lead, all_w = get_word_counts_for_title("B-cell")
+        assert lead == 80
+        assert all_w == 800
 
     def test_returns_none_when_record_not_found(self, monkeypatch):
         """Test that function returns None counts when record not found."""
-        lead, all_w = get_word_counts_for_title("ghost")
+        lead, all_w = get_word_counts_for_title("Ghost_Article")
         assert lead is None
         assert all_w is None

@@ -33,42 +33,42 @@ def setup_db():
 
 def test_in_process_workflow():
     # Test add
-    ip = add_in_process("test_title", "test_user", "en", "RTT", "lead", 100)
-    assert ip.title == "test_title"
-    assert ip.user == "test_user"
+    ip = add_in_process("World Health Organization", "Public_Health_Expert", "ar", "Medicine", "lead", 2500)
+    assert ip.title == "World Health Organization"
+    assert ip.user == "Public_Health_Expert"
 
     # Test get
     ip2 = get_in_process(ip.id)
-    assert ip2.title == "test_title"
+    assert ip2.title == "World Health Organization"
 
     # Test get by multiple keys
-    ip3 = get_in_process_by_title_user_lang("test_title", "test_user", "en")
+    ip3 = get_in_process_by_title_user_lang("World Health Organization", "Public_Health_Expert", "ar")
     assert ip3.id == ip.id
 
     # Test list
     all_ip = list_in_process()
-    assert any(x.title == "test_title" for x in all_ip)
+    assert any(x.title == "World Health Organization" for x in all_ip)
 
     # Test list by user/lang
-    by_user = list_in_process_by_user("test_user")
+    by_user = list_in_process_by_user("Public_Health_Expert")
     assert len(by_user) >= 1
-    by_lang = list_in_process_by_lang("en")
+    by_lang = list_in_process_by_lang("ar")
     assert len(by_lang) >= 1
 
     # Test is_in_process
-    assert is_in_process("test_title", "test_user", "en") is True
+    assert is_in_process("World Health Organization", "Public_Health_Expert", "ar") is True
 
     # Test update
-    updated = update_in_process(ip.id, word=200)
-    assert updated.word == 200
+    updated = update_in_process(ip.id, word=3000)
+    assert updated.word == 3000
 
     # Test delete by title/user/lang
-    success = delete_in_process_by_title_user_lang("test_title", "test_user", "en")
+    success = delete_in_process_by_title_user_lang("World Health Organization", "Public_Health_Expert", "ar")
     assert success is True
     assert get_in_process(ip.id) is None
 
     # Test delete by ID
-    ip_new = add_in_process("new", "new_user", "fr")
+    ip_new = add_in_process("Common cold", "Medical_Student", "es")
     delete_in_process(ip_new.id)
     assert get_in_process(ip_new.id) is None
 
@@ -78,8 +78,8 @@ class TestListInProcess:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_in_process("t1", "u1", "en")
-        add_in_process("t2", "u2", "en")
+        add_in_process("Fever", "User_One", "en")
+        add_in_process("Cough", "User_Two", "en")
         result = list_in_process()
         assert len(result) >= 2
 
@@ -89,11 +89,11 @@ class TestListInProcessByUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns records by user."""
-        add_in_process("t1", "u1", "en")
-        add_in_process("t2", "u2", "en")
-        result = list_in_process_by_user("u1")
+        add_in_process("Headache", "Brain_User", "en")
+        add_in_process("Migraine", "Other_User", "en")
+        result = list_in_process_by_user("Brain_User")
         assert len(result) == 1
-        assert result[0].user == "u1"
+        assert result[0].user == "Brain_User"
 
 
 class TestListInProcessByLang:
@@ -101,8 +101,8 @@ class TestListInProcessByLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns records by language."""
-        add_in_process("t1", "u1", "en")
-        add_in_process("t2", "u1", "fr")
+        add_in_process("Back pain", "User_A", "en")
+        add_in_process("Douleur dorsale", "User_A", "fr")
         result = list_in_process_by_lang("fr")
         assert len(result) == 1
         assert result[0].lang == "fr"
@@ -113,10 +113,10 @@ class TestGetInProcess:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        ip = add_in_process("t1", "u1", "en")
+        ip = add_in_process("Sore throat", "User_B", "en")
         result = get_in_process(ip.id)
         assert isinstance(result, InProcessRecord)
-        assert result.title == "t1"
+        assert result.title == "Sore throat"
 
 
 class TestGetInProcessByTitleUserLang:
@@ -124,9 +124,9 @@ class TestGetInProcessByTitleUserLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title, user, and language."""
-        add_in_process("t1", "u1", "en")
-        result = get_in_process_by_title_user_lang("t1", "u1", "en")
-        assert result.title == "t1"
+        add_in_process("Insomnia", "Sleepy_Editor", "en")
+        result = get_in_process_by_title_user_lang("Insomnia", "Sleepy_Editor", "en")
+        assert result.title == "Insomnia"
 
 
 class TestAddInProcess:
@@ -134,9 +134,9 @@ class TestAddInProcess:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_in_process("t1", "u1", "en", word=100)
-        assert record.title == "t1"
-        assert record.word == 100
+        record = add_in_process("Nausea", "Stomach_Expert", "en", word=150)
+        assert record.title == "Nausea"
+        assert record.word == 150
 
 
 class TestUpdateInProcess:
@@ -144,9 +144,9 @@ class TestUpdateInProcess:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        ip = add_in_process("t1", "u1", "en", word=10)
-        updated = update_in_process(ip.id, word=20)
-        assert updated.word == 20
+        ip = add_in_process("Rash", "Skin_Expert", "en", word=100)
+        updated = update_in_process(ip.id, word=200)
+        assert updated.word == 200
 
 
 class TestDeleteInProcess:
@@ -154,7 +154,7 @@ class TestDeleteInProcess:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        ip = add_in_process("t1", "u1", "en")
+        ip = add_in_process("Allergy", "Immune_Expert", "en")
         delete_in_process(ip.id)
         assert get_in_process(ip.id) is None
 
@@ -164,10 +164,10 @@ class TestDeleteInProcessByTitleUserLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes by composite key."""
-        add_in_process("t1", "u1", "en")
-        success = delete_in_process_by_title_user_lang("t1", "u1", "en")
+        add_in_process("Asthma", "Lung_Expert", "en")
+        success = delete_in_process_by_title_user_lang("Asthma", "Lung_Expert", "en")
         assert success is True
-        assert get_in_process_by_title_user_lang("t1", "u1", "en") is None
+        assert get_in_process_by_title_user_lang("Asthma", "Lung_Expert", "en") is None
 
 
 class TestIsInProcess:
@@ -175,9 +175,9 @@ class TestIsInProcess:
 
     def test_returns_true_when_record_exists(self, monkeypatch):
         """Test that function returns True when record found."""
-        add_in_process("t1", "u1", "en")
-        assert is_in_process("t1", "u1", "en") is True
+        add_in_process("Diabetes", "Endo_Expert", "en")
+        assert is_in_process("Diabetes", "Endo_Expert", "en") is True
 
     def test_returns_false_when_record_not_found(self, monkeypatch):
         """Test that function returns False when record not found."""
-        assert is_in_process("ghost", "u1", "en") is False
+        assert is_in_process("Ghost_Article", "Nonexistent_User", "en") is False

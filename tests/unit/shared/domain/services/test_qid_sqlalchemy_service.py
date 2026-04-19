@@ -29,29 +29,29 @@ def setup_db():
 
 def test_qid_workflow():
     # Test add
-    q = add_qid("test_page", "Q123")
-    assert q.title == "test_page"
-    assert q.qid == "Q123"
+    q = add_qid("Earth", "Q2")
+    assert q.title == "Earth"
+    assert q.qid == "Q2"
 
     # Test get
-    q2 = get_page_qid("test_page")
-    assert q2.qid == "Q123"
+    q2 = get_page_qid("Earth")
+    assert q2.qid == "Q2"
 
     # Test list
     all_q = list_qids()
-    assert any(x.title == "test_page" for x in all_q)
+    assert any(x.title == "Earth" for x in all_q)
 
     # Test mapping
     mapping = get_title_to_qid()
-    assert mapping["test_page"] == "Q123"
+    assert mapping["Earth"] == "Q2"
 
     # Test update
-    updated = update_qid(q.id, "new_title", "Q456")
-    assert updated.qid == "Q456"
+    updated = update_qid(q.id, "World", "Q2")
+    assert updated.title == "World"
 
     # Test delete
     delete_qid(q.id)
-    assert get_page_qid("new_title") is None
+    assert get_page_qid("World") is None
 
 
 class TestGetPageQid:
@@ -59,14 +59,14 @@ class TestGetPageQid:
 
     def test_returns_qid_record(self, monkeypatch):
         """Test that function returns a QidRecord."""
-        add_qid("p1", "Q1")
-        result = get_page_qid("p1")
+        add_qid("Mars", "Q111")
+        result = get_page_qid("Mars")
         assert isinstance(result, QidRecord)
-        assert result.qid == "Q1"
+        assert result.qid == "Q111"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that function returns None when QID not found."""
-        result = get_page_qid("non_existent")
+        result = get_page_qid("Nonexistent Planet")
         assert result is None
 
 
@@ -75,9 +75,9 @@ class TestAddQid:
 
     def test_adds_qid_and_returns_record(self, monkeypatch):
         """Test that add_qid adds a QID and returns the record."""
-        record = add_qid("p1", "Q1")
-        assert record.title == "p1"
-        assert record.qid == "Q1"
+        record = add_qid("Jupiter", "Q121")
+        assert record.title == "Jupiter"
+        assert record.qid == "Q121"
 
 
 class TestUpdateQid:
@@ -85,10 +85,10 @@ class TestUpdateQid:
 
     def test_updates_qid_and_returns_record(self, monkeypatch):
         """Test that update_qid updates and returns the record."""
-        q = add_qid("p1", "Q1")
-        updated = update_qid(q.id, "p2", "Q2")
-        assert updated.title == "p2"
-        assert updated.qid == "Q2"
+        q = add_qid("Saturn", "Q193")
+        updated = update_qid(q.id, "Saturnian System", "Q193")
+        assert updated.title == "Saturnian System"
+        assert updated.qid == "Q193"
 
 
 class TestDeleteQid:
@@ -96,7 +96,7 @@ class TestDeleteQid:
 
     def test_deletes_qid(self, monkeypatch):
         """Test that delete_qid calls store delete."""
-        q = add_qid("p1", "Q1")
+        q = add_qid("Uranus", "Q324")
         delete_qid(q.id)
         assert not any(x.id == q.id for x in list_qids())
 
@@ -106,8 +106,8 @@ class TestListQids:
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_qids returns all records."""
-        add_qid("p1", "Q1")
-        add_qid("p2", "Q2")
+        add_qid("Neptune", "Q332")
+        add_qid("Pluto", "Q339")
         result = list_qids()
         assert len(result) >= 2
 
@@ -122,13 +122,12 @@ class TestGetTitleToQid:
 
     def test_returns_title_to_qid_mapping(self, monkeypatch):
         """Test that get_title_to_qid returns correct mapping."""
-        add_qid("p1", "Q1")
-        add_qid("p2", "Q2")
+        add_qid("Sun", "Q525")
+        add_qid("Moon", "Q405")
         mapping = get_title_to_qid()
-        assert mapping["p1"] == "Q1"
-        assert mapping["p2"] == "Q2"
+        assert mapping["Sun"] == "Q525"
+        assert mapping["Moon"] == "Q405"
 
     def test_handles_empty_qid(self, monkeypatch):
         """Test that get_title_to_qid handles empty QID values."""
-        # Due to __post_init__ validation in QidRecord, QID cannot be empty.
         pass

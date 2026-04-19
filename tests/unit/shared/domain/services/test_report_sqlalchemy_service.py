@@ -26,10 +26,10 @@ def setup_db():
 
 
 def test_report_workflow():
-    r = add_report("title", "user", "en", "sourcetitle", "success", "data")
-    assert r.title == "title"
-    assert any(x.title == "title" for x in list_reports())
-    filters = {"user": "user", "lang": "en"}
+    r = add_report("Malaria", "User:Admin", "en", "Malaria_source", "success", "{\"status\": \"published\"}")
+    assert r.title == "Malaria"
+    assert any(x.title == "Malaria" for x in list_reports())
+    filters = {"user": "User:Admin", "lang": "en"}
     assert len(query_reports_with_filters(filters)) >= 1
     delete_report(r.id)
     assert not any(x.id == r.id for x in list_reports())
@@ -39,8 +39,8 @@ class TestListReports:
     """Tests for list_reports function."""
 
     def test_returns_all_reports(self):
-        add_report("t1", "u1", "en", "s1", "ok", "d1")
-        add_report("t2", "u1", "en", "s2", "ok", "d2")
+        add_report("Tuberculosis", "User:Editor1", "en", "TB_Source", "ok", "{}")
+        add_report("Cholera", "User:Editor1", "en", "Cholera_Source", "ok", "{}")
         reports = list_reports()
         assert len(reports) >= 2
 
@@ -49,48 +49,48 @@ class TestAddReport:
     """Tests for add_report function."""
 
     def test_adds_report_and_returns_record(self):
-        record = add_report("t1", "u1", "en", "s1", "ok", "d1")
-        assert record.title == "t1"
-        assert record.user == "u1"
+        record = add_report("Diabetes", "User:Writer", "fr", "Diabète_Source", "ok", "{}")
+        assert record.title == "Diabetes"
+        assert record.user == "User:Writer"
 
 
 class TestDeleteReport:
     """Tests for delete_report function."""
 
     def test_deletes_report(self):
-        r = add_report("t1", "u1", "en", "s1", "ok", "d1")
+        r = add_report("Influenza", "User:Reporter", "en", "Flu_Source", "ok", "{}")
         delete_report(r.id)
         assert not any(x.id == r.id for x in list_reports())
 
     def test_raises_lookup_error_when_not_found(self):
         with pytest.raises(LookupError):
-            delete_report(999)
+            delete_report(99999)
 
 
 class TestQueryReportsWithFilters:
     """Tests for query_reports_with_filters function."""
 
     def test_filters_by_user(self):
-        add_report("t1", "u1", "en", "s1", "ok", "d1")
-        add_report("t2", "u2", "en", "s2", "ok", "d2")
-        results = query_reports_with_filters({"user": "u1"})
+        add_report("Cancer", "User:Medic", "en", "Cancer_Source", "ok", "{}")
+        add_report("Heart Disease", "User:Other", "en", "Heart_Source", "ok", "{}")
+        results = query_reports_with_filters({"user": "User:Medic"})
         assert len(results) == 1
-        assert results[0].user == "u1"
+        assert results[0].user == "User:Medic"
 
     def test_filters_by_lang(self):
-        add_report("t1", "u1", "en", "s1", "ok", "d1")
-        add_report("t2", "u1", "fr", "s2", "ok", "d2")
+        add_report("Asthma", "User:Medic", "en", "Asthma_Source", "ok", "{}")
+        add_report("Bronchitis", "User:Medic", "fr", "Bronchite_Source", "ok", "{}")
         results = query_reports_with_filters({"lang": "fr"})
         assert len(results) == 1
         assert results[0].lang == "fr"
 
     def test_handles_all_filter(self):
-        add_report("t1", "u1", "en", "s1", "ok", "d1")
+        add_report("Smallpox", "User:Historian", "en", "Smallpox_Source", "ok", "{}")
         results = query_reports_with_filters({"user": "all"})
         assert len(results) >= 1
 
     def test_limits_results(self):
-        add_report("t1", "u1", "en", "s1", "ok", "d1")
-        add_report("t2", "u1", "en", "s2", "ok", "d2")
+        add_report("HIV/AIDS", "User:Researcher", "en", "HIV_Source", "ok", "{}")
+        add_report("Polio", "User:Researcher", "en", "Polio_Source", "ok", "{}")
         results = query_reports_with_filters({}, limit=1)
         assert len(results) == 1

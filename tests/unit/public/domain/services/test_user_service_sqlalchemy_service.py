@@ -31,17 +31,17 @@ def setup_db():
 
 
 def test_user_workflow():
-    u = add_user("test_user", "test@example.com", "enwiki", "Editor")
-    assert u.username == "test_user"
-    assert get_user(u.user_id).username == "test_user"
-    assert get_user_by_username("test_user").user_id == u.user_id
-    assert any(x.username == "test_user" for x in list_users())
-    assert any(x.username == "test_user" for x in list_users_by_group("Editor"))
-    updated = update_user(u.user_id, email="new@example.com")
-    assert updated.email == "new@example.com"
-    assert user_exists("test_user") is True
-    u4 = add_or_update_user("test_user", email="final@example.com")
-    assert u4.email == "final@example.com"
+    u = add_user("James_Heilman", "jh@example.com", "enwiki", "Editor")
+    assert u.username == "James_Heilman"
+    assert get_user(u.user_id).username == "James_Heilman"
+    assert get_user_by_username("James_Heilman").user_id == u.user_id
+    assert any(x.username == "James_Heilman" for x in list_users())
+    assert any(x.username == "James_Heilman" for x in list_users_by_group("Editor"))
+    updated = update_user(u.user_id, email="jh_new@example.com")
+    assert updated.email == "jh_new@example.com"
+    assert user_exists("James_Heilman") is True
+    u4 = add_or_update_user("James_Heilman", email="jh_final@example.com")
+    assert u4.email == "jh_final@example.com"
     delete_user(u.user_id)
     assert get_user(u.user_id) is None
 
@@ -51,8 +51,8 @@ class TestListUsers:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_user("u1")
-        add_user("u2")
+        add_user("Wiki_Admin")
+        add_user("Wiki_Editor")
         result = list_users()
         assert len(result) >= 2
 
@@ -62,11 +62,11 @@ class TestListUsersByGroup:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns filtered list from store."""
-        add_user("u1", user_group="GroupA")
-        add_user("u2", user_group="GroupB")
-        result = list_users_by_group("GroupA")
+        add_user("Expert1", user_group="Medical_Board")
+        add_user("Expert2", user_group="General_Board")
+        result = list_users_by_group("Medical_Board")
         assert len(result) == 1
-        assert result[0].username == "u1"
+        assert result[0].username == "Expert1"
 
 
 class TestGetUser:
@@ -74,10 +74,10 @@ class TestGetUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        u = add_user("u1")
+        u = add_user("ContributorA")
         result = get_user(u.user_id)
         assert isinstance(result, UserRecord)
-        assert result.username == "u1"
+        assert result.username == "ContributorA"
 
 
 class TestGetUserByUsername:
@@ -85,9 +85,9 @@ class TestGetUserByUsername:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by username."""
-        add_user("u1")
-        result = get_user_by_username("u1")
-        assert result.username == "u1"
+        add_user("Linguist_Specialist")
+        result = get_user_by_username("Linguist_Specialist")
+        assert result.username == "Linguist_Specialist"
 
 
 class TestAddUser:
@@ -95,9 +95,9 @@ class TestAddUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_user("u1", "e1", "w1", "g1")
-        assert record.username == "u1"
-        assert record.email == "e1"
+        record = add_user("New_Researcher", "research@wiki.org", "enwiki", "Researcher")
+        assert record.username == "New_Researcher"
+        assert record.email == "research@wiki.org"
 
 
 class TestAddOrUpdateUser:
@@ -105,9 +105,9 @@ class TestAddOrUpdateUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts record."""
-        add_user("u1", email="old@e.com")
-        record = add_or_update_user("u1", email="new@e.com")
-        assert record.email == "new@e.com"
+        add_user("Translator_X", email="old@trans.org")
+        record = add_or_update_user("Translator_X", email="new@trans.org")
+        assert record.email == "new@trans.org"
         assert len(list_users()) == 1
 
 
@@ -116,9 +116,9 @@ class TestUpdateUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        u = add_user("u1", email="old")
-        updated = update_user(u.user_id, email="new")
-        assert updated.email == "new"
+        u = add_user("Bureaucrat1", email="old_email")
+        updated = update_user(u.user_id, email="new_email")
+        assert updated.email == "new_email"
 
 
 class TestDeleteUser:
@@ -126,7 +126,7 @@ class TestDeleteUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        u = add_user("u1")
+        u = add_user("Temporary_Account")
         delete_user(u.user_id)
         assert get_user(u.user_id) is None
 
@@ -136,9 +136,9 @@ class TestUserExists:
 
     def test_returns_true_when_user_exists(self, monkeypatch):
         """Test that function returns True when user found."""
-        add_user("u1")
-        assert user_exists("u1") is True
+        add_user("Active_Member")
+        assert user_exists("Active_Member") is True
 
     def test_returns_false_when_user_not_found(self, monkeypatch):
         """Test that function returns False when user not found."""
-        assert user_exists("ghost") is False
+        assert user_exists("Nonexistent_Member") is False

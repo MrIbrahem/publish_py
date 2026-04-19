@@ -31,34 +31,34 @@ def setup_db():
 
 def test_refs_count_workflow():
     # Test add
-    r = add_refs_count("test_page", 10, 50)
-    assert r.r_title == "test_page"
-    assert r.r_lead_refs == 10
+    r = add_refs_count("Aspirin", 15, 120)
+    assert r.r_title == "Aspirin"
+    assert r.r_lead_refs == 15
 
     # Test get
     r2 = get_refs_count(r.r_id)
-    assert r2.r_title == "test_page"
+    assert r2.r_title == "Aspirin"
 
     # Test get by title
-    r3 = get_refs_count_by_title("test_page")
+    r3 = get_refs_count_by_title("Aspirin")
     assert r3.r_id == r.r_id
 
     # Test get_ref_counts_for_title
-    lead, all_refs = get_ref_counts_for_title("test_page")
-    assert lead == 10
-    assert all_refs == 50
+    lead, all_refs = get_ref_counts_for_title("Aspirin")
+    assert lead == 15
+    assert all_refs == 120
 
     # Test list
     all_r = list_refs_counts()
-    assert any(x.r_title == "test_page" for x in all_r)
+    assert any(x.r_title == "Aspirin" for x in all_r)
 
     # Test update
     updated = update_refs_count(r.r_id, r_lead_refs=20)
     assert updated.r_lead_refs == 20
 
     # Test add_or_update
-    r4 = add_or_update_refs_count("test_page", 30, 60)
-    assert r4.r_lead_refs == 30
+    r4 = add_or_update_refs_count("Aspirin", 25, 150)
+    assert r4.r_lead_refs == 25
 
     # Test delete
     delete_refs_count(r.r_id)
@@ -70,8 +70,8 @@ class TestListRefsCounts:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_refs_count("t1")
-        add_refs_count("t2")
+        add_refs_count("Paracetamol")
+        add_refs_count("Ibuprofen")
         result = list_refs_counts()
         assert len(result) >= 2
 
@@ -81,10 +81,10 @@ class TestGetRefsCount:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        r = add_refs_count("t1")
+        r = add_refs_count("Insulin")
         result = get_refs_count(r.r_id)
         assert isinstance(result, RefsCountRecord)
-        assert result.r_title == "t1"
+        assert result.r_title == "Insulin"
 
 
 class TestGetRefsCountByTitle:
@@ -92,9 +92,9 @@ class TestGetRefsCountByTitle:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title."""
-        add_refs_count("t1")
-        result = get_refs_count_by_title("t1")
-        assert result.r_title == "t1"
+        add_refs_count("Penicillin")
+        result = get_refs_count_by_title("Penicillin")
+        assert result.r_title == "Penicillin"
 
 
 class TestAddRefsCount:
@@ -102,10 +102,10 @@ class TestAddRefsCount:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_refs_count("t1", 5, 10)
-        assert record.r_title == "t1"
-        assert record.r_lead_refs == 5
-        assert record.r_all_refs == 10
+        record = add_refs_count("Morphine", 10, 80)
+        assert record.r_title == "Morphine"
+        assert record.r_lead_refs == 10
+        assert record.r_all_refs == 80
 
 
 class TestAddOrUpdateRefsCount:
@@ -113,10 +113,10 @@ class TestAddOrUpdateRefsCount:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts record."""
-        add_refs_count("t1", 1, 2)
-        record = add_or_update_refs_count("t1", 3, 4)
-        assert record.r_lead_refs == 3
-        assert record.r_all_refs == 4
+        add_refs_count("Dopamine", 5, 40)
+        record = add_or_update_refs_count("Dopamine", 8, 50)
+        assert record.r_lead_refs == 8
+        assert record.r_all_refs == 50
         assert len(list_refs_counts()) == 1
 
 
@@ -125,9 +125,9 @@ class TestUpdateRefsCount:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        r = add_refs_count("t1", 1, 2)
-        updated = update_refs_count(r.r_id, r_lead_refs=3)
-        assert updated.r_lead_refs == 3
+        r = add_refs_count("Adrenaline", 2, 20)
+        updated = update_refs_count(r.r_id, r_lead_refs=5)
+        assert updated.r_lead_refs == 5
 
 
 class TestDeleteRefsCount:
@@ -135,7 +135,7 @@ class TestDeleteRefsCount:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        r = add_refs_count("t1")
+        r = add_refs_count("Diazepam")
         delete_refs_count(r.r_id)
         assert get_refs_count(r.r_id) is None
 
@@ -145,13 +145,13 @@ class TestGetRefsCountsForTitle:
 
     def test_returns_counts_when_record_exists(self, monkeypatch):
         """Test that function returns counts when record found."""
-        add_refs_count("t1", 10, 20)
-        lead, all_refs = get_ref_counts_for_title("t1")
-        assert lead == 10
-        assert all_refs == 20
+        add_refs_count("Caffeine", 30, 200)
+        lead, all_refs = get_ref_counts_for_title("Caffeine")
+        assert lead == 30
+        assert all_refs == 200
 
     def test_returns_none_when_record_not_found(self, monkeypatch):
         """Test that function returns None when record not found."""
-        lead, all_refs = get_ref_counts_for_title("ghost")
+        lead, all_refs = get_ref_counts_for_title("Ghost_Article")
         assert lead is None
         assert all_refs is None

@@ -33,39 +33,39 @@ def setup_db():
 
 def test_views_new_workflow():
     # Test add
-    v = add_views_new("target1", "en", 2023, 1000)
-    assert v.target == "target1"
-    assert v.views == 1000
+    v = add_views_new("Dengue_fever", "en", 2023, 1500000)
+    assert v.target == "Dengue_fever"
+    assert v.views == 1500000
 
     # Test get
     v2 = get_views_new(v.id)
-    assert v2.target == "target1"
+    assert v2.target == "Dengue_fever"
 
     # Test get by target, lang, year
-    v3 = get_views_by_target_lang_year("target1", "en", 2023)
+    v3 = get_views_by_target_lang_year("Dengue_fever", "en", 2023)
     assert v3.id == v.id
 
     # Test list
     all_v = list_views_new()
-    assert any(x.target == "target1" for x in all_v)
+    assert any(x.target == "Dengue_fever" for x in all_v)
 
     # Test list by target/lang
-    by_target = list_views_by_target("target1")
+    by_target = list_views_by_target("Dengue_fever")
     assert len(by_target) >= 1
     by_lang = list_views_by_lang("en")
     assert len(by_lang) >= 1
 
     # Test update
-    updated = update_views_new(v.id, views=2000)
-    assert updated.views == 2000
+    updated = update_views_new(v.id, views=1600000)
+    assert updated.views == 1600000
 
     # Test total views
-    total = get_total_views_for_target("target1")
-    assert total == 2000
+    total = get_total_views_for_target("Dengue_fever")
+    assert total == 1600000
 
     # Test add_or_update
-    v4 = add_or_update_views_new("target1", "en", 2023, 3000)
-    assert v4.views == 3000
+    v4 = add_or_update_views_new("Dengue_fever", "en", 2023, 1700000)
+    assert v4.views == 1700000
 
     # Test delete
     delete_views_new(v.id)
@@ -77,8 +77,8 @@ class TestListViewsNew:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_views_new("t1", "en", 2023)
-        add_views_new("t2", "en", 2023)
+        add_views_new("Malaria", "en", 2023)
+        add_views_new("Cholera", "en", 2023)
         result = list_views_new()
         assert len(result) >= 2
 
@@ -88,12 +88,12 @@ class TestListViewsByTarget:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns records by target."""
-        add_views_new("t1", "en", 2022)
-        add_views_new("t1", "en", 2023)
-        add_views_new("t2", "en", 2023)
-        result = list_views_by_target("t1")
+        add_views_new("Tuberculosis", "en", 2022)
+        add_views_new("Tuberculosis", "en", 2023)
+        add_views_new("Diabetes", "en", 2023)
+        result = list_views_by_target("Tuberculosis")
         assert len(result) == 2
-        assert all(r.target == "t1" for r in result)
+        assert all(r.target == "Tuberculosis" for r in result)
 
 
 class TestListViewsByLang:
@@ -101,8 +101,8 @@ class TestListViewsByLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns records by language."""
-        add_views_new("t1", "en", 2023)
-        add_views_new("t1", "fr", 2023)
+        add_views_new("Influenza", "en", 2023)
+        add_views_new("Influenza", "fr", 2023)
         result = list_views_by_lang("fr")
         assert len(result) == 1
         assert result[0].lang == "fr"
@@ -113,10 +113,10 @@ class TestGetViewsNew:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        v = add_views_new("t1", "en", 2023)
+        v = add_views_new("Hepatitis_B", "en", 2023)
         result = get_views_new(v.id)
         assert isinstance(result, ViewsNewRecord)
-        assert result.target == "t1"
+        assert result.target == "Hepatitis_B"
 
 
 class TestGetViewsByTargetLangYear:
@@ -124,9 +124,9 @@ class TestGetViewsByTargetLangYear:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by target, lang, and year."""
-        add_views_new("t1", "en", 2023)
-        result = get_views_by_target_lang_year("t1", "en", 2023)
-        assert result.target == "t1"
+        add_views_new("Measles", "en", 2023)
+        result = get_views_by_target_lang_year("Measles", "en", 2023)
+        assert result.target == "Measles"
         assert result.year == 2023
 
 
@@ -135,9 +135,9 @@ class TestAddViewsNew:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_views_new("t1", "en", 2023, 100)
-        assert record.target == "t1"
-        assert record.views == 100
+        record = add_views_new("Smallpox", "en", 2023, 500000)
+        assert record.target == "Smallpox"
+        assert record.views == 500000
 
 
 class TestAddOrUpdateViewsNew:
@@ -145,9 +145,9 @@ class TestAddOrUpdateViewsNew:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts record."""
-        add_views_new("t1", "en", 2023, 10)
-        record = add_or_update_views_new("t1", "en", 2023, 20)
-        assert record.views == 20
+        add_views_new("Polio", "en", 2023, 100000)
+        record = add_or_update_views_new("Polio", "en", 2023, 200000)
+        assert record.views == 200000
         assert len(list_views_new()) == 1
 
 
@@ -156,9 +156,9 @@ class TestUpdateViewsNew:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        v = add_views_new("t1", "en", 2023, 10)
-        updated = update_views_new(v.id, views=20)
-        assert updated.views == 20
+        v = add_views_new("Stroke", "en", 2023, 1000000)
+        updated = update_views_new(v.id, views=1100000)
+        assert updated.views == 1100000
 
 
 class TestDeleteViewsNew:
@@ -166,7 +166,7 @@ class TestDeleteViewsNew:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        v = add_views_new("t1", "en", 2023)
+        v = add_views_new("Asthma", "en", 2023)
         delete_views_new(v.id)
         assert get_views_new(v.id) is None
 
@@ -176,15 +176,15 @@ class TestGetTotalViewsForTarget:
 
     def test_returns_sum_of_views(self, monkeypatch):
         """Test that function returns sum of views."""
-        add_views_new("t1", "en", 2022, 100)
-        add_views_new("t1", "fr", 2023, 200)
-        assert get_total_views_for_target("t1") == 300
+        add_views_new("Cancer", "en", 2022, 5000000)
+        add_views_new("Cancer", "fr", 2023, 1000000)
+        assert get_total_views_for_target("Cancer") == 6000000
 
     def test_returns_zero_when_no_records(self, monkeypatch):
         """Test that function returns 0 when no records."""
-        assert get_total_views_for_target("ghost") == 0
+        assert get_total_views_for_target("Ghost_Article") == 0
 
     def test_handles_none_views(self, monkeypatch):
         """Test that function handles None views."""
-        add_views_new("t1", "en", 2022, None)
-        assert get_total_views_for_target("t1") == 0
+        add_views_new("Empty_Views", "en", 2022, None)
+        assert get_total_views_for_target("Empty_Views") == 0

@@ -30,29 +30,29 @@ def setup_db():
 
 def test_lang_workflow():
     # Test add
-    l = add_lang("en", "English", "English")
-    assert l.code == "en"
-    assert l.autonym == "English"
+    l = add_lang("ar", "العربية", "Arabic")
+    assert l.code == "ar"
+    assert l.autonym == "العربية"
 
     # Test get
     l2 = get_lang(l.lang_id)
-    assert l2.code == "en"
+    assert l2.code == "ar"
 
     # Test get by code
-    l3 = get_lang_by_code("en")
+    l3 = get_lang_by_code("ar")
     assert l3.lang_id == l.lang_id
 
     # Test list
     all_l = list_langs()
-    assert any(x.code == "en" for x in all_l)
+    assert any(x.code == "ar" for x in all_l)
 
     # Test update
-    updated = update_lang(l.lang_id, autonym="Eng")
-    assert updated.autonym == "Eng"
+    updated = update_lang(l.lang_id, autonym="Arabe")
+    assert updated.autonym == "Arabe"
 
     # Test add_or_update
-    l4 = add_or_update_lang("en", "English", "English Lang")
-    assert l4.name == "English Lang"
+    l4 = add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
+    assert l4.name == "Modern Standard Arabic"
 
     # Test delete
     delete_lang(l.lang_id)
@@ -75,10 +75,10 @@ class TestGetLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        l = add_lang("en", "English", "English")
+        l = add_lang("es", "Español", "Spanish")
         result = get_lang(l.lang_id)
         assert isinstance(result, LangRecord)
-        assert result.code == "en"
+        assert result.code == "es"
 
 
 class TestGetLangByCode:
@@ -86,9 +86,9 @@ class TestGetLangByCode:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by code."""
-        add_lang("en", "English", "English")
-        result = get_lang_by_code("en")
-        assert result.code == "en"
+        add_lang("de", "Deutsch", "German")
+        result = get_lang_by_code("de")
+        assert result.code == "de"
 
 
 class TestAddLang:
@@ -96,8 +96,8 @@ class TestAddLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_lang("en", "English", "English")
-        assert record.code == "en"
+        record = add_lang("it", "Italiano", "Italian")
+        assert record.code == "it"
 
 
 class TestAddOrUpdateLang:
@@ -105,10 +105,9 @@ class TestAddOrUpdateLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts record."""
-        add_lang("en", "Old Autonym", "Old Name")
-        record = add_or_update_lang("en", "New Autonym", "New Name")
-        assert record.autonym == "New Autonym"
-        assert record.name == "New Name"
+        add_lang("pt", "Português", "Portuguese")
+        record = add_or_update_lang("pt", "Português", "Portuguese (Brazil)")
+        assert record.name == "Portuguese (Brazil)"
         assert len(list_langs()) == 1
 
 
@@ -117,9 +116,9 @@ class TestUpdateLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        l = add_lang("en", "English", "English")
-        updated = update_lang(l.lang_id, autonym="Eng")
-        assert updated.autonym == "Eng"
+        l = add_lang("hi", "हिन्दी", "Hindi")
+        updated = update_lang(l.lang_id, autonym="Hindi Autonym")
+        assert updated.autonym == "Hindi Autonym"
 
 
 class TestDeleteLang:
@@ -127,6 +126,6 @@ class TestDeleteLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        l = add_lang("en", "English", "English")
+        l = add_lang("ru", "Русский", "Russian")
         delete_lang(l.lang_id)
         assert get_lang(l.lang_id) is None

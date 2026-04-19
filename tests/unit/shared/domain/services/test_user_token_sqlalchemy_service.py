@@ -27,15 +27,15 @@ def setup_db():
 
 
 def test_user_token_workflow():
-    upsert_user_token(user_id=1, username="test_user", access_key="key", access_secret="secret")
-    t = get_user_token(1)
-    assert t.username == "test_user"
-    assert get_user_token_by_username("test_user").user_id == 1
-    delete_user_token_by_username("test_user")
-    assert get_user_token(1) is None
-    upsert_user_token(user_id=2, username="user2", access_key="k2", access_secret="s2")
-    delete_user_token(2)
-    assert get_user_token(2) is None
+    upsert_user_token(user_id=12345, username="ExampleWikiEditor", access_key="oauth_key_123", access_secret="oauth_secret_456")
+    t = get_user_token(12345)
+    assert t.username == "ExampleWikiEditor"
+    assert get_user_token_by_username("ExampleWikiEditor").user_id == 12345
+    delete_user_token_by_username("ExampleWikiEditor")
+    assert get_user_token(12345) is None
+    upsert_user_token(user_id=67890, username="TrustedContributor", access_key="key2", access_secret="secret2")
+    delete_user_token(67890)
+    assert get_user_token(67890) is None
 
 
 class TestUpsertUserToken:
@@ -43,9 +43,9 @@ class TestUpsertUserToken:
 
     def test_delegates_to_store_upsert(self, monkeypatch):
         """Test that function inserts a token."""
-        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
+        upsert_user_token(user_id=1, username="GlobalAdmin", access_key="k1", access_secret="s1")
         record = get_user_token(1)
-        assert record.username == "u1"
+        assert record.username == "GlobalAdmin"
 
 
 class TestGetUserToken:
@@ -58,14 +58,14 @@ class TestGetUserToken:
 
     def test_returns_record_when_found(self, monkeypatch):
         """Test that record is returned when found."""
-        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
-        record = get_user_token(1)
+        upsert_user_token(user_id=100, username="MedicineBot", access_key="k1", access_secret="s1")
+        record = get_user_token(100)
         assert isinstance(record, UserTokenRecord)
-        assert record.user_id == 1
+        assert record.user_id == 100
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that None is returned when user not found."""
-        assert get_user_token(999) is None
+        assert get_user_token(999999) is None
 
 
 class TestDeleteUserToken:
@@ -73,14 +73,13 @@ class TestDeleteUserToken:
 
     def test_returns_none_for_empty_user_id(self, monkeypatch):
         """Test that None is returned for empty user_id."""
-        # Function returns None by default when empty user_id
         assert delete_user_token(None) is None
 
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function deletes the token."""
-        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
-        delete_user_token(1)
-        assert get_user_token(1) is None
+        upsert_user_token(user_id=200, username="TranslatorHelper", access_key="k1", access_secret="s1")
+        delete_user_token(200)
+        assert get_user_token(200) is None
 
 
 class TestGetUserTokenByUsername:
@@ -93,17 +92,17 @@ class TestGetUserTokenByUsername:
 
     def test_strips_whitespace_from_username(self, monkeypatch):
         """Test that username is stripped of whitespace."""
-        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
-        assert get_user_token_by_username("  u1  ").user_id == 1
+        upsert_user_token(user_id=300, username="CleanUser", access_key="k1", access_secret="s1")
+        assert get_user_token_by_username("  CleanUser  ").user_id == 300
 
     def test_returns_record_when_found(self, monkeypatch):
         """Test that record is returned when found."""
-        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
-        assert get_user_token_by_username("u1").user_id == 1
+        upsert_user_token(user_id=400, username="ActiveBureaucrat", access_key="k1", access_secret="s1")
+        assert get_user_token_by_username("ActiveBureaucrat").user_id == 400
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that None is returned when user not found."""
-        assert get_user_token_by_username("ghost") is None
+        assert get_user_token_by_username("GhostEditor") is None
 
 
 class TestDeleteUserTokenByUsername:
@@ -115,11 +114,10 @@ class TestDeleteUserTokenByUsername:
 
     def test_deletes_by_user_id_when_found(self, monkeypatch):
         """Test that token is deleted by user_id when username found."""
-        upsert_user_token(user_id=1, username="u1", access_key="k1", access_secret="s1")
-        delete_user_token_by_username("u1")
-        assert get_user_token(1) is None
+        upsert_user_token(user_id=500, username="OneTimeUser", access_key="k1", access_secret="s1")
+        delete_user_token_by_username("OneTimeUser")
+        assert get_user_token(500) is None
 
     def test_skips_delete_when_user_not_found(self, monkeypatch):
         """Test that delete is skipped when username not found."""
-        # Should not raise error
-        delete_user_token_by_username("non_existent")
+        delete_user_token_by_username("NonExistentUser")
