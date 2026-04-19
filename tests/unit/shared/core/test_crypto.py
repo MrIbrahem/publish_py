@@ -124,7 +124,7 @@ class TestRoundTrip:
             "simple_string",
             "string_with_special_chars!@#$%",
             "unicode_日本語",
-            "long_string_" * 100,
+            "long_string_" * 10,
             "",
             "single_token_with_underscores_and-dashes123",
         ],

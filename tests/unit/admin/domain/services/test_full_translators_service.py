@@ -24,22 +24,8 @@ class TestGetFullTranslatorsDb:
     def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
         """Test that the same instance is returned on multiple calls."""
 
-
-
-
-
-
-
-
-
-
     def test_raises_error_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when database config is missing."""
-
-
-
-
-
 
 
 class TestListFullTranslators:
@@ -49,31 +35,11 @@ class TestListFullTranslators:
         """Test that list_full_translators returns all records."""
 
 
-
-
-
-
-
-
-
-
-
-
 class TestListActiveFullTranslators:
     """Tests for list_active_full_translators function."""
 
     def test_returns_active_records(self, monkeypatch):
         """Test that list_active_full_translators returns active records."""
-
-
-
-
-
-
-
-
-
-
 
 
 class TestGetFullTranslator:
@@ -83,31 +49,11 @@ class TestGetFullTranslator:
         """Test that function returns a FullTranslatorRecord."""
 
 
-
-
-
-
-
-
-
-
-
-
 class TestGetFullTranslatorByUser:
     """Tests for get_full_translator_by_user function."""
 
     def test_returns_translator_by_user(self, monkeypatch):
         """Test that function returns translator by username."""
-
-
-
-
-
-
-
-
-
-
 
 
 class TestAddFullTranslator:
@@ -117,31 +63,11 @@ class TestAddFullTranslator:
         """Test that add_full_translator adds and returns the record."""
 
 
-
-
-
-
-
-
-
-
-
-
 class TestAddOrUpdateFullTranslator:
     """Tests for add_or_update_full_translator function."""
 
     def test_upserts_translator(self, monkeypatch):
         """Test that add_or_update_full_translator upserts the record."""
-
-
-
-
-
-
-
-
-
-
 
 
 class TestUpdateFullTranslator:
@@ -151,29 +77,11 @@ class TestUpdateFullTranslator:
         """Test that update_full_translator updates and returns the record."""
 
 
-
-
-
-
-
-
-
-
-
-
 class TestDeleteFullTranslator:
     """Tests for delete_full_translator function."""
 
     def test_deletes_translator(self, monkeypatch):
         """Test that delete_full_translator calls store delete."""
-
-
-
-
-
-
-
-
 
 
 class TestIsFullTranslator:
@@ -182,39 +90,8 @@ class TestIsFullTranslator:
     def test_returns_true_when_user_is_active_translator(self, monkeypatch):
         """Test that is_full_translator returns True for active translator."""
 
-
-
-
-
-
-
-
-
-
-
-
     def test_returns_false_when_user_not_translator(self, monkeypatch):
         """Test that is_full_translator returns False when user not found."""
 
-
-
-
-
-
-
-
-
-
     def test_returns_false_when_translator_inactive(self, monkeypatch):
         """Test that is_full_translator returns False for inactive translator."""
-
-
-
-
-
-
-
-
-
-
-

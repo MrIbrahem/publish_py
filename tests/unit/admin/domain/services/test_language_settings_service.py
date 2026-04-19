@@ -22,24 +22,8 @@ class TestGetLanguageSettingsDb:
     def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
         """Test that the same instance is returned on multiple calls."""
 
-
-
-
-
-
-
-
-
-
     def test_raises_error_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when database config is missing."""
-
-
-
-
-
-
-
 
 
 class TestListLanguageSettings:
@@ -49,31 +33,11 @@ class TestListLanguageSettings:
         """Test that list_language_settings returns all records."""
 
 
-
-
-
-
-
-
-
-
-
-
 class TestGetLanguageSetting:
     """Tests for get_language_setting function."""
 
     def test_returns_setting_record(self, monkeypatch):
         """Test that function returns a LanguageSettingRecord."""
-
-
-
-
-
-
-
-
-
-
 
 
 class TestGetLanguageSettingByCode:
@@ -83,33 +47,11 @@ class TestGetLanguageSettingByCode:
         """Test that function returns setting by language code."""
 
 
-
-
-
-
-
-
-
-
-
-
-
 class TestAddLanguageSetting:
     """Tests for add_language_setting function."""
 
     def test_adds_setting_and_returns_record(self, monkeypatch):
         """Test that add_language_setting adds and returns the record."""
-
-
-
-
-
-
-
-
-
-
-
 
 
 class TestAddOrUpdateLanguageSetting:
@@ -119,17 +61,6 @@ class TestAddOrUpdateLanguageSetting:
         """Test that add_or_update_language_setting upserts the record."""
 
 
-
-
-
-
-
-
-
-
-
-
-
 class TestUpdateLanguageSetting:
     """Tests for update_language_setting function."""
 
@@ -137,27 +68,8 @@ class TestUpdateLanguageSetting:
         """Test that update_language_setting updates and returns the record."""
 
 
-
-
-
-
-
-
-
-
-
-
-
 class TestDeleteLanguageSetting:
     """Tests for delete_language_setting function."""
 
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_language_setting calls store delete."""
-
-
-
-
-
-
-
-

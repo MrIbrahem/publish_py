@@ -13,7 +13,6 @@ from src.sqlalchemy_app.public.domain.services.in_process_service import (
     delete_in_process_by_title_user_lang,
     get_in_process,
     get_in_process_by_title_user_lang,
-
     is_in_process,
     list_in_process,
     list_in_process_by_lang,

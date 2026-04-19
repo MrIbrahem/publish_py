@@ -14,7 +14,6 @@ from src.sqlalchemy_app.public.domain.services.views_new_service import (
     get_total_views_for_target,
     get_views_by_target_lang_year,
     get_views_new,
-
     list_views_by_lang,
     list_views_by_target,
     list_views_new,

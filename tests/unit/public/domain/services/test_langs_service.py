@@ -13,7 +13,6 @@ from src.sqlalchemy_app.public.domain.services.lang_service import (
     delete_lang,
     get_lang,
     get_lang_by_code,
-
     list_langs,
     update_lang,
 )
