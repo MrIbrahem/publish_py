@@ -30,7 +30,7 @@ def setup_db():
 
 def test_language_setting_workflow():
     # Test add
-    ls = add_language_setting("en", 1, 0, 1, 0)
+    ls = add_language_setting("en", 1, 0, 1)
     assert ls.lang_code == "en"
     assert ls.move_dots == 1
 
@@ -51,7 +51,7 @@ def test_language_setting_workflow():
     assert updated.move_dots == 0
 
     # Test add_or_update
-    ls4 = add_or_update_language_setting("en", 1, 1, 1, 1)
+    ls4 = add_or_update_language_setting("en", 1, 1, 1)
     assert ls4.move_dots == 1
     assert ls4.expend == 1
 

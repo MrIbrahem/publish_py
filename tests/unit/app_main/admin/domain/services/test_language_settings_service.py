@@ -107,9 +107,9 @@ class TestAddLanguageSetting:
             "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
         )
 
-        result = add_language_setting("fr", 1, 0, 1, 0)
+        result = add_language_setting("fr", 1, 0, 1)
 
-        mock_store.add.assert_called_once_with("fr", 1, 0, 1, 0)
+        mock_store.add.assert_called_once_with("fr", 1, 0, 1)
         assert result is mock_record
 
 
@@ -125,9 +125,9 @@ class TestAddOrUpdateLanguageSetting:
             "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
         )
 
-        result = add_or_update_language_setting("de", 0, 1, 0, 1)
+        result = add_or_update_language_setting("de", 0, 1, 0)
 
-        mock_store.add_or_update.assert_called_once_with("de", 0, 1, 0, 1)
+        mock_store.add_or_update.assert_called_once_with("de", 0, 1, 0)
         assert result is mock_record
 
 

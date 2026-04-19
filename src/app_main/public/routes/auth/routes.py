@@ -11,7 +11,6 @@ from functools import wraps
 from typing import Any, Callable, cast
 from urllib.parse import urlencode
 
-import pymysql
 from flask import (
     Blueprint,
     flash,
@@ -278,7 +277,7 @@ def logout() -> WerkzeugResponse:
             delete_user_token(user_id)
             flash("You have been logged out successfully.", "info")
             logger.info("User token deleted for user_id: %s", user_id)
-        except pymysql.MySQLError:
+        except Exception:
             logger.exception("Failed to delete user token during logout")
             flash("Error while clearing OAuth credentials.", "danger")
     else:

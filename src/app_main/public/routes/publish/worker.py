@@ -17,6 +17,7 @@ from ....shared.clients import (
 from ....shared.domain.services import (
     add_report,
     find_exists_or_update_page,
+    find_exists_or_update_user_page,
     get_user_token_by_username,
     insert_page_target,
     insert_user_page_target,
@@ -334,7 +335,11 @@ def insert_to_db_2(
     result["use_user_sql"] = use_user_sql
 
     # Check if exists and update if needed
-    exists = find_exists_or_update_page(sourcetitle, lang, user, target, use_user_sql)
+    if use_user_sql:
+        exists = find_exists_or_update_user_page(sourcetitle, lang, user, target)
+    else:
+        exists = find_exists_or_update_page(sourcetitle, lang, user, target)
+
     if exists:
         result["exists"] = "already_in"
         return result

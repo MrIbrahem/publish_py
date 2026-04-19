@@ -87,7 +87,7 @@ class TestLanguageSettingsDB:
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
 
         settings_db = LanguageSettingsDB(db_config)
-        result = settings_db.add("fr", 0, 0, 0, 0)
+        result = settings_db.add("fr", 0, 0, 0)
 
         assert isinstance(result, LanguageSettingRecord)
         assert result.lang_code == "fr"
@@ -141,7 +141,7 @@ class TestLanguageSettingsDB:
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
 
         settings_db = LanguageSettingsDB(db_config)
-        result = settings_db.add_or_update("de", 1, 0, 1, 0)
+        result = settings_db.add_or_update("de", 1, 0, 1)
 
         assert isinstance(result, LanguageSettingRecord)
         assert result.lang_code == "de"

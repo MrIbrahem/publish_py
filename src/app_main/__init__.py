@@ -75,11 +75,6 @@ def create_app(config_class: Type | None = None) -> Flask:
 
     Returns:
         Configured Flask application instance.
-
-    Example:
-        from app_main import create_app
-        from app_main.config import TestingConfig
-        app = create_app(TestingConfig)
     """
     # Use absolute paths based on the current module location
     base_dir = os.path.abspath(os.path.dirname(__file__))
