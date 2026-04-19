@@ -17,6 +17,7 @@ class SidebarItem:
     icon: str | None = None
     target: str | None = None
     disabled: bool = False
+    ready: bool = False
 
 
 def generate_list_item(href, title, icon=None, target=None):
@@ -213,6 +214,10 @@ def create_side(active_route):
             css_class = "active" if (active_route == item.href or item.href.startswith(f"{active_route}/")) else ""
             href_full = item.href if item.target else f"/admin/{item.href}"
             link = generate_list_item(href_full, item.title, item.icon, item.target)
+
+            if not item.ready:
+                link = f"<s>{link}</s>"
+
             lis.append(f"<li id='{item.id}' class='{css_class}'>{link}</li>")
 
         if lis:
