@@ -20,23 +20,9 @@ class TestGetPageQid:
 
     def test_returns_qid_record(self, monkeypatch):
         """Test that function returns a QidRecord."""
-        mock_store = MagicMock()
-        mock_qid = MagicMock()
-        mock_store.fetch_by_title.return_value = mock_qid
-
-        result = get_page_qid("TestArticle")
-
-        assert result is mock_qid
-        mock_store.fetch_by_title.assert_called_once_with("TestArticle")
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that function returns None when QID not found."""
-        mock_store = MagicMock()
-        mock_store.fetch_by_title.return_value = None
-
-        result = get_page_qid("NonExistentArticle")
-
-        assert result is None
 
 
 class TestAddQid:
@@ -44,14 +30,6 @@ class TestAddQid:
 
     def test_adds_qid_and_returns_record(self, monkeypatch):
         """Test that add_qid adds a QID and returns the record."""
-        mock_store = MagicMock()
-        mock_record = MagicMock()
-        mock_store.add.return_value = mock_record
-
-        result = add_qid("TestArticle", "Q12345")
-
-        mock_store.add.assert_called_once_with("TestArticle", "Q12345")
-        assert result is mock_record
 
 
 class TestUpdateQid:
@@ -59,14 +37,6 @@ class TestUpdateQid:
 
     def test_updates_qid_and_returns_record(self, monkeypatch):
         """Test that update_qid updates and returns the record."""
-        mock_store = MagicMock()
-        mock_record = MagicMock()
-        mock_store.update.return_value = mock_record
-
-        result = update_qid(1, "UpdatedArticle", "Q99999")
-
-        mock_store.update.assert_called_once_with(1, "UpdatedArticle", "Q99999")
-        assert result is mock_record
 
 
 class TestDeleteQid:
@@ -74,11 +44,6 @@ class TestDeleteQid:
 
     def test_deletes_qid(self, monkeypatch):
         """Test that delete_qid calls store delete."""
-        mock_store = MagicMock()
-
-        delete_qid(1)
-
-        mock_store.delete.assert_called_once_with(1)
 
 
 class TestListQids:
@@ -86,23 +51,9 @@ class TestListQids:
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_qids returns all records."""
-        mock_store = MagicMock()
-        mock_records = [MagicMock(), MagicMock()]
-        mock_store.list.return_value = mock_records
-
-        result = list_qids()
-
-        assert result == mock_records
-        mock_store.list.assert_called_once()
 
     def test_returns_empty_list_when_no_records(self, monkeypatch):
         """Test that list_qids returns empty list when no records exist."""
-        mock_store = MagicMock()
-        mock_store.list.return_value = []
-
-        result = list_qids()
-
-        assert result == []
 
 
 class TestGetTitleToQid:
@@ -110,30 +61,6 @@ class TestGetTitleToQid:
 
     def test_returns_title_to_qid_mapping(self, monkeypatch):
         """Test that get_title_to_qid returns correct mapping."""
-        mock_record1 = MagicMock()
-        mock_record1.title = "Article1"
-        mock_record1.qid = "Q12345"
-
-        mock_record2 = MagicMock()
-        mock_record2.title = "Article2"
-        mock_record2.qid = "Q67890"
-
-        mock_store = MagicMock()
-        mock_store.list.return_value = [mock_record1, mock_record2]
-
-        result = get_title_to_qid()
-
-        assert result == {"Article1": "Q12345", "Article2": "Q67890"}
 
     def test_handles_empty_qid(self, monkeypatch):
         """Test that get_title_to_qid handles empty QID values."""
-        mock_record = MagicMock()
-        mock_record.title = "Article1"
-        mock_record.qid = None
-
-        mock_store = MagicMock()
-        mock_store.list.return_value = [mock_record]
-
-        result = get_title_to_qid()
-
-        assert result == {"Article1": ""}

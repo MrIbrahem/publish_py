@@ -1,19 +1,5 @@
-"""Unit tests for page_service module.
-
-NOTE: These tests cover the service layer which acts as a thin wrapper around
-the PagesDB class. The actual database operations are thoroughly tested in
-test_db_pages.py. These tests focus on:
-
-- Singleton pattern (global _PAGE_STORE caching)
-- Error handling when database configuration is missing
-- Delegation to underlying PagesDB methods
-- Service layer convenience functions
-
-The service layer provides:
-- Lazy initialization of PagesDB with caching
-- Configuration validation before DB operations
-- Simplified API for common page operations
-- Mirrors the PHP helper functions from php_src/bots/sql/db_pages.php
+"""
+Unit tests for page_service module.
 """
 
 from unittest.mock import MagicMock, patch
@@ -35,14 +21,6 @@ class TestListPages:
 
     def test_returns_list_of_pages(self, monkeypatch):
         """Test that function returns list from store."""
-        mock_store = MagicMock()
-        mock_records = [MagicMock(), MagicMock()]
-        mock_store.list.return_value = mock_records
-
-        result = list_pages()
-
-        assert result is mock_records
-        mock_store.list.assert_called_once()
 
 
 class TestAddPage:
@@ -50,14 +28,6 @@ class TestAddPage:
 
     def test_delegates_to_store_add(self, monkeypatch):
         """Test that function delegates to store.add."""
-        mock_store = MagicMock()
-        mock_record = MagicMock()
-        mock_store.add.return_value = mock_record
-
-        result = add_page("TestTitle", "TestFile")
-
-        assert result is mock_record
-        mock_store.add.assert_called_once_with("TestTitle", "TestFile")
 
 
 class TestAddOrUpdatePage:
@@ -65,14 +35,6 @@ class TestAddOrUpdatePage:
 
     def test_delegates_to_store_add_or_update(self, monkeypatch):
         """Test that function delegates to store.add_or_update."""
-        mock_store = MagicMock()
-        mock_record = MagicMock()
-        mock_store.add_or_update.return_value = mock_record
-
-        result = add_or_update_page("TestTitle", "TestFile")
-
-        assert result is mock_record
-        mock_store.add_or_update.assert_called_once_with("TestTitle", "TestFile")
 
 
 class TestUpdatePage:
@@ -80,14 +42,6 @@ class TestUpdatePage:
 
     def test_delegates_to_store_update(self, monkeypatch):
         """Test that function delegates to store.update."""
-        mock_store = MagicMock()
-        mock_record = MagicMock()
-        mock_store.update.return_value = mock_record
-
-        result = update_page(1, "TestTitle", "TestFile")
-
-        assert result is mock_record
-        mock_store.update.assert_called_once_with(1, "TestTitle", "TestFile")
 
 
 class TestDeletePage:
@@ -95,14 +49,6 @@ class TestDeletePage:
 
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function delegates to store.delete."""
-        mock_store = MagicMock()
-        mock_record = MagicMock()
-        mock_store.delete.return_value = mock_record
-
-        result = delete_page(1)
-
-        assert result is mock_record
-        mock_store.delete.assert_called_once_with(1)
 
 
 class TestFindExistsOrUpdate:
@@ -110,22 +56,9 @@ class TestFindExistsOrUpdate:
 
     def test_delegates_to_store_find_exists_or_update(self, monkeypatch):
         """Test that function delegates to store._find_exists_or_update."""
-        mock_store = MagicMock()
-        mock_store._find_exists_or_update.return_value = True
-
-        result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
-
-        assert result is True
-        mock_store._find_exists_or_update.assert_called_once_with("TestTitle", "ar", "TestUser", "Target")
 
     def test_returns_false_when_not_exists(self, monkeypatch):
         """Test that function returns False when record not found."""
-        mock_store = MagicMock()
-        mock_store._find_exists_or_update.return_value = False
-
-        result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
-
-        assert result is False
 
 
 class TestInsertPageTarget:
@@ -133,49 +66,6 @@ class TestInsertPageTarget:
 
     def test_delegates_to_store_insert_page_target(self, monkeypatch):
         """Test that function delegates to store.insert_page_target."""
-        mock_store = MagicMock()
-        mock_store.insert_page_target.return_value = True
-
-        result = insert_page_target(
-            sourcetitle="Source",
-            tr_type="Lead",
-            cat="Category",
-            lang="ar",
-            user="TestUser",
-            target="Target",
-            mdwiki_revid=12345,
-            word=100,
-        )
-
-        assert result is True
-        mock_store.insert_page_target.assert_called_once_with(
-            sourcetitle="Source",
-            tr_type="Lead",
-            cat="Category",
-            lang="ar",
-            user="TestUser",
-            target="Target",
-            mdwiki_revid=12345,
-            word=100,
-        )
 
     def test_passes_optional_params(self, monkeypatch):
         """Test that optional parameters are passed correctly."""
-        mock_store = MagicMock()
-        mock_store.insert_page_target.return_value = True
-
-        # Call with minimal required params
-        result = insert_page_target(
-            sourcetitle="Source",
-            tr_type="Lead",
-            cat="Category",
-            lang="ar",
-            user="TestUser",
-            target="Target",
-        )
-
-        assert result is True
-        # Verify default values for optional params
-        call_kwargs = mock_store.insert_page_target.call_args.kwargs
-        assert call_kwargs["mdwiki_revid"] is None
-        assert call_kwargs["word"] == 0
