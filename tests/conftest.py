@@ -4,11 +4,11 @@ import os
 import sys
 from pathlib import Path
 from typing import Any, Generator
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-from unittest.mock import patch
 from sqlalchemy.orm import sessionmaker
 
 if sys:

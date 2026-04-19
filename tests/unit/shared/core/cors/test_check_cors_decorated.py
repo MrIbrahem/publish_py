@@ -97,7 +97,9 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         )
         app.config["CORS_DISABLED"] = False
         mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=response)
-        mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com"])
+        mocker.patch(
+            "src.sqlalchemy_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com"]
+        )
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()

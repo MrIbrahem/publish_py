@@ -21,7 +21,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from sqlalchemy.orm import sessionmaker
-
 from src.sqlalchemy_app.shared.domain.engine import (
     BaseDb,
     build_engine,

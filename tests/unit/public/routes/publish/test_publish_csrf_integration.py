@@ -163,7 +163,9 @@ class BasePublishTest:
             patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
             patch("src.sqlalchemy_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
             patch("src.sqlalchemy_app.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.find_exists_or_update_user_page") as mock_user_find_exists,
+            patch(
+                "src.sqlalchemy_app.public.routes.publish.worker.find_exists_or_update_user_page"
+            ) as mock_user_find_exists,
             patch("src.sqlalchemy_app.public.routes.publish.worker.insert_page_target") as mock_insert_page,
             patch("src.sqlalchemy_app.public.routes.publish.worker.insert_user_page_target") as mock_insert_user_page,
         ):
