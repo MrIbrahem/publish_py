@@ -125,12 +125,12 @@ class Coordinators:
         def delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
             return _delete_coordinator(coordinator_id)
 
-        @bp_admin.post("/coordinators/<int:coordinator_id>/activate")
+        @bp_admin.post("/coordinators/<int:record_id>/activate")
         @admin_required
-        def activate_coordinator(coordinator_id: int) -> ResponseReturnValue:
-            return _activate_record(coordinator_id)
+        def activate_coordinator(record_id: int) -> ResponseReturnValue:
+            return _activate_record(record_id)
 
-        @bp_admin.post("/coordinators/<int:coordinator_id>/deactivate")
+        @bp_admin.post("/coordinators/<int:record_id>/deactivate")
         @admin_required
-        def deactivate_coordinator(coordinator_id: int) -> ResponseReturnValue:
-            return _deactivate_record(coordinator_id)
+        def deactivate_coordinator(record_id: int) -> ResponseReturnValue:
+            return _deactivate_record(record_id)
