@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from typing import Any, Generator
 from unittest.mock import MagicMock, patch
+from sqlalchemy import Column, Integer, MetaData, String, Table
 
 import pytest
 from flask.app import Flask
@@ -155,8 +156,12 @@ def setup_db():
 
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
 
+    meta = MetaData()
+    pages_users = Table("pages_users", meta, Column("id", Integer, primary_key=True), Column("title", String(255)))
+    pages_users.create(engine)
+
+    BaseDb.metadata.create_all(engine)
     with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         Session = sessionmaker(bind=engine)
         mock_session_factory.return_value = Session()
