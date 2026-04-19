@@ -5,10 +5,11 @@ import sys
 from pathlib import Path
 from typing import Any, Generator
 from unittest.mock import MagicMock
-
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
+from unittest.mock import patch
+from sqlalchemy.orm import sessionmaker
 
 if sys:
     os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
@@ -141,3 +142,22 @@ def db_config():
         db_user="user",
         db_password="pass",
     )
+
+
+@pytest.fixture(autouse=True)
+def setup_db():
+    """Initialize an in-memory SQLite database for tests."""
+    from src.sqlalchemy_app.shared.domain.engine import (
+        BaseDb,
+        build_engine,
+        init_db,
+    )
+
+    init_db("sqlite:///:memory:")
+    engine = build_engine("sqlite:///:memory:")
+    BaseDb.metadata.create_all(engine)
+
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
+        Session = sessionmaker(bind=engine)
+        mock_session_factory.return_value = Session()
+        yield
