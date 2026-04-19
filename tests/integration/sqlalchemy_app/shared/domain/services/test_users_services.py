@@ -19,6 +19,13 @@ The actual DB operations are mocked to avoid requiring a real database.
 from unittest.mock import MagicMock, patch
 
 import pytest
+from sqlalchemy.orm import sessionmaker
+
+from src.sqlalchemy_app.shared.domain.engine import (
+    BaseDb,
+    build_engine,
+    init_db,
+)
 from src.sqlalchemy_app.shared.domain.services.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,
@@ -28,19 +35,24 @@ from src.sqlalchemy_app.shared.domain.services.user_token_service import (
 )
 
 
+@pytest.fixture(autouse=True)
+def setup_db():
+    """Initialize an in-memory SQLite database for tests."""
+    init_db("sqlite:///:memory:")
+    engine = build_engine("sqlite:///:memory:")
+    BaseDb.metadata.create_all(engine)
+
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
+        Session = sessionmaker(bind=engine)
+        mock_session_factory.return_value = Session()
+        yield
+
+
 class TestUserServiceIntegration:
     """Integration tests for user token service."""
 
-    def test_full_token_lifecycle(self, monkeypatch):
+    def test_full_token_lifecycle(self):
         """Test complete CRUD lifecycle through service layer."""
-        # Setup mock DB
-        mock_db = MagicMock()
-        mock_record = MagicMock()
-        mock_record.user_id = 12345
-        mock_record.username = "TestUser"
-
-        # 1. Create token
-        mock_db.upsert.return_value = mock_record
         upsert_user_token(
             user_id=12345,
             username="TestUser",
@@ -48,59 +60,40 @@ class TestUserServiceIntegration:
             access_secret="test_secret",
         )
 
-        # 2. Read token
-        mock_db._fetch_by_id.return_value = mock_record
         result = get_user_token(12345)
-        assert result is mock_record
-
-        # 3. Delete token
-        mock_db.delete.return_value = None
-        delete_user_token(12345)
-
-        # Verify all operations were called
-        mock_db.upsert.assert_called_once()
-        mock_db._fetch_by_id.assert_called_once_with(12345)
-        mock_db.delete.assert_called_once_with(12345)
-
-    def test_username_lookup_integration(self, monkeypatch):
-        """Test username-based operations integrate correctly."""
-        mock_db = MagicMock()
-        mock_record = MagicMock()
-        mock_record.user_id = 12345
-
-        # Setup mock responses
-        mock_db._fetch_by_username.return_value = mock_record
-        mock_db.get_user_id.return_value = 12345
-
-        # Get by username
-        result = get_user_token_by_username("TestUser")
+        assert result is not None
         assert result.user_id == 12345
 
-        # Delete by username
-        delete_user_token_by_username("TestUser")
-        mock_db.delete.assert_called_once_with(12345)
+        delete_user_token(12345)
 
-    def test_empty_username_handling(self, monkeypatch):
+        result = get_user_token(12345)
+        assert result is None
+
+    def test_username_lookup_integration(self):
+        """Test username-based operations integrate correctly."""
+        upsert_user_token(
+            user_id=12345,
+            username="TestUser",
+            access_key="test_key",
+            access_secret="test_secret",
+        )
+
+        result = get_user_token_by_username("TestUser")
+        assert result is not None
+        assert result.user_id == 12345
+
+    def test_empty_username_handling(self):
         """Test service handles empty usernames gracefully."""
-        mock_db = MagicMock()
-
-        # These should not call the DB
         result = get_user_token_by_username("")
         assert result is None
-        mock_db._fetch_by_username.assert_not_called()
 
         result = delete_user_token_by_username("   ")
         assert result is None
-        mock_db.get_user_id.assert_not_called()
 
-    def test_lookup_error_handling(self, monkeypatch):
+    def test_lookup_error_handling(self):
         """Test service handles LookupError from DB layer."""
-        mock_db = MagicMock()
+        result = get_user_token(99999)
+        assert result is None
 
-        # Setup DB to raise LookupError
-        mock_db._fetch_by_id.side_effect = LookupError("User not found")
-        mock_db._fetch_by_username.side_effect = LookupError("User not found")
-
-        # Service should return None, not propagate exception
-        assert get_user_token(99999) is None
-        assert get_user_token_by_username("NonExistent") is None
+        result = get_user_token_by_username("NonExistent")
+        assert result is None
