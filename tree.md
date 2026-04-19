@@ -2,27 +2,21 @@
 src/
 ├── __init__.py
 ├── app.py
-├── app_main/
+├── db_models/
+│   ├── __init__.py
+│   ├── admin_models.py
+│   ├── public_models.py
+│   └── shared_models.py
+├── env_config.py
+├── logger_config.py
+├── sqlalchemy_app/
 │   ├── __init__.py
 │   ├── admin/
 │   │   ├── __init__.py
+│   │   ├── decorators.py
 │   │   ├── domain/
-│   │   │   ├── db/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── db_coordinators.py
-│   │   │   │   ├── db_full_translators.py
-│   │   │   │   ├── db_language_settings.py
-│   │   │   │   ├── db_settings.py
-│   │   │   │   ├── db_users_no_inprocess.py
-│   │   │   │   └── schema.py
-│   │   │   ├── db_ensure_tables.py
-│   │   │   ├── models/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── coordinator.py
-│   │   │   │   ├── full_translator.py
-│   │   │   │   ├── language_setting.py
-│   │   │   │   ├── setting.py
-│   │   │   │   └── users_no_inprocess.py
+│   │   │   ├── __init__.py
+│   │   │   ├── models.py
 │   │   │   └── services/
 │   │   │       ├── __init__.py
 │   │   │       ├── coordinator_service.py
@@ -30,42 +24,22 @@ src/
 │   │   │       ├── language_setting_service.py
 │   │   │       ├── setting_service.py
 │   │   │       └── users_no_inprocess_service.py
-│   │   └── routes/
-│   │       └── __init__.py
+│   │   ├── domain_models.py
+│   │   ├── routes/
+│   │   │   ├── __init__.py
+│   │   │   ├── admin.py
+│   │   │   ├── coordinators.py
+│   │   │   ├── full_translators.py
+│   │   │   ├── language_settings.py
+│   │   │   ├── settings.py
+│   │   │   └── users_no_inprocess.py
+│   │   └── sidebar.py
 │   ├── config.py
 │   ├── public/
 │   │   ├── __init__.py
 │   │   ├── domain/
-│   │   │   ├── db/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── db_assessments.py
-│   │   │   │   ├── db_enwiki_pageviews.py
-│   │   │   │   ├── db_in_process.py
-│   │   │   │   ├── db_langs.py
-│   │   │   │   ├── db_mdwiki_revids.py
-│   │   │   │   ├── db_pages_users_to_main.py
-│   │   │   │   ├── db_projects.py
-│   │   │   │   ├── db_refs_counts.py
-│   │   │   │   ├── db_translate_type.py
-│   │   │   │   ├── db_users.py
-│   │   │   │   ├── db_views_new.py
-│   │   │   │   ├── db_words.py
-│   │   │   │   └── schema.py
-│   │   │   ├── db_ensure_tables.py
-│   │   │   ├── models/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── assessment.py
-│   │   │   │   ├── enwiki_pageview.py
-│   │   │   │   ├── in_process.py
-│   │   │   │   ├── lang.py
-│   │   │   │   ├── mdwiki_revid.py
-│   │   │   │   ├── pages_users_to_main.py
-│   │   │   │   ├── project.py
-│   │   │   │   ├── refs_count.py
-│   │   │   │   ├── translate_type.py
-│   │   │   │   ├── user.py
-│   │   │   │   ├── views_new.py
-│   │   │   │   └── word.py
+│   │   │   ├── __init__.py
+│   │   │   ├── models.py
 │   │   │   └── services/
 │   │   │       ├── __init__.py
 │   │   │       ├── assessment_service.py
@@ -80,6 +54,7 @@ src/
 │   │   │       ├── user_service.py
 │   │   │       ├── views_new_service.py
 │   │   │       └── word_service.py
+│   │   ├── domain_models.py
 │   │   └── routes/
 │   │       ├── __init__.py
 │   │       ├── api/
@@ -127,34 +102,20 @@ src/
 │       │   │   ├── is_allowed_checker.py
 │       │   │   └── publish_secret_checks.py
 │       │   ├── crypto.py
-│       │   ├── db_driver.py
 │       │   └── extensions.py
 │       ├── domain/
 │       │   ├── __init__.py
-│       │   ├── db/
-│       │   │   ├── __init__.py
-│       │   │   ├── db_categories.py
-│       │   │   ├── db_pages.py
-│       │   │   ├── db_publish_reports.py
-│       │   │   ├── db_qids.py
-│       │   │   ├── db_user_tokens.py
-│       │   │   └── schema.py
-│       │   ├── db_ensure_tables.py
-│       │   ├── models/
-│       │   │   ├── __init__.py
-│       │   │   ├── category.py
-│       │   │   ├── page.py
-│       │   │   ├── qid.py
-│       │   │   ├── report.py
-│       │   │   └── user_token.py
+│       │   ├── engine.py
+│       │   ├── models.py
 │       │   └── services/
 │       │       ├── __init__.py
 │       │       ├── category_service.py
-│       │       ├── db_service.py
 │       │       ├── page_service.py
-│       │       ├── qids_service.py
+│       │       ├── qid_service.py
+│       │       ├── report_service.py
+│       │       ├── user_page_service.py
 │       │       └── user_token_service.py
-│       ├── domain.zip
+│       ├── domain_models.py
 │       └── utils/
 │           ├── __init__.py
 │           ├── decode_bytes.py
@@ -165,9 +126,21 @@ src/
 │           │   ├── text_processor.py
 │           │   └── words.py
 │           └── web_utils.py
-├── env_config.py
-├── logger_config.py
 ├── static/
+│   ├── css/
+│   │   ├── navbar.css
+│   │   ├── sidebar-desktop.css
+│   │   ├── sidebar-mobile.css
+│   │   └── style.css
+│   ├── images/
+│   ├── js/
+│   │   ├── autocomplete.js
+│   │   ├── card-tools.js
+│   │   ├── dark-mode.js
+│   │   ├── sidebar.js
+│   │   └── SVGLanguages.js
+│   └── translate.svg
 └── templates/
+    └── admins/
 
 ```
