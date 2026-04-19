@@ -15,10 +15,6 @@ from src.sqlalchemy_app.public.domain.services.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_in_process_workflow():

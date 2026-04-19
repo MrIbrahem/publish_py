@@ -15,10 +15,6 @@ from src.sqlalchemy_app.public.domain.services.views_new_service import (
     list_views_new,
     update_views_new,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_views_new_workflow():

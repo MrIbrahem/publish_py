@@ -13,10 +13,6 @@ from src.sqlalchemy_app.public.domain.services.enwiki_pageview_service import (
     list_enwiki_pageviews,
     update_enwiki_pageview,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_enwiki_pageview_workflow():
@@ -52,7 +48,6 @@ def test_enwiki_pageview_workflow():
     # Test delete
     delete_enwiki_pageview(p.id)
     assert get_enwiki_pageview(p.id) is None
-
 
 
 class TestGetEnwikiPageviewsDb:

@@ -16,10 +16,6 @@ from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     list_translate_types,
     update_translate_type,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_translate_type_workflow():

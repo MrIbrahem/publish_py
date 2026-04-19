@@ -5,11 +5,11 @@ import sys
 from pathlib import Path
 from typing import Any, Generator
 from unittest.mock import MagicMock, patch
-from sqlalchemy import Column, Integer, MetaData, String, Table
 
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
+from sqlalchemy import Column, Integer, MetaData, String, Table
 from sqlalchemy.orm import sessionmaker
 
 if sys:

@@ -18,10 +18,6 @@ from src.sqlalchemy_app.public.domain.services.user_service import (
     update_user,
     user_exists,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_user_workflow():
@@ -38,6 +34,7 @@ def test_user_workflow():
     assert u4.email == "final@example.com"
     delete_user(u.user_id)
     assert get_user(u.user_id) is None
+
 
 class TestGetUsersDb:
     """Tests for get_users_db function."""

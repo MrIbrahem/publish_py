@@ -36,6 +36,7 @@ from src.sqlalchemy_app.shared.domain.services.page_service import (
     update_page,
 )
 
+
 class TestPagesServiceIntegration:
     """Integration tests for pages service."""
 

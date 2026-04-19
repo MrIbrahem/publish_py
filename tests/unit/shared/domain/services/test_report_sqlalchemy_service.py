@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.shared_models import ReportRecord
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 from src.sqlalchemy_app.shared.domain.models import _ReportRecord
 from src.sqlalchemy_app.shared.domain.services.report_service import (
     add_report,
@@ -10,9 +9,6 @@ from src.sqlalchemy_app.shared.domain.services.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-
-
-
 
 
 def test_report_workflow():

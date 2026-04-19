@@ -11,10 +11,6 @@ from src.sqlalchemy_app.admin.domain.services.setting_service import (
     list_settings,
     update_value,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_setting_workflow():
@@ -42,6 +38,7 @@ def test_setting_workflow():
     # Test delete
     delete_setting(s.id)
     assert get_setting(s.id) is None
+
 
 class TestGetSettingsDb:
     """Tests for get_settings_db function."""

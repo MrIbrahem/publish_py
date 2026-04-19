@@ -12,10 +12,6 @@ from src.sqlalchemy_app.public.domain.services.project_service import (
     list_projects,
     update_project,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_project_workflow():
@@ -46,7 +42,6 @@ def test_project_workflow():
     # Test delete
     delete_project(p.g_id)
     assert get_project(p.g_id) is None
-
 
 
 class TestGetProjectsDb:

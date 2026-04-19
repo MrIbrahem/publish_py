@@ -12,10 +12,6 @@ from src.sqlalchemy_app.public.domain.services.mdwiki_revid_service import (
     list_mdwiki_revids,
     update_mdwiki_revid,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_mdwiki_revid_workflow():
@@ -47,7 +43,6 @@ def test_mdwiki_revid_workflow():
     # Test delete
     delete_mdwiki_revid("test_page")
     assert get_mdwiki_revid_by_title("test_page") is None
-
 
 
 class TestGetMdwikiRevidsDb:

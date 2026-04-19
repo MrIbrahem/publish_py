@@ -13,10 +13,6 @@ from src.sqlalchemy_app.public.domain.services.word_service import (
     list_words,
     update_word,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_word_workflow():
@@ -53,7 +49,6 @@ def test_word_workflow():
     # Test delete
     delete_word(w.w_id)
     assert get_word(w.w_id) is None
-
 
 
 class TestGetWordsDb:

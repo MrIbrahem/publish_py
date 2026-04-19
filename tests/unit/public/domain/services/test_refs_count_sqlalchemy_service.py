@@ -13,10 +13,6 @@ from src.sqlalchemy_app.public.domain.services.refs_count_service import (
     list_refs_counts,
     update_refs_count,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_refs_count_workflow():
@@ -53,6 +49,7 @@ def test_refs_count_workflow():
     # Test delete
     delete_refs_count(r.r_id)
     assert get_refs_count(r.r_id) is None
+
 
 class TestGetRefsCountsDb:
     """Tests for get_refs_counts_db function."""

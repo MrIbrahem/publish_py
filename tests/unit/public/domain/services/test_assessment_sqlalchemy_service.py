@@ -12,10 +12,6 @@ from src.sqlalchemy_app.public.domain.services.assessment_service import (
     list_assessments,
     update_assessment,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-
 
 
 def test_assessment_workflow():

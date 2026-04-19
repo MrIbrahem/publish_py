@@ -15,9 +15,6 @@ from src.sqlalchemy_app.shared.domain.services.page_service import (
 )
 
 
-
-
-
 def test_page_workflow():
     p = add_page("test_page", "target_file")
     assert p.title == "test_page"
