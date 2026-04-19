@@ -52,7 +52,6 @@ class LanguageSettingRecord:
     expend: int | None = 0
     add_en_lang: int | None = 0
 
-
     def to_dict(self) -> dict:
         """Convert record to dictionary."""
         return {
@@ -61,7 +60,6 @@ class LanguageSettingRecord:
             "move_dots": self.move_dots,
             "expend": self.expend,
             "add_en_lang": self.add_en_lang,
-
         }
 
 
