@@ -148,6 +148,7 @@ def db_config():
 @pytest.fixture(autouse=True)
 def setup_db():
     """Initialize an in-memory SQLite database for tests."""
+    from src.sqlalchemy_app.shared.domain import engine as engine_mod
     from src.sqlalchemy_app.shared.domain.engine import (
         BaseDb,
         build_engine,
@@ -162,7 +163,9 @@ def setup_db():
     pages_users.create(engine)
 
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
+    factory = sessionmaker(bind=engine, expire_on_commit=False)
+
+    with patch.object(engine_mod, "_SessionFactory", factory):
         yield
+
+    engine.dispose()

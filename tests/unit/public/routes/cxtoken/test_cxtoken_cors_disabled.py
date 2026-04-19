@@ -34,16 +34,13 @@ class TestCxtokenEndpoint:
     """Tests for cxtoken endpoint."""
 
     def test_cors_not_allowed_without_origin(self, client):
-
-        with (patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
+        """Test that requests without allowed origin are rejected."""
+        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
             mock_get_token.return_value = None
-
-            """Test that requests without allowed origin are rejected."""
             response = client.get(
                 "/cxtoken?wiki=en&user=TestUser",
                 base_url="https://unknown-site.com",
             )
-
             assert response.status_code == 403
 
     def test_returns_error_for_empty_params(self, client):
