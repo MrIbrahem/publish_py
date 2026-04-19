@@ -14,7 +14,7 @@ from flask import Flask, flash, render_template, request  # , g
 from .admin.routes.admin import (
     bp_admin,
 )
-from .admin.sqlalchemy_db.services.coordinator_service import active_coordinators
+from .admin.domain.services.coordinator_service import active_coordinators
 from .config import settings
 from .public.routes import (
     bp_api,
@@ -27,7 +27,7 @@ from .public.routes import (
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
-from .shared.sqlalchemy_db.engine import build_db_url, init_db
+from .shared.domain.engine import build_db_url, init_db
 
 logger = logging.getLogger(__name__)
 
@@ -73,11 +73,6 @@ def create_app(config_class: Type | None = None) -> Flask:
 
     Returns:
         Configured Flask application instance.
-
-    Example:
-        from app_main import create_app
-        from app_main.config import TestingConfig
-        app = create_app(TestingConfig)
     """
     # Use absolute paths based on the current module location
     base_dir = os.path.abspath(os.path.dirname(__file__))

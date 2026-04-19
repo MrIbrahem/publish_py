@@ -35,3 +35,5 @@ coverage.xml
 app2.py
 */__pycache__/*
 *.zip
+/_work_files/php_publish
+/src/app_main

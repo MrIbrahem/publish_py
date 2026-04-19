@@ -25,10 +25,10 @@ src/
 │   │   │   │   └── users_no_inprocess.py
 │   │   │   └── services/
 │   │   │       ├── __init__.py
-│   │   │       ├── coordinators_service.py
-│   │   │       ├── full_translators_service.py
-│   │   │       ├── language_settings_service.py
-│   │   │       ├── settings_service.py
+│   │   │       ├── coordinator_service.py
+│   │   │       ├── full_translator_service.py
+│   │   │       ├── language_setting_service.py
+│   │   │       ├── setting_service.py
 │   │   │       └── users_no_inprocess_service.py
 │   │   └── routes/
 │   │       └── __init__.py
@@ -68,18 +68,18 @@ src/
 │   │   │   │   └── word.py
 │   │   │   └── services/
 │   │   │       ├── __init__.py
-│   │   │       ├── assessments_service.py
-│   │   │       ├── enwiki_pageviews_service.py
+│   │   │       ├── assessment_service.py
+│   │   │       ├── enwiki_pageview_service.py
 │   │   │       ├── in_process_service.py
-│   │   │       ├── langs_service.py
-│   │   │       ├── mdwiki_revids_service.py
+│   │   │       ├── lang_service.py
+│   │   │       ├── mdwiki_revid_service.py
 │   │   │       ├── pages_users_to_main_service.py
-│   │   │       ├── projects_service.py
-│   │   │       ├── refs_counts_service.py
+│   │   │       ├── project_service.py
+│   │   │       ├── refs_count_service.py
 │   │   │       ├── translate_type_service.py
-│   │   │       ├── users_service.py
+│   │   │       ├── user_service.py
 │   │   │       ├── views_new_service.py
-│   │   │       └── words_service.py
+│   │   │       └── word_service.py
 │   │   └── routes/
 │   │       ├── __init__.py
 │   │       ├── api/
@@ -149,11 +149,11 @@ src/
 │       │   │   └── user_token.py
 │       │   └── services/
 │       │       ├── __init__.py
-│       │       ├── categories_service.py
+│       │       ├── category_service.py
 │       │       ├── db_service.py
-│       │       ├── pages_service.py
+│       │       ├── page_service.py
 │       │       ├── qids_service.py
-│       │       └── users_services.py
+│       │       └── user_token_service.py
 │       ├── domain.zip
 │       └── utils/
 │           ├── __init__.py

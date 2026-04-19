@@ -43,8 +43,8 @@ if sys:
 
 
 # Import after environment setup
-from src.app_main import create_app
-from src.app_main.config import TestingConfig
+from src.sqlalchemy_app import create_app
+from src.sqlalchemy_app.config import TestingConfig
 
 
 @pytest.fixture
@@ -110,30 +110,30 @@ def auth_client(app):
 
 @pytest.fixture
 def mock_is_denied(mocker):
-    return mocker.patch("src.app_main.shared.core.cors.is_allowed", return_value=None)
+    return mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_is_allowed(mocker):
-    return mocker.patch("src.app_main.shared.core.cors.is_allowed", return_value=None)
+    return mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_check_secret(mocker):
-    return mocker.patch("src.app_main.shared.core.cors.check_publish_secret_code", return_value=None)
+    return mocker.patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None)
 
 
 @pytest.fixture
 def mock_load_request(mocker):
     mock_req = MagicMock()
-    mocker.patch("src.app_main.shared.core.cors._load_request", return_value=mock_req)
+    mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=mock_req)
     return mock_req
 
 
 @pytest.fixture
 def db_config():
     """Fixture for DbConfig instance."""
-    from src.app_main.config import DbConfig
+    from src.sqlalchemy_app.config import DbConfig
 
     return DbConfig(
         db_name="test_db",

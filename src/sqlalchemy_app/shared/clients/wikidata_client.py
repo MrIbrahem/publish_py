@@ -8,7 +8,7 @@ import logging
 from typing import Any
 
 from ...config import settings
-from ..sqlalchemy_db.services.qid_service import get_page_qid
+from ..domain.services.qid_service import get_page_qid
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)

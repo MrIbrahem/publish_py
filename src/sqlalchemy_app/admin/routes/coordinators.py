@@ -14,13 +14,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..sqlalchemy_db.services.coordinator_service import (
+from ..decorators import admin_required
+from ..domain.services.coordinator_service import (
     add_coordinator,
     delete_coordinator,
     list_coordinators,
     set_coordinator_active,
 )
-from .decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
@@ -63,23 +63,32 @@ def _add_coordinator() -> ResponseReturnValue:
     return redirect(url_for("admin.coordinators_dashboard"))
 
 
-def _update_coordinator_active(coordinator_id: int) -> ResponseReturnValue:
-    """Toggle the active flag for a coordinator."""
-
-    desired = request.form.get("is_active", "0") == "1"
+def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
+    """Shared helper to update coordinator active status."""
+    action = "activate" if is_active else "deactivate"
+    past_tense = "activated" if is_active else "deactivated"
     try:
-        record = set_coordinator_active(coordinator_id, desired)
+        record = set_coordinator_active(record_id, is_active)
     except LookupError as exc:
-        logger.exception("Unable to update coordinator.")
+        logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
     except Exception:  # pragma: no cover - defensive guard
-        logger.exception("Unable to update coordinator.")
-        flash("Unable to update coordinator status. Please try again.", "danger")
+        logger.exception(f"Unable to {action} coordinator.")
+        flash(f"Unable to {action} coordinator. Please try again.", "danger")
     else:
-        state = "activated" if record.is_active else "deactivated"
-        flash(f"Coordinator '{record.username}' {state}.", "success")
+        flash(f"Coordinator '{record.username}' {past_tense}.", "success")
 
     return redirect(url_for("admin.coordinators_dashboard"))
+
+
+def _activate_record(record_id: int) -> ResponseReturnValue:
+    """Activate a coordinator."""
+    return _set_record_active_status(record_id, True)
+
+
+def _deactivate_record(record_id: int) -> ResponseReturnValue:
+    """Deactivate a coordinator."""
+    return _set_record_active_status(record_id, False)
 
 
 def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
@@ -111,12 +120,17 @@ class Coordinators:
         def add_coordinator() -> ResponseReturnValue:
             return _add_coordinator()
 
-        @bp_admin.post("/coordinators/<int:coordinator_id>/active")
-        @admin_required
-        def update_coordinator_active(coordinator_id: int) -> ResponseReturnValue:
-            return _update_coordinator_active(coordinator_id)
-
         @bp_admin.post("/coordinators/<int:coordinator_id>/delete")
         @admin_required
         def delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
             return _delete_coordinator(coordinator_id)
+
+        @bp_admin.post("/coordinators/<int:record_id>/activate")
+        @admin_required
+        def activate_coordinator(record_id: int) -> ResponseReturnValue:
+            return _activate_record(record_id)
+
+        @bp_admin.post("/coordinators/<int:record_id>/deactivate")
+        @admin_required
+        def deactivate_coordinator(record_id: int) -> ResponseReturnValue:
+            return _deactivate_record(record_id)

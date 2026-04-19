@@ -39,39 +39,45 @@ gunicorn --workers=4 --bind=0.0.0.0 --forwarded-allow-ips=* src.app:app
 ## Architecture
 
 ### Application Factory
+
 ```python
-from app_main import create_app
+from sqlalchemy_app import create_app
 app = create_app()
 ```
 
 ### Key Directories
-- `src/app_main/app_routes/` - Flask blueprints: `bp_api`, `bp_auth`, `bp_cxtoken`, `bp_main`, `bp_post`, `bp_fixrefs`
-- `src/app_main/db/` - Database classes inheriting from `db_driver.py` (`DbPublishReports`, `DbPages`, `DbQids`)
-- `src/app_main/services/` - External integrations (mediawiki_api, wikidata_client, oauth_client, text_processor)
-- `src/app_main/users/` - User context (`current.py`) and storage (`store.py`)
+
+-   `src/sqlalchemy_app/app_routes/` - Flask blueprints: `bp_api`, `bp_auth`, `bp_cxtoken`, `bp_main`, `bp_post`, `bp_fixrefs`
+-   `src/sqlalchemy_app/db/` - Database classes inheriting from `db_driver.py` (`DbPublishReports`, `DbPages`, `DbQids`)
+-   `src/sqlalchemy_app/services/` - External integrations (mediawiki_api, wikidata_client, oauth_client, text_processor)
+-   `src/sqlalchemy_app/users/` - User context (`current.py`) and storage (`store.py`)
 
 ### Configuration
-Frozen dataclasses with `@lru_cache` singletons in `src/app_main/config.py`. Access via `from app_main.config import settings`.
+
+Frozen dataclasses with `@lru_cache` singletons in `src/sqlalchemy_app/config.py`. Access via `from sqlalchemy_app.config import settings`.
 
 ### Database Pattern
+
 Base `Database` class in `db_driver.py` provides:
-- Context manager support (`with Database(config) as db:`)
-- Automatic retry with exponential backoff for transient errors
-- Connection pooling via thread-local cache
-- Safe variants (`fetch_query_safe`, `execute_query_safe`) that log errors instead of raising
+
+-   Context manager support (`with Database(config) as db:`)
+-   Automatic retry with exponential backoff for transient errors
+-   Connection pooling via thread-local cache
+-   Safe variants (`fetch_query_safe`, `execute_query_safe`) that log errors instead of raising
 
 ### OAuth Flow
+
 1. `/login` -> MediaWiki OAuth -> `/callback`
 2. Tokens encrypted with Fernet (cryptography library), stored in database
 3. Used for authenticated MediaWiki API calls
 
 ## Important Conventions
 
-- **Import order**: `env_config.py` must be imported first (loads .env)
-- **Line length**: 120 characters
-- **Quotes**: Double quotes
-- **CSRF protection**: Enabled via Flask-WTF on all POST routes
-- **External dependency**: `fix_refs` module loaded from `FIX_REFS_PY_PATH` env var or falls back gracefully
+-   **Import order**: `env_config.py` must be imported first (loads .env)
+-   **Line length**: 120 characters
+-   **Quotes**: Double quotes
+-   **CSRF protection**: Enabled via Flask-WTF on all POST routes
+-   **External dependency**: `fix_refs` module loaded from `FIX_REFS_PY_PATH` env var or falls back gracefully
 
 ## Environment Variables
 
