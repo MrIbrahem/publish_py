@@ -100,6 +100,9 @@ class TestGetWordByTitle:
         result = get_word_by_title("DNA replication")
         assert result.w_title == "DNA replication"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_word_by_title("Ghost") is None
+
 
 class TestAddWord:
     """Tests for add_word function."""
@@ -109,6 +112,20 @@ class TestAddWord:
         record = add_word("Protein folding", 300, 1500)
         assert record.w_title == "Protein folding"
         assert record.w_lead_words == 300
+
+    def test_passes_optional_params(self, monkeypatch):
+        """Test that optional params are passed correctly."""
+        record = add_word("T1", w_lead_words=50)
+        assert record.w_lead_words == 50
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_word("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_word("Duplicate")
+
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_word("")
 
 
 class TestAddOrUpdateWord:
@@ -121,6 +138,10 @@ class TestAddOrUpdateWord:
         assert record.w_lead_words == 150
         assert len(list_words()) == 1
 
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_or_update_word("  ")
+
 
 class TestUpdateWord:
     """Tests for update_word function."""
@@ -131,6 +152,15 @@ class TestUpdateWord:
         updated = update_word(w.w_id, w_lead_words=75)
         assert updated.w_lead_words == 75
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        w = add_word("No_Change")
+        result = update_word(w.w_id)
+        assert result.w_title == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_word(9999, w_lead_words=10)
+
 
 class TestDeleteWord:
     """Tests for delete_word function."""
@@ -140,6 +170,10 @@ class TestDeleteWord:
         w = add_word("T-cell")
         delete_word(w.w_id)
         assert get_word(w.w_id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_word(9999)
 
 
 class TestGetWordCountsForTitle:
@@ -152,7 +186,7 @@ class TestGetWordCountsForTitle:
         assert lead == 80
         assert all_w == 800
 
-    def test_returns_none_when_record_not_found(self, monkeypatch):
+    def test_returns_none_when_not_found(self, monkeypatch):
         """Test that function returns None counts when record not found."""
         lead, all_w = get_word_counts_for_title("Ghost_Article")
         assert lead is None

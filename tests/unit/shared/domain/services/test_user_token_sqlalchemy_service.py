@@ -41,11 +41,22 @@ def test_user_token_workflow():
 class TestUpsertUserToken:
     """Tests for upsert_user_token function."""
 
-    def test_delegates_to_store_upsert(self, monkeypatch):
-        """Test that function inserts a token."""
+    def test_inserts_new_token(self, monkeypatch):
+        """Test that function inserts a new token."""
         upsert_user_token(user_id=1, username="GlobalAdmin", access_key="k1", access_secret="s1")
         record = get_user_token(1)
         assert record.username == "GlobalAdmin"
+
+    def test_updates_existing_token(self, monkeypatch):
+        """Test that function updates an existing token."""
+        upsert_user_token(user_id=1, username="GlobalAdmin", access_key="k1", access_secret="s1")
+        upsert_user_token(user_id=1, username="GlobalAdmin_Updated", access_key="k2", access_secret="s2")
+        record = get_user_token(1)
+        assert record.username == "GlobalAdmin_Updated"
+
+    def test_raises_error_if_no_username(self, monkeypatch):
+        with pytest.raises(ValueError, match="Username is required"):
+            upsert_user_token(user_id=1, username="", access_key="k", access_secret="s")
 
 
 class TestGetUserToken:
@@ -75,7 +86,7 @@ class TestDeleteUserToken:
         """Test that None is returned for empty user_id."""
         assert delete_user_token(None) is None
 
-    def test_delegates_to_store_delete(self, monkeypatch):
+    def test_deletes_the_token(self, monkeypatch):
         """Test that function deletes the token."""
         upsert_user_token(user_id=200, username="TranslatorHelper", access_key="k1", access_secret="s1")
         delete_user_token(200)

@@ -118,6 +118,9 @@ class TestGetInProcess:
         assert isinstance(result, InProcessRecord)
         assert result.title == "Sore throat"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_in_process(9999) is None
+
 
 class TestGetInProcessByTitleUserLang:
     """Tests for get_in_process_by_title_user_lang function."""
@@ -127,6 +130,9 @@ class TestGetInProcessByTitleUserLang:
         add_in_process("Insomnia", "Sleepy_Editor", "en")
         result = get_in_process_by_title_user_lang("Insomnia", "Sleepy_Editor", "en")
         assert result.title == "Insomnia"
+
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_in_process_by_title_user_lang("Ghost", "Ghost", "en") is None
 
 
 class TestAddInProcess:
@@ -138,6 +144,23 @@ class TestAddInProcess:
         assert record.title == "Nausea"
         assert record.word == 150
 
+    def test_raises_error_if_exists(self, monkeypatch):
+        from sqlalchemy.exc import IntegrityError
+        with patch("src.sqlalchemy_app.public.domain.services.in_process_service.get_session") as mock_get_session:
+            mock_session = MagicMock()
+            mock_session.commit.side_effect = IntegrityError(None, None, None)
+            mock_get_session.return_value.__enter__.return_value = mock_session
+            with pytest.raises(ValueError, match="already exists"):
+                add_in_process("Duplicate", "User", "en")
+
+    def test_raises_error_if_missing_required(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_in_process("", "U", "L")
+        with pytest.raises(ValueError, match="User is required"):
+            add_in_process("T", "", "L")
+        with pytest.raises(ValueError, match="Language is required"):
+            add_in_process("T", "U", " ")
+
 
 class TestUpdateInProcess:
     """Tests for update_in_process function."""
@@ -148,6 +171,15 @@ class TestUpdateInProcess:
         updated = update_in_process(ip.id, word=200)
         assert updated.word == 200
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        ip = add_in_process("No_Change", "U", "en")
+        result = update_in_process(ip.id)
+        assert result.title == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_in_process(9999, word=10)
+
 
 class TestDeleteInProcess:
     """Tests for delete_in_process function."""
@@ -157,6 +189,10 @@ class TestDeleteInProcess:
         ip = add_in_process("Allergy", "Immune_Expert", "en")
         delete_in_process(ip.id)
         assert get_in_process(ip.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_in_process(9999)
 
 
 class TestDeleteInProcessByTitleUserLang:

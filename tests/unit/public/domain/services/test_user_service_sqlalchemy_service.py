@@ -79,6 +79,9 @@ class TestGetUser:
         assert isinstance(result, UserRecord)
         assert result.username == "ContributorA"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_user(9999) is None
+
 
 class TestGetUserByUsername:
     """Tests for get_user_by_username function."""
@@ -89,6 +92,9 @@ class TestGetUserByUsername:
         result = get_user_by_username("Linguist_Specialist")
         assert result.username == "Linguist_Specialist"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_user_by_username("Ghost") is None
+
 
 class TestAddUser:
     """Tests for add_user function."""
@@ -98,6 +104,21 @@ class TestAddUser:
         record = add_user("New_Researcher", "research@wiki.org", "enwiki", "Researcher")
         assert record.username == "New_Researcher"
         assert record.email == "research@wiki.org"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        # User table in models.py doesn't have UNIQUE on username.
+        # But service expects it.
+        from sqlalchemy.exc import IntegrityError
+        with patch("src.sqlalchemy_app.public.domain.services.user_service.get_session") as mock_get_session:
+            mock_session = MagicMock()
+            mock_session.commit.side_effect = IntegrityError(None, None, None)
+            mock_get_session.return_value.__enter__.return_value = mock_session
+            with pytest.raises(ValueError, match="already exists"):
+                add_user("Duplicate")
+
+    def test_raises_error_if_no_username(self, monkeypatch):
+        with pytest.raises(ValueError, match="Username is required"):
+            add_user("")
 
 
 class TestAddOrUpdateUser:
@@ -110,6 +131,10 @@ class TestAddOrUpdateUser:
         assert record.email == "new@trans.org"
         assert len(list_users()) == 1
 
+    def test_raises_error_if_no_username(self, monkeypatch):
+        with pytest.raises(ValueError, match="Username is required"):
+            add_or_update_user(" ")
+
 
 class TestUpdateUser:
     """Tests for update_user function."""
@@ -120,6 +145,15 @@ class TestUpdateUser:
         updated = update_user(u.user_id, email="new_email")
         assert updated.email == "new_email"
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        u = add_user("No_Change")
+        result = update_user(u.user_id)
+        assert result.username == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_user(9999, email="T")
+
 
 class TestDeleteUser:
     """Tests for delete_user function."""
@@ -129,6 +163,10 @@ class TestDeleteUser:
         u = add_user("Temporary_Account")
         delete_user(u.user_id)
         assert get_user(u.user_id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_user(9999)
 
 
 class TestUserExists:

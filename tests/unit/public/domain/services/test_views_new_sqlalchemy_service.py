@@ -118,6 +118,9 @@ class TestGetViewsNew:
         assert isinstance(result, ViewsNewRecord)
         assert result.target == "Hepatitis_B"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_views_new(9999) is None
+
 
 class TestGetViewsByTargetLangYear:
     """Tests for get_views_by_target_lang_year function."""
@@ -129,6 +132,9 @@ class TestGetViewsByTargetLangYear:
         assert result.target == "Measles"
         assert result.year == 2023
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_views_by_target_lang_year("Ghost", "en", 2023) is None
+
 
 class TestAddViewsNew:
     """Tests for add_views_new function."""
@@ -138,6 +144,17 @@ class TestAddViewsNew:
         record = add_views_new("Smallpox", "en", 2023, 500000)
         assert record.target == "Smallpox"
         assert record.views == 500000
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_views_new("Duplicate", "en", 2023)
+        with pytest.raises(ValueError, match="already exists"):
+            add_views_new("Duplicate", "en", 2023)
+
+    def test_raises_error_if_no_target_or_lang(self, monkeypatch):
+        with pytest.raises(ValueError, match="Target is required"):
+            add_views_new("", "en", 2023)
+        with pytest.raises(ValueError, match="Language is required"):
+            add_views_new("T", " ", 2023)
 
 
 class TestAddOrUpdateViewsNew:
@@ -150,6 +167,12 @@ class TestAddOrUpdateViewsNew:
         assert record.views == 200000
         assert len(list_views_new()) == 1
 
+    def test_raises_error_if_no_target_or_lang(self, monkeypatch):
+        with pytest.raises(ValueError, match="Target is required"):
+            add_or_update_views_new("", "en", 2023)
+        with pytest.raises(ValueError, match="Language is required"):
+            add_or_update_views_new("T", " ", 2023)
+
 
 class TestUpdateViewsNew:
     """Tests for update_views_new function."""
@@ -160,6 +183,15 @@ class TestUpdateViewsNew:
         updated = update_views_new(v.id, views=1100000)
         assert updated.views == 1100000
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        v = add_views_new("No_Change", "en", 2023)
+        result = update_views_new(v.id)
+        assert result.target == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_views_new(9999, views=10)
+
 
 class TestDeleteViewsNew:
     """Tests for delete_views_new function."""
@@ -169,6 +201,10 @@ class TestDeleteViewsNew:
         v = add_views_new("Asthma", "en", 2023)
         delete_views_new(v.id)
         assert get_views_new(v.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_views_new(9999)
 
 
 class TestGetTotalViewsForTarget:

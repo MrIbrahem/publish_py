@@ -127,6 +127,9 @@ class TestGetCoordinatorByUser:
         result = get_coordinator_by_user("Wiki_Lead")
         assert result.username == "Wiki_Lead"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_coordinator_by_user("Ghost") is None
+
 
 class TestAddCoordinator:
     """Tests for add_coordinator function."""
@@ -135,6 +138,15 @@ class TestAddCoordinator:
         """Test that add_coordinator adds and returns the record."""
         record = add_coordinator("New_Admin")
         assert record.username == "New_Admin"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_coordinator("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_coordinator("Duplicate")
+
+    def test_raises_error_if_no_username(self, monkeypatch):
+        with pytest.raises(ValueError, match="username is required"):
+            add_coordinator("")
 
 
 class TestAddOrUpdateCoordinator:
@@ -147,6 +159,10 @@ class TestAddOrUpdateCoordinator:
         assert record.is_active == 0
         assert len(list_coordinators()) == 1
 
+    def test_raises_error_if_no_username(self, monkeypatch):
+        with pytest.raises(ValueError, match="username is required"):
+            add_or_update_coordinator(" ")
+
 
 class TestUpdateCoordinator:
     """Tests for update_coordinator function."""
@@ -157,6 +173,15 @@ class TestUpdateCoordinator:
         updated = update_coordinator(c.id, is_active=0)
         assert updated.is_active == 0
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        c = add_coordinator("No_Change")
+        result = update_coordinator(c.id)
+        assert result.username == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_coordinator(9999, is_active=0)
+
 
 class TestDeleteCoordinator:
     """Tests for delete_coordinator function."""
@@ -166,6 +191,10 @@ class TestDeleteCoordinator:
         c = add_coordinator("Delete_Me")
         delete_coordinator(c.id)
         assert get_coordinator(c.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_coordinator(9999)
 
 
 class TestIsCoordinator:

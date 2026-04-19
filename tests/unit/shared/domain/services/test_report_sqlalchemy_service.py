@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.sqlalchemy_app.shared.domain_models import ReportRecord
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, get_session, init_db
 from src.sqlalchemy_app.shared.domain.models import _ReportRecord
 from src.sqlalchemy_app.shared.domain.services.report_service import (
     add_report,
@@ -63,7 +63,7 @@ class TestDeleteReport:
         assert not any(x.id == r.id for x in list_reports())
 
     def test_raises_lookup_error_when_not_found(self):
-        with pytest.raises(LookupError):
+        with pytest.raises(LookupError, match="not found"):
             delete_report(99999)
 
 
@@ -94,3 +94,28 @@ class TestQueryReportsWithFilters:
         add_report("Polio", "User:Researcher", "en", "Polio_Source", "ok", "{}")
         results = query_reports_with_filters({}, limit=1)
         assert len(results) == 1
+
+    def test_filters_by_year_month(self):
+        from datetime import datetime
+        with get_session() as session:
+            # SQLite current_timestamp is UTC
+            session.add(_ReportRecord(title="Old Report", user="U", lang="en", sourcetitle="S", result="ok", data="{}", date=datetime(2020, 5, 1)))
+            session.commit()
+
+        results = query_reports_with_filters({"year": 2020, "month": 5})
+        assert len(results) == 1
+        assert results[0].title == "Old Report"
+
+    def test_filters_not_empty(self):
+        add_report("T1", "U1", "en", "S1", "ok", "{}")
+        results = query_reports_with_filters({"title": "not_empty"})
+        assert len(results) >= 1
+
+    def test_filters_empty(self):
+        # We can't easily add a report with empty title via service because it's not handled there,
+        # but we can via manual insert.
+        with get_session() as session:
+            session.add(_ReportRecord(title="", user="U", lang="en", sourcetitle="S", result="ok", data="{}"))
+            session.commit()
+        results = query_reports_with_filters({"title": "empty"})
+        assert len(results) >= 1

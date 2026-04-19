@@ -100,6 +100,9 @@ class TestGetUsersNoInprocess:
         assert isinstance(result, UsersNoInprocessRecord)
         assert result.user == "Clinical_Editor"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_users_no_inprocess(9999) is None
+
 
 class TestGetUsersNoInprocessByUser:
     """Tests for get_users_no_inprocess_by_user function."""
@@ -110,6 +113,9 @@ class TestGetUsersNoInprocessByUser:
         result = get_users_no_inprocess_by_user("Medical_Librarian")
         assert result.user == "Medical_Librarian"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_users_no_inprocess_by_user("Ghost") is None
+
 
 class TestAddUsersNoInprocess:
     """Tests for add_users_no_inprocess function."""
@@ -118,6 +124,15 @@ class TestAddUsersNoInprocess:
         """Test that function adds and returns the record."""
         record = add_users_no_inprocess("Science_Writer")
         assert record.user == "Science_Writer"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_users_no_inprocess("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_users_no_inprocess("Duplicate")
+
+    def test_raises_error_if_no_user(self, monkeypatch):
+        with pytest.raises(ValueError, match="User is required"):
+            add_users_no_inprocess("")
 
 
 class TestAddOrUpdateUsersNoInprocess:
@@ -130,6 +145,10 @@ class TestAddOrUpdateUsersNoInprocess:
         assert record.active == 0
         assert len(list_users_no_inprocess()) == 1
 
+    def test_raises_error_if_no_user(self, monkeypatch):
+        with pytest.raises(ValueError, match="User is required"):
+            add_or_update_users_no_inprocess(" ")
+
 
 class TestUpdateUsersNoInprocess:
     """Tests for update_users_no_inprocess function."""
@@ -140,6 +159,15 @@ class TestUpdateUsersNoInprocess:
         updated = update_users_no_inprocess(rec.id, active=0)
         assert updated.active == 0
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        rec = add_users_no_inprocess("No_Change")
+        result = update_users_no_inprocess(rec.id)
+        assert result.user == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_users_no_inprocess(9999, active=0)
+
 
 class TestDeleteUsersNoInprocess:
     """Tests for delete_users_no_inprocess function."""
@@ -149,6 +177,10 @@ class TestDeleteUsersNoInprocess:
         rec = add_users_no_inprocess("To_Delete")
         delete_users_no_inprocess(rec.id)
         assert get_users_no_inprocess(rec.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_users_no_inprocess(9999)
 
 
 class TestShouldHideFromInprocess:

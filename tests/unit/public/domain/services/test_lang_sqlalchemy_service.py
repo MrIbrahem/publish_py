@@ -80,6 +80,9 @@ class TestGetLang:
         assert isinstance(result, LangRecord)
         assert result.code == "es"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_lang(9999) is None
+
 
 class TestGetLangByCode:
     """Tests for get_lang_by_code function."""
@@ -90,6 +93,9 @@ class TestGetLangByCode:
         result = get_lang_by_code("de")
         assert result.code == "de"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_lang_by_code("ghost") is None
+
 
 class TestAddLang:
     """Tests for add_lang function."""
@@ -98,6 +104,21 @@ class TestAddLang:
         """Test that function adds and returns record."""
         record = add_lang("it", "Italiano", "Italian")
         assert record.code == "it"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        # Lang table in models.py doesn't have UNIQUE on code.
+        # But service expects it.
+        from sqlalchemy.exc import IntegrityError
+        with patch("src.sqlalchemy_app.public.domain.services.lang_service.get_session") as mock_get_session:
+            mock_session = MagicMock()
+            mock_session.commit.side_effect = IntegrityError(None, None, None)
+            mock_get_session.return_value.__enter__.return_value = mock_session
+            with pytest.raises(ValueError, match="already exists"):
+                add_lang("en", "En", "En")
+
+    def test_raises_error_if_no_code(self, monkeypatch):
+        with pytest.raises(ValueError, match="Language code is required"):
+            add_lang("", "Autonym", "Name")
 
 
 class TestAddOrUpdateLang:
@@ -110,6 +131,10 @@ class TestAddOrUpdateLang:
         assert record.name == "Portuguese (Brazil)"
         assert len(list_langs()) == 1
 
+    def test_raises_error_if_no_code(self, monkeypatch):
+        with pytest.raises(ValueError, match="Language code is required"):
+            add_or_update_lang(" ", "A", "N")
+
 
 class TestUpdateLang:
     """Tests for update_lang function."""
@@ -120,6 +145,15 @@ class TestUpdateLang:
         updated = update_lang(l.lang_id, autonym="Hindi Autonym")
         assert updated.autonym == "Hindi Autonym"
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        l = add_lang("ja", "J", "J")
+        result = update_lang(l.lang_id)
+        assert result.code == "ja"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_lang(9999, autonym="Ar")
+
 
 class TestDeleteLang:
     """Tests for delete_lang function."""
@@ -129,3 +163,7 @@ class TestDeleteLang:
         l = add_lang("ru", "Русский", "Russian")
         delete_lang(l.lang_id)
         assert get_lang(l.lang_id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_lang(9999)

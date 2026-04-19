@@ -79,6 +79,9 @@ class TestGetMdwikiRevidByTitle:
         result = get_mdwiki_revid_by_title("Aspirin")
         assert result.revid == 3030303
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_mdwiki_revid_by_title("Ghost") is None
+
 
 class TestAddMdwikiRevid:
     """Tests for add_mdwiki_revid function."""
@@ -88,6 +91,15 @@ class TestAddMdwikiRevid:
         record = add_mdwiki_revid("Penicillin", 4040404)
         assert record.title == "Penicillin"
         assert record.revid == 4040404
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_mdwiki_revid("Duplicate", 1)
+        with pytest.raises(ValueError, match="already exists"):
+            add_mdwiki_revid("Duplicate", 2)
+
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_mdwiki_revid("", 123)
 
 
 class TestAddOrUpdateMdwikiRevid:
@@ -100,6 +112,10 @@ class TestAddOrUpdateMdwikiRevid:
         assert record.revid == 6060606
         assert len(list_mdwiki_revids()) == 1
 
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_or_update_mdwiki_revid(" ", 123)
+
 
 class TestUpdateMdwikiRevid:
     """Tests for update_mdwiki_revid function."""
@@ -110,6 +126,10 @@ class TestUpdateMdwikiRevid:
         updated = update_mdwiki_revid("Paracetamol", 8080808)
         assert updated.revid == 8080808
 
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_mdwiki_revid("Ghost", 123)
+
 
 class TestDeleteMdwikiRevid:
     """Tests for delete_mdwiki_revid function."""
@@ -119,6 +139,10 @@ class TestDeleteMdwikiRevid:
         add_mdwiki_revid("Ibuprofen", 9090909)
         delete_mdwiki_revid("Ibuprofen")
         assert get_mdwiki_revid_by_title("Ibuprofen") is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_mdwiki_revid("Ghost")
 
 
 class TestGetRevidForTitle:

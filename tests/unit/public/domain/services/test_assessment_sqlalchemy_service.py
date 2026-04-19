@@ -80,6 +80,9 @@ class TestGetAssessment:
         assert isinstance(result, AssessmentRecord)
         assert result.title == "Asthma"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_assessment(9999) is None
+
 
 class TestGetAssessmentByTitle:
     """Tests for get_assessment_by_title function."""
@@ -90,6 +93,9 @@ class TestGetAssessmentByTitle:
         result = get_assessment_by_title("Stroke")
         assert result.title == "Stroke"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_assessment_by_title("Ghost") is None
+
 
 class TestAddAssessment:
     """Tests for add_assessment function."""
@@ -99,6 +105,15 @@ class TestAddAssessment:
         record = add_assessment("Influenza", "Mid")
         assert record.title == "Influenza"
         assert record.importance == "Mid"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_assessment("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_assessment("Duplicate")
+
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_assessment("")
 
 
 class TestAddOrUpdateAssessment:
@@ -111,6 +126,10 @@ class TestAddOrUpdateAssessment:
         assert record.importance == "High"
         assert len(list_assessments()) == 1
 
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_or_update_assessment(" ")
+
 
 class TestUpdateAssessment:
     """Tests for update_assessment function."""
@@ -121,6 +140,15 @@ class TestUpdateAssessment:
         updated = update_assessment(a.id, importance="High")
         assert updated.importance == "High"
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        a = add_assessment("No_Change")
+        result = update_assessment(a.id)
+        assert result.title == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_assessment(9999, importance="High")
+
 
 class TestDeleteAssessment:
     """Tests for delete_assessment function."""
@@ -130,3 +158,7 @@ class TestDeleteAssessment:
         a = add_assessment("Measles")
         delete_assessment(a.id)
         assert get_assessment(a.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_assessment(9999)

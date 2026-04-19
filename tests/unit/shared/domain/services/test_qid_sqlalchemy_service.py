@@ -79,6 +79,11 @@ class TestAddQid:
         assert record.title == "Jupiter"
         assert record.qid == "Q121"
 
+    def test_updates_existing_qid(self, monkeypatch):
+        add_qid("Venus", "Q1")
+        updated = add_qid("Venus", "Q2")
+        assert updated.qid == "Q2"
+
 
 class TestUpdateQid:
     """Tests for update_qid function."""
@@ -90,6 +95,10 @@ class TestUpdateQid:
         assert updated.title == "Saturnian System"
         assert updated.qid == "Q193"
 
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_qid(9999, "T", "Q1")
+
 
 class TestDeleteQid:
     """Tests for delete_qid function."""
@@ -99,6 +108,10 @@ class TestDeleteQid:
         q = add_qid("Uranus", "Q324")
         delete_qid(q.id)
         assert not any(x.id == q.id for x in list_qids())
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_qid(9999)
 
 
 class TestListQids:

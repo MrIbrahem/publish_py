@@ -75,6 +75,9 @@ class TestGetSetting:
         assert isinstance(result, SettingRecord)
         assert result.key == "analytics_id"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_setting(9999) is None
+
 
 class TestGetSettingByKey:
     """Tests for get_setting_by_key function."""
@@ -85,6 +88,9 @@ class TestGetSettingByKey:
         result = get_setting_by_key("api_timeout")
         assert result.key == "api_timeout"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_setting_by_key("ghost") is None
+
 
 class TestAddSetting:
     """Tests for add_setting function."""
@@ -93,6 +99,17 @@ class TestAddSetting:
         """Test that add_setting adds and returns the record."""
         record = add_setting("debug_logging", "Enable Debug Logs", "boolean", "True")
         assert record.key == "debug_logging"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_setting("K1", "T1")
+        with pytest.raises(ValueError, match="already exists"):
+            add_setting("K1", "T1")
+
+    def test_raises_error_if_no_key_or_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Key is required"):
+            add_setting("", "Title")
+        with pytest.raises(ValueError, match="Title is required"):
+            add_setting("Key", "")
 
 
 class TestUpdateValue:
@@ -104,6 +121,15 @@ class TestUpdateValue:
         updated = update_value(s.id, "50")
         assert updated.value == 50
 
+    def test_handles_none_value(self, monkeypatch):
+        s = add_setting("nullable_setting", "Title", value="Something")
+        updated = update_value(s.id, None)
+        assert updated.value is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_value(9999, "NewValue")
+
 
 class TestDeleteSetting:
     """Tests for delete_setting function."""
@@ -113,3 +139,7 @@ class TestDeleteSetting:
         s = add_setting("temporary_key", "Will be deleted")
         delete_setting(s.id)
         assert get_setting(s.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_setting(9999)

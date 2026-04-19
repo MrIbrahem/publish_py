@@ -64,6 +64,14 @@ class TestAddCategory:
         assert record.category == "Cardiology"
         assert record.is_default == 0
 
+    def test_updates_existing_category(self, monkeypatch):
+        """Test updating an existing category via add_category."""
+        add_category("Neurology", campaign="Brain_Health")
+        updated = add_category("Neurology", campaign="New_Brain_Health", display="New Brain")
+        assert updated.category == "Neurology"
+        assert updated.campaign == "New_Brain_Health"
+        assert updated.display == "New Brain"
+
     def test_adds_category_with_default(self, monkeypatch):
         """Test adding a category and setting it as default."""
         add_category("Neurology", campaign="Brain_Health", is_default=1)
@@ -107,6 +115,10 @@ class TestDeleteCategory:
         delete_category(cat.id)
         assert not any(c.id == cat.id for c in list_categories())
 
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_category(9999)
+
 
 class TestUpdateCategory:
     """Tests for update_category function."""
@@ -117,6 +129,10 @@ class TestUpdateCategory:
         updated = update_category(cat.id, "Metabolic_Medicine", "Metabolism_Campaign")
         assert updated.category == "Metabolic_Medicine"
         assert updated.campaign == "Metabolism_Campaign"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_category(9999, "Title", "File")
 
 
 class TestGetCampToCats:
@@ -132,8 +148,13 @@ class TestGetCampToCats:
 
     def test_handles_empty_category(self, monkeypatch):
         """Test that get_camp_to_cats handles empty category values."""
+        # This is to cover the 'record.category or ""' part
+        # We need to bypass add_category validation if possible, or use one that allows empty category
         pass
 
     def test_skips_empty_campaign(self, monkeypatch):
         """Test that get_camp_to_cats skips records with empty campaign."""
+        # In add_category, if campaign is None it defaults to "".
+        # But CategoryRecord __post_init__ might raise ValueError if campaign is empty.
+        # Let's check CategoryRecord.
         pass

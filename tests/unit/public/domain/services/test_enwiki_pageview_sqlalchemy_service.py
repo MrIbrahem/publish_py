@@ -101,6 +101,9 @@ class TestGetEnwikiPageview:
         assert isinstance(result, EnwikiPageviewRecord)
         assert result.title == "Genetics"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_enwiki_pageview(9999) is None
+
 
 class TestGetEnwikiPageviewByTitle:
     """Tests for get_enwiki_pageview_by_title function."""
@@ -111,6 +114,9 @@ class TestGetEnwikiPageviewByTitle:
         result = get_enwiki_pageview_by_title("Microbiology")
         assert result.title == "Microbiology"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_enwiki_pageview_by_title("Ghost") is None
+
 
 class TestAddEnwikiPageview:
     """Tests for add_enwiki_pageview function."""
@@ -120,6 +126,15 @@ class TestAddEnwikiPageview:
         record = add_enwiki_pageview("Virology", 300)
         assert record.title == "Virology"
         assert record.en_views == 300
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_enwiki_pageview("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_enwiki_pageview("Duplicate")
+
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_enwiki_pageview("")
 
 
 class TestAddOrUpdateEnwikiPageview:
@@ -132,6 +147,10 @@ class TestAddOrUpdateEnwikiPageview:
         assert record.en_views == 150
         assert len(list_enwiki_pageviews()) == 1
 
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_or_update_enwiki_pageview("  ")
+
 
 class TestUpdateEnwikiPageview:
     """Tests for update_enwiki_pageview function."""
@@ -142,6 +161,15 @@ class TestUpdateEnwikiPageview:
         updated = update_enwiki_pageview(p.id, en_views=200)
         assert updated.en_views == 200
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        p = add_enwiki_pageview("No_Change")
+        result = update_enwiki_pageview(p.id)
+        assert result.title == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_enwiki_pageview(9999, en_views=10)
+
 
 class TestDeleteEnwikiPageview:
     """Tests for delete_enwiki_pageview function."""
@@ -151,3 +179,7 @@ class TestDeleteEnwikiPageview:
         p = add_enwiki_pageview("Pathology")
         delete_enwiki_pageview(p.id)
         assert get_enwiki_pageview(p.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_enwiki_pageview(9999)

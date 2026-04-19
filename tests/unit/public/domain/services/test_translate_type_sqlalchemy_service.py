@@ -119,6 +119,9 @@ class TestGetTranslateType:
         assert isinstance(result, TranslateTypeRecord)
         assert result.tt_title == "Cohort study"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_translate_type(9999) is None
+
 
 class TestGetTranslateTypeByTitle:
     """Tests for get_translate_type_by_title function."""
@@ -129,6 +132,9 @@ class TestGetTranslateTypeByTitle:
         result = get_translate_type_by_title("Diagnostic test")
         assert result.tt_title == "Diagnostic test"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_translate_type_by_title("Ghost") is None
+
 
 class TestAddTranslateType:
     """Tests for add_translate_type function."""
@@ -138,6 +144,15 @@ class TestAddTranslateType:
         record = add_translate_type("Treatment guidelines", 1, 0)
         assert record.tt_title == "Treatment guidelines"
         assert record.tt_lead == 1
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_translate_type("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_translate_type("Duplicate")
+
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_translate_type("")
 
 
 class TestAddOrUpdateTranslateType:
@@ -151,6 +166,10 @@ class TestAddOrUpdateTranslateType:
         assert record.tt_full == 1
         assert len(list_translate_types()) == 1
 
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_or_update_translate_type(" ")
+
 
 class TestUpdateTranslateType:
     """Tests for update_translate_type function."""
@@ -161,6 +180,15 @@ class TestUpdateTranslateType:
         updated = update_translate_type(tt.tt_id, tt_full=1)
         assert updated.tt_full == 1
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        tt = add_translate_type("No_Change")
+        result = update_translate_type(tt.tt_id)
+        assert result.tt_title == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_translate_type(9999, tt_full=1)
+
 
 class TestDeleteTranslateType:
     """Tests for delete_translate_type function."""
@@ -170,6 +198,10 @@ class TestDeleteTranslateType:
         tt = add_translate_type("Pathology report")
         delete_translate_type(tt.tt_id)
         assert get_translate_type(tt.tt_id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_translate_type(9999)
 
 
 class TestCanTranslateLead:

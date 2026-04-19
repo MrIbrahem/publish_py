@@ -100,6 +100,9 @@ class TestGetFullTranslator:
         assert isinstance(result, FullTranslatorRecord)
         assert result.user == "Expert_Linguist"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_full_translator(9999) is None
+
 
 class TestGetFullTranslatorByUser:
     """Tests for get_full_translator_by_user function."""
@@ -110,6 +113,9 @@ class TestGetFullTranslatorByUser:
         result = get_full_translator_by_user("Polyglot_Wiki")
         assert result.user == "Polyglot_Wiki"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_full_translator_by_user("Ghost") is None
+
 
 class TestAddFullTranslator:
     """Tests for add_full_translator function."""
@@ -118,6 +124,15 @@ class TestAddFullTranslator:
         """Test that add_full_translator adds and returns the record."""
         record = add_full_translator("New_Translator")
         assert record.user == "New_Translator"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_full_translator("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_full_translator("Duplicate")
+
+    def test_raises_error_if_no_user(self, monkeypatch):
+        with pytest.raises(ValueError, match="User is required"):
+            add_full_translator("")
 
 
 class TestAddOrUpdateFullTranslator:
@@ -130,6 +145,10 @@ class TestAddOrUpdateFullTranslator:
         assert record.active == 0
         assert len(list_full_translators()) == 1
 
+    def test_raises_error_if_no_user(self, monkeypatch):
+        with pytest.raises(ValueError, match="User is required"):
+            add_or_update_full_translator(" ")
+
 
 class TestUpdateFullTranslator:
     """Tests for update_full_translator function."""
@@ -140,6 +159,15 @@ class TestUpdateFullTranslator:
         updated = update_full_translator(ft.id, active=0)
         assert updated.active == 0
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        ft = add_full_translator("No_Change")
+        result = update_full_translator(ft.id)
+        assert result.user == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_full_translator(9999, active=0)
+
 
 class TestDeleteFullTranslator:
     """Tests for delete_full_translator function."""
@@ -149,6 +177,10 @@ class TestDeleteFullTranslator:
         ft = add_full_translator("Delete_Trans")
         delete_full_translator(ft.id)
         assert get_full_translator(ft.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_full_translator(9999)
 
 
 class TestIsFullTranslator:

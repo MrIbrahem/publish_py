@@ -81,6 +81,9 @@ class TestGetLanguageSetting:
         assert isinstance(result, LanguageSettingRecord)
         assert result.lang_code == "zh"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_language_setting(9999) is None
+
 
 class TestGetLanguageSettingByCode:
     """Tests for get_language_setting_by_code function."""
@@ -91,6 +94,9 @@ class TestGetLanguageSettingByCode:
         result = get_language_setting_by_code("hi")
         assert result.lang_code == "hi"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_language_setting_by_code("ghost") is None
+
 
 class TestAddLanguageSetting:
     """Tests for add_language_setting function."""
@@ -99,6 +105,15 @@ class TestAddLanguageSetting:
         """Test that add_language_setting adds and returns the record."""
         record = add_language_setting("pt")
         assert record.lang_code == "pt"
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_language_setting("en")
+        with pytest.raises(ValueError, match="already exists"):
+            add_language_setting("en")
+
+    def test_raises_error_if_no_code(self, monkeypatch):
+        with pytest.raises(ValueError, match="Language code is required"):
+            add_language_setting("")
 
 
 class TestAddOrUpdateLanguageSetting:
@@ -111,6 +126,10 @@ class TestAddOrUpdateLanguageSetting:
         assert record.move_dots == 1
         assert len(list_language_settings()) == 1
 
+    def test_raises_error_if_no_code(self, monkeypatch):
+        with pytest.raises(ValueError, match="Language code is required"):
+            add_or_update_language_setting(" ")
+
 
 class TestUpdateLanguageSetting:
     """Tests for update_language_setting function."""
@@ -121,6 +140,15 @@ class TestUpdateLanguageSetting:
         updated = update_language_setting(ls.id, move_dots=0)
         assert updated.move_dots == 0
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        ls = add_language_setting("ko")
+        result = update_language_setting(ls.id)
+        assert result.lang_code == "ko"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_language_setting(9999, move_dots=1)
+
 
 class TestDeleteLanguageSetting:
     """Tests for delete_language_setting function."""
@@ -130,3 +158,7 @@ class TestDeleteLanguageSetting:
         ls = add_language_setting("de")
         delete_language_setting(ls.id)
         assert get_language_setting(ls.id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_language_setting(9999)

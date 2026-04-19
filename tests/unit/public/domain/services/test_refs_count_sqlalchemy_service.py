@@ -86,6 +86,9 @@ class TestGetRefsCount:
         assert isinstance(result, RefsCountRecord)
         assert result.r_title == "Insulin"
 
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_refs_count(9999) is None
+
 
 class TestGetRefsCountByTitle:
     """Tests for get_refs_count_by_title function."""
@@ -95,6 +98,9 @@ class TestGetRefsCountByTitle:
         add_refs_count("Penicillin")
         result = get_refs_count_by_title("Penicillin")
         assert result.r_title == "Penicillin"
+
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_refs_count_by_title("Ghost") is None
 
 
 class TestAddRefsCount:
@@ -106,6 +112,15 @@ class TestAddRefsCount:
         assert record.r_title == "Morphine"
         assert record.r_lead_refs == 10
         assert record.r_all_refs == 80
+
+    def test_raises_error_if_exists(self, monkeypatch):
+        add_refs_count("Duplicate")
+        with pytest.raises(ValueError, match="already exists"):
+            add_refs_count("Duplicate")
+
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_refs_count("")
 
 
 class TestAddOrUpdateRefsCount:
@@ -119,6 +134,10 @@ class TestAddOrUpdateRefsCount:
         assert record.r_all_refs == 50
         assert len(list_refs_counts()) == 1
 
+    def test_raises_error_if_no_title(self, monkeypatch):
+        with pytest.raises(ValueError, match="Title is required"):
+            add_or_update_refs_count(" ")
+
 
 class TestUpdateRefsCount:
     """Tests for update_refs_count function."""
@@ -129,6 +148,15 @@ class TestUpdateRefsCount:
         updated = update_refs_count(r.r_id, r_lead_refs=5)
         assert updated.r_lead_refs == 5
 
+    def test_returns_record_if_no_kwargs(self, monkeypatch):
+        r = add_refs_count("No_Change")
+        result = update_refs_count(r.r_id)
+        assert result.r_title == "No_Change"
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            update_refs_count(9999, r_lead_refs=10)
+
 
 class TestDeleteRefsCount:
     """Tests for delete_refs_count function."""
@@ -138,6 +166,10 @@ class TestDeleteRefsCount:
         r = add_refs_count("Diazepam")
         delete_refs_count(r.r_id)
         assert get_refs_count(r.r_id) is None
+
+    def test_raises_error_if_not_found(self, monkeypatch):
+        with pytest.raises(ValueError, match="not found"):
+            delete_refs_count(9999)
 
 
 class TestGetRefsCountsForTitle:
