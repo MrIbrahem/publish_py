@@ -37,5 +37,5 @@ app2.py
 *.zip
 /_work_files/php_publish
 /src/app_main
-/tests/unit/app_main1
-/tests/integration/app_main1
+/tests/unit/app_main
+/tests/integration/app_main
