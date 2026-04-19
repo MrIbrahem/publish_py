@@ -14,13 +14,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
+from ..decorators import admin_required
 from ..sqlalchemy_db.services.users_no_inprocess_service import (
     add_users_no_inprocess,
     delete_users_no_inprocess,
     list_users_no_inprocess,
     update_users_no_inprocess,
 )
-from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
@@ -63,23 +63,32 @@ def _add_user_no_inprocess() -> ResponseReturnValue:
     return redirect(url_for("admin.users_no_inprocess_dashboard"))
 
 
-def _update_user_no_inprocess_active(record_id: int) -> ResponseReturnValue:
-    """Toggle the active flag for a user not in process record."""
-
-    active = 1 if request.form.get("active") == "1" else 0
+def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
+    """Shared helper to update record active status."""
+    action = "activate" if is_active else "deactivate"
+    past_tense = "activated" if is_active else "deactivated"
     try:
-        record = update_users_no_inprocess(record_id, active=active)
-    except ValueError as exc:
-        logger.warning(f"Unable to update user: {exc}")
+        record = update_users_no_inprocess(record_id, is_active)
+    except LookupError as exc:
+        logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
-    except Exception:
-        logger.exception("Unable to update user.")
-        flash("Unable to update user status. Please try again.", "danger")
+    except Exception:  # pragma: no cover - defensive guard
+        logger.exception(f"Unable to {action} record.")
+        flash(f"Unable to {action} record. Please try again.", "danger")
     else:
-        state = "activated" if record.active else "deactivated"
-        flash(f"User '{record.user}' {state}.", "success")
+        flash(f"Record '{record.username}' {past_tense}.", "success")
 
     return redirect(url_for("admin.users_no_inprocess_dashboard"))
+
+
+def _activate_record(record_id: int) -> ResponseReturnValue:
+    """Activate a record."""
+    return _set_record_active_status(record_id, True)
+
+
+def _deactivate_record(record_id: int) -> ResponseReturnValue:
+    """Deactivate a record."""
+    return _set_record_active_status(record_id, False)
 
 
 def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
@@ -116,7 +125,12 @@ class UsersNoInprocess:
         def delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
             return _delete_user_no_inprocess(record_id)
 
-        @bp_admin.post("/users_no_inprocess/<int:record_id>/active")
+        @bp_admin.post("/users_no_inprocess/<int:record_id>/activate")
         @admin_required
-        def update_user_no_inprocess_active(record_id: int) -> ResponseReturnValue:
-            return _update_user_no_inprocess_active(record_id)
+        def activate_user_no_inprocess(record_id: int) -> ResponseReturnValue:
+            return _activate_record(record_id)
+
+        @bp_admin.post("/users_no_inprocess/<int:record_id>/deactivate")
+        @admin_required
+        def deactivate_user_no_inprocess(record_id: int) -> ResponseReturnValue:
+            return _deactivate_record(record_id)

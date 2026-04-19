@@ -71,8 +71,9 @@
                         <td>{{ coordinator.id }}</td>
                         <td>{{ coordinator.username }}</td>
                         <td class="text-center">
+                            {% set endpoint_target = 'admin.deactivate_coordinator' if coordinator.is_active else 'admin.activate_coordinator' %}
                             <form method="post"
-                                action="{{ url_for('admin.deactivate_coordinator' if coordinator.is_active else 'admin.activate_coordinator', coordinator_id=coordinator.id) }}"
+                                action="{{ url_for(endpoint_target, coordinator_id=coordinator.id) }}"
                                 class="d-inline">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <div class="form-check form-switch d-inline-flex align-items-center">

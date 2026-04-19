@@ -14,13 +14,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
+from ..decorators import admin_required
 from ..sqlalchemy_db.services.coordinator_service import (
     add_coordinator,
     delete_coordinator,
     list_coordinators,
     set_coordinator_active,
 )
-from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
@@ -63,12 +63,12 @@ def _add_coordinator() -> ResponseReturnValue:
     return redirect(url_for("admin.coordinators_dashboard"))
 
 
-def _set_coordinator_active_status(coordinator_id: int, is_active: bool) -> ResponseReturnValue:
+def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
     """Shared helper to update coordinator active status."""
     action = "activate" if is_active else "deactivate"
     past_tense = "activated" if is_active else "deactivated"
     try:
-        record = set_coordinator_active(coordinator_id, is_active)
+        record = set_coordinator_active(record_id, is_active)
     except LookupError as exc:
         logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
@@ -81,14 +81,14 @@ def _set_coordinator_active_status(coordinator_id: int, is_active: bool) -> Resp
     return redirect(url_for("admin.coordinators_dashboard"))
 
 
-def _activate_coordinator(coordinator_id: int) -> ResponseReturnValue:
+def _activate_record(record_id: int) -> ResponseReturnValue:
     """Activate a coordinator."""
-    return _set_coordinator_active_status(coordinator_id, True)
+    return _set_record_active_status(record_id, True)
 
 
-def _deactivate_coordinator(coordinator_id: int) -> ResponseReturnValue:
+def _deactivate_record(record_id: int) -> ResponseReturnValue:
     """Deactivate a coordinator."""
-    return _set_coordinator_active_status(coordinator_id, False)
+    return _set_record_active_status(record_id, False)
 
 
 def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
@@ -128,9 +128,9 @@ class Coordinators:
         @bp_admin.post("/coordinators/<int:coordinator_id>/activate")
         @admin_required
         def activate_coordinator(coordinator_id: int) -> ResponseReturnValue:
-            return _activate_coordinator(coordinator_id)
+            return _activate_record(coordinator_id)
 
         @bp_admin.post("/coordinators/<int:coordinator_id>/deactivate")
         @admin_required
         def deactivate_coordinator(coordinator_id: int) -> ResponseReturnValue:
-            return _deactivate_coordinator(coordinator_id)
+            return _deactivate_record(coordinator_id)

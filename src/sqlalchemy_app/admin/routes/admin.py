@@ -12,8 +12,6 @@ from flask import (
     url_for,
 )
 
-from .coordinators import Coordinators
-
 # from ..admin_routes import (
 #     Coordinators,
 #     Jobs,
@@ -21,10 +19,11 @@ from .coordinators import Coordinators
 #     Templates,
 # )
 from ..decorators import admin_required
+from ..sidebar import create_side
+from .coordinators import Coordinators
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .settings import SettingsRoutes
-from ..sidebar import create_side
 from .users_no_inprocess import UsersNoInprocess
 
 logger = logging.getLogger(__name__)

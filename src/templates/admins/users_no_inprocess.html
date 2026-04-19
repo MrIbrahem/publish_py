@@ -72,8 +72,9 @@
                         <td>{{ user_rec.id }}</td>
                         <td>{{ user_rec.user }}</td>
                         <td class="text-center">
+                            {% set endpoint_target = 'admin.deactivate_user_no_inprocess' if coordinator.is_active else 'admin.activate_user_no_inprocess' %}
                             <form method="post"
-                                action="{{ url_for('admin.update_user_no_inprocess_active', record_id=user_rec.id) }}"
+                                action="{{ url_for(endpoint_target, record_id=user_rec.id) }}"
                                 class="d-inline">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                 <div class="form-check form-switch d-inline-flex align-items-center">

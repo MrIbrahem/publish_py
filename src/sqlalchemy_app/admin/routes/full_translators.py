@@ -14,13 +14,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
+from ..decorators import admin_required
 from ..sqlalchemy_db.services.full_translator_service import (
     add_full_translator,
     delete_full_translator,
     list_full_translators,
     update_full_translator,
 )
-from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
@@ -63,23 +63,32 @@ def _add_full_translator() -> ResponseReturnValue:
     return redirect(url_for("admin.full_translators_dashboard"))
 
 
-def _update_full_translator_active(translator_id: int) -> ResponseReturnValue:
-    """Toggle the active flag for a full translator."""
-
-    active = 1 if request.form.get("active") == "1" else 0
+def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
+    """Shared helper to update record active status."""
+    action = "activate" if is_active else "deactivate"
+    past_tense = "activated" if is_active else "deactivated"
     try:
-        record = update_full_translator(translator_id, active=active)
-    except ValueError as exc:
-        logger.warning(f"Unable to update full translator: {exc}")
+        record = update_full_translator(record_id, is_active)
+    except LookupError as exc:
+        logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
-    except Exception:
-        logger.exception("Unable to update full translator.")
-        flash("Unable to update full translator status. Please try again.", "danger")
+    except Exception:  # pragma: no cover - defensive guard
+        logger.exception(f"Unable to {action} record.")
+        flash(f"Unable to {action} record. Please try again.", "danger")
     else:
-        state = "activated" if record.active else "deactivated"
-        flash(f"Full translator '{record.user}' {state}.", "success")
+        flash(f"Record '{record.username}' {past_tense}.", "success")
 
     return redirect(url_for("admin.full_translators_dashboard"))
+
+
+def _activate_record(record_id: int) -> ResponseReturnValue:
+    """Activate a record."""
+    return _set_record_active_status(record_id, True)
+
+
+def _deactivate_record(record_id: int) -> ResponseReturnValue:
+    """Deactivate a record."""
+    return _set_record_active_status(record_id, False)
 
 
 def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
@@ -116,7 +125,12 @@ class FullTranslators:
         def delete_full_translator(translator_id: int) -> ResponseReturnValue:
             return _delete_full_translator(translator_id)
 
-        @bp_admin.post("/full_translators/<int:translator_id>/active")
+        @bp_admin.post("/full_translators/<int:record_id>/activate")
         @admin_required
-        def update_full_translator_active(translator_id: int) -> ResponseReturnValue:
-            return _update_full_translator_active(translator_id)
+        def activate_full_translator(record_id: int) -> ResponseReturnValue:
+            return _activate_record(record_id)
+
+        @bp_admin.post("/full_translators/<int:record_id>/deactivate")
+        @admin_required
+        def deactivate_full_translator(record_id: int) -> ResponseReturnValue:
+            return _deactivate_record(record_id)

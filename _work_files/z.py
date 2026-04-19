@@ -3,8 +3,7 @@ from pathlib import Path
 
 
 def generate_domain_test_placeholders(src_root, test_root):
-    """
-    """
+    """ """
     src_path = Path(src_root)
     test_base = Path(test_root)
 
@@ -35,7 +34,7 @@ def generate_domain_test_placeholders(src_root, test_root):
                 # المسار الذي سيظهر في النص الوصفي (مثلاً domain/models/user.py)
                 # نبحث عن موقع word "domain" وما بعدها
                 parts = current_path.parts
-                internal_path = "/".join(parts[parts.index("src"):])
+                internal_path = "/".join(parts[parts.index("src") :])
 
                 content = f'"""\nUnit tests for {internal_path}/{file} module.\n"""\n'
                 content_new = f'"""\nUnit tests for {internal_path}/{file} module.\nTODO: write tests\n"""\n'

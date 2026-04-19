@@ -70,8 +70,9 @@
                         <td>{{ translator.id }}</td>
                         <td>{{ translator.user }}</td>
                         <td class="text-center">
+                            {% set endpoint_target = 'admin.deactivate_full_translator' if coordinator.is_active else 'admin.activate_full_translator' %}
                             <form method="post"
-                                action="{{ url_for('admin.update_full_translator_active', translator_id=translator.id) }}"
+                                action="{{ url_for(endpoint_target, translator_id=translator.id) }}"
                                 class="d-inline">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                 <div class="form-check form-switch d-inline-flex align-items-center">
