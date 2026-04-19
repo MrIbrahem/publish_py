@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.admin_models import CoordinatorRecord
-from src.sqlalchemy_app.admin.sqlalchemy_db.models import _CoordinatorRecord
-from src.sqlalchemy_app.admin.sqlalchemy_db.services.coordinator_service import (
+from src.sqlalchemy_app.admin.domain.models import _CoordinatorRecord
+from src.sqlalchemy_app.admin.domain.services.coordinator_service import (
     active_coordinators,
     add_coordinator,
     add_or_update_coordinator,
@@ -15,17 +15,17 @@ from src.sqlalchemy_app.admin.sqlalchemy_db.services.coordinator_service import 
     set_coordinator_active,
     update_coordinator,
 )
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import init_db
+from src.sqlalchemy_app.shared.domain.engine import init_db
 
 
 @pytest.fixture(autouse=True)
 def setup_db():
     init_db("sqlite:///:memory:")
-    from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine
+    from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine
 
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

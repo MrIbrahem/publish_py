@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import ViewsNewRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.models import _ViewsNewRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.services.views_new_service import (
+from src.sqlalchemy_app.public.domain.models import _ViewsNewRecord
+from src.sqlalchemy_app.public.domain.services.views_new_service import (
     add_or_update_views_new,
     add_views_new,
     delete_views_new,
@@ -15,7 +15,7 @@ from src.sqlalchemy_app.public.sqlalchemy_db.services.views_new_service import (
     list_views_new,
     update_views_new,
 )
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -23,7 +23,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import UserRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.models import _UserRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.services.user_service import (
+from src.sqlalchemy_app.public.domain.models import _UserRecord
+from src.sqlalchemy_app.public.domain.services.user_service import (
     add_or_update_user,
     add_user,
     delete_user,
@@ -18,7 +18,7 @@ from src.sqlalchemy_app.public.sqlalchemy_db.services.user_service import (
     update_user,
     user_exists,
 )
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -26,7 +26,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

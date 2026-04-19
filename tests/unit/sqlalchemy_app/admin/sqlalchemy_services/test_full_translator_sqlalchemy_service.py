@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.admin_models import FullTranslatorRecord
-from src.sqlalchemy_app.admin.sqlalchemy_db.models import _FullTranslatorRecord
-from src.sqlalchemy_app.admin.sqlalchemy_db.services.full_translator_service import (
+from src.sqlalchemy_app.admin.domain.models import _FullTranslatorRecord
+from src.sqlalchemy_app.admin.domain.services.full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,
     delete_full_translator,
@@ -14,7 +14,7 @@ from src.sqlalchemy_app.admin.sqlalchemy_db.services.full_translator_service imp
     list_full_translators,
     update_full_translator,
 )
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -22,7 +22,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

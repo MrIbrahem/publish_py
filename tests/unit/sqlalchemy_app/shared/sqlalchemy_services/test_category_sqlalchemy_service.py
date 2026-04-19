@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.shared_models import CategoryRecord
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
-from src.sqlalchemy_app.shared.sqlalchemy_db.models import _CategoryRecord
-from src.sqlalchemy_app.shared.sqlalchemy_db.services.category_service import (
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.models import _CategoryRecord
+from src.sqlalchemy_app.shared.domain.services.category_service import (
     add_category,
     delete_category,
     get_camp_to_cats,
@@ -19,7 +19,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

@@ -9,7 +9,7 @@ from typing import Any, Dict
 from flask import Blueprint, Response, jsonify, request
 
 from ....shared.core.cors import check_cors
-from ....shared.sqlalchemy_db.services.report_service import query_reports_with_filters
+from ....shared.domain.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")

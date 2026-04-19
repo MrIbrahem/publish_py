@@ -15,7 +15,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ..decorators import admin_required
-from ..sqlalchemy_db.services.coordinator_service import (
+from ..domain.services.coordinator_service import (
     add_coordinator,
     delete_coordinator,
     list_coordinators,

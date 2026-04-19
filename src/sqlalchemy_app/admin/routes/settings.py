@@ -35,7 +35,7 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
 
 class SettingsRoutes:
     def __init__(self, bp_admin: Blueprint):
-        from ..sqlalchemy_db.services import setting_service as service
+        from ..domain.services import setting_service as service
 
         @bp_admin.get("/settings")
         @admin_required
@@ -86,7 +86,7 @@ class SettingsRoutes:
         @bp_admin.post("/settings/update")
         @admin_required
         def settings_update():
-            from ..sqlalchemy_db.services import setting_service as service
+            from ..domain.services import setting_service as service
 
             all_settings = service.list_settings()
             failed_keys: list[str] = []

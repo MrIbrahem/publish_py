@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import RefsCountRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.models import _RefsCountRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.services.refs_count_service import (
+from src.sqlalchemy_app.public.domain.models import _RefsCountRecord
+from src.sqlalchemy_app.public.domain.services.refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,
     delete_refs_count,
@@ -13,7 +13,7 @@ from src.sqlalchemy_app.public.sqlalchemy_db.services.refs_count_service import 
     list_refs_counts,
     update_refs_count,
 )
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -21,7 +21,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)

@@ -2,15 +2,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import PagesUsersToMainRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.models import _PagesUsersToMainRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.services.pages_users_to_main_service import (
+from src.sqlalchemy_app.public.domain.models import _PagesUsersToMainRecord
+from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service import (
     add_pages_users_to_main,
     delete_pages_users_to_main,
     get_pages_users_to_main,
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -25,7 +25,7 @@ def setup_db():
     pages_users.create(engine)
 
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)
@@ -35,7 +35,7 @@ def setup_db():
 
 def test_pages_users_to_main_workflow():
     from sqlalchemy import text
-    from src.sqlalchemy_app.shared.sqlalchemy_db.engine import get_session
+    from src.sqlalchemy_app.shared.domain.engine import get_session
 
     with get_session() as session:
         session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'test')"))

@@ -15,7 +15,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ..decorators import admin_required
-from ..sqlalchemy_db.services.full_translator_service import (
+from ..domain.services.full_translator_service import (
     add_full_translator,
     delete_full_translator,
     list_full_translators,

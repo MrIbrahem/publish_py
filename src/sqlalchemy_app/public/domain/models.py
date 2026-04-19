@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, func, text
 
-from ...shared.sqlalchemy_db.engine import BaseDb
+from ...shared.domain.engine import BaseDb
 
 
 class _AssessmentRecord(BaseDb):

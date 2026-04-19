@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import TranslateTypeRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.models import _TranslateTypeRecord
-from src.sqlalchemy_app.public.sqlalchemy_db.services.translate_type_service import (
+from src.sqlalchemy_app.public.domain.models import _TranslateTypeRecord
+from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     add_or_update_translate_type,
     add_translate_type,
     can_translate_full,
@@ -16,7 +16,7 @@ from src.sqlalchemy_app.public.sqlalchemy_db.services.translate_type_service imp
     list_translate_types,
     update_translate_type,
 )
-from src.sqlalchemy_app.shared.sqlalchemy_db.engine import BaseDb, build_engine, init_db
+from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
@@ -24,7 +24,7 @@ def setup_db():
     init_db("sqlite:///:memory:")
     engine = build_engine("sqlite:///:memory:")
     BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.sqlalchemy_db.engine._SessionFactory") as mock_session_factory:
+    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
         from sqlalchemy.orm import sessionmaker
 
         Session = sessionmaker(bind=engine)
