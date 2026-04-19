@@ -97,8 +97,8 @@ def configure_logging(level) -> None:
     try:
         log_dir.mkdir(parents=True, exist_ok=True)
     except OSError as exc:
-        setup_logging(level=level, name="app_main")
-        logging.getLogger("app_main").warning(
+        setup_logging(level=level, name="sqlalchemy_app")
+        logging.getLogger("sqlalchemy_app").warning(
             "Falling back to console logging; could not create log directory %s: %s", log_dir, exc
         )
         return
@@ -109,7 +109,7 @@ def configure_logging(level) -> None:
 
     setup_logging(
         level=level,
-        name="app_main",
+        name="sqlalchemy_app",
         log_file=all_log_path,
         error_log_file=error_log_path,
     )

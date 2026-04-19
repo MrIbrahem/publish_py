@@ -4,9 +4,17 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
-from ..app_main.shared.utils.decode_bytes import coerce_bytes
-
 logger = logging.getLogger(__name__)
+
+
+def coerce_bytes(value: Any) -> bytes:
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, bytearray):
+        return bytes(value)
+    if isinstance(value, memoryview):
+        return value.tobytes()
+    raise TypeError("Expected bytes-compatible value for encrypted token")
 
 
 @dataclass
@@ -203,7 +211,7 @@ class UserTokenRecord:
 
     def decrypted(self) -> tuple[str, str]:
         """Return the decrypted access token and secret."""
-        from ..app_main.shared.core.crypto import decrypt_value
+        from ..sqlalchemy_app.shared.core.crypto import decrypt_value
 
         access_key = decrypt_value(self.access_token)
         access_secret = decrypt_value(self.access_secret)
