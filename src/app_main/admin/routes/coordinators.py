@@ -20,7 +20,7 @@ from ..domain.services.coordinators_service import (
     list_coordinators,
     set_coordinator_active,
 )
-from .decorators import admin_required
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

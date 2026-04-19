@@ -20,9 +20,9 @@ from .coordinators import Coordinators
 #     OwidCharts,
 #     Templates,
 # )
-from .decorators import admin_required
+from ..decorators import admin_required
 from .settings import SettingsRoutes
-from .sidebar import create_side
+from ..sidebar import create_side
 
 logger = logging.getLogger(__name__)
 

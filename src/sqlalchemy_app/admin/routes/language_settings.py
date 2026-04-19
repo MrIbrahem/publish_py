@@ -21,7 +21,7 @@ from ..sqlalchemy_db.services.language_setting_service import (
     list_language_settings,
     update_language_setting,
 )
-from .decorators import admin_required
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

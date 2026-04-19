@@ -20,11 +20,11 @@ from .coordinators import Coordinators
 #     OwidCharts,
 #     Templates,
 # )
-from .decorators import admin_required
+from ..decorators import admin_required
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .settings import SettingsRoutes
-from .sidebar import create_side
+from ..sidebar import create_side
 from .users_no_inprocess import UsersNoInprocess
 
 logger = logging.getLogger(__name__)

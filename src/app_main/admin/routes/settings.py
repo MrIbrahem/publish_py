@@ -8,7 +8,7 @@ from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from .decorators import admin_required
+from ..decorators import admin_required
 
 
 def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:

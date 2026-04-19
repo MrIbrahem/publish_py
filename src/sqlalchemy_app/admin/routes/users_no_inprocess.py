@@ -20,7 +20,7 @@ from ..sqlalchemy_db.services.users_no_inprocess_service import (
     list_users_no_inprocess,
     update_users_no_inprocess,
 )
-from .decorators import admin_required
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

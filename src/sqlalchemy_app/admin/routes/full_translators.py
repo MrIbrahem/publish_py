@@ -20,7 +20,7 @@ from ..sqlalchemy_db.services.full_translator_service import (
     list_full_translators,
     update_full_translator,
 )
-from .decorators import admin_required
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
