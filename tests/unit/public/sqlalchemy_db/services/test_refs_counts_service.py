@@ -14,7 +14,7 @@ from src.sqlalchemy_app.public.domain.services.refs_count_service import (
     get_ref_counts_for_title,
     get_refs_count,
     get_refs_count_by_title,
-    get_refs_counts_db,
+
     list_refs_counts,
     update_refs_count,
 )

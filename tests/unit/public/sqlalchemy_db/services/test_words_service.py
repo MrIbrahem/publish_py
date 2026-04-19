@@ -14,7 +14,7 @@ from src.sqlalchemy_app.public.domain.services.word_service import (
     get_word,
     get_word_by_title,
     get_word_counts_for_title,
-    get_words_db,
+
     list_words,
     update_word,
 )

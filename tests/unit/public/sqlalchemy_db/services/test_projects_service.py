@@ -13,7 +13,7 @@ from src.sqlalchemy_app.public.domain.services.project_service import (
     delete_project,
     get_project,
     get_project_by_title,
-    get_projects_db,
+
     list_projects,
     update_project,
 )

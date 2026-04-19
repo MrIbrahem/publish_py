@@ -11,7 +11,7 @@ from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service impor
     add_pages_users_to_main,
     delete_pages_users_to_main,
     get_pages_users_to_main,
-    get_pages_users_to_main_db,
+
     list_pages_users_to_main,
     update_pages_users_to_main,
 )

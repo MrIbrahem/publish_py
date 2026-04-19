@@ -13,7 +13,7 @@ from src.sqlalchemy_app.public.domain.services.enwiki_pageview_service import (
     delete_enwiki_pageview,
     get_enwiki_pageview,
     get_enwiki_pageview_by_title,
-    get_enwiki_pageviews_db,
+
     get_top_enwiki_pageviews,
     list_enwiki_pageviews,
     update_enwiki_pageview,

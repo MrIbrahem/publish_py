@@ -13,7 +13,7 @@ from src.sqlalchemy_app.public.domain.services.user_service import (
     delete_user,
     get_user,
     get_user_by_username,
-    get_users_db,
+
     list_users,
     list_users_by_group,
     update_user,

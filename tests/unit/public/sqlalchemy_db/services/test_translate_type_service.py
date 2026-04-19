@@ -15,7 +15,7 @@ from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     delete_translate_type,
     get_translate_type,
     get_translate_type_by_title,
-    get_translate_type_db,
+
     list_full_enabled_types,
     list_lead_enabled_types,
     list_translate_types,
