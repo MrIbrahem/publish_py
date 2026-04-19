@@ -22,7 +22,7 @@ class TestLanguageSettingsDB:
         """Test that fetch_by_id returns record when ID exists."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "lang_code": "en", "move_dots": 1, "expend": 0, "add_en_lang": 1, "add_en_lng": 0}
+            {"id": 1, "lang_code": "en", "move_dots": 1, "expend": 0, "add_en_lang": 1}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
@@ -50,7 +50,7 @@ class TestLanguageSettingsDB:
         """Test that fetch_by_lang_code returns record when lang_code exists."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "lang_code": "ar", "move_dots": 0, "expend": 1, "add_en_lang": 0, "add_en_lng": 1}
+            {"id": 1, "lang_code": "ar", "move_dots": 0, "expend": 1, "add_en_lang": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
@@ -65,8 +65,8 @@ class TestLanguageSettingsDB:
         """Test that list returns all language setting records."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "lang_code": "en", "move_dots": 1, "expend": 0, "add_en_lang": 1, "add_en_lng": 0},
-            {"id": 2, "lang_code": "ar", "move_dots": 0, "expend": 1, "add_en_lang": 0, "add_en_lng": 1},
+            {"id": 1, "lang_code": "en", "move_dots": 1, "expend": 0, "add_en_lang": 1},
+            {"id": 2, "lang_code": "ar", "move_dots": 0, "expend": 1, "add_en_lang": 0},
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
@@ -81,7 +81,7 @@ class TestLanguageSettingsDB:
         """Test that add inserts a new language setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "lang_code": "fr", "move_dots": 0, "expend": 0, "add_en_lang": 0, "add_en_lng": 0}
+            {"id": 1, "lang_code": "fr", "move_dots": 0, "expend": 0, "add_en_lang": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
@@ -105,14 +105,14 @@ class TestLanguageSettingsDB:
         """Test that update modifies a language setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.side_effect = [
-            [{"id": 1, "lang_code": "en", "move_dots": 0, "expend": 0, "add_en_lang": 0, "add_en_lng": 0}],
-            [{"id": 1, "lang_code": "en", "move_dots": 1, "expend": 1, "add_en_lang": 1, "add_en_lng": 1}],
+            [{"id": 1, "lang_code": "en", "move_dots": 0, "expend": 0, "add_en_lang": 0}],
+            [{"id": 1, "lang_code": "en", "move_dots": 1, "expend": 1, "add_en_lang": 1}],
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
 
         settings_db = LanguageSettingsDB(db_config)
-        result = settings_db.update(1, move_dots=1, expend=1, add_en_lang=1, add_en_lng=1)
+        result = settings_db.update(1, move_dots=1, expend=1, add_en_lang=1)
 
         assert isinstance(result, LanguageSettingRecord)
         assert result.move_dots == 1
@@ -121,7 +121,7 @@ class TestLanguageSettingsDB:
         """Test that delete removes a language setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "lang_code": "en", "move_dots": 0, "expend": 0, "add_en_lang": 0, "add_en_lng": 0}
+            {"id": 1, "lang_code": "en", "move_dots": 0, "expend": 0, "add_en_lang": 0}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)
@@ -135,7 +135,7 @@ class TestLanguageSettingsDB:
         """Test that add_or_update upserts a language setting record."""
         mock_db = MagicMock()
         mock_db.fetch_query_safe.return_value = [
-            {"id": 1, "lang_code": "de", "move_dots": 1, "expend": 0, "add_en_lang": 1, "add_en_lng": 0}
+            {"id": 1, "lang_code": "de", "move_dots": 1, "expend": 0, "add_en_lang": 1}
         ]
 
         monkeypatch.setattr("src.app_main.admin.domain.db.db_language_settings.Database", lambda db_data: mock_db)

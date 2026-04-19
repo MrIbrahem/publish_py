@@ -47,7 +47,6 @@ def add_language_setting(
     move_dots: int = 0,
     expend: int = 0,
     add_en_lang: int = 0,
-    add_en_lng: int = 0,
 ) -> LanguageSettingRecord:
     """Add a new language setting record."""
     lang_code = lang_code.strip()
@@ -60,7 +59,6 @@ def add_language_setting(
             move_dots=move_dots,
             expend=expend,
             add_en_lang=add_en_lang,
-            add_en_lng=add_en_lng,
         )
         session.add(orm_obj)
         try:
@@ -78,7 +76,6 @@ def add_or_update_language_setting(
     move_dots: int = 0,
     expend: int = 0,
     add_en_lang: int = 0,
-    add_en_lng: int = 0,
 ) -> LanguageSettingRecord:
     """Add or update a language setting record."""
     lang_code = lang_code.strip()
@@ -91,14 +88,12 @@ def add_or_update_language_setting(
             orm_obj.move_dots = move_dots
             orm_obj.expend = expend
             orm_obj.add_en_lang = add_en_lang
-            orm_obj.add_en_lng = add_en_lng
         else:
             orm_obj = _LanguageSettingRecord(
                 lang_code=lang_code,
                 move_dots=move_dots,
                 expend=expend,
                 add_en_lang=add_en_lang,
-                add_en_lng=add_en_lng,
             )
             session.add(orm_obj)
 

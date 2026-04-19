@@ -51,7 +51,6 @@ def _add_language_setting() -> ResponseReturnValue:
     move_dots = 1 if request.form.get("move_dots") == "1" else 0
     expend = 1 if request.form.get("expend") == "1" else 0
     add_en_lang = 1 if request.form.get("add_en_lang") == "1" else 0
-    add_en_lng = 1 if request.form.get("add_en_lng") == "1" else 0
 
     try:
         add_language_setting(
@@ -59,7 +58,6 @@ def _add_language_setting() -> ResponseReturnValue:
             move_dots=move_dots,
             expend=expend,
             add_en_lang=add_en_lang,
-            add_en_lng=add_en_lng,
         )
     except ValueError as exc:
         logger.warning(f"Unable to add language setting: {exc}")
@@ -81,7 +79,6 @@ def _update_language_setting(setting_id: int) -> ResponseReturnValue:
         "move_dots": 1 if request.form.get("move_dots") == "1" else 0,
         "expend": 1 if request.form.get("expend") == "1" else 0,
         "add_en_lang": 1 if request.form.get("add_en_lang") == "1" else 0,
-        "add_en_lng": 1 if request.form.get("add_en_lng") == "1" else 0,
     }
 
     try:

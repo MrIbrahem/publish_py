@@ -49,13 +49,6 @@
                             <label class="form-check-label" for="new-add-en-lang">Add EN Lang</label>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" name="add_en_lng"
-                                id="new-add-en-lng" value="1">
-                            <label class="form-check-label" for="new-add-en-lng">Add EN Lng</label>
-                        </div>
-                    </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-outline-primary">
                             <i class="bi bi-plus-lg"></i> Add
@@ -73,7 +66,6 @@
                         <th scope="col" class="text-center">Move Dots</th>
                         <th scope="col" class="text-center">Expend</th>
                         <th scope="col" class="text-center">Add EN Lang</th>
-                        <th scope="col" class="text-center">Add EN Lng</th>
                         <th scope="col" class="text-center" style="width: 10%">Actions</th>
                     </tr>
                 </thead>
@@ -115,16 +107,6 @@
                                 <input class="form-check-input" type="checkbox" role="switch"
                                     id="add-en-lang-{{ s.id }}" {% if s.add_en_lang %}checked{% endif %}
                                     onchange="document.getElementById('add-en-lang-value-{{ s.id }}').value = this.checked ? '1' : '0';"
-                                    form="form-update-{{ s.id }}">
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <div class="form-check form-switch d-inline-block">
-                                <input type="hidden" name="add_en_lng" id="add-en-lng-value-{{ s.id }}"
-                                    value="{{ 1 if s.add_en_lng else 0 }}" form="form-update-{{ s.id }}">
-                                <input class="form-check-input" type="checkbox" role="switch" id="add-en-lng-{{ s.id }}"
-                                    {% if s.add_en_lng %}checked{% endif %}
-                                    onchange="document.getElementById('add-en-lng-value-{{ s.id }}').value = this.checked ? '1' : '0';"
                                     form="form-update-{{ s.id }}">
                             </div>
                         </td>

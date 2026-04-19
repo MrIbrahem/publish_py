@@ -58,7 +58,6 @@ class LanguageSettingsDB:
         move_dots: int = 0,
         expend: int = 0,
         add_en_lang: int = 0,
-        add_en_lng: int = 0,
     ) -> LanguageSettingRecord:
         """Add a new language setting record."""
         lang_code = lang_code.strip()
@@ -68,10 +67,10 @@ class LanguageSettingsDB:
         try:
             self.db.execute_query(
                 """
-                INSERT INTO language_settings (lang_code, move_dots, expend, add_en_lang, add_en_lng)
+                INSERT INTO language_settings (lang_code, move_dots, expend, add_en_lang)
                 VALUES (%s, %s, %s, %s, %s)
                 """,
-                (lang_code, move_dots, expend, add_en_lang, add_en_lng),
+                (lang_code, move_dots, expend, add_en_lang),
             )
         except pymysql.err.IntegrityError:
             raise ValueError(f"Language setting for '{lang_code}' already exists") from None
@@ -120,7 +119,6 @@ class LanguageSettingsDB:
         move_dots: int = 0,
         expend: int = 0,
         add_en_lang: int = 0,
-        add_en_lng: int = 0,
     ) -> LanguageSettingRecord:
         """Add or update a language setting record."""
         lang_code = lang_code.strip()
@@ -129,15 +127,14 @@ class LanguageSettingsDB:
 
         self.db.execute_query_safe(
             """
-            INSERT INTO language_settings (lang_code, move_dots, expend, add_en_lang, add_en_lng)
+            INSERT INTO language_settings (lang_code, move_dots, expend, add_en_lang)
             VALUES (%s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 move_dots = VALUES(move_dots),
                 expend = VALUES(expend),
                 add_en_lang = VALUES(add_en_lang),
-                add_en_lng = VALUES(add_en_lng)
             """,
-            (lang_code, move_dots, expend, add_en_lang, add_en_lng),
+            (lang_code, move_dots, expend, add_en_lang),
         )
         record = self.fetch_by_lang_code(lang_code)
         if not record:

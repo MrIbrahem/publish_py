@@ -20,7 +20,6 @@ class TestLanguageSettingRecord:
         assert record.move_dots == 0  # Default value
         assert record.expend == 0
         assert record.add_en_lang == 0
-        assert record.add_en_lng == 0
 
     def test_create_with_all_fields(self):
         """Test creating LanguageSettingRecord with all fields."""
@@ -30,14 +29,12 @@ class TestLanguageSettingRecord:
             move_dots=1,
             expend=1,
             add_en_lang=1,
-            add_en_lng=1,
         )
         assert record.id == 1
         assert record.lang_code == "ar"
         assert record.move_dots == 1
         assert record.expend == 1
         assert record.add_en_lang == 1
-        assert record.add_en_lng == 1
 
     def test_to_dict(self):
         """Test converting LanguageSettingRecord to dictionary."""
@@ -47,7 +44,6 @@ class TestLanguageSettingRecord:
             move_dots=1,
             expend=0,
             add_en_lang=1,
-            add_en_lng=0,
         )
         result = record.to_dict()
         assert result == {
@@ -56,5 +52,4 @@ class TestLanguageSettingRecord:
             "move_dots": 1,
             "expend": 0,
             "add_en_lang": 1,
-            "add_en_lng": 0,
         }

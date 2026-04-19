@@ -76,7 +76,6 @@ class _LanguageSettingRecord(BaseDb):
         move_dots tinyint DEFAULT '0',
         expend tinyint DEFAULT '0',
         add_en_lang tinyint DEFAULT '0',
-        add_en_lng tinyint DEFAULT '0',
         PRIMARY KEY (id),
         UNIQUE KEY lang_code (lang_code)
     )
@@ -89,7 +88,6 @@ class _LanguageSettingRecord(BaseDb):
     move_dots = Column(Integer, default=0, server_default=text("0"))
     expend = Column(Integer, default=0, server_default=text("0"))
     add_en_lang = Column(Integer, default=0, server_default=text("0"))
-    add_en_lng = Column(Integer, default=0, server_default=text("0"))
 
     def to_dict(self) -> dict:
         return {
@@ -98,7 +96,6 @@ class _LanguageSettingRecord(BaseDb):
             "move_dots": self.move_dots,
             "expend": self.expend,
             "add_en_lang": self.add_en_lang,
-            "add_en_lng": self.add_en_lng,
         }
 
 

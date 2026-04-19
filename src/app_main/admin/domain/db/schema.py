@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS language_settings (
     move_dots tinyint DEFAULT '0',
     expend tinyint DEFAULT '0',
     add_en_lang tinyint DEFAULT '0',
-    add_en_lng tinyint DEFAULT '0',
     PRIMARY KEY (id),
     UNIQUE KEY lang_code (lang_code)
   )

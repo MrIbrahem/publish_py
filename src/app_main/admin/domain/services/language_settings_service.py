@@ -53,11 +53,10 @@ def add_language_setting(
     move_dots: int = 0,
     expend: int = 0,
     add_en_lang: int = 0,
-    add_en_lng: int = 0,
 ) -> LanguageSettingRecord:
     """Add a new language setting record."""
     store = get_language_settings_db()
-    return store.add(lang_code, move_dots, expend, add_en_lang, add_en_lng)
+    return store.add(lang_code, move_dots, expend, add_en_lang)
 
 
 def add_or_update_language_setting(
@@ -65,11 +64,10 @@ def add_or_update_language_setting(
     move_dots: int = 0,
     expend: int = 0,
     add_en_lang: int = 0,
-    add_en_lng: int = 0,
 ) -> LanguageSettingRecord:
     """Add or update a language setting record."""
     store = get_language_settings_db()
-    return store.add_or_update(lang_code, move_dots, expend, add_en_lang, add_en_lng)
+    return store.add_or_update(lang_code, move_dots, expend, add_en_lang)
 
 
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
