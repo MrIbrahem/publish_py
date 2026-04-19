@@ -31,11 +31,11 @@ from .user_token_service import (
 )
 
 __all__ = [
-    # pages_service
+    # page_service
     "find_exists_or_update_page",
     "insert_page_target",
     "list_pages",
-    # users_services
+    # user_token_service
     "upsert_user_token",
     "get_user_token",
     "delete_user_token",
@@ -46,7 +46,7 @@ __all__ = [
     "delete_report",
     "list_reports",
     "query_reports_with_filters",
-    # pages_users_service
+    # user_page_service
     "list_user_pages",
     "add_or_update_user_page",
     "add_user_page",

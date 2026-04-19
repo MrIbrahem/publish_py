@@ -1,11 +1,11 @@
 """
-Unit tests for language_settings_service module.
+Unit tests for language_setting_service module.
 """
 
 from unittest.mock import MagicMock
 
 import pytest
-from src.app_main.admin.domain.services.language_settings_service import (
+from src.app_main.admin.domain.services.language_setting_service import (
     add_language_setting,
     add_or_update_language_setting,
     delete_language_setting,
@@ -24,7 +24,7 @@ class TestGetLanguageSettingsDb:
         """Test that the same instance is returned on multiple calls."""
         mock_store = MagicMock()
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service._LANGUAGE_SETTINGS_STORE", mock_store
+            "src.app_main.admin.domain.services.language_setting_service._LANGUAGE_SETTINGS_STORE", mock_store
         )
 
         result1 = get_language_settings_db()
@@ -34,9 +34,9 @@ class TestGetLanguageSettingsDb:
 
     def test_raises_error_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when database config is missing."""
-        monkeypatch.setattr("src.app_main.admin.domain.services.language_settings_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.admin.domain.services.language_setting_service.has_db_config", lambda: False)
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service._LANGUAGE_SETTINGS_STORE", None
+            "src.app_main.admin.domain.services.language_setting_service._LANGUAGE_SETTINGS_STORE", None
         )
 
         with pytest.raises(RuntimeError, match="LanguageSettingsDB requires database configuration"):
@@ -52,7 +52,7 @@ class TestListLanguageSettings:
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
+            "src.app_main.admin.domain.services.language_setting_service.get_language_settings_db", lambda: mock_store
         )
 
         result = list_language_settings()
@@ -69,7 +69,7 @@ class TestGetLanguageSetting:
         mock_record = MagicMock()
         mock_store.fetch_by_id.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
+            "src.app_main.admin.domain.services.language_setting_service.get_language_settings_db", lambda: mock_store
         )
 
         result = get_language_setting(1)
@@ -86,7 +86,7 @@ class TestGetLanguageSettingByCode:
         mock_record = MagicMock()
         mock_store.fetch_by_lang_code.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
+            "src.app_main.admin.domain.services.language_setting_service.get_language_settings_db", lambda: mock_store
         )
 
         result = get_language_setting_by_code("ar")
@@ -104,7 +104,7 @@ class TestAddLanguageSetting:
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
+            "src.app_main.admin.domain.services.language_setting_service.get_language_settings_db", lambda: mock_store
         )
 
         result = add_language_setting("fr", 1, 0, 1)
@@ -122,7 +122,7 @@ class TestAddOrUpdateLanguageSetting:
         mock_record = MagicMock()
         mock_store.add_or_update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
+            "src.app_main.admin.domain.services.language_setting_service.get_language_settings_db", lambda: mock_store
         )
 
         result = add_or_update_language_setting("de", 0, 1, 0)
@@ -140,7 +140,7 @@ class TestUpdateLanguageSetting:
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
+            "src.app_main.admin.domain.services.language_setting_service.get_language_settings_db", lambda: mock_store
         )
 
         result = update_language_setting(1, move_dots=1, expend=1)
@@ -156,7 +156,7 @@ class TestDeleteLanguageSetting:
         """Test that delete_language_setting calls store delete."""
         mock_store = MagicMock()
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.language_settings_service.get_language_settings_db", lambda: mock_store
+            "src.app_main.admin.domain.services.language_setting_service.get_language_settings_db", lambda: mock_store
         )
 
         delete_language_setting(1)

@@ -39,7 +39,7 @@ publish_py/
 │       │       │   ├── coordinator.py
 │       │       │   ├── ...
 │       │       └── services/
-│       │           ├── coordinators_service.py
+│       │           ├── coordinator_service.py
 │       │           ├── ...
 │       ├── public/
 │       │   └── domain/
@@ -51,7 +51,7 @@ publish_py/
 │       │       │   ├── assessment.py
 │       │       │   ├── ...
 │       │       └── services/
-│       │           ├── langs_service.py
+│       │           ├── lang_service.py
 │       │           ├── ...
 ├── tests/
 │   └── unit/

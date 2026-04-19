@@ -1,11 +1,11 @@
 """
-Unit tests for full_translators_service module.
+Unit tests for full_translator_service module.
 """
 
 from unittest.mock import MagicMock
 
 import pytest
-from src.app_main.admin.domain.services.full_translators_service import (
+from src.app_main.admin.domain.services.full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,
     delete_full_translator,
@@ -26,7 +26,7 @@ class TestGetFullTranslatorsDb:
         """Test that the same instance is returned on multiple calls."""
         mock_store = MagicMock()
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service._FULL_TRANSLATORS_STORE", mock_store
+            "src.app_main.admin.domain.services.full_translator_service._FULL_TRANSLATORS_STORE", mock_store
         )
 
         result1 = get_full_translators_db()
@@ -36,8 +36,8 @@ class TestGetFullTranslatorsDb:
 
     def test_raises_error_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when database config is missing."""
-        monkeypatch.setattr("src.app_main.admin.domain.services.full_translators_service.has_db_config", lambda: False)
-        monkeypatch.setattr("src.app_main.admin.domain.services.full_translators_service._FULL_TRANSLATORS_STORE", None)
+        monkeypatch.setattr("src.app_main.admin.domain.services.full_translator_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.admin.domain.services.full_translator_service._FULL_TRANSLATORS_STORE", None)
 
         with pytest.raises(RuntimeError, match="FullTranslatorsDB requires database configuration"):
             get_full_translators_db()
@@ -52,7 +52,7 @@ class TestListFullTranslators:
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = list_full_translators()
@@ -69,7 +69,7 @@ class TestListActiveFullTranslators:
         mock_records = [MagicMock()]
         mock_store.list_active.return_value = mock_records
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = list_active_full_translators()
@@ -86,7 +86,7 @@ class TestGetFullTranslator:
         mock_record = MagicMock()
         mock_store.fetch_by_id.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = get_full_translator(1)
@@ -103,7 +103,7 @@ class TestGetFullTranslatorByUser:
         mock_record = MagicMock()
         mock_store.fetch_by_user.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = get_full_translator_by_user("TestUser")
@@ -120,7 +120,7 @@ class TestAddFullTranslator:
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = add_full_translator("NewUser", 1)
@@ -137,7 +137,7 @@ class TestAddOrUpdateFullTranslator:
         mock_record = MagicMock()
         mock_store.add_or_update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = add_or_update_full_translator("TestUser", 1)
@@ -154,7 +154,7 @@ class TestUpdateFullTranslator:
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = update_full_translator(1, user="UpdatedUser")
@@ -169,7 +169,7 @@ class TestDeleteFullTranslator:
         """Test that delete_full_translator calls store delete."""
         mock_store = MagicMock()
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         delete_full_translator(1)
@@ -187,7 +187,7 @@ class TestIsFullTranslator:
         mock_record.active = 1
         mock_store.fetch_by_user.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = is_full_translator("TranslatorUser")
@@ -199,7 +199,7 @@ class TestIsFullTranslator:
         mock_store = MagicMock()
         mock_store.fetch_by_user.return_value = None
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = is_full_translator("RegularUser")
@@ -213,7 +213,7 @@ class TestIsFullTranslator:
         mock_record.active = 0
         mock_store.fetch_by_user.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.admin.domain.services.full_translators_service.get_full_translators_db", lambda: mock_store
+            "src.app_main.admin.domain.services.full_translator_service.get_full_translators_db", lambda: mock_store
         )
 
         result = is_full_translator("InactiveTranslator")

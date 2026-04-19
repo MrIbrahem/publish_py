@@ -1,5 +1,5 @@
 """
-Unit tests for domain/services/refs_counts_service.py module.
+Unit tests for domain/services/refs_count_service.py module.
 
 Tests for refs_counts service layer which provides cached access to RefsCountsDB.
 """
@@ -7,7 +7,7 @@ Tests for refs_counts service layer which provides cached access to RefsCountsDB
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.refs_counts_service import (
+from src.app_main.public.domain.services.refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,
     delete_refs_count,
@@ -26,8 +26,8 @@ class TestGetRefsCountsDb:
     def test_returns_cached_instance(self, monkeypatch):
         """Test that singleton pattern returns same instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.public.domain.services.refs_counts_service._REFS_COUNTS_STORE", mock_db)
-        monkeypatch.setattr("src.app_main.public.domain.services.refs_counts_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.refs_count_service._REFS_COUNTS_STORE", mock_db)
+        monkeypatch.setattr("src.app_main.public.domain.services.refs_count_service.has_db_config", lambda: True)
 
         result = get_refs_counts_db()
 
@@ -35,19 +35,19 @@ class TestGetRefsCountsDb:
 
     def test_raises_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when DB config is missing."""
-        monkeypatch.setattr("src.app_main.public.domain.services.refs_counts_service._REFS_COUNTS_STORE", None)
-        monkeypatch.setattr("src.app_main.public.domain.services.refs_counts_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.public.domain.services.refs_count_service._REFS_COUNTS_STORE", None)
+        monkeypatch.setattr("src.app_main.public.domain.services.refs_count_service.has_db_config", lambda: False)
 
         with pytest.raises(RuntimeError, match="RefsCountsDB requires database configuration"):
             get_refs_counts_db()
 
     def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
         """Test that new RefsCountsDB is created when none cached."""
-        monkeypatch.setattr("src.app_main.public.domain.services.refs_counts_service._REFS_COUNTS_STORE", None)
-        monkeypatch.setattr("src.app_main.public.domain.services.refs_counts_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.refs_count_service._REFS_COUNTS_STORE", None)
+        monkeypatch.setattr("src.app_main.public.domain.services.refs_count_service.has_db_config", lambda: True)
 
         mock_db_instance = MagicMock()
-        with patch("src.app_main.public.domain.services.refs_counts_service.RefsCountsDB") as MockDB:
+        with patch("src.app_main.public.domain.services.refs_count_service.RefsCountsDB") as MockDB:
             MockDB.return_value = mock_db_instance
 
             result = get_refs_counts_db()
@@ -64,7 +64,7 @@ class TestListRefsCounts:
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         result = list_refs_counts()
@@ -82,7 +82,7 @@ class TestGetRefsCount:
         mock_record = MagicMock()
         mock_store.fetch_by_id.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         result = get_refs_count(123)
@@ -100,7 +100,7 @@ class TestGetRefsCountByTitle:
         mock_record = MagicMock()
         mock_store.fetch_by_title.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         result = get_refs_count_by_title("TestPage")
@@ -118,7 +118,7 @@ class TestAddRefsCount:
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         result = add_refs_count("TestPage", r_lead_refs=5, r_all_refs=20)
@@ -136,7 +136,7 @@ class TestAddOrUpdateRefsCount:
         mock_record = MagicMock()
         mock_store.add_or_update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         result = add_or_update_refs_count("TestPage", r_lead_refs=10, r_all_refs=40)
@@ -154,7 +154,7 @@ class TestUpdateRefsCount:
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         result = update_refs_count(1, r_lead_refs=10, r_all_refs=40)
@@ -172,7 +172,7 @@ class TestDeleteRefsCount:
         mock_record = MagicMock()
         mock_store.delete.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         result = delete_refs_count(1)
@@ -192,7 +192,7 @@ class TestGetRefsCountsForTitle:
         mock_record.r_all_refs = 20
         mock_store.fetch_by_title.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         lead, all_refs = get_ref_counts_for_title("TestPage")
@@ -205,7 +205,7 @@ class TestGetRefsCountsForTitle:
         mock_store = MagicMock()
         mock_store.fetch_by_title.return_value = None
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.refs_counts_service.get_refs_counts_db", lambda: mock_store
+            "src.app_main.public.domain.services.refs_count_service.get_refs_counts_db", lambda: mock_store
         )
 
         lead, all_refs = get_ref_counts_for_title("Missing")

@@ -1,5 +1,5 @@
 """
-Unit tests for domain/services/enwiki_pageviews_service.py module.
+Unit tests for domain/services/enwiki_pageview_service.py module.
 
 Tests for enwiki_pageviews service layer which provides cached access to EnwikiPageviewsDB.
 """
@@ -7,7 +7,7 @@ Tests for enwiki_pageviews service layer which provides cached access to EnwikiP
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.enwiki_pageviews_service import (
+from src.app_main.public.domain.services.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
     delete_enwiki_pageview,
@@ -27,9 +27,9 @@ class TestGetEnwikiPageviewsDb:
         """Test that singleton pattern returns same instance."""
         mock_db = MagicMock()
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service._ENWIKI_PAGEVIEWS_STORE", mock_db
+            "src.app_main.public.domain.services.enwiki_pageview_service._ENWIKI_PAGEVIEWS_STORE", mock_db
         )
-        monkeypatch.setattr("src.app_main.public.domain.services.enwiki_pageviews_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.enwiki_pageview_service.has_db_config", lambda: True)
 
         result = get_enwiki_pageviews_db()
 
@@ -38,9 +38,9 @@ class TestGetEnwikiPageviewsDb:
     def test_raises_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when DB config is missing."""
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service._ENWIKI_PAGEVIEWS_STORE", None
+            "src.app_main.public.domain.services.enwiki_pageview_service._ENWIKI_PAGEVIEWS_STORE", None
         )
-        monkeypatch.setattr("src.app_main.public.domain.services.enwiki_pageviews_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.public.domain.services.enwiki_pageview_service.has_db_config", lambda: False)
 
         with pytest.raises(RuntimeError, match="EnwikiPageviewsDB requires database configuration"):
             get_enwiki_pageviews_db()
@@ -48,12 +48,12 @@ class TestGetEnwikiPageviewsDb:
     def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
         """Test that new EnwikiPageviewsDB is created when none cached."""
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service._ENWIKI_PAGEVIEWS_STORE", None
+            "src.app_main.public.domain.services.enwiki_pageview_service._ENWIKI_PAGEVIEWS_STORE", None
         )
-        monkeypatch.setattr("src.app_main.public.domain.services.enwiki_pageviews_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.enwiki_pageview_service.has_db_config", lambda: True)
 
         mock_db_instance = MagicMock()
-        with patch("src.app_main.public.domain.services.enwiki_pageviews_service.EnwikiPageviewsDB") as MockDB:
+        with patch("src.app_main.public.domain.services.enwiki_pageview_service.EnwikiPageviewsDB") as MockDB:
             MockDB.return_value = mock_db_instance
 
             result = get_enwiki_pageviews_db()
@@ -70,7 +70,7 @@ class TestListEnwikiPageviews:
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = list_enwiki_pageviews()
@@ -88,7 +88,7 @@ class TestGetTopEnwikiPageviews:
         mock_records = [MagicMock()]
         mock_store.list_by_views.return_value = mock_records
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = get_top_enwiki_pageviews(limit=50)
@@ -101,7 +101,7 @@ class TestGetTopEnwikiPageviews:
         mock_store = MagicMock()
         mock_store.list_by_views.return_value = []
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         get_top_enwiki_pageviews()
@@ -118,7 +118,7 @@ class TestGetEnwikiPageview:
         mock_record = MagicMock()
         mock_store.fetch_by_id.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = get_enwiki_pageview(123)
@@ -136,7 +136,7 @@ class TestGetEnwikiPageviewByTitle:
         mock_record = MagicMock()
         mock_store.fetch_by_title.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = get_enwiki_pageview_by_title("TestPage")
@@ -154,7 +154,7 @@ class TestAddEnwikiPageview:
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = add_enwiki_pageview("TestPage", en_views=1000)
@@ -172,7 +172,7 @@ class TestAddOrUpdateEnwikiPageview:
         mock_record = MagicMock()
         mock_store.add_or_update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = add_or_update_enwiki_pageview("TestPage", en_views=2000)
@@ -190,7 +190,7 @@ class TestUpdateEnwikiPageview:
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = update_enwiki_pageview(1, en_views=2000)
@@ -208,7 +208,7 @@ class TestDeleteEnwikiPageview:
         mock_record = MagicMock()
         mock_store.delete.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.enwiki_pageviews_service.get_enwiki_pageviews_db", lambda: mock_store
+            "src.app_main.public.domain.services.enwiki_pageview_service.get_enwiki_pageviews_db", lambda: mock_store
         )
 
         result = delete_enwiki_pageview(1)

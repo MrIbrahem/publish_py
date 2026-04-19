@@ -1,5 +1,5 @@
 """
-Unit tests for domain/services/users_service.py module.
+Unit tests for domain/services/user_service.py module.
 
 Tests for users service layer which provides cached access to UsersDB.
 """
@@ -7,7 +7,7 @@ Tests for users service layer which provides cached access to UsersDB.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.users_service import (
+from src.app_main.public.domain.services.user_service import (
     add_or_update_user,
     add_user,
     delete_user,
@@ -27,8 +27,8 @@ class TestGetUsersDb:
     def test_returns_cached_instance(self, monkeypatch):
         """Test that singleton pattern returns same instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service._USERS_STORE", mock_db)
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service._USERS_STORE", mock_db)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.has_db_config", lambda: True)
 
         result = get_users_db()
 
@@ -36,19 +36,19 @@ class TestGetUsersDb:
 
     def test_raises_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when DB config is missing."""
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service._USERS_STORE", None)
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service._USERS_STORE", None)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.has_db_config", lambda: False)
 
         with pytest.raises(RuntimeError, match="UsersDB requires database configuration"):
             get_users_db()
 
     def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
         """Test that new UsersDB is created when none cached."""
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service._USERS_STORE", None)
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service._USERS_STORE", None)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.has_db_config", lambda: True)
 
         mock_db_instance = MagicMock()
-        with patch("src.app_main.public.domain.services.users_service.UsersDB") as MockDB:
+        with patch("src.app_main.public.domain.services.user_service.UsersDB") as MockDB:
             MockDB.return_value = mock_db_instance
 
             result = get_users_db()
@@ -64,7 +64,7 @@ class TestListUsers:
         mock_store = MagicMock()
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = list_users()
 
@@ -80,7 +80,7 @@ class TestListUsersByGroup:
         mock_store = MagicMock()
         mock_records = [MagicMock()]
         mock_store.list_by_group.return_value = mock_records
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = list_users_by_group("Translators")
 
@@ -96,7 +96,7 @@ class TestGetUser:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.fetch_by_id.return_value = mock_record
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = get_user(123)
 
@@ -112,7 +112,7 @@ class TestGetUserByUsername:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.fetch_by_username.return_value = mock_record
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = get_user_by_username("TestUser")
 
@@ -128,7 +128,7 @@ class TestAddUser:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = add_user("TestUser", email="test@example.com", wiki="ar.wikipedia.org")
 
@@ -144,7 +144,7 @@ class TestAddOrUpdateUser:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add_or_update.return_value = mock_record
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = add_or_update_user("TestUser", user_group="Translators")
 
@@ -160,7 +160,7 @@ class TestUpdateUser:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = update_user(1, email="new@example.com")
 
@@ -176,7 +176,7 @@ class TestDeleteUser:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.delete.return_value = mock_record
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = delete_user(1)
 
@@ -191,7 +191,7 @@ class TestUserExists:
         """Test that function returns True when user found."""
         mock_store = MagicMock()
         mock_store.fetch_by_username.return_value = MagicMock()
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = user_exists("TestUser")
 
@@ -201,7 +201,7 @@ class TestUserExists:
         """Test that function returns False when user not found."""
         mock_store = MagicMock()
         mock_store.fetch_by_username.return_value = None
-        monkeypatch.setattr("src.app_main.public.domain.services.users_service.get_users_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.public.domain.services.user_service.get_users_db", lambda: mock_store)
 
         result = user_exists("Missing")
 

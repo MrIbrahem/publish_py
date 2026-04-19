@@ -5,7 +5,7 @@ Unit tests for qids_service module.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.services.qids_service import (
+from src.app_main.shared.domain.services.qid_service import (
     add_qid,
     delete_qid,
     get_page_qid,

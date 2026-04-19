@@ -1,11 +1,11 @@
 """
-Unit tests for settings_service module.
+Unit tests for setting_service module.
 """
 
 from unittest.mock import MagicMock
 
 import pytest
-from src.app_main.admin.domain.services.settings_service import (
+from src.app_main.admin.domain.services.setting_service import (
     add_setting,
     delete_setting,
     get_setting,
@@ -22,7 +22,7 @@ class TestGetSettingsDb:
     def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
         """Test that the same instance is returned on multiple calls."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service._SETTINGS_STORE", mock_store)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service._SETTINGS_STORE", mock_store)
 
         result1 = get_settings_db()
         result2 = get_settings_db()
@@ -31,8 +31,8 @@ class TestGetSettingsDb:
 
     def test_raises_error_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when database config is missing."""
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.has_db_config", lambda: False)
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service._SETTINGS_STORE", None)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service._SETTINGS_STORE", None)
 
         with pytest.raises(RuntimeError, match="SettingsDB requires database configuration"):
             get_settings_db()
@@ -46,7 +46,7 @@ class TestListSettings:
         mock_store = MagicMock()
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service.get_settings_db", lambda: mock_store)
 
         result = list_settings()
 
@@ -61,7 +61,7 @@ class TestGetSetting:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.fetch_by_id.return_value = mock_record
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service.get_settings_db", lambda: mock_store)
 
         result = get_setting(1)
 
@@ -76,7 +76,7 @@ class TestGetSettingByKey:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.fetch_by_key.return_value = mock_record
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service.get_settings_db", lambda: mock_store)
 
         result = get_setting_by_key("test_key")
 
@@ -92,7 +92,7 @@ class TestAddSetting:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service.get_settings_db", lambda: mock_store)
 
         result = add_setting("test_key", "Test Setting", "boolean", "true")
 
@@ -108,7 +108,7 @@ class TestUpdateValue:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.update_value.return_value = mock_record
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service.get_settings_db", lambda: mock_store)
 
         result = update_value(1, "new_value")
 
@@ -122,7 +122,7 @@ class TestDeleteSetting:
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_setting calls store delete."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.admin.domain.services.settings_service.get_settings_db", lambda: mock_store)
+        monkeypatch.setattr("src.app_main.admin.domain.services.setting_service.get_settings_db", lambda: mock_store)
 
         delete_setting(1)
 

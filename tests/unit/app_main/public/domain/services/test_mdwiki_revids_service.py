@@ -1,5 +1,5 @@
 """
-Unit tests for domain/services/mdwiki_revids_service.py module.
+Unit tests for domain/services/mdwiki_revid_service.py module.
 
 Tests for mdwiki_revids service layer which provides cached access to MdwikiRevidsDB.
 """
@@ -7,7 +7,7 @@ Tests for mdwiki_revids service layer which provides cached access to MdwikiRevi
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.public.domain.services.mdwiki_revids_service import (
+from src.app_main.public.domain.services.mdwiki_revid_service import (
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
     delete_mdwiki_revid,
@@ -25,8 +25,8 @@ class TestGetMdwikiRevidsDb:
     def test_returns_cached_instance(self, monkeypatch):
         """Test that singleton pattern returns same instance."""
         mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revids_service._MDWIKI_REVIDS_STORE", mock_db)
-        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revids_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revid_service._MDWIKI_REVIDS_STORE", mock_db)
+        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revid_service.has_db_config", lambda: True)
 
         result = get_mdwiki_revids_db()
 
@@ -34,19 +34,19 @@ class TestGetMdwikiRevidsDb:
 
     def test_raises_when_no_db_config(self, monkeypatch):
         """Test that RuntimeError is raised when DB config is missing."""
-        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revids_service._MDWIKI_REVIDS_STORE", None)
-        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revids_service.has_db_config", lambda: False)
+        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revid_service._MDWIKI_REVIDS_STORE", None)
+        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revid_service.has_db_config", lambda: False)
 
         with pytest.raises(RuntimeError, match="MdwikiRevidsDB requires database configuration"):
             get_mdwiki_revids_db()
 
     def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
         """Test that new MdwikiRevidsDB is created when none cached."""
-        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revids_service._MDWIKI_REVIDS_STORE", None)
-        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revids_service.has_db_config", lambda: True)
+        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revid_service._MDWIKI_REVIDS_STORE", None)
+        monkeypatch.setattr("src.app_main.public.domain.services.mdwiki_revid_service.has_db_config", lambda: True)
 
         mock_db_instance = MagicMock()
-        with patch("src.app_main.public.domain.services.mdwiki_revids_service.MdwikiRevidsDB") as MockDB:
+        with patch("src.app_main.public.domain.services.mdwiki_revid_service.MdwikiRevidsDB") as MockDB:
             MockDB.return_value = mock_db_instance
 
             result = get_mdwiki_revids_db()
@@ -63,7 +63,7 @@ class TestListMdwikiRevids:
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = list_mdwiki_revids()
@@ -81,7 +81,7 @@ class TestGetMdwikiRevidByTitle:
         mock_record = MagicMock()
         mock_store.fetch_by_title.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = get_mdwiki_revid_by_title("TestPage")
@@ -99,7 +99,7 @@ class TestAddMdwikiRevid:
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = add_mdwiki_revid("TestPage", 12345)
@@ -117,7 +117,7 @@ class TestAddOrUpdateMdwikiRevid:
         mock_record = MagicMock()
         mock_store.add_or_update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = add_or_update_mdwiki_revid("TestPage", 54321)
@@ -135,7 +135,7 @@ class TestUpdateMdwikiRevid:
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = update_mdwiki_revid("TestPage", 54321)
@@ -153,7 +153,7 @@ class TestDeleteMdwikiRevid:
         mock_record = MagicMock()
         mock_store.delete.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = delete_mdwiki_revid("TestPage")
@@ -172,7 +172,7 @@ class TestGetRevidForTitle:
         mock_record.revid = 12345
         mock_store.fetch_by_title.return_value = mock_record
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = get_revid_for_title("TestPage")
@@ -184,7 +184,7 @@ class TestGetRevidForTitle:
         mock_store = MagicMock()
         mock_store.fetch_by_title.return_value = None
         monkeypatch.setattr(
-            "src.app_main.public.domain.services.mdwiki_revids_service.get_mdwiki_revids_db", lambda: mock_store
+            "src.app_main.public.domain.services.mdwiki_revid_service.get_mdwiki_revids_db", lambda: mock_store
         )
 
         result = get_revid_for_title("Missing")
