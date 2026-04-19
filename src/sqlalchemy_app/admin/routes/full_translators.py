@@ -111,12 +111,12 @@ class FullTranslators:
         def add_full_translator() -> ResponseReturnValue:
             return _add_full_translator()
 
-        @bp_admin.post("/full_translators/<int:translator_id>/active")
-        @admin_required
-        def update_full_translator_active(translator_id: int) -> ResponseReturnValue:
-            return _update_full_translator_active(translator_id)
-
         @bp_admin.post("/full_translators/<int:translator_id>/delete")
         @admin_required
         def delete_full_translator(translator_id: int) -> ResponseReturnValue:
             return _delete_full_translator(translator_id)
+
+        @bp_admin.post("/full_translators/<int:translator_id>/active")
+        @admin_required
+        def update_full_translator_active(translator_id: int) -> ResponseReturnValue:
+            return _update_full_translator_active(translator_id)

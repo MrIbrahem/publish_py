@@ -111,12 +111,12 @@ class UsersNoInprocess:
         def add_user_no_inprocess() -> ResponseReturnValue:
             return _add_user_no_inprocess()
 
-        @bp_admin.post("/users_no_inprocess/<int:record_id>/active")
-        @admin_required
-        def update_user_no_inprocess_active(record_id: int) -> ResponseReturnValue:
-            return _update_user_no_inprocess_active(record_id)
-
         @bp_admin.post("/users_no_inprocess/<int:record_id>/delete")
         @admin_required
         def delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
             return _delete_user_no_inprocess(record_id)
+
+        @bp_admin.post("/users_no_inprocess/<int:record_id>/active")
+        @admin_required
+        def update_user_no_inprocess_active(record_id: int) -> ResponseReturnValue:
+            return _update_user_no_inprocess_active(record_id)
