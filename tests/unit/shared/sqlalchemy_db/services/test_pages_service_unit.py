@@ -19,70 +19,15 @@ The service layer provides:
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.services.page_service import (
+from src.sqlalchemy_app.shared.domain.services.page_service import (
     add_or_update_page,
     add_page,
     delete_page,
     find_exists_or_update_page,
-    get_pages_db,
     insert_page_target,
     list_pages,
     update_page,
 )
-
-
-class TestGetPagesDb:
-    """Tests for get_pages_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-        mock_db = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service._PAGE_STORE", mock_db)
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.has_db_config", lambda: True)
-
-        result = get_pages_db()
-
-        assert result is mock_db
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service._PAGE_STORE", None)
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.has_db_config", lambda: False)
-
-        with pytest.raises(RuntimeError, match="PagesDB requires database configuration"):
-            get_pages_db()
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new PagesDB is created when none cached."""
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service._PAGE_STORE", None)
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.has_db_config", lambda: True)
-
-        mock_db_instance = MagicMock()
-        with patch("src.app_main.shared.domain.services.page_service.PagesDB") as MockPagesDB:
-            MockPagesDB.return_value = mock_db_instance
-
-            result = get_pages_db()
-
-            assert result is mock_db_instance
-            MockPagesDB.assert_called_once()
-
-    def test_caches_instance_after_first_creation(self, monkeypatch):
-        """Test that created instance is cached for reuse."""
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service._PAGE_STORE", None)
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.has_db_config", lambda: True)
-
-        mock_db_instance = MagicMock()
-        with patch("src.app_main.shared.domain.services.page_service.PagesDB") as MockPagesDB:
-            MockPagesDB.return_value = mock_db_instance
-
-            # First call
-            result1 = get_pages_db()
-            # Second call should return cached instance
-            result2 = get_pages_db()
-
-            assert result1 is result2 is mock_db_instance
-            # PagesDB should only be instantiated once
-            MockPagesDB.assert_called_once()
 
 
 class TestListPages:
@@ -93,7 +38,6 @@ class TestListPages:
         mock_store = MagicMock()
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = list_pages()
 
@@ -109,7 +53,6 @@ class TestAddPage:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = add_page("TestTitle", "TestFile")
 
@@ -125,7 +68,6 @@ class TestAddOrUpdatePage:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add_or_update.return_value = mock_record
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = add_or_update_page("TestTitle", "TestFile")
 
@@ -141,7 +83,6 @@ class TestUpdatePage:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = update_page(1, "TestTitle", "TestFile")
 
@@ -157,7 +98,6 @@ class TestDeletePage:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.delete.return_value = mock_record
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = delete_page(1)
 
@@ -172,7 +112,6 @@ class TestFindExistsOrUpdate:
         """Test that function delegates to store._find_exists_or_update."""
         mock_store = MagicMock()
         mock_store._find_exists_or_update.return_value = True
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
 
@@ -183,7 +122,6 @@ class TestFindExistsOrUpdate:
         """Test that function returns False when record not found."""
         mock_store = MagicMock()
         mock_store._find_exists_or_update.return_value = False
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
 
@@ -197,7 +135,6 @@ class TestInsertPageTarget:
         """Test that function delegates to store.insert_page_target."""
         mock_store = MagicMock()
         mock_store.insert_page_target.return_value = True
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         result = insert_page_target(
             sourcetitle="Source",
@@ -226,7 +163,6 @@ class TestInsertPageTarget:
         """Test that optional parameters are passed correctly."""
         mock_store = MagicMock()
         mock_store.insert_page_target.return_value = True
-        monkeypatch.setattr("src.app_main.shared.domain.services.page_service.get_pages_db", lambda: mock_store)
 
         # Call with minimal required params
         result = insert_page_target(

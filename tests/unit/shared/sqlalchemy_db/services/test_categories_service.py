@@ -5,7 +5,7 @@ Unit tests for category_service module.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.services.category_service import (
+from src.sqlalchemy_app.shared.domain.services.category_service import (
     add_category,
     delete_category,
     get_camp_to_cats,
@@ -23,9 +23,6 @@ class TestGetCampaignCategory:
         mock_store = MagicMock()
         mock_category = MagicMock()
         mock_store.fetch_by_campaign.return_value = mock_category
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = get_campaign_category("TestCampaign")
 
@@ -36,9 +33,6 @@ class TestGetCampaignCategory:
         """Test that function returns None when campaign not found."""
         mock_store = MagicMock()
         mock_store.fetch_by_campaign.return_value = None
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = get_campaign_category("NonExistentCampaign")
 
@@ -53,9 +47,6 @@ class TestAddCategory:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = add_category(
             category="TestCategory",
@@ -76,9 +67,6 @@ class TestAddCategory:
         mock_record = MagicMock()
         mock_record.id = 1
         mock_store.add.return_value = mock_record
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = add_category(
             category="TestCategory",
@@ -96,9 +84,6 @@ class TestAddCategory:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = add_category(
             category="TestCategory",
@@ -116,9 +101,6 @@ class TestListCategories:
         mock_store = MagicMock()
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = list_categories()
 
@@ -129,9 +111,6 @@ class TestListCategories:
         """Test that function returns empty list when no categories exist."""
         mock_store = MagicMock()
         mock_store.list.return_value = []
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = list_categories()
 
@@ -144,9 +123,6 @@ class TestDeleteCategory:
     def test_deletes_category(self, monkeypatch):
         """Test that delete_category calls store delete."""
         mock_store = MagicMock()
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         delete_category(1)
 
@@ -161,9 +137,6 @@ class TestUpdateCategory:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = update_category(1, "UpdatedTitle", "UpdatedFile")
 
@@ -186,9 +159,6 @@ class TestGetCampToCats:
 
         mock_store = MagicMock()
         mock_store.list.return_value = [mock_record1, mock_record2]
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = get_camp_to_cats()
 
@@ -202,9 +172,6 @@ class TestGetCampToCats:
 
         mock_store = MagicMock()
         mock_store.list.return_value = [mock_record]
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = get_camp_to_cats()
 
@@ -218,9 +185,6 @@ class TestGetCampToCats:
 
         mock_store = MagicMock()
         mock_store.list.return_value = [mock_record]
-        monkeypatch.setattr(
-            "src.app_main.shared.domain.services.category_service.get_categories_db", lambda: mock_store
-        )
 
         result = get_camp_to_cats()
 

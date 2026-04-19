@@ -5,38 +5,14 @@ Unit tests for qid_service module.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.app_main.shared.domain.services.qid_service import (
+from src.sqlalchemy_app.shared.domain.services.qid_service import (
     add_qid,
     delete_qid,
     get_page_qid,
-    get_qids_db,
     get_title_to_qid,
     list_qids,
     update_qid,
 )
-
-
-class TestGetQidsDb:
-    """Tests for get_qids_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that the same instance is returned on multiple calls."""
-        mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service._qid_STORE", mock_store)
-
-        result1 = get_qids_db()
-        result2 = get_qids_db()
-
-        assert result1 is result2
-        assert result1 is mock_store
-
-    def test_raises_error_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when database config is missing."""
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.has_db_config", lambda: False)
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service._qid_STORE", None)
-
-        with pytest.raises(RuntimeError, match="QidsDB requires database configuration"):
-            get_qids_db()
 
 
 class TestGetPageQid:
@@ -47,7 +23,6 @@ class TestGetPageQid:
         mock_store = MagicMock()
         mock_qid = MagicMock()
         mock_store.fetch_by_title.return_value = mock_qid
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = get_page_qid("TestArticle")
 
@@ -58,7 +33,6 @@ class TestGetPageQid:
         """Test that function returns None when QID not found."""
         mock_store = MagicMock()
         mock_store.fetch_by_title.return_value = None
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = get_page_qid("NonExistentArticle")
 
@@ -73,7 +47,6 @@ class TestAddQid:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.add.return_value = mock_record
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = add_qid("TestArticle", "Q12345")
 
@@ -89,7 +62,6 @@ class TestUpdateQid:
         mock_store = MagicMock()
         mock_record = MagicMock()
         mock_store.update.return_value = mock_record
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = update_qid(1, "UpdatedArticle", "Q99999")
 
@@ -103,7 +75,6 @@ class TestDeleteQid:
     def test_deletes_qid(self, monkeypatch):
         """Test that delete_qid calls store delete."""
         mock_store = MagicMock()
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         delete_qid(1)
 
@@ -118,7 +89,6 @@ class TestListQids:
         mock_store = MagicMock()
         mock_records = [MagicMock(), MagicMock()]
         mock_store.list.return_value = mock_records
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = list_qids()
 
@@ -129,7 +99,6 @@ class TestListQids:
         """Test that list_qids returns empty list when no records exist."""
         mock_store = MagicMock()
         mock_store.list.return_value = []
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = list_qids()
 
@@ -151,7 +120,6 @@ class TestGetTitleToQid:
 
         mock_store = MagicMock()
         mock_store.list.return_value = [mock_record1, mock_record2]
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = get_title_to_qid()
 
@@ -165,7 +133,6 @@ class TestGetTitleToQid:
 
         mock_store = MagicMock()
         mock_store.list.return_value = [mock_record]
-        monkeypatch.setattr("src.app_main.shared.domain.services.qid_service.get_qids_db", lambda: mock_store)
 
         result = get_title_to_qid()
 
