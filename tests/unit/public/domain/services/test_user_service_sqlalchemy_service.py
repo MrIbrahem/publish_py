@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from src.db_models.public_models import UserRecord
 from src.sqlalchemy_app.public.models import _UserRecord
-from src.sqlalchemy_app.public.domain.services.user_service import (
+from src.sqlalchemy_app.public.services.user_service import (
     add_or_update_user,
     add_user,
     delete_user,
@@ -96,7 +96,7 @@ class TestAddUser:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.sqlalchemy_app.public.domain.services.user_service.get_session") as mock_get_session:
+        with patch("src.sqlalchemy_app.public.services.user_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session

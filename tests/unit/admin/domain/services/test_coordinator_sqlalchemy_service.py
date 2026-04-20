@@ -15,7 +15,7 @@ from src.sqlalchemy_app.admin.services.coordinator_service import (
     set_coordinator_active,
     update_coordinator,
 )
-from src.sqlalchemy_app.shared.domain.engine import init_db
+from src.sqlalchemy_app.shared.engine import init_db
 
 
 def test_coordinator_workflow():

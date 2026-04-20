@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.shared_models import UserPageRecord
-from src.sqlalchemy_app.shared.domain.engine import get_session
-from src.sqlalchemy_app.shared.domain.models import _UserPageRecord
-from src.sqlalchemy_app.shared.domain.services.user_page_service import (
+from src.sqlalchemy_app.shared.engine import get_session
+from src.sqlalchemy_app.shared.models import _UserPageRecord
+from src.sqlalchemy_app.shared.services.user_page_service import (
     add_or_update_user_page,
     add_user_page,
     delete_user_page,
@@ -132,7 +132,7 @@ class TestInsertUserPageTarget:
         assert any(p.title == "Pathology" for p in list_user_pages())
 
     def test_handles_exception(self, monkeypatch):
-        with patch("src.sqlalchemy_app.shared.domain.services.user_page_service.get_session") as mock_get_session:
+        with patch("src.sqlalchemy_app.shared.services.user_page_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = Exception("DB Error")
             mock_get_session.return_value.__enter__.return_value = mock_session

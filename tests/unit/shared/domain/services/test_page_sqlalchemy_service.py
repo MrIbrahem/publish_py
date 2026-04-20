@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.shared_models import PageRecord
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, get_session, init_db
-from src.sqlalchemy_app.shared.domain.models import _PageRecord
-from src.sqlalchemy_app.shared.domain.services.page_service import (
+from src.sqlalchemy_app.shared.engine import BaseDb, build_engine, get_session, init_db
+from src.sqlalchemy_app.shared.models import _PageRecord
+from src.sqlalchemy_app.shared.services.page_service import (
     add_or_update_page,
     add_page,
     delete_page,
@@ -64,7 +64,7 @@ class TestAddPage:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.sqlalchemy_app.shared.domain.services.page_service.get_session") as mock_get_session:
+        with patch("src.sqlalchemy_app.shared.services.page_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
@@ -146,7 +146,7 @@ class TestFindExistsOrUpdate:
         with get_session() as session:
             session.add(_PageRecord(title="Error_Page", lang="en", user="U", target=""))
             session.commit()
-        with patch("src.sqlalchemy_app.shared.domain.services.page_service.get_session") as mock_get_session:
+        with patch("src.sqlalchemy_app.shared.services.page_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.query.return_value.filter.return_value.all.return_value = [MagicMock(target="")]
             mock_session.commit.side_effect = Exception("DB Error")
@@ -186,7 +186,7 @@ class TestInsertPageTarget:
         assert p.word == 1200
 
     def test_handles_exception(self, monkeypatch):
-        with patch("src.sqlalchemy_app.shared.domain.services.page_service.get_session") as mock_get_session:
+        with patch("src.sqlalchemy_app.shared.services.page_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = Exception("DB Error")
             mock_get_session.return_value.__enter__.return_value = mock_session

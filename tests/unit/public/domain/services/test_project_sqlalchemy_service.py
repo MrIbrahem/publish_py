@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from src.db_models.public_models import ProjectRecord
 from src.sqlalchemy_app.public.models import _ProjectRecord
-from src.sqlalchemy_app.public.domain.services.project_service import (
+from src.sqlalchemy_app.public.services.project_service import (
     add_or_update_project,
     add_project,
     delete_project,

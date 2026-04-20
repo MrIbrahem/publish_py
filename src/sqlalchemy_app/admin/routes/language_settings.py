@@ -14,7 +14,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...public.domain.services.lang_service import list_langs
+from ...public.services.lang_service import list_langs
 from ..decorators import admin_required
 from ..services.language_setting_service import (
     add_language_setting,

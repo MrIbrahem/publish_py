@@ -148,8 +148,8 @@ def db_config():
 @pytest.fixture(autouse=True)
 def setup_db():
     """Initialize an in-memory SQLite database for tests."""
-    from src.sqlalchemy_app.shared.domain import engine as engine_mod
-    from src.sqlalchemy_app.shared.domain.engine import (
+    from src.sqlalchemy_app.shared import engine as engine_mod
+    from src.sqlalchemy_app.shared.engine import (
         BaseDb,
         build_engine,
         init_db,

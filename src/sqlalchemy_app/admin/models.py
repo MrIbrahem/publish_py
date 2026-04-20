@@ -9,7 +9,7 @@ import logging
 from sqlalchemy import Column, Enum, Integer, String, text
 
 # from sqlalchemy.dialects.mysql import LONGTEXT
-from ..shared.domain.engine import LONGTEXT, BaseDb
+from ..shared.engine import LONGTEXT, BaseDb
 
 logger = logging.getLogger(__name__)
 

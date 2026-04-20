@@ -2,7 +2,7 @@
 Integration tests for user_token_service module.
 """
 
-from src.sqlalchemy_app.shared.domain.services.user_token_service import (
+from src.sqlalchemy_app.shared.services.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,
     get_user_token,

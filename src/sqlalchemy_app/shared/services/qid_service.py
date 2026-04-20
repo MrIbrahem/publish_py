@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from .....db_models.shared_models import QidRecord
+from ....db_models.shared_models import QidRecord
 from ..engine import get_session
 from ..models import _QidRecord
 

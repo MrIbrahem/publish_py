@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from .....db_models.shared_models import CategoryRecord
+from ....db_models.shared_models import CategoryRecord
 from ..engine import get_session
 from ..models import _CategoryRecord
 

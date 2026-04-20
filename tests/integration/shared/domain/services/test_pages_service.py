@@ -18,7 +18,7 @@ These tests complement the unit tests by verifying the service-to-DB integration
 
 from unittest.mock import MagicMock, patch
 
-from src.sqlalchemy_app.shared.domain.services.page_service import (
+from src.sqlalchemy_app.shared.services.page_service import (
     add_or_update_page,
     add_page,
     delete_page,

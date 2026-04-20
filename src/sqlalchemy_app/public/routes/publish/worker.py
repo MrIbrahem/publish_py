@@ -14,7 +14,7 @@ from ....shared.clients import (
     link_to_wikidata,
     publish_do_edit,
 )
-from ....shared.domain.services import (
+from ....shared.services import (
     add_report,
     find_exists_or_update_page,
     find_exists_or_update_user_page,
@@ -22,7 +22,7 @@ from ....shared.domain.services import (
     insert_page_target,
     insert_user_page_target,
 )
-from ....shared.domain.services.category_service import get_campaign_category
+from ....shared.services.category_service import get_campaign_category
 from ....shared.utils.helpers import (
     determine_hashtag,
     do_changes_to_text,
