@@ -17,32 +17,35 @@ def rename_test_files(target_dir):
         print(f"Directory '{target_dir}' not found.")
         return
 
-    for filename in os.listdir(target_dir):
-        if file_pattern.match(filename):
-            file_path = os.path.join(target_dir, filename)
+    for root, dirs, files in os.walk(target_dir):
 
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
+        for filename in files:
+            print(filename)
+            if file_pattern.match(filename):
+                file_path = os.path.join(target_dir, filename)
 
-                match = import_pattern.search(content)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
 
-                if match:
-                    service_name = match.group(1)
-                    new_filename = f"test_{service_name}.py"
-                    new_file_path = os.path.join(target_dir, new_filename)
+                    match = import_pattern.search(content)
 
-                    # Avoid overwriting if the name is already correct or exists
-                    if filename != new_filename:
-                        os.rename(file_path, new_file_path)
-                        print(f"Renamed: {filename} -> {new_filename}")
+                    if match:
+                        service_name = match.group(1)
+                        new_filename = f"test_{service_name}.py"
+                        new_file_path = os.path.join(target_dir, new_filename)
+
+                        # Avoid overwriting if the name is already correct or exists
+                        if filename != new_filename:
+                            os.rename(file_path, new_file_path)
+                            print(f"Renamed: {filename} -> {new_filename}")
+                        else:
+                            print(f"Skipped: {filename} already matches target name.")
                     else:
-                        print(f"Skipped: {filename} already matches target name.")
-                else:
-                    print(f"No matching import found in: {filename}")
+                        print(f"No matching import found in: {filename}")
 
-            except Exception as e:
-                print(f"Error processing {filename}: {e}")
+                except Exception as e:
+                    print(f"Error processing {filename}: {e}")
 
 
 if __name__ == "__main__":
