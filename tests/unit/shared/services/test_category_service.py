@@ -22,8 +22,13 @@ def test_category_workflow() -> None:
 
     assert get_camp_to_cats()["Health_Campaign"] == "Medicine"
 
-    updated = update_category(c.id, "Medical_Science", "Science_Campaign")
+    updated = update_category(
+        category_id=c.id,
+        category="Medical_Science",
+        campaign="Science_Campaign",
+    )
     assert updated.category == "Medical_Science"
+    assert get_campaign_category("Science_Campaign").category == "Medical_Science"
 
     delete_category(c.id)
     assert get_campaign_category("Science_Campaign") is None

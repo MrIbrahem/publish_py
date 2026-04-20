@@ -10,11 +10,12 @@ from typing import List
 from ...db_models.shared_models import CategoryRecord
 from ..engine import get_session
 from ..models import _CategoryRecord
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
 
-def set_default_category(session, orm_obj) -> CategoryRecord:
+def set_default_category(session: Session , orm_obj) -> CategoryRecord:
     session.query(_CategoryRecord).update({_CategoryRecord.is_default: 0})
     orm_obj.is_default = 1
     session.commit()
@@ -64,19 +65,36 @@ def add_category(
         return record
 
 
-def update_category(category_id: int, title: str, main_file: str) -> CategoryRecord:
+def update_category(
+    category_id: int,
+    category: str,
+    campaign: str,
+    display: str | None = "",
+    category2: str | None = "",
+    depth: int = 0,
+    is_default: int = 0,
+) -> CategoryRecord:
     """Update category."""
     with get_session() as session:
         orm_obj = session.query(_CategoryRecord).filter(_CategoryRecord.id == category_id).first()
         if not orm_obj:
             raise ValueError(f"Category with ID {category_id} not found")
 
-        orm_obj.category = title
-        orm_obj.campaign = main_file
+        orm_obj.category = category
+        orm_obj.campaign = campaign
+        orm_obj.display = display
+        orm_obj.category2 = category2
+        orm_obj.depth = depth
 
         session.commit()
         session.refresh(orm_obj)
-        return CategoryRecord(**orm_obj.to_dict())
+        record = CategoryRecord(**orm_obj.to_dict())
+
+        if is_default:
+            # set this category as default by unsetting default flag on all other categories
+            record = set_default_category(session, orm_obj)
+
+        return record
 
 
 def delete_category(category_id: int) -> None:
