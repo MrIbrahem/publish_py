@@ -279,7 +279,7 @@ class TestMetadataLogic(BasePublishTest):
             assert tab["words"] == 500
 
     def test_hashtag_logic(self, csrf_client, common_patches):
-        """ TODO: write tests """
+        """TODO: write tests"""
 
     def test_empty_revid_fallback(self, csrf_client, common_patches):
         # نُعدّل الـ revid ليكون فارغاً
