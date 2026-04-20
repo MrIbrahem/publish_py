@@ -1,19 +1,5 @@
-"""Integration tests for user_token_service module.
-
-NOTE: These integration tests verify the service layer works correctly with
-the database layer. The service module acts as a thin wrapper around UserTokenDB.
-
-These tests verify:
-- Service initialization and DB connection
-- End-to-end token operations through the service layer
-- Error handling integration between service and DB layers
-- The service layer properly delegates to UserTokenDB while adding:
-  - Singleton pattern management
-  - Configuration validation
-  - Input sanitization (strip whitespace)
-  - None-safe operations
-
-The actual DB operations are mocked to avoid requiring a real database.
+"""
+Integration tests for user_token_service module.
 """
 
 from src.sqlalchemy_app.shared.domain.services.user_token_service import (
