@@ -14,7 +14,6 @@ from .report_service import (
     query_reports_with_filters,
 )
 from .user_page_service import (
-    add_or_update_user_page,
     add_user_page,
     delete_user_page,
     find_exists_or_update_user_page,
@@ -48,7 +47,6 @@ __all__ = [
     "query_reports_with_filters",
     # user_page_service
     "list_user_pages",
-    "add_or_update_user_page",
     "add_user_page",
     "update_user_page",
     "delete_user_page",

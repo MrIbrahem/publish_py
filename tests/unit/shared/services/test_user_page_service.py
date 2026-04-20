@@ -5,7 +5,6 @@ from src.sqlalchemy_app.db_models.shared_models import UserPageRecord
 from src.sqlalchemy_app.shared.engine import get_session
 from src.sqlalchemy_app.shared.models import _UserPageRecord
 from src.sqlalchemy_app.shared.services.user_page_service import (
-    add_or_update_user_page,
     add_user_page,
     delete_user_page,
     find_exists_or_update_user_page,
@@ -31,9 +30,6 @@ def test_user_page_workflow() -> None:
     assert any(x.title == "Influenza" for x in list_user_pages())
     updated = update_user_page(p.id, "Flu", "Flu.html")
     assert updated.title == "Flu"
-
-    p2 = add_or_update_user_page("Flu", "Gripe.html")
-    assert p2.target == "Gripe.html"
 
     with get_session() as session:
         orm_p = session.query(_UserPageRecord).filter(_UserPageRecord.id == p.id).first()
@@ -90,19 +86,6 @@ class TestAddUserPage:
     def test_raises_error_if_no_title(self, monkeypatch):
         with pytest.raises(ValueError, match="Title is required"):
             add_user_page("", "test.html")
-
-
-class TestAddOrUpdateUserPage:
-    """Tests for add_or_update_user_page function."""
-
-    def test_updates_if_exists(self, monkeypatch):
-        add_user_page("Cardiology", "Old.html")
-        record = add_or_update_user_page("Cardiology", "New.html")
-        assert record.target == "New.html"
-
-    def test_adds_if_not_exists(self, monkeypatch):
-        record = add_or_update_user_page("Oncology", "Oncology.html")
-        assert record.title == "Oncology"
 
 
 class TestUpdateUserPage:

@@ -80,25 +80,6 @@ def add_page(
     )
 
 
-def add_or_update_page(title: str, main_file: str) -> PageRecord:
-    """Add or update a page."""
-    title = title.strip()
-    if not title:
-        raise ValueError("Title is required")
-
-    with get_session() as session:
-        orm_obj = session.query(_PageRecord).filter(_PageRecord.title == title).first()
-        if orm_obj:
-            orm_obj.target = main_file
-        else:
-            orm_obj = _PageRecord(title=title, target=main_file)
-            session.add(orm_obj)
-
-        session.commit()
-        session.refresh(orm_obj)
-        return PageRecord(**orm_obj.to_dict())
-
-
 def update_page(page_id: int, title: str, main_file: str) -> PageRecord:
     """Update page."""
     with get_session() as session:
@@ -168,7 +149,6 @@ def find_exists_or_update_page(
 __all__ = [
     "list_pages",
     "add_page",
-    "add_or_update_page",
     "update_page",
     "delete_page",
     "find_exists_or_update_page",

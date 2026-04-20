@@ -79,26 +79,6 @@ def add_user_page(
         word,
     )
 
-
-def add_or_update_user_page(title: str, main_file: str) -> UserPageRecord:
-    """Add or update a page."""
-    title = title.strip()
-    if not title:
-        raise ValueError("Title is required")
-
-    with get_session() as session:
-        orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.title == title).first()
-        if orm_obj:
-            orm_obj.target = main_file
-        else:
-            orm_obj = _UserPageRecord(title=title, target=main_file)
-            session.add(orm_obj)
-
-        session.commit()
-        session.refresh(orm_obj)
-        return UserPageRecord(**orm_obj.to_dict())
-
-
 def update_user_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
     """Update page."""
     with get_session() as session:
@@ -167,7 +147,6 @@ def find_exists_or_update_user_page(
 
 __all__ = [
     "list_user_pages",
-    "add_or_update_user_page",
     "add_user_page",
     "update_user_page",
     "delete_user_page",

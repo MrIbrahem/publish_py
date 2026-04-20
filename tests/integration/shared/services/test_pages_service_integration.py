@@ -19,7 +19,6 @@ These tests complement the unit tests by verifying the service-to-DB integration
 from unittest.mock import MagicMock, patch
 
 from src.sqlalchemy_app.shared.services.page_service import (
-    add_or_update_page,
     add_page,
     delete_page,
     find_exists_or_update_page,
@@ -46,12 +45,6 @@ class TestPagesServiceIntegration:
 
         result = delete_page(1)
         assert result.id == 1
-
-    def test_add_or_update_integration(self):
-        """Test add_or_update through service layer."""
-        result = add_or_update_page("TestPage", "TestFile")
-        assert result.title == "TestPage"
-        assert result.target == "TestFile"
 
     def test_find_exists_or_update_integration(self):
         """Test find_exists_or_update_page through service layer."""

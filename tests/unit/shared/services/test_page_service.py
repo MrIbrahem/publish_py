@@ -5,7 +5,6 @@ from src.sqlalchemy_app.db_models.shared_models import PageRecord
 from src.sqlalchemy_app.shared.engine import BaseDb, build_engine, get_session, init_db
 from src.sqlalchemy_app.shared.models import _PageRecord
 from src.sqlalchemy_app.shared.services.page_service import (
-    add_or_update_page,
     add_page,
     delete_page,
     find_exists_or_update_page,
@@ -32,9 +31,6 @@ def test_page_workflow():
 
     updated = update_page(p.id, "COVID-19", "COVID-19.html")
     assert updated.title == "COVID-19"
-
-    p2 = add_or_update_page("COVID-19", "Coronavirus_disease_2019.html")
-    assert p2.target == "Coronavirus_disease_2019.html"
 
     with get_session() as session:
         orm_p = session.query(_PageRecord).filter(_PageRecord.id == p.id).first()
@@ -95,24 +91,6 @@ class TestAddPage:
             mock_get_session.return_value.__enter__.return_value = mock_session
             with pytest.raises(ValueError, match="already exists"):
                 add_page("Duplicate", "t1.html")
-
-
-class TestAddOrUpdatePage:
-    """Tests for add_or_update_page function."""
-
-    def test_updates_if_exists(self, monkeypatch):
-        """Test that function updates if exists."""
-        add_page("Relativity", "Relativity.html")
-        record = add_or_update_page("Relativity", "General_relativity.html")
-        assert record.target == "General_relativity.html"
-
-    def test_adds_if_not_exists(self, monkeypatch):
-        record = add_or_update_page("New Page", "new.html")
-        assert record.title == "New Page"
-
-    def test_raises_error_if_no_title(self, monkeypatch):
-        with pytest.raises(ValueError, match="Title is required"):
-            add_or_update_page(" ", "test.html")
 
 
 class TestUpdatePage:
