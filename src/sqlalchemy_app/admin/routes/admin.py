@@ -23,6 +23,7 @@ from ..sidebar import create_side
 from .coordinators import Coordinators
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
+from .last import LastDashboard
 from .settings import SettingsRoutes
 from .users_no_inprocess import UsersNoInprocess
 from .projects import ProjectsDashboard
@@ -74,6 +75,7 @@ def register_blueprints(bp_admin) -> None:
     FullTranslators(bp_admin)
     UsersNoInprocess(bp_admin)
     LanguageSettings(bp_admin)
+    LastDashboard(bp_admin)
     # Templates(bp_admin)
     SettingsRoutes(bp_admin)
     ProjectsDashboard(bp_admin)
