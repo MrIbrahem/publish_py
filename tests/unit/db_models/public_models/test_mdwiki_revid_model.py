@@ -4,7 +4,7 @@ Unit tests for domain.models.mdwiki_revid module.
 Tests for MdwikiRevidRecord.
 """
 
-from src.db_models.public_models import (
+from src.sqlalchemy_app.shared.db_models.public_models import (
     MdwikiRevidRecord,
 )
 
