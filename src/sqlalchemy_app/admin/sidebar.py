@@ -76,6 +76,7 @@ def create_side(active_route):
                 href="reports",
                 title="Publish Reports",
                 icon="bi-file-earmark-text",
+                ready=True,
             ),
         ],
         "Pages": [

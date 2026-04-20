@@ -48,6 +48,12 @@ def index():
     return render_template("admins/index.html")
 
 
+@bp_admin.get("/reports")
+@admin_required
+def reports():
+    return render_template("admins/reports.html")
+
+
 def register_blueprints(bp_admin) -> None:
     Coordinators(bp_admin)
     FullTranslators(bp_admin)
