@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-from sqlalchemy import Column, Integer, MetaData, String, Table
+from sqlalchemy import Column, Date, DateTime, Integer, MetaData, String, Table, func, text
 from sqlalchemy.orm import sessionmaker
 
 if sys:
@@ -159,7 +159,23 @@ def setup_db():
     engine = build_engine("sqlite:///:memory:")
 
     meta = MetaData()
-    pages_users = Table("pages_users", meta, Column("id", Integer, primary_key=True), Column("title", String(255)))
+    pages_users = Table(
+        "pages_users",
+        meta,
+        Column("id", Integer, primary_key=True),
+        Column("title", String(120), nullable=False),
+        Column("word", Integer, nullable=True),
+        Column("translate_type", String(20), nullable=True),
+        Column("cat", String(120), nullable=True),
+        Column("lang", String(30), nullable=True),
+        Column("user", String(120), nullable=True),
+        Column("target", String(120), nullable=True),
+        Column("date", Date, nullable=True),
+        Column("pupdate", String(120), nullable=True),
+        Column("add_date", DateTime, nullable=False, server_default=func.current_timestamp()),
+        Column("deleted", Integer, nullable=False, server_default=text("0")),
+        Column("mdwiki_revid", Integer, nullable=True),
+    )
     pages_users.create(engine)
 
     BaseDb.metadata.create_all(engine)
