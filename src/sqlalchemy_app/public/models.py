@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, event, func, text
 
+from sqlalchemy import inspect
 from ..shared.engine import BaseDb
 
 
@@ -401,12 +402,17 @@ __all__ = [
 
 @event.listens_for(BaseDb.metadata, "after_create")
 def create_views_new_all_view(target, connection, **kw):
-    """Create the views_new_all view after tables are created."""
-    connection.execute(text("""
-        CREATE VIEW views_new_all AS
-        SELECT v.target AS target,
-               v.lang AS lang,
-               SUM(v.views) AS views
-        FROM views_new v
-        GROUP BY v.target, v.lang
-    """))
+    inspector = inspect(connection)
+    existing_views = inspector.get_view_names()
+
+    if "views_new_all" not in existing_views:
+        connection.execute(text("""
+            CREATE VIEW views_new_all AS
+            SELECT v.target AS target,
+                   v.lang AS lang,
+                   SUM(v.views) AS views
+            FROM views_new v
+            GROUP BY v.target, v.lang
+        """))
+    else:
+        print("View 'views_new_all' already exists, skipping creation.")

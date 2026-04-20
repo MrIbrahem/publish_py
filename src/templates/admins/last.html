@@ -1,0 +1,140 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}Recent Translations{% endblock %}
+
+{% block contents %}
+
+<div class="card">
+    <div class="card-header">
+        <form method="get" action="{{ url_for('admin.last_dashboard') }}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <h4 class="mb-0">Recent translations ({{ count }}):</h4>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text">Namespace:</span>
+                    <div class="form-control d-flex gap-3">
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="last_table" id="radio_pages" value="pages" {% if last_table == 'pages' %}checked{% endif %}>
+                            <label class="form-check-label" for="radio_pages">Main</label>
+                        </div>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="last_table" id="radio_pages_users" value="pages_users" {% if last_table == 'pages_users' %}checked{% endif %}>
+                            <label class="form-check-label" for="radio_pages_users">User</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <select class="form-select" id="lang" name="lang" aria-label="Language code">
+                        <option value="All" {% if current_lang == 'All' %}selected{% endif %}>All</option>
+                        {% for lang in languages %}
+                        <option value="{{ lang.code }}" {% if current_lang == lang.code %}selected{% endif %}>({{ lang.code }}) {{ lang.autonym }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="d-none d-md-inline mb-3">
+            <span class="me-2">Toggle columns:</span>
+            <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="3" href="#">Campaign</a>
+            <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="8" href="#">Flags</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped" id="lastTable" style="font-size: 90%;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Title</th>
+                        <th>Campaign</th>
+                        <th>Translated</th>
+                        <th>Published</th>
+                        <th>Views</th>
+                        <th>Draft</th>
+                        <th>Flags</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            {% set display_user = row.user[:15] if row.user and row.user|length > 15 else row.user %}
+                            <a href="{{ url_for('admin.full_translators_dashboard') }}?user={{ row.user }}" data-bs-toggle="tooltip" title="{{ row.user }}">{{ display_user }}</a>
+                        </td>
+                        <td>
+                            <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}" target="_blank">{{ row.title }}</a>
+                        </td>
+                        <td>{{ row.campaign or row.cat }}</td>
+                        <td>
+                            <a href="/Translation_Dashboard/leaderboard.php?langcode={{ row.lang }}">{{ row.lang }}</a>:
+                            <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}" target="_blank">{{ row.target }}</a>
+                        </td>
+                        <td>{{ row.pupdate }}</td>
+                        <td>
+                            {% if last_table == 'pages' and row.views %}
+                            <a href="https://pageviews.wmcloud.org/?project={{ row.lang }}.wikipedia.org&platform=all-access&agent=all-agents&start={{ row.pupdate or '2019-01-01' }}&end={{ yesterday }}&redirects=0&pages={{ row.target | replace(' ', '_') | urlencode }}" target="_blank">{{ "{:,}".format(row.views) }}</a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.add_date %}
+                            <a href="//mdwikicx.toolforge.org/wiki/{{ row.lang }}/{{ row.title | replace(' ', '_') | urlencode }}" target="_blank">{{ row.add_date[:10] if 'T' in row.add_date else row.add_date }}</a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        let table = $('#lastTable').DataTable({
+            stateSave: true,
+            paging: false,
+            responsive: {
+                details: true
+            },
+            order: [[5, 'desc']], // Sort by Published date descending
+            columnDefs: [
+                { targets: [3, 8], visible: false } // Hide Campaign and Flags by default
+            ]
+        });
+
+        // Toggle column visibility
+        $('a.toggle-vis').on('click', function (e) {
+            e.preventDefault();
+
+            let columnIdx = $(this).attr('data-column');
+            let column = table.column(columnIdx);
+
+            // Toggle visibility and button style
+            column.visible(!column.visible());
+            $(this).toggleClass('btn-outline-primary btn-outline-secondary');
+        });
+
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}
