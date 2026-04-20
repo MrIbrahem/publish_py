@@ -42,9 +42,12 @@ class TestCsrfInitApp:
         # Create a test client
         client = app.test_client()
 
-        # Make a GET request to get a CSRF token
+        # Make a GET request to establish a request context and get a CSRF token
         # The app should now have CSRF protection enabled
-        with app.app_context():
+        with client.session_transaction():
+            pass  # Just establish a request context
+
+        with app.test_request_context():
             from flask_wtf.csrf import generate_csrf
 
             csrf_token = generate_csrf()
