@@ -11,7 +11,8 @@ from sqlalchemy import func, text
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....shared.models import _ReportRecord
+from ....shared.models import _CategoryRecord, _ReportRecord
+from ....public.models import _InProcessRecord, _LangRecord
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 
@@ -141,6 +142,124 @@ def publish_reports_stats() -> Response:
     except Exception:
         logger.exception("Error fetching publish_reports_stats")
         return jsonify({"error": "An internal error occurred while fetching stats"}), 500
+
+    response_data = {
+        "results": data,
+        "count": len(data),
+    }
+
+    return jsonify(response_data)
+
+
+@bp_api.route("/in_process", methods=["GET"])
+@check_cors
+def get_in_process() -> Response:
+    """
+    Handle in_process API requests.
+    Returns in-process translations with joined category and language data.
+
+    Query:
+        SELECT title, user, lang, cat, translate_type, word, add_date,
+               ca.campaign, la.autonym
+        FROM in_process
+        LEFT JOIN categories ca ON cat = ca.category
+        LEFT JOIN langs la ON lang = la.code
+
+    Returns:
+        JSON response with in-process records
+    """
+    try:
+        with get_session() as session:
+            # Perform the JOIN query using SQLAlchemy
+            results = (
+                session.query(
+                    _InProcessRecord.id,
+                    _InProcessRecord.title,
+                    _InProcessRecord.user,
+                    _InProcessRecord.lang,
+                    _InProcessRecord.cat,
+                    _InProcessRecord.translate_type,
+                    _InProcessRecord.word,
+                    _InProcessRecord.add_date,
+                    _CategoryRecord.campaign.label("campaign"),
+                    _LangRecord.autonym.label("autonym"),
+                )
+                .outerjoin(_CategoryRecord, _InProcessRecord.cat == _CategoryRecord.category)
+                .outerjoin(_LangRecord, _InProcessRecord.lang == _LangRecord.code)
+                .order_by(_InProcessRecord.id.asc())
+                .all()
+            )
+
+            # Convert results to list of dicts
+            data: List[Dict[str, Any]] = [
+                {
+                    "id": row.id,
+                    "title": row.title,
+                    "user": row.user,
+                    "lang": row.lang,
+                    "cat": row.cat,
+                    "translate_type": row.translate_type,
+                    "word": row.word,
+                    "add_date": row.add_date.isoformat() if row.add_date else None,
+                    "campaign": row.campaign if row.campaign else row.cat,
+                    "autonym": row.autonym if row.autonym else row.lang,
+                }
+                for row in results
+            ]
+
+    except Exception:
+        logger.exception("Error fetching in_process data")
+        return jsonify({"error": "An internal error occurred while fetching in-process data"}), 500
+
+    response_data = {
+        "results": data,
+        "count": len(data),
+    }
+
+    return jsonify(response_data)
+
+
+@bp_api.route("/in_process_total", methods=["GET"])
+@check_cors
+def get_in_process_total() -> Response:
+    """
+    Handle in_process_total API requests.
+    Returns aggregated counts of in-process translations per user.
+
+    Query:
+        SELECT user, COUNT(*) as article_count
+        FROM in_process
+        GROUP BY user
+        ORDER BY article_count DESC
+
+    Returns:
+        JSON response with user counts
+    """
+    try:
+        with get_session() as session:
+            # Query counts grouped by user
+            results = (
+                session.query(
+                    _InProcessRecord.user,
+                    func.count(_InProcessRecord.id).label("article_count"),
+                )
+                .group_by(_InProcessRecord.user)
+                .order_by(func.count(_InProcessRecord.id).desc())
+                .all()
+            )
+
+            # Convert results to list of dicts
+            data: List[Dict[str, Any]] = [
+                {
+                    "user": row.user,
+                    "article_count": row.article_count,
+                }
+                for row in results
+            ]
+
+    except Exception:
+        logger.exception("Error fetching in_process_total data")
+        return jsonify({"error": "An internal error occurred while fetching in-process total data"}), 500
 
     response_data = {
         "results": data,
