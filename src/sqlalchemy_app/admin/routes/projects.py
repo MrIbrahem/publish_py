@@ -61,10 +61,11 @@ def _add_project() -> ResponseReturnValue:
     return redirect(url_for("admin.projects_dashboard"))
 
 
-def _update_project(record_id: int) -> ResponseReturnValue:
+def _update_project(record_id: int, g_title: str | None = None) -> ResponseReturnValue:
     """Update an existing project record."""
 
-    g_title = request.form.get("g_title")
+    if g_title is None:
+        g_title = request.form.get("g_title")
 
     try:
         record = update_project_title(record_id, g_title)
