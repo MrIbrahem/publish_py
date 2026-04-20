@@ -392,3 +392,24 @@ __all__ = [
     "_ViewsNewAllRecord",
     "_WordRecord",
 ]
+
+
+# -----------------------------------------------------------------------------
+# Create views_new_all view automatically when tables are created
+# -----------------------------------------------------------------------------
+
+
+@event.listens_for(BaseDb.metadata, "after_create")
+def create_views_new_all_view(target, connection, **kw):
+    """Create the views_new_all view after tables are created."""
+    connection.execute(text("""
+        CREATE OR REPLACE VIEW views_new_all AS
+        SELECT v.target AS target,
+               v.lang AS lang,
+               SUM(v.views) AS views
+        FROM views_new v
+        GROUP BY v.target, v.lang
+    """))
+
+
+س
