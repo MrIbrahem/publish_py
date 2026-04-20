@@ -410,6 +410,3 @@ def create_views_new_all_view(target, connection, **kw):
         FROM views_new v
         GROUP BY v.target, v.lang
     """))
-
-
-س
