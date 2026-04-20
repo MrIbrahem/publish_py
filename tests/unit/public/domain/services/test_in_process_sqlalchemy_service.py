@@ -59,19 +59,6 @@ def test_in_process_workflow():
     assert get_in_process(ip_new.id) is None
 
 
-class TestGetInProcessDb:
-    """Tests for get_in_process_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new InProcessDB is created when none cached."""
-
-
 class TestListInProcess:
     """Tests for list_in_process function."""
 

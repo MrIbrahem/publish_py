@@ -45,19 +45,6 @@ def test_lang_workflow():
     assert get_lang(l.lang_id) is None
 
 
-class TestGetLangsDb:
-    """Tests for get_langs_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new LangsDB is created when none cached."""
-
-
 class TestListLangs:
     """Tests for list_langs function."""
 

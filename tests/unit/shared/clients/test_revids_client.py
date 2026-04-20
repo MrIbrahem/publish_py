@@ -24,7 +24,7 @@ class TestGetRevid:
             assert result == ""
 
 
-class TestGetRevidDb:
+class TestGetRevidDbU:
     """Tests for get_revid_db function."""
 
     def test_returns_empty_string_on_error(self):

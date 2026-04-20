@@ -60,19 +60,6 @@ def test_translate_type_workflow():
     assert get_translate_type(tt.tt_id) is None
 
 
-class TestGetTranslateTypeDb:
-    """Tests for get_translate_type_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new TranslateTypeDB is created when none cached."""
-
-
 class TestListTranslateTypes:
     """Tests for list_translate_types function."""
 

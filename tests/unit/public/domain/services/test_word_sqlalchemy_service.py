@@ -51,22 +51,6 @@ def test_word_workflow():
     assert get_word(w.w_id) is None
 
 
-class TestGetWordsDb:
-    """Tests for get_words_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new WordsDB is created when none cached."""
-
-    def test_caches_instance_after_first_creation(self, monkeypatch):
-        """Test that created instance is cached for reuse."""
-
-
 class TestListWords:
     """Tests for list_words function."""
 

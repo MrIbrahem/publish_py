@@ -46,16 +46,6 @@ def test_language_setting_workflow():
     assert get_language_setting(ls.id) is None
 
 
-class TestGetLanguageSettingsDb:
-    """Tests for get_language_settings_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that the same instance is returned on multiple calls."""
-
-    def test_raises_error_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when database config is missing."""
-
-
 class TestListLanguageSettings:
     """Tests for list_language_settings function."""
 

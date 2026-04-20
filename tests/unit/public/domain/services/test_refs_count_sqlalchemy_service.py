@@ -51,19 +51,6 @@ def test_refs_count_workflow():
     assert get_refs_count(r.r_id) is None
 
 
-class TestGetRefsCountsDb:
-    """Tests for get_refs_counts_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new RefsCountsDB is created when none cached."""
-
-
 class TestListRefsCounts:
     """Tests for list_refs_counts function."""
 

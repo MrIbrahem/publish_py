@@ -44,19 +44,6 @@ def test_project_workflow():
     assert get_project(p.g_id) is None
 
 
-class TestGetProjectsDb:
-    """Tests for get_projects_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new ProjectsDB is created when none cached."""
-
-
 class TestListProjects:
     """Tests for list_projects function."""
 

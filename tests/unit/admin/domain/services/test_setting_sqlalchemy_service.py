@@ -40,16 +40,6 @@ def test_setting_workflow():
     assert get_setting(s.id) is None
 
 
-class TestGetSettingsDb:
-    """Tests for get_settings_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that the same instance is returned on multiple calls."""
-
-    def test_raises_error_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when database config is missing."""
-
-
 class TestListSettings:
     """Tests for list_settings function."""
 

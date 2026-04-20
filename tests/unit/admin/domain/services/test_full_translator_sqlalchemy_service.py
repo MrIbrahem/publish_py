@@ -53,16 +53,6 @@ def test_full_translator_workflow():
     assert get_full_translator(ft.id) is None
 
 
-class TestGetFullTranslatorsDb:
-    """Tests for get_full_translators_db function."""
-
-    def test_returns_cached_instance_on_subsequent_calls(self, monkeypatch):
-        """Test that the same instance is returned on multiple calls."""
-
-    def test_raises_error_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when database config is missing."""
-
-
 class TestListFullTranslators:
     """Tests for list_full_translators function."""
 

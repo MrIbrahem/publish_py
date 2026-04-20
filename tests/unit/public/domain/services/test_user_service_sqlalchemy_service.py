@@ -36,19 +36,6 @@ def test_user_workflow():
     assert get_user(u.user_id) is None
 
 
-class TestGetUsersDb:
-    """Tests for get_users_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new UsersDB is created when none cached."""
-
-
 class TestListUsers:
     """Tests for list_users function."""
 

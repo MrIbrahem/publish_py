@@ -45,19 +45,6 @@ def test_mdwiki_revid_workflow():
     assert get_mdwiki_revid_by_title("test_page") is None
 
 
-class TestGetMdwikiRevidsDb:
-    """Tests for get_mdwiki_revids_db function."""
-
-    def test_returns_cached_instance(self, monkeypatch):
-        """Test that singleton pattern returns same instance."""
-
-    def test_raises_when_no_db_config(self, monkeypatch):
-        """Test that RuntimeError is raised when DB config is missing."""
-
-    def test_creates_new_instance_when_cached_is_none(self, monkeypatch):
-        """Test that new MdwikiRevidsDB is created when none cached."""
-
-
 class TestListMdwikiRevids:
     """Tests for list_mdwiki_revids function."""
 
