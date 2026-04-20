@@ -16,22 +16,47 @@ from src.sqlalchemy_app.shared.services.page_service import (
 
 
 def test_page_workflow():
-    p = add_page("COVID-19 pandemic", "COVID-19_pandemic.html")
+    p = add_page(
+        sourcetitle="COVID-19 pandemic",
+        tr_type="lead",
+        cat="History",
+        lang="fr",
+        user="Historian",
+        target="COVID-19_pandemic.html",
+        mdwiki_revid=4444,
+        word=52,
+    )
     assert p.title == "COVID-19 pandemic"
+
     assert any(x.title == "COVID-19 pandemic" for x in list_pages())
+
     updated = update_page(p.id, "COVID-19", "COVID-19.html")
     assert updated.title == "COVID-19"
+
     p2 = add_or_update_page("COVID-19", "Coronavirus_disease_2019.html")
     assert p2.target == "Coronavirus_disease_2019.html"
+
     with get_session() as session:
         orm_p = session.query(_PageRecord).filter(_PageRecord.id == p.id).first()
         orm_p.lang = "en"
         orm_p.user = "WikiUser"
         orm_p.target = ""
         session.commit()
+
     assert find_exists_or_update_page("COVID-19", "en", "WikiUser", "Pandemic_target.html") is True
-    success = insert_page_target("Black Death", "lead", "History", "fr", "Historian", "Peste_noire.html", word=5000)
+
+    success = insert_page_target(
+        sourcetitle="Black Death",
+        tr_type="lead",
+        cat="History",
+        lang="fr",
+        user="Historian",
+        target="Peste_noire.html",
+        mdwiki_revid=525252,
+        word=5000,
+    )
     assert success is True
+
     delete_page(p.id)
     assert not any(x.id == p.id for x in list_pages())
 

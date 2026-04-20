@@ -15,24 +15,49 @@ from src.sqlalchemy_app.shared.services.user_page_service import (
 )
 
 
-def test_user_page_workflow():
-    p = add_user_page("Influenza", "Influenza.html")
+def test_user_page_workflow() -> None:
+    p = add_user_page(
+        sourcetitle="Influenza",
+        tr_type="lead",
+        cat="History",
+        lang="de",
+        user="user1",
+        target="Influenza.html",
+        mdwiki_revid=5875,
+        word=45,
+    )
     assert p.title == "Influenza"
+
     assert any(x.title == "Influenza" for x in list_user_pages())
     updated = update_user_page(p.id, "Flu", "Flu.html")
     assert updated.title == "Flu"
+
     p2 = add_or_update_user_page("Flu", "Gripe.html")
     assert p2.target == "Gripe.html"
+
     with get_session() as session:
         orm_p = session.query(_UserPageRecord).filter(_UserPageRecord.id == p.id).first()
         orm_p.lang = "es"
         orm_p.user = "Spanish_Editor"
         orm_p.target = ""
         session.commit()
+
     assert find_exists_or_update_user_page("Flu", "es", "Spanish_Editor", "Gripe_target.html") is True
-    success = insert_user_page_target("Malaria", "lead", "Medicine", "fr", "French_Wiki", "Paludisme.html", word=3000)
+
+    success = insert_user_page_target(
+        sourcetitle="Malaria",
+        tr_type="lead",
+        cat="Medicine",
+        lang="fr",
+        user="French_Wiki",
+        target="Paludisme.html",
+        mdwiki_revid=220,
+        word=3000,
+    )
+
     assert success is True
     delete_user_page(p.id)
+
     assert not any(x.id == p.id for x in list_user_pages())
 
 

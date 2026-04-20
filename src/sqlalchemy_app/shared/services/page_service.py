@@ -24,23 +24,60 @@ def list_pages() -> List[PageRecord]:
         return [PageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
-def add_page(title: str, main_file: str) -> PageRecord:
-    """Add a page."""
-    title = title.strip()
-    if not title:
-        raise ValueError("Title is required")
-
+def insert_page_target(
+    sourcetitle: str,
+    tr_type: str,
+    cat: str,
+    lang: str,
+    user: str,
+    target: str,
+    mdwiki_revid: int | None = None,
+    word: int = 0,
+) -> bool:
+    """Insert a page target record."""
     with get_session() as session:
-        orm_obj = _PageRecord(title=title, target=main_file)
+        orm_obj = _PageRecord(
+            title=sourcetitle,
+            word=word,
+            translate_type=tr_type,
+            cat=cat,
+            lang=lang,
+            user=user,
+            pupdate=func.current_date(),
+            target=target,
+            mdwiki_revid=mdwiki_revid,
+        )
         session.add(orm_obj)
         try:
             session.commit()
-        except IntegrityError:
+            return True
+        except Exception as e:
+            logger.error(f"Failed to insert page target: {e}")
             session.rollback()
-            raise ValueError(f"Page '{title}' already exists") from None
+            return False
 
-        session.refresh(orm_obj)
-        return PageRecord(**orm_obj.to_dict())
+
+def add_page(
+    sourcetitle: str,
+    tr_type: str,
+    cat: str,
+    lang: str,
+    user: str,
+    target: str,
+    mdwiki_revid: int | None = None,
+    word: int = 0,
+) -> PageRecord:
+    """Add a page."""
+    return insert_page_target(
+        sourcetitle,
+        tr_type,
+        cat,
+        lang,
+        user,
+        target,
+        mdwiki_revid,
+        word,
+    )
 
 
 def add_or_update_page(title: str, main_file: str) -> PageRecord:
@@ -126,39 +163,6 @@ def find_exists_or_update_page(
                     session.rollback()
 
         return len(orm_objs) > 0
-
-
-def insert_page_target(
-    sourcetitle: str,
-    tr_type: str,
-    cat: str,
-    lang: str,
-    user: str,
-    target: str,
-    mdwiki_revid: int | None = None,
-    word: int = 0,
-) -> bool:
-    """Insert a page target record."""
-    with get_session() as session:
-        orm_obj = _PageRecord(
-            title=sourcetitle,
-            word=word,
-            translate_type=tr_type,
-            cat=cat,
-            lang=lang,
-            user=user,
-            pupdate=func.current_date(),
-            target=target,
-            mdwiki_revid=mdwiki_revid,
-        )
-        session.add(orm_obj)
-        try:
-            session.commit()
-            return True
-        except Exception as e:
-            logger.error(f"Failed to insert page target: {e}")
-            session.rollback()
-            return False
 
 
 __all__ = [
