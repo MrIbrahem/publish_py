@@ -8,7 +8,7 @@ Endpoints:
 import logging
 from typing import Any, Dict, List
 
-from flask import Response, jsonify
+from flask import Response, jsonify, request
 from sqlalchemy import Integer, case, cast, func
 
 from ....shared.core.cors import check_cors
@@ -56,6 +56,7 @@ def get_top_langs() -> Response:
     Returns:
         JSON response with language statistics
     """
+    limit = request.args.get("limit", 50)
     try:
         with get_session() as session:
             # Build the word count expression
@@ -77,7 +78,7 @@ def get_top_langs() -> Response:
             )
 
             # Query with joins
-            results = (
+            query = (
                 session.query(
                     _PageRecord.lang,
                     _LangRecord.name.label("lang_name"),
@@ -98,9 +99,15 @@ def get_top_langs() -> Response:
                 .filter(_PageRecord.user.is_not(None))
                 .filter(_PageRecord.lang != "")
                 .filter(_PageRecord.lang.is_not(None))
+            )
+
+            if limit:
+                query = query.filter(limit=limit)
+
+            results = (
+                query
                 .group_by(_PageRecord.lang, _LangRecord.name)
-                .order_by(func.count(_PageRecord.target).desc())
-                .all()
+                .order_by(func.count(_PageRecord.target).desc()).all()
             )
 
             # Convert results to list of dicts
@@ -162,6 +169,8 @@ def get_top_users() -> Response:
     Returns:
         JSON response with user statistics
     """
+
+    limit = request.args.get("limit", 50)
     try:
         with get_session() as session:
             # Build the word count expression
@@ -183,7 +192,7 @@ def get_top_users() -> Response:
             )
 
             # Query with joins
-            results = (
+            query = (
                 session.query(
                     _PageRecord.user,
                     func.count(_PageRecord.target).label("targets"),
@@ -202,10 +211,17 @@ def get_top_users() -> Response:
                 .filter(_PageRecord.user.is_not(None))
                 .filter(_PageRecord.lang != "")
                 .filter(_PageRecord.lang.is_not(None))
-                .group_by(_PageRecord.user)
-                .order_by(func.count(_PageRecord.target).desc())
-                .all()
             )
+
+            if limit:
+                query = query.filter(limit=limit)
+
+            results = (
+                query
+                .group_by(_PageRecord.user)
+                .order_by(func.count(_PageRecord.target).desc()).all()
+            )
+            results = query.order_by(func.count(_PageRecord.target).desc()).all()
 
             # Convert results to list of dicts
             data: List[Dict[str, Any]] = [
