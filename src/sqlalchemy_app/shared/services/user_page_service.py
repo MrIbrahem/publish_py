@@ -95,15 +95,15 @@ def insert_user_page_target(
 def update_user_page(
     page_id: int,
     title: str,
-    translate_type: str,
-    cat: str,
-    lang: str,
-    user: str,
     target: str,
+    translate_type: str | None = None,
+    cat: str | None = None,
+    lang: str | None = None,
+    user: str | None = None,
     mdwiki_revid: int | None = None,
-    word: int = 0,
-    add_date: str = None,
-    deleted: int = 0,
+    word: int | None = None,
+    add_date: str | None = None,
+    deleted: int | None = None,
 ) -> UserPageRecord:
     """Update page."""
     with get_session() as session:
@@ -112,15 +112,23 @@ def update_user_page(
             raise LookupError(f"Page id {page_id} was not found")
 
         orm_obj.title = title
-        orm_obj.translate_type = translate_type
-        orm_obj.cat = cat
-        orm_obj.lang = lang
-        orm_obj.user = user
         orm_obj.target = target
-        orm_obj.mdwiki_revid = mdwiki_revid
-        orm_obj.word = word
-        orm_obj.add_date = add_date
-        orm_obj.deleted = deleted
+        if translate_type is not None:
+            orm_obj.translate_type = translate_type
+        if cat is not None:
+            orm_obj.cat = cat
+        if lang is not None:
+            orm_obj.lang = lang
+        if user is not None:
+            orm_obj.user = user
+        if mdwiki_revid is not None:
+            orm_obj.mdwiki_revid = mdwiki_revid
+        if word is not None:
+            orm_obj.word = word
+        if add_date is not None:
+            orm_obj.add_date = add_date
+        if deleted is not None:
+            orm_obj.deleted = deleted
 
         session.commit()
         session.refresh(orm_obj)

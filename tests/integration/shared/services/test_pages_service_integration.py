@@ -33,18 +33,18 @@ class TestPagesServiceIntegration:
 
     def test_full_page_lifecycle(self):
         """Test complete CRUD lifecycle through service layer."""
-        result = add_page("TestPage", "TestFile")
+        result = add_page("TestPage", "lead", "Test", "en", "TestUser", "TestFile")
         assert result.title == "TestPage"
 
         pages = list_pages()
         assert len(pages) == 1
         assert pages[0].title == "TestPage"
 
-        result = update_page(1, "UpdatedPage", "UpdatedFile")
+        result = update_page(result.id, "UpdatedPage", "UpdatedFile")
         assert result.title == "UpdatedPage"
 
-        result = delete_page(1)
-        assert result.id == 1
+        result = delete_page(result.id)
+        assert result.title == "UpdatedPage"
 
     def test_find_exists_or_update_integration(self):
         """Test find_exists_or_update_page through service layer."""
