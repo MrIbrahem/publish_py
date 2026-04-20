@@ -155,6 +155,7 @@ def create_side(active_route):
                 href="projects",
                 title="Projects",
                 icon="bi-kanban",
+                ready=True,
             ),
             SidebarItem(
                 id="Campaigns",
