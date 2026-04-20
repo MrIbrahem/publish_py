@@ -95,7 +95,7 @@ class _InProcessRecord(BaseDb):
             "cat": self.cat,
             "translate_type": self.translate_type,
             "word": self.word,
-            "add_date": str(self.add_date),
+            "add_date": str(self.add_date) if self.add_date else self.add_date,
         }
 
 
