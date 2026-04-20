@@ -9,8 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
+from .....db_models.public_models import RefsCountRecord
 from ....shared.domain.engine import get_session
-from ...domain_models import RefsCountRecord
 from ..models import _RefsCountRecord
 
 logger = logging.getLogger(__name__)
