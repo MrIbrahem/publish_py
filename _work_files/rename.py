@@ -4,16 +4,14 @@ from pathlib import Path
 
 
 def rename_test_files_recursive(root_dir):
-    root_dir = 'tests'
+    root_dir = "tests"
 
     # Matches files like test_v1_sqlalchemy_service.py
-    file_pattern = re.compile(r'test_.*?_sqlalchemy_service\.py')
+    file_pattern = re.compile(r"test_.*?_sqlalchemy_service\.py")
 
     # Matches the import line and captures the service name in Group 1
     # Note: (?:...) is a non-capturing group for the module path
-    import_pattern = re.compile(
-        r'from src\.sqlalchemy_app\.(?:admin|public|shared)\.services\.(.*?) import \('
-    )
+    import_pattern = re.compile(r"from src\.sqlalchemy_app\.(?:admin|public|shared)\.services\.(.*?) import \(")
 
     if not os.path.exists(root_dir):
         print(f"Directory '{root_dir}' not found.")
@@ -26,7 +24,7 @@ def rename_test_files_recursive(root_dir):
                 file_path = os.path.join(dirpath, filename)
 
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         content = f.read()
 
                     match = import_pattern.search(content)
