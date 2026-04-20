@@ -92,7 +92,19 @@ def insert_page_target(
         return False
 
 
-def update_page(page_id: int, title: str, main_file: str) -> PageRecord:
+def update_page(
+    page_id: int,
+    title: str,
+    translate_type: str,
+    cat: str,
+    lang: str,
+    user: str,
+    target: str,
+    mdwiki_revid: int | None = None,
+    word: int = 0,
+    add_date: str = None,
+    deleted: int = 0,
+) -> PageRecord:
     """Update page."""
     with get_session() as session:
         orm_obj = session.query(_PageRecord).filter(_PageRecord.id == page_id).first()
@@ -100,7 +112,15 @@ def update_page(page_id: int, title: str, main_file: str) -> PageRecord:
             raise LookupError(f"Page id {page_id} was not found")
 
         orm_obj.title = title
-        orm_obj.target = main_file
+        orm_obj.translate_type = translate_type
+        orm_obj.cat = cat
+        orm_obj.lang = lang
+        orm_obj.user = user
+        orm_obj.target = target
+        orm_obj.mdwiki_revid = mdwiki_revid
+        orm_obj.word = word
+        orm_obj.add_date = add_date
+        orm_obj.deleted = deleted
 
         session.commit()
         session.refresh(orm_obj)
