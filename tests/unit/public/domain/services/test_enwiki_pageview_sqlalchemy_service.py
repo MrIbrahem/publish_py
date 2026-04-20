@@ -13,20 +13,6 @@ from src.sqlalchemy_app.public.domain.services.enwiki_pageview_service import (
     update_enwiki_pageview,
 )
 from src.sqlalchemy_app.public.domain_models import EnwikiPageviewRecord
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        from sqlalchemy.orm import sessionmaker
-
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
 
 
 def test_enwiki_pageview_workflow():

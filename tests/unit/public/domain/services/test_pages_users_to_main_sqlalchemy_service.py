@@ -10,7 +10,6 @@ from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service impor
     update_pages_users_to_main,
 )
 from src.sqlalchemy_app.public.domain_models import PagesUsersToMainRecord
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
 @pytest.fixture(autouse=True)
