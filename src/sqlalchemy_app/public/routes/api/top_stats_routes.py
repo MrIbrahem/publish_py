@@ -221,7 +221,6 @@ def get_top_users() -> Response:
                 .group_by(_PageRecord.user)
                 .order_by(func.count(_PageRecord.target).desc()).all()
             )
-            results = query.order_by(func.count(_PageRecord.target).desc()).all()
 
             # Convert results to list of dicts
             data: List[Dict[str, Any]] = [
