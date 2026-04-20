@@ -34,19 +34,6 @@ from src.sqlalchemy_app.shared.domain.services.user_token_service import (
 )
 
 
-@pytest.fixture(autouse=True)
-def setup_db():
-    """Initialize an in-memory SQLite database for tests."""
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
-
-
 class TestUserServiceIntegration:
     """Integration tests for user token service."""
 
