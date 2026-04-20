@@ -22,8 +22,6 @@ from ..decorators import admin_required
 from ..sidebar import create_side
 from .coordinators import Coordinators
 from .full_translators import FullTranslators
-from .in_process import InProcess
-from .in_process_total import InProcessTotal
 from .language_settings import LanguageSettings
 from .settings import SettingsRoutes
 from .users_no_inprocess import UsersNoInprocess
@@ -56,11 +54,24 @@ def reports():
     return render_template("admins/reports.html")
 
 
+@bp_admin.get("/process")
+@admin_required
+def in_process_dashboard():
+    return render_template("admins/in_process.html")
+
+
+@bp_admin.get("/process_total")
+@admin_required
+def in_process_total_dashboard():
+    """Render the in-process totals dashboard."""
+    return render_template(
+        "admins/in_process_total.html",
+    )
+
+
 def register_blueprints(bp_admin) -> None:
     Coordinators(bp_admin)
     FullTranslators(bp_admin)
-    InProcess(bp_admin)
-    InProcessTotal(bp_admin)
     UsersNoInprocess(bp_admin)
     LanguageSettings(bp_admin)
     # Templates(bp_admin)
