@@ -153,6 +153,21 @@ def create_views_new_all_view(target, connection, **kw):
     else:
         print("View 'views_new_all' already exists, skipping creation.")
 
+    if "users_list" not in existing_views:
+        connection.execute(text("""
+            CREATE VIEW users_list AS
+                select
+                    u.user_id AS user_id,
+                    u.username AS username,
+                    u.wiki AS wiki,
+                    u.user_group AS user_group,
+                    u.reg_date AS reg_date
+                from
+                    users u
+        """))
+    else:
+        print("View 'users_list' already exists, skipping creation.")
+
 
 __all__ = [
     # Model

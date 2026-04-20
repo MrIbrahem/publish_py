@@ -7,12 +7,12 @@ import logging
 from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
-from sqlalchemy import func, text
+from sqlalchemy import case, cast, func, text, Integer
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....shared.models import _CategoryRecord, _ReportRecord
-from ....public.models import _InProcessRecord, _LangRecord
+from ....shared.models import _CategoryRecord, _PageRecord, _ReportRecord
+from ....public.models import _InProcessRecord, _LangRecord, _ViewsNewAllRecord, _WordRecord
 from .pages_query_service import list_pages_users, list_pages_with_views
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
