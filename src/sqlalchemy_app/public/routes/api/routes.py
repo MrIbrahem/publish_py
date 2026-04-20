@@ -9,6 +9,8 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
+from ....shared.services.category_service import list_categories
+
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.models import _CategoryRecord, _ReportRecord
@@ -337,9 +339,29 @@ def get_pages_with_views() -> Response:
     return jsonify(response_data)
 
 
+@bp_api.route("/categories", methods=["GET"])
+@check_cors
+def list_categories_views() -> Response:
+    """
+    Handle pages_with_views API requests.
+    """
+    try:
+        data = list_categories()
+    except Exception:
+        logger.exception("Error fetching pages_with_views data")
+        return jsonify({"error": "An internal error occurred while fetching pages_with_views data"}), 500
+
+    data = [x.to_dict() for x in data]
+    response_data = {
+        "results": data,
+        "count": len(data),
+    }
+
+    return jsonify(response_data)
+
+
 # Register top_stats routes
 bp_api.route("/top_langs", methods=["GET"])(get_top_langs)
 bp_api.route("/top_users", methods=["GET"])(get_top_users)
-
 
 __all__ = ["bp_api"]

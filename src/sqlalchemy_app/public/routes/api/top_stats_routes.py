@@ -98,7 +98,7 @@ def get_top_langs() -> Response:
                 .filter(_PageRecord.user.is_not(None))
                 .filter(_PageRecord.lang != "")
                 .filter(_PageRecord.lang.is_not(None))
-                .group_by(_PageRecord.lang)
+                .group_by(_PageRecord.lang, _LangRecord.name)
                 .order_by(func.count(_PageRecord.target).desc())
                 .all()
             )
