@@ -40,7 +40,25 @@ def _projects_dashboard():
 
 def _add_project() -> ResponseReturnValue:
     """Create a new project record."""
-    ...
+    g_title = request.form.get("g_title", "").strip()
+    if not g_title:
+        flash("Title is required.", "danger")
+        return redirect(url_for("admin.projects_dashboard"))
+
+    try:
+        add_project(
+            g_title=g_title,
+        )
+    except ValueError as exc:
+        logger.warning(f"Unable to add project: {exc}")
+        flash(str(exc), "warning")
+    except Exception:
+        logger.exception("Unable to add project.")
+        flash("Unable to add project. Please try again.", "danger")
+    else:
+        flash(f"project for '{g_title}' added.", "success")
+
+    return redirect(url_for("admin.projects_dashboard"))
 
 
 def _update_project(record_id: int) -> ResponseReturnValue:
@@ -91,12 +109,12 @@ class ProjectsDashboard:
         def add_project_record() -> ResponseReturnValue:
             return _add_project()
 
-        @bp_admin.post("/projects/<int:record_id>/update")
-        @admin_required
-        def update_project_route(record_id: int) -> ResponseReturnValue:
-            return _update_project(record_id)
-
         @bp_admin.post("/projects/<int:record_id>/delete")
         @admin_required
         def delete_project_route(record_id: int) -> ResponseReturnValue:
             return _delete_project(record_id)
+
+        @bp_admin.post("/projects/update")
+        @admin_required
+        def projects_update():
+            logger.warning(request.form)
