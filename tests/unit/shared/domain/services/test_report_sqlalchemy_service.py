@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.shared_models import ReportRecord
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 from src.sqlalchemy_app.shared.domain.models import _ReportRecord
 from src.sqlalchemy_app.shared.domain.services.report_service import (
     add_report,
@@ -10,19 +9,6 @@ from src.sqlalchemy_app.shared.domain.services.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        from sqlalchemy.orm import sessionmaker
-
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
 
 
 def test_report_workflow():

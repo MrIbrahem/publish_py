@@ -12,20 +12,6 @@ from src.sqlalchemy_app.public.domain.services.project_service import (
     list_projects,
     update_project,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        from sqlalchemy.orm import sessionmaker
-
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
 
 
 def test_project_workflow():
@@ -56,7 +42,6 @@ def test_project_workflow():
     # Test delete
     delete_project(p.g_id)
     assert get_project(p.g_id) is None
-
 
 
 class TestGetProjectsDb:

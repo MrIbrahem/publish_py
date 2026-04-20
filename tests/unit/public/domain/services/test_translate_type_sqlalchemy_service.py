@@ -16,20 +16,6 @@ from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     list_translate_types,
     update_translate_type,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        from sqlalchemy.orm import sessionmaker
-
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
 
 
 def test_translate_type_workflow():

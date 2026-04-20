@@ -16,15 +16,6 @@ These tests verify:
 The actual DB operations are mocked to avoid requiring a real database.
 """
 
-from unittest.mock import MagicMock, patch
-
-import pytest
-from sqlalchemy.orm import sessionmaker
-from src.sqlalchemy_app.shared.domain.engine import (
-    BaseDb,
-    build_engine,
-    init_db,
-)
 from src.sqlalchemy_app.shared.domain.services.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,
@@ -32,19 +23,6 @@ from src.sqlalchemy_app.shared.domain.services.user_token_service import (
     get_user_token_by_username,
     upsert_user_token,
 )
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    """Initialize an in-memory SQLite database for tests."""
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
 
 
 class TestUserServiceIntegration:

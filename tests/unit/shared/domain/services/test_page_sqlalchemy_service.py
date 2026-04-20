@@ -15,19 +15,6 @@ from src.sqlalchemy_app.shared.domain.services.page_service import (
 )
 
 
-@pytest.fixture(autouse=True)
-def setup_db():
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        from sqlalchemy.orm import sessionmaker
-
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
-
-
 def test_page_workflow():
     p = add_page("test_page", "target_file")
     assert p.title == "test_page"

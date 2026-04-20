@@ -13,20 +13,6 @@ from src.sqlalchemy_app.public.domain.services.refs_count_service import (
     list_refs_counts,
     update_refs_count,
 )
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
-    BaseDb.metadata.create_all(engine)
-    with patch("src.sqlalchemy_app.shared.domain.engine._SessionFactory") as mock_session_factory:
-        from sqlalchemy.orm import sessionmaker
-
-        Session = sessionmaker(bind=engine)
-        mock_session_factory.return_value = Session()
-        yield
 
 
 def test_refs_count_workflow():
@@ -63,6 +49,7 @@ def test_refs_count_workflow():
     # Test delete
     delete_refs_count(r.r_id)
     assert get_refs_count(r.r_id) is None
+
 
 class TestGetRefsCountsDb:
     """Tests for get_refs_counts_db function."""
