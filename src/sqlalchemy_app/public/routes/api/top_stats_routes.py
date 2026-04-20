@@ -99,16 +99,14 @@ def get_top_langs() -> Response:
                 .filter(_PageRecord.user.is_not(None))
                 .filter(_PageRecord.lang != "")
                 .filter(_PageRecord.lang.is_not(None))
+                .group_by(_PageRecord.lang, _LangRecord.name)
+                .order_by(func.count(_PageRecord.target).desc())
             )
 
             if limit:
                 query = query.limit(int(limit))
 
-            results = (
-                query
-                .group_by(_PageRecord.lang, _LangRecord.name)
-                .order_by(func.count(_PageRecord.target).desc()).all()
-            )
+            results = query.all()
 
             # Convert results to list of dicts
             data: List[Dict[str, Any]] = [
@@ -211,16 +209,14 @@ def get_top_users() -> Response:
                 .filter(_PageRecord.user.is_not(None))
                 .filter(_PageRecord.lang != "")
                 .filter(_PageRecord.lang.is_not(None))
+                .group_by(_PageRecord.user)
+                .order_by(func.count(_PageRecord.target).desc())
             )
 
             if limit:
                 query = query.limit(int(limit))
 
-            results = (
-                query
-                .group_by(_PageRecord.user)
-                .order_by(func.count(_PageRecord.target).desc()).all()
-            )
+            results = query.all()
 
             # Convert results to list of dicts
             data: List[Dict[str, Any]] = [
