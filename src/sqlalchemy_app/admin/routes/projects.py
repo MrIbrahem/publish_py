@@ -116,5 +116,19 @@ class ProjectsDashboard:
 
         @bp_admin.post("/projects/update")
         @admin_required
-        def projects_update():
-            logger.warning(request.form)
+        def projects_update() -> ResponseReturnValue:
+            projects = request.form.getlist("projects[][g_id]")
+            titles = request.form.getlist("projects[][g_title]")
+            deletes = request.form.getlist("projects[][delete]")
+
+            for i, g_id in enumerate(projects):
+                record_id = int(g_id)
+                g_title = titles[i] if i < len(titles) else ""
+                is_deleted = str(record_id) in deletes
+
+                if is_deleted:
+                    _delete_project(record_id)
+                elif g_title:
+                    _update_project(record_id, g_title)
+
+            return redirect(url_for("admin.projects_dashboard"))
