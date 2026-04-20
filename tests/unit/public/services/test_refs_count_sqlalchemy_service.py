@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.public_models import RefsCountRecord
 from src.sqlalchemy_app.public.models import _RefsCountRecord
 from src.sqlalchemy_app.public.services.refs_count_service import (
     add_or_update_refs_count,
@@ -12,7 +13,6 @@ from src.sqlalchemy_app.public.services.refs_count_service import (
     list_refs_counts,
     update_refs_count,
 )
-from src.db_models.public_models import RefsCountRecord
 
 
 def test_refs_count_workflow():

@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.public_models import LangRecord
 from src.sqlalchemy_app.public.models import _LangRecord
 from src.sqlalchemy_app.public.services.lang_service import (
     add_lang,
@@ -11,7 +12,6 @@ from src.sqlalchemy_app.public.services.lang_service import (
     list_langs,
     update_lang,
 )
-from src.db_models.public_models import LangRecord
 
 
 def test_lang_workflow():
