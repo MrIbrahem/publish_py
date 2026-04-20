@@ -28,7 +28,7 @@ def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
         LIMIT 100
     """
     with get_session() as session:
-        results = (
+        query = (
             session.query(
                 _UserPageRecord,
                 _CategoryRecord.campaign.label("campaign"),
@@ -36,10 +36,12 @@ def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
             .outerjoin(_CategoryRecord, _UserPageRecord.cat == _CategoryRecord.category)
             .filter(_UserPageRecord.target != "")
             .filter(_UserPageRecord.target.is_not(None))
-            .order_by(_UserPageRecord.pupdate.desc())
-            .limit(limit)
-            .all()
         )
+
+        if lang and lang != "All":
+            query = query.filter(_UserPageRecord.lang == lang)
+
+        results = query.order_by(_UserPageRecord.pupdate.desc()).limit(limit).all()
 
         return [
             {
@@ -72,16 +74,18 @@ def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, An
             .scalar_subquery()
         )
 
-        results = (
+        query = (
             session.query(
                 _PageRecord,
                 views_subquery.label("views"),
             )
             .filter(_PageRecord.target != "")
-            .distinct()
-            .limit(limit)
-            .all()
         )
+
+        if lang and lang != "All":
+            query = query.filter(_PageRecord.lang == lang)
+
+        results = query.distinct().limit(limit).all()
 
         return [
             {
