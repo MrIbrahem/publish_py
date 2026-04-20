@@ -9,9 +9,9 @@ import time
 import pytest
 from src.sqlalchemy_app.public.routes.cxtoken.cache import (
     CxToken,
+    cache,
     get_from_store,
     store_jwt,
-    cache,
 )
 
 
