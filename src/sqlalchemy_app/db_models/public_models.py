@@ -220,6 +220,23 @@ class ViewsNewRecord:
 
 
 @dataclass
+class ViewsNewAllRecord:
+    """Representation of a views_new_all view record (aggregated views)."""
+
+    target: str
+    lang: str
+    views: int | None = 0
+
+    def to_dict(self) -> dict:
+        """Convert record to dictionary."""
+        return {
+            "target": self.target,
+            "lang": self.lang,
+            "views": self.views,
+        }
+
+
+@dataclass
 class WordRecord:
     """Representation of a words record."""
 
@@ -250,5 +267,6 @@ __all__ = [
     "TranslateTypeRecord",
     "UserRecord",
     "ViewsNewRecord",
+    "ViewsNewAllRecord",
     "WordRecord",
 ]
