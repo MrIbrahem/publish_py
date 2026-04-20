@@ -16,16 +16,8 @@ The actual DB operations are mocked to avoid requiring a real database.
 These tests complement the unit tests by verifying the service-to-DB integration.
 """
 
-from contextlib import contextmanager
 from unittest.mock import MagicMock, patch
 
-import pytest
-from sqlalchemy.orm import sessionmaker
-from src.sqlalchemy_app.shared.domain.engine import (
-    BaseDb,
-    build_engine,
-    init_db,
-)
 from src.sqlalchemy_app.shared.domain.services.page_service import (
     add_or_update_page,
     add_page,
