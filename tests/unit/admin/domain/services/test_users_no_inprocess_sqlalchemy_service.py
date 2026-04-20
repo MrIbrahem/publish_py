@@ -18,35 +18,35 @@ from src.sqlalchemy_app.admin.domain_models import UsersNoInprocessRecord
 
 def test_users_no_inprocess_workflow():
     # Test add
-    rec = add_users_no_inprocess("Doc_James", 1)
-    assert rec.user == "Doc_James"
+    rec = add_users_no_inprocess("User_1", 1)
+    assert rec.user == "User_1"
     assert rec.active == 1
 
     # Test get
     rec2 = get_users_no_inprocess(rec.id)
-    assert rec2.user == "Doc_James"
+    assert rec2.user == "User_1"
 
     # Test get by user
-    rec3 = get_users_no_inprocess_by_user("Doc_James")
+    rec3 = get_users_no_inprocess_by_user("User_1")
     assert rec3.id == rec.id
 
     # Test list
     all_rec = list_users_no_inprocess()
-    assert any(x.user == "Doc_James" for x in all_rec)
+    assert any(x.user == "User_1" for x in all_rec)
 
     # Test active
     active = list_active_users_no_inprocess()
-    assert any(x.user == "Doc_James" for x in active)
+    assert any(x.user == "User_1" for x in active)
 
     # Test update
     updated = update_users_no_inprocess(rec.id, active=0)
     assert updated.active == 0
-    assert should_hide_from_inprocess("Doc_James") is False
+    assert should_hide_from_inprocess("User_1") is False
 
     # Test add_or_update
-    rec4 = add_or_update_users_no_inprocess("Doc_James", 1)
+    rec4 = add_or_update_users_no_inprocess("User_1", 1)
     assert rec4.active == 1
-    assert should_hide_from_inprocess("Doc_James") is True
+    assert should_hide_from_inprocess("User_1") is True
 
     # Test delete
     delete_users_no_inprocess(rec.id)

@@ -20,43 +20,43 @@ from src.sqlalchemy_app.shared.domain.engine import init_db
 
 def test_coordinator_workflow():
     # Test add
-    c = add_coordinator("James_Heilman", 1)
-    assert c.username == "James_Heilman"
+    c = add_coordinator("Wiki_User", 1)
+    assert c.username == "Wiki_User"
     assert c.is_active == 1
     assert c.id is not None
 
     # Test get
     c2 = get_coordinator(c.id)
-    assert c2.username == "James_Heilman"
+    assert c2.username == "Wiki_User"
 
     # Test get by user
-    c3 = get_coordinator_by_user("James_Heilman")
+    c3 = get_coordinator_by_user("Wiki_User")
     assert c3.id == c.id
 
     # Test list
     all_c = list_coordinators()
     assert len(all_c) >= 1
-    assert any(x.username == "James_Heilman" for x in all_c)
+    assert any(x.username == "Wiki_User" for x in all_c)
 
     # Test active
     active_coordinators.cache_clear()
     active = active_coordinators()
-    assert "James_Heilman" in active
+    assert "Wiki_User" in active
 
     # Test update
     updated = update_coordinator(c.id, is_active=0)
     assert updated.is_active == 0
 
     active_coordinators.cache_clear()
-    assert "James_Heilman" not in active_coordinators()
+    assert "Wiki_User" not in active_coordinators()
 
     # Test is_coordinator
-    assert is_coordinator("James_Heilman") is False
+    assert is_coordinator("Wiki_User") is False
     set_coordinator_active(c.id, True)
-    assert is_coordinator("James_Heilman") is True
+    assert is_coordinator("Wiki_User") is True
 
     # Test add_or_update
-    c4 = add_or_update_coordinator("James_Heilman", 0)
+    c4 = add_or_update_coordinator("Wiki_User", 0)
     assert c4.is_active == 0
 
     # Test delete

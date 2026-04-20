@@ -17,16 +17,16 @@ from src.sqlalchemy_app.public.domain_models import UserRecord
 
 
 def test_user_workflow():
-    u = add_user("James_Heilman", "jh@example.com", "enwiki", "Editor")
-    assert u.username == "James_Heilman"
-    assert get_user(u.user_id).username == "James_Heilman"
-    assert get_user_by_username("James_Heilman").user_id == u.user_id
-    assert any(x.username == "James_Heilman" for x in list_users())
-    assert any(x.username == "James_Heilman" for x in list_users_by_group("Editor"))
+    u = add_user("Wiki_User", "jh@example.com", "enwiki", "Editor")
+    assert u.username == "Wiki_User"
+    assert get_user(u.user_id).username == "Wiki_User"
+    assert get_user_by_username("Wiki_User").user_id == u.user_id
+    assert any(x.username == "Wiki_User" for x in list_users())
+    assert any(x.username == "Wiki_User" for x in list_users_by_group("Editor"))
     updated = update_user(u.user_id, email="jh_new@example.com")
     assert updated.email == "jh_new@example.com"
-    assert user_exists("James_Heilman") is True
-    u4 = add_or_update_user("James_Heilman", email="jh_final@example.com")
+    assert user_exists("Wiki_User") is True
+    u4 = add_or_update_user("Wiki_User", email="jh_final@example.com")
     assert u4.email == "jh_final@example.com"
     delete_user(u.user_id)
     assert get_user(u.user_id) is None
