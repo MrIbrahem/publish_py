@@ -14,7 +14,7 @@ from ...models import _ViewsNewAllRecord
 logger = logging.getLogger(__name__)
 
 
-def list_pages_users(limit: int = 100) -> List[Dict[str, Any]]:
+def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
     """
     Return pages_users records with joined category campaign data.
 
@@ -50,7 +50,7 @@ def list_pages_users(limit: int = 100) -> List[Dict[str, Any]]:
         ]
 
 
-def list_pages_with_views() -> List[Dict[str, Any]]:
+def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
     """
     Return pages records with views from views_new_all.
 
@@ -79,6 +79,7 @@ def list_pages_with_views() -> List[Dict[str, Any]]:
             )
             .filter(_PageRecord.target != "")
             .distinct()
+            .limit(limit)
             .all()
         )
 

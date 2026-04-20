@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-from sqlalchemy import Column, Date, DateTime, Integer, MetaData, String, Table, func, text
+from sqlalchemy import Column, Date, DateTime, Integer, MetaData, String, Table, UniqueConstraint, func, text
 from sqlalchemy.orm import sessionmaker
 
 if sys:
@@ -187,6 +187,7 @@ def setup_db():
         Column("lang", String(30), nullable=False),
         Column("year", Integer, nullable=False),
         Column("views", Integer, nullable=True),
+        UniqueConstraint("target", "lang", "year", name="target_lang_year"),
     )
     views_new.create(engine)
 

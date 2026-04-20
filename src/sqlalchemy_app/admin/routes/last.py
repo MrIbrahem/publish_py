@@ -26,13 +26,9 @@ def _last_dashboard():
 
     # Fetch data based on table type
     if last_table == "pages":
-        rows = list_pages_with_views()
+        rows = list_pages_with_views(limit=100, lang=lang)
     else:
-        rows = list_pages_users(limit=100)
-
-    # Filter by language if specified
-    if lang and lang != "All":
-        rows = [row for row in rows if row.get("lang") == lang]
+        rows = list_pages_users(limit=100, lang=lang)
 
     # Get languages for dropdown
     languages = list_langs()

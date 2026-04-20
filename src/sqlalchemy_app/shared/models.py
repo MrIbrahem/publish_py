@@ -98,7 +98,7 @@ class _PageRecord(BaseDb):
             "target": self.target,
             "date": self.date,
             "pupdate": self.pupdate,
-            "add_date": self.add_date,
+            "add_date": str(self.add_date),
             "deleted": self.deleted,
             "mdwiki_revid": self.mdwiki_revid,
         }
@@ -129,7 +129,7 @@ class _QidRecord(BaseDb):
             "id": self.id,
             "qid": self.qid,
             "title": self.title,
-            "add_date": self.add_date,
+            "add_date": str(self.add_date),
         }
 
 
@@ -228,7 +228,7 @@ class _UserPageRecord(BaseDb):
             "target": self.target,
             "date": self.date,
             "pupdate": self.pupdate,
-            "add_date": self.add_date,
+            "add_date": str(self.add_date),
             "deleted": self.deleted,
             "mdwiki_revid": self.mdwiki_revid,
         }

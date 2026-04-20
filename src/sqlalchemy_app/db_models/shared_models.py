@@ -85,7 +85,7 @@ class PageRecord:
             "target": self.target,
             "date": self.date,
             "pupdate": self.pupdate,
-            "add_date": self.add_date,
+            "add_date": str(self.add_date),
             "deleted": self.deleted,
             "mdwiki_revid": self.mdwiki_revid,
         }
@@ -109,7 +109,7 @@ class QidRecord:
             "id": self.id,
             "qid": self.qid,
             "title": self.title,
-            "add_date": self.add_date,
+            "add_date": str(self.add_date),
         }
 
     def __post_init__(self) -> None:
@@ -190,7 +190,7 @@ class UserPageRecord:
             "target": self.target,
             "date": self.date,
             "pupdate": self.pupdate,
-            "add_date": self.add_date,
+            "add_date": str(self.add_date),
             "deleted": self.deleted,
             "mdwiki_revid": self.mdwiki_revid,
         }
