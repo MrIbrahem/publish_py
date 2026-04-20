@@ -320,6 +320,37 @@ class _ViewsNewRecord(BaseDb):
         }
 
 
+class _ViewsNewAllRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS views_new_all (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        target varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        lang varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+        views int DEFAULT '0',
+        PRIMARY KEY (id),
+        UNIQUE KEY target_lang (target, lang),
+        KEY target (target)
+    )
+    """
+
+    __tablename__ = "views_new_all"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    target = Column(String(120), nullable=False)
+    lang = Column(String(30), nullable=False)
+    views = Column(Integer, default=0, server_default=text("0"))
+
+    __table_args__ = (UniqueConstraint("target", "lang", name="target_lang"),)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "target": self.target,
+            "lang": self.lang,
+            "views": self.views,
+        }
+
+
 class _WordRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS words (
@@ -360,5 +391,6 @@ __all__ = [
     "_TranslateTypeRecord",
     "_UserRecord",
     "_ViewsNewRecord",
+    "_ViewsNewAllRecord",
     "_WordRecord",
 ]

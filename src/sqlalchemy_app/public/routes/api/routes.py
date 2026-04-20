@@ -11,8 +11,8 @@ from sqlalchemy import func, text
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....shared.models import _CategoryRecord, _ReportRecord
-from ....public.models import _InProcessRecord, _LangRecord
+from ....shared.models import _CategoryRecord, _ReportRecord, _UserPageRecord, _PageRecord
+from ....public.models import _InProcessRecord, _LangRecord, _ViewsNewAllRecord
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 
@@ -260,6 +260,170 @@ def get_in_process_total() -> Response:
     except Exception:
         logger.exception("Error fetching in_process_total data")
         return jsonify({"error": "An internal error occurred while fetching in-process total data"}), 500
+
+    response_data = {
+        "results": data,
+        "count": len(data),
+    }
+
+    return jsonify(response_data)
+
+
+@bp_api.route("/pages_users", methods=["GET"])
+@check_cors
+def get_pages_users() -> Response:
+    """
+    Handle pages_users API requests.
+    Returns pages_users records with joined category campaign data.
+
+    Query:
+        SELECT title, word, translate_type, cat, lang, user, target, date,
+               pupdate, add_date, deleted, mdwiki_revid, campaign
+        FROM pages_users p
+        LEFT JOIN categories ca ON p.cat = ca.category
+        WHERE (target != '' AND target IS NOT NULL)
+        ORDER BY pupdate DESC
+        LIMIT 100
+
+    Returns:
+        JSON response with pages_users records
+    """
+    try:
+        with get_session() as session:
+            # Perform the JOIN query using SQLAlchemy
+            results = (
+                session.query(
+                    _UserPageRecord.title,
+                    _UserPageRecord.word,
+                    _UserPageRecord.translate_type,
+                    _UserPageRecord.cat,
+                    _UserPageRecord.lang,
+                    _UserPageRecord.user,
+                    _UserPageRecord.target,
+                    _UserPageRecord.date,
+                    _UserPageRecord.pupdate,
+                    _UserPageRecord.add_date,
+                    _UserPageRecord.deleted,
+                    _UserPageRecord.mdwiki_revid,
+                    _CategoryRecord.campaign.label("campaign"),
+                )
+                .outerjoin(_CategoryRecord, _UserPageRecord.cat == _CategoryRecord.category)
+                .filter(_UserPageRecord.target != "")
+                .filter(_UserPageRecord.target.is_not(None))
+                .order_by(_UserPageRecord.pupdate.desc())
+                .limit(100)
+                .all()
+            )
+
+            # Convert results to list of dicts
+            data: List[Dict[str, Any]] = [
+                {
+                    "title": row.title,
+                    "word": row.word,
+                    "translate_type": row.translate_type,
+                    "cat": row.cat,
+                    "lang": row.lang,
+                    "user": row.user,
+                    "target": row.target,
+                    "date": row.date.isoformat() if row.date else None,
+                    "pupdate": row.pupdate,
+                    "add_date": row.add_date.isoformat() if row.add_date else None,
+                    "deleted": row.deleted,
+                    "mdwiki_revid": row.mdwiki_revid,
+                    "campaign": row.campaign if row.campaign else row.cat,
+                }
+                for row in results
+            ]
+
+    except Exception:
+        logger.exception("Error fetching pages_users data")
+        return jsonify({"error": "An internal error occurred while fetching pages_users data"}), 500
+
+    response_data = {
+        "results": data,
+        "count": len(data),
+    }
+
+    return jsonify(response_data)
+
+
+@bp_api.route("/pages_with_views", methods=["GET"])
+@check_cors
+def get_pages_with_views() -> Response:
+    """
+    Handle pages_with_views API requests.
+    Returns pages records with views from views_new_all.
+
+    Query:
+        SELECT DISTINCT p.id, p.title, p.word, p.translate_type, p.cat, p.lang,
+               p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
+               p.mdwiki_revid,
+               (SELECT v.views FROM views_new_all v
+                WHERE p.target = v.target AND p.lang = v.lang) as views
+        FROM pages p
+        WHERE p.target != ''
+
+    Returns:
+        JSON response with pages records including views
+    """
+    try:
+        with get_session() as session:
+            # Create a subquery for views
+            views_subquery = (
+                session.query(_ViewsNewAllRecord.views)
+                .filter(_ViewsNewAllRecord.target == _PageRecord.target)
+                .filter(_ViewsNewAllRecord.lang == _PageRecord.lang)
+                .correlate(_PageRecord)
+                .scalar_subquery()
+            )
+
+            # Perform the query with subquery
+            results = (
+                session.query(
+                    _PageRecord.id,
+                    _PageRecord.title,
+                    _PageRecord.word,
+                    _PageRecord.translate_type,
+                    _PageRecord.cat,
+                    _PageRecord.lang,
+                    _PageRecord.user,
+                    _PageRecord.target,
+                    _PageRecord.date,
+                    _PageRecord.pupdate,
+                    _PageRecord.add_date,
+                    _PageRecord.deleted,
+                    _PageRecord.mdwiki_revid,
+                    views_subquery.label("views"),
+                )
+                .filter(_PageRecord.target != "")
+                .distinct()
+                .all()
+            )
+
+            # Convert results to list of dicts
+            data: List[Dict[str, Any]] = [
+                {
+                    "id": row.id,
+                    "title": row.title,
+                    "word": row.word,
+                    "translate_type": row.translate_type,
+                    "cat": row.cat,
+                    "lang": row.lang,
+                    "user": row.user,
+                    "target": row.target,
+                    "date": row.date.isoformat() if row.date else None,
+                    "pupdate": row.pupdate,
+                    "add_date": row.add_date.isoformat() if row.add_date else None,
+                    "deleted": row.deleted,
+                    "mdwiki_revid": row.mdwiki_revid,
+                    "views": row.views,
+                }
+                for row in results
+            ]
+
+    except Exception:
+        logger.exception("Error fetching pages_with_views data")
+        return jsonify({"error": "An internal error occurred while fetching pages_with_views data"}), 500
 
     response_data = {
         "results": data,
