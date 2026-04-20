@@ -25,12 +25,12 @@ class TestSettingsDashboard:
         """Test that settings dashboard lists settings."""
         with patch("src.sqlalchemy_app.admin.decorators.active_coordinators") as mock_coords:
             mock_coords.return_value = ["TestUser"]
-            with patch("src.sqlalchemy_app.admin.routes.settings.setting_service") as mock_service:
+            with patch("src.sqlalchemy_app.admin.services.setting_service.list_settings") as mock_list:
                 mock_setting = MagicMock()
                 mock_setting.key = "test_setting"
                 mock_setting.value_type = "boolean"
                 mock_setting.to_dict.return_value = {"value": True}
-                mock_service.list_settings.return_value = [mock_setting]
+                mock_list.return_value = [mock_setting]
 
                 response = auth_client.get("/admin/settings")
 
@@ -54,8 +54,8 @@ class TestCreateSetting:
         """Test creating setting with valid data."""
         with patch("src.sqlalchemy_app.admin.decorators.active_coordinators") as mock_coords:
             mock_coords.return_value = ["TestUser"]
-            with patch("src.sqlalchemy_app.admin.routes.settings.setting_service") as mock_service:
-                mock_service.add_setting.return_value = MagicMock(key="new_setting")
+            with patch("src.sqlalchemy_app.admin.services.setting_service.add_setting") as mock_add:
+                mock_add.return_value = MagicMock(key="new_setting")
 
                 response = auth_client.post(
                     "/admin/settings/create",
@@ -106,8 +106,8 @@ class TestUpdateSetting:
             mock_setting.value_type = "boolean"
             mock_setting.id = 1
 
-            with patch("src.sqlalchemy_app.admin.routes.settings.setting_service") as mock_service:
-                mock_service.list_settings.return_value = [mock_setting]
+            with patch("src.sqlalchemy_app.admin.services.setting_service.list_settings") as mock_list:
+                mock_list.return_value = [mock_setting]
 
                 response = auth_client.post(
                     "/admin/settings/update",
@@ -126,8 +126,8 @@ class TestUpdateSetting:
             mock_setting.value_type = "boolean"
             mock_setting.id = 1
 
-            with patch("src.sqlalchemy_app.admin.routes.settings.setting_service") as mock_service:
-                mock_service.list_settings.return_value = [mock_setting]
+            with patch("src.sqlalchemy_app.admin.services.setting_service.list_settings") as mock_list:
+                mock_list.return_value = [mock_setting]
 
                 response = auth_client.post(
                     "/admin/settings/update",
