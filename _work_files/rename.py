@@ -22,6 +22,7 @@ def rename_test_files_recursive(root_dir):
     for dirpath, _, filenames in os.walk(root_dir):
         for filename in filenames:
             if file_pattern.match(filename):
+                print(filename)
                 file_path = os.path.join(dirpath, filename)
 
                 try:
