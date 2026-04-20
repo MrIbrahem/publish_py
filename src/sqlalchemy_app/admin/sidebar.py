@@ -158,11 +158,12 @@ def create_side(active_route):
                 ready=True,
             ),
             SidebarItem(
-                id="Campaigns",
+                id="campaigns",
                 admin=1,
-                href="Campaigns",
+                href="campaigns",
                 title="Campaigns",
                 icon="bi-megaphone",
+                ready=True,
             ),
             SidebarItem(
                 id="settings",
