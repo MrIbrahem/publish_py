@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import extract, func, text
 from sqlalchemy.exc import IntegrityError
 
-from ....db_models.shared_models import ReportRecord
+from ...db_models.shared_models import ReportRecord
 from ..engine import get_session
 from ..models import _ReportRecord
 

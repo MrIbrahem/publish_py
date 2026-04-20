@@ -211,7 +211,7 @@ class UserTokenRecord:
 
     def decrypted(self) -> tuple[str, str]:
         """Return the decrypted access token and secret."""
-        from ..sqlalchemy_app.shared.core.crypto import decrypt_value
+        from ..shared.core.crypto import decrypt_value
 
         access_key = decrypt_value(self.access_token)
         access_secret = decrypt_value(self.access_secret)

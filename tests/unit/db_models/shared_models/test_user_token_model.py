@@ -7,7 +7,7 @@ Tests for UserTokenRecord.
 from unittest.mock import patch
 
 import pytest
-from src.db_models.shared_models import (
+from src.sqlalchemy_app.db_models.shared_models import (
     UserTokenRecord,
 )
 

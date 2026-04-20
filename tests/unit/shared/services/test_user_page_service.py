@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.shared_models import UserPageRecord
+from src.sqlalchemy_app.db_models.shared_models import UserPageRecord
 from src.sqlalchemy_app.shared.engine import get_session
 from src.sqlalchemy_app.shared.models import _UserPageRecord
 from src.sqlalchemy_app.shared.services.user_page_service import (

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.db_models.admin_models import FullTranslatorRecord
+from src.sqlalchemy_app.db_models.admin_models import FullTranslatorRecord
 from src.sqlalchemy_app.admin.models import _FullTranslatorRecord
 from src.sqlalchemy_app.admin.services.full_translator_service import (
     add_full_translator,
