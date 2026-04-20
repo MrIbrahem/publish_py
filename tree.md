@@ -24,7 +24,6 @@ src/
 │   │   │       ├── language_setting_service.py
 │   │   │       ├── setting_service.py
 │   │   │       └── users_no_inprocess_service.py
-│   │   ├── domain_models.py
 │   │   ├── routes/
 │   │   │   ├── __init__.py
 │   │   │   ├── admin.py
@@ -54,7 +53,6 @@ src/
 │   │   │       ├── user_service.py
 │   │   │       ├── views_new_service.py
 │   │   │       └── word_service.py
-│   │   ├── domain_models.py
 │   │   └── routes/
 │   │       ├── __init__.py
 │   │       ├── api/
@@ -115,7 +113,6 @@ src/
 │       │       ├── report_service.py
 │       │       ├── user_page_service.py
 │       │       └── user_token_service.py
-│       ├── domain_models.py
 │       └── utils/
 │           ├── __init__.py
 │           ├── decode_bytes.py

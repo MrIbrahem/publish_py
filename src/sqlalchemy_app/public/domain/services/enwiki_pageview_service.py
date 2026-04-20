@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from .....db_models.public_models import EnwikiPageviewRecord
 from ....shared.domain.engine import get_session
-from ..models import _EnwikiPageviewRecord
+from ...models import _EnwikiPageviewRecord
 
 logger = logging.getLogger(__name__)
 

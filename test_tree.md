@@ -3,16 +3,24 @@ tests/
 ├── __init__.py
 ├── conftest.py
 ├── integration/
-│   ├── sqlalchemy_app/
-│   │   └── shared/
-│   │       ├── core/
-│   │       │   └── cors/
-│   │       │       └── test_is_allowed_checker.py
-│   │       └── domain/
-│   │           └── services/
-│   │               ├── test_pages_service.py
-│   │               └── test_users_services.py
-│   └── sqlalchemy_app.zip
+│   ├── public/
+│   │   └── routes/
+│   │       ├── cxtoken/
+│   │       │   ├── test_cxtoken_cors_disabled_sqlalchemy.py
+│   │       │   └── test_cxtoken_cors_on_sqlalchemy.py
+│   │       ├── publish/
+│   │       │   ├── test_publish_cors_disabled_sqlalchemy.py
+│   │       │   ├── test_publish_cors_on_sqlalchemy.py
+│   │       │   └── test_publish_csrf_integration_sqlalchemy.py
+│   │       └── test_api_integration_alchemy.py
+│   └── shared/
+│       ├── core/
+│       │   └── cors/
+│       │       └── test_is_allowed_checker.py
+│       └── domain/
+│           └── services/
+│               ├── test_pages_service.py
+│               └── test_user_token_service.py
 └── unit/
     ├── admin/
     │   ├── domain/
@@ -107,6 +115,7 @@ tests/
         │       ├── test_page_sqlalchemy_service.py
         │       ├── test_qid_sqlalchemy_service.py
         │       ├── test_report_sqlalchemy_service.py
+        │       ├── test_user_page_sqlalchemy_service.py
         │       └── test_user_token_sqlalchemy_service.py
         └── utils/
             ├── helpers/

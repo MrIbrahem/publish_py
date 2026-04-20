@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from .....db_models.public_models import InProcessRecord
 from ....shared.domain.engine import get_session
-from ..models import _InProcessRecord
+from ...models import _InProcessRecord
 
 logger = logging.getLogger(__name__)
 

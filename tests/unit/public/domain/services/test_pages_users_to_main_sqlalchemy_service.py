@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import PagesUsersToMainRecord
-from src.sqlalchemy_app.public.domain.models import _PagesUsersToMainRecord
+from src.sqlalchemy_app.public.models import _PagesUsersToMainRecord
 from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service import (
     add_pages_users_to_main,
     delete_pages_users_to_main,

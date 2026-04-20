@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import UserRecord
-from src.sqlalchemy_app.public.domain.models import _UserRecord
+from src.sqlalchemy_app.public.models import _UserRecord
 from src.sqlalchemy_app.public.domain.services.user_service import (
     add_or_update_user,
     add_user,

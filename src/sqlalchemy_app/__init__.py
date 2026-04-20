@@ -11,7 +11,7 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, render_template, request  # , g
 
-from .admin.domain.services.coordinator_service import active_coordinators
+from .admin.services.coordinator_service import active_coordinators
 from .admin.routes.admin import (
     bp_admin,
 )

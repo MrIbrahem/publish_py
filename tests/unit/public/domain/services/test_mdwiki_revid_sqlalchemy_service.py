@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.db_models.public_models import MdwikiRevidRecord
-from src.sqlalchemy_app.public.domain.models import _MdwikiRevidRecord
+from src.sqlalchemy_app.public.models import _MdwikiRevidRecord
 from src.sqlalchemy_app.public.domain.services.mdwiki_revid_service import (
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,

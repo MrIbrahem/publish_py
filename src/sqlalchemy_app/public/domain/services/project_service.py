@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from .....db_models.public_models import ProjectRecord
 from ....shared.domain.engine import get_session
-from ..models import _ProjectRecord
+from ...models import _ProjectRecord
 
 logger = logging.getLogger(__name__)
 
