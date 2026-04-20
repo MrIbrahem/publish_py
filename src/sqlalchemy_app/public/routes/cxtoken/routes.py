@@ -13,7 +13,7 @@ from flask import Blueprint, Response, jsonify, request
 from ....config import settings
 from ....shared.clients.oauth_client import get_cxtoken
 from ....shared.core.cors import check_cors
-from ....shared.domain.services.user_token_service import (
+from ....shared.services.user_token_service import (
     delete_user_token_by_username,
     get_user_token_by_username,
 )

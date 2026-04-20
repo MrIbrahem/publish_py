@@ -9,7 +9,7 @@ from typing import Any, Dict
 from flask import Blueprint, Response, jsonify, request
 
 from ....shared.core.cors import check_cors
-from ....shared.domain.services.report_service import query_reports_with_filters
+from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
@@ -88,6 +88,30 @@ def get_publish_reports() -> Response:
     # Build response
     data = [r.to_dict() for r in records]
 
+    response_data = {
+        "results": data,
+        "count": len(data),
+    }
+
+    response = jsonify(response_data)
+
+    return response
+
+
+@bp_api.route("/publish_reports_stats", methods=["GET"])
+@check_cors
+def publish_reports_stats() -> Response:
+    """
+    Handle publish_reports API requests.
+    Returns:
+        JSON response with matching reports or error
+    """
+    query = """
+        SELECT DISTINCT YEAR(date) as year, MONTH(date) as month, lang, user, result
+        FROM publish_reports
+        GROUP BY year, month, lang, user, result
+    """
+    data = ""
     response_data = {
         "results": data,
         "count": len(data),

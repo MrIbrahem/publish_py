@@ -22,10 +22,11 @@ def generate_domain_test_placeholders(src_root, test_root):
                 file_stem = Path(file).stem
 
                 # تحديد اسم ملف الاختبار
-                if "models" in current_path.parts:
-                    test_filename = f"test_{file_stem}_sqlalchemy_model.py"
+                if "routes" in current_path.parts:
+                    test_filename = f"test_{file_stem}_routes.py"
                 else:
-                    test_filename = f"test_{file_stem}_sqlalchemy.py"
+                    # test_filename = f"test_{file_stem}.py"
+                    continue
 
                 # إنشاء المجلد إذا لم يكن موجوداً
                 target_dir.mkdir(parents=True, exist_ok=True)

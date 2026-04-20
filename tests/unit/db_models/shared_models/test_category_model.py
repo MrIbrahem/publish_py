@@ -5,7 +5,7 @@ Tests for CategoryRecord.
 """
 
 import pytest
-from src.db_models.shared_models import (
+from src.sqlalchemy_app.db_models.shared_models import (
     CategoryRecord,
 )
 

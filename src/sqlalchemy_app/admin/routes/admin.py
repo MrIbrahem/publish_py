@@ -25,6 +25,8 @@ from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .settings import SettingsRoutes
 from .users_no_inprocess import UsersNoInprocess
+from .projects import ProjectsDashboard
+from .campaigns import CampaignsDashboard
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,12 @@ def index():
     return render_template("admins/index.html")
 
 
+@bp_admin.get("/reports")
+@admin_required
+def reports():
+    return render_template("admins/reports.html")
+
+
 def register_blueprints(bp_admin) -> None:
     Coordinators(bp_admin)
     FullTranslators(bp_admin)
@@ -53,6 +61,8 @@ def register_blueprints(bp_admin) -> None:
     LanguageSettings(bp_admin)
     # Templates(bp_admin)
     SettingsRoutes(bp_admin)
+    ProjectsDashboard(bp_admin)
+    CampaignsDashboard(bp_admin)
     # Jobs(bp_admin)
     # OwidCharts(bp_admin)
 

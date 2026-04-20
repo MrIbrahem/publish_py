@@ -4,7 +4,7 @@ Unit tests for domain.models.word module.
 Tests for WordRecord.
 """
 
-from src.db_models.public_models import (
+from src.sqlalchemy_app.db_models.public_models import (
     WordRecord,
 )
 

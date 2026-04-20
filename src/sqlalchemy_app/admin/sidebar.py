@@ -76,6 +76,7 @@ def create_side(active_route):
                 href="reports",
                 title="Publish Reports",
                 icon="bi-file-earmark-text",
+                ready=True,
             ),
         ],
         "Pages": [
@@ -155,13 +156,15 @@ def create_side(active_route):
                 href="projects",
                 title="Projects",
                 icon="bi-kanban",
+                ready=True,
             ),
             SidebarItem(
-                id="Campaigns",
+                id="campaigns",
                 admin=1,
-                href="Campaigns",
+                href="campaigns",
                 title="Campaigns",
                 icon="bi-megaphone",
+                ready=True,
             ),
             SidebarItem(
                 id="settings",
