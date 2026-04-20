@@ -61,23 +61,6 @@ def add_project(g_title: str) -> ProjectRecord:
         return ProjectRecord(**orm_obj.to_dict())
 
 
-def add_or_update_project(g_title: str) -> ProjectRecord:
-    """Add or update a project record."""
-    g_title = g_title.strip()
-    if not g_title:
-        raise ValueError("Project title is required")
-
-    with get_session() as session:
-        orm_obj = session.query(_ProjectRecord).filter(_ProjectRecord.g_title == g_title).first()
-        if not orm_obj:
-            orm_obj = _ProjectRecord(g_title=g_title)
-            session.add(orm_obj)
-
-        session.commit()
-        session.refresh(orm_obj)
-        return ProjectRecord(**orm_obj.to_dict())
-
-
 def update_project(project_id: int, **kwargs) -> ProjectRecord:
     """Update a project record."""
     with get_session() as session:
@@ -115,7 +98,6 @@ __all__ = [
     "get_project",
     "get_project_by_title",
     "add_project",
-    "add_or_update_project",
     "update_project",
     "delete_project",
 ]

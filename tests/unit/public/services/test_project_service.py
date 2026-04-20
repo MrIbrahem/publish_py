@@ -4,7 +4,6 @@ import pytest
 from src.sqlalchemy_app.db_models.public_models import ProjectRecord
 from src.sqlalchemy_app.public.models import _ProjectRecord
 from src.sqlalchemy_app.public.services.project_service import (
-    add_or_update_project,
     add_project,
     delete_project,
     get_project,
@@ -34,10 +33,6 @@ def test_project_workflow():
     # Test update
     updated = update_project(p.g_id, g_title="WP:MED")
     assert updated.g_title == "WP:MED"
-
-    # Test add_or_update
-    p4 = add_or_update_project("WP:MED")
-    assert p4.g_id == p.g_id
 
     # Test delete
     delete_project(p.g_id)
@@ -98,21 +93,6 @@ class TestAddProject:
     def test_raises_error_if_no_title(self, monkeypatch):
         with pytest.raises(ValueError, match="Project title is required"):
             add_project("")
-
-
-class TestAddOrUpdateProject:
-    """Tests for add_or_update_project function."""
-
-    def test_delegates_to_store(self, monkeypatch):
-        """Test that function upserts record."""
-        p = add_project("WikiProject Health")
-        record = add_or_update_project("WikiProject Health")
-        assert record.g_id == p.g_id
-        assert len(list_projects()) == 1
-
-    def test_raises_error_if_no_title(self, monkeypatch):
-        with pytest.raises(ValueError, match="Project title is required"):
-            add_or_update_project(" ")
 
 
 class TestUpdateProject:
