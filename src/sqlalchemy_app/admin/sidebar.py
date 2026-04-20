@@ -50,9 +50,9 @@ def create_side(active_route):
     main_menu = {
         "Translations": [
             SidebarItem(
-                id="last_coord",
+                id="last",
                 admin=1,
-                href="last_coord",
+                href="last",
                 title="Recent",
                 icon="bi-clock-history",
             ),
