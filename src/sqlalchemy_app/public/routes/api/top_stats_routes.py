@@ -102,7 +102,7 @@ def get_top_langs() -> Response:
             )
 
             if limit:
-                query = query.filter(limit=limit)
+                query = query.limit(int(limit))
 
             results = (
                 query
@@ -214,7 +214,7 @@ def get_top_users() -> Response:
             )
 
             if limit:
-                query = query.filter(limit=limit)
+                query = query.limit(int(limit))
 
             results = (
                 query

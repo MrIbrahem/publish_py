@@ -46,6 +46,16 @@
                     </li>
                     <li class="{{ nav_item_class }}">
                         {{ nav_link_with_args(
+                            'fixrefs.index',
+                            'bi-list-task',
+                            'Leaderboard',
+                            url_for('main.leaderboard'),
+                            '/leaderboard',
+                            )
+                        }}
+                    </li>
+                    <li class="{{ nav_item_class }}">
+                        {{ nav_link_with_args(
                             'main.reports',
                             'bi-list-task',
                             'Publish Reports',
