@@ -35,6 +35,8 @@ def add_user_page(
     word: int = 0,
 ) -> UserPageRecord:
     """Insert a page target record."""
+    if not sourcetitle:
+        raise ValueError("Title is required")
     with get_session() as session:
         orm_obj = _UserPageRecord(
             title=sourcetitle,
@@ -71,23 +73,22 @@ def insert_user_page_target(
     target: str,
     mdwiki_revid: int | None = None,
     word: int = 0,
-) -> UserPageRecord:
-    """Add a page and return the created record."""
+) -> bool:
+    """Insert a user page target record and return success status."""
     try:
         add_user_page(
-            title=sourcetitle,
-            word=word,
-            translate_type=tr_type,
+            sourcetitle=sourcetitle,
+            tr_type=tr_type,
             cat=cat,
             lang=lang,
             user=user,
-            pupdate=func.current_date(),
             target=target,
             mdwiki_revid=mdwiki_revid,
+            word=word,
         )
         return True
     except Exception as e:
-        logger.error(f"Failed to add page: {e}")
+        logger.error(f"Failed to insert user page target: {e}")
         return False
 
 

@@ -61,8 +61,8 @@ class TestListUserPages:
     """Tests for list_user_pages function."""
 
     def test_returns_list_of_pages(self, monkeypatch):
-        add_user_page("Anatomy", "Anatomy.html")
-        add_user_page("Physiology", "Physiology.html")
+        add_user_page("Anatomy", "lead", "Medicine", "en", "TestUser", "Anatomy.html")
+        add_user_page("Physiology", "lead", "Medicine", "en", "TestUser", "Physiology.html")
         result = list_user_pages()
         assert len(result) >= 2
 
@@ -71,7 +71,7 @@ class TestAddUserPage:
     """Tests for add_user_page function."""
 
     def test_adds_page(self, monkeypatch):
-        record = add_user_page("Neurology", "Neurology.html")
+        record = add_user_page("Neurology", "lead", "Medicine", "en", "TestUser", "Neurology.html")
         assert record.title == "Neurology"
 
     def test_raises_error_if_exists(self, monkeypatch):
@@ -85,14 +85,14 @@ class TestAddUserPage:
 
     def test_raises_error_if_no_title(self, monkeypatch):
         with pytest.raises(ValueError, match="Title is required"):
-            add_user_page("", "test.html")
+            add_user_page("", "lead", "Test", "en", "TestUser", "test.html")
 
 
 class TestUpdateUserPage:
     """Tests for update_user_page function."""
 
     def test_updates_record(self, monkeypatch):
-        p = add_user_page("Surgery", "Surgery.html")
+        p = add_user_page("Surgery", "lead", "Medicine", "en", "TestUser", "Surgery.html")
         updated = update_user_page(p.id, "Plastic Surgery", "Plastic.html")
         assert updated.title == "Plastic Surgery"
 
@@ -105,7 +105,7 @@ class TestDeleteUserPage:
     """Tests for delete_user_page function."""
 
     def test_deletes_record(self, monkeypatch):
-        p = add_user_page("Pediatrics", "Pediatrics.html")
+        p = add_user_page("Pediatrics", "lead", "Medicine", "en", "TestUser", "Pediatrics.html")
         delete_user_page(p.id)
         assert not any(x.id == p.id for x in list_user_pages())
 

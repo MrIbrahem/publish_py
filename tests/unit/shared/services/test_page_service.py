@@ -62,8 +62,8 @@ class TestListPages:
 
     def test_returns_list_of_pages(self, monkeypatch):
         """Test that function returns list from store."""
-        add_page("Evolution", "Evolution.html")
-        add_page("Genetics", "Genetics.html")
+        add_page("Evolution", "lead", "Biology", "en", "TestUser", "Evolution.html")
+        add_page("Genetics", "lead", "Biology", "en", "TestUser", "Genetics.html")
         result = list_pages()
         assert len(result) >= 2
         assert any(p.title == "Evolution" for p in result)
@@ -74,13 +74,13 @@ class TestAddPage:
 
     def test_adds_page(self, monkeypatch):
         """Test that function adds a page."""
-        record = add_page("Quantum mechanics", "Quantum_mechanics.html")
+        record = add_page("Quantum mechanics", "lead", "Physics", "en", "TestUser", "Quantum_mechanics.html")
         assert record.title == "Quantum mechanics"
         assert record.target == "Quantum_mechanics.html"
 
     def test_raises_error_if_no_title(self, monkeypatch):
         with pytest.raises(ValueError, match="Title is required"):
-            add_page("", "test.html")
+            add_page("", "lead", "Test", "en", "TestUser", "test.html")
 
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
@@ -90,7 +90,7 @@ class TestAddPage:
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
             with pytest.raises(ValueError, match="already exists"):
-                add_page("Duplicate", "t1.html")
+                add_page("Duplicate", "lead", "Test", "en", "TestUser", "t1.html")
 
 
 class TestUpdatePage:
@@ -98,7 +98,7 @@ class TestUpdatePage:
 
     def test_updates_the_record(self, monkeypatch):
         """Test that function updates the record."""
-        p = add_page("Sociology", "Sociology.html")
+        p = add_page("Sociology", "lead", "Social", "en", "TestUser", "Sociology.html")
         updated = update_page(p.id, "Social Science", "Social_Science.html")
         assert updated.title == "Social Science"
         assert updated.target == "Social_Science.html"
@@ -113,7 +113,7 @@ class TestDeletePage:
 
     def test_deletes_the_record(self, monkeypatch):
         """Test that function deletes the record."""
-        p = add_page("Economics", "Economics.html")
+        p = add_page("Economics", "lead", "Social", "en", "TestUser", "Economics.html")
         delete_page(p.id)
         assert not any(x.id == p.id for x in list_pages())
 
