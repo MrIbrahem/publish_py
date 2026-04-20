@@ -4,11 +4,14 @@ Mirrors: php_src/endpoints/index.php?get=publish_reports
 """
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
+from sqlalchemy import func, text
 
 from ....shared.core.cors import check_cors
+from ....shared.engine import get_session
+from ....shared.models import _ReportRecord
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 
@@ -102,24 +105,49 @@ def get_publish_reports() -> Response:
 @check_cors
 def publish_reports_stats() -> Response:
     """
-    Handle publish_reports API requests.
+    Handle publish_reports_stats API requests.
+    Returns stats for populating filter options (year, month, lang, user, result).
+
     Returns:
-        JSON response with matching reports or error
+        JSON response with distinct filter values
     """
-    query = """
-        SELECT DISTINCT YEAR(date) as year, MONTH(date) as month, lang, user, result
-        FROM publish_reports
-        GROUP BY year, month, lang, user, result
-    """
-    data = ""
+    try:
+        with get_session() as session:
+            # Query distinct year, month, lang, user, result using SQLAlchemy
+            results = (
+                session.query(
+                    func.extract("year", _ReportRecord.date).label("year"),
+                    func.extract("month", _ReportRecord.date).label("month"),
+                    _ReportRecord.lang,
+                    _ReportRecord.user,
+                    _ReportRecord.result,
+                )
+                .distinct()
+                .all()
+            )
+
+            # Convert results to list of dicts
+            data: List[Dict[str, Any]] = [
+                {
+                    "year": int(row.year) if row.year else None,
+                    "month": int(row.month) if row.month else None,
+                    "lang": row.lang,
+                    "user": row.user,
+                    "result": row.result,
+                }
+                for row in results
+            ]
+
+    except Exception:
+        logger.exception("Error fetching publish_reports_stats")
+        return jsonify({"error": "An internal error occurred while fetching stats"}), 500
+
     response_data = {
         "results": data,
         "count": len(data),
     }
 
-    response = jsonify(response_data)
-
-    return response
+    return jsonify(response_data)
 
 
 __all__ = ["bp_api"]
