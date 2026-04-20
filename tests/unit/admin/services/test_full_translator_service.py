@@ -20,7 +20,7 @@ def test_full_translator_workflow():
     # Test add
     ft = add_full_translator("Global_Translator", 1)
     assert ft.user == "Global_Translator"
-    assert ft.active == 1
+    assert ft.is_active == 1
 
     # Test get
     ft2 = get_full_translator(ft.id)
@@ -39,13 +39,13 @@ def test_full_translator_workflow():
     assert any(x.user == "Global_Translator" for x in active)
 
     # Test update
-    updated = update_full_translator(ft.id, active=0)
-    assert updated.active == 0
+    updated = update_full_translator(ft.id, is_active=0)
+    assert updated.is_active == 0
     assert is_full_translator("Global_Translator") is False
 
     # Test add_or_update
     ft4 = add_or_update_full_translator("Global_Translator", 1)
-    assert ft4.active == 1
+    assert ft4.is_active == 1
     assert is_full_translator("Global_Translator") is True
 
     # Test delete
@@ -69,8 +69,8 @@ class TestListActiveFullTranslators:
 
     def test_returns_active_records(self, monkeypatch):
         """Test that list_active_full_translators returns active records."""
-        add_full_translator("Active_Trans", active=1)
-        add_full_translator("Inactive_Trans", active=0)
+        add_full_translator("Active_Trans", is_active=1)
+        add_full_translator("Inactive_Trans", is_active=0)
         active = list_active_full_translators()
         assert len(active) == 1
         assert active[0].user == "Active_Trans"
@@ -126,9 +126,9 @@ class TestAddOrUpdateFullTranslator:
 
     def test_upserts_translator(self, monkeypatch):
         """Test that add_or_update_full_translator upserts the record."""
-        add_full_translator("Sync_Trans", active=1)
-        record = add_or_update_full_translator("Sync_Trans", active=0)
-        assert record.active == 0
+        add_full_translator("Sync_Trans", is_active=1)
+        record = add_or_update_full_translator("Sync_Trans", is_active=0)
+        assert record.is_active == 0
         assert len(list_full_translators()) == 1
 
     def test_raises_error_if_no_user(self, monkeypatch):
@@ -141,9 +141,9 @@ class TestUpdateFullTranslator:
 
     def test_updates_translator_and_returns_record(self, monkeypatch):
         """Test that update_full_translator updates and returns the record."""
-        ft = add_full_translator("Update_Trans", active=1)
-        updated = update_full_translator(ft.id, active=0)
-        assert updated.active == 0
+        ft = add_full_translator("Update_Trans", is_active=1)
+        updated = update_full_translator(ft.id, is_active=0)
+        assert updated.is_active == 0
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         ft = add_full_translator("No_Change")
@@ -152,7 +152,7 @@ class TestUpdateFullTranslator:
 
     def test_raises_error_if_not_found(self, monkeypatch):
         with pytest.raises(ValueError, match="not found"):
-            update_full_translator(9999, active=0)
+            update_full_translator(9999, is_active=0)
 
 
 class TestDeleteFullTranslator:
@@ -174,7 +174,7 @@ class TestIsFullTranslator:
 
     def test_returns_true_when_user_is_active_translator(self, monkeypatch):
         """Test that is_full_translator returns True for active translator."""
-        add_full_translator("Active_Polyglot", active=1)
+        add_full_translator("Active_Polyglot", is_active=1)
         assert is_full_translator("Active_Polyglot") is True
 
     def test_returns_false_when_user_not_translator(self, monkeypatch):
@@ -183,5 +183,5 @@ class TestIsFullTranslator:
 
     def test_returns_false_when_translator_inactive(self, monkeypatch):
         """Test that is_full_translator returns False for inactive translator."""
-        add_full_translator("Inactive_Polyglot", active=0)
+        add_full_translator("Inactive_Polyglot", is_active=0)
         assert is_full_translator("Inactive_Polyglot") is False

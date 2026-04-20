@@ -24,11 +24,11 @@ def list_full_translators() -> List[FullTranslatorRecord]:
 
 
 def list_active_full_translators() -> List[FullTranslatorRecord]:
-    """Return all active full translator records."""
+    """Return all is_active full translator records."""
     with get_session() as session:
         orm_objs = (
             session.query(_FullTranslatorRecord)
-            .filter(_FullTranslatorRecord.active == 1)
+            .filter(_FullTranslatorRecord.is_active == 1)
             .order_by(_FullTranslatorRecord.id.asc())
             .all()
         )
@@ -54,14 +54,14 @@ def get_full_translator_by_user(user: str) -> FullTranslatorRecord | None:
         return FullTranslatorRecord(**orm_obj.to_dict())
 
 
-def add_full_translator(user: str, active: int = 1) -> FullTranslatorRecord:
+def add_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
     """Add a new full translator record."""
     user = user.strip()
     if not user:
         raise ValueError("User is required")
 
     with get_session() as session:
-        orm_obj = _FullTranslatorRecord(user=user, active=active)
+        orm_obj = _FullTranslatorRecord(user=user, is_active=is_active)
         session.add(orm_obj)
         try:
             session.commit()
@@ -73,7 +73,7 @@ def add_full_translator(user: str, active: int = 1) -> FullTranslatorRecord:
         return FullTranslatorRecord(**orm_obj.to_dict())
 
 
-def add_or_update_full_translator(user: str, active: int = 1) -> FullTranslatorRecord:
+def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
     """Add or update a full translator record."""
     user = user.strip()
     if not user:
@@ -82,9 +82,9 @@ def add_or_update_full_translator(user: str, active: int = 1) -> FullTranslatorR
     with get_session() as session:
         orm_obj = session.query(_FullTranslatorRecord).filter(_FullTranslatorRecord.user == user).first()
         if orm_obj:
-            orm_obj.active = active
+            orm_obj.is_active = is_active
         else:
-            orm_obj = _FullTranslatorRecord(user=user, active=active)
+            orm_obj = _FullTranslatorRecord(user=user, is_active=is_active)
             session.add(orm_obj)
 
         session.commit()
@@ -127,7 +127,7 @@ def delete_full_translator(translator_id: int) -> FullTranslatorRecord:
 def is_full_translator(user: str) -> bool:
     """Check if a user is a full translator."""
     record = get_full_translator_by_user(user)
-    return record is not None and record.active == 1
+    return record is not None and record.is_active == 1
 
 
 __all__ = [

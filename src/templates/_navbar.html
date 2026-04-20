@@ -20,7 +20,7 @@
 <header>
     <nav class="navbar navbar-expand-lg mb-4 border-bottom bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">PublishPy</a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">WikiProjectMed Translation Dashboard</a>
             <div class="d-flex align-items-center order-lg-last">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,11 +36,21 @@
                     {% set nav_item_class = "nav-item col-lg-auto col-md-4 col-sm-6 col-6" %}
                     <li class="{{ nav_item_class }}">
                         {{ nav_link_with_args(
-                            'fixrefs.index',
-                            'bi-list-task',
-                            'Fix Refs',
-                            url_for('fixrefs.index'),
-                            '/fixrefs',
+                            'main.leaderboard',
+                            'bi-bar-chart-line',
+                            'Leaderboard',
+                            url_for('main.leaderboard'),
+                            '/leaderboard',
+                            )
+                        }}
+                    </li>
+                    <li class="{{ nav_item_class }}">
+                        {{ nav_link_with_args(
+                            'main.missing',
+                            'bi-card-list',
+                            'missing',
+                            url_for('main.missing'),
+                            '/missing',
                             )
                         }}
                     </li>
@@ -48,9 +58,9 @@
                         {{ nav_link_with_args(
                             'fixrefs.index',
                             'bi-list-task',
-                            'Leaderboard',
-                            url_for('main.leaderboard'),
-                            '/leaderboard',
+                            'Fix Refs',
+                            url_for('fixrefs.index'),
+                            '/fixrefs',
                             )
                         }}
                     </li>
@@ -64,13 +74,9 @@
                             )
                         }}
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://mdwiki.toolforge.org/" target="_blank"
-                            rel="noopener">MDWiki</a>
-                    </li>
                     {% if is_admin %}
                     <li class="{{ nav_item_class }}">
-                        {{ nav_link('admin.', 'bi-people-fill', 'Admins', url_for('admin.index')) }}
+                        {{ nav_link('admin.', 'bi-people-fill', 'Coordinator Tools', url_for('admin.index')) }}
                     </li>
                     {% endif %}
                 </ul>

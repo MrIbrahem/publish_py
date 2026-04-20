@@ -24,11 +24,11 @@ def list_users_no_inprocess() -> List[UsersNoInprocessRecord]:
 
 
 def list_active_users_no_inprocess() -> List[UsersNoInprocessRecord]:
-    """Return all active users_no_inprocess records."""
+    """Return all is_active users_no_inprocess records."""
     with get_session() as session:
         orm_objs = (
             session.query(_UsersNoInprocessRecord)
-            .filter(_UsersNoInprocessRecord.active == 1)
+            .filter(_UsersNoInprocessRecord.is_active == 1)
             .order_by(_UsersNoInprocessRecord.id.asc())
             .all()
         )
@@ -54,14 +54,14 @@ def get_users_no_inprocess_by_user(user: str) -> UsersNoInprocessRecord | None:
         return UsersNoInprocessRecord(**orm_obj.to_dict())
 
 
-def add_users_no_inprocess(user: str, active: int = 1) -> UsersNoInprocessRecord:
+def add_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRecord:
     """Add a new users_no_inprocess record."""
     user = user.strip()
     if not user:
         raise ValueError("User is required")
 
     with get_session() as session:
-        orm_obj = _UsersNoInprocessRecord(user=user, active=active)
+        orm_obj = _UsersNoInprocessRecord(user=user, is_active=is_active)
         session.add(orm_obj)
         try:
             session.commit()
@@ -73,7 +73,7 @@ def add_users_no_inprocess(user: str, active: int = 1) -> UsersNoInprocessRecord
         return UsersNoInprocessRecord(**orm_obj.to_dict())
 
 
-def add_or_update_users_no_inprocess(user: str, active: int = 1) -> UsersNoInprocessRecord:
+def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRecord:
     """Add or update a users_no_inprocess record."""
     user = user.strip()
     if not user:
@@ -82,9 +82,9 @@ def add_or_update_users_no_inprocess(user: str, active: int = 1) -> UsersNoInpro
     with get_session() as session:
         orm_obj = session.query(_UsersNoInprocessRecord).filter(_UsersNoInprocessRecord.user == user).first()
         if orm_obj:
-            orm_obj.active = active
+            orm_obj.is_active = is_active
         else:
-            orm_obj = _UsersNoInprocessRecord(user=user, active=active)
+            orm_obj = _UsersNoInprocessRecord(user=user, is_active=is_active)
             session.add(orm_obj)
 
         session.commit()
@@ -127,7 +127,7 @@ def delete_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord:
 def should_hide_from_inprocess(user: str) -> bool:
     """Check if a user should be hidden from in-process list."""
     record = get_users_no_inprocess_by_user(user)
-    return record is not None and record.active == 1
+    return record is not None and record.is_active == 1
 
 
 __all__ = [

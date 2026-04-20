@@ -30,7 +30,7 @@ def _users_no_inprocess_dashboard():
 
     users = list_users_no_inprocess()
     total = len(users)
-    is_active = sum(1 for u in users if u.active)
+    is_active = sum(1 for u in users if u.is_active)
 
     return render_template(
         "admins/users_no_inprocess.html",

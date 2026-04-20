@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid my-5">
+    <div align=center>
+        <h4>Top languages by missing Articles ($date)</h4>
+        <h5>Number of pages in Category:RTT : $length</h5>
+    </div>
+    <div class='card'>
+        <div class='card-body' style='padding:5px 0px 5px 5px;'>
+            <table class="table table-striped compact soro table-mobile-responsive table_100 table_text_left">
+                <thead>
+                    <tr>
+                        <th class="spannowrap">#</th>
+                        <th class="spannowrap">Language Name</th>
+                        <th class="spannowrap">Code</th>
+                        <th class="spannowrap">Autonym</th>
+                        <th>Translated Articles</th>
+                        <th>Exists Articles</th>
+                        <th>Missing Articles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    $text
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}

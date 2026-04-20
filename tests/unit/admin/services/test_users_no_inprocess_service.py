@@ -20,7 +20,7 @@ def test_users_no_inprocess_workflow():
     # Test add
     rec = add_users_no_inprocess("User_1", 1)
     assert rec.user == "User_1"
-    assert rec.active == 1
+    assert rec.is_active == 1
 
     # Test get
     rec2 = get_users_no_inprocess(rec.id)
@@ -34,18 +34,18 @@ def test_users_no_inprocess_workflow():
     all_rec = list_users_no_inprocess()
     assert any(x.user == "User_1" for x in all_rec)
 
-    # Test active
-    active = list_active_users_no_inprocess()
-    assert any(x.user == "User_1" for x in active)
+    # Test is_active
+    is_active = list_active_users_no_inprocess()
+    assert any(x.user == "User_1" for x in is_active)
 
     # Test update
-    updated = update_users_no_inprocess(rec.id, active=0)
-    assert updated.active == 0
+    updated = update_users_no_inprocess(rec.id, is_active=0)
+    assert updated.is_active == 0
     assert should_hide_from_inprocess("User_1") is False
 
     # Test add_or_update
     rec4 = add_or_update_users_no_inprocess("User_1", 1)
-    assert rec4.active == 1
+    assert rec4.is_active == 1
     assert should_hide_from_inprocess("User_1") is True
 
     # Test delete
@@ -68,12 +68,12 @@ class TestListActiveUsersNoInprocess:
     """Tests for list_active_users_no_inprocess function."""
 
     def test_returns_list_from_store(self, monkeypatch):
-        """Test that function returns active records."""
-        add_users_no_inprocess("Active_Wiki_User", active=1)
-        add_users_no_inprocess("Inactive_Wiki_User", active=0)
-        active = list_active_users_no_inprocess()
-        assert len(active) == 1
-        assert active[0].user == "Active_Wiki_User"
+        """Test that function returns is_active records."""
+        add_users_no_inprocess("Active_Wiki_User", is_active=1)
+        add_users_no_inprocess("Inactive_Wiki_User", is_active=0)
+        is_active = list_active_users_no_inprocess()
+        assert len(is_active) == 1
+        assert is_active[0].user == "Active_Wiki_User"
 
 
 class TestGetUsersNoInprocess:
@@ -126,9 +126,9 @@ class TestAddOrUpdateUsersNoInprocess:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function upserts the record."""
-        add_users_no_inprocess("Regular_Editor", active=1)
-        record = add_or_update_users_no_inprocess("Regular_Editor", active=0)
-        assert record.active == 0
+        add_users_no_inprocess("Regular_Editor", is_active=1)
+        record = add_or_update_users_no_inprocess("Regular_Editor", is_active=0)
+        assert record.is_active == 0
         assert len(list_users_no_inprocess()) == 1
 
     def test_raises_error_if_no_user(self, monkeypatch):
@@ -141,9 +141,9 @@ class TestUpdateUsersNoInprocess:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns the record."""
-        rec = add_users_no_inprocess("Target_User", active=1)
-        updated = update_users_no_inprocess(rec.id, active=0)
-        assert updated.active == 0
+        rec = add_users_no_inprocess("Target_User", is_active=1)
+        updated = update_users_no_inprocess(rec.id, is_active=0)
+        assert updated.is_active == 0
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         rec = add_users_no_inprocess("No_Change")
@@ -152,7 +152,7 @@ class TestUpdateUsersNoInprocess:
 
     def test_raises_error_if_not_found(self, monkeypatch):
         with pytest.raises(ValueError, match="not found"):
-            update_users_no_inprocess(9999, active=0)
+            update_users_no_inprocess(9999, is_active=0)
 
 
 class TestDeleteUsersNoInprocess:
@@ -173,13 +173,13 @@ class TestShouldHideFromInprocess:
     """Tests for should_hide_from_inprocess function."""
 
     def test_returns_true_when_record_exists_and_active(self, monkeypatch):
-        """Test that function returns True when record exists and is active."""
-        add_users_no_inprocess("Quiet_Editor", active=1)
+        """Test that function returns True when record exists and is is_active."""
+        add_users_no_inprocess("Quiet_Editor", is_active=1)
         assert should_hide_from_inprocess("Quiet_Editor") is True
 
     def test_returns_false_when_record_exists_but_inactive(self, monkeypatch):
         """Test that function returns False when record exists but is inactive."""
-        add_users_no_inprocess("Noisy_Editor", active=0)
+        add_users_no_inprocess("Noisy_Editor", is_active=0)
         assert should_hide_from_inprocess("Noisy_Editor") is False
 
     def test_returns_false_when_no_record(self, monkeypatch):
