@@ -13,7 +13,6 @@ from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.models import _CategoryRecord, _ReportRecord
 from ....public.models import _InProcessRecord, _LangRecord
-from .pages_query_service import list_pages_users, list_pages_with_views
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 

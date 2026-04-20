@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import Text, create_engine
+from sqlalchemy import Text, create_engine, inspect, text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
@@ -129,6 +129,29 @@ def get_session() -> Session:
         # In a real app, init_db would be called at startup.
         raise RuntimeError("Call init_db() before using the database.")
     return _SessionFactory()
+
+
+# -----------------------------------------------------------------------------
+# Create views_new_all view automatically when tables are created
+# -----------------------------------------------------------------------------
+
+
+@event.listens_for(BaseDb.metadata, "after_create")
+def create_views_new_all_view(target, connection, **kw):
+    inspector = inspect(connection)
+    existing_views = inspector.get_view_names()
+
+    if "views_new_all" not in existing_views:
+        connection.execute(text("""
+            CREATE VIEW views_new_all AS
+            SELECT v.target AS target,
+                   v.lang AS lang,
+                   SUM(v.views) AS views
+            FROM views_new v
+            GROUP BY v.target, v.lang
+        """))
+    else:
+        print("View 'views_new_all' already exists, skipping creation.")
 
 
 __all__ = [
