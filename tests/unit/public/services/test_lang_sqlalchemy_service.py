@@ -11,7 +11,7 @@ from src.sqlalchemy_app.public.services.lang_service import (
     list_langs,
     update_lang,
 )
-from src.sqlalchemy_app.shared.db_models.public_models import LangRecord
+from src.db_models.public_models import LangRecord
 
 
 def test_lang_workflow():

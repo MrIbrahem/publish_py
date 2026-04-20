@@ -12,7 +12,7 @@ from src.sqlalchemy_app.public.services.refs_count_service import (
     list_refs_counts,
     update_refs_count,
 )
-from src.sqlalchemy_app.shared.db_models.public_models import RefsCountRecord
+from src.db_models.public_models import RefsCountRecord
 
 
 def test_refs_count_workflow():

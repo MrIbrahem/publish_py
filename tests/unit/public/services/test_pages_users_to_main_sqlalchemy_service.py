@@ -9,7 +9,7 @@ from src.sqlalchemy_app.public.services.pages_users_to_main_service import (
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
-from src.sqlalchemy_app.shared.db_models.public_models import PagesUsersToMainRecord
+from src.db_models.public_models import PagesUsersToMainRecord
 
 
 def test_pages_users_to_main_workflow():

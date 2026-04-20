@@ -4,7 +4,7 @@ Unit tests for domain.models.views_new module.
 Tests for ViewsNewRecord.
 """
 
-from src.sqlalchemy_app.shared.db_models.public_models import (
+from src.db_models.public_models import (
     ViewsNewRecord,
 )
 

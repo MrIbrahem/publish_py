@@ -4,7 +4,7 @@ Unit tests for domain.models.project module.
 Tests for ProjectRecord.
 """
 
-from src.sqlalchemy_app.shared.db_models.public_models import (
+from src.db_models.public_models import (
     ProjectRecord,
 )
 

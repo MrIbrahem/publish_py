@@ -12,7 +12,7 @@ from src.sqlalchemy_app.public.services.enwiki_pageview_service import (
     list_enwiki_pageviews,
     update_enwiki_pageview,
 )
-from src.sqlalchemy_app.shared.db_models.public_models import EnwikiPageviewRecord
+from src.db_models.public_models import EnwikiPageviewRecord
 
 
 def test_enwiki_pageview_workflow():

@@ -4,7 +4,7 @@ Unit tests for domain.models.pages_users_to_main module.
 Tests for PagesUsersToMainRecord.
 """
 
-from src.sqlalchemy_app.shared.db_models.public_models import (
+from src.db_models.public_models import (
     PagesUsersToMainRecord,
 )
 

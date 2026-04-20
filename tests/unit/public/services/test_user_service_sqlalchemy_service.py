@@ -13,7 +13,7 @@ from src.sqlalchemy_app.public.services.user_service import (
     update_user,
     user_exists,
 )
-from src.sqlalchemy_app.shared.db_models.public_models import UserRecord
+from src.db_models.public_models import UserRecord
 
 
 def test_user_workflow():

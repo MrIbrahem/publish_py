@@ -15,7 +15,7 @@ from src.sqlalchemy_app.public.services.translate_type_service import (
     list_translate_types,
     update_translate_type,
 )
-from src.sqlalchemy_app.shared.db_models.public_models import TranslateTypeRecord
+from src.db_models.public_models import TranslateTypeRecord
 
 
 def test_translate_type_workflow():

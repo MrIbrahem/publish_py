@@ -6,7 +6,7 @@ Tests for UserRecord.
 
 from datetime import datetime
 
-from src.sqlalchemy_app.shared.db_models.public_models import (
+from src.db_models.public_models import (
     UserRecord,
 )
 

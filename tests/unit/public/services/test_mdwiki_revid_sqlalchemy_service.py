@@ -11,7 +11,7 @@ from src.sqlalchemy_app.public.services.mdwiki_revid_service import (
     list_mdwiki_revids,
     update_mdwiki_revid,
 )
-from src.sqlalchemy_app.shared.db_models.public_models import MdwikiRevidRecord
+from src.db_models.public_models import MdwikiRevidRecord
 
 
 def test_mdwiki_revid_workflow():
