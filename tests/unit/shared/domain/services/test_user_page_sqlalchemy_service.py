@@ -1,8 +1,9 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, get_session, init_db
+from src.sqlalchemy_app.shared.domain.engine import get_session
 from src.sqlalchemy_app.shared.domain.models import _UserPageRecord
+from src.sqlalchemy_app.shared.domain_models import UserPageRecord
 from src.sqlalchemy_app.shared.domain.services.user_page_service import (
     add_or_update_user_page,
     add_user_page,
@@ -12,7 +13,6 @@ from src.sqlalchemy_app.shared.domain.services.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.sqlalchemy_app.shared.domain_models import UserPageRecord
 
 
 def test_user_page_workflow():
