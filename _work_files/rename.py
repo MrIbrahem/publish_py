@@ -3,29 +3,29 @@ import re
 from pathlib import Path
 
 
-def rename_test_files(target_dir):
+def rename_test_files_recursive(root_dir):
+    root_dir = 'tests'
 
-    # Regex to match the specific file naming convention
-    file_pattern = re.compile(r"test_.*?_sqlalchemy_service\.py")
+    # Matches files like test_v1_sqlalchemy_service.py
+    file_pattern = re.compile(r'test_.*?_sqlalchemy_service\.py')
 
-    # Regex to extract the service name from the import statement
-    # Group 1: admin|public|shared
-    # Group 2: the actual service name (e.g., category_service)
-    import_pattern = re.compile(r"from src\.sqlalchemy_app\.(?:admin|public|shared)\.services\.(.*?) import \(")
+    # Matches the import line and captures the service name in Group 1
+    # Note: (?:...) is a non-capturing group for the module path
+    import_pattern = re.compile(
+        r'from src\.sqlalchemy_app\.(?:admin|public|shared)\.services\.(.*?) import \('
+    )
 
-    if not os.path.exists(target_dir):
-        print(f"Directory '{target_dir}' not found.")
+    if not os.path.exists(root_dir):
+        print(f"Directory '{root_dir}' not found.")
         return
 
-    for root, dirs, files in os.walk(target_dir):
-
-        for filename in files:
-            print(filename)
+    for dirpath, _, filenames in os.walk(root_dir):
+        for filename in filenames:
             if file_pattern.match(filename):
-                file_path = os.path.join(target_dir, filename)
+                file_path = os.path.join(dirpath, filename)
 
                 try:
-                    with open(file_path, "r", encoding="utf-8") as f:
+                    with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
 
                     match = import_pattern.search(content)
@@ -33,21 +33,24 @@ def rename_test_files(target_dir):
                     if match:
                         service_name = match.group(1)
                         new_filename = f"test_{service_name}.py"
-                        new_file_path = os.path.join(target_dir, new_filename)
+                        new_file_path = os.path.join(dirpath, new_filename)
 
-                        # Avoid overwriting if the name is already correct or exists
                         if filename != new_filename:
-                            os.rename(file_path, new_file_path)
-                            print(f"Renamed: {filename} -> {new_filename}")
+                            # Check if destination already exists to prevent data loss
+                            if os.path.exists(new_file_path):
+                                print(f"Conflict: {new_filename} already exists in {dirpath}. Skipping.")
+                            else:
+                                os.rename(file_path, new_file_path)
+                                print(f"Renamed: {filename} -> {new_filename}")
                         else:
-                            print(f"Skipped: {filename} already matches target name.")
+                            print(f"Skipped: {filename} is already correctly named.")
                     else:
-                        print(f"No matching import found in: {filename}")
+                        print(f"No matching import found in: {file_path}")
 
                 except Exception as e:
-                    print(f"Error processing {filename}: {e}")
+                    print(f"Error processing {file_path}: {e}")
 
 
 if __name__ == "__main__":
-    target_dir = Path(__file__).parent.parent / "tests/unit"
-    rename_test_files(target_dir)
+    root_dir = Path(__file__).parent.parent / "tests/unit"
+    rename_test_files_recursive(root_dir)
