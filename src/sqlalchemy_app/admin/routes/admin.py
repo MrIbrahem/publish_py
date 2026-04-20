@@ -25,6 +25,7 @@ from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .settings import SettingsRoutes
 from .users_no_inprocess import UsersNoInprocess
+from .projects import ProjectsDashboard
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,7 @@ def register_blueprints(bp_admin) -> None:
     LanguageSettings(bp_admin)
     # Templates(bp_admin)
     SettingsRoutes(bp_admin)
+    ProjectsDashboard(bp_admin)
     # Jobs(bp_admin)
     # OwidCharts(bp_admin)
 

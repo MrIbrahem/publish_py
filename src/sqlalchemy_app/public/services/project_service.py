@@ -80,6 +80,20 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord:
         return ProjectRecord(**orm_obj.to_dict())
 
 
+def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
+    """Update a project record."""
+    with get_session() as session:
+        orm_obj = session.query(_ProjectRecord).filter(_ProjectRecord.g_id == project_id).first()
+        if not orm_obj:
+            raise ValueError(f"Project record with ID {project_id} not found")
+
+        orm_obj.g_title = g_title
+
+        session.commit()
+        session.refresh(orm_obj)
+        return ProjectRecord(**orm_obj.to_dict())
+
+
 def delete_project(project_id: int) -> ProjectRecord:
     """Delete a project record by ID."""
     with get_session() as session:
@@ -99,5 +113,6 @@ __all__ = [
     "get_project_by_title",
     "add_project",
     "update_project",
+    "update_project_title",
     "delete_project",
 ]
