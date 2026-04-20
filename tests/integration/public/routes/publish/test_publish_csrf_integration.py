@@ -163,6 +163,9 @@ class BasePublishTest:
             patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
             patch("src.sqlalchemy_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
             patch("src.sqlalchemy_app.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
+            patch(
+                "src.sqlalchemy_app.public.routes.publish.worker.find_exists_or_update_user_page"
+            ) as mock_user_find_exists,
             patch("src.sqlalchemy_app.public.routes.publish.worker.insert_page_target") as mock_insert_page,
             patch("src.sqlalchemy_app.public.routes.publish.worker.insert_user_page_target") as mock_insert_user_page,
         ):
@@ -189,6 +192,7 @@ class BasePublishTest:
                 "add_report": mock_load_reports_db,
                 "should_add": mock_should_add,
                 "find_exists_or_update_page": mock_find_exists,
+                "find_exists_or_update_user_page": mock_user_find_exists,
                 "insert_page_target": mock_insert_page,
                 "insert_user_page_target": mock_insert_user_page,
             }
@@ -279,7 +283,19 @@ class TestMetadataLogic(BasePublishTest):
             assert tab["words"] == 500
 
     def test_hashtag_logic(self, csrf_client, common_patches):
-        """TODO: write tests"""
+        response = self._post(
+            csrf_client,
+            self._default_payload(
+                user="Mr. Ibrahem",
+                title="Mr. Ibrahem/Test Page",
+            ),
+        )
+
+        assert response.status_code == 200
+        to_do_calls = common_patches["to_do"].call_args_list
+        if to_do_calls:
+            summary = to_do_calls[0][0][0].get("summary", "")
+            assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
 
     def test_empty_revid_fallback(self, csrf_client, common_patches):
         # نُعدّل الـ revid ليكون فارغاً
