@@ -14,6 +14,15 @@ from ..models import _CategoryRecord
 logger = logging.getLogger(__name__)
 
 
+def set_default_category(session, orm_obj) -> CategoryRecord:
+    session.query(_CategoryRecord).update({_CategoryRecord.is_default: 0})
+    orm_obj.is_default = 1
+    session.commit()
+    session.refresh(orm_obj)
+    record = CategoryRecord(**orm_obj.to_dict())
+    return record
+
+
 def add_category(
     category: str,
     display: str | None = "",
@@ -50,11 +59,7 @@ def add_category(
 
         if is_default:
             # set this category as default by unsetting default flag on all other categories
-            session.query(_CategoryRecord).update({_CategoryRecord.is_default: 0})
-            orm_obj.is_default = 1
-            session.commit()
-            session.refresh(orm_obj)
-            record = CategoryRecord(**orm_obj.to_dict())
+            record = set_default_category(session, orm_obj)
 
         return record
 

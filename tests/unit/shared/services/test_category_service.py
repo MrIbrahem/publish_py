@@ -13,14 +13,18 @@ from src.sqlalchemy_app.shared.services.category_service import (
 )
 
 
-def test_category_workflow():
+def test_category_workflow() -> None:
     c = add_category("Medicine", "Medicine Content", "Health_Campaign", "Anatomy", 1, 1)
     assert c.category == "Medicine"
+
     assert get_campaign_category("Health_Campaign").category == "Medicine"
     assert any(x.category == "Medicine" for x in list_categories())
+
     assert get_camp_to_cats()["Health_Campaign"] == "Medicine"
+
     updated = update_category(c.id, "Medical_Science", "Science_Campaign")
     assert updated.category == "Medical_Science"
+
     delete_category(c.id)
     assert get_campaign_category("Science_Campaign") is None
 
