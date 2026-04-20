@@ -24,7 +24,7 @@ def list_user_pages() -> List[UserPageRecord]:
         return [UserPageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
-def insert_user_page_target(
+def add_user_page(
     sourcetitle: str,
     tr_type: str,
     cat: str,
@@ -33,7 +33,7 @@ def insert_user_page_target(
     target: str,
     mdwiki_revid: int | None = None,
     word: int = 0,
-) -> bool:
+) -> UserPageRecord:
     """Insert a page target record."""
     with get_session() as session:
         orm_obj = _UserPageRecord(
@@ -50,14 +50,19 @@ def insert_user_page_target(
         session.add(orm_obj)
         try:
             session.commit()
-            return True
-        except Exception as e:
-            logger.error(f"Failed to insert page target: {e}")
+            session.refresh(orm_obj)
+            return UserPageRecord(**orm_obj.to_dict())
+        except IntegrityError as e:
+            logger.error(f"Failed to add page (integrity error): {e}")
             session.rollback()
-            return False
+            raise ValueError(f"Page with title '{sourcetitle}' already exists") from e
+        except Exception as e:
+            logger.error(f"Failed to add page: {e}")
+            session.rollback()
+            raise
 
 
-def add_user_page(
+def insert_user_page_target(
     sourcetitle: str,
     tr_type: str,
     cat: str,
@@ -67,17 +72,24 @@ def add_user_page(
     mdwiki_revid: int | None = None,
     word: int = 0,
 ) -> UserPageRecord:
-    """Add a page."""
-    return insert_user_page_target(
-        sourcetitle,
-        tr_type,
-        cat,
-        lang,
-        user,
-        target,
-        mdwiki_revid,
-        word,
-    )
+    """Add a page and return the created record."""
+    try:
+        add_user_page(
+            title=sourcetitle,
+            word=word,
+            translate_type=tr_type,
+            cat=cat,
+            lang=lang,
+            user=user,
+            pupdate=func.current_date(),
+            target=target,
+            mdwiki_revid=mdwiki_revid,
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Failed to add page: {e}")
+        return False
+
 
 def update_user_page(page_id: int, title: str, main_file: str) -> UserPageRecord:
     """Update page."""
