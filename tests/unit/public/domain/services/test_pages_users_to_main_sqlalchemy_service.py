@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.public_models import PagesUsersToMainRecord
 from src.sqlalchemy_app.public.domain.models import _PagesUsersToMainRecord
 from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service import (
     add_pages_users_to_main,
@@ -9,7 +10,6 @@ from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service impor
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
-from src.sqlalchemy_app.public.domain_models import PagesUsersToMainRecord
 
 
 def test_pages_users_to_main_workflow():

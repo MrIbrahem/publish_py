@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.shared_models import CategoryRecord
 from src.sqlalchemy_app.shared.domain.models import _CategoryRecord
 from src.sqlalchemy_app.shared.domain.services.category_service import (
     add_category,
@@ -10,7 +11,6 @@ from src.sqlalchemy_app.shared.domain.services.category_service import (
     list_categories,
     update_category,
 )
-from src.sqlalchemy_app.shared.domain_models import CategoryRecord
 
 
 def test_category_workflow():

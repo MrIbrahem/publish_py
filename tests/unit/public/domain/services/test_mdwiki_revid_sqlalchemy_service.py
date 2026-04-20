@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.public_models import MdwikiRevidRecord
 from src.sqlalchemy_app.public.domain.models import _MdwikiRevidRecord
 from src.sqlalchemy_app.public.domain.services.mdwiki_revid_service import (
     add_mdwiki_revid,
@@ -11,7 +12,6 @@ from src.sqlalchemy_app.public.domain.services.mdwiki_revid_service import (
     list_mdwiki_revids,
     update_mdwiki_revid,
 )
-from src.sqlalchemy_app.public.domain_models import MdwikiRevidRecord
 
 
 def test_mdwiki_revid_workflow():

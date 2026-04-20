@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.public_models import TranslateTypeRecord
 from src.sqlalchemy_app.public.domain.models import _TranslateTypeRecord
 from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     add_or_update_translate_type,
@@ -15,7 +16,6 @@ from src.sqlalchemy_app.public.domain.services.translate_type_service import (
     list_translate_types,
     update_translate_type,
 )
-from src.sqlalchemy_app.public.domain_models import TranslateTypeRecord
 
 
 def test_translate_type_workflow():

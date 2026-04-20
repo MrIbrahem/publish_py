@@ -16,15 +16,6 @@ These tests verify:
 The actual DB operations are mocked to avoid requiring a real database.
 """
 
-from unittest.mock import MagicMock, patch
-
-import pytest
-from sqlalchemy.orm import sessionmaker
-from src.sqlalchemy_app.shared.domain.engine import (
-    BaseDb,
-    build_engine,
-    init_db,
-)
 from src.sqlalchemy_app.shared.domain.services.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,

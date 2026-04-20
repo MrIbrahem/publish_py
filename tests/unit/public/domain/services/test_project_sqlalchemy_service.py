@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.public_models import ProjectRecord
 from src.sqlalchemy_app.public.domain.models import _ProjectRecord
 from src.sqlalchemy_app.public.domain.services.project_service import (
     add_or_update_project,
@@ -11,7 +12,6 @@ from src.sqlalchemy_app.public.domain.services.project_service import (
     list_projects,
     update_project,
 )
-from src.sqlalchemy_app.public.domain_models import ProjectRecord
 
 
 def test_project_workflow():

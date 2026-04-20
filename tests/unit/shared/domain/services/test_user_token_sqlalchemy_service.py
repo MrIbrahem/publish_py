@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.db_models.shared_models import UserTokenRecord
 from src.sqlalchemy_app.shared.domain.models import _UserTokenRecord
 from src.sqlalchemy_app.shared.domain.services.user_token_service import (
     delete_user_token,
@@ -9,7 +10,6 @@ from src.sqlalchemy_app.shared.domain.services.user_token_service import (
     get_user_token_by_username,
     upsert_user_token,
 )
-from src.sqlalchemy_app.shared.domain_models import UserTokenRecord
 
 
 def test_user_token_workflow():
