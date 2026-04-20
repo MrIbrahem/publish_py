@@ -55,6 +55,7 @@ def create_side(active_route):
                 href="last",
                 title="Recent",
                 icon="bi-clock-history",
+                ready=True,
             ),
             SidebarItem(
                 id="process",

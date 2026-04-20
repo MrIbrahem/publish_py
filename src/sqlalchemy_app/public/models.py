@@ -403,7 +403,7 @@ __all__ = [
 def create_views_new_all_view(target, connection, **kw):
     """Create the views_new_all view after tables are created."""
     connection.execute(text("""
-        CREATE OR REPLACE VIEW views_new_all AS
+        CREATE VIEW views_new_all AS
         SELECT v.target AS target,
                v.lang AS lang,
                SUM(v.views) AS views
