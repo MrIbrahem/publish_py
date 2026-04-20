@@ -4,7 +4,7 @@ Public domain models.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, func, text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, event, func, text
 
 from ..shared.engine import BaseDb
 
@@ -335,6 +335,11 @@ class _ViewsNewAllRecord(BaseDb):
     target = Column(String(120), primary_key=True, nullable=False)
     lang = Column(String(30), primary_key=True, nullable=False)
     views = Column(Integer, default=0, server_default=text("0"))
+
+    __table_args__ = (
+        # Prevent SQLAlchemy from trying to create this as a table
+        {'info': {'is_view': True}},
+    )
 
     def to_dict(self) -> dict:
         return {

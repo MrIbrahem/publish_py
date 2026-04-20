@@ -12,6 +12,9 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
 
+from sqlalchemy import event
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -109,7 +112,12 @@ def init_db(db_url: str, create_tables: bool = False) -> None:
     global _SessionFactory
     engine = build_engine(db_url)
     if create_tables:
-        BaseDb.metadata.create_all(engine)
+        tables = [
+            t for t in BaseDb.metadata.tables.values()
+            if not t.info.get("is_view")
+        ]
+
+        BaseDb.metadata.create_all(engine, tables=tables)
     _SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
 
 
