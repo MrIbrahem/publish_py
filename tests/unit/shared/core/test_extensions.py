@@ -6,7 +6,7 @@ TODO: write tests
 from __future__ import annotations
 
 import pytest
-from src.sqlalchemy_app.shared.core.extensions import csrf, csrf_init_app, csrf_exempt
+from src.sqlalchemy_app.shared.core.extensions import csrf, csrf_exempt, csrf_init_app
 
 
 class TestCsrf:
