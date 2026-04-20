@@ -61,11 +61,8 @@ def _add_project() -> ResponseReturnValue:
     return redirect(url_for("admin.projects_dashboard"))
 
 
-def _update_project(record_id: int, g_title: str | None = None) -> ResponseReturnValue:
+def _update_project(record_id: int, g_title: str) -> None:
     """Update an existing project record."""
-
-    if g_title is None:
-        g_title = request.form.get("g_title")
 
     try:
         record = update_project_title(record_id, g_title)
@@ -78,10 +75,8 @@ def _update_project(record_id: int, g_title: str | None = None) -> ResponseRetur
     else:
         flash(f"project for '{record.g_title}' updated.", "success")
 
-    return redirect(url_for("admin.projects_dashboard"))
 
-
-def _delete_project(record_id: int) -> ResponseReturnValue:
+def _delete_project(record_id: int) -> None:
     """Remove a project record entirely."""
 
     try:
@@ -94,8 +89,6 @@ def _delete_project(record_id: int) -> ResponseReturnValue:
         flash("Unable to delete project. Please try again.", "danger")
     else:
         flash(f"project for '{record.g_title}' removed.", "success")
-
-    return redirect(url_for("admin.projects_dashboard"))
 
 
 class ProjectsDashboard:
@@ -110,26 +103,23 @@ class ProjectsDashboard:
         def add_project_record() -> ResponseReturnValue:
             return _add_project()
 
-        @bp_admin.post("/projects/<int:record_id>/delete")
-        @admin_required
-        def delete_project_route(record_id: int) -> ResponseReturnValue:
-            return _delete_project(record_id)
-
         @bp_admin.post("/projects/update")
         @admin_required
         def projects_update() -> ResponseReturnValue:
             projects = request.form.getlist("projects[][g_id]")
             titles = request.form.getlist("projects[][g_title]")
+            titles_original = request.form.getlist("titles_original[][g_title]")
             deletes = request.form.getlist("projects[][delete]")
 
             for i, g_id in enumerate(projects):
                 record_id = int(g_id)
                 g_title = titles[i] if i < len(titles) else ""
+                g_title_original = titles_original[i] if i < len(titles_original) else ""
                 is_deleted = str(record_id) in deletes
 
                 if is_deleted:
                     _delete_project(record_id)
-                elif g_title:
+                elif g_title != g_title_original:
                     _update_project(record_id, g_title)
 
             return redirect(url_for("admin.projects_dashboard"))
