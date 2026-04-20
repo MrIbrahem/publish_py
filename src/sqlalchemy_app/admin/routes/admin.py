@@ -22,6 +22,7 @@ from ..decorators import admin_required
 from ..sidebar import create_side
 from .coordinators import Coordinators
 from .full_translators import FullTranslators
+from .in_process import InProcess
 from .in_process_total import InProcessTotal
 from .language_settings import LanguageSettings
 from .settings import SettingsRoutes
@@ -58,6 +59,7 @@ def reports():
 def register_blueprints(bp_admin) -> None:
     Coordinators(bp_admin)
     FullTranslators(bp_admin)
+    InProcess(bp_admin)
     InProcessTotal(bp_admin)
     UsersNoInprocess(bp_admin)
     LanguageSettings(bp_admin)

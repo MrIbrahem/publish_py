@@ -62,6 +62,7 @@ def create_side(active_route):
                 href="process",
                 title="In Process",
                 icon="bi-hourglass",
+                ready=True,
             ),
             SidebarItem(
                 id="process_total",
