@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.domain_models import PageRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, get_session, init_db
 from src.sqlalchemy_app.shared.domain.models import _PageRecord
 from src.sqlalchemy_app.shared.domain.services.page_service import (
@@ -13,6 +12,7 @@ from src.sqlalchemy_app.shared.domain.services.page_service import (
     list_pages,
     update_page,
 )
+from src.sqlalchemy_app.shared.domain_models import PageRecord
 
 
 @pytest.fixture(autouse=True)
@@ -76,6 +76,7 @@ class TestAddPage:
 
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
+
         with patch("src.sqlalchemy_app.shared.domain.services.page_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
@@ -174,13 +175,24 @@ class TestInsertPageTarget:
 
     def test_inserts_correctly(self, monkeypatch):
         """Test that function inserts correctly."""
-        success = insert_page_target("Global warming", "type", "Climate", "en", "Climatologist", "Global_warming_target.html")
+        success = insert_page_target(
+            "Global warming", "type", "Climate", "en", "Climatologist", "Global_warming_target.html"
+        )
         assert success is True
         assert any(p.title == "Global warming" for p in list_pages())
 
     def test_passes_optional_params(self, monkeypatch):
         """Test that optional parameters are passed correctly."""
-        success = insert_page_target("Astrophysics", "type", "Science", "en", "Astronomer", "Astrophysics_target.html", mdwiki_revid=987654, word=1200)
+        success = insert_page_target(
+            "Astrophysics",
+            "type",
+            "Science",
+            "en",
+            "Astronomer",
+            "Astrophysics_target.html",
+            mdwiki_revid=987654,
+            word=1200,
+        )
         assert success is True
         p = next(p for p in list_pages() if p.title == "Astrophysics")
         assert p.mdwiki_revid == 987654

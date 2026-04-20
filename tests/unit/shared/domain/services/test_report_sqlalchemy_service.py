@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.domain_models import ReportRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, get_session, init_db
 from src.sqlalchemy_app.shared.domain.models import _ReportRecord
 from src.sqlalchemy_app.shared.domain.services.report_service import (
@@ -10,6 +9,7 @@ from src.sqlalchemy_app.shared.domain.services.report_service import (
     list_reports,
     query_reports_with_filters,
 )
+from src.sqlalchemy_app.shared.domain_models import ReportRecord
 
 
 @pytest.fixture(autouse=True)
@@ -26,7 +26,7 @@ def setup_db():
 
 
 def test_report_workflow():
-    r = add_report("Malaria", "User:Admin", "en", "Malaria_source", "success", "{\"status\": \"published\"}")
+    r = add_report("Malaria", "User:Admin", "en", "Malaria_source", "success", '{"status": "published"}')
     assert r.title == "Malaria"
     assert any(x.title == "Malaria" for x in list_reports())
     filters = {"user": "User:Admin", "lang": "en"}
@@ -97,9 +97,20 @@ class TestQueryReportsWithFilters:
 
     def test_filters_by_year_month(self):
         from datetime import datetime
+
         with get_session() as session:
             # SQLite current_timestamp is UTC
-            session.add(_ReportRecord(title="Old Report", user="U", lang="en", sourcetitle="S", result="ok", data="{}", date=datetime(2020, 5, 1)))
+            session.add(
+                _ReportRecord(
+                    title="Old Report",
+                    user="U",
+                    lang="en",
+                    sourcetitle="S",
+                    result="ok",
+                    data="{}",
+                    date=datetime(2020, 5, 1),
+                )
+            )
             session.commit()
 
         results = query_reports_with_filters({"year": 2020, "month": 5})

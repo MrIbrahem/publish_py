@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.domain_models import UserTokenRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 from src.sqlalchemy_app.shared.domain.models import _UserTokenRecord
 from src.sqlalchemy_app.shared.domain.services.user_token_service import (
@@ -11,6 +10,7 @@ from src.sqlalchemy_app.shared.domain.services.user_token_service import (
     get_user_token_by_username,
     upsert_user_token,
 )
+from src.sqlalchemy_app.shared.domain_models import UserTokenRecord
 
 
 @pytest.fixture(autouse=True)
@@ -27,7 +27,9 @@ def setup_db():
 
 
 def test_user_token_workflow():
-    upsert_user_token(user_id=12345, username="ExampleWikiEditor", access_key="oauth_key_123", access_secret="oauth_secret_456")
+    upsert_user_token(
+        user_id=12345, username="ExampleWikiEditor", access_key="oauth_key_123", access_secret="oauth_secret_456"
+    )
     t = get_user_token(12345)
     assert t.username == "ExampleWikiEditor"
     assert get_user_token_by_username("ExampleWikiEditor").user_id == 12345

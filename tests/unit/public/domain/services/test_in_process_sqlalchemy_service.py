@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.public.domain_models import InProcessRecord
 from src.sqlalchemy_app.public.domain.models import _InProcessRecord
 from src.sqlalchemy_app.public.domain.services.in_process_service import (
     add_in_process,
@@ -15,6 +14,7 @@ from src.sqlalchemy_app.public.domain.services.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
+from src.sqlalchemy_app.public.domain_models import InProcessRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
@@ -146,6 +146,7 @@ class TestAddInProcess:
 
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
+
         with patch("src.sqlalchemy_app.public.domain.services.in_process_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)

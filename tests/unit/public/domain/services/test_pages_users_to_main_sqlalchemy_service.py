@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.public.domain_models import PagesUsersToMainRecord
 from src.sqlalchemy_app.public.domain.models import _PagesUsersToMainRecord
 from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service import (
     add_pages_users_to_main,
@@ -10,6 +9,7 @@ from src.sqlalchemy_app.public.domain.services.pages_users_to_main_service impor
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
+from src.sqlalchemy_app.public.domain_models import PagesUsersToMainRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
@@ -70,6 +70,7 @@ class TestListPagesUsersToMain:
         """Test that function returns list from store."""
         from sqlalchemy import text
         from src.sqlalchemy_app.shared.domain.engine import get_session
+
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (10, 'Malaria'), (20, 'Cholera')"))
             session.commit()
@@ -87,6 +88,7 @@ class TestGetPagesUsersToMain:
         """Test that function returns record by ID."""
         from sqlalchemy import text
         from src.sqlalchemy_app.shared.domain.engine import get_session
+
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (30, 'Dengue fever')"))
             session.commit()
@@ -107,6 +109,7 @@ class TestAddPagesUsersToMain:
         """Test that function adds and returns record."""
         from sqlalchemy import text
         from src.sqlalchemy_app.shared.domain.engine import get_session
+
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (40, 'Yellow fever')"))
             session.commit()
@@ -117,7 +120,10 @@ class TestAddPagesUsersToMain:
 
     def test_raises_error_on_failure(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
-        with patch("src.sqlalchemy_app.public.domain.services.pages_users_to_main_service.get_session") as mock_get_session:
+
+        with patch(
+            "src.sqlalchemy_app.public.domain.services.pages_users_to_main_service.get_session"
+        ) as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
@@ -132,6 +138,7 @@ class TestUpdatePagesUsersToMain:
         """Test that function updates and returns record."""
         from sqlalchemy import text
         from src.sqlalchemy_app.shared.domain.engine import get_session
+
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (50, 'Zika virus')"))
             session.commit()
@@ -143,6 +150,7 @@ class TestUpdatePagesUsersToMain:
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         from sqlalchemy import text
         from src.sqlalchemy_app.shared.domain.engine import get_session
+
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (51, 'T')"))
             session.commit()
@@ -162,6 +170,7 @@ class TestDeletePagesUsersToMain:
         """Test that function deletes the record."""
         from sqlalchemy import text
         from src.sqlalchemy_app.shared.domain.engine import get_session
+
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (60, 'Ebola virus')"))
             session.commit()

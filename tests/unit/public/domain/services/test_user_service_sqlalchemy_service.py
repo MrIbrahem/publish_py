@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.public.domain_models import UserRecord
 from src.sqlalchemy_app.public.domain.models import _UserRecord
 from src.sqlalchemy_app.public.domain.services.user_service import (
     add_or_update_user,
@@ -14,6 +13,7 @@ from src.sqlalchemy_app.public.domain.services.user_service import (
     update_user,
     user_exists,
 )
+from src.sqlalchemy_app.public.domain_models import UserRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
@@ -109,6 +109,7 @@ class TestAddUser:
         # User table in models.py doesn't have UNIQUE on username.
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
+
         with patch("src.sqlalchemy_app.public.domain.services.user_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)

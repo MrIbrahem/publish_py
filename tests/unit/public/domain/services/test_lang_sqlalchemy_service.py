@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.public.domain_models import LangRecord
 from src.sqlalchemy_app.public.domain.models import _LangRecord
 from src.sqlalchemy_app.public.domain.services.lang_service import (
     add_lang,
@@ -12,6 +11,7 @@ from src.sqlalchemy_app.public.domain.services.lang_service import (
     list_langs,
     update_lang,
 )
+from src.sqlalchemy_app.public.domain_models import LangRecord
 from src.sqlalchemy_app.shared.domain.engine import BaseDb, build_engine, init_db
 
 
@@ -109,6 +109,7 @@ class TestAddLang:
         # Lang table in models.py doesn't have UNIQUE on code.
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
+
         with patch("src.sqlalchemy_app.public.domain.services.lang_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
