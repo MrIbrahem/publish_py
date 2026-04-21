@@ -38,6 +38,10 @@ class UserTokenRecord:
         access_secret = decrypt_value(self.access_secret)
         return access_key, access_secret
 
+    def __post_init__(self):
+        self.access_token = coerce_bytes(self.access_token)
+        self.access_secret = coerce_bytes(self.access_secret)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "user_id": self.user_id,
