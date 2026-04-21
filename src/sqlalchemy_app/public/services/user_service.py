@@ -93,6 +93,11 @@ def update_user(
     user_group: str = "Uncategorized",
 ) -> UserRecord:
     """Update a user record."""
+
+    username = username.strip()
+    if not username:
+        raise ValueError("Username is required")
+
     with get_session() as session:
         orm_obj = session.query(_UserRecord).filter(_UserRecord.user_id == user_id).first()
         if not orm_obj:

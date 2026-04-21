@@ -1,4 +1,4 @@
-"""Admin-only routes for managing users not in process."""
+"""Admin-only routes for managing user emails and groups."""
 
 from __future__ import annotations
 
@@ -127,7 +127,7 @@ def _update_record(user_id: int) -> ResponseReturnValue:
             wiki=wiki,
             user_group=user_group,
         )
-    except LookupError as exc:
+    except ValueError as exc:
         logger.exception("Unable to update User.")
         flash(str(exc), "warning")
     except Exception:  # pragma: no cover - defensive guard
@@ -151,7 +151,7 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
         logger.exception("Unable to delete user.")
         flash("Unable to delete user. Please try again.", "danger")
     else:
-        flash(f"User '{record.user}' deleted", "success")
+        flash(f"User '{record.username}' deleted", "success")
 
     return redirect(url_for("admin.users_emails.dashboard"))
 
