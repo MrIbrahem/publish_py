@@ -11,10 +11,10 @@ from typing import Any, Dict, List
 from flask import Response, jsonify, request
 from sqlalchemy import Integer, case, cast, func
 
+from ....public.models import _LangRecord, _ViewsNewAllRecord, _WordRecord
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.models import _PageRecord
-from ....public.models import _LangRecord, _ViewsNewAllRecord, _WordRecord
 
 logger = logging.getLogger(__name__)
 
@@ -73,9 +73,7 @@ def get_top_langs() -> Response:
             # Build the word count expression
             word_expr = case(
                 (
-                    _PageRecord.word.is_not(None)
-                    & (_PageRecord.word != 0)
-                    & (_PageRecord.word != ""),
+                    _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
                     _PageRecord.word,
                 ),
                 (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
@@ -100,8 +98,7 @@ def get_top_langs() -> Response:
                 .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
                 .outerjoin(
                     _ViewsNewAllRecord,
-                    (_PageRecord.target == _ViewsNewAllRecord.target)
-                    & (_PageRecord.lang == _ViewsNewAllRecord.lang),
+                    (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),
                 )
                 .outerjoin(_LangRecord, _PageRecord.lang == _LangRecord.code)
                 .filter(_PageRecord.target != "")
@@ -196,9 +193,7 @@ def get_top_users() -> Response:
             # Build the word count expression
             word_expr = case(
                 (
-                    _PageRecord.word.is_not(None)
-                    & (_PageRecord.word != 0)
-                    & (_PageRecord.word != ""),
+                    _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
                     _PageRecord.word,
                 ),
                 (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
@@ -222,8 +217,7 @@ def get_top_users() -> Response:
                 .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
                 .outerjoin(
                     _ViewsNewAllRecord,
-                    (_PageRecord.target == _ViewsNewAllRecord.target)
-                    & (_PageRecord.lang == _ViewsNewAllRecord.lang),
+                    (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),
                 )
                 .filter(_PageRecord.target != "")
                 .filter(_PageRecord.target.is_not(None))

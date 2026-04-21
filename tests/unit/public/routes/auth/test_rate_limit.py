@@ -7,7 +7,6 @@ from __future__ import annotations
 from datetime import timedelta
 
 import pytest
-
 from src.sqlalchemy_app.public.routes.auth.rate_limit import (
     RateLimiter,
     callback_rate_limiter,

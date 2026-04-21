@@ -178,10 +178,7 @@ def get_in_process_counts_by_user() -> List[dict]:
             .order_by(func.count(_InProcessRecord.id).desc())
             .all()
         )
-        return [
-            {"user": row.user, "article_count": row.article_count}
-            for row in results
-        ]
+        return [{"user": row.user, "article_count": row.article_count} for row in results]
 
 
 __all__ = [

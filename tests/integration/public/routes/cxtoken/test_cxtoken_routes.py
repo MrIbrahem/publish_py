@@ -147,7 +147,9 @@ class TestCxTokenUserFormatting:
             with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.settings") as mock_settings:
                 mock_settings.users.special_users = {"SpecialUser": "MappedUser"}
 
-                with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+                with patch(
+                    "src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username"
+                ) as mock_get_token:
                     mock_get_token.return_value = None
 
                     response = client.get("/cxtoken/?wiki=en&user=SpecialUser")

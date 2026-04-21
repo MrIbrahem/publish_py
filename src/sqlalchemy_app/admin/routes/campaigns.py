@@ -16,15 +16,15 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..decorators import admin_required
 from ...shared.services.category_service import (
     add_category,
-    update_category,
     delete_category,
+    get_camp_to_cats,
     get_campaign_category,
     list_categories,
-    get_camp_to_cats,
+    update_category,
 )
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

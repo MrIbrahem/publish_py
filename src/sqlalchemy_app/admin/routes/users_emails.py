@@ -15,23 +15,20 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...public.services.project_service import list_projects
-
 from ...db_models.public_models import ProjectRecord, UserRecord
-
-from ...shared.services.page_service import list_of_users_by_translations_count
-
-from ..decorators import admin_required
+from ...public.services.project_service import list_projects
 from ...public.services.user_service import (
-    list_users,
-    list_users_by_group,
+    add_user,
+    delete_user,
     get_user,
     get_user_by_username,
-    add_user,
+    list_users,
+    list_users_by_group,
     update_user,
-    delete_user,
     user_exists,
 )
+from ...shared.services.page_service import list_of_users_by_translations_count
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

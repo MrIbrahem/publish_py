@@ -9,19 +9,16 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
-from ....shared.services.page_service import list_of_users_by_translations_count
-
-from ...services.in_process_service import get_in_process_counts_by_user
-
-from ....shared.services.category_service import list_categories
-
+from ....public.models import _InProcessRecord, _LangRecord
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.models import _CategoryRecord, _ReportRecord
-from ....public.models import _InProcessRecord, _LangRecord
-from .pages_query_service import list_pages_users, list_pages_with_views
+from ....shared.services.category_service import list_categories
+from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
+from ...services.in_process_service import get_in_process_counts_by_user
+from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")

@@ -6,8 +6,8 @@ import logging
 
 from flask import render_template, request
 
+from ...public.routes.api.pages_query_service import list_pages_users, list_pages_with_views
 from ...public.services.lang_service import list_langs
-from ...public.routes.api.pages_query_service import list_pages_with_views, list_pages_users
 
 logger = logging.getLogger(__name__)
 

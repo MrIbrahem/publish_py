@@ -20,15 +20,15 @@ from flask import (
 # )
 from ..decorators import admin_required
 from ..sidebar import create_side
+from .campaigns import campaigns_module
 from .coordinators import Coordinators
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .last import last_translations_dashboard
-from .settings import SettingsRoutes
-from .users_no_inprocess import UsersNoInprocess
 from .projects import ProjectsDashboard
-from .campaigns import campaigns_module
+from .settings import SettingsRoutes
 from .users_emails import users_emails_module
+from .users_no_inprocess import UsersNoInprocess
 
 logger = logging.getLogger(__name__)
 

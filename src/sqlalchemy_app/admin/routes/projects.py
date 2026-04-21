@@ -16,13 +16,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..decorators import admin_required
 from ...public.services.project_service import (
-    list_projects,
     add_project,
-    update_project_title,
     delete_project,
+    list_projects,
+    update_project_title,
 )
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

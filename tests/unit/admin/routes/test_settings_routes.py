@@ -7,7 +7,6 @@ from __future__ import annotations
 import json
 
 import pytest
-
 from src.sqlalchemy_app.admin.routes.settings import _parse_setting_value
 
 
@@ -178,20 +177,14 @@ class TestParseSettingValue:
 
     def test_parse_nested_json(self):
         """Test that nested JSON objects are parsed correctly."""
-        nested_json = json.dumps({
-            "level1": {
-                "level2": {
-                    "level3": ["item1", "item2"]
-                }
-            }
-        })
+        nested_json = json.dumps({"level1": {"level2": {"level3": ["item1", "item2"]}}})
         result, success = _parse_setting_value("json", nested_json)
         assert result["level1"]["level2"]["level3"] == ["item1", "item2"]
         assert success is True
 
     def test_parse_json_with_special_characters(self):
         """Test that JSON with special characters is parsed correctly."""
-        json_str = '{"special": "quotes \' and \\\" and backslash \\\\\"}'
+        json_str = '{"special": "quotes \' and \\" and backslash \\\\"}'
         result, success = _parse_setting_value("json", json_str)
-        assert result["special"] == 'quotes \' and " and backslash \\'
+        assert result["special"] == "quotes ' and \" and backslash \\"
         assert success is True

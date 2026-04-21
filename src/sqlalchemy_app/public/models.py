@@ -339,8 +339,8 @@ class _ViewsNewAllRecord(BaseDb):
     __table_args__ = (
         # Prevent SQLAlchemy from trying to create this as a table
         {
-            'info': {
-                'is_view': True,
+            "info": {
+                "is_view": True,
                 "create_query": """
                     CREATE VIEW views_new_all AS
                     SELECT v.target AS target,
@@ -348,7 +348,7 @@ class _ViewsNewAllRecord(BaseDb):
                         SUM(v.views) AS views
                     FROM views_new v
                     GROUP BY v.target, v.lang
-                    """
+                    """,
             }
         },
     )
