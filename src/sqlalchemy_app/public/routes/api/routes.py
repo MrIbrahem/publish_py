@@ -173,6 +173,8 @@ def get_in_process() -> Response:
         JSON response with in-process records
     """
     try:
+        limit = request.args.get("limit", default=500, type=int)
+        limit = max(1, min(limit, 5000))
         with get_session() as session:
             # Perform the JOIN query using SQLAlchemy
             results = (
@@ -191,6 +193,7 @@ def get_in_process() -> Response:
                 .outerjoin(_CategoryRecord, _InProcessRecord.cat == _CategoryRecord.category)
                 .outerjoin(_LangRecord, _InProcessRecord.lang == _LangRecord.code)
                 .order_by(_InProcessRecord.id.asc())
+                .limit(limit)
                 .all()
             )
 
