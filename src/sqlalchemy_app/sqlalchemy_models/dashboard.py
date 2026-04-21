@@ -39,21 +39,15 @@ class CategoryRecord(BaseDb):
     is_default = Column(Integer, nullable=False, default=0)
 
     def __init__(self, **kwargs):
+        # Convert depth and is_default to int if provided as strings
+        for key in ("depth", "is_default"):
+            kwargs[key] = int(kwargs.get(key, 0))
+
         # Apply Python-level defaults for fields not provided
         if "display" not in kwargs:
             kwargs["display"] = ""
         if "category2" not in kwargs:
             kwargs["category2"] = ""
-        if "depth" not in kwargs:
-            kwargs["depth"] = 0
-        if "is_default" not in kwargs:
-            kwargs["is_default"] = 0
-
-        # Convert depth and is_default to int
-        if "depth" in kwargs:
-            kwargs["depth"] = int(kwargs["depth"]) if kwargs["depth"] is not None else 0
-        if "is_default" in kwargs:
-            kwargs["is_default"] = int(kwargs["is_default"]) if kwargs["is_default"] is not None else 0
 
         super().__init__(**kwargs)
 

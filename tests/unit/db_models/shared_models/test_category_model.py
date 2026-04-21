@@ -83,8 +83,8 @@ class TestCategoryRecord:
 
         assert record.display == ""
         assert record.category2 == ""
-        assert record.depth == 0
         assert record.is_default == 0
+        assert record.depth == 0
 
     def test_depth_conversion(self):
         """Test that depth is converted to int."""

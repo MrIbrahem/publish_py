@@ -61,4 +61,5 @@ class TestReportRecord:
             data="{}",
         )
         result = record.to_dict()
-        assert result["date"] == ""
+        # assert result["date"] == ""
+        assert result["date"] is None

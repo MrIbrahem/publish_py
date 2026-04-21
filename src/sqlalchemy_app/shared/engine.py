@@ -44,20 +44,17 @@ class BaseDb(DeclarativeBase):
         """Convert ORM object to dictionary."""
         data = {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
-        if "add_date" in data:
-            data["add_date"] = str(self.add_date) if self.add_date else self.add_date
+        if "add_date" in data and self.add_date:
+            data["add_date"] = self.add_date.isoformat() if hasattr(self.add_date, "isoformat") else str(self.add_date)
 
-        if "date" in data:
-            if self.date is None:
-                date_str = ""
-            elif hasattr(self.date, "isoformat"):
-                date_str = self.date.isoformat()
-            else:
-                date_str = str(self.date)
-            data["date"] = date_str
+        if "date" in data and self.date:
+            data["date"] = self.date.isoformat() if hasattr(self.date, "isoformat") else str(self.date)
+
+        for column in self.__table__.columns:
+            if column.nullable is False and data[column.name] is None:
+                data[column.name] = column.default
 
         return data
-
 
 # ---------------------------------------------------------------------------
 # 2. Database connection — replaces db_driver.py entirely
