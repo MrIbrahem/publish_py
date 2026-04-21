@@ -137,36 +137,9 @@ class _SettingRecord(BaseDb):
         }
 
 
-class _UsersNoInprocessRecord(BaseDb):
-    """
-    CREATE TABLE IF NOT EXISTS users_no_inprocess (
-        id int unsigned NOT NULL AUTO_INCREMENT,
-        user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-        is_active int NOT NULL DEFAULT '1',
-        PRIMARY KEY (id),
-        UNIQUE KEY user (user)
-    )
-
-    """
-
-    __tablename__ = "users_no_inprocess"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user = Column(String(120), unique=True, nullable=False)
-    is_active = Column(Integer, nullable=False, default=1)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "user": self.user,
-            "is_active": self.is_active,
-        }
-
-
 __all__ = [
     "_CoordinatorRecord",
     "_FullTranslatorRecord",
     "_LanguageSettingRecord",
     "_SettingRecord",
-    "_UsersNoInprocessRecord",
 ]
