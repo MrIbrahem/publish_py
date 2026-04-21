@@ -1,6 +1,4 @@
 from .admin_models import (
-    CoordinatorRecord,
-    FullTranslatorRecord,
     LanguageSettingRecord,
     SettingRecord,
 )
@@ -26,6 +24,8 @@ from .shared_models import (
     UserPageRecord,
 )
 from .users_models import (
+    CoordinatorRecord,
+    FullTranslatorRecord,
     UserRecord,
     UsersNoInprocessRecord,
     UserTokenRecord,
@@ -33,8 +33,6 @@ from .users_models import (
 
 __all__ = [
     # admin_models
-    "CoordinatorRecord",
-    "FullTranslatorRecord",
     "LanguageSettingRecord",
     "SettingRecord",
     # public_models
@@ -51,6 +49,8 @@ __all__ = [
     "ViewsNewAllRecord",
     "WordRecord",
     # users_models
+    "CoordinatorRecord",
+    "FullTranslatorRecord",
     "UsersNoInprocessRecord",
     "UserTokenRecord",
     "UserRecord",

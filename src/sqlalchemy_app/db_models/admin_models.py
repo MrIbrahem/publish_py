@@ -9,40 +9,6 @@ from typing import Any, Optional
 
 
 @dataclass
-class CoordinatorRecord:
-    """Representation of a coordinator record."""
-
-    id: int
-    username: str
-    is_active: int = 1
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "id": self.id,
-            "username": self.username,
-            "is_active": self.is_active,
-        }
-
-
-@dataclass
-class FullTranslatorRecord:
-    """Representation of a full translator record."""
-
-    id: int
-    user: str
-    is_active: int = 1
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "id": self.id,
-            "user": self.user,
-            "is_active": self.is_active,
-        }
-
-
-@dataclass
 class LanguageSettingRecord:
     """Representation of a language setting record."""
 

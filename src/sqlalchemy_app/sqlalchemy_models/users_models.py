@@ -118,7 +118,63 @@ class _UsersNoInprocessRecord(BaseDb):
         }
 
 
+class _FullTranslatorRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS full_translators (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        is_active int NOT NULL DEFAULT '1',
+        PRIMARY KEY (id),
+        UNIQUE KEY user (user)
+    )
+    """
+
+    __tablename__ = "full_translators"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user = Column(String(120), unique=True, nullable=False)
+    is_active = Column(Integer, nullable=False, default=1)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "user": self.user,
+            "is_active": self.is_active,
+        }
+
+
+class _CoordinatorRecord(BaseDb):
+    """
+    ORM model for the coordinators table.
+    CREATE TABLE IF NOT EXISTS coordinators (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        username varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+        is_active int NOT NULL DEFAULT '1',
+        PRIMARY KEY (id),
+        UNIQUE KEY username (username)
+      )
+    """
+
+    __tablename__ = "coordinators"
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    username: str = Column(String(120), unique=True, nullable=False)
+    is_active: int = Column(Integer, nullable=False, default=1)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "username": self.username,
+            "is_active": self.is_active,
+        }
+
+    def __repr__(self) -> str:
+        return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
+
+
 __all__ = [
+    "_CoordinatorRecord",
+    "_FullTranslatorRecord",
     "_UsersNoInprocessRecord",
     "_UserTokenRecord",
     "_UserRecord",
