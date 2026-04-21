@@ -111,6 +111,12 @@ class UserPageRecord(BaseDb):
     deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
     mdwiki_revid = Column(Integer, nullable=True)
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "deleted" not in kwargs:
+            kwargs["deleted"] = 0
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
