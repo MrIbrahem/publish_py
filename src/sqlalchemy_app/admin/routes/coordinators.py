@@ -109,28 +109,36 @@ def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
 
 
 class Coordinators:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/coordinators")
+    def __init__(self):
+        self.bp = Blueprint("coordinators", __name__, url_prefix="/coordinators")
+        self._setup_routes()
+
+    def _setup_routes(self):
+
+        @self.bp.get("/")
         @admin_required
         def coordinators_dashboard():
             return _coordinators_dashboard()
 
-        @bp_admin.post("/coordinators/add")
+        @self.bp.post("/add")
         @admin_required
         def add_coordinator() -> ResponseReturnValue:
             return _add_coordinator()
 
-        @bp_admin.post("/coordinators/<int:coordinator_id>/delete")
+        @self.bp.post("/<int:coordinator_id>/delete")
         @admin_required
         def delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
             return _delete_coordinator(coordinator_id)
 
-        @bp_admin.post("/coordinators/<int:record_id>/activate")
+        @self.bp.post("/<int:record_id>/activate")
         @admin_required
         def activate_coordinator(record_id: int) -> ResponseReturnValue:
             return _activate_record(record_id)
 
-        @bp_admin.post("/coordinators/<int:record_id>/deactivate")
+        @self.bp.post("/<int:record_id>/deactivate")
         @admin_required
         def deactivate_coordinator(record_id: int) -> ResponseReturnValue:
             return _deactivate_record(record_id)
+
+
+coordinators_module = Coordinators()

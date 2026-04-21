@@ -109,28 +109,36 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
 
 
 class UsersNoInprocess:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/users_no_inprocess")
+    def __init__(self):
+        self.bp = Blueprint("users_no_inprocess", __name__, url_prefix="/users_no_inprocess")
+        self._setup_routes()
+
+    def _setup_routes(self):
+
+        @self.bp.get("/")
         @admin_required
         def users_no_inprocess_dashboard():
             return _users_no_inprocess_dashboard()
 
-        @bp_admin.post("/users_no_inprocess/add")
+        @self.bp.post("/add")
         @admin_required
         def add_user_no_inprocess() -> ResponseReturnValue:
             return _add_user_no_inprocess()
 
-        @bp_admin.post("/users_no_inprocess/<int:record_id>/delete")
+        @self.bp.post("/<int:record_id>/delete")
         @admin_required
         def delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
             return _delete_user_no_inprocess(record_id)
 
-        @bp_admin.post("/users_no_inprocess/<int:record_id>/activate")
+        @self.bp.post("/<int:record_id>/activate")
         @admin_required
         def activate_user_no_inprocess(record_id: int) -> ResponseReturnValue:
             return _activate_record(record_id)
 
-        @bp_admin.post("/users_no_inprocess/<int:record_id>/deactivate")
+        @self.bp.post("/<int:record_id>/deactivate")
         @admin_required
         def deactivate_user_no_inprocess(record_id: int) -> ResponseReturnValue:
             return _deactivate_record(record_id)
+
+
+usersnoinprocess_module = UsersNoInprocess()

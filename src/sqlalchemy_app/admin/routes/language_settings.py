@@ -113,23 +113,31 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
 
 
 class LanguageSettings:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/language_settings")
+    def __init__(self):
+        self.bp = Blueprint("language_settings", __name__, url_prefix="/language_settings")
+        self._setup_routes()
+
+    def _setup_routes(self):
+
+        @self.bp.get("/")
         @admin_required
         def language_settings_dashboard():
             return _language_settings_dashboard()
 
-        @bp_admin.post("/language_settings/add")
+        @self.bp.post("/add")
         @admin_required
         def add_language_setting() -> ResponseReturnValue:
             return _add_language_setting()
 
-        @bp_admin.post("/language_settings/<int:setting_id>/update")
+        @self.bp.post("/<int:setting_id>/update")
         @admin_required
         def update_language_setting_route(setting_id: int) -> ResponseReturnValue:
             return _update_language_setting(setting_id)
 
-        @bp_admin.post("/language_settings/<int:setting_id>/delete")
+        @self.bp.post("/<int:setting_id>/delete")
         @admin_required
         def delete_language_setting_route(setting_id: int) -> ResponseReturnValue:
             return _delete_language_setting(setting_id)
+
+
+languagesettings_module = LanguageSettings()

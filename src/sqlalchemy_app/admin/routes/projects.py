@@ -92,18 +92,23 @@ def _delete_project(record_id: int) -> None:
 
 
 class ProjectsDashboard:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/projects")
+    def __init__(self):
+        self.bp = Blueprint("projects", __name__, url_prefix="/projects")
+        self._setup_routes()
+
+    def _setup_routes(self):
+
+        @self.bp.get("/")
         @admin_required
         def projects_dashboard():
             return _projects_dashboard()
 
-        @bp_admin.post("/projects/add")
+        @self.bp.post("/add")
         @admin_required
         def add_project_record() -> ResponseReturnValue:
             return _add_project()
 
-        @bp_admin.post("/projects/update")
+        @self.bp.post("/update")
         @admin_required
         def projects_update() -> ResponseReturnValue:
             projects = request.form.getlist("projects[][g_id]")

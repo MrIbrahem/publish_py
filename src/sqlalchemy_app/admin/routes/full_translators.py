@@ -109,28 +109,36 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
 
 
 class FullTranslators:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/full_translators")
+    def __init__(self):
+        self.bp = Blueprint("full_translators", __name__, url_prefix="/full_translators")
+        self._setup_routes()
+
+    def _setup_routes(self):
+
+        @self.bp.get("/")
         @admin_required
         def full_translators_dashboard():
             return _full_translators_dashboard()
 
-        @bp_admin.post("/full_translators/add")
+        @self.bp.post("/add")
         @admin_required
         def add_full_translator() -> ResponseReturnValue:
             return _add_full_translator()
 
-        @bp_admin.post("/full_translators/<int:translator_id>/delete")
+        @self.bp.post("/<int:translator_id>/delete")
         @admin_required
         def delete_full_translator(translator_id: int) -> ResponseReturnValue:
             return _delete_full_translator(translator_id)
 
-        @bp_admin.post("/full_translators/<int:record_id>/activate")
+        @self.bp.post("/<int:record_id>/activate")
         @admin_required
         def activate_full_translator(record_id: int) -> ResponseReturnValue:
             return _activate_record(record_id)
 
-        @bp_admin.post("/full_translators/<int:record_id>/deactivate")
+        @self.bp.post("/<int:record_id>/deactivate")
         @admin_required
         def deactivate_full_translator(record_id: int) -> ResponseReturnValue:
             return _deactivate_record(record_id)
+
+
+fulltranslators_module = FullTranslators()

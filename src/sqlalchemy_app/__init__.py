@@ -21,8 +21,8 @@ from .public.routes import (
     bp_auth,
     bp_cxtoken,
     bp_fixrefs,
-    bp_main,
     bp_leaderboard,
+    bp_main,
     bp_publish,
 )
 from .shared.auth.identity import current_user

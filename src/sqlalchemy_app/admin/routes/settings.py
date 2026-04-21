@@ -34,10 +34,14 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
 
 
 class SettingsRoutes:
-    def __init__(self, bp_admin: Blueprint):
+    def __init__(self):
+        self.bp = Blueprint("settings", __name__, url_prefix="/settings")
+        self._setup_routes()
+
+    def _setup_routes(self):
         from ..services import setting_service as service
 
-        @bp_admin.get("/settings")
+        @self.bp.get("/")
         @admin_required
         def settings_view():
             all_settings = service.list_settings()
@@ -49,7 +53,7 @@ class SettingsRoutes:
                 settings_list[i]["value_type"] = s.value_type
             return render_template("admins/settings.html", settings_list=settings_list)
 
-        @bp_admin.post("/settings/create")
+        @self.bp.post("/create")
         @admin_required
         def settings_create():
             key = request.form.get("key", "").strip()
@@ -83,10 +87,9 @@ class SettingsRoutes:
 
             return redirect(url_for("admin.settings_view"))
 
-        @bp_admin.post("/settings/update")
+        @self.bp.post("/update")
         @admin_required
         def settings_update():
-            from ..services import setting_service as service
 
             all_settings = service.list_settings()
             failed_keys: list[str] = []
