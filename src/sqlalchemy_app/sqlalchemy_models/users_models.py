@@ -38,9 +38,9 @@ class _UserTokenRecord(BaseDb):
     updated_at = Column(
         DateTime,
         nullable=False,
-        # server_default=func.current_timestamp(),
-        # server_onupdate=func.current_timestamp(),
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_default=func.current_timestamp(),
+        server_onupdate=func.current_timestamp(),
+        # server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
     )
     last_used_at = Column(DateTime, nullable=True, server_default=func.current_timestamp())
     rotated_at = Column(DateTime, nullable=True)
