@@ -9,7 +9,7 @@ from sqlalchemy import Column, Integer, String
 from ..shared.engine import BaseDb
 
 
-class _AssessmentRecord(BaseDb):
+class AssessmentRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS assessments (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -34,7 +34,7 @@ class _AssessmentRecord(BaseDb):
         }
 
 
-class _RefsCountRecord(BaseDb):
+class RefsCountRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS refs_counts (
         r_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -62,7 +62,7 @@ class _RefsCountRecord(BaseDb):
         }
 
 
-class _WordRecord(BaseDb):
+class WordRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS words (
         w_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -91,7 +91,7 @@ class _WordRecord(BaseDb):
 
 
 __all__ = [
-    "_AssessmentRecord",
-    "_RefsCountRecord",
-    "_WordRecord",
+    "AssessmentRecord",
+    "RefsCountRecord",
+    "WordRecord",
 ]

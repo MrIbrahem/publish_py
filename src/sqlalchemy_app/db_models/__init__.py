@@ -1,9 +1,4 @@
 
-from .metrics_models import (
-    AssessmentRecord,
-    RefsCountRecord,
-    WordRecord,
-)
 from .pages_models import (
     PageRecord,
     PagesUsersToMainRecord,
@@ -37,10 +32,6 @@ from .views_models import (
 )
 
 __all__ = [
-    # metrics_models
-    "AssessmentRecord",
-    "RefsCountRecord",
-    "WordRecord",
     # pages_models
     "PageRecord",
     "UserPageRecord",

@@ -13,7 +13,7 @@ from sqlalchemy import Integer, case, cast, func
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....sqlalchemy_models import _LangRecord, _PageRecord, _ViewsNewAllRecord, _WordRecord
+from ....sqlalchemy_models import _LangRecord, _PageRecord, _ViewsNewAllRecord, WordRecord
 
 logger = logging.getLogger(__name__)
 
@@ -80,8 +80,8 @@ def get_top_langs() -> Response:
                     _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
                     _PageRecord.word,
                 ),
-                (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
-                else_=_WordRecord.w_lead_words,
+                (_PageRecord.translate_type == "all", WordRecord.w_all_words),
+                else_=WordRecord.w_lead_words,
             )
 
             # Build the views expression (CAST to UNSIGNED)
@@ -99,7 +99,7 @@ def get_top_langs() -> Response:
                     func.sum(word_expr).label("words"),
                     func.sum(views_expr).label("views"),
                 )
-                .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
+                .outerjoin(WordRecord, WordRecord.w_title == _PageRecord.title)
                 .outerjoin(
                     _ViewsNewAllRecord,
                     (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),
@@ -203,8 +203,8 @@ def get_top_users() -> Response:
                     _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
                     _PageRecord.word,
                 ),
-                (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
-                else_=_WordRecord.w_lead_words,
+                (_PageRecord.translate_type == "all", WordRecord.w_all_words),
+                else_=WordRecord.w_lead_words,
             )
 
             # Build the views expression (CAST to UNSIGNED)
@@ -221,7 +221,7 @@ def get_top_users() -> Response:
                     func.sum(word_expr).label("words"),
                     func.sum(views_expr).label("views"),
                 )
-                .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
+                .outerjoin(WordRecord, WordRecord.w_title == _PageRecord.title)
                 .outerjoin(
                     _ViewsNewAllRecord,
                     (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),

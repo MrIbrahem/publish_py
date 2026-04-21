@@ -3,9 +3,9 @@ from .admin_models import (
     SettingRecord,
 )
 from .metrics_models import (
-    _AssessmentRecord,
-    _RefsCountRecord,
-    _WordRecord,
+    AssessmentRecord,
+    RefsCountRecord,
+    WordRecord,
 )
 from .pages_models import (
     _PageRecord,
@@ -44,9 +44,9 @@ __all__ = [
     "LanguageSettingRecord",
     "SettingRecord",
     # metrics_models
-    "_AssessmentRecord",
-    "_RefsCountRecord",
-    "_WordRecord",
+    "AssessmentRecord",
+    "RefsCountRecord",
+    "WordRecord",
     # pages_models
     "_PageRecord",
     "_UserPageRecord",

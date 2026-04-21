@@ -37,6 +37,16 @@ class LanguageSettingRecord(BaseDb):
     expend = Column(Integer, default=0, server_default=text("0"))
     add_en_lang = Column(Integer, default=0, server_default=text("0"))
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "move_dots" not in kwargs:
+            kwargs["move_dots"] = 0
+        if "expend" not in kwargs:
+            kwargs["expend"] = 0
+        if "add_en_lang" not in kwargs:
+            kwargs["add_en_lang"] = 0
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -75,6 +85,14 @@ class SettingRecord(BaseDb):
         default="boolean",
     )
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "value_type" not in kwargs:
+            kwargs["value_type"] = "boolean"
+        super().__init__(**kwargs)
+        # Parse value based on value_type after initialization
+        self.value = self._parse_value(self.value, self.value_type)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -84,19 +102,15 @@ class SettingRecord(BaseDb):
             "value_type": self.value_type,
         }
 
-    def __post_init__(self):
-        """Determine form type based on displayed value."""
-        self.value = self._parse_value(self.value, self.value_type)
-
     def _parse_value(self, value: Optional[str], value_type: str) -> Any:
         if value is None:
             return None
         if value_type == "boolean":
-            return "true" if value.lower() in ("1", "true", "yes", "on") else "false"
+            return "true" if str(value).lower() in ("1", "true", "yes", "on") else "false"
         elif value_type == "integer":
             try:
                 return int(value)
-            except ValueError:
+            except (ValueError, TypeError):
                 return 0
 
         return str(value)  # string
