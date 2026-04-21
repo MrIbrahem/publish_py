@@ -7,9 +7,7 @@ Tests for UserTokenRecord.
 from unittest.mock import patch
 
 import pytest
-from src.sqlalchemy_app.db_models import (
-    UserTokenRecord,
-)
+from src.sqlalchemy_app.db_models import UserTokenRecord
 
 
 @pytest.fixture

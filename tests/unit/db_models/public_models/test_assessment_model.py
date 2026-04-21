@@ -4,9 +4,7 @@ Unit tests for domain.models.assessment module.
 Tests for AssessmentRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
-    AssessmentRecord,
-)
+from src.sqlalchemy_app.db_models import AssessmentRecord
 
 
 class TestAssessmentRecord:

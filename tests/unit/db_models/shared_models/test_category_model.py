@@ -5,9 +5,7 @@ Tests for CategoryRecord.
 """
 
 import pytest
-from src.sqlalchemy_app.db_models import (
-    CategoryRecord,
-)
+from src.sqlalchemy_app.db_models import CategoryRecord
 
 
 class TestCategoryRecord:

@@ -4,9 +4,7 @@ Unit tests for domain.models.users_no_inprocess module.
 Tests for UsersNoInprocessRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
-    UsersNoInprocessRecord,
-)
+from src.sqlalchemy_app.db_models import UsersNoInprocessRecord
 
 
 class TestUsersNoInprocessRecord:

@@ -4,9 +4,7 @@ Unit tests for domain.models.coordinator module.
 Tests for CoordinatorRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
-    CoordinatorRecord,
-)
+from src.sqlalchemy_app.db_models import CoordinatorRecord
 
 
 class TestCoordinatorRecord:

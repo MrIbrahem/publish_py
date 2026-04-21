@@ -4,9 +4,7 @@ Unit tests for domain.models.pages_users_to_main module.
 Tests for PagesUsersToMainRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
-    PagesUsersToMainRecord,
-)
+from src.sqlalchemy_app.db_models import PagesUsersToMainRecord
 
 
 class TestPagesUsersToMainRecord:
