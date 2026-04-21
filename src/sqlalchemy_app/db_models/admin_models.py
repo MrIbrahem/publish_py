@@ -74,8 +74,6 @@ class SettingRecord:
 
 
 __all__ = [
-    "CoordinatorRecord",
-    "FullTranslatorRecord",
     "LanguageSettingRecord",
     "SettingRecord",
 ]
