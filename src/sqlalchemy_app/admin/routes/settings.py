@@ -131,3 +131,6 @@ class SettingsRoutes:
             else:
                 flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
             return redirect(url_for("admin.settings_view"))
+
+
+settings_module = SettingsRoutes()

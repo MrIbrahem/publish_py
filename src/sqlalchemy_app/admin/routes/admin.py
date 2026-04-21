@@ -25,8 +25,8 @@ from .coordinators import Coordinators
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .last import last_translations_dashboard
-from .projects import ProjectsDashboard
-from .settings import SettingsRoutes
+from .projects import projects_module
+from .settings import settings_module
 from .users_emails import users_emails_module
 from .users_no_inprocess import UsersNoInprocess
 
@@ -83,8 +83,8 @@ def register_blueprints(bp_admin: Blueprint) -> None:
     UsersNoInprocess(bp_admin)
     LanguageSettings(bp_admin)
     # Templates(bp_admin)
-    SettingsRoutes(bp_admin)
-    ProjectsDashboard(bp_admin)
+    bp_admin.register_blueprint(settings_module.bp)
+    bp_admin.register_blueprint(projects_module.bp)
     bp_admin.register_blueprint(campaigns_module.bp)
     # Jobs(bp_admin)
     # OwidCharts(bp_admin)

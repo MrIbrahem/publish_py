@@ -123,3 +123,6 @@ class ProjectsDashboard:
                     _update_project(record_id, g_title)
 
             return redirect(url_for("admin.projects_dashboard"))
+
+
+projects_module = ProjectsDashboard()
