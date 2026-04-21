@@ -9,6 +9,8 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
+from ...services.in_process_service import get_in_process_counts_by_user
+
 from ....shared.services.category_service import list_categories
 
 from ....shared.core.cors import check_cors
@@ -240,26 +242,7 @@ def get_in_process_total() -> Response:
         JSON response with user counts
     """
     try:
-        with get_session() as session:
-            # Query counts grouped by user
-            results = (
-                session.query(
-                    _InProcessRecord.user,
-                    func.count(_InProcessRecord.id).label("article_count"),
-                )
-                .group_by(_InProcessRecord.user)
-                .order_by(func.count(_InProcessRecord.id).desc())
-                .all()
-            )
-
-            # Convert results to list of dicts
-            data: List[Dict[str, Any]] = [
-                {
-                    "user": row.user,
-                    "article_count": row.article_count,
-                }
-                for row in results
-            ]
+        data = get_in_process_counts_by_user()
 
     except Exception:
         logger.exception("Error fetching in_process_total data")
