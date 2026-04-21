@@ -46,11 +46,11 @@ def _add_campaign_and_category() -> ResponseReturnValue:
     campaign = request.form.get("campaign", "").strip()
     if not category:
         flash("Category is required.", "danger")
-        return redirect(url_for("admin.campaigns_dashboard"))
+        return redirect(url_for("admin.campaigns.dashboard"))
 
     if not campaign:
         flash("Campaign is required.", "danger")
-        return redirect(url_for("admin.campaigns_dashboard"))
+        return redirect(url_for("admin.campaigns.dashboard"))
 
     try:
         add_category(
@@ -66,7 +66,7 @@ def _add_campaign_and_category() -> ResponseReturnValue:
     else:
         flash(f"category for '{category}' added.", "success")
 
-    return redirect(url_for("admin.campaigns_dashboard"))
+    return redirect(url_for("admin.campaigns.dashboard"))
 
 
 def _update_category(
@@ -116,20 +116,24 @@ def _delete_category(record_id: int) -> None:
 
 
 class CampaignsDashboard:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/campaigns")
+    def __init__(self):
+        self.bp = Blueprint("campaigns", __name__, url_prefix="/campaigns")
+        self._setup_routes()
+
+    def _setup_routes(self):
+        @self.bp.get("/")
         @admin_required
-        def campaigns_dashboard():
+        def dashboard():
             return _campaigns_dashboard()
 
-        @bp_admin.post("/campaigns/add")
+        @self.bp.post("/add")
         @admin_required
-        def add_campaign_record() -> ResponseReturnValue:
+        def add_record() -> ResponseReturnValue:
             return _add_campaign_and_category()
 
-        @bp_admin.post("/campaigns/update")
+        @self.bp.post("/update")
         @admin_required
-        def campaigns_update() -> ResponseReturnValue:
+        def update() -> ResponseReturnValue:
             default_cat = request.form.get("default_cat")
             ids = request.form.getlist("rows[][id]")
             campaigns = request.form.getlist("rows[][campaign]")
@@ -162,4 +166,7 @@ class CampaignsDashboard:
                         is_default=is_default,
                     )
 
-            return redirect(url_for("admin.campaigns_dashboard"))
+            return redirect(url_for("admin.campaigns.dashboard"))
+
+
+campaigns_module = CampaignsDashboard()

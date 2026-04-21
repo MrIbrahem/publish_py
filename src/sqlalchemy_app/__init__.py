@@ -135,7 +135,7 @@ def create_app(config_class: Type | None = None) -> Flask:
     def page_not_found(e: Exception) -> Tuple[str, int]:
         """Handle 404 errors"""
         logger.error("Page not found: %s", e)
-        logger.error(f"Request host: {request.host}")
+        logger.error(f"Request url: {request.url}")
         flash("Page not found", "warning")
         return render_template("index.html", title="Page Not Found"), 404
 

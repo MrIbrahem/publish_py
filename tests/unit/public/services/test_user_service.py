@@ -4,14 +4,13 @@ import pytest
 from src.sqlalchemy_app.db_models.public_models import UserRecord
 from src.sqlalchemy_app.public.models import _UserRecord
 from src.sqlalchemy_app.public.services.user_service import (
-    add_or_update_user,
     add_user,
     delete_user,
     get_user,
     get_user_by_username,
     list_users,
     list_users_by_group,
-    update_user,
+    update_user_data,
     user_exists,
 )
 
@@ -19,15 +18,18 @@ from src.sqlalchemy_app.public.services.user_service import (
 def test_user_workflow():
     u = add_user("Wiki_User", "jh@example.com", "enwiki", "Editor")
     assert u.username == "Wiki_User"
+
     assert get_user(u.user_id).username == "Wiki_User"
     assert get_user_by_username("Wiki_User").user_id == u.user_id
+
     assert any(x.username == "Wiki_User" for x in list_users())
     assert any(x.username == "Wiki_User" for x in list_users_by_group("Editor"))
-    updated = update_user(u.user_id, email="jh_new@example.com")
+
+    updated = update_user_data(u.user_id, email="jh_new@example.com")
     assert updated.email == "jh_new@example.com"
+
     assert user_exists("Wiki_User") is True
-    u4 = add_or_update_user("Wiki_User", email="jh_final@example.com")
-    assert u4.email == "jh_final@example.com"
+
     delete_user(u.user_id)
     assert get_user(u.user_id) is None
 
@@ -108,38 +110,23 @@ class TestAddUser:
             add_user("")
 
 
-class TestAddOrUpdateUser:
-    """Tests for add_or_update_user function."""
-
-    def test_delegates_to_store(self, monkeypatch):
-        """Test that function upserts record."""
-        add_user("Translator_X", email="old@trans.org")
-        record = add_or_update_user("Translator_X", email="new@trans.org")
-        assert record.email == "new@trans.org"
-        assert len(list_users()) == 1
-
-    def test_raises_error_if_no_username(self, monkeypatch):
-        with pytest.raises(ValueError, match="Username is required"):
-            add_or_update_user(" ")
-
-
 class TestUpdateUser:
     """Tests for update_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
         u = add_user("Bureaucrat1", email="old_email")
-        updated = update_user(u.user_id, email="new_email")
+        updated = update_user_data(u.user_id, email="new_email")
         assert updated.email == "new_email"
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         u = add_user("No_Change")
-        result = update_user(u.user_id)
+        result = update_user_data(u.user_id)
         assert result.username == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
         with pytest.raises(ValueError, match="not found"):
-            update_user(9999, email="T")
+            update_user_data(9999, email="T")
 
 
 class TestDeleteUser:

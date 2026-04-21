@@ -186,6 +186,15 @@ def find_exists_or_update_page(
         return len(orm_objs) > 0
 
 
+def list_of_users_by_translations_count() -> dict[str, int]:
+    """
+    select DISTINCT user, count(target) as count from pages where target != '' group by user order by count desc
+    """
+    result: dict[str, int] = {}
+
+    return result
+
+
 __all__ = [
     "list_pages",
     "add_page",
@@ -193,4 +202,5 @@ __all__ = [
     "delete_page",
     "find_exists_or_update_page",
     "insert_page_target",
+    "list_of_users_by_translations_count",
 ]

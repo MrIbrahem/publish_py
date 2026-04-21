@@ -1,0 +1,105 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block contents %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="headline">Users</h3>
+    </div>
+    <div class="card-body">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <form method="post" action="{{ url_for('admin.users_emails.add') }}" class="row g-2 align-items-end">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="col-sm-8 col-md-6 col-lg-4">
+                        <label class="form-label" for="new-username">Username</label>
+                        <input type="text" name="username" class="form-control" id="new-username" placeholder=""
+                            required>
+                    </div>
+                    <div class="col-sm-8 col-md-6 col-lg-4">
+                        <label class="form-label" for="new-email">Email</label>
+                        <input type="text" name="email" class="form-control" id="new-email" placeholder="">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus-fill"></i> Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header text-bg-light">
+                <h5 class="mb-0 mt-1">Manage Users</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-striped compact table-sm" id="users_table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">@</th>
+                                <th scope="col">Project</th>
+                                <th scope="col">Wiki</th>
+                                <th scope="col">Live</th>
+                                <th scope="col">Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in users %}
+                            <tr>
+                                <td> {{ loop.index }} </td>
+                                <td> {{ s.username }} </td>
+                                <td> {{ s.email }} </td>
+                                <td> {{ s.live }} </td>
+                                <td> {{ s.user_group }} </td>
+                                <td> {{ s.wiki }} </td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <a class="btn btn-outline-primary btn-sm" pup-target=""
+                                        onclick="pup_window_new(this)">Edit</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-buttons-dt/3.2.5/buttons.dataTables.min.css"
+    rel='stylesheet' />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/3.2.5/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-buttons-dt/3.2.5/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/3.2.5/js/buttons.html5.js"></script>
+<script>
+    $(document).ready(function () {
+        var t = $('#users_table').DataTable({
+            layout: {
+                topStart: {
+                    buttons: ['copy', 'csv']
+                }
+            },
+            stateSave: true,
+            // order: [[5	, 'desc']],
+            // paging: false,
+            lengthMenu: [
+                [50, 100, 150],
+                [50, 100, 150]
+            ],
+            // scrollY: 800
+        });
+    });
+</script>
+{% endblock %}

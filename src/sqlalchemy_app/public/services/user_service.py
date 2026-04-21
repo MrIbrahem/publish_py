@@ -85,39 +85,35 @@ def add_user(
         return UserRecord(**orm_obj.to_dict())
 
 
-def add_or_update_user(
+def update_user(
+    user_id: int,
     username: str,
     email: str = "",
     wiki: str = "",
     user_group: str = "Uncategorized",
 ) -> UserRecord:
-    """Add or update a user record."""
-    username = username.strip()
-    if not username:
-        raise ValueError("Username is required")
-
+    """Update a user record."""
     with get_session() as session:
-        orm_obj = session.query(_UserRecord).filter(_UserRecord.username == username).first()
-        if orm_obj:
-            orm_obj.email = email
-            orm_obj.wiki = wiki
-            orm_obj.user_group = user_group
-        else:
-            orm_obj = _UserRecord(
-                username=username,
-                email=email,
-                wiki=wiki,
-                user_group=user_group,
-                reg_date=func.now(),
-            )
-            session.add(orm_obj)
+        orm_obj = session.query(_UserRecord).filter(_UserRecord.user_id == user_id).first()
+        if not orm_obj:
+            raise ValueError(f"User record with ID {user_id} not found")
+
+        if not kwargs:
+            return UserRecord(**orm_obj.to_dict())
+
+        for key, value in kwargs.items():
+            if hasattr(orm_obj, key):
+                setattr(orm_obj, key, value)
 
         session.commit()
         session.refresh(orm_obj)
         return UserRecord(**orm_obj.to_dict())
 
 
-def update_user(user_id: int, **kwargs) -> UserRecord:
+def update_user_data(
+    user_id: int,
+    **kwargs,
+) -> UserRecord:
     """Update a user record."""
     with get_session() as session:
         orm_obj = session.query(_UserRecord).filter(_UserRecord.user_id == user_id).first()
@@ -161,8 +157,7 @@ __all__ = [
     "get_user",
     "get_user_by_username",
     "add_user",
-    "add_or_update_user",
-    "update_user",
+    "update_user_data",
     "delete_user",
     "user_exists",
 ]

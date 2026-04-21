@@ -101,7 +101,7 @@ class _LanguageSettingRecord(BaseDb):
 
 class _SettingRecord(BaseDb):
     """
-    CREATE TABLE IF NOT EXISTS settings (
+    CREATE TABLE IF NOT EXISTS new_settings (
         `id` INT NOT NULL AUTO_INCREMENT,
         `key` VARCHAR(190) NOT NULL,
         `title` VARCHAR(500) NOT NULL,
@@ -112,7 +112,7 @@ class _SettingRecord(BaseDb):
     )
     """
 
-    __tablename__ = "settings"
+    __tablename__ = "new_settings"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     key = Column(String(190), unique=True, nullable=False)

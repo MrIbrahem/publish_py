@@ -129,11 +129,12 @@ def create_side(active_route):
                 ready=True,
             ),
             SidebarItem(
-                id="Emails",
+                id="users_emails",
                 admin=1,
-                href="Emails",
-                title="Emails",
+                href="users_emails",
+                title="Users Emails",
                 icon="bi-envelope",
+                ready=True,
             ),
             SidebarItem(
                 id="full_tr",
