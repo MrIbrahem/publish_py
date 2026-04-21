@@ -35,8 +35,8 @@ from .users_models import (
 )
 from .views_models import (
     EnwikiPageviewRecord,
-    ViewsNewRecord,
     ViewsNewAllRecord,
+    ViewsNewRecord,
 )
 
 __all__ = [

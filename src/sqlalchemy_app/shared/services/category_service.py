@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from ...sqlalchemy_models import CategoryRecord, CategoryRecord
+from ...sqlalchemy_models import CategoryRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)

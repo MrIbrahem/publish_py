@@ -11,7 +11,7 @@ from src.sqlalchemy_app.public.services.user_service import (
     update_user_data,
     user_exists,
 )
-from src.sqlalchemy_app.sqlalchemy_models import UserRecord, UserRecord
+from src.sqlalchemy_app.sqlalchemy_models import UserRecord
 
 
 def test_user_workflow():

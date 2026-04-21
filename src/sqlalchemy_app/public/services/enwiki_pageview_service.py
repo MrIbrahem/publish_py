@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ...shared.engine import get_session
-from ...sqlalchemy_models import EnwikiPageviewRecord, EnwikiPageviewRecord
+from ...sqlalchemy_models import EnwikiPageviewRecord
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +25,7 @@ def list_enwiki_pageviews() -> List[EnwikiPageviewRecord]:
 def get_top_enwiki_pageviews(limit: int = 100) -> List[EnwikiPageviewRecord]:
     """Return top enwiki pageview records by view count."""
     with get_session() as session:
-        orm_objs = (
-            session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.en_views.desc()).limit(limit).all()
-        )
+        orm_objs = session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.en_views.desc()).limit(limit).all()
         return [EnwikiPageviewRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
