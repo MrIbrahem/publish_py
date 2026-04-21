@@ -10,8 +10,7 @@ from typing import Any, List
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import PageRecord
-from ...sqlalchemy_models import _PageRecord
+from ...sqlalchemy_models import PageRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,7 @@ logger = logging.getLogger(__name__)
 def list_pages() -> List[PageRecord]:
     """Return all pages."""
     with get_session() as session:
-        orm_objs = session.query(_PageRecord).order_by(_PageRecord.id.asc()).all()
+        orm_objs = session.query(PageRecord).order_by(PageRecord.id.asc()).all()
         return [PageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
@@ -38,7 +37,7 @@ def add_page(
     if not sourcetitle:
         raise ValueError("Title is required")
     with get_session() as session:
-        orm_obj = _PageRecord(
+        orm_obj = PageRecord(
             title=sourcetitle,
             word=word,
             translate_type=tr_type,
@@ -107,7 +106,7 @@ def update_page(
 ) -> PageRecord:
     """Update page."""
     with get_session() as session:
-        orm_obj = session.query(_PageRecord).filter(_PageRecord.id == page_id).first()
+        orm_obj = session.query(PageRecord).filter(PageRecord.id == page_id).first()
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
@@ -138,7 +137,7 @@ def update_page(
 def delete_page(page_id: int) -> PageRecord:
     """Delete a page."""
     with get_session() as session:
-        orm_obj = session.query(_PageRecord).filter(_PageRecord.id == page_id).first()
+        orm_obj = session.query(PageRecord).filter(PageRecord.id == page_id).first()
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
@@ -159,11 +158,11 @@ def find_exists_or_update_page(
     with get_session() as session:
         # Check existence
         orm_objs = (
-            session.query(_PageRecord)
+            session.query(PageRecord)
             .filter(
-                _PageRecord.title == title,
-                _PageRecord.lang == lang,
-                _PageRecord.user == user,
+                PageRecord.title == title,
+                PageRecord.lang == lang,
+                PageRecord.user == user,
             )
             .all()
         )
@@ -198,11 +197,11 @@ def list_of_users_by_translations_count() -> dict[str, int]:
     with get_session() as session:
         # Query: SELECT user, COUNT(target) as count FROM pages WHERE target != '' GROUP BY user ORDER BY count DESC
         rows = (
-            session.query(_PageRecord.user, func.count(_PageRecord.target).label("count"))
-            .filter(_PageRecord.target != "")
-            .filter(_PageRecord.target.isnot(None))
-            .group_by(_PageRecord.user)
-            .order_by(func.count(_PageRecord.target).desc())
+            session.query(PageRecord.user, func.count(PageRecord.target).label("count"))
+            .filter(PageRecord.target != "")
+            .filter(PageRecord.target.isnot(None))
+            .group_by(PageRecord.user)
+            .order_by(func.count(PageRecord.target).desc())
             .all()
         )
         for user, count in rows:

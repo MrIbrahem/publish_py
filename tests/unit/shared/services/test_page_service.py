@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models import PageRecord
 from src.sqlalchemy_app.shared.engine import BaseDb, build_engine, get_session, init_db
 from src.sqlalchemy_app.shared.services.page_service import (
     add_page,
@@ -11,7 +10,7 @@ from src.sqlalchemy_app.shared.services.page_service import (
     list_pages,
     update_page,
 )
-from src.sqlalchemy_app.sqlalchemy_models import _PageRecord
+from src.sqlalchemy_app.sqlalchemy_models import PageRecord
 
 
 def test_page_workflow():
@@ -33,7 +32,7 @@ def test_page_workflow():
     assert updated.title == "COVID-19"
 
     with get_session() as session:
-        orm_p = session.query(_PageRecord).filter(_PageRecord.id == p.id).first()
+        orm_p = session.query(PageRecord).filter(PageRecord.id == p.id).first()
         orm_p.lang = "en"
         orm_p.user = "WikiUser"
         orm_p.target = ""
@@ -129,7 +128,7 @@ class TestFindExistsOrUpdate:
         """Test that function updates target if empty."""
         # Manual insert to set specific fields
         with get_session() as session:
-            session.add(_PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
+            session.add(PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
             session.commit()
 
         result = find_exists_or_update_page("Philosophy", "en", "PhilAuthor", "Philosophy_article.html")
@@ -147,7 +146,7 @@ class TestFindExistsOrUpdate:
 
     def test_handles_exception_on_commit(self, monkeypatch):
         with get_session() as session:
-            session.add(_PageRecord(title="Error_Page", lang="en", user="U", target=""))
+            session.add(PageRecord(title="Error_Page", lang="en", user="U", target=""))
             session.commit()
         with patch("src.sqlalchemy_app.shared.services.page_service.get_session") as mock_get_session:
             mock_session = MagicMock()

@@ -2,7 +2,7 @@
 Shared domain models - SQLAlchemy ORM.
 
 Note: Several models have been moved to specialized modules:
-- pages_models.py: _PageRecord, _UserPageRecord
+- pages_models.py: PageRecord, UserPageRecord
 - qid_models.py: _QidRecord
 """
 

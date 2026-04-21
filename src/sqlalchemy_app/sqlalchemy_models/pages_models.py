@@ -11,7 +11,7 @@ from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String, func
 from ..shared.engine import BaseDb
 
 
-class _PageRecord(BaseDb):
+class PageRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -67,7 +67,7 @@ class _PageRecord(BaseDb):
         }
 
 
-class _UserPageRecord(BaseDb):
+class UserPageRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -123,7 +123,7 @@ class _UserPageRecord(BaseDb):
         }
 
 
-class _PagesUsersToMainRecord(BaseDb):
+class PagesUsersToMainRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS pages_users_to_main (
         id int unsigned NOT NULL,
@@ -152,7 +152,7 @@ class _PagesUsersToMainRecord(BaseDb):
 
 
 __all__ = [
-    "_PageRecord",
-    "_UserPageRecord",
-    "_PagesUsersToMainRecord",
+    "PageRecord",
+    "UserPageRecord",
+    "PagesUsersToMainRecord",
 ]

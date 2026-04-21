@@ -8,9 +8,9 @@ from .metrics_models import (
     WordRecord,
 )
 from .pages_models import (
-    _PageRecord,
-    _PagesUsersToMainRecord,
-    _UserPageRecord,
+    PageRecord,
+    PagesUsersToMainRecord,
+    UserPageRecord,
 )
 from .public_models import (
     _InProcessRecord,
@@ -48,9 +48,9 @@ __all__ = [
     "RefsCountRecord",
     "WordRecord",
     # pages_models
-    "_PageRecord",
-    "_UserPageRecord",
-    "_PagesUsersToMainRecord",
+    "PageRecord",
+    "UserPageRecord",
+    "PagesUsersToMainRecord",
     # public_models
     "_InProcessRecord",
     "_LangRecord",

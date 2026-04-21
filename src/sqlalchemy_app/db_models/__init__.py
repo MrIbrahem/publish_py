@@ -1,9 +1,4 @@
 
-from .pages_models import (
-    PageRecord,
-    PagesUsersToMainRecord,
-    UserPageRecord,
-)
 from .public_models import (
     InProcessRecord,
     LangRecord,
@@ -32,10 +27,6 @@ from .views_models import (
 )
 
 __all__ = [
-    # pages_models
-    "PageRecord",
-    "UserPageRecord",
-    "PagesUsersToMainRecord",
     # public_models
     "InProcessRecord",
     "LangRecord",
