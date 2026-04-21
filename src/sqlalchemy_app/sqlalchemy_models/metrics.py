@@ -26,13 +26,6 @@ class AssessmentRecord(BaseDb):
     title = Column(String(120), unique=True, nullable=False)
     importance = Column(String(120), nullable=True)
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "importance": self.importance,
-        }
-
 
 class RefsCountRecord(BaseDb):
     """
@@ -53,14 +46,6 @@ class RefsCountRecord(BaseDb):
     r_lead_refs = Column(Integer, nullable=True)
     r_all_refs = Column(Integer, nullable=True)
 
-    def to_dict(self) -> dict:
-        return {
-            "r_id": self.r_id,
-            "r_title": self.r_title,
-            "r_lead_refs": self.r_lead_refs,
-            "r_all_refs": self.r_all_refs,
-        }
-
 
 class WordRecord(BaseDb):
     """
@@ -80,14 +65,6 @@ class WordRecord(BaseDb):
     w_title = Column(String(120), unique=True, nullable=False)
     w_lead_words = Column(Integer, nullable=True)
     w_all_words = Column(Integer, nullable=True)
-
-    def to_dict(self) -> dict:
-        return {
-            "w_id": self.w_id,
-            "w_title": self.w_title,
-            "w_lead_words": self.w_lead_words,
-            "w_all_words": self.w_all_words,
-        }
 
 
 __all__ = [

@@ -9,6 +9,7 @@ from typing import Any
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from ..decorators import admin_required
+from ..services import setting_service as service
 
 
 def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
@@ -39,7 +40,6 @@ class SettingsRoutes:
         self._setup_routes()
 
     def _setup_routes(self):
-        from ..services import setting_service as service
 
         @self.bp.get("/")
         @admin_required

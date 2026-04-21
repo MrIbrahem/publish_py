@@ -63,7 +63,6 @@ CREATE TABLE publish_reports (
         SET
             utf8mb4 COLLATE utf8mb4_bin NOT NULL,
             PRIMARY KEY (id),
-            CONSTRAINT publish_reports_chk_1 CHECK (json_valid (data))
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE VIEW all_articles_titles AS

@@ -4,7 +4,9 @@ import logging
 from typing import Any
 
 from sqlalchemy import Column, Date, DateTime, Integer, LargeBinary, String, func, text
+from sqlalchemy.orm import validates
 
+from ..shared.core.crypto import decrypt_value
 from ..shared.engine import LONGTEXT, BaseDb
 from ..shared.utils.decode_bytes import coerce_bytes
 
@@ -45,35 +47,16 @@ class UserTokenRecord(BaseDb):
     last_used_at = Column(DateTime, nullable=True, server_default=func.current_timestamp())
     rotated_at = Column(DateTime, nullable=True)
 
-    def __init__(self, **kwargs):
-        # Coerce access_token and access_secret to bytes before initialization
-        if "access_token" in kwargs:
-            kwargs["access_token"] = coerce_bytes(kwargs["access_token"])
-        if "access_secret" in kwargs:
-            kwargs["access_secret"] = coerce_bytes(kwargs["access_secret"])
-        super().__init__(**kwargs)
+    @validates("access_token", "access_secret")
+    def validate_bytes(self, key, value):
+        return coerce_bytes(value)
 
     def decrypted(self) -> tuple[str, str]:
         """Return the decrypted access token and secret."""
-        from ..shared.core.crypto import decrypt_value
 
         access_key = decrypt_value(self.access_token)
         access_secret = decrypt_value(self.access_secret)
         return access_key, access_secret
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "user_id": self.user_id,
-            "username": self.username,
-            # "access_token": self.access_token,
-            # "access_secret": self.access_secret,
-            "access_token": coerce_bytes(self.access_token),
-            "access_secret": coerce_bytes(self.access_secret),
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-            "last_used_at": self.last_used_at,
-            "rotated_at": self.rotated_at,
-        }
 
 
 class UserRecord(BaseDb):
@@ -108,16 +91,6 @@ class UserRecord(BaseDb):
             kwargs["user_group"] = "Uncategorized"
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict:
-        return {
-            "user_id": self.user_id,
-            "username": self.username,
-            "email": self.email,
-            "wiki": self.wiki,
-            "user_group": self.user_group,
-            "reg_date": self.reg_date,
-        }
-
 
 class UsersNoInprocessRecord(BaseDb):
     """
@@ -143,13 +116,6 @@ class UsersNoInprocessRecord(BaseDb):
             kwargs["is_active"] = 1
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "user": self.user,
-            "is_active": self.is_active,
-        }
-
 
 class CoordinatorRecord(BaseDb):
     """
@@ -174,13 +140,6 @@ class CoordinatorRecord(BaseDb):
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
         super().__init__(**kwargs)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "username": self.username,
-            "is_active": self.is_active,
-        }
 
     def __repr__(self) -> str:
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
@@ -208,13 +167,6 @@ class FullTranslatorRecord(BaseDb):
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
         super().__init__(**kwargs)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "user": self.user,
-            "is_active": self.is_active,
-        }
 
 
 __all__ = [

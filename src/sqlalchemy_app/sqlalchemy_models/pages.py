@@ -55,23 +55,6 @@ class PageRecord(BaseDb):
             kwargs["deleted"] = 0
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
-
 
 class UserPageRecord(BaseDb):
     """
@@ -111,22 +94,11 @@ class UserPageRecord(BaseDb):
     deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
     mdwiki_revid = Column(Integer, nullable=True)
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "deleted" not in kwargs:
+            kwargs["deleted"] = 0
+        super().__init__(**kwargs)
 
 
 class PagesUsersToMainRecord(BaseDb):
@@ -158,17 +130,48 @@ class PagesUsersToMainRecord(BaseDb):
             kwargs["new_qid"] = ""
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "new_target": self.new_target,
-            "new_user": self.new_user,
-            "new_qid": self.new_qid,
-        }
+
+class InProcessRecord(BaseDb):
+    """
+    CREATE TABLE IF NOT EXISTS in_process (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+        user varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+        lang varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+        cat varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT 'RTT',
+        translate_type varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'lead',
+        word int DEFAULT '0',
+        add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY title (title)
+    )
+    """
+
+    __tablename__ = "in_process"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(255), nullable=False)
+    user = Column(String(255), nullable=False)
+    lang = Column(String(30), nullable=False)
+    cat = Column(String(255), default="RTT", server_default=text("'RTT'"))
+    translate_type = Column(String(20), default="lead", server_default=text("'lead'"))
+    word = Column(Integer, default=0, server_default=text("0"))
+    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
+
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "cat" not in kwargs:
+            kwargs["cat"] = "RTT"
+        if "translate_type" not in kwargs:
+            kwargs["translate_type"] = "lead"
+        if "word" not in kwargs:
+            kwargs["word"] = 0
+        super().__init__(**kwargs)
 
 
 __all__ = [
     "PageRecord",
     "UserPageRecord",
     "PagesUsersToMainRecord",
+    "InProcessRecord",
 ]
