@@ -1,6 +1,6 @@
-from .setting import (
-    LanguageSettingRecord,
-    SettingRecord,
+from .dashboard import (
+    CategoryRecord,
+    ProjectRecord,
 )
 from .metrics import (
     AssessmentRecord,
@@ -18,17 +18,14 @@ from .public import (
     MdwikiRevidRecord,
     TranslateTypeRecord,
 )
+from .publish import ReportRecord
 from .qid import (
     QidRecord,
 )
-
-from .dashboard import (
-    CategoryRecord,
-    ProjectRecord,
+from .setting import (
+    LanguageSettingRecord,
+    SettingRecord,
 )
-
-from .publish import ReportRecord
-
 from .users import (
     CoordinatorRecord,
     FullTranslatorRecord,

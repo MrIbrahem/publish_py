@@ -46,6 +46,7 @@ class RefsCountRecord(BaseDb):
     r_lead_refs = Column(Integer, nullable=True)
     r_all_refs = Column(Integer, nullable=True)
 
+
 class WordRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS words (

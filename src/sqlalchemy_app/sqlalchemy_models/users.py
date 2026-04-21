@@ -6,9 +6,9 @@ from typing import Any
 from sqlalchemy import Column, Date, DateTime, Integer, LargeBinary, String, func, text
 from sqlalchemy.orm import validates
 
+from ..shared.core.crypto import decrypt_value
 from ..shared.engine import LONGTEXT, BaseDb
 from ..shared.utils.decode_bytes import coerce_bytes
-from ..shared.core.crypto import decrypt_value
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class UserTokenRecord(BaseDb):
     last_used_at = Column(DateTime, nullable=True, server_default=func.current_timestamp())
     rotated_at = Column(DateTime, nullable=True)
 
-    @validates('access_token', 'access_secret')
+    @validates("access_token", "access_secret")
     def validate_bytes(self, key, value):
         return coerce_bytes(value)
 

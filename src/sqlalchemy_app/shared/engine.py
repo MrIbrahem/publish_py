@@ -8,10 +8,10 @@ import logging
 from typing import Any
 
 from sqlalchemy import Text, create_engine, event, inspect, text
+from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
-from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +57,7 @@ class BaseDb(DeclarativeBase):
             data["date"] = date_str
 
         return data
+
 
 # ---------------------------------------------------------------------------
 # 2. Database connection — replaces db_driver.py entirely

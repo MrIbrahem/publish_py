@@ -46,7 +46,6 @@ class ReportRecord(BaseDb):
     data = Column(LONGTEXT, nullable=False)
 
 
-
 __all__ = [
     "ReportRecord",
 ]
