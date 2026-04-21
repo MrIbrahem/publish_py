@@ -6,10 +6,43 @@
 
 <div class="card">
     <div class="card-header">
-        <h3 class="headline">Users</h3>
+        <div class="row">
+            <div class="col-md-3">
+                <span class="card-title h4" style="font-weight:bold;">
+                    Users: {{ total_users }}
+                </span>
+            </div>
+            <div class="col-md-9">
+                <form method="get" action="{{ url_for('admin.users_emails.dashboard') }}">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text">Project:</span>
+                                <select aria-label="Project" dir="ltr" class="form-select options" id="project"
+                                    name="project">
+                                    <option data-tokens="all" value="All"
+                                        {% if project_selected == 'All' %}selected{% endif %}>All</option>
+                                    {% for p in projects %}
+                                    <option data-tokens="{{ p.g_title }}" value="{{ p.g_title }}" {% if project_selected == p.g_title %}selected{% endif %}>{{ p.g_title }}
+                                    </option>
+                                    {% endfor %}
+                                    <option data-tokens="empty" value="empty" {% if project_selected == 'empty' %}selected{% endif %}>empty</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="aligncenter col-md-3">
+                            <input class="btn btn-outline-primary" type="submit" value="Filter">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-header">
     </div>
     <div class="card-body">
-        <div class="card mb-4 shadow-sm">
+        <div class="card mb-2 shadow-sm">
             <div class="card-body">
                 <form method="post" action="{{ url_for('admin.users_emails.add') }}" class="row g-2 align-items-end">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -32,9 +65,6 @@
         </div>
 
         <div class="card shadow-sm">
-            <div class="card-header text-bg-light">
-                <h5 class="mb-0 mt-1">Manage Users</h5>
-            </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle table-striped compact table-sm" id="users_table">
@@ -56,11 +86,11 @@
                                 <td> {{ loop.index }} </td>
                                 <td> {{ s.username }} </td>
                                 <td> {{ s.email }} </td>
-                                <td> {{ s.live }} </td>
+                                <td> </td>
                                 <td> {{ s.user_group }} </td>
                                 <td> {{ s.wiki }} </td>
                                 <td>
-
+                                    {{ s.live }}
                                 </td>
                                 <td>
                                     <a class="btn btn-outline-primary btn-sm" pup-target=""

@@ -15,7 +15,9 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db_models.public_models import UserRecord
+from ...public.services.project_service import list_projects
+
+from ...db_models.public_models import ProjectRecord, UserRecord
 
 from ...shared.services.page_service import list_of_users_by_translations_count
 
@@ -34,24 +36,46 @@ from ...public.services.user_service import (
 logger = logging.getLogger(__name__)
 
 
+def filter_users(users: List[UserRecord], project_name: str):
+    if project_name == "All":
+        return users
+
+    if project_name == "empty":
+        return [x for x in users if not x.user_group]
+
+    users = [x for x in users if x.user_group == project_name]
+    return users
+
+
 def _dashboard():
     """Render the users not in process management dashboard."""
 
+    projects: List[ProjectRecord] = list_projects()
+
     users: List[UserRecord] = list_users()
     total = len(users)
+
+    project_name = request.args.get("project", "").strip()
+    if project_name:
+        users = filter_users(users, project_name)
+
     users_counts: dict[str, int] = list_of_users_by_translations_count()
 
     users_data = []
 
     for x in users:
         user_data = x.to_dict()
-        user_data["live"] = users_counts.get(x.username)
+        user_data["live"] = users_counts.get(x.username) or 0
         users_data.append(user_data)
+
+    # sort data by value
+    users_data = sorted(users_data, key=lambda x: x["live"], reverse=True)
 
     return render_template(
         "admins/users_emails.html",
         users=users_data,
-        users_counts=users_counts,
+        projects=projects,
+        project_selected=project_name,
         total_users=total,
     )
 
@@ -82,7 +106,7 @@ def _add_user() -> ResponseReturnValue:
         logger.exception("Unable to add user.")
         flash("Unable to add user. Please try again.", "danger")
     else:
-        flash(f"User '{record.user}' added to 'not in process' list.", "success")
+        flash(f"User '{record.username}' added to 'not in process' list.", "success")
 
     return redirect(url_for("admin.users_emails.dashboard"))
 
