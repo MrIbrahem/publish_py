@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.public_models import AssessmentRecord
+from ...db_models import AssessmentRecord
 from ...sqlalchemy_models import _AssessmentRecord
 from ...shared.engine import get_session
 

@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.public_models import UserRecord
+from ...db_models import UserRecord
 from ...sqlalchemy_models import _UserRecord
 from ...shared.engine import get_session
 

@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.public_models import InProcessRecord
+from ...db_models import InProcessRecord
 from ...sqlalchemy_models import _InProcessRecord
 from ...shared.engine import get_session
 

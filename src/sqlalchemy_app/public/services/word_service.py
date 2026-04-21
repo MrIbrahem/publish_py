@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.public_models import WordRecord
+from ...db_models import WordRecord
 from ...sqlalchemy_models import _WordRecord
 from ...shared.engine import get_session
 

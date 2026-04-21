@@ -12,7 +12,7 @@ from src.sqlalchemy_app.admin.services.full_translator_service import (
     list_full_translators,
     update_full_translator,
 )
-from src.sqlalchemy_app.db_models.admin_models import FullTranslatorRecord
+from src.sqlalchemy_app.db_models import FullTranslatorRecord
 from src.sqlalchemy_app.sqlalchemy_models import _FullTranslatorRecord
 
 

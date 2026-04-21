@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.admin_models import UsersNoInprocessRecord
+from ...db_models import UsersNoInprocessRecord
 from ...sqlalchemy_models import _UsersNoInprocessRecord
 from ...shared.engine import get_session
 
