@@ -10,9 +10,9 @@ from typing import Any, List
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.shared_models import PageRecord
+from ...db_models import PageRecord
+from ...sqlalchemy_models import _PageRecord
 from ..engine import get_session
-from ..models import _PageRecord
 
 logger = logging.getLogger(__name__)
 
@@ -186,6 +186,31 @@ def find_exists_or_update_page(
         return len(orm_objs) > 0
 
 
+def list_of_users_by_translations_count() -> dict[str, int]:
+    """
+    Get a dictionary of users and their translation counts.
+
+    Returns:
+        Dictionary mapping username to count of published translations,
+        ordered by count descending.
+    """
+    result: dict[str, int] = {}
+    with get_session() as session:
+        # Query: SELECT user, COUNT(target) as count FROM pages WHERE target != '' GROUP BY user ORDER BY count DESC
+        rows = (
+            session.query(_PageRecord.user, func.count(_PageRecord.target).label("count"))
+            .filter(_PageRecord.target != "")
+            .filter(_PageRecord.target.isnot(None))
+            .group_by(_PageRecord.user)
+            .order_by(func.count(_PageRecord.target).desc())
+            .all()
+        )
+        for user, count in rows:
+            if user is not None:
+                result[user] = count
+    return result
+
+
 __all__ = [
     "list_pages",
     "add_page",
@@ -193,4 +218,5 @@ __all__ = [
     "delete_page",
     "find_exists_or_update_page",
     "insert_page_target",
+    "list_of_users_by_translations_count",
 ]

@@ -10,10 +10,10 @@ from typing import Optional
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.shared_models import UserTokenRecord
+from ...db_models import UserTokenRecord
+from ...sqlalchemy_models import _UserTokenRecord
 from ..core.crypto import encrypt_value
 from ..engine import get_session
-from ..models import _UserTokenRecord
 
 logger = logging.getLogger(__name__)
 

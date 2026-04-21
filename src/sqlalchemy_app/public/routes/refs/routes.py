@@ -21,17 +21,16 @@ logger = logging.getLogger(__name__)
 
 @bp_fixrefs.route("/", methods=["GET"])
 def index() -> str:
-    current_user_obj = current_user()
+
     return render_template(
         "fix-refs.html",
         result=None,
-        current_user=current_user_obj,
+
     )
 
 
 @bp_fixrefs.route("/", methods=["POST"])
 def process() -> str:
-    current_user_obj = current_user()
 
     source_title = request.form.get("sourceTitle", "")
     title = request.form.get("title", "")
@@ -53,7 +52,7 @@ def process() -> str:
 
     return render_template(
         "fix-refs.html",
-        current_user=current_user_obj,
+
         sourceTitle=source_title,
         title=title,
         lang=lang,

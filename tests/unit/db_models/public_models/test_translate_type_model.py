@@ -4,7 +4,7 @@ Unit tests for domain.models.translate_type module.
 Tests for TranslateTypeRecord.
 """
 
-from src.sqlalchemy_app.db_models.public_models import (
+from src.sqlalchemy_app.db_models import (
     TranslateTypeRecord,
 )
 

@@ -9,15 +9,17 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
-from ....shared.services.category_service import list_categories
+from ....db_models import InProcessRecord
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....shared.models import _CategoryRecord, _ReportRecord
-from ....public.models import _InProcessRecord, _LangRecord
-from .pages_query_service import list_pages_users, list_pages_with_views
+from ....shared.services.category_service import list_categories
+from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
+from ....sqlalchemy_models import _CategoryRecord, _InProcessRecord, _LangRecord, _ReportRecord
+from ...services.in_process_service import get_in_process_counts_by_user
+from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
@@ -172,10 +174,13 @@ def get_in_process() -> Response:
     Returns:
         JSON response with in-process records
     """
+    lang = request.args.get("lang", default="", type=str)
+    limit = request.args.get("limit", default=500, type=int)
+    limit = max(1, min(limit, 5000))
     try:
         with get_session() as session:
             # Perform the JOIN query using SQLAlchemy
-            results = (
+            query = (
                 session.query(
                     _InProcessRecord.id,
                     _InProcessRecord.title,
@@ -190,9 +195,13 @@ def get_in_process() -> Response:
                 )
                 .outerjoin(_CategoryRecord, _InProcessRecord.cat == _CategoryRecord.category)
                 .outerjoin(_LangRecord, _InProcessRecord.lang == _LangRecord.code)
-                .order_by(_InProcessRecord.id.asc())
-                .all()
+
             )
+
+            if lang and lang != "All":
+                query = query.filter(_InProcessRecord.lang == lang)
+
+            results = query.order_by(_InProcessRecord.id.asc()).limit(limit).all()
 
             # Convert results to list of dicts
             data: List[Dict[str, Any]] = [
@@ -240,26 +249,7 @@ def get_in_process_total() -> Response:
         JSON response with user counts
     """
     try:
-        with get_session() as session:
-            # Query counts grouped by user
-            results = (
-                session.query(
-                    _InProcessRecord.user,
-                    func.count(_InProcessRecord.id).label("article_count"),
-                )
-                .group_by(_InProcessRecord.user)
-                .order_by(func.count(_InProcessRecord.id).desc())
-                .all()
-            )
-
-            # Convert results to list of dicts
-            data: List[Dict[str, Any]] = [
-                {
-                    "user": row.user,
-                    "article_count": row.article_count,
-                }
-                for row in results
-            ]
+        data = get_in_process_counts_by_user()
 
     except Exception:
         logger.exception("Error fetching in_process_total data")
@@ -341,17 +331,40 @@ def get_pages_with_views() -> Response:
 
 @bp_api.route("/categories", methods=["GET"])
 @check_cors
-def list_categories_views() -> Response:
+def get_categories() -> Response:
     """
+    Handle categories API requests. Returns all category records.
+    """
+    try:
+        records = list_categories()
+    except Exception:
+        logger.exception("Error fetching categories data")
+        return jsonify({"error": "An internal error occurred while fetching categories data"}), 500
+
+    records = [x.to_dict() for x in records]
+    response_data = {
+        "results": records,
+        "count": len(records),
+    }
+
+    return jsonify(response_data)
+
+
+@bp_api.route("/users_by_translations_count", methods=["GET"])
+@check_cors
+def users_by_translations_count() -> Response:
+    """C
     Handle pages_with_views API requests.
     """
     try:
-        data = list_categories()
+        data = list_of_users_by_translations_count()
     except Exception:
-        logger.exception("Error fetching pages_with_views data")
-        return jsonify({"error": "An internal error occurred while fetching pages_with_views data"}), 500
+        logger.exception("Error fetching list_of_users_by_translations_count data")
+        return jsonify({"error": "An internal error occurred while fetching v data"}), 500
 
-    data = [x.to_dict() for x in data]
+    # sort data by value
+    data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True))
+
     response_data = {
         "results": data,
         "count": len(data),

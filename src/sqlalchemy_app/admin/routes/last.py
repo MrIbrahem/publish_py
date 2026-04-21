@@ -3,17 +3,17 @@
 from __future__ import annotations
 
 import logging
+from datetime import date, timedelta
 
-from flask import Blueprint, render_template, request
+from flask import render_template, request
 
-from ..decorators import admin_required
+from ...public.routes.api.pages_query_service import list_pages_users, list_pages_with_views
 from ...public.services.lang_service import list_langs
-from ...public.routes.api.pages_query_service import list_pages_with_views, list_pages_users
 
 logger = logging.getLogger(__name__)
 
 
-def _last_dashboard():
+def last_translations_dashboard() -> str:
     """Render the recent translations dashboard."""
 
     # Get query parameters
@@ -40,12 +40,5 @@ def _last_dashboard():
         current_lang=lang,
         last_table=last_table,
         count=len(rows),
+        yesterday=(date.today() - timedelta(days=1)).isoformat(),
     )
-
-
-class LastDashboard:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/last")
-        @admin_required
-        def last_dashboard():
-            return _last_dashboard()

@@ -9,40 +9,6 @@ from typing import Any, Optional
 
 
 @dataclass
-class CoordinatorRecord:
-    """Representation of a coordinator record."""
-
-    id: int
-    username: str
-    is_active: int = 1
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "id": self.id,
-            "username": self.username,
-            "is_active": self.is_active,
-        }
-
-
-@dataclass
-class FullTranslatorRecord:
-    """Representation of a full translator record."""
-
-    id: int
-    user: str
-    is_active: int = 1
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "id": self.id,
-            "user": self.user,
-            "is_active": self.is_active,
-        }
-
-
-@dataclass
 class LanguageSettingRecord:
     """Representation of a language setting record."""
 
@@ -53,7 +19,6 @@ class LanguageSettingRecord:
     add_en_lang: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "lang_code": self.lang_code,
@@ -82,7 +47,6 @@ class SettingRecord:
     value_type: str = "boolean"
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "key": self.key,
@@ -109,27 +73,7 @@ class SettingRecord:
         return str(value)  # string
 
 
-@dataclass
-class UsersNoInprocessRecord:
-    """Representation of a users_no_inprocess record."""
-
-    id: int
-    user: str
-    is_active: int = 1
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "id": self.id,
-            "user": self.user,
-            "is_active": self.is_active,
-        }
-
-
 __all__ = [
-    "CoordinatorRecord",
-    "FullTranslatorRecord",
     "LanguageSettingRecord",
     "SettingRecord",
-    "UsersNoInprocessRecord",
 ]

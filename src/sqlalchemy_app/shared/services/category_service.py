@@ -7,15 +7,16 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from ...db_models.shared_models import CategoryRecord
-from ..engine import get_session
-from ..models import _CategoryRecord
 from sqlalchemy.orm import Session
+
+from ...db_models import CategoryRecord
+from ...sqlalchemy_models import _CategoryRecord
+from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 
 
-def set_default_category(session: Session , orm_obj) -> CategoryRecord:
+def set_default_category(session: Session, orm_obj) -> CategoryRecord:
     session.query(_CategoryRecord).update({_CategoryRecord.is_default: 0})
     orm_obj.is_default = 1
     session.commit()

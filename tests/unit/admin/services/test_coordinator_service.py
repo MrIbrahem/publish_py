@@ -1,8 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models.admin_models import CoordinatorRecord
-from src.sqlalchemy_app.admin.models import _CoordinatorRecord
 from src.sqlalchemy_app.admin.services.coordinator_service import (
     active_coordinators,
     add_coordinator,
@@ -15,7 +13,9 @@ from src.sqlalchemy_app.admin.services.coordinator_service import (
     set_coordinator_active,
     update_coordinator,
 )
+from src.sqlalchemy_app.db_models import CoordinatorRecord
 from src.sqlalchemy_app.shared.engine import init_db
+from src.sqlalchemy_app.sqlalchemy_models import _CoordinatorRecord
 
 
 def test_coordinator_workflow():

@@ -57,7 +57,7 @@
         </div>
 
         <div class="table-responsive shadow-sm">
-            <table class="table table-striped table-hover align-middle mb-0 DataTable">
+            <table class="table table-striped compact table-sm table-hover align-middle mb-0 DataTable">
                 <thead>
                     <tr>
                         <th scope="col" style="width: 5%">ID</th>
@@ -84,7 +84,7 @@
                                         {% if user_rec.is_active %}checked{% endif %}
                                         onchange="document.getElementById('user-is_active-value-{{ user_rec.id }}').value = this.checked ? '1' : '0'; this.form.submit();">
                                     <label class="visually-hidden" for="user-is_active-{{ user_rec.id }}">Toggle
-                                        user is_active state</label>
+                                        user active state</label>
                                 </div>
                             </form>
                         </td>

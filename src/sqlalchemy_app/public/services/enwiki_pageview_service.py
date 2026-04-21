@@ -9,9 +9,9 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.public_models import EnwikiPageviewRecord
+from ...db_models import EnwikiPageviewRecord
 from ...shared.engine import get_session
-from ..models import _EnwikiPageviewRecord
+from ...sqlalchemy_models import _EnwikiPageviewRecord
 
 logger = logging.getLogger(__name__)
 

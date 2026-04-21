@@ -450,19 +450,6 @@ def start_task():
 
 **Recommendation**: Audit services for threading usage and ensure proper context handling.
 
-#### 8.2 SECRET_KEY_FALLBACKS Not Implemented ⚠️ LOW
-
-**SKILL.md Issue #8**:
-
-```python
-# Flask 3.1.0 feature for key rotation
-class Config:
-    SECRET_KEY = "new-secret-key-2024"
-    SECRET_KEY_FALLBACKS = ["old-secret-key-2023"]
-```
-
-**Recommendation**: Consider implementing for zero-downtime key rotation.
-
 ---
 
 ### 9. Import Order Convention ⚠️ NON-COMPLIANT

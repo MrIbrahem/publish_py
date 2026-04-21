@@ -9,7 +9,7 @@
         <h3 class="headline">Translations in Process</h3>
     </div>
     <div class="card-body">
-        <div class="row g-3 mb-4">
+        <!-- <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
@@ -18,10 +18,11 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="table-responsive shadow-sm">
-            <table class="table table-striped table-hover align-middle mb-0" id="inProcessTable">
+            <table class="table table-striped compact table-sm table-smtable-hover align-middle mb-0"
+                id="inProcessTable">
                 <thead>
                     <tr>
                         <th scope="col" style="width: 5%">#</th>
@@ -63,20 +64,26 @@
                 {
                     data: 'user',
                     render: function (data, type, row) {
-                        return `<a href="https://mdwiki.org/wiki/User:${data}" target="_blank">${data}</a> (<a href="https://mdwiki.org/wiki/User_talk:${data}" target="_blank">talk</a>)`;
+                        const escapedUser = $('<div>').text(data || '').html();
+                        const encodedUser = encodeURIComponent(data || '');
+                        return `<a href="https://mdwiki.org/wiki/User:${encodedUser}" target="_blank" rel="noopener noreferrer">${escapedUser}</a> (<a href="https://mdwiki.org/wiki/User_talk:${encodedUser}" target="_blank" rel="noopener noreferrer">talk</a>)`;
                     }
                 },
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return `(${row.lang}) ${row.autonym}`;
+                        const lang = $('<div>').text(row.lang || '').html();
+                        const autonym = $('<div>').text(row.autonym || '').html();
+                        return `(${lang}) ${autonym}`;
                     }
                 },
                 {
-                    data: 'title'
+                    data: 'title',
+                    render: $.fn.dataTable.render.text()
                 },
                 {
-                    data: 'campaign'
+                    data: 'campaign',
+                    render: $.fn.dataTable.render.text()
                 },
                 {
                     data: 'add_date',

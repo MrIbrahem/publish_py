@@ -20,14 +20,15 @@ from flask import (
 # )
 from ..decorators import admin_required
 from ..sidebar import create_side
+from .campaigns import campaigns_module
 from .coordinators import Coordinators
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
-from .last import LastDashboard
-from .settings import SettingsRoutes
-from .users_no_inprocess import UsersNoInprocess
+from .last import last_translations_dashboard
 from .projects import ProjectsDashboard
-from .campaigns import CampaignsDashboard
+from .settings import SettingsRoutes
+from .users_emails import users_emails_module
+from .users_no_inprocess import UsersNoInprocess
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,13 @@ def inject_sidebar():
 @bp_admin.get("/")
 @admin_required
 def index():
-    return render_template("admins/index.html")
+    return redirect(url_for("admin.last_dashboard"))
+
+
+@bp_admin.get("/last")
+@admin_required
+def last_dashboard():
+    return last_translations_dashboard()
 
 
 @bp_admin.get("/reports")
@@ -70,18 +77,18 @@ def in_process_total_dashboard():
     )
 
 
-def register_blueprints(bp_admin) -> None:
+def register_blueprints(bp_admin: Blueprint) -> None:
     Coordinators(bp_admin)
     FullTranslators(bp_admin)
     UsersNoInprocess(bp_admin)
     LanguageSettings(bp_admin)
-    LastDashboard(bp_admin)
     # Templates(bp_admin)
     SettingsRoutes(bp_admin)
     ProjectsDashboard(bp_admin)
-    CampaignsDashboard(bp_admin)
+    bp_admin.register_blueprint(campaigns_module.bp)
     # Jobs(bp_admin)
     # OwidCharts(bp_admin)
+    bp_admin.register_blueprint(users_emails_module.bp)
 
 
 register_blueprints(bp_admin)

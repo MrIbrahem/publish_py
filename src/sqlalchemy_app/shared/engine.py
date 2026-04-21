@@ -7,13 +7,10 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import Text, create_engine, inspect, text
+from sqlalchemy import Text, create_engine, event, inspect, text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
-
-from sqlalchemy import event
-
 
 logger = logging.getLogger(__name__)
 
@@ -112,12 +109,9 @@ def init_db(db_url: str, create_tables: bool = False) -> None:
     global _SessionFactory
     engine = build_engine(db_url)
     if create_tables:
-        tables = [
-            t for t in BaseDb.metadata.tables.values()
-            if not t.info.get("is_view")
-        ]
+        real_tables = [t for t in BaseDb.metadata.tables.values() if not t.info.get("is_view")]
 
-        BaseDb.metadata.create_all(engine, tables=tables)
+        BaseDb.metadata.create_all(engine, tables=real_tables)
     _SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
 
 
@@ -132,7 +126,7 @@ def get_session() -> Session:
 
 
 # -----------------------------------------------------------------------------
-# Create views_new_all view automatically when tables are created
+# Create views automatically when tables are created
 # -----------------------------------------------------------------------------
 
 
@@ -141,32 +135,35 @@ def create_views_new_all_view(target, connection, **kw):
     inspector = inspect(connection)
     existing_views = inspector.get_view_names()
 
-    if "views_new_all" not in existing_views:
-        connection.execute(text("""
-            CREATE VIEW views_new_all AS
-            SELECT v.target AS target,
-                   v.lang AS lang,
-                   SUM(v.views) AS views
-            FROM views_new v
-            GROUP BY v.target, v.lang
-        """))
-    else:
-        print("View 'views_new_all' already exists, skipping creation.")
+    views_to_create = {
+        table.name: table.info.get("create_query")
+        for table in target.tables.values()
+        if table.info.get("is_view") and table.info.get("create_query")
+    }
 
-    if "users_list" not in existing_views:
-        connection.execute(text("""
-            CREATE VIEW users_list AS
-                select
-                    u.user_id AS user_id,
-                    u.username AS username,
-                    u.wiki AS wiki,
-                    u.user_group AS user_group,
-                    u.reg_date AS reg_date
-                from
-                    users u
-        """))
-    else:
-        print("View 'users_list' already exists, skipping creation.")
+    views_to_create[
+        "users_list"
+    ] = """
+        CREATE VIEW users_list AS
+            select
+                u.user_id AS user_id,
+                u.username AS username,
+                u.wiki AS wiki,
+                u.user_group AS user_group,
+                u.reg_date AS reg_date
+            from
+                users u
+    """
+
+    for name, query in views_to_create.items():
+        if name not in existing_views:
+            try:
+                connection.execute(text(query))
+                logger.info(f"Successfully created view: {name}")
+            except Exception as e:
+                logger.exception(f"Error creating view {name}", exc_info=True)
+        else:
+            logger.info(f"View '{name}' already exists, skipping.")
 
 
 __all__ = [

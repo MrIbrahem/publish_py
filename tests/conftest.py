@@ -193,12 +193,16 @@ def setup_db():
 
     # Create views_new_all as a view
     with engine.connect() as conn:
-        conn.execute(text("""
+        conn.execute(
+            text(
+                """
             CREATE VIEW IF NOT EXISTS views_new_all AS
             SELECT target, lang, SUM(views) as views
             FROM views_new
             GROUP BY target, lang
-        """))
+        """
+            )
+        )
         conn.commit()
 
     # Create all other tables except views_new_all (which is already created as a view)

@@ -5,7 +5,6 @@ Tests for shared.utils.web_utils module.
 from __future__ import annotations
 
 import pytest
-
 from src.sqlalchemy_app.shared.utils.web_utils import parse_select_fields
 
 

@@ -1,8 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models.public_models import WordRecord
-from src.sqlalchemy_app.public.models import _WordRecord
+from src.sqlalchemy_app.db_models import WordRecord
 from src.sqlalchemy_app.public.services.word_service import (
     add_or_update_word,
     add_word,
@@ -13,6 +12,7 @@ from src.sqlalchemy_app.public.services.word_service import (
     list_words,
     update_word,
 )
+from src.sqlalchemy_app.sqlalchemy_models import _WordRecord
 
 
 def test_word_workflow():

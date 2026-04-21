@@ -8,8 +8,7 @@ import logging
 from typing import Any, Dict, List
 
 from ....shared.engine import get_session
-from ....shared.models import _CategoryRecord, _PageRecord, _UserPageRecord
-from ...models import _ViewsNewAllRecord
+from ....sqlalchemy_models import _CategoryRecord, _PageRecord, _UserPageRecord, _ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
 
@@ -74,13 +73,10 @@ def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, An
             .scalar_subquery()
         )
 
-        query = (
-            session.query(
-                _PageRecord,
-                views_subquery.label("views"),
-            )
-            .filter(_PageRecord.target != "")
-        )
+        query = session.query(
+            _PageRecord,
+            views_subquery.label("views"),
+        ).filter(_PageRecord.target != "")
 
         if lang and lang != "All":
             query = query.filter(_PageRecord.lang == lang)

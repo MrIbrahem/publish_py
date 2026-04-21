@@ -10,9 +10,9 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.public_models import InProcessRecord
+from ...db_models import InProcessRecord
 from ...shared.engine import get_session
-from ..models import _InProcessRecord
+from ...sqlalchemy_models import _InProcessRecord
 
 logger = logging.getLogger(__name__)
 
@@ -178,10 +178,7 @@ def get_in_process_counts_by_user() -> List[dict]:
             .order_by(func.count(_InProcessRecord.id).desc())
             .all()
         )
-        return [
-            {"user": row.user, "article_count": row.article_count}
-            for row in results
-        ]
+        return [{"user": row.user, "article_count": row.article_count} for row in results]
 
 
 __all__ = [

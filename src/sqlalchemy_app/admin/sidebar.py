@@ -129,11 +129,12 @@ def create_side(active_route):
                 ready=True,
             ),
             SidebarItem(
-                id="Emails",
+                id="users_emails",
                 admin=1,
-                href="Emails",
-                title="Emails",
+                href="users_emails",
+                title="Users Emails",
                 icon="bi-envelope",
+                ready=True,
             ),
             SidebarItem(
                 id="full_tr",
@@ -219,7 +220,7 @@ def create_side(active_route):
 
     for key, items in main_menu.items():
         lis = []
-        group_is_active = True
+        group_is_active = False
         key_id = key.lower().replace(" ", "_")
         for item in items:
             if item.disabled:
@@ -230,6 +231,8 @@ def create_side(active_route):
             link = generate_list_item(href_full, item)
 
             lis.append(f"<li id='{item.id}' class='{css_class}'>{link}</li>")
+            if css_class:
+                group_is_active = True
 
         if lis:
             show = "show" if group_is_active else ""

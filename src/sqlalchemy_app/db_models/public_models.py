@@ -17,7 +17,6 @@ class AssessmentRecord:
     importance: str | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "title": self.title,
@@ -34,7 +33,6 @@ class EnwikiPageviewRecord:
     en_views: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "title": self.title,
@@ -56,7 +54,6 @@ class InProcessRecord:
     add_date: Any | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "title": self.title,
@@ -79,7 +76,6 @@ class LangRecord:
     name: str
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "lang_id": self.lang_id,
             "code": self.code,
@@ -96,7 +92,6 @@ class MdwikiRevidRecord:
     revid: int
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "title": self.title,
             "revid": self.revid,
@@ -113,7 +108,6 @@ class PagesUsersToMainRecord:
     new_qid: str = ""
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "new_target": self.new_target,
@@ -130,7 +124,6 @@ class ProjectRecord:
     g_title: str
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "g_id": self.g_id,
             "g_title": self.g_title,
@@ -147,7 +140,6 @@ class RefsCountRecord:
     r_all_refs: int | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "r_id": self.r_id,
             "r_title": self.r_title,
@@ -166,35 +158,11 @@ class TranslateTypeRecord:
     tt_full: int = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "tt_id": self.tt_id,
             "tt_title": self.tt_title,
             "tt_lead": self.tt_lead,
             "tt_full": self.tt_full,
-        }
-
-
-@dataclass
-class UserRecord:
-    """Representation of a user record."""
-
-    user_id: int
-    username: str
-    email: str = ""
-    wiki: str = ""
-    user_group: str = "Uncategorized"
-    reg_date: Any | None = None
-
-    def to_dict(self) -> dict:
-        """Convert record to dictionary."""
-        return {
-            "user_id": self.user_id,
-            "username": self.username,
-            "email": self.email,
-            "wiki": self.wiki,
-            "user_group": self.user_group,
-            "reg_date": self.reg_date,
         }
 
 
@@ -209,7 +177,6 @@ class ViewsNewRecord:
     views: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "target": self.target,
@@ -228,7 +195,6 @@ class ViewsNewAllRecord:
     views: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "target": self.target,
             "lang": self.lang,
@@ -246,7 +212,6 @@ class WordRecord:
     w_all_words: int | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "w_id": self.w_id,
             "w_title": self.w_title,
@@ -265,7 +230,6 @@ __all__ = [
     "ProjectRecord",
     "RefsCountRecord",
     "TranslateTypeRecord",
-    "UserRecord",
     "ViewsNewRecord",
     "ViewsNewAllRecord",
     "WordRecord",

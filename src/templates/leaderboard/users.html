@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class=''>
+        <div class='row g-1'>
+            <div class='col-lg-4 col-md-12 border_debug border rounded'>
+                <div class="d-flex align-items-center justify-content-center" style="height: 100%">
+                    <div class="list-group">
+                        <h4 class='text-center'>User: oʻzbekcha / ўзбекча (uz) <br><a target="_blank"
+                                href="http://uz.wikipedia.org/wiki/Category:Translated_from_MDWiki">(cat)</a>
+                        </h4>
+                        <div class="d-flex align-items-center justify-content-center " style="height: 100%">
+                            <div class="text-muted">
+                                Articles: <strong>1</strong> &nbsp;
+                                Words: <strong>170</strong> &nbsp;
+                                Pageviews: <strong><span id="hrefjsontoadd">0</span></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='col-lg-5 col-md-6'>
+                <div class="position-relative py-1 border rounded">
+                    <canvas id="chart_69e6e6d5e7ab7" height="100" width="200" class="invert-on-dark"></canvas>
+                    <script>
+                        graph_js(
+                            ['', '2023-08'],
+                            [0, 1],
+                            "chart_69e6e6d5e7ab7"
+                        )
+                    </script>
+                </div>
+            </div>
+            <div class='col-lg-3 col-md-6 border_debug'>
+                <form method="get" action="leaderboard.php" class="border rounded">
+
+                    <input type='hidden' name='get' value='langs' /><input type='hidden' name='langcode' value='uz' />
+                    <div class='container mt-3'>
+                        <div class='row g-1'>
+                            <div class="col-12">
+                                <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
+                                    <option value='all'>Year: All</option>
+                                    <option value='2023'>2023</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mt-1">
+                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">Filter</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class='card mt-1'>
+        <div class='card-body p-1'>
+            <table class='table table-striped compact table_text_left table_responsive' id='leadtable'>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th data-priority="1">Lang</th>
+                        <th data-priority="2">Title</th>
+                        <th>Campaign</th>
+                        <th>Words</th>
+                        <th data-priority="3">Translated</th>
+                        <th>Date</th>
+                        <th>Views</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th data-content="#">
+
+                        </th>
+                        <td data-content="Lang">
+                        </td>
+                        <td data-content="Title">
+                        </td>
+                        <td data-content="Campaign">
+                        </td>
+                        <td data-content="Words">
+
+                        </td>
+                        <td data-content="Translated">
+
+                        </td>
+                        <td data-content="Date" class='spannowrap'>
+                        </td>
+                        <td data-content='Views'>
+
+                        </td>
+
+                    </tr>
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+        </div>
+    </div> <br>
+    <div class='card'>
+        <div class='card-body' style='padding:5px 0px 5px 5px;'>
+            <h2 class='text-center'>Translations in process</h2>
+            <!--
+                https://mdwiki.toolforge.org/api.php?get=top_lang_of_users&users%5B0%5D=SeaTub
+                https://mdwiki.toolforge.org/api.php?get=pages_by_user_or_lang&user=SeaTub
+                https://mdwiki.toolforge.org/api.php?get=in_process&user=SeaTub
+                https://mdwiki.toolforge.org/api.php?get=user_status&select=year&user=SeaTub
+                https://mdwiki.toolforge.org/api.php?get=user_status&select=lang&user=SeaTub
+                https://mdwiki.toolforge.org/api.php?get=user_status&select=campaign&user=SeaTub
+                /api/in_process?user=es
+             -->
+            <table class='table table-striped compact table_text_left table_responsive' id='leadtable2'>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th data-priority="1">Lang</th>
+                        <th data-priority="2">Title</th>
+                        <th>Campaign</th>
+                        <th>Words</th>
+                        <th data-priority="3">Translated</th>
+                        <th>Start date</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    $(document).ready(function () {
+        // get_views();
+
+        // $('[data-toggle="tooltip"]').tooltip();
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+        // $('.card').CardWidget('toggle')
+        $('.table_responsive').DataTable({
+            stateSave: false,
+            paging: false,
+            info: false,
+            searching: false,
+            responsive: {
+                details: true
+                // display: $.fn.dataTable.Responsive.display.modal()
+            }
+        });
+
+    });
+</script>
+{% endblock %}

@@ -13,8 +13,7 @@ from sqlalchemy import Integer, case, cast, func
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....shared.models import _PageRecord
-from ....public.models import _LangRecord, _ViewsNewAllRecord, _WordRecord
+from ....sqlalchemy_models import _LangRecord, _PageRecord, _ViewsNewAllRecord, _WordRecord
 
 logger = logging.getLogger(__name__)
 
@@ -67,15 +66,18 @@ def get_top_langs() -> Response:
     Returns:
         JSON response with language statistics
     """
-    limit = request.args.get("limit", 50)
+
+    limit = request.args.get("limit", default=50, type=int)
+    if limit is None or limit <= 0:
+        limit = 50
+    limit = min(limit, 1000)
+
     try:
         with get_session() as session:
             # Build the word count expression
             word_expr = case(
                 (
-                    _PageRecord.word.is_not(None)
-                    & (_PageRecord.word != 0)
-                    & (_PageRecord.word != ""),
+                    _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
                     _PageRecord.word,
                 ),
                 (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
@@ -100,8 +102,7 @@ def get_top_langs() -> Response:
                 .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
                 .outerjoin(
                     _ViewsNewAllRecord,
-                    (_PageRecord.target == _ViewsNewAllRecord.target)
-                    & (_PageRecord.lang == _ViewsNewAllRecord.lang),
+                    (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),
                 )
                 .outerjoin(_LangRecord, _PageRecord.lang == _LangRecord.code)
                 .filter(_PageRecord.target != "")
@@ -190,15 +191,16 @@ def get_top_users() -> Response:
         JSON response with user statistics
     """
 
-    limit = request.args.get("limit", 50)
+    limit = request.args.get("limit", default=50, type=int)
+    if limit is None or limit <= 0:
+        limit = 50
+    limit = min(limit, 1000)
     try:
         with get_session() as session:
             # Build the word count expression
             word_expr = case(
                 (
-                    _PageRecord.word.is_not(None)
-                    & (_PageRecord.word != 0)
-                    & (_PageRecord.word != ""),
+                    _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
                     _PageRecord.word,
                 ),
                 (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
@@ -222,8 +224,7 @@ def get_top_users() -> Response:
                 .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
                 .outerjoin(
                     _ViewsNewAllRecord,
-                    (_PageRecord.target == _ViewsNewAllRecord.target)
-                    & (_PageRecord.lang == _ViewsNewAllRecord.lang),
+                    (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),
                 )
                 .filter(_PageRecord.target != "")
                 .filter(_PageRecord.target.is_not(None))

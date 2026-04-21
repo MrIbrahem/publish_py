@@ -9,9 +9,9 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models.public_models import LangRecord
+from ...db_models import LangRecord
 from ...shared.engine import get_session
-from ..models import _LangRecord
+from ...sqlalchemy_models import _LangRecord
 
 logger = logging.getLogger(__name__)
 

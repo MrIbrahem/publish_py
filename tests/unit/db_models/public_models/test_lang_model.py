@@ -4,7 +4,7 @@ Unit tests for domain.models.lang module.
 Tests for LangRecord.
 """
 
-from src.sqlalchemy_app.db_models.public_models import (
+from src.sqlalchemy_app.db_models import (
     LangRecord,
 )
 

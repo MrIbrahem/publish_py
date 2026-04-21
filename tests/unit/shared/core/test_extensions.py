@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from flask import Blueprint, Flask
-
 from src.sqlalchemy_app.shared.core.extensions import csrf, csrf_exempt, csrf_init_app
 
 

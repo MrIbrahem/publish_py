@@ -7,7 +7,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.sqlalchemy_app.public.routes.auth.oauth import (
     IDENTITY_ERROR_MESSAGE,
     OAuthIdentityError,
