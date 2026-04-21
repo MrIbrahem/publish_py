@@ -4,9 +4,7 @@ Unit tests for domain.models.enwiki_pageview module.
 Tests for EnwikiPageviewRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
-    EnwikiPageviewRecord,
-)
+from src.sqlalchemy_app.sqlalchemy_models import EnwikiPageviewRecord
 
 
 class TestEnwikiPageviewRecord:

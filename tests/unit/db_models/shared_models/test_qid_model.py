@@ -5,9 +5,7 @@ Tests for QidRecord.
 """
 
 import pytest
-from src.sqlalchemy_app.db_models import (
-    QidRecord,
-)
+from src.sqlalchemy_app.sqlalchemy_models import QidRecord
 
 
 class TestQidRecord:

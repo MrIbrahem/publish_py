@@ -11,7 +11,7 @@ from ..shared.utils.decode_bytes import coerce_bytes
 logger = logging.getLogger(__name__)
 
 
-class _UserTokenRecord(BaseDb):
+class UserTokenRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS user_tokens (
         user_id int NOT NULL,
@@ -40,9 +40,26 @@ class _UserTokenRecord(BaseDb):
         nullable=False,
         server_default=func.current_timestamp(),
         server_onupdate=func.current_timestamp(),
+        # server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
     )
     last_used_at = Column(DateTime, nullable=True, server_default=func.current_timestamp())
     rotated_at = Column(DateTime, nullable=True)
+
+    def __init__(self, **kwargs):
+        # Coerce access_token and access_secret to bytes before initialization
+        if "access_token" in kwargs:
+            kwargs["access_token"] = coerce_bytes(kwargs["access_token"])
+        if "access_secret" in kwargs:
+            kwargs["access_secret"] = coerce_bytes(kwargs["access_secret"])
+        super().__init__(**kwargs)
+
+    def decrypted(self) -> tuple[str, str]:
+        """Return the decrypted access token and secret."""
+        from ..shared.core.crypto import decrypt_value
+
+        access_key = decrypt_value(self.access_token)
+        access_secret = decrypt_value(self.access_secret)
+        return access_key, access_secret
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -59,7 +76,7 @@ class _UserTokenRecord(BaseDb):
         }
 
 
-class _UserRecord(BaseDb):
+class UserRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS users (
         user_id int NOT NULL AUTO_INCREMENT,
@@ -81,6 +98,16 @@ class _UserRecord(BaseDb):
     user_group = Column(String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'"))
     reg_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "email" not in kwargs:
+            kwargs["email"] = ""
+        if "wiki" not in kwargs:
+            kwargs["wiki"] = ""
+        if "user_group" not in kwargs:
+            kwargs["user_group"] = "Uncategorized"
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "user_id": self.user_id,
@@ -92,7 +119,7 @@ class _UserRecord(BaseDb):
         }
 
 
-class _UsersNoInprocessRecord(BaseDb):
+class UsersNoInprocessRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS users_no_inprocess (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -110,6 +137,12 @@ class _UsersNoInprocessRecord(BaseDb):
     user = Column(String(120), unique=True, nullable=False)
     is_active = Column(Integer, nullable=False, default=1)
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "is_active" not in kwargs:
+            kwargs["is_active"] = 1
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -118,7 +151,7 @@ class _UsersNoInprocessRecord(BaseDb):
         }
 
 
-class _CoordinatorRecord(BaseDb):
+class CoordinatorRecord(BaseDb):
     """
     ORM model for the coordinators table.
     CREATE TABLE IF NOT EXISTS coordinators (
@@ -136,6 +169,12 @@ class _CoordinatorRecord(BaseDb):
     username: str = Column(String(120), unique=True, nullable=False)
     is_active: int = Column(Integer, nullable=False, default=1)
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "is_active" not in kwargs:
+            kwargs["is_active"] = 1
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -147,7 +186,7 @@ class _CoordinatorRecord(BaseDb):
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
-class _FullTranslatorRecord(BaseDb):
+class FullTranslatorRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS full_translators (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -164,6 +203,12 @@ class _FullTranslatorRecord(BaseDb):
     user = Column(String(120), unique=True, nullable=False)
     is_active = Column(Integer, nullable=False, default=1)
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "is_active" not in kwargs:
+            kwargs["is_active"] = 1
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -173,9 +218,9 @@ class _FullTranslatorRecord(BaseDb):
 
 
 __all__ = [
-    "_CoordinatorRecord",
-    "_FullTranslatorRecord",
-    "_UsersNoInprocessRecord",
-    "_UserTokenRecord",
-    "_UserRecord",
+    "CoordinatorRecord",
+    "FullTranslatorRecord",
+    "UsersNoInprocessRecord",
+    "UserTokenRecord",
+    "UserRecord",
 ]

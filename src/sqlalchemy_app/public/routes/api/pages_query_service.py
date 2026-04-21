@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, List
 
 from ....shared.engine import get_session
-from ....sqlalchemy_models import _CategoryRecord, _PageRecord, _UserPageRecord, _ViewsNewAllRecord
+from ....sqlalchemy_models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
 
@@ -29,18 +29,18 @@ def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
     with get_session() as session:
         query = (
             session.query(
-                _UserPageRecord,
-                _CategoryRecord.campaign.label("campaign"),
+                UserPageRecord,
+                CategoryRecord.campaign.label("campaign"),
             )
-            .outerjoin(_CategoryRecord, _UserPageRecord.cat == _CategoryRecord.category)
-            .filter(_UserPageRecord.target != "")
-            .filter(_UserPageRecord.target.is_not(None))
+            .outerjoin(CategoryRecord, UserPageRecord.cat == CategoryRecord.category)
+            .filter(UserPageRecord.target != "")
+            .filter(UserPageRecord.target.is_not(None))
         )
 
         if lang and lang != "All":
-            query = query.filter(_UserPageRecord.lang == lang)
+            query = query.filter(UserPageRecord.lang == lang)
 
-        results = query.order_by(_UserPageRecord.pupdate.desc()).limit(limit).all()
+        results = query.order_by(UserPageRecord.pupdate.desc()).limit(limit).all()
 
         return [
             {
@@ -66,20 +66,20 @@ def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, An
     """
     with get_session() as session:
         views_subquery = (
-            session.query(_ViewsNewAllRecord.views)
-            .filter(_ViewsNewAllRecord.target == _PageRecord.target)
-            .filter(_ViewsNewAllRecord.lang == _PageRecord.lang)
-            .correlate(_PageRecord)
+            session.query(ViewsNewAllRecord.views)
+            .filter(ViewsNewAllRecord.target == PageRecord.target)
+            .filter(ViewsNewAllRecord.lang == PageRecord.lang)
+            .correlate(PageRecord)
             .scalar_subquery()
         )
 
         query = session.query(
-            _PageRecord,
+            PageRecord,
             views_subquery.label("views"),
-        ).filter(_PageRecord.target != "")
+        ).filter(PageRecord.target != "")
 
         if lang and lang != "All":
-            query = query.filter(_PageRecord.lang == lang)
+            query = query.filter(PageRecord.lang == lang)
 
         results = query.distinct().limit(limit).all()
 

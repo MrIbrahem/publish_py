@@ -4,9 +4,7 @@ Unit tests for domain.models.full_translator module.
 Tests for FullTranslatorRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
-    FullTranslatorRecord,
-)
+from src.sqlalchemy_app.sqlalchemy_models import FullTranslatorRecord
 
 
 class TestFullTranslatorRecord:

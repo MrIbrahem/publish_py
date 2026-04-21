@@ -21,14 +21,14 @@ from flask import (
 from ..decorators import admin_required
 from ..sidebar import create_side
 from .campaigns import campaigns_module
-from .coordinators import Coordinators
-from .full_translators import FullTranslators
-from .language_settings import LanguageSettings
+from .coordinators import coordinators_module
+from .full_translators import fulltranslators_module
+from .language_settings import languagesettings_module
 from .last import last_translations_dashboard
-from .projects import ProjectsDashboard
-from .settings import SettingsRoutes
+from .projects import projects_module
+from .settings import settings_module
 from .users_emails import users_emails_module
-from .users_no_inprocess import UsersNoInprocess
+from .users_no_inprocess import usersnoinprocess_module
 
 logger = logging.getLogger(__name__)
 
@@ -78,13 +78,13 @@ def in_process_total_dashboard():
 
 
 def register_blueprints(bp_admin: Blueprint) -> None:
-    Coordinators(bp_admin)
-    FullTranslators(bp_admin)
-    UsersNoInprocess(bp_admin)
-    LanguageSettings(bp_admin)
+    bp_admin.register_blueprint(coordinators_module.bp)
+    bp_admin.register_blueprint(fulltranslators_module.bp)
+    bp_admin.register_blueprint(usersnoinprocess_module.bp)
+    bp_admin.register_blueprint(languagesettings_module.bp)
     # Templates(bp_admin)
-    SettingsRoutes(bp_admin)
-    ProjectsDashboard(bp_admin)
+    bp_admin.register_blueprint(settings_module.bp)
+    bp_admin.register_blueprint(projects_module.bp)
     bp_admin.register_blueprint(campaigns_module.bp)
     # Jobs(bp_admin)
     # OwidCharts(bp_admin)

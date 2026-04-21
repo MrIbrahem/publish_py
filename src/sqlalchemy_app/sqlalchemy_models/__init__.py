@@ -1,63 +1,96 @@
 from .admin_models import (
-    _LanguageSettingRecord,
-    _SettingRecord,
+    LanguageSettingRecord,
+    SettingRecord,
+)
+from .metrics_models import (
+    AssessmentRecord,
+    RefsCountRecord,
+    WordRecord,
+)
+from .pages_models import (
+    PageRecord,
+    PagesUsersToMainRecord,
+    UserPageRecord,
 )
 from .public_models import (
-    _AssessmentRecord,
-    _EnwikiPageviewRecord,
-    _InProcessRecord,
-    _LangRecord,
-    _MdwikiRevidRecord,
-    _PagesUsersToMainRecord,
-    _ProjectRecord,
-    _RefsCountRecord,
-    _TranslateTypeRecord,
-    _ViewsNewAllRecord,
-    _ViewsNewRecord,
-    _WordRecord,
+    InProcessRecord,
+    LangRecord,
+    MdwikiRevidRecord,
+    ProjectRecord,
+    TranslateTypeRecord,
+)
+from .qid_models import (
+    QidRecord,
 )
 from .shared_models import (
-    _CategoryRecord,
-    _PageRecord,
-    _QidRecord,
-    _ReportRecord,
-    _UserPageRecord,
+    CategoryRecord,
+    ReportRecord,
 )
 from .users_models import (
-    _CoordinatorRecord,
-    _FullTranslatorRecord,
-    _UserRecord,
-    _UsersNoInprocessRecord,
-    _UserTokenRecord,
+    CoordinatorRecord,
+    FullTranslatorRecord,
+    UserRecord,
+    UsersNoInprocessRecord,
+    UserTokenRecord,
+)
+from .views_models import (
+    EnwikiPageviewRecord,
+    ViewsNewAllRecord,
+    ViewsNewRecord,
 )
 
 __all__ = [
     # admin_models
-    "_LanguageSettingRecord",
-    "_SettingRecord",
+    "LanguageSettingRecord",
+    "SettingRecord",
+    # metrics_models
+    "AssessmentRecord",
+    "RefsCountRecord",
+    "WordRecord",
+    # pages_models
+    "PageRecord",
+    "UserPageRecord",
+    "PagesUsersToMainRecord",
     # public_models
-    "_AssessmentRecord",
-    "_EnwikiPageviewRecord",
-    "_InProcessRecord",
-    "_LangRecord",
-    "_MdwikiRevidRecord",
-    "_PagesUsersToMainRecord",
-    "_ProjectRecord",
-    "_RefsCountRecord",
-    "_TranslateTypeRecord",
-    "_ViewsNewRecord",
-    "_ViewsNewAllRecord",
-    "_WordRecord",
-    # users_models
-    "_CoordinatorRecord",
-    "_FullTranslatorRecord",
-    "_UsersNoInprocessRecord",
-    "_UserTokenRecord",
-    "_UserRecord",
+    "InProcessRecord",
+    "LangRecord",
+    "MdwikiRevidRecord",
+    "ProjectRecord",
+    "TranslateTypeRecord",
+    # qid_models
+    "QidRecord",
     # shared_models
-    "_PageRecord",
-    "_ReportRecord",
-    "_CategoryRecord",
-    "_UserPageRecord",
-    "_QidRecord",
+    "ReportRecord",
+    "CategoryRecord",
+    # users_models
+    "CoordinatorRecord",
+    "FullTranslatorRecord",
+    "UsersNoInprocessRecord",
+    "UserTokenRecord",
+    "UserRecord",
+    # views_models
+    "EnwikiPageviewRecord",
+    "ViewsNewRecord",
+    "ViewsNewAllRecord",
+    # public_models
+    "InProcessRecord",
+    "LangRecord",
+    "MdwikiRevidRecord",
+    "ProjectRecord",
+    "TranslateTypeRecord",
+    # qid_models
+    "QidRecord",
+    # shared_models
+    "ReportRecord",
+    "CategoryRecord",
+    # users_models
+    "CoordinatorRecord",
+    "FullTranslatorRecord",
+    "UsersNoInprocessRecord",
+    "UserTokenRecord",
+    "UserRecord",
+    # views_models
+    "EnwikiPageviewRecord",
+    "ViewsNewRecord",
+    "ViewsNewAllRecord",
 ]

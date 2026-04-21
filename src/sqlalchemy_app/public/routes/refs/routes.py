@@ -25,7 +25,6 @@ def index() -> str:
     return render_template(
         "fix-refs.html",
         result=None,
-
     )
 
 
@@ -52,7 +51,6 @@ def process() -> str:
 
     return render_template(
         "fix-refs.html",
-
         sourceTitle=source_title,
         title=title,
         lang=lang,

@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models import ViewsNewRecord
 from src.sqlalchemy_app.public.services.views_new_service import (
     add_or_update_views_new,
     add_views_new,
@@ -14,7 +13,7 @@ from src.sqlalchemy_app.public.services.views_new_service import (
     list_views_new,
     update_views_new,
 )
-from src.sqlalchemy_app.sqlalchemy_models import _ViewsNewRecord
+from src.sqlalchemy_app.sqlalchemy_models import ViewsNewRecord
 
 
 def test_views_new_workflow():

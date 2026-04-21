@@ -39,7 +39,7 @@
 
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.add_user_no_inprocess') }}"
+                <form method="post" action="{{ url_for('admin.users_no_inprocess.add') }}"
                     class="row g-2 align-items-end">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="col-sm-8 col-md-6 col-lg-4">
@@ -72,7 +72,7 @@
                         <td>{{ user_rec.id }}</td>
                         <td>{{ user_rec.user }}</td>
                         <td class="text-center">
-                            {% set endpoint_target = 'admin.deactivate_user_no_inprocess' if user_rec.is_active else 'admin.activate_user_no_inprocess' %}
+                            {% set endpoint_target = 'admin.users_no_inprocess.deactivate' if user_rec.is_active else 'admin.users_no_inprocess.activate' %}
                             <form method="post" action="{{ url_for(endpoint_target, record_id=user_rec.id) }}"
                                 class="d-inline">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -90,7 +90,7 @@
                         </td>
                         <td class="text-center">
                             <form method="post"
-                                action="{{ url_for('admin.delete_user_no_inprocess', record_id=user_rec.id) }}"
+                                action="{{ url_for('admin.users_no_inprocess.delete', record_id=user_rec.id) }}"
                                 class="d-inline" onsubmit="return confirm('Remove {{ user_rec.user }} from list?');">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                 <button type="submit" class="btn btn-outline-danger btn-sm">

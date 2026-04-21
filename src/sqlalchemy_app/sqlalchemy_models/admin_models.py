@@ -5,6 +5,7 @@ Admin domain models.
 from __future__ import annotations
 
 import logging
+from typing import Any, Optional
 
 from sqlalchemy import Column, Enum, Integer, String, text
 
@@ -14,7 +15,7 @@ from ..shared.engine import LONGTEXT, BaseDb
 logger = logging.getLogger(__name__)
 
 
-class _LanguageSettingRecord(BaseDb):
+class LanguageSettingRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS language_settings (
         id int NOT NULL AUTO_INCREMENT,
@@ -35,6 +36,16 @@ class _LanguageSettingRecord(BaseDb):
     expend = Column(Integer, default=0, server_default=text("0"))
     add_en_lang = Column(Integer, default=0, server_default=text("0"))
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "move_dots" not in kwargs:
+            kwargs["move_dots"] = 0
+        if "expend" not in kwargs:
+            kwargs["expend"] = 0
+        if "add_en_lang" not in kwargs:
+            kwargs["add_en_lang"] = 0
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -45,7 +56,7 @@ class _LanguageSettingRecord(BaseDb):
         }
 
 
-class _SettingRecord(BaseDb):
+class SettingRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS new_settings (
         `id` INT NOT NULL AUTO_INCREMENT,
@@ -73,6 +84,14 @@ class _SettingRecord(BaseDb):
         default="boolean",
     )
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "value_type" not in kwargs:
+            kwargs["value_type"] = "boolean"
+        super().__init__(**kwargs)
+        # Parse value based on value_type after initialization
+        self.value = self._parse_value(self.value, self.value_type)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -82,8 +101,21 @@ class _SettingRecord(BaseDb):
             "value_type": self.value_type,
         }
 
+    def _parse_value(self, value: Optional[str], value_type: str) -> Any:
+        if value is None:
+            return None
+        if value_type == "boolean":
+            return "true" if str(value).lower() in ("1", "true", "yes", "on") else "false"
+        elif value_type == "integer":
+            try:
+                return int(value)
+            except (ValueError, TypeError):
+                return 0
+
+        return str(value)  # string
+
 
 __all__ = [
-    "_LanguageSettingRecord",
-    "_SettingRecord",
+    "LanguageSettingRecord",
+    "SettingRecord",
 ]

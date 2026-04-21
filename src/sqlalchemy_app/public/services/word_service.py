@@ -9,9 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import WordRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _WordRecord
+from ...sqlalchemy_models import WordRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,27 +18,27 @@ logger = logging.getLogger(__name__)
 def list_words() -> List[WordRecord]:
     """Return all word records."""
     with get_session() as session:
-        orm_objs = session.query(_WordRecord).order_by(_WordRecord.w_id.asc()).all()
-        return [WordRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        orm_objs = session.query(WordRecord).order_by(WordRecord.w_id.asc()).all()
+        return orm_objs
 
 
 def get_word(word_id: int) -> WordRecord | None:
     """Get a word record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_WordRecord).filter(_WordRecord.w_id == word_id).first()
+        orm_obj = session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
         if not orm_obj:
             logger.warning(f"Word record with ID {word_id} not found")
             return None
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_word_by_title(title: str) -> WordRecord | None:
     """Get a word record by title."""
     with get_session() as session:
-        orm_obj = session.query(_WordRecord).filter(_WordRecord.w_title == title).first()
+        orm_obj = session.query(WordRecord).filter(WordRecord.w_title == title).first()
         if not orm_obj:
             return None
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_word(
@@ -53,7 +52,7 @@ def add_word(
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = _WordRecord(w_title=w_title, w_lead_words=w_lead_words, w_all_words=w_all_words)
+        orm_obj = WordRecord(w_title=w_title, w_lead_words=w_lead_words, w_all_words=w_all_words)
         session.add(orm_obj)
         try:
             session.commit()
@@ -62,7 +61,7 @@ def add_word(
             raise ValueError(f"Word count for '{w_title}' already exists") from None
 
         session.refresh(orm_obj)
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_word(
@@ -76,28 +75,28 @@ def add_or_update_word(
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = session.query(_WordRecord).filter(_WordRecord.w_title == w_title).first()
+        orm_obj = session.query(WordRecord).filter(WordRecord.w_title == w_title).first()
         if orm_obj:
             orm_obj.w_lead_words = w_lead_words
             orm_obj.w_all_words = w_all_words
         else:
-            orm_obj = _WordRecord(w_title=w_title, w_lead_words=w_lead_words, w_all_words=w_all_words)
+            orm_obj = WordRecord(w_title=w_title, w_lead_words=w_lead_words, w_all_words=w_all_words)
             session.add(orm_obj)
 
         session.commit()
         session.refresh(orm_obj)
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_word(word_id: int, **kwargs) -> WordRecord:
     """Update a word record."""
     with get_session() as session:
-        orm_obj = session.query(_WordRecord).filter(_WordRecord.w_id == word_id).first()
+        orm_obj = session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
         if not orm_obj:
             raise ValueError(f"Word record with ID {word_id} not found")
 
         if not kwargs:
-            return WordRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -105,13 +104,13 @@ def update_word(word_id: int, **kwargs) -> WordRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_word(word_id: int) -> WordRecord:
     """Delete a word record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_WordRecord).filter(_WordRecord.w_id == word_id).first()
+        orm_obj = session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
         if not orm_obj:
             raise ValueError(f"Word record with ID {word_id} not found")
 

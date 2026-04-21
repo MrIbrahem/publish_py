@@ -13,7 +13,7 @@ from sqlalchemy import Integer, case, cast, func
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....sqlalchemy_models import _LangRecord, _PageRecord, _ViewsNewAllRecord, _WordRecord
+from ....sqlalchemy_models import LangRecord, PageRecord, ViewsNewAllRecord, WordRecord
 
 logger = logging.getLogger(__name__)
 
@@ -77,42 +77,42 @@ def get_top_langs() -> Response:
             # Build the word count expression
             word_expr = case(
                 (
-                    _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
-                    _PageRecord.word,
+                    PageRecord.word.is_not(None) & (PageRecord.word != 0) & (PageRecord.word != ""),
+                    PageRecord.word,
                 ),
-                (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
-                else_=_WordRecord.w_lead_words,
+                (PageRecord.translate_type == "all", WordRecord.w_all_words),
+                else_=WordRecord.w_lead_words,
             )
 
             # Build the views expression (CAST to UNSIGNED)
             views_expr = case(
-                (_ViewsNewAllRecord.views.is_(None) | (_ViewsNewAllRecord.views == ""), 0),
-                else_=cast(_ViewsNewAllRecord.views, Integer),
+                (ViewsNewAllRecord.views.is_(None) | (ViewsNewAllRecord.views == ""), 0),
+                else_=cast(ViewsNewAllRecord.views, Integer),
             )
 
             # Query with joins
             query = (
                 session.query(
-                    _PageRecord.lang,
-                    _LangRecord.name.label("lang_name"),
-                    func.count(_PageRecord.target).label("targets"),
+                    PageRecord.lang,
+                    LangRecord.name.label("lang_name"),
+                    func.count(PageRecord.target).label("targets"),
                     func.sum(word_expr).label("words"),
                     func.sum(views_expr).label("views"),
                 )
-                .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
+                .outerjoin(WordRecord, WordRecord.w_title == PageRecord.title)
                 .outerjoin(
-                    _ViewsNewAllRecord,
-                    (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),
+                    ViewsNewAllRecord,
+                    (PageRecord.target == ViewsNewAllRecord.target) & (PageRecord.lang == ViewsNewAllRecord.lang),
                 )
-                .outerjoin(_LangRecord, _PageRecord.lang == _LangRecord.code)
-                .filter(_PageRecord.target != "")
-                .filter(_PageRecord.target.is_not(None))
-                .filter(_PageRecord.user != "")
-                .filter(_PageRecord.user.is_not(None))
-                .filter(_PageRecord.lang != "")
-                .filter(_PageRecord.lang.is_not(None))
-                .group_by(_PageRecord.lang, _LangRecord.name)
-                .order_by(func.count(_PageRecord.target).desc())
+                .outerjoin(LangRecord, PageRecord.lang == LangRecord.code)
+                .filter(PageRecord.target != "")
+                .filter(PageRecord.target.is_not(None))
+                .filter(PageRecord.user != "")
+                .filter(PageRecord.user.is_not(None))
+                .filter(PageRecord.lang != "")
+                .filter(PageRecord.lang.is_not(None))
+                .group_by(PageRecord.lang, LangRecord.name)
+                .order_by(func.count(PageRecord.target).desc())
             )
 
             if limit:
@@ -200,40 +200,40 @@ def get_top_users() -> Response:
             # Build the word count expression
             word_expr = case(
                 (
-                    _PageRecord.word.is_not(None) & (_PageRecord.word != 0) & (_PageRecord.word != ""),
-                    _PageRecord.word,
+                    PageRecord.word.is_not(None) & (PageRecord.word != 0) & (PageRecord.word != ""),
+                    PageRecord.word,
                 ),
-                (_PageRecord.translate_type == "all", _WordRecord.w_all_words),
-                else_=_WordRecord.w_lead_words,
+                (PageRecord.translate_type == "all", WordRecord.w_all_words),
+                else_=WordRecord.w_lead_words,
             )
 
             # Build the views expression (CAST to UNSIGNED)
             views_expr = case(
-                (_ViewsNewAllRecord.views.is_(None) | (_ViewsNewAllRecord.views == ""), 0),
-                else_=cast(_ViewsNewAllRecord.views, Integer),
+                (ViewsNewAllRecord.views.is_(None) | (ViewsNewAllRecord.views == ""), 0),
+                else_=cast(ViewsNewAllRecord.views, Integer),
             )
 
             # Query with joins
             query = (
                 session.query(
-                    _PageRecord.user,
-                    func.count(_PageRecord.target).label("targets"),
+                    PageRecord.user,
+                    func.count(PageRecord.target).label("targets"),
                     func.sum(word_expr).label("words"),
                     func.sum(views_expr).label("views"),
                 )
-                .outerjoin(_WordRecord, _WordRecord.w_title == _PageRecord.title)
+                .outerjoin(WordRecord, WordRecord.w_title == PageRecord.title)
                 .outerjoin(
-                    _ViewsNewAllRecord,
-                    (_PageRecord.target == _ViewsNewAllRecord.target) & (_PageRecord.lang == _ViewsNewAllRecord.lang),
+                    ViewsNewAllRecord,
+                    (PageRecord.target == ViewsNewAllRecord.target) & (PageRecord.lang == ViewsNewAllRecord.lang),
                 )
-                .filter(_PageRecord.target != "")
-                .filter(_PageRecord.target.is_not(None))
-                .filter(_PageRecord.user != "")
-                .filter(_PageRecord.user.is_not(None))
-                .filter(_PageRecord.lang != "")
-                .filter(_PageRecord.lang.is_not(None))
-                .group_by(_PageRecord.user)
-                .order_by(func.count(_PageRecord.target).desc())
+                .filter(PageRecord.target != "")
+                .filter(PageRecord.target.is_not(None))
+                .filter(PageRecord.user != "")
+                .filter(PageRecord.user.is_not(None))
+                .filter(PageRecord.lang != "")
+                .filter(PageRecord.lang.is_not(None))
+                .group_by(PageRecord.user)
+                .order_by(func.count(PageRecord.target).desc())
             )
 
             if limit:

@@ -34,12 +34,16 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
 
 
 class SettingsRoutes:
-    def __init__(self, bp_admin: Blueprint):
+    def __init__(self):
+        self.bp = Blueprint("settings", __name__, url_prefix="/settings")
+        self._setup_routes()
+
+    def _setup_routes(self):
         from ..services import setting_service as service
 
-        @bp_admin.get("/settings")
+        @self.bp.get("/")
         @admin_required
-        def settings_view():
+        def dashboard():
             all_settings = service.list_settings()
             # Convert records to dicts for template compatibility
             settings_list = [s.to_dict() for s in all_settings]
@@ -49,9 +53,9 @@ class SettingsRoutes:
                 settings_list[i]["value_type"] = s.value_type
             return render_template("admins/settings.html", settings_list=settings_list)
 
-        @bp_admin.post("/settings/create")
+        @self.bp.post("/create")
         @admin_required
-        def settings_create():
+        def create():
             key = request.form.get("key", "").strip()
             title = request.form.get("title", "").strip()
             value_type = request.form.get("value_type", "boolean").strip()
@@ -61,7 +65,7 @@ class SettingsRoutes:
                     "Key must start with a lowercase letter and contain only lowercase letters, digits, and underscores.",
                     "danger",
                 )
-                return redirect(url_for("admin.settings_view"))
+                return redirect(url_for("admin.settings.dashboard"))
 
             if value_type == "boolean":
                 value = False
@@ -81,12 +85,11 @@ class SettingsRoutes:
             else:
                 flash("Key and Title are required.", "danger")
 
-            return redirect(url_for("admin.settings_view"))
+            return redirect(url_for("admin.settings.dashboard"))
 
-        @bp_admin.post("/settings/update")
+        @self.bp.post("/update")
         @admin_required
-        def settings_update():
-            from ..services import setting_service as service
+        def update():
 
             all_settings = service.list_settings()
             failed_keys: list[str] = []
@@ -130,4 +133,7 @@ class SettingsRoutes:
                 flash("Settings updated successfully.", "success")
             else:
                 flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
-            return redirect(url_for("admin.settings_view"))
+            return redirect(url_for("admin.settings.dashboard"))
+
+
+settings_module = SettingsRoutes()

@@ -10,8 +10,7 @@ from typing import Any, List
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import UserPageRecord
-from ...sqlalchemy_models import _UserPageRecord
+from ...sqlalchemy_models import UserPageRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)
@@ -20,8 +19,8 @@ logger = logging.getLogger(__name__)
 def list_user_pages() -> List[UserPageRecord]:
     """Return all pages_users."""
     with get_session() as session:
-        orm_objs = session.query(_UserPageRecord).order_by(_UserPageRecord.id.asc()).all()
-        return [UserPageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        orm_objs = session.query(UserPageRecord).order_by(UserPageRecord.id.asc()).all()
+        return orm_objs
 
 
 def add_user_page(
@@ -38,7 +37,7 @@ def add_user_page(
     if not sourcetitle:
         raise ValueError("Title is required")
     with get_session() as session:
-        orm_obj = _UserPageRecord(
+        orm_obj = UserPageRecord(
             title=sourcetitle,
             word=word,
             translate_type=tr_type,
@@ -53,7 +52,7 @@ def add_user_page(
         try:
             session.commit()
             session.refresh(orm_obj)
-            return UserPageRecord(**orm_obj.to_dict())
+            return orm_obj
         except IntegrityError as e:
             logger.error(f"Failed to add page (integrity error): {e}")
             session.rollback()
@@ -107,7 +106,7 @@ def update_user_page(
 ) -> UserPageRecord:
     """Update page."""
     with get_session() as session:
-        orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.id == page_id).first()
+        orm_obj = session.query(UserPageRecord).filter(UserPageRecord.id == page_id).first()
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
@@ -132,13 +131,13 @@ def update_user_page(
 
         session.commit()
         session.refresh(orm_obj)
-        return UserPageRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_user_page(page_id: int) -> UserPageRecord:
     """Delete a page."""
     with get_session() as session:
-        orm_obj = session.query(_UserPageRecord).filter(_UserPageRecord.id == page_id).first()
+        orm_obj = session.query(UserPageRecord).filter(UserPageRecord.id == page_id).first()
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
@@ -159,11 +158,11 @@ def find_exists_or_update_user_page(
     with get_session() as session:
         # Check existence
         orm_objs = (
-            session.query(_UserPageRecord)
+            session.query(UserPageRecord)
             .filter(
-                _UserPageRecord.title == title,
-                _UserPageRecord.lang == lang,
-                _UserPageRecord.user == user,
+                UserPageRecord.title == title,
+                UserPageRecord.lang == lang,
+                UserPageRecord.user == user,
             )
             .all()
         )

@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models import AssessmentRecord
 from src.sqlalchemy_app.public.services.assessment_service import (
     add_assessment,
     add_or_update_assessment,
@@ -11,7 +10,7 @@ from src.sqlalchemy_app.public.services.assessment_service import (
     list_assessments,
     update_assessment,
 )
-from src.sqlalchemy_app.sqlalchemy_models import _AssessmentRecord
+from src.sqlalchemy_app.sqlalchemy_models import AssessmentRecord
 
 
 def test_assessment_workflow():

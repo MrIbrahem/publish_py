@@ -4,9 +4,7 @@ Unit tests for domain.models.refs_count module.
 Tests for RefsCountRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
-    RefsCountRecord,
-)
+from src.sqlalchemy_app.sqlalchemy_models import RefsCountRecord
 
 
 class TestRefsCountRecord:

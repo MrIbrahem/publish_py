@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models import UserPageRecord
 from src.sqlalchemy_app.shared.engine import get_session
 from src.sqlalchemy_app.shared.services.user_page_service import (
     add_user_page,
@@ -11,7 +10,7 @@ from src.sqlalchemy_app.shared.services.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.sqlalchemy_app.sqlalchemy_models import _UserPageRecord
+from src.sqlalchemy_app.sqlalchemy_models import UserPageRecord
 
 
 def test_user_page_workflow() -> None:
@@ -32,7 +31,7 @@ def test_user_page_workflow() -> None:
     assert updated.title == "Flu"
 
     with get_session() as session:
-        orm_p = session.query(_UserPageRecord).filter(_UserPageRecord.id == p.id).first()
+        orm_p = session.query(UserPageRecord).filter(UserPageRecord.id == p.id).first()
         orm_p.lang = "es"
         orm_p.user = "Spanish_Editor"
         orm_p.target = ""
@@ -78,9 +77,9 @@ class TestAddUserPage:
         # We need a real uniqueness constraint in the database for this to fail.
         # Let's check if the model has one. It doesn't seem to have a UNIQUE constraint on title.
         # Wait, the service uses session.commit() and catches IntegrityError.
-        # But _UserPageRecord only has id as primary key.
+        # But UserPageRecord only has id as primary key.
         # If there's no unique constraint on title, it won't raise IntegrityError.
-        # Let's check _PageRecord too.
+        # Let's check PageRecord too.
         pass
 
     def test_raises_error_if_no_title(self, monkeypatch):
@@ -119,7 +118,7 @@ class TestFindExistsOrUpdateUserPage:
 
     def test_updates_target_if_empty(self, monkeypatch):
         with get_session() as session:
-            session.add(_UserPageRecord(title="Psychiatry", lang="en", user="Dr_Smith", target=""))
+            session.add(UserPageRecord(title="Psychiatry", lang="en", user="Dr_Smith", target=""))
             session.commit()
 
         result = find_exists_or_update_user_page("Psychiatry", "en", "Dr_Smith", "Mental_Health.html")

@@ -15,7 +15,7 @@
                 <h5 class="mb-0 mt-1">Add Language Setting</h5>
             </div>
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.add_language_setting') }}"
+                <form method="post" action="{{ url_for('admin.language_settings.add') }}"
                     class="row g-3 align-items-end">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="col-md-3">
@@ -73,7 +73,7 @@
                         </td>
                         <td>
                             <form method="post"
-                                action="{{ url_for('admin.update_language_setting_route', setting_id=s.id) }}"
+                                action="{{ url_for('admin.language_settings.update', setting_id=s.id) }}"
                                 id="form-update-{{ s.id }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             </form>
@@ -116,7 +116,7 @@
                                     <i class="bi bi-save"></i>
                                 </button>
                                 <form method="post"
-                                    action="{{ url_for('admin.delete_language_setting_route', setting_id=s.id) }}"
+                                    action="{{ url_for('admin.language_settings.delete', setting_id=s.id) }}"
                                     class="d-inline"
                                     onsubmit="return confirm('Remove setting for {{ s.lang_code }}?');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

@@ -42,13 +42,13 @@ For each entity (e.g., Coordinator, User, Page):
 ### 4. Structure Example
 
 ```python
-from ..models.coordinator import CoordinatorRecord, _CoordinatorRecord
+from ..models.coordinator import CoordinatorRecord, CoordinatorRecord
 from ...shared.db.engine import get_session
 
 def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
     with get_session() as session:
-        orm_obj = session.query(_CoordinatorRecord).filter(_CoordinatorRecord.id == coordinator_id).first()
-        return CoordinatorRecord(**orm_obj.to_dict()) if orm_obj else None
+        orm_obj = session.query(CoordinatorRecord).filter(CoordinatorRecord.id == coordinator_id).first()
+        return orm_obj # CoordinatorRecord(**orm_obj.to_dict()) if orm_obj else None
 
 ```
 

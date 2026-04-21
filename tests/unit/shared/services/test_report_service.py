@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models import ReportRecord
 from src.sqlalchemy_app.shared.engine import BaseDb, build_engine, get_session, init_db
 from src.sqlalchemy_app.shared.services.report_service import (
     add_report,
@@ -9,7 +8,7 @@ from src.sqlalchemy_app.shared.services.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-from src.sqlalchemy_app.sqlalchemy_models import _ReportRecord
+from src.sqlalchemy_app.sqlalchemy_models import ReportRecord
 
 
 def test_report_workflow():
@@ -88,7 +87,7 @@ class TestQueryReportsWithFilters:
         with get_session() as session:
             # SQLite current_timestamp is UTC
             session.add(
-                _ReportRecord(
+                ReportRecord(
                     title="Old Report",
                     user="U",
                     lang="en",
@@ -113,7 +112,7 @@ class TestQueryReportsWithFilters:
         # We can't easily add a report with empty title via service because it's not handled there,
         # but we can via manual insert.
         with get_session() as session:
-            session.add(_ReportRecord(title="", user="U", lang="en", sourcetitle="S", result="ok", data="{}"))
+            session.add(ReportRecord(title="", user="U", lang="en", sourcetitle="S", result="ok", data="{}"))
             session.commit()
         results = query_reports_with_filters({"title": "empty"})
         assert len(results) >= 1

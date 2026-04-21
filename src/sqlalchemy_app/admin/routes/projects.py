@@ -43,7 +43,7 @@ def _add_project() -> ResponseReturnValue:
     g_title = request.form.get("g_title", "").strip()
     if not g_title:
         flash("Title is required.", "danger")
-        return redirect(url_for("admin.projects_dashboard"))
+        return redirect(url_for("admin.projects.dashboard"))
 
     try:
         add_project(
@@ -58,7 +58,7 @@ def _add_project() -> ResponseReturnValue:
     else:
         flash(f"project for '{g_title}' added.", "success")
 
-    return redirect(url_for("admin.projects_dashboard"))
+    return redirect(url_for("admin.projects.dashboard"))
 
 
 def _update_project(record_id: int, g_title: str) -> None:
@@ -92,20 +92,25 @@ def _delete_project(record_id: int) -> None:
 
 
 class ProjectsDashboard:
-    def __init__(self, bp_admin: Blueprint):
-        @bp_admin.get("/projects")
+    def __init__(self):
+        self.bp = Blueprint("projects", __name__, url_prefix="/projects")
+        self._setup_routes()
+
+    def _setup_routes(self):
+
+        @self.bp.get("/")
         @admin_required
-        def projects_dashboard():
+        def dashboard():
             return _projects_dashboard()
 
-        @bp_admin.post("/projects/add")
+        @self.bp.post("/add")
         @admin_required
-        def add_project_record() -> ResponseReturnValue:
+        def add() -> ResponseReturnValue:
             return _add_project()
 
-        @bp_admin.post("/projects/update")
+        @self.bp.post("/update")
         @admin_required
-        def projects_update() -> ResponseReturnValue:
+        def update() -> ResponseReturnValue:
             projects = request.form.getlist("projects[][g_id]")
             titles = request.form.getlist("projects[][g_title]")
             titles_original = request.form.getlist("titles_original[][g_title]")
@@ -122,4 +127,7 @@ class ProjectsDashboard:
                 elif g_title != g_title_original:
                     _update_project(record_id, g_title)
 
-            return redirect(url_for("admin.projects_dashboard"))
+            return redirect(url_for("admin.projects.dashboard"))
+
+
+projects_module = ProjectsDashboard()

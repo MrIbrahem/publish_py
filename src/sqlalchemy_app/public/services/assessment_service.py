@@ -9,9 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import AssessmentRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _AssessmentRecord
+from ...sqlalchemy_models import AssessmentRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,27 +18,27 @@ logger = logging.getLogger(__name__)
 def list_assessments() -> List[AssessmentRecord]:
     """Return all assessment records."""
     with get_session() as session:
-        orm_objs = session.query(_AssessmentRecord).order_by(_AssessmentRecord.id.asc()).all()
-        return [AssessmentRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        orm_objs = session.query(AssessmentRecord).order_by(AssessmentRecord.id.asc()).all()
+        return orm_objs
 
 
 def get_assessment(assessment_id: int) -> AssessmentRecord | None:
     """Get an assessment record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_AssessmentRecord).filter(_AssessmentRecord.id == assessment_id).first()
+        orm_obj = session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
         if not orm_obj:
             logger.warning(f"Assessment record with ID {assessment_id} not found")
             return None
-        return AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_assessment_by_title(title: str) -> AssessmentRecord | None:
     """Get an assessment record by title."""
     with get_session() as session:
-        orm_obj = session.query(_AssessmentRecord).filter(_AssessmentRecord.title == title).first()
+        orm_obj = session.query(AssessmentRecord).filter(AssessmentRecord.title == title).first()
         if not orm_obj:
             return None
-        return AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_assessment(title: str, importance: str | None = None) -> AssessmentRecord:
@@ -49,7 +48,7 @@ def add_assessment(title: str, importance: str | None = None) -> AssessmentRecor
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = _AssessmentRecord(title=title, importance=importance)
+        orm_obj = AssessmentRecord(title=title, importance=importance)
         session.add(orm_obj)
         try:
             session.commit()
@@ -58,7 +57,7 @@ def add_assessment(title: str, importance: str | None = None) -> AssessmentRecor
             raise ValueError(f"Assessment for '{title}' already exists") from None
 
         session.refresh(orm_obj)
-        return AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_assessment(title: str, importance: str | None = None) -> AssessmentRecord:
@@ -68,27 +67,27 @@ def add_or_update_assessment(title: str, importance: str | None = None) -> Asses
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = session.query(_AssessmentRecord).filter(_AssessmentRecord.title == title).first()
+        orm_obj = session.query(AssessmentRecord).filter(AssessmentRecord.title == title).first()
         if orm_obj:
             orm_obj.importance = importance
         else:
-            orm_obj = _AssessmentRecord(title=title, importance=importance)
+            orm_obj = AssessmentRecord(title=title, importance=importance)
             session.add(orm_obj)
 
         session.commit()
         session.refresh(orm_obj)
-        return AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
     """Update an assessment record."""
     with get_session() as session:
-        orm_obj = session.query(_AssessmentRecord).filter(_AssessmentRecord.id == assessment_id).first()
+        orm_obj = session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
         if not orm_obj:
             raise ValueError(f"Assessment record with ID {assessment_id} not found")
 
         if not kwargs:
-            return AssessmentRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -96,13 +95,13 @@ def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_assessment(assessment_id: int) -> AssessmentRecord:
     """Delete an assessment record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_AssessmentRecord).filter(_AssessmentRecord.id == assessment_id).first()
+        orm_obj = session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
         if not orm_obj:
             raise ValueError(f"Assessment record with ID {assessment_id} not found")
 

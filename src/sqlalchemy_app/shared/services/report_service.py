@@ -10,8 +10,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import extract, func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import ReportRecord
-from ...sqlalchemy_models import _ReportRecord
+from ...sqlalchemy_models import ReportRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)
@@ -20,8 +19,8 @@ logger = logging.getLogger(__name__)
 def list_reports() -> List[ReportRecord]:
     """Return all report records."""
     with get_session() as session:
-        orm_objs = session.query(_ReportRecord).order_by(_ReportRecord.id.desc()).all()
-        return [ReportRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        orm_objs = session.query(ReportRecord).order_by(ReportRecord.id.desc()).all()
+        return orm_objs
 
 
 def add_report(
@@ -34,7 +33,7 @@ def add_report(
 ) -> ReportRecord:
     """Add a new report record."""
     with get_session() as session:
-        orm_obj = _ReportRecord(
+        orm_obj = ReportRecord(
             title=title,
             user=user,
             lang=lang,
@@ -46,13 +45,13 @@ def add_report(
         session.add(orm_obj)
         session.commit()
         session.refresh(orm_obj)
-        return ReportRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_report(report_id: int) -> ReportRecord:
     """Delete a report record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_ReportRecord).filter(_ReportRecord.id == report_id).first()
+        orm_obj = session.query(ReportRecord).filter(ReportRecord.id == report_id).first()
         if not orm_obj:
             raise LookupError(f"Report id {report_id} was not found")
 
@@ -70,15 +69,15 @@ def query_reports_with_filters(
     """Query reports with dynamic filtering."""
 
     COLUMN_MAP = {
-        "title": _ReportRecord.title,
-        "user": _ReportRecord.user,
-        "lang": _ReportRecord.lang,
-        "sourcetitle": _ReportRecord.sourcetitle,
-        "result": _ReportRecord.result,
+        "title": ReportRecord.title,
+        "user": ReportRecord.user,
+        "lang": ReportRecord.lang,
+        "sourcetitle": ReportRecord.sourcetitle,
+        "result": ReportRecord.result,
     }
 
     with get_session() as session:
-        query = session.query(_ReportRecord)
+        query = session.query(ReportRecord)
 
         for name, value in filters.items():
             if str(value).lower() == "all":
@@ -86,12 +85,12 @@ def query_reports_with_filters(
 
             # Year/Month filters
             if name == "year":
-                # query = query.filter(func.year(_ReportRecord.date) == value)
-                query = query.filter(extract("year", _ReportRecord.date) == value)
+                # query = query.filter(func.year(ReportRecord.date) == value)
+                query = query.filter(extract("year", ReportRecord.date) == value)
 
             elif name == "month":
-                # query = query.filter(func.month(_ReportRecord.date) == value)
-                query = query.filter(extract("month", _ReportRecord.date) == value)
+                # query = query.filter(func.month(ReportRecord.date) == value)
+                query = query.filter(extract("month", ReportRecord.date) == value)
             elif name in COLUMN_MAP:
                 # to match ReportsDB methods
                 column = COLUMN_MAP[name]
@@ -106,14 +105,14 @@ def query_reports_with_filters(
                 else:
                     query = query.filter(column == value)
 
-        query = query.order_by(_ReportRecord.id.desc())
+        query = query.order_by(ReportRecord.id.desc())
 
         if limit:
             query = query.limit(limit)
 
         orm_objs = query.all()
 
-        return [ReportRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 __all__ = [

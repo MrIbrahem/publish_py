@@ -10,9 +10,8 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import InProcessRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _InProcessRecord
+from ...sqlalchemy_models import InProcessRecord
 
 logger = logging.getLogger(__name__)
 
@@ -20,57 +19,51 @@ logger = logging.getLogger(__name__)
 def list_in_process() -> List[InProcessRecord]:
     """Return all in_process records."""
     with get_session() as session:
-        orm_objs = session.query(_InProcessRecord).order_by(_InProcessRecord.id.asc()).all()
-        return [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        orm_objs = session.query(InProcessRecord).order_by(InProcessRecord.id.asc()).all()
+        return orm_objs
 
 
 def list_in_process_by_user(user: str) -> List[InProcessRecord]:
     """Return in_process records for a specific user."""
     with get_session() as session:
         orm_objs = (
-            session.query(_InProcessRecord)
-            .filter(_InProcessRecord.user == user)
-            .order_by(_InProcessRecord.id.asc())
-            .all()
+            session.query(InProcessRecord).filter(InProcessRecord.user == user).order_by(InProcessRecord.id.asc()).all()
         )
-        return [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_in_process_by_lang(lang: str) -> List[InProcessRecord]:
     """Return in_process records for a specific language."""
     with get_session() as session:
         orm_objs = (
-            session.query(_InProcessRecord)
-            .filter(_InProcessRecord.lang == lang)
-            .order_by(_InProcessRecord.id.asc())
-            .all()
+            session.query(InProcessRecord).filter(InProcessRecord.lang == lang).order_by(InProcessRecord.id.asc()).all()
         )
-        return [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_in_process(process_id: int) -> InProcessRecord | None:
     """Get an in_process record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_InProcessRecord).filter(_InProcessRecord.id == process_id).first()
+        orm_obj = session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
         if not orm_obj:
             logger.warning(f"In-process record with ID {process_id} not found")
             return None
-        return InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_in_process_by_title_user_lang(title: str, user: str, lang: str) -> InProcessRecord | None:
     """Get an in_process record by title, user, and language."""
     with get_session() as session:
         orm_obj = (
-            session.query(_InProcessRecord)
-            .filter(_InProcessRecord.title == title)
-            .filter(_InProcessRecord.user == user)
-            .filter(_InProcessRecord.lang == lang)
+            session.query(InProcessRecord)
+            .filter(InProcessRecord.title == title)
+            .filter(InProcessRecord.user == user)
+            .filter(InProcessRecord.lang == lang)
             .first()
         )
         if not orm_obj:
             return None
-        return InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_in_process(
@@ -94,7 +87,7 @@ def add_in_process(
         raise ValueError("Language is required")
 
     with get_session() as session:
-        orm_obj = _InProcessRecord(
+        orm_obj = InProcessRecord(
             title=title,
             user=user,
             lang=lang,
@@ -111,18 +104,18 @@ def add_in_process(
             raise ValueError(f"In-process record for '{title}' by '{user}' in '{lang}' already exists") from None
 
         session.refresh(orm_obj)
-        return InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
     """Update an in_process record."""
     with get_session() as session:
-        orm_obj = session.query(_InProcessRecord).filter(_InProcessRecord.id == process_id).first()
+        orm_obj = session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
         if not orm_obj:
             raise ValueError(f"In-process record with ID {process_id} not found")
 
         if not kwargs:
-            return InProcessRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -130,13 +123,13 @@ def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_in_process(process_id: int) -> InProcessRecord:
     """Delete an in_process record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_InProcessRecord).filter(_InProcessRecord.id == process_id).first()
+        orm_obj = session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
         if not orm_obj:
             raise ValueError(f"In-process record with ID {process_id} not found")
 
@@ -150,10 +143,10 @@ def delete_in_process_by_title_user_lang(title: str, user: str, lang: str) -> bo
     """Delete an in_process record by title, user, and language."""
     with get_session() as session:
         result = (
-            session.query(_InProcessRecord)
-            .filter(_InProcessRecord.title == title)
-            .filter(_InProcessRecord.user == user)
-            .filter(_InProcessRecord.lang == lang)
+            session.query(InProcessRecord)
+            .filter(InProcessRecord.title == title)
+            .filter(InProcessRecord.user == user)
+            .filter(InProcessRecord.lang == lang)
             .delete()
         )
         session.commit()
@@ -171,11 +164,11 @@ def get_in_process_counts_by_user() -> List[dict]:
     with get_session() as session:
         results = (
             session.query(
-                _InProcessRecord.user,
-                func.count(_InProcessRecord.id).label("article_count"),
+                InProcessRecord.user,
+                func.count(InProcessRecord.id).label("article_count"),
             )
-            .group_by(_InProcessRecord.user)
-            .order_by(func.count(_InProcessRecord.id).desc())
+            .group_by(InProcessRecord.user)
+            .order_by(func.count(InProcessRecord.id).desc())
             .all()
         )
         return [{"user": row.user, "article_count": row.article_count} for row in results]

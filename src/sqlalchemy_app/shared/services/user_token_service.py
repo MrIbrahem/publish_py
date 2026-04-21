@@ -10,8 +10,7 @@ from typing import Optional
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import UserTokenRecord
-from ...sqlalchemy_models import _UserTokenRecord
+from ...sqlalchemy_models import UserTokenRecord
 from ..core.crypto import encrypt_value
 from ..engine import get_session
 
@@ -29,7 +28,7 @@ def upsert_user_token(*, user_id: int, username: str, access_key: str, access_se
     now = func.current_timestamp()
 
     with get_session() as session:
-        orm_obj = session.query(_UserTokenRecord).filter(_UserTokenRecord.user_id == user_id).first()
+        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
         if orm_obj:
             orm_obj.username = username
             orm_obj.access_token = encrypted_token
@@ -38,7 +37,7 @@ def upsert_user_token(*, user_id: int, username: str, access_key: str, access_se
             orm_obj.last_used_at = now
             orm_obj.rotated_at = now
         else:
-            orm_obj = _UserTokenRecord(
+            orm_obj = UserTokenRecord(
                 user_id=user_id,
                 username=username,
                 access_token=encrypted_token,
@@ -59,10 +58,10 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
 
     user_id = int(user_id)
     with get_session() as session:
-        orm_obj = session.query(_UserTokenRecord).filter(_UserTokenRecord.user_id == user_id).first()
+        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
         if not orm_obj:
             return None
-        return UserTokenRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_user_token(user_id: int) -> None:
@@ -71,7 +70,7 @@ def delete_user_token(user_id: int) -> None:
         return
 
     with get_session() as session:
-        session.query(_UserTokenRecord).filter(_UserTokenRecord.user_id == user_id).delete()
+        session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).delete()
         session.commit()
 
 
@@ -82,10 +81,10 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
         return None
 
     with get_session() as session:
-        orm_obj = session.query(_UserTokenRecord).filter(_UserTokenRecord.username == username).first()
+        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.username == username).first()
         if not orm_obj:
             return None
-        return UserTokenRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_user_token_by_username(username: str) -> None:
@@ -95,7 +94,7 @@ def delete_user_token_by_username(username: str) -> None:
         return
 
     with get_session() as session:
-        session.query(_UserTokenRecord).filter(_UserTokenRecord.username == username).delete()
+        session.query(UserTokenRecord).filter(UserTokenRecord.username == username).delete()
         session.commit()
 
 
