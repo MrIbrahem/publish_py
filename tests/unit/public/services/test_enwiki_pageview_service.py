@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.sqlalchemy_app.db_models.public_models import EnwikiPageviewRecord
-from src.sqlalchemy_app.public.models import _EnwikiPageviewRecord
+from src.sqlalchemy_app.sqlalchemy_models import _EnwikiPageviewRecord
 from src.sqlalchemy_app.public.services.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,

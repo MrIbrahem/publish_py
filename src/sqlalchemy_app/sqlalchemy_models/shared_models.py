@@ -5,8 +5,8 @@ from typing import Any
 
 from sqlalchemy import Column, Date, DateTime, Integer, LargeBinary, String, func, text
 
-from .engine import LONGTEXT, BaseDb
-from .utils.decode_bytes import coerce_bytes
+from ..shared.engine import LONGTEXT, BaseDb
+from ..shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 

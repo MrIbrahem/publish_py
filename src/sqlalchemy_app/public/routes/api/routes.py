@@ -9,10 +9,10 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
-from ....public.models import _InProcessRecord, _LangRecord
+from ....sqlalchemy_models import _InProcessRecord, _LangRecord
+from ....sqlalchemy_models import _CategoryRecord, _ReportRecord
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....shared.models import _CategoryRecord, _ReportRecord
 from ....shared.services.category_service import list_categories
 from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters

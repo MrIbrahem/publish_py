@@ -7,9 +7,9 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
+from ....sqlalchemy_models import _ViewsNewAllRecord
+from ....sqlalchemy_models import _CategoryRecord, _PageRecord, _UserPageRecord
 from ....shared.engine import get_session
-from ....shared.models import _CategoryRecord, _PageRecord, _UserPageRecord
-from ...models import _ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
 

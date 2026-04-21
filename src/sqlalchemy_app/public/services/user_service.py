@@ -11,8 +11,8 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ...db_models.public_models import UserRecord
+from ...sqlalchemy_models import _UserRecord
 from ...shared.engine import get_session
-from ..models import _UserRecord
 
 logger = logging.getLogger(__name__)
 
@@ -98,12 +98,10 @@ def update_user(
         if not orm_obj:
             raise ValueError(f"User record with ID {user_id} not found")
 
-        if not kwargs:
-            return UserRecord(**orm_obj.to_dict())
-
-        for key, value in kwargs.items():
-            if hasattr(orm_obj, key):
-                setattr(orm_obj, key, value)
+        orm_obj.username = username
+        orm_obj.email = email
+        orm_obj.wiki = wiki
+        orm_obj.user_group = user_group
 
         session.commit()
         session.refresh(orm_obj)
