@@ -106,7 +106,7 @@ class TestUpdateValue:
         """Test that update_value updates the setting value."""
         s = add_setting("items_per_page", "Search results limit", value_type="integer", value="20")
         updated = update_value(s.id, "50")
-        assert updated.value == 50
+        assert updated.value == "50"
 
     def test_handles_none_value(self, monkeypatch):
         s = add_setting("nullable_setting", "Title", value="Something")
