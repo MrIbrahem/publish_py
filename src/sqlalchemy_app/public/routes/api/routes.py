@@ -9,6 +9,8 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
+from ....db_models import InProcessRecord
+
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.services.category_service import list_categories
@@ -172,12 +174,13 @@ def get_in_process() -> Response:
     Returns:
         JSON response with in-process records
     """
+    lang = request.args.get("lang", default="", type=str)
+    limit = request.args.get("limit", default=500, type=int)
+    limit = max(1, min(limit, 5000))
     try:
-        limit = request.args.get("limit", default=500, type=int)
-        limit = max(1, min(limit, 5000))
         with get_session() as session:
             # Perform the JOIN query using SQLAlchemy
-            results = (
+            query = (
                 session.query(
                     _InProcessRecord.id,
                     _InProcessRecord.title,
@@ -192,10 +195,13 @@ def get_in_process() -> Response:
                 )
                 .outerjoin(_CategoryRecord, _InProcessRecord.cat == _CategoryRecord.category)
                 .outerjoin(_LangRecord, _InProcessRecord.lang == _LangRecord.code)
-                .order_by(_InProcessRecord.id.asc())
-                .limit(limit)
-                .all()
+
             )
+
+            if lang and lang != "All":
+                query = query.filter(_InProcessRecord.lang == lang)
+
+            results = query.order_by(_InProcessRecord.id.asc()).limit(limit).all()
 
             # Convert results to list of dicts
             data: List[Dict[str, Any]] = [
