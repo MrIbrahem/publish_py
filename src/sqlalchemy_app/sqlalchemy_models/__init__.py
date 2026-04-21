@@ -2,26 +2,29 @@ from .admin_models import (
     _LanguageSettingRecord,
     _SettingRecord,
 )
-from .public_models import (
+from .metrics_models import (
     _AssessmentRecord,
-    _EnwikiPageviewRecord,
+    _RefsCountRecord,
+    _WordRecord,
+)
+from .pages_models import (
+    _PageRecord,
+    _PagesUsersToMainRecord,
+    _UserPageRecord,
+)
+from .public_models import (
     _InProcessRecord,
     _LangRecord,
     _MdwikiRevidRecord,
-    _PagesUsersToMainRecord,
     _ProjectRecord,
-    _RefsCountRecord,
     _TranslateTypeRecord,
-    _ViewsNewAllRecord,
-    _ViewsNewRecord,
-    _WordRecord,
+)
+from .qid_models import (
+    _QidRecord,
 )
 from .shared_models import (
     _CategoryRecord,
-    _PageRecord,
-    _QidRecord,
     _ReportRecord,
-    _UserPageRecord,
 )
 from .users_models import (
     _CoordinatorRecord,
@@ -30,34 +33,43 @@ from .users_models import (
     _UsersNoInprocessRecord,
     _UserTokenRecord,
 )
+from .views_models import (
+    _EnwikiPageviewRecord,
+    _ViewsNewAllRecord,
+    _ViewsNewRecord,
+)
 
 __all__ = [
     # admin_models
     "_LanguageSettingRecord",
     "_SettingRecord",
-    # public_models
+    # metrics_models
     "_AssessmentRecord",
-    "_EnwikiPageviewRecord",
+    "_RefsCountRecord",
+    "_WordRecord",
+    # pages_models
+    "_PageRecord",
+    "_UserPageRecord",
+    "_PagesUsersToMainRecord",
+    # public_models
     "_InProcessRecord",
     "_LangRecord",
     "_MdwikiRevidRecord",
-    "_PagesUsersToMainRecord",
     "_ProjectRecord",
-    "_RefsCountRecord",
     "_TranslateTypeRecord",
-    "_ViewsNewRecord",
-    "_ViewsNewAllRecord",
-    "_WordRecord",
+    # qid_models
+    "_QidRecord",
+    # shared_models
+    "_ReportRecord",
+    "_CategoryRecord",
     # users_models
     "_CoordinatorRecord",
     "_FullTranslatorRecord",
     "_UsersNoInprocessRecord",
     "_UserTokenRecord",
     "_UserRecord",
-    # shared_models
-    "_PageRecord",
-    "_ReportRecord",
-    "_CategoryRecord",
-    "_UserPageRecord",
-    "_QidRecord",
+    # views_models
+    "_EnwikiPageviewRecord",
+    "_ViewsNewRecord",
+    "_ViewsNewAllRecord",
 ]
