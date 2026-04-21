@@ -3,9 +3,9 @@ Public domain models - SQLAlchemy ORM.
 
 Note: Several models have been moved to specialized modules:
 - pages_models.py: PagesUsersToMainRecord
-- views_models.py: _EnwikiPageviewRecord, _ViewsNewRecord, _ViewsNewAllRecord
+- views_models.py: EnwikiPageviewRecord, ViewsNewRecord, ViewsNewAllRecord
 - metrics_models.py: AssessmentRecord, RefsCountRecord, WordRecord
-- qid_models.py: _QidRecord
+- qid_models.py: QidRecord
 """
 
 from __future__ import annotations

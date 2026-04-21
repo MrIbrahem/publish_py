@@ -3,7 +3,7 @@ Shared domain models - SQLAlchemy ORM.
 
 Note: Several models have been moved to specialized modules:
 - pages_models.py: PageRecord, UserPageRecord
-- qid_models.py: _QidRecord
+- qid_models.py: QidRecord
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from ..shared.engine import LONGTEXT, BaseDb
 logger = logging.getLogger(__name__)
 
 
-class _CategoryRecord(BaseDb):
+class CategoryRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS categories (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -54,8 +54,19 @@ class _CategoryRecord(BaseDb):
             "is_default": self.is_default,
         }
 
+    def __post_init__(self) -> None:
+        # Validate that required fields are not empty
+        if not self.category:
+            raise ValueError("Category name cannot be empty")
 
-class _ReportRecord(BaseDb):
+        if not self.campaign:
+            raise ValueError("Campaign name cannot be empty")
+
+        self.depth = int(self.depth) or 0
+        self.is_default = int(self.is_default) or 0
+
+
+class ReportRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS publish_reports (
         id int NOT NULL AUTO_INCREMENT,
@@ -87,10 +98,18 @@ class _ReportRecord(BaseDb):
     data = Column(LONGTEXT, nullable=False)
 
     def to_dict(self) -> dict[str, Any]:
+        """Convert a ReportRecord to a dictionary."""
+        # Handle date conversion with None safety
+        if self.date is None:
+            date_str = ""
+        elif hasattr(self.date, "isoformat"):
+            date_str = self.date.isoformat()
+        else:
+            date_str = str(self.date)
+
         return {
             "id": self.id,
-            # "date": self.date.isoformat() if hasattr(self.date, "isoformat") else str(self.date),
-            "date": self.date,
+            "date": date_str,
             "title": self.title,
             "user": self.user,
             "lang": self.lang,
@@ -101,6 +120,6 @@ class _ReportRecord(BaseDb):
 
 
 __all__ = [
-    "_ReportRecord",
-    "_CategoryRecord",
+    "ReportRecord",
+    "CategoryRecord",
 ]

@@ -2,19 +2,6 @@ from .admin_models import (
     LanguageSettingRecord,
     SettingRecord,
 )
-from .db_models import (
-    CategoryRecord,
-    CoordinatorRecord,
-    EnwikiPageviewRecord,
-    FullTranslatorRecord,
-    QidRecord,
-    ReportRecord,
-    UserRecord,
-    UsersNoInprocessRecord,
-    UserTokenRecord,
-    ViewsNewAllRecord,
-    ViewsNewRecord,
-)
 from .metrics_models import (
     AssessmentRecord,
     RefsCountRecord,
@@ -33,23 +20,23 @@ from .public_models import (
     TranslateTypeRecord,
 )
 from .qid_models import (
-    _QidRecord,
+    QidRecord,
 )
 from .shared_models import (
-    _CategoryRecord,
-    _ReportRecord,
+    CategoryRecord,
+    ReportRecord,
 )
 from .users_models import (
-    _CoordinatorRecord,
-    _FullTranslatorRecord,
-    _UserRecord,
-    _UsersNoInprocessRecord,
-    _UserTokenRecord,
+    CoordinatorRecord,
+    FullTranslatorRecord,
+    UserRecord,
+    UsersNoInprocessRecord,
+    UserTokenRecord,
 )
 from .views_models import (
-    _EnwikiPageviewRecord,
-    _ViewsNewAllRecord,
-    _ViewsNewRecord,
+    EnwikiPageviewRecord,
+    ViewsNewRecord,
+    ViewsNewAllRecord,
 )
 
 __all__ = [
@@ -71,20 +58,20 @@ __all__ = [
     "ProjectRecord",
     "TranslateTypeRecord",
     # qid_models
-    "_QidRecord",
+    "QidRecord",
     # shared_models
-    "_ReportRecord",
-    "_CategoryRecord",
+    "ReportRecord",
+    "CategoryRecord",
     # users_models
-    "_CoordinatorRecord",
-    "_FullTranslatorRecord",
-    "_UsersNoInprocessRecord",
-    "_UserTokenRecord",
-    "_UserRecord",
+    "CoordinatorRecord",
+    "FullTranslatorRecord",
+    "UsersNoInprocessRecord",
+    "UserTokenRecord",
+    "UserRecord",
     # views_models
-    "_EnwikiPageviewRecord",
-    "_ViewsNewRecord",
-    "_ViewsNewAllRecord",
+    "EnwikiPageviewRecord",
+    "ViewsNewRecord",
+    "ViewsNewAllRecord",
     # public_models
     "InProcessRecord",
     "LangRecord",

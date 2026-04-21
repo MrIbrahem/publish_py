@@ -9,7 +9,7 @@ from sqlalchemy import Column, Integer, String, UniqueConstraint, text
 from ..shared.engine import BaseDb
 
 
-class _EnwikiPageviewRecord(BaseDb):
+class EnwikiPageviewRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS enwiki_pageviews (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -34,7 +34,7 @@ class _EnwikiPageviewRecord(BaseDb):
         }
 
 
-class _ViewsNewRecord(BaseDb):
+class ViewsNewRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS views_new (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -68,7 +68,7 @@ class _ViewsNewRecord(BaseDb):
         }
 
 
-class _ViewsNewAllRecord(BaseDb):
+class ViewsNewAllRecord(BaseDb):
     """
     CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `views_new_all` AS
         SELECT `v`.`target` AS `target`,
@@ -110,7 +110,7 @@ class _ViewsNewAllRecord(BaseDb):
 
 
 __all__ = [
-    "_EnwikiPageviewRecord",
-    "_ViewsNewRecord",
-    "_ViewsNewAllRecord",
+    "EnwikiPageviewRecord",
+    "ViewsNewRecord",
+    "ViewsNewAllRecord",
 ]

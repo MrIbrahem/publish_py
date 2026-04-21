@@ -11,7 +11,7 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ...shared.engine import get_session
-from ...sqlalchemy_models import CoordinatorRecord, _CoordinatorRecord
+from ...sqlalchemy_models import CoordinatorRecord, CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 def list_coordinators() -> List[CoordinatorRecord]:
     """Return all coordinator records."""
     with get_session() as session:
-        orm_objs = session.query(_CoordinatorRecord).order_by(_CoordinatorRecord.id).all()
+        orm_objs = session.query(CoordinatorRecord).order_by(CoordinatorRecord.id).all()
         # return orm_objs
         return [CoordinatorRecord(**record.to_dict()) for record in orm_objs]
 
@@ -29,10 +29,10 @@ def active_coordinators() -> List[str]:
     """Return usernames of all active coordinators (cached)."""
     with get_session() as session:
         records = (
-            session.query(_CoordinatorRecord)
-            # .filter(_CoordinatorRecord.is_active == 1)
+            session.query(CoordinatorRecord)
+            # .filter(CoordinatorRecord.is_active == 1)
             .filter_by(is_active=1)
-            .order_by(_CoordinatorRecord.id)
+            .order_by(CoordinatorRecord.id)
             .all()
         )
         return [r.username for r in records]
@@ -41,8 +41,8 @@ def active_coordinators() -> List[str]:
 def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
     """Get a coordinator record by ID."""
     with get_session() as session:
-        # record = session.query(_CoordinatorRecord).filter(_CoordinatorRecord.id == coordinator_id).first()
-        record = session.get(_CoordinatorRecord, coordinator_id)
+        # record = session.query(CoordinatorRecord).filter(CoordinatorRecord.id == coordinator_id).first()
+        record = session.get(CoordinatorRecord, coordinator_id)
         if not record:
             logger.warning(f"Coordinator record with ID {coordinator_id} not found")
             return None
@@ -53,8 +53,8 @@ def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
 def get_coordinator_by_user(username: str) -> CoordinatorRecord | None:
     """Get a coordinator record by username."""
     with get_session() as session:
-        # record = session.query(_CoordinatorRecord).filter(_CoordinatorRecord.username == username).first()
-        record = session.query(_CoordinatorRecord).filter_by(username=username).first()
+        # record = session.query(CoordinatorRecord).filter(CoordinatorRecord.username == username).first()
+        record = session.query(CoordinatorRecord).filter_by(username=username).first()
         if not record:
             return None
         return CoordinatorRecord(**record.to_dict())
@@ -67,7 +67,7 @@ def add_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
         raise ValueError("username is required")
 
     with get_session() as session:
-        record = _CoordinatorRecord(username=username, is_active=is_active)
+        record = CoordinatorRecord(username=username, is_active=is_active)
         session.add(record)
         try:
             session.commit()
@@ -89,11 +89,11 @@ def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorR
         raise ValueError("username is required")
 
     with get_session() as session:
-        record = session.query(_CoordinatorRecord).filter(_CoordinatorRecord.username == username).first()
+        record = session.query(CoordinatorRecord).filter(CoordinatorRecord.username == username).first()
         if record:
             record.is_active = is_active
         else:
-            record = _CoordinatorRecord(username=username, is_active=is_active)
+            record = CoordinatorRecord(username=username, is_active=is_active)
             session.add(record)
         session.commit()
         session.refresh(record)
@@ -105,8 +105,8 @@ def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorR
 def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
     """Update fields on a coordinator record. Raises ValueError if not found."""
     with get_session() as session:
-        # record = session.query(_CoordinatorRecord).filter(_CoordinatorRecord.id == coordinator_id).first()
-        record = session.get(_CoordinatorRecord, coordinator_id)
+        # record = session.query(CoordinatorRecord).filter(CoordinatorRecord.id == coordinator_id).first()
+        record = session.get(CoordinatorRecord, coordinator_id)
         if not record:
             raise ValueError(f"Coordinator with ID {coordinator_id} not found")
 
@@ -126,8 +126,8 @@ def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
 def delete_coordinator(coordinator_id: int) -> None:
     """Delete a coordinator record by ID."""
     with get_session() as session:
-        # record = session.query(_CoordinatorRecord).filter(_CoordinatorRecord.id == coordinator_id).first()
-        record = session.get(_CoordinatorRecord, coordinator_id)
+        # record = session.query(CoordinatorRecord).filter(CoordinatorRecord.id == coordinator_id).first()
+        record = session.get(CoordinatorRecord, coordinator_id)
         if not record:
             raise ValueError(f"Coordinator with ID {coordinator_id} not found")
         session.delete(record)

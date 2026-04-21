@@ -9,7 +9,7 @@ from src.sqlalchemy_app.shared.services.category_service import (
     list_categories,
     update_category,
 )
-from src.sqlalchemy_app.sqlalchemy_models import CategoryRecord, _CategoryRecord
+from src.sqlalchemy_app.sqlalchemy_models import CategoryRecord, CategoryRecord
 
 
 def test_category_workflow() -> None:

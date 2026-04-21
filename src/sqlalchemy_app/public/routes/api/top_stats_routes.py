@@ -13,7 +13,7 @@ from sqlalchemy import Integer, case, cast, func
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....sqlalchemy_models import LangRecord, PageRecord, WordRecord, _ViewsNewAllRecord
+from ....sqlalchemy_models import LangRecord, PageRecord, WordRecord, ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
 
@@ -86,8 +86,8 @@ def get_top_langs() -> Response:
 
             # Build the views expression (CAST to UNSIGNED)
             views_expr = case(
-                (_ViewsNewAllRecord.views.is_(None) | (_ViewsNewAllRecord.views == ""), 0),
-                else_=cast(_ViewsNewAllRecord.views, Integer),
+                (ViewsNewAllRecord.views.is_(None) | (ViewsNewAllRecord.views == ""), 0),
+                else_=cast(ViewsNewAllRecord.views, Integer),
             )
 
             # Query with joins
@@ -101,8 +101,8 @@ def get_top_langs() -> Response:
                 )
                 .outerjoin(WordRecord, WordRecord.w_title == PageRecord.title)
                 .outerjoin(
-                    _ViewsNewAllRecord,
-                    (PageRecord.target == _ViewsNewAllRecord.target) & (PageRecord.lang == _ViewsNewAllRecord.lang),
+                    ViewsNewAllRecord,
+                    (PageRecord.target == ViewsNewAllRecord.target) & (PageRecord.lang == ViewsNewAllRecord.lang),
                 )
                 .outerjoin(LangRecord, PageRecord.lang == LangRecord.code)
                 .filter(PageRecord.target != "")
@@ -209,8 +209,8 @@ def get_top_users() -> Response:
 
             # Build the views expression (CAST to UNSIGNED)
             views_expr = case(
-                (_ViewsNewAllRecord.views.is_(None) | (_ViewsNewAllRecord.views == ""), 0),
-                else_=cast(_ViewsNewAllRecord.views, Integer),
+                (ViewsNewAllRecord.views.is_(None) | (ViewsNewAllRecord.views == ""), 0),
+                else_=cast(ViewsNewAllRecord.views, Integer),
             )
 
             # Query with joins
@@ -223,8 +223,8 @@ def get_top_users() -> Response:
                 )
                 .outerjoin(WordRecord, WordRecord.w_title == PageRecord.title)
                 .outerjoin(
-                    _ViewsNewAllRecord,
-                    (PageRecord.target == _ViewsNewAllRecord.target) & (PageRecord.lang == _ViewsNewAllRecord.lang),
+                    ViewsNewAllRecord,
+                    (PageRecord.target == ViewsNewAllRecord.target) & (PageRecord.lang == ViewsNewAllRecord.lang),
                 )
                 .filter(PageRecord.target != "")
                 .filter(PageRecord.target.is_not(None))

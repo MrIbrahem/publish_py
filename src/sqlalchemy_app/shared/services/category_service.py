@@ -9,14 +9,14 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from ...sqlalchemy_models import CategoryRecord, _CategoryRecord
+from ...sqlalchemy_models import CategoryRecord, CategoryRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 
 
 def set_default_category(session: Session, orm_obj) -> CategoryRecord:
-    session.query(_CategoryRecord).update({_CategoryRecord.is_default: 0})
+    session.query(CategoryRecord).update({CategoryRecord.is_default: 0})
     orm_obj.is_default = 1
     session.commit()
     session.refresh(orm_obj)
@@ -38,14 +38,14 @@ def add_category(
     display = display or campaign
 
     with get_session() as session:
-        orm_obj = session.query(_CategoryRecord).filter(_CategoryRecord.category == category).first()
+        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.category == category).first()
         if orm_obj:
             orm_obj.campaign = campaign
             orm_obj.display = display
             orm_obj.category2 = category2
             orm_obj.depth = depth
         else:
-            orm_obj = _CategoryRecord(
+            orm_obj = CategoryRecord(
                 category=category,
                 campaign=campaign,
                 display=display,
@@ -76,7 +76,7 @@ def update_category(
 ) -> CategoryRecord:
     """Update category."""
     with get_session() as session:
-        orm_obj = session.query(_CategoryRecord).filter(_CategoryRecord.id == category_id).first()
+        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
         if not orm_obj:
             raise ValueError(f"Category with ID {category_id} not found")
 
@@ -100,7 +100,7 @@ def update_category(
 def delete_category(category_id: int) -> None:
     """Delete a category."""
     with get_session() as session:
-        orm_obj = session.query(_CategoryRecord).filter(_CategoryRecord.id == category_id).first()
+        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
         if not orm_obj:
             raise ValueError(f"Category with ID {category_id} not found")
 
@@ -111,7 +111,7 @@ def delete_category(category_id: int) -> None:
 def get_campaign_category(campaign: str) -> CategoryRecord | None:
     """Get the category for a campaign."""
     with get_session() as session:
-        orm_obj = session.query(_CategoryRecord).filter(_CategoryRecord.campaign == campaign).first()
+        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.campaign == campaign).first()
         if not orm_obj:
             logger.warning(f"Campaign {campaign} not found")
             return None
@@ -121,7 +121,7 @@ def get_campaign_category(campaign: str) -> CategoryRecord | None:
 def list_categories() -> List[CategoryRecord]:
     """Return all categories."""
     with get_session() as session:
-        orm_objs = session.query(_CategoryRecord).order_by(_CategoryRecord.id.asc()).all()
+        orm_objs = session.query(CategoryRecord).order_by(CategoryRecord.id.asc()).all()
         return [CategoryRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 

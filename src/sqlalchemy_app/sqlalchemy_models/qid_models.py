@@ -9,7 +9,7 @@ from sqlalchemy import Column, DateTime, Integer, String, func
 from ..shared.engine import BaseDb
 
 
-class _QidRecord(BaseDb):
+class QidRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS qids (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -37,7 +37,19 @@ class _QidRecord(BaseDb):
             "add_date": str(self.add_date) if self.add_date else self.add_date,
         }
 
+    def __post_init__(self) -> None:
+        # Validate that required fields are not empty
+        if not self.title:
+            raise ValueError("Title cannot be empty")
+
+        if not self.qid:
+            raise ValueError("QID cannot be empty")
+
+        # Validate QID format (should start with Q followed by digits)
+        if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
+            raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
+
 
 __all__ = [
-    "_QidRecord",
+    "QidRecord",
 ]

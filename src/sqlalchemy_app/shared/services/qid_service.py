@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import QidRecord, _QidRecord
+from ...sqlalchemy_models import QidRecord, QidRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)
@@ -19,11 +19,11 @@ logger = logging.getLogger(__name__)
 def add_qid(title: str, qid: str) -> QidRecord:
     """Add or update a QID for a title."""
     with get_session() as session:
-        orm_obj = session.query(_QidRecord).filter(_QidRecord.title == title).first()
+        orm_obj = session.query(QidRecord).filter(QidRecord.title == title).first()
         if orm_obj:
             orm_obj.qid = qid
         else:
-            orm_obj = _QidRecord(title=title, qid=qid, add_date=func.now())
+            orm_obj = QidRecord(title=title, qid=qid, add_date=func.now())
             session.add(orm_obj)
 
         session.commit()
@@ -34,7 +34,7 @@ def add_qid(title: str, qid: str) -> QidRecord:
 def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
     """Update a QID record."""
     with get_session() as session:
-        orm_obj = session.query(_QidRecord).filter(_QidRecord.id == qid_id).first()
+        orm_obj = session.query(QidRecord).filter(QidRecord.id == qid_id).first()
         if not orm_obj:
             raise ValueError(f"QID record with ID {qid_id} not found")
 
@@ -48,7 +48,7 @@ def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
 def delete_qid(qid_id: int) -> None:
     """Delete a QID record."""
     with get_session() as session:
-        orm_obj = session.query(_QidRecord).filter(_QidRecord.id == qid_id).first()
+        orm_obj = session.query(QidRecord).filter(QidRecord.id == qid_id).first()
         if not orm_obj:
             raise ValueError(f"QID record with ID {qid_id} not found")
 
@@ -59,7 +59,7 @@ def delete_qid(qid_id: int) -> None:
 def get_page_qid(title: str) -> QidRecord | None:
     """Get the QID for a page title."""
     with get_session() as session:
-        orm_obj = session.query(_QidRecord).filter(_QidRecord.title == title).first()
+        orm_obj = session.query(QidRecord).filter(QidRecord.title == title).first()
         if not orm_obj:
             logger.warning(f"QID for title {title} not found")
             return None
@@ -69,7 +69,7 @@ def get_page_qid(title: str) -> QidRecord | None:
 def list_qids() -> List[QidRecord]:
     """Return all QID records."""
     with get_session() as session:
-        orm_objs = session.query(_QidRecord).order_by(_QidRecord.id.asc()).all()
+        orm_objs = session.query(QidRecord).order_by(QidRecord.id.asc()).all()
         return [QidRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 

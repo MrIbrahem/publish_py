@@ -11,7 +11,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ...shared.engine import get_session
-from ...sqlalchemy_models import UserRecord, _UserRecord
+from ...sqlalchemy_models import UserRecord, UserRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 def list_users() -> List[UserRecord]:
     """Return all user records."""
     with get_session() as session:
-        orm_objs = session.query(_UserRecord).order_by(_UserRecord.user_id.asc()).all()
+        orm_objs = session.query(UserRecord).order_by(UserRecord.user_id.asc()).all()
         return [UserRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
@@ -27,9 +27,9 @@ def list_users_by_group(user_group: str) -> List[UserRecord]:
     """Return user records by group."""
     with get_session() as session:
         orm_objs = (
-            session.query(_UserRecord)
-            .filter(_UserRecord.user_group == user_group)
-            .order_by(_UserRecord.user_id.asc())
+            session.query(UserRecord)
+            .filter(UserRecord.user_group == user_group)
+            .order_by(UserRecord.user_id.asc())
             .all()
         )
         return [UserRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
@@ -38,7 +38,7 @@ def list_users_by_group(user_group: str) -> List[UserRecord]:
 def get_user(user_id: int) -> UserRecord | None:
     """Get a user record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_UserRecord).filter(_UserRecord.user_id == user_id).first()
+        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
         if not orm_obj:
             logger.warning(f"User record with ID {user_id} not found")
             return None
@@ -48,7 +48,7 @@ def get_user(user_id: int) -> UserRecord | None:
 def get_user_by_username(username: str) -> UserRecord | None:
     """Get a user record by username."""
     with get_session() as session:
-        orm_obj = session.query(_UserRecord).filter(_UserRecord.username == username).first()
+        orm_obj = session.query(UserRecord).filter(UserRecord.username == username).first()
         if not orm_obj:
             return None
         return UserRecord(**orm_obj.to_dict())
@@ -66,7 +66,7 @@ def add_user(
         raise ValueError("Username is required")
 
     with get_session() as session:
-        orm_obj = _UserRecord(
+        orm_obj = UserRecord(
             username=username,
             email=email,
             wiki=wiki,
@@ -98,7 +98,7 @@ def update_user(
         raise ValueError("Username is required")
 
     with get_session() as session:
-        orm_obj = session.query(_UserRecord).filter(_UserRecord.user_id == user_id).first()
+        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
         if not orm_obj:
             raise ValueError(f"User record with ID {user_id} not found")
 
@@ -118,7 +118,7 @@ def update_user_data(
 ) -> UserRecord:
     """Update a user record."""
     with get_session() as session:
-        orm_obj = session.query(_UserRecord).filter(_UserRecord.user_id == user_id).first()
+        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
         if not orm_obj:
             raise ValueError(f"User record with ID {user_id} not found")
 
@@ -137,7 +137,7 @@ def update_user_data(
 def delete_user(user_id: int) -> UserRecord:
     """Delete a user record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_UserRecord).filter(_UserRecord.user_id == user_id).first()
+        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
         if not orm_obj:
             raise ValueError(f"User record with ID {user_id} not found")
 

@@ -15,7 +15,7 @@ from ....shared.services.category_service import list_categories
 from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
-from ....sqlalchemy_models import InProcessRecord, LangRecord, _CategoryRecord, _ReportRecord
+from ....sqlalchemy_models import InProcessRecord, LangRecord, CategoryRecord, ReportRecord
 from ...services.in_process_service import get_in_process_counts_by_user
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
@@ -121,11 +121,11 @@ def publish_reports_stats() -> Response:
             # Query distinct year, month, lang, user, result using SQLAlchemy
             results = (
                 session.query(
-                    func.extract("year", _ReportRecord.date).label("year"),
-                    func.extract("month", _ReportRecord.date).label("month"),
-                    _ReportRecord.lang,
-                    _ReportRecord.user,
-                    _ReportRecord.result,
+                    func.extract("year", ReportRecord.date).label("year"),
+                    func.extract("month", ReportRecord.date).label("month"),
+                    ReportRecord.lang,
+                    ReportRecord.user,
+                    ReportRecord.result,
                 )
                 .distinct()
                 .all()
@@ -188,10 +188,10 @@ def get_in_process() -> Response:
                     InProcessRecord.translate_type,
                     InProcessRecord.word,
                     InProcessRecord.add_date,
-                    _CategoryRecord.campaign.label("campaign"),
+                    CategoryRecord.campaign.label("campaign"),
                     LangRecord.autonym.label("autonym"),
                 )
-                .outerjoin(_CategoryRecord, InProcessRecord.cat == _CategoryRecord.category)
+                .outerjoin(CategoryRecord, InProcessRecord.cat == CategoryRecord.category)
                 .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
             )
 

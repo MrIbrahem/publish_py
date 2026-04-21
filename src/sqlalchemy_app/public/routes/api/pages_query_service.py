@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, List
 
 from ....shared.engine import get_session
-from ....sqlalchemy_models import PageRecord, UserPageRecord, _CategoryRecord, _ViewsNewAllRecord
+from ....sqlalchemy_models import PageRecord, UserPageRecord, CategoryRecord, ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +30,9 @@ def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
         query = (
             session.query(
                 UserPageRecord,
-                _CategoryRecord.campaign.label("campaign"),
+                CategoryRecord.campaign.label("campaign"),
             )
-            .outerjoin(_CategoryRecord, UserPageRecord.cat == _CategoryRecord.category)
+            .outerjoin(CategoryRecord, UserPageRecord.cat == CategoryRecord.category)
             .filter(UserPageRecord.target != "")
             .filter(UserPageRecord.target.is_not(None))
         )
@@ -66,9 +66,9 @@ def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, An
     """
     with get_session() as session:
         views_subquery = (
-            session.query(_ViewsNewAllRecord.views)
-            .filter(_ViewsNewAllRecord.target == PageRecord.target)
-            .filter(_ViewsNewAllRecord.lang == PageRecord.lang)
+            session.query(ViewsNewAllRecord.views)
+            .filter(ViewsNewAllRecord.target == PageRecord.target)
+            .filter(ViewsNewAllRecord.lang == PageRecord.lang)
             .correlate(PageRecord)
             .scalar_subquery()
         )
