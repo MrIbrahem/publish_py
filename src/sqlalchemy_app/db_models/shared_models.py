@@ -1,3 +1,11 @@
+"""
+Shared domain models - Dataclasses.
+
+Note: Several models have been moved to specialized modules:
+- pages_models.py: PageRecord, UserPageRecord
+- qid_models.py: QidRecord
+"""
+
 from __future__ import annotations
 
 import logging
@@ -45,75 +53,6 @@ class CategoryRecord:
 
 
 @dataclass
-class PageRecord:
-    """Representation of a page."""
-
-    id: int
-    title: str
-    word: int | None = None
-    translate_type: str | None = None
-    cat: str | None = None
-    lang: str | None = None
-    user: str | None = None
-    target: str | None = None
-    date: Any | None = None
-    pupdate: str | None = None
-    add_date: Any | None = None
-    deleted: int = 0
-    mdwiki_revid: int | None = None
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
-
-
-@dataclass
-class QidRecord:
-    """
-    QID records.
-    add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    """
-
-    id: int
-    qid: str
-    title: str
-    add_date: str
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "qid": self.qid,
-            "title": self.title,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-        }
-
-    def __post_init__(self) -> None:
-        # Validate that required fields are not empty
-        if not self.title:
-            raise ValueError("Title cannot be empty")
-
-        if not self.qid:
-            raise ValueError("QID cannot be empty")
-
-        # Validate QID format (should start with Q followed by digits)
-        if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
-            raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
-
-
-@dataclass
 class ReportRecord:
     """Representation of a report record."""
 
@@ -148,46 +87,7 @@ class ReportRecord:
         }
 
 
-@dataclass
-class UserPageRecord:
-    """Representation of a page."""
-
-    id: int
-    title: str
-    word: int | None = None
-    translate_type: str | None = None
-    cat: str | None = None
-    lang: str | None = None
-    user: str | None = None
-    target: str | None = None
-    date: Any | None = None
-    pupdate: str | None = None
-    add_date: Any | None = None
-    deleted: int = 0
-    mdwiki_revid: int | None = None
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
-
-
 __all__ = [
-    "PageRecord",
     "ReportRecord",
     "CategoryRecord",
-    "UserPageRecord",
-    "QidRecord",
 ]
