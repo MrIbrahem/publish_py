@@ -19,7 +19,7 @@ def list_projects() -> List[ProjectRecord]:
     """Return all project records."""
     with get_session() as session:
         orm_objs = session.query(ProjectRecord).order_by(ProjectRecord.g_id.asc()).all()
-        return [ProjectRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [ProjectRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_project(project_id: int) -> ProjectRecord | None:
@@ -29,7 +29,7 @@ def get_project(project_id: int) -> ProjectRecord | None:
         if not orm_obj:
             logger.warning(f"Project record with ID {project_id} not found")
             return None
-        return ProjectRecord(**orm_obj.to_dict())
+        return orm_obj  # ProjectRecord(**orm_obj.to_dict())
 
 
 def get_project_by_title(title: str) -> ProjectRecord | None:
@@ -38,7 +38,7 @@ def get_project_by_title(title: str) -> ProjectRecord | None:
         orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_title == title).first()
         if not orm_obj:
             return None
-        return ProjectRecord(**orm_obj.to_dict())
+        return orm_obj  # ProjectRecord(**orm_obj.to_dict())
 
 
 def add_project(g_title: str) -> ProjectRecord:
@@ -57,7 +57,7 @@ def add_project(g_title: str) -> ProjectRecord:
             raise ValueError(f"Project '{g_title}' already exists") from None
 
         session.refresh(orm_obj)
-        return ProjectRecord(**orm_obj.to_dict())
+        return orm_obj  # ProjectRecord(**orm_obj.to_dict())
 
 
 def update_project(project_id: int, **kwargs) -> ProjectRecord:
@@ -68,7 +68,7 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord:
             raise ValueError(f"Project record with ID {project_id} not found")
 
         if not kwargs:
-            return ProjectRecord(**orm_obj.to_dict())
+            return orm_obj  # ProjectRecord(**orm_obj.to_dict())
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -76,7 +76,7 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return ProjectRecord(**orm_obj.to_dict())
+        return orm_obj  # ProjectRecord(**orm_obj.to_dict())
 
 
 def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
@@ -90,7 +90,7 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return ProjectRecord(**orm_obj.to_dict())
+        return orm_obj  # ProjectRecord(**orm_obj.to_dict())
 
 
 def delete_project(project_id: int) -> ProjectRecord:

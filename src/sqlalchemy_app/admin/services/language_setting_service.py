@@ -110,7 +110,7 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
             raise ValueError(f"Language setting record with ID {setting_id} not found")
 
         if not kwargs:
-            return LanguageSettingRecord(**orm_obj.to_dict())
+            return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):

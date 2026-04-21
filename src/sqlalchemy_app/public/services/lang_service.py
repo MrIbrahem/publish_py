@@ -19,7 +19,7 @@ def list_langs() -> List[LangRecord]:
     """Return all language records."""
     with get_session() as session:
         orm_objs = session.query(LangRecord).order_by(LangRecord.lang_id.asc()).all()
-        # return [LangRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        # return orm_objs # [LangRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
         return orm_objs
 
 

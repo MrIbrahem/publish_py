@@ -20,7 +20,7 @@ def list_pages() -> List[PageRecord]:
     """Return all pages."""
     with get_session() as session:
         orm_objs = session.query(PageRecord).order_by(PageRecord.id.asc()).all()
-        return [PageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [PageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def add_page(
@@ -52,7 +52,7 @@ def add_page(
         try:
             session.commit()
             session.refresh(orm_obj)
-            return PageRecord(**orm_obj.to_dict())
+            return orm_obj  # PageRecord(**orm_obj.to_dict())
         except IntegrityError as e:
             logger.error(f"Failed to add page (integrity error): {e}")
             session.rollback()
@@ -131,7 +131,7 @@ def update_page(
 
         session.commit()
         session.refresh(orm_obj)
-        return PageRecord(**orm_obj.to_dict())
+        return orm_obj  # PageRecord(**orm_obj.to_dict())
 
 
 def delete_page(page_id: int) -> PageRecord:

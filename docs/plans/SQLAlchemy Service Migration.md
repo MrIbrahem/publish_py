@@ -48,7 +48,7 @@ from ...shared.db.engine import get_session
 def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
     with get_session() as session:
         orm_obj = session.query(CoordinatorRecord).filter(CoordinatorRecord.id == coordinator_id).first()
-        return CoordinatorRecord(**orm_obj.to_dict()) if orm_obj else None
+        return orm_obj # CoordinatorRecord(**orm_obj.to_dict()) if orm_obj else None
 
 ```
 

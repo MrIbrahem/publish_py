@@ -20,7 +20,7 @@ def list_in_process() -> List[InProcessRecord]:
     """Return all in_process records."""
     with get_session() as session:
         orm_objs = session.query(InProcessRecord).order_by(InProcessRecord.id.asc()).all()
-        return [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def list_in_process_by_user(user: str) -> List[InProcessRecord]:
@@ -29,7 +29,7 @@ def list_in_process_by_user(user: str) -> List[InProcessRecord]:
         orm_objs = (
             session.query(InProcessRecord).filter(InProcessRecord.user == user).order_by(InProcessRecord.id.asc()).all()
         )
-        return [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def list_in_process_by_lang(lang: str) -> List[InProcessRecord]:

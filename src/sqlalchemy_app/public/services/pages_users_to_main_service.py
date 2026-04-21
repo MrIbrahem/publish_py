@@ -19,7 +19,7 @@ def list_pages_users_to_main() -> List[PagesUsersToMainRecord]:
     """Return all pages_users_to_main records."""
     with get_session() as session:
         orm_objs = session.query(PagesUsersToMainRecord).order_by(PagesUsersToMainRecord.id.asc()).all()
-        return [PagesUsersToMainRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [PagesUsersToMainRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_pages_users_to_main(record_id: int) -> PagesUsersToMainRecord | None:
@@ -29,7 +29,7 @@ def get_pages_users_to_main(record_id: int) -> PagesUsersToMainRecord | None:
         if not orm_obj:
             logger.warning(f"PagesUsersToMain record with ID {record_id} not found")
             return None
-        return PagesUsersToMainRecord(**orm_obj.to_dict())
+        return orm_obj  # PagesUsersToMainRecord(**orm_obj.to_dict())
 
 
 def add_pages_users_to_main(
@@ -49,7 +49,7 @@ def add_pages_users_to_main(
             raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
 
         session.refresh(orm_obj)
-        return PagesUsersToMainRecord(**orm_obj.to_dict())
+        return orm_obj  # PagesUsersToMainRecord(**orm_obj.to_dict())
 
 
 def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainRecord:
@@ -60,7 +60,7 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
             raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
 
         if not kwargs:
-            return PagesUsersToMainRecord(**orm_obj.to_dict())
+            return orm_obj  # PagesUsersToMainRecord(**orm_obj.to_dict())
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -68,7 +68,7 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
 
         session.commit()
         session.refresh(orm_obj)
-        return PagesUsersToMainRecord(**orm_obj.to_dict())
+        return orm_obj  # PagesUsersToMainRecord(**orm_obj.to_dict())
 
 
 def delete_pages_users_to_main(record_id: int) -> PagesUsersToMainRecord:

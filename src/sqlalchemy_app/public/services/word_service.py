@@ -19,7 +19,7 @@ def list_words() -> List[WordRecord]:
     """Return all word records."""
     with get_session() as session:
         orm_objs = session.query(WordRecord).order_by(WordRecord.w_id.asc()).all()
-        return [WordRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [WordRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_word(word_id: int) -> WordRecord | None:
@@ -29,7 +29,7 @@ def get_word(word_id: int) -> WordRecord | None:
         if not orm_obj:
             logger.warning(f"Word record with ID {word_id} not found")
             return None
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj  # WordRecord(**orm_obj.to_dict())
 
 
 def get_word_by_title(title: str) -> WordRecord | None:
@@ -38,7 +38,7 @@ def get_word_by_title(title: str) -> WordRecord | None:
         orm_obj = session.query(WordRecord).filter(WordRecord.w_title == title).first()
         if not orm_obj:
             return None
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj  # WordRecord(**orm_obj.to_dict())
 
 
 def add_word(
@@ -61,7 +61,7 @@ def add_word(
             raise ValueError(f"Word count for '{w_title}' already exists") from None
 
         session.refresh(orm_obj)
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj  # WordRecord(**orm_obj.to_dict())
 
 
 def add_or_update_word(
@@ -85,7 +85,7 @@ def add_or_update_word(
 
         session.commit()
         session.refresh(orm_obj)
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj  # WordRecord(**orm_obj.to_dict())
 
 
 def update_word(word_id: int, **kwargs) -> WordRecord:
@@ -96,7 +96,7 @@ def update_word(word_id: int, **kwargs) -> WordRecord:
             raise ValueError(f"Word record with ID {word_id} not found")
 
         if not kwargs:
-            return WordRecord(**orm_obj.to_dict())
+            return orm_obj  # WordRecord(**orm_obj.to_dict())
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -104,7 +104,7 @@ def update_word(word_id: int, **kwargs) -> WordRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return WordRecord(**orm_obj.to_dict())
+        return orm_obj  # WordRecord(**orm_obj.to_dict())
 
 
 def delete_word(word_id: int) -> WordRecord:
