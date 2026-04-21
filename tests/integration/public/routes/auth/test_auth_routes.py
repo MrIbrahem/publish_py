@@ -4,6 +4,7 @@ Integration tests for src/sqlalchemy_app/public/routes/auth/routes.py module.
 
 from __future__ import annotations
 
+from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -32,12 +33,28 @@ class TestAuthLogin:
             mock_settings.sessions.state_key = "oauth_state"
             mock_settings.sessions.request_token_key = "request_token"
 
-            # Make 6 requests to exceed rate limit
-            for _ in range(6):
-                response = client.get("/login", follow_redirects=False)
+            # Mock rate limiter to test rate limiting quickly
+            with patch("src.sqlalchemy_app.public.routes.auth.routes.login_rate_limiter") as mock_limiter:
+                call_count = 0
 
-            # After rate limit exceeded, should redirect with warning
-            assert response.status_code in [302, 429]
+                def allow_side_effect(_key):
+                    nonlocal call_count
+                    call_count += 1
+                    # Allow first 5 requests, block the 6th
+                    return call_count <= 5
+
+                mock_limiter.allow.side_effect = allow_side_effect
+                mock_limiter.try_after.return_value = timedelta(seconds=30)
+
+                with patch("src.sqlalchemy_app.public.routes.auth.routes.start_login") as mock_start:
+                    mock_start.return_value = ("https://oauth.provider.com/authorize", MagicMock())
+
+                    # Make 6 requests to exceed rate limit
+                    for _ in range(6):
+                        response = client.get("/login", follow_redirects=False)
+
+                    # After rate limit exceeded, should redirect with warning
+                    assert response.status_code in [302, 429]
 
     def test_login_starts_oauth_flow(self, app: Flask, client: FlaskClient):
         """Test that login starts OAuth flow when properly configured."""
