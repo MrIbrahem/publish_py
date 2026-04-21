@@ -11,7 +11,7 @@
     <div class="card-body">
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.add_project_record') }}" class="row g-2 align-items-end">
+                <form method="post" action="{{ url_for('admin.projects.add') }}" class="row g-2 align-items-end">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="col-sm-8 col-md-6 col-lg-4">
                         <label class="form-label" for="new-g_title">Add Project</label>
@@ -32,7 +32,7 @@
                 <h5 class="mb-0 mt-1">Manage projects</h5>
             </div>
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.projects_update') }}">
+                <form method="post" action="{{ url_for('admin.projects.update') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                     <div class="table-responsive">

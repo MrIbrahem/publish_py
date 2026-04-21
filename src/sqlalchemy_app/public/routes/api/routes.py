@@ -10,7 +10,6 @@ from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
 from ....db_models import InProcessRecord
-
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.services.category_service import list_categories
@@ -195,7 +194,6 @@ def get_in_process() -> Response:
                 )
                 .outerjoin(_CategoryRecord, _InProcessRecord.cat == _CategoryRecord.category)
                 .outerjoin(_LangRecord, _InProcessRecord.lang == _LangRecord.code)
-
             )
 
             if lang and lang != "All":

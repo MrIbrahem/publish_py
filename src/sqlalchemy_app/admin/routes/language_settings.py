@@ -46,7 +46,7 @@ def _add_language_setting() -> ResponseReturnValue:
     lang_code = request.form.get("lang_code", "").strip()
     if not lang_code:
         flash("Language code is required.", "danger")
-        return redirect(url_for("admin.language_settings_dashboard"))
+        return redirect(url_for("admin.language_settings.dashboard"))
 
     move_dots = 1 if request.form.get("move_dots") == "1" else 0
     expend = 1 if request.form.get("expend") == "1" else 0
@@ -68,7 +68,7 @@ def _add_language_setting() -> ResponseReturnValue:
     else:
         flash(f"Language setting for '{lang_code}' added.", "success")
 
-    return redirect(url_for("admin.language_settings_dashboard"))
+    return redirect(url_for("admin.language_settings.dashboard"))
 
 
 def _update_language_setting(setting_id: int) -> ResponseReturnValue:
@@ -92,7 +92,7 @@ def _update_language_setting(setting_id: int) -> ResponseReturnValue:
     else:
         flash(f"Language setting for '{record.lang_code}' updated.", "success")
 
-    return redirect(url_for("admin.language_settings_dashboard"))
+    return redirect(url_for("admin.language_settings.dashboard"))
 
 
 def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
@@ -109,7 +109,7 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
     else:
         flash(f"Language setting for '{record.lang_code}' removed.", "success")
 
-    return redirect(url_for("admin.language_settings_dashboard"))
+    return redirect(url_for("admin.language_settings.dashboard"))
 
 
 class LanguageSettings:
@@ -121,22 +121,22 @@ class LanguageSettings:
 
         @self.bp.get("/")
         @admin_required
-        def language_settings_dashboard():
+        def dashboard():
             return _language_settings_dashboard()
 
         @self.bp.post("/add")
         @admin_required
-        def add_language_setting() -> ResponseReturnValue:
+        def add() -> ResponseReturnValue:
             return _add_language_setting()
 
         @self.bp.post("/<int:setting_id>/update")
         @admin_required
-        def update_language_setting_route(setting_id: int) -> ResponseReturnValue:
+        def update(setting_id: int) -> ResponseReturnValue:
             return _update_language_setting(setting_id)
 
         @self.bp.post("/<int:setting_id>/delete")
         @admin_required
-        def delete_language_setting_route(setting_id: int) -> ResponseReturnValue:
+        def delete(setting_id: int) -> ResponseReturnValue:
             return _delete_language_setting(setting_id)
 
 

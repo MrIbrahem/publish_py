@@ -47,7 +47,7 @@ def _add_full_translator() -> ResponseReturnValue:
     username = request.form.get("username", "").strip()
     if not username:
         flash("Username is required to add a full translator.", "danger")
-        return redirect(url_for("admin.full_translators_dashboard"))
+        return redirect(url_for("admin.full_translators.dashboard"))
 
     try:
         record = add_full_translator(username)
@@ -60,7 +60,7 @@ def _add_full_translator() -> ResponseReturnValue:
     else:
         flash(f"Full translator '{record.user}' added.", "success")
 
-    return redirect(url_for("admin.full_translators_dashboard"))
+    return redirect(url_for("admin.full_translators.dashboard"))
 
 
 def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
@@ -78,7 +78,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
     else:
         flash(f"Record '{record.username}' {past_tense}.", "success")
 
-    return redirect(url_for("admin.full_translators_dashboard"))
+    return redirect(url_for("admin.full_translators.dashboard"))
 
 
 def _activate_record(record_id: int) -> ResponseReturnValue:
@@ -105,7 +105,7 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
     else:
         flash(f"Full translator '{record.user}' removed.", "success")
 
-    return redirect(url_for("admin.full_translators_dashboard"))
+    return redirect(url_for("admin.full_translators.dashboard"))
 
 
 class FullTranslators:
@@ -117,27 +117,28 @@ class FullTranslators:
 
         @self.bp.get("/")
         @admin_required
-        def full_translators_dashboard():
+        def dashboard():
+            # Call the internal function _full_translators_dashboard to return the full dashboard
             return _full_translators_dashboard()
 
         @self.bp.post("/add")
         @admin_required
-        def add_full_translator() -> ResponseReturnValue:
+        def add() -> ResponseReturnValue:
             return _add_full_translator()
 
         @self.bp.post("/<int:translator_id>/delete")
         @admin_required
-        def delete_full_translator(translator_id: int) -> ResponseReturnValue:
+        def delete(translator_id: int) -> ResponseReturnValue:
             return _delete_full_translator(translator_id)
 
         @self.bp.post("/<int:record_id>/activate")
         @admin_required
-        def activate_full_translator(record_id: int) -> ResponseReturnValue:
+        def activate(record_id: int) -> ResponseReturnValue:
             return _activate_record(record_id)
 
         @self.bp.post("/<int:record_id>/deactivate")
         @admin_required
-        def deactivate_full_translator(record_id: int) -> ResponseReturnValue:
+        def deactivate(record_id: int) -> ResponseReturnValue:
             return _deactivate_record(record_id)
 
 

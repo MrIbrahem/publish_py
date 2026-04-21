@@ -47,7 +47,7 @@ def _add_user_no_inprocess() -> ResponseReturnValue:
     username = request.form.get("username", "").strip()
     if not username:
         flash("Username is required to add a user.", "danger")
-        return redirect(url_for("admin.users_no_inprocess_dashboard"))
+        return redirect(url_for("admin.users_no_inprocess.dashboard"))
 
     try:
         record = add_users_no_inprocess(username)
@@ -60,7 +60,7 @@ def _add_user_no_inprocess() -> ResponseReturnValue:
     else:
         flash(f"User '{record.user}' added to 'not in process' list.", "success")
 
-    return redirect(url_for("admin.users_no_inprocess_dashboard"))
+    return redirect(url_for("admin.users_no_inprocess.dashboard"))
 
 
 def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
@@ -78,7 +78,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
     else:
         flash(f"Record '{record.username}' {past_tense}.", "success")
 
-    return redirect(url_for("admin.users_no_inprocess_dashboard"))
+    return redirect(url_for("admin.users_no_inprocess.dashboard"))
 
 
 def _activate_record(record_id: int) -> ResponseReturnValue:
@@ -105,7 +105,7 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
     else:
         flash(f"User '{record.user}' removed from 'not in process' list.", "success")
 
-    return redirect(url_for("admin.users_no_inprocess_dashboard"))
+    return redirect(url_for("admin.users_no_inprocess.dashboard"))
 
 
 class UsersNoInprocess:
@@ -117,27 +117,27 @@ class UsersNoInprocess:
 
         @self.bp.get("/")
         @admin_required
-        def users_no_inprocess_dashboard():
+        def dashboard():
             return _users_no_inprocess_dashboard()
 
         @self.bp.post("/add")
         @admin_required
-        def add_user_no_inprocess() -> ResponseReturnValue:
+        def add() -> ResponseReturnValue:
             return _add_user_no_inprocess()
 
         @self.bp.post("/<int:record_id>/delete")
         @admin_required
-        def delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
+        def delete(record_id: int) -> ResponseReturnValue:
             return _delete_user_no_inprocess(record_id)
 
         @self.bp.post("/<int:record_id>/activate")
         @admin_required
-        def activate_user_no_inprocess(record_id: int) -> ResponseReturnValue:
+        def activate(record_id: int) -> ResponseReturnValue:
             return _activate_record(record_id)
 
         @self.bp.post("/<int:record_id>/deactivate")
         @admin_required
-        def deactivate_user_no_inprocess(record_id: int) -> ResponseReturnValue:
+        def deactivate(record_id: int) -> ResponseReturnValue:
             return _deactivate_record(record_id)
 
 

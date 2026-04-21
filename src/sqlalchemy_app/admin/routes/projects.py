@@ -43,7 +43,7 @@ def _add_project() -> ResponseReturnValue:
     g_title = request.form.get("g_title", "").strip()
     if not g_title:
         flash("Title is required.", "danger")
-        return redirect(url_for("admin.projects_dashboard"))
+        return redirect(url_for("admin.projects.dashboard"))
 
     try:
         add_project(
@@ -58,7 +58,7 @@ def _add_project() -> ResponseReturnValue:
     else:
         flash(f"project for '{g_title}' added.", "success")
 
-    return redirect(url_for("admin.projects_dashboard"))
+    return redirect(url_for("admin.projects.dashboard"))
 
 
 def _update_project(record_id: int, g_title: str) -> None:
@@ -100,17 +100,17 @@ class ProjectsDashboard:
 
         @self.bp.get("/")
         @admin_required
-        def projects_dashboard():
+        def dashboard():
             return _projects_dashboard()
 
         @self.bp.post("/add")
         @admin_required
-        def add_project_record() -> ResponseReturnValue:
+        def add() -> ResponseReturnValue:
             return _add_project()
 
         @self.bp.post("/update")
         @admin_required
-        def projects_update() -> ResponseReturnValue:
+        def update() -> ResponseReturnValue:
             projects = request.form.getlist("projects[][g_id]")
             titles = request.form.getlist("projects[][g_title]")
             titles_original = request.form.getlist("titles_original[][g_title]")
@@ -127,7 +127,7 @@ class ProjectsDashboard:
                 elif g_title != g_title_original:
                     _update_project(record_id, g_title)
 
-            return redirect(url_for("admin.projects_dashboard"))
+            return redirect(url_for("admin.projects.dashboard"))
 
 
 projects_module = ProjectsDashboard()

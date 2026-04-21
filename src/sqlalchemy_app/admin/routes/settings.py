@@ -43,7 +43,7 @@ class SettingsRoutes:
 
         @self.bp.get("/")
         @admin_required
-        def settings_view():
+        def dashboard():
             all_settings = service.list_settings()
             # Convert records to dicts for template compatibility
             settings_list = [s.to_dict() for s in all_settings]
@@ -55,7 +55,7 @@ class SettingsRoutes:
 
         @self.bp.post("/create")
         @admin_required
-        def settings_create():
+        def create():
             key = request.form.get("key", "").strip()
             title = request.form.get("title", "").strip()
             value_type = request.form.get("value_type", "boolean").strip()
@@ -65,7 +65,7 @@ class SettingsRoutes:
                     "Key must start with a lowercase letter and contain only lowercase letters, digits, and underscores.",
                     "danger",
                 )
-                return redirect(url_for("admin.settings_view"))
+                return redirect(url_for("admin.settings.dashboard"))
 
             if value_type == "boolean":
                 value = False
@@ -85,11 +85,11 @@ class SettingsRoutes:
             else:
                 flash("Key and Title are required.", "danger")
 
-            return redirect(url_for("admin.settings_view"))
+            return redirect(url_for("admin.settings.dashboard"))
 
         @self.bp.post("/update")
         @admin_required
-        def settings_update():
+        def update():
 
             all_settings = service.list_settings()
             failed_keys: list[str] = []
@@ -133,7 +133,7 @@ class SettingsRoutes:
                 flash("Settings updated successfully.", "success")
             else:
                 flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
-            return redirect(url_for("admin.settings_view"))
+            return redirect(url_for("admin.settings.dashboard"))
 
 
 settings_module = SettingsRoutes()
