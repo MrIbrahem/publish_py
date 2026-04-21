@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import logging
+from datetime import date, timedelta
 
 from flask import render_template, request
-from datetime import date, timedelta
+
 from ...public.routes.api.pages_query_service import list_pages_users, list_pages_with_views
 from ...public.services.lang_service import list_langs
 
