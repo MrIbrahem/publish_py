@@ -55,23 +55,6 @@ class PageRecord(BaseDb):
             kwargs["deleted"] = 0
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
-
 
 class UserPageRecord(BaseDb):
     """
@@ -117,23 +100,6 @@ class UserPageRecord(BaseDb):
             kwargs["deleted"] = 0
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
-
 
 class PagesUsersToMainRecord(BaseDb):
     """
@@ -163,14 +129,6 @@ class PagesUsersToMainRecord(BaseDb):
         if "new_qid" not in kwargs:
             kwargs["new_qid"] = ""
         super().__init__(**kwargs)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "new_target": self.new_target,
-            "new_user": self.new_user,
-            "new_qid": self.new_qid,
-        }
 
 
 class InProcessRecord(BaseDb):
@@ -209,18 +167,6 @@ class InProcessRecord(BaseDb):
         if "word" not in kwargs:
             kwargs["word"] = 0
         super().__init__(**kwargs)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "user": self.user,
-            "lang": self.lang,
-            "cat": self.cat,
-            "translate_type": self.translate_type,
-            "word": self.word,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-        }
 
 
 __all__ = [

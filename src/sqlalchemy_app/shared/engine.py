@@ -11,6 +11,7 @@ from sqlalchemy import Text, create_engine, event, inspect, text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
+from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +24,8 @@ class LONGTEXT(TypeDecorator):
 
     def load_dialect_impl(self, dialect):
         if dialect.name == "mysql":
-            from sqlalchemy.dialects.mysql import LONGTEXT
 
-            return dialect.type_descriptor(LONGTEXT())
+            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
         return dialect.type_descriptor(Text())
 
 
@@ -42,8 +42,21 @@ class BaseDb(DeclarativeBase):
 
     def to_dict(self) -> dict[str, Any]:
         """Convert ORM object to dictionary."""
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+        data = {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
+        if "add_date" in data:
+            data["add_date"] = str(self.add_date) if self.add_date else self.add_date
+
+        if "date" in data:
+            if self.date is None:
+                date_str = ""
+            elif hasattr(self.date, "isoformat"):
+                date_str = self.date.isoformat()
+            else:
+                date_str = str(self.date)
+            data["date"] = date_str
+
+        return data
 
 # ---------------------------------------------------------------------------
 # 2. Database connection — replaces db_driver.py entirely

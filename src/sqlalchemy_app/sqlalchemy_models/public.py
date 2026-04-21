@@ -33,14 +33,6 @@ class LangRecord(BaseDb):
     autonym = Column(String(70), nullable=False)
     name = Column(String(70), nullable=False)
 
-    def to_dict(self) -> dict:
-        return {
-            "lang_id": self.lang_id,
-            "code": self.code,
-            "autonym": self.autonym,
-            "name": self.name,
-        }
-
 
 class MdwikiRevidRecord(BaseDb):
     """
@@ -55,12 +47,6 @@ class MdwikiRevidRecord(BaseDb):
 
     title = Column(String(255), primary_key=True)
     revid = Column(Integer, nullable=False)
-
-    def to_dict(self) -> dict:
-        return {
-            "title": self.title,
-            "revid": self.revid,
-        }
 
 
 class TranslateTypeRecord(BaseDb):
@@ -90,18 +76,9 @@ class TranslateTypeRecord(BaseDb):
             kwargs["tt_full"] = 0
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict:
-        return {
-            "tt_id": self.tt_id,
-            "tt_title": self.tt_title,
-            "tt_lead": self.tt_lead,
-            "tt_full": self.tt_full,
-        }
-
 
 __all__ = [
     "LangRecord",
     "MdwikiRevidRecord",
-    "ProjectRecord",
     "TranslateTypeRecord",
 ]

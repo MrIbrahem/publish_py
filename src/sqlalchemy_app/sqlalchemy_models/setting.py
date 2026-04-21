@@ -46,15 +46,6 @@ class LanguageSettingRecord(BaseDb):
             kwargs["add_en_lang"] = 0
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "lang_code": self.lang_code,
-            "move_dots": self.move_dots,
-            "expend": self.expend,
-            "add_en_lang": self.add_en_lang,
-        }
-
 
 class SettingRecord(BaseDb):
     """
@@ -91,15 +82,6 @@ class SettingRecord(BaseDb):
         super().__init__(**kwargs)
         # Parse value based on value_type after initialization
         self.value = self._parse_value(self.value, self.value_type)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "key": self.key,
-            "title": self.title,
-            "value": self.value,
-            "value_type": self.value_type,
-        }
 
     def _parse_value(self, value: Optional[str], value_type: str) -> Any:
         if value is None:

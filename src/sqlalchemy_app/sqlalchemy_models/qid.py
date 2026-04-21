@@ -43,14 +43,6 @@ class QidRecord(BaseDb):
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "qid": self.qid,
-            "title": self.title,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-        }
-
 
 __all__ = [
     "QidRecord",

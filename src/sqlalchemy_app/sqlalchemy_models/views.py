@@ -32,13 +32,6 @@ class EnwikiPageviewRecord(BaseDb):
             kwargs["en_views"] = 0
         super().__init__(**kwargs)
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "en_views": self.en_views,
-        }
-
 
 class ViewsNewRecord(BaseDb):
     """
@@ -69,15 +62,6 @@ class ViewsNewRecord(BaseDb):
         if "views" not in kwargs:
             kwargs["views"] = 0
         super().__init__(**kwargs)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "target": self.target,
-            "lang": self.lang,
-            "year": self.year,
-            "views": self.views,
-        }
 
 
 class ViewsNewAllRecord(BaseDb):
@@ -112,13 +96,6 @@ class ViewsNewAllRecord(BaseDb):
             }
         },
     )
-
-    def to_dict(self) -> dict:
-        return {
-            "target": self.target,
-            "lang": self.lang,
-            "views": self.views,
-        }
 
 
 __all__ = [

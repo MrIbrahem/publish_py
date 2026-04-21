@@ -64,17 +64,6 @@ class CategoryRecord(BaseDb):
         if not self.campaign:
             raise ValueError("Campaign name cannot be empty")
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "category": self.category,
-            "campaign": self.campaign,
-            "display": self.display,
-            "category2": self.category2,
-            "depth": self.depth,
-            "is_default": self.is_default,
-        }
-
 
 class ProjectRecord(BaseDb):
     """
@@ -90,12 +79,6 @@ class ProjectRecord(BaseDb):
 
     g_id = Column(Integer, primary_key=True, autoincrement=True)
     g_title = Column(String(120), unique=True, nullable=False)
-
-    def to_dict(self) -> dict:
-        return {
-            "g_id": self.g_id,
-            "g_title": self.g_title,
-        }
 
 
 __all__ = [

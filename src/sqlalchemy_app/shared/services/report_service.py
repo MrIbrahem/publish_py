@@ -86,11 +86,11 @@ def query_reports_with_filters(
             # Year/Month filters
             if name == "year":
                 # query = query.filter(func.year(ReportRecord.date) == value)
-                query = query.filter(extract("year", ReportRecord.date) == value)
+                query = query.filter(extract("year", ReportRecord.date) == int(value))
 
             elif name == "month":
                 # query = query.filter(func.month(ReportRecord.date) == value)
-                query = query.filter(extract("month", ReportRecord.date) == value)
+                query = query.filter(extract("month", ReportRecord.date) == int(value))
             elif name in COLUMN_MAP:
                 # to match ReportsDB methods
                 column = COLUMN_MAP[name]
