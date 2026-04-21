@@ -20,7 +20,7 @@ def list_users() -> List[UserRecord]:
     """Return all user records."""
     with get_session() as session:
         orm_objs = session.query(UserRecord).order_by(UserRecord.user_id.asc()).all()
-        return orm_objs  # [UserRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_users_by_group(user_group: str) -> List[UserRecord]:
@@ -32,7 +32,7 @@ def list_users_by_group(user_group: str) -> List[UserRecord]:
             .order_by(UserRecord.user_id.asc())
             .all()
         )
-        return orm_objs  # [UserRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_user(user_id: int) -> UserRecord | None:
@@ -42,7 +42,7 @@ def get_user(user_id: int) -> UserRecord | None:
         if not orm_obj:
             logger.warning(f"User record with ID {user_id} not found")
             return None
-        return orm_obj  # UserRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_user_by_username(username: str) -> UserRecord | None:
@@ -51,7 +51,7 @@ def get_user_by_username(username: str) -> UserRecord | None:
         orm_obj = session.query(UserRecord).filter(UserRecord.username == username).first()
         if not orm_obj:
             return None
-        return orm_obj  # UserRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_user(
@@ -81,7 +81,7 @@ def add_user(
             raise ValueError(f"User '{username}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # UserRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_user(
@@ -109,7 +109,7 @@ def update_user(
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # UserRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_user_data(
@@ -123,7 +123,7 @@ def update_user_data(
             raise ValueError(f"User record with ID {user_id} not found")
 
         if not kwargs:
-            return orm_obj  # UserRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -131,7 +131,7 @@ def update_user_data(
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # UserRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_user(user_id: int) -> UserRecord:

@@ -115,14 +115,14 @@ def get_campaign_category(campaign: str) -> CategoryRecord | None:
         if not orm_obj:
             logger.warning(f"Campaign {campaign} not found")
             return None
-        return orm_obj  # CategoryRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def list_categories() -> List[CategoryRecord]:
     """Return all categories."""
     with get_session() as session:
         orm_objs = session.query(CategoryRecord).order_by(CategoryRecord.id.asc()).all()
-        return orm_objs  # [CategoryRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_camp_to_cats() -> dict[str, str]:

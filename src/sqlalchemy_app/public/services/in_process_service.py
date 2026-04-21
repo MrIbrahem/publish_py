@@ -20,7 +20,7 @@ def list_in_process() -> List[InProcessRecord]:
     """Return all in_process records."""
     with get_session() as session:
         orm_objs = session.query(InProcessRecord).order_by(InProcessRecord.id.asc()).all()
-        return orm_objs  # [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_in_process_by_user(user: str) -> List[InProcessRecord]:
@@ -29,7 +29,7 @@ def list_in_process_by_user(user: str) -> List[InProcessRecord]:
         orm_objs = (
             session.query(InProcessRecord).filter(InProcessRecord.user == user).order_by(InProcessRecord.id.asc()).all()
         )
-        return orm_objs  # [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_in_process_by_lang(lang: str) -> List[InProcessRecord]:
@@ -38,7 +38,7 @@ def list_in_process_by_lang(lang: str) -> List[InProcessRecord]:
         orm_objs = (
             session.query(InProcessRecord).filter(InProcessRecord.lang == lang).order_by(InProcessRecord.id.asc()).all()
         )
-        return orm_objs  # [InProcessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_in_process(process_id: int) -> InProcessRecord | None:
@@ -48,7 +48,7 @@ def get_in_process(process_id: int) -> InProcessRecord | None:
         if not orm_obj:
             logger.warning(f"In-process record with ID {process_id} not found")
             return None
-        return orm_obj  # InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_in_process_by_title_user_lang(title: str, user: str, lang: str) -> InProcessRecord | None:
@@ -63,7 +63,7 @@ def get_in_process_by_title_user_lang(title: str, user: str, lang: str) -> InPro
         )
         if not orm_obj:
             return None
-        return orm_obj  # InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_in_process(
@@ -104,7 +104,7 @@ def add_in_process(
             raise ValueError(f"In-process record for '{title}' by '{user}' in '{lang}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
@@ -115,7 +115,7 @@ def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
             raise ValueError(f"In-process record with ID {process_id} not found")
 
         if not kwargs:
-            return orm_obj  # InProcessRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -123,7 +123,7 @@ def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # InProcessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_in_process(process_id: int) -> InProcessRecord:

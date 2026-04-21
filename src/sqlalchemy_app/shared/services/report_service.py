@@ -20,7 +20,7 @@ def list_reports() -> List[ReportRecord]:
     """Return all report records."""
     with get_session() as session:
         orm_objs = session.query(ReportRecord).order_by(ReportRecord.id.desc()).all()
-        return orm_objs  # [ReportRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def add_report(
@@ -45,7 +45,7 @@ def add_report(
         session.add(orm_obj)
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # ReportRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_report(report_id: int) -> ReportRecord:
@@ -112,7 +112,7 @@ def query_reports_with_filters(
 
         orm_objs = query.all()
 
-        return orm_objs  # [ReportRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 __all__ = [

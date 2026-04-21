@@ -28,7 +28,7 @@ def add_qid(title: str, qid: str) -> QidRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # QidRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
@@ -42,7 +42,7 @@ def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
         orm_obj.qid = qid
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # QidRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_qid(qid_id: int) -> None:
@@ -63,14 +63,14 @@ def get_page_qid(title: str) -> QidRecord | None:
         if not orm_obj:
             logger.warning(f"QID for title {title} not found")
             return None
-        return orm_obj  # QidRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def list_qids() -> List[QidRecord]:
     """Return all QID records."""
     with get_session() as session:
         orm_objs = session.query(QidRecord).order_by(QidRecord.id.asc()).all()
-        return orm_objs  # [QidRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_title_to_qid() -> dict[str, str]:

@@ -19,7 +19,7 @@ def list_mdwiki_revids() -> List[MdwikiRevidRecord]:
     """Return all mdwiki_revid records."""
     with get_session() as session:
         orm_objs = session.query(MdwikiRevidRecord).order_by(MdwikiRevidRecord.title.asc()).all()
-        return orm_objs  # [MdwikiRevidRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_mdwiki_revid_by_title(title: str) -> MdwikiRevidRecord | None:
@@ -28,7 +28,7 @@ def get_mdwiki_revid_by_title(title: str) -> MdwikiRevidRecord | None:
         orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
         if not orm_obj:
             return None
-        return orm_obj  # MdwikiRevidRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
@@ -47,7 +47,7 @@ def add_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
             raise ValueError(f"MDWiki revid for '{title}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # MdwikiRevidRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
@@ -66,7 +66,7 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # MdwikiRevidRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
@@ -79,7 +79,7 @@ def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
         orm_obj.revid = revid
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # MdwikiRevidRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_mdwiki_revid(title: str) -> MdwikiRevidRecord:

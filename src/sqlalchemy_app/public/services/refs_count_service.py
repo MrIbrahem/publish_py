@@ -19,7 +19,7 @@ def list_refs_counts() -> List[RefsCountRecord]:
     """Return all refs_count records."""
     with get_session() as session:
         orm_objs = session.query(RefsCountRecord).order_by(RefsCountRecord.r_id.asc()).all()
-        return orm_objs  # [RefsCountRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_refs_count(refs_id: int) -> RefsCountRecord | None:
@@ -29,7 +29,7 @@ def get_refs_count(refs_id: int) -> RefsCountRecord | None:
         if not orm_obj:
             logger.warning(f"RefsCount record with ID {refs_id} not found")
             return None
-        return orm_obj  # RefsCountRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_refs_count_by_title(title: str) -> RefsCountRecord | None:
@@ -38,7 +38,7 @@ def get_refs_count_by_title(title: str) -> RefsCountRecord | None:
         orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_title == title).first()
         if not orm_obj:
             return None
-        return orm_obj  # RefsCountRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_refs_count(
@@ -61,7 +61,7 @@ def add_refs_count(
             raise ValueError(f"Refs count for '{r_title}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # RefsCountRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_refs_count(
@@ -85,7 +85,7 @@ def add_or_update_refs_count(
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # RefsCountRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
@@ -96,7 +96,7 @@ def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
             raise ValueError(f"RefsCount record with ID {refs_id} not found")
 
         if not kwargs:
-            return orm_obj  # RefsCountRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -104,7 +104,7 @@ def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # RefsCountRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_refs_count(refs_id: int) -> RefsCountRecord:

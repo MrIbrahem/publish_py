@@ -61,7 +61,7 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
         orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
         if not orm_obj:
             return None
-        return orm_obj  # UserTokenRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_user_token(user_id: int) -> None:
@@ -84,7 +84,7 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
         orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.username == username).first()
         if not orm_obj:
             return None
-        return orm_obj  # UserTokenRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_user_token_by_username(username: str) -> None:

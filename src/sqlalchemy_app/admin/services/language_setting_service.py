@@ -20,7 +20,7 @@ def list_language_settings() -> List[LanguageSettingRecord]:
     """Return all language setting records."""
     with get_session() as session:
         orm_objs = session.query(LanguageSettingRecord).order_by(LanguageSettingRecord.id.asc()).all()
-        return orm_objs  # [LanguageSettingRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_language_setting(setting_id: int) -> LanguageSettingRecord | None:
@@ -30,7 +30,7 @@ def get_language_setting(setting_id: int) -> LanguageSettingRecord | None:
         if not orm_obj:
             logger.warning(f"Language setting record with ID {setting_id} not found")
             return None
-        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_language_setting_by_code(lang_code: str) -> LanguageSettingRecord | None:
@@ -39,7 +39,7 @@ def get_language_setting_by_code(lang_code: str) -> LanguageSettingRecord | None
         orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
         if not orm_obj:
             return None
-        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_language_setting(
@@ -68,7 +68,7 @@ def add_language_setting(
             raise ValueError(f"Language setting for '{lang_code}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_language_setting(
@@ -99,7 +99,7 @@ def add_or_update_language_setting(
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
@@ -110,7 +110,7 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
             raise ValueError(f"Language setting record with ID {setting_id} not found")
 
         if not kwargs:
-            return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -118,7 +118,7 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_language_setting(setting_id: int):

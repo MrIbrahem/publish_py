@@ -20,7 +20,7 @@ def list_user_pages() -> List[UserPageRecord]:
     """Return all pages_users."""
     with get_session() as session:
         orm_objs = session.query(UserPageRecord).order_by(UserPageRecord.id.asc()).all()
-        return orm_objs  # [UserPageRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def add_user_page(
@@ -52,7 +52,7 @@ def add_user_page(
         try:
             session.commit()
             session.refresh(orm_obj)
-            return orm_obj  # UserPageRecord(**orm_obj.to_dict())
+            return orm_obj
         except IntegrityError as e:
             logger.error(f"Failed to add page (integrity error): {e}")
             session.rollback()
@@ -131,7 +131,7 @@ def update_user_page(
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # UserPageRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_user_page(page_id: int) -> UserPageRecord:

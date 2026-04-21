@@ -19,7 +19,7 @@ def list_translate_types() -> List[TranslateTypeRecord]:
     """Return all translate_type records."""
     with get_session() as session:
         orm_objs = session.query(TranslateTypeRecord).order_by(TranslateTypeRecord.tt_id.asc()).all()
-        return orm_objs  # [TranslateTypeRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_lead_enabled_types() -> List[TranslateTypeRecord]:
@@ -31,7 +31,7 @@ def list_lead_enabled_types() -> List[TranslateTypeRecord]:
             .order_by(TranslateTypeRecord.tt_id.asc())
             .all()
         )
-        return orm_objs  # [TranslateTypeRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_full_enabled_types() -> List[TranslateTypeRecord]:
@@ -43,7 +43,7 @@ def list_full_enabled_types() -> List[TranslateTypeRecord]:
             .order_by(TranslateTypeRecord.tt_id.asc())
             .all()
         )
-        return orm_objs  # [TranslateTypeRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_translate_type(tt_id: int) -> TranslateTypeRecord | None:
@@ -53,7 +53,7 @@ def get_translate_type(tt_id: int) -> TranslateTypeRecord | None:
         if not orm_obj:
             logger.warning(f"TranslateType record with ID {tt_id} not found")
             return None
-        return orm_obj  # TranslateTypeRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_translate_type_by_title(title: str) -> TranslateTypeRecord | None:
@@ -62,7 +62,7 @@ def get_translate_type_by_title(title: str) -> TranslateTypeRecord | None:
         orm_obj = session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_title == title).first()
         if not orm_obj:
             return None
-        return orm_obj  # TranslateTypeRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_translate_type(
@@ -85,7 +85,7 @@ def add_translate_type(
             raise ValueError(f"Translate type '{tt_title}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # TranslateTypeRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_translate_type(
@@ -109,7 +109,7 @@ def add_or_update_translate_type(
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # TranslateTypeRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
@@ -120,7 +120,7 @@ def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
             raise ValueError(f"TranslateType record with ID {tt_id} not found")
 
         if not kwargs:
-            return orm_obj  # TranslateTypeRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -128,7 +128,7 @@ def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # TranslateTypeRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_translate_type(tt_id: int) -> TranslateTypeRecord:

@@ -19,7 +19,7 @@ def list_langs() -> List[LangRecord]:
     """Return all language records."""
     with get_session() as session:
         orm_objs = session.query(LangRecord).order_by(LangRecord.lang_id.asc()).all()
-        # return orm_objs # [LangRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        # return orm_objs
         return orm_objs
 
 
@@ -30,7 +30,7 @@ def get_lang(lang_id: int) -> LangRecord | None:
         if not orm_obj:
             logger.warning(f"Language record with ID {lang_id} not found")
             return None
-        return orm_obj  # LangRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_lang_by_code(code: str) -> LangRecord | None:
@@ -39,7 +39,7 @@ def get_lang_by_code(code: str) -> LangRecord | None:
         orm_obj = session.query(LangRecord).filter(LangRecord.code == code).first()
         if not orm_obj:
             return None
-        return orm_obj  # LangRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_lang(code: str, autonym: str, name: str) -> LangRecord:
@@ -58,7 +58,7 @@ def add_lang(code: str, autonym: str, name: str) -> LangRecord:
             raise ValueError(f"Language '{code}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # LangRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_lang(code: str, autonym: str, name: str) -> LangRecord:
@@ -78,7 +78,7 @@ def add_or_update_lang(code: str, autonym: str, name: str) -> LangRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # LangRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_lang(lang_id: int, **kwargs) -> LangRecord:
@@ -89,7 +89,7 @@ def update_lang(lang_id: int, **kwargs) -> LangRecord:
             raise ValueError(f"Language record with ID {lang_id} not found")
 
         if not kwargs:
-            return orm_obj  # LangRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -97,7 +97,7 @@ def update_lang(lang_id: int, **kwargs) -> LangRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # LangRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_lang(lang_id: int):

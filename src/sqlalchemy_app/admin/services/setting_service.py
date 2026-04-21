@@ -19,7 +19,7 @@ def list_settings() -> List[SettingRecord]:
     """Return all setting records."""
     with get_session() as session:
         orm_objs = session.query(SettingRecord).order_by(SettingRecord.id.asc()).all()
-        return [SettingRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_setting(setting_id: int) -> SettingRecord | None:
@@ -29,7 +29,7 @@ def get_setting(setting_id: int) -> SettingRecord | None:
         if not orm_obj:
             logger.warning(f"Setting record with ID {setting_id} not found")
             return None
-        return SettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_setting_by_key(key: str) -> SettingRecord | None:
@@ -38,7 +38,7 @@ def get_setting_by_key(key: str) -> SettingRecord | None:
         orm_obj = session.query(SettingRecord).filter(SettingRecord.key == key).first()
         if not orm_obj:
             return None
-        return SettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_setting(
@@ -70,20 +70,20 @@ def add_setting(
             raise ValueError(f"Setting with key '{key}' already exists") from None
 
         session.refresh(orm_obj)
-        return SettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_value(setting_id: int, value: Any) -> SettingRecord:
     """Update a setting record value."""
     with get_session() as session:
-        orm_obj = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
+        orm_obj: SettingRecord = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
         if not orm_obj:
             raise ValueError(f"Setting record with ID {setting_id} not found")
 
-        orm_obj.value = str(value) if value is not None else None
+        orm_obj.value = value  # str(value) if value is not None else None
         session.commit()
         session.refresh(orm_obj)
-        return SettingRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_setting(setting_id: int) -> SettingRecord:

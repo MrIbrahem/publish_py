@@ -19,7 +19,7 @@ def list_assessments() -> List[AssessmentRecord]:
     """Return all assessment records."""
     with get_session() as session:
         orm_objs = session.query(AssessmentRecord).order_by(AssessmentRecord.id.asc()).all()
-        return orm_objs  # [AssessmentRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_assessment(assessment_id: int) -> AssessmentRecord | None:
@@ -29,7 +29,7 @@ def get_assessment(assessment_id: int) -> AssessmentRecord | None:
         if not orm_obj:
             logger.warning(f"Assessment record with ID {assessment_id} not found")
             return None
-        return orm_obj  # AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_assessment_by_title(title: str) -> AssessmentRecord | None:
@@ -38,7 +38,7 @@ def get_assessment_by_title(title: str) -> AssessmentRecord | None:
         orm_obj = session.query(AssessmentRecord).filter(AssessmentRecord.title == title).first()
         if not orm_obj:
             return None
-        return orm_obj  # AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_assessment(title: str, importance: str | None = None) -> AssessmentRecord:
@@ -57,7 +57,7 @@ def add_assessment(title: str, importance: str | None = None) -> AssessmentRecor
             raise ValueError(f"Assessment for '{title}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_assessment(title: str, importance: str | None = None) -> AssessmentRecord:
@@ -76,7 +76,7 @@ def add_or_update_assessment(title: str, importance: str | None = None) -> Asses
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
@@ -87,7 +87,7 @@ def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
             raise ValueError(f"Assessment record with ID {assessment_id} not found")
 
         if not kwargs:
-            return orm_obj  # AssessmentRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -95,7 +95,7 @@ def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # AssessmentRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_assessment(assessment_id: int) -> AssessmentRecord:

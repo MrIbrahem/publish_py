@@ -19,7 +19,7 @@ def list_users_no_inprocess() -> List[UsersNoInprocessRecord]:
     """Return all users_no_inprocess records."""
     with get_session() as session:
         orm_objs = session.query(UsersNoInprocessRecord).order_by(UsersNoInprocessRecord.id.asc()).all()
-        return orm_objs  # [UsersNoInprocessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_active_users_no_inprocess() -> List[UsersNoInprocessRecord]:
@@ -31,7 +31,7 @@ def list_active_users_no_inprocess() -> List[UsersNoInprocessRecord]:
             .order_by(UsersNoInprocessRecord.id.asc())
             .all()
         )
-        return orm_objs  # [UsersNoInprocessRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord | None:
@@ -41,7 +41,7 @@ def get_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord | None:
         if not orm_obj:
             logger.warning(f"UsersNoInprocess record with ID {record_id} not found")
             return None
-        return orm_obj  # UsersNoInprocessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_users_no_inprocess_by_user(user: str) -> UsersNoInprocessRecord | None:
@@ -50,7 +50,7 @@ def get_users_no_inprocess_by_user(user: str) -> UsersNoInprocessRecord | None:
         orm_obj = session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.user == user).first()
         if not orm_obj:
             return None
-        return orm_obj  # UsersNoInprocessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRecord:
@@ -69,7 +69,7 @@ def add_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRec
             raise ValueError(f"UsersNoInprocess '{user}' already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # UsersNoInprocessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRecord:
@@ -88,7 +88,7 @@ def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoIn
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # UsersNoInprocessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecord:
@@ -99,7 +99,7 @@ def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecor
             raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
 
         if not kwargs:
-            return orm_obj  # UsersNoInprocessRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -107,7 +107,7 @@ def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecor
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # UsersNoInprocessRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord:

@@ -19,7 +19,7 @@ def list_views_new() -> List[ViewsNewRecord]:
     """Return all views_new records."""
     with get_session() as session:
         orm_objs = session.query(ViewsNewRecord).order_by(ViewsNewRecord.id.asc()).all()
-        return orm_objs  # [ViewsNewRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_views_by_target(target: str) -> List[ViewsNewRecord]:
@@ -31,7 +31,7 @@ def list_views_by_target(target: str) -> List[ViewsNewRecord]:
             .order_by(ViewsNewRecord.year.desc())
             .all()
         )
-        return orm_objs  # [ViewsNewRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def list_views_by_lang(lang: str) -> List[ViewsNewRecord]:
@@ -40,7 +40,7 @@ def list_views_by_lang(lang: str) -> List[ViewsNewRecord]:
         orm_objs = (
             session.query(ViewsNewRecord).filter(ViewsNewRecord.lang == lang).order_by(ViewsNewRecord.id.asc()).all()
         )
-        return orm_objs  # [ViewsNewRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs
 
 
 def get_views_new(view_id: int) -> ViewsNewRecord | None:
@@ -50,7 +50,7 @@ def get_views_new(view_id: int) -> ViewsNewRecord | None:
         if not orm_obj:
             logger.warning(f"ViewsNew record with ID {view_id} not found")
             return None
-        return orm_obj  # ViewsNewRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def get_views_by_target_lang_year(target: str, lang: str, year: int) -> ViewsNewRecord | None:
@@ -65,7 +65,7 @@ def get_views_by_target_lang_year(target: str, lang: str, year: int) -> ViewsNew
         )
         if not orm_obj:
             return None
-        return orm_obj  # ViewsNewRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_views_new(
@@ -93,7 +93,7 @@ def add_views_new(
             raise ValueError(f"Views record for '{target}' in '{lang}' for year {year} already exists") from None
 
         session.refresh(orm_obj)
-        return orm_obj  # ViewsNewRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def add_or_update_views_new(
@@ -127,7 +127,7 @@ def add_or_update_views_new(
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # ViewsNewRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
@@ -138,7 +138,7 @@ def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
             raise ValueError(f"ViewsNew record with ID {view_id} not found")
 
         if not kwargs:
-            return orm_obj  # ViewsNewRecord(**orm_obj.to_dict())
+            return orm_obj
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -146,7 +146,7 @@ def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return orm_obj  # ViewsNewRecord(**orm_obj.to_dict())
+        return orm_obj
 
 
 def delete_views_new(view_id: int) -> ViewsNewRecord:
