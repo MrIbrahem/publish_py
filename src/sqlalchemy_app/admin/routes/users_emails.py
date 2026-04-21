@@ -15,7 +15,6 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...sqlalchemy_models import ProjectRecord, UserRecord
 from ...public.services.project_service import list_projects
 from ...public.services.user_service import (
     add_user,
@@ -28,6 +27,7 @@ from ...public.services.user_service import (
     user_exists,
 )
 from ...shared.services.page_service import list_of_users_by_translations_count
+from ...sqlalchemy_models import ProjectRecord, UserRecord
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)

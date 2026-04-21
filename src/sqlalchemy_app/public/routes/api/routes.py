@@ -9,14 +9,13 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
-from ....sqlalchemy_models import InProcessRecord
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.services.category_service import list_categories
 from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
-from ....sqlalchemy_models import _CategoryRecord, _InProcessRecord, _LangRecord, _ReportRecord
+from ....sqlalchemy_models import InProcessRecord, LangRecord, _CategoryRecord, _ReportRecord
 from ...services.in_process_service import get_in_process_counts_by_user
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
@@ -181,25 +180,25 @@ def get_in_process() -> Response:
             # Perform the JOIN query using SQLAlchemy
             query = (
                 session.query(
-                    _InProcessRecord.id,
-                    _InProcessRecord.title,
-                    _InProcessRecord.user,
-                    _InProcessRecord.lang,
-                    _InProcessRecord.cat,
-                    _InProcessRecord.translate_type,
-                    _InProcessRecord.word,
-                    _InProcessRecord.add_date,
+                    InProcessRecord.id,
+                    InProcessRecord.title,
+                    InProcessRecord.user,
+                    InProcessRecord.lang,
+                    InProcessRecord.cat,
+                    InProcessRecord.translate_type,
+                    InProcessRecord.word,
+                    InProcessRecord.add_date,
                     _CategoryRecord.campaign.label("campaign"),
-                    _LangRecord.autonym.label("autonym"),
+                    LangRecord.autonym.label("autonym"),
                 )
-                .outerjoin(_CategoryRecord, _InProcessRecord.cat == _CategoryRecord.category)
-                .outerjoin(_LangRecord, _InProcessRecord.lang == _LangRecord.code)
+                .outerjoin(_CategoryRecord, InProcessRecord.cat == _CategoryRecord.category)
+                .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
             )
 
             if lang and lang != "All":
-                query = query.filter(_InProcessRecord.lang == lang)
+                query = query.filter(InProcessRecord.lang == lang)
 
-            results = query.order_by(_InProcessRecord.id.asc()).limit(limit).all()
+            results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()
 
             # Convert results to list of dicts
             data: List[Dict[str, Any]] = [

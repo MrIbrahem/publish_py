@@ -13,7 +13,7 @@ from sqlalchemy import Integer, case, cast, func
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....sqlalchemy_models import _LangRecord, PageRecord, _ViewsNewAllRecord, WordRecord
+from ....sqlalchemy_models import LangRecord, PageRecord, WordRecord, _ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ def get_top_langs() -> Response:
             query = (
                 session.query(
                     PageRecord.lang,
-                    _LangRecord.name.label("lang_name"),
+                    LangRecord.name.label("lang_name"),
                     func.count(PageRecord.target).label("targets"),
                     func.sum(word_expr).label("words"),
                     func.sum(views_expr).label("views"),
@@ -104,14 +104,14 @@ def get_top_langs() -> Response:
                     _ViewsNewAllRecord,
                     (PageRecord.target == _ViewsNewAllRecord.target) & (PageRecord.lang == _ViewsNewAllRecord.lang),
                 )
-                .outerjoin(_LangRecord, PageRecord.lang == _LangRecord.code)
+                .outerjoin(LangRecord, PageRecord.lang == LangRecord.code)
                 .filter(PageRecord.target != "")
                 .filter(PageRecord.target.is_not(None))
                 .filter(PageRecord.user != "")
                 .filter(PageRecord.user.is_not(None))
                 .filter(PageRecord.lang != "")
                 .filter(PageRecord.lang.is_not(None))
-                .group_by(PageRecord.lang, _LangRecord.name)
+                .group_by(PageRecord.lang, LangRecord.name)
                 .order_by(func.count(PageRecord.target).desc())
             )
 

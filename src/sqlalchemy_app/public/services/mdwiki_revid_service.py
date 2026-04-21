@@ -9,9 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import MdwikiRevidRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _MdwikiRevidRecord
+from ...sqlalchemy_models import MdwikiRevidRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,14 +18,14 @@ logger = logging.getLogger(__name__)
 def list_mdwiki_revids() -> List[MdwikiRevidRecord]:
     """Return all mdwiki_revid records."""
     with get_session() as session:
-        orm_objs = session.query(_MdwikiRevidRecord).order_by(_MdwikiRevidRecord.title.asc()).all()
+        orm_objs = session.query(MdwikiRevidRecord).order_by(MdwikiRevidRecord.title.asc()).all()
         return [MdwikiRevidRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_mdwiki_revid_by_title(title: str) -> MdwikiRevidRecord | None:
     """Get an mdwiki_revid record by title."""
     with get_session() as session:
-        orm_obj = session.query(_MdwikiRevidRecord).filter(_MdwikiRevidRecord.title == title).first()
+        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
         if not orm_obj:
             return None
         return MdwikiRevidRecord(**orm_obj.to_dict())
@@ -39,7 +38,7 @@ def add_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = _MdwikiRevidRecord(title=title, revid=revid)
+        orm_obj = MdwikiRevidRecord(title=title, revid=revid)
         session.add(orm_obj)
         try:
             session.commit()
@@ -58,11 +57,11 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = session.query(_MdwikiRevidRecord).filter(_MdwikiRevidRecord.title == title).first()
+        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
         if orm_obj:
             orm_obj.revid = revid
         else:
-            orm_obj = _MdwikiRevidRecord(title=title, revid=revid)
+            orm_obj = MdwikiRevidRecord(title=title, revid=revid)
             session.add(orm_obj)
 
         session.commit()
@@ -73,7 +72,7 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
 def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
     """Update an mdwiki_revid record."""
     with get_session() as session:
-        orm_obj = session.query(_MdwikiRevidRecord).filter(_MdwikiRevidRecord.title == title).first()
+        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
         if not orm_obj:
             raise ValueError(f"MDWiki revid record for '{title}' not found")
 
@@ -86,7 +85,7 @@ def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
 def delete_mdwiki_revid(title: str) -> MdwikiRevidRecord:
     """Delete an mdwiki_revid record by title."""
     with get_session() as session:
-        orm_obj = session.query(_MdwikiRevidRecord).filter(_MdwikiRevidRecord.title == title).first()
+        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
         if not orm_obj:
             raise ValueError(f"MDWiki revid record for '{title}' not found")
 

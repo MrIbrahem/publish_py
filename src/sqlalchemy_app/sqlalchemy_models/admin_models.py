@@ -5,7 +5,6 @@ Admin domain models.
 from __future__ import annotations
 
 import logging
-
 from typing import Any, Optional
 
 from sqlalchemy import Column, Enum, Integer, String, text

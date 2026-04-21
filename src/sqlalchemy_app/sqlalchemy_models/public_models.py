@@ -15,7 +15,7 @@ from sqlalchemy import Column, DateTime, Integer, String, func, text
 from ..shared.engine import BaseDb
 
 
-class _InProcessRecord(BaseDb):
+class InProcessRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS in_process (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -55,7 +55,7 @@ class _InProcessRecord(BaseDb):
         }
 
 
-class _LangRecord(BaseDb):
+class LangRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS langs (
         lang_id int NOT NULL AUTO_INCREMENT,
@@ -82,7 +82,7 @@ class _LangRecord(BaseDb):
         }
 
 
-class _MdwikiRevidRecord(BaseDb):
+class MdwikiRevidRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS mdwiki_revids (
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -103,7 +103,7 @@ class _MdwikiRevidRecord(BaseDb):
         }
 
 
-class _ProjectRecord(BaseDb):
+class ProjectRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS projects (
         g_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -125,7 +125,7 @@ class _ProjectRecord(BaseDb):
         }
 
 
-class _TranslateTypeRecord(BaseDb):
+class TranslateTypeRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS translate_type (
         tt_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -154,9 +154,9 @@ class _TranslateTypeRecord(BaseDb):
 
 
 __all__ = [
-    "_InProcessRecord",
-    "_LangRecord",
-    "_MdwikiRevidRecord",
-    "_ProjectRecord",
-    "_TranslateTypeRecord",
+    "InProcessRecord",
+    "LangRecord",
+    "MdwikiRevidRecord",
+    "ProjectRecord",
+    "TranslateTypeRecord",
 ]

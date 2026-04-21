@@ -10,8 +10,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import extract, func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import ReportRecord
-from ...sqlalchemy_models import _ReportRecord
+from ...sqlalchemy_models import ReportRecord, _ReportRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)

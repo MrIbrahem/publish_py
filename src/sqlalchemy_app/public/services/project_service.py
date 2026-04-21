@@ -9,9 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import ProjectRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _ProjectRecord
+from ...sqlalchemy_models import ProjectRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,14 +18,14 @@ logger = logging.getLogger(__name__)
 def list_projects() -> List[ProjectRecord]:
     """Return all project records."""
     with get_session() as session:
-        orm_objs = session.query(_ProjectRecord).order_by(_ProjectRecord.g_id.asc()).all()
+        orm_objs = session.query(ProjectRecord).order_by(ProjectRecord.g_id.asc()).all()
         return [ProjectRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_project(project_id: int) -> ProjectRecord | None:
     """Get a project record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_ProjectRecord).filter(_ProjectRecord.g_id == project_id).first()
+        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
         if not orm_obj:
             logger.warning(f"Project record with ID {project_id} not found")
             return None
@@ -36,7 +35,7 @@ def get_project(project_id: int) -> ProjectRecord | None:
 def get_project_by_title(title: str) -> ProjectRecord | None:
     """Get a project record by title."""
     with get_session() as session:
-        orm_obj = session.query(_ProjectRecord).filter(_ProjectRecord.g_title == title).first()
+        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_title == title).first()
         if not orm_obj:
             return None
         return ProjectRecord(**orm_obj.to_dict())
@@ -49,7 +48,7 @@ def add_project(g_title: str) -> ProjectRecord:
         raise ValueError("Project title is required")
 
     with get_session() as session:
-        orm_obj = _ProjectRecord(g_title=g_title)
+        orm_obj = ProjectRecord(g_title=g_title)
         session.add(orm_obj)
         try:
             session.commit()
@@ -64,7 +63,7 @@ def add_project(g_title: str) -> ProjectRecord:
 def update_project(project_id: int, **kwargs) -> ProjectRecord:
     """Update a project record."""
     with get_session() as session:
-        orm_obj = session.query(_ProjectRecord).filter(_ProjectRecord.g_id == project_id).first()
+        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
         if not orm_obj:
             raise ValueError(f"Project record with ID {project_id} not found")
 
@@ -83,7 +82,7 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord:
 def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
     """Update a project record."""
     with get_session() as session:
-        orm_obj = session.query(_ProjectRecord).filter(_ProjectRecord.g_id == project_id).first()
+        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
         if not orm_obj:
             raise ValueError(f"Project record with ID {project_id} not found")
 
@@ -97,7 +96,7 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
 def delete_project(project_id: int) -> ProjectRecord:
     """Delete a project record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_ProjectRecord).filter(_ProjectRecord.g_id == project_id).first()
+        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
         if not orm_obj:
             raise ValueError(f"Project record with ID {project_id} not found")
 

@@ -9,9 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import FullTranslatorRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _FullTranslatorRecord
+from ...sqlalchemy_models import FullTranslatorRecord, _FullTranslatorRecord
 
 logger = logging.getLogger(__name__)
 

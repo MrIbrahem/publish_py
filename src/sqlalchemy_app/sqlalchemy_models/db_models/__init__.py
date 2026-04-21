@@ -1,11 +1,3 @@
-
-from .public_models import (
-    InProcessRecord,
-    LangRecord,
-    MdwikiRevidRecord,
-    ProjectRecord,
-    TranslateTypeRecord,
-)
 from .qid_models import (
     QidRecord,
 )
@@ -27,12 +19,6 @@ from .views_models import (
 )
 
 __all__ = [
-    # public_models
-    "InProcessRecord",
-    "LangRecord",
-    "MdwikiRevidRecord",
-    "ProjectRecord",
-    "TranslateTypeRecord",
     # qid_models
     "QidRecord",
     # shared_models
