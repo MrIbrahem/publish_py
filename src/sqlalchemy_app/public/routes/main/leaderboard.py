@@ -14,11 +14,11 @@ from flask import (
 
 from ....shared.auth.identity import current_user
 
-bp_main = Blueprint("main", __name__, url_prefix="")
+bp_leaderboard = Blueprint("leaderboard", __name__, url_prefix="/leaderboard")
 logger = logging.getLogger(__name__)
 
 
-@bp_main.get("/")
+@bp_leaderboard.get("/")
 def index():
     current_user_obj = current_user()
     return render_template(
@@ -27,7 +27,7 @@ def index():
     )
 
 
-@bp_main.get("/reports")
+@bp_leaderboard.get("/reports")
 def reports():
     current_user_obj = current_user()
     return render_template(
@@ -36,7 +36,16 @@ def reports():
     )
 
 
-@bp_main.get("/missing")
+@bp_leaderboard.get("/leaderboard")
+def leaderboard():
+    current_user_obj = current_user()
+    return render_template(
+        "leaderboard.html",
+        current_user=current_user_obj,
+    )
+
+
+@bp_leaderboard.get("/missing")
 def missing():
     current_user_obj = current_user()
     return render_template(
@@ -45,9 +54,9 @@ def missing():
     )
 
 
-@bp_main.get("/favicon.ico")
+@bp_leaderboard.get("/favicon.ico")
 def favicon():
     return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
 
 
-__all__ = ["bp_main"]
+__all__ = ["bp_leaderboard"]

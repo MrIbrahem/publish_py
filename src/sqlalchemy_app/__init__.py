@@ -22,6 +22,7 @@ from .public.routes import (
     bp_cxtoken,
     bp_fixrefs,
     bp_main,
+    bp_leaderboard,
     bp_publish,
 )
 from .shared.auth.identity import current_user
@@ -112,6 +113,7 @@ def create_app(config_class: Type | None = None) -> Flask:
         init_db(db_url, True)
 
     app.register_blueprint(bp_main)
+    app.register_blueprint(bp_leaderboard)
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_cxtoken)
     app.register_blueprint(bp_publish)
