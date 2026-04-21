@@ -19,7 +19,7 @@ def list_full_translators() -> List[FullTranslatorRecord]:
     """Return all full translator records."""
     with get_session() as session:
         orm_objs = session.query(FullTranslatorRecord).order_by(FullTranslatorRecord.id.asc()).all()
-        return [FullTranslatorRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [FullTranslatorRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def list_active_full_translators() -> List[FullTranslatorRecord]:
@@ -31,7 +31,7 @@ def list_active_full_translators() -> List[FullTranslatorRecord]:
             .order_by(FullTranslatorRecord.id.asc())
             .all()
         )
-        return [FullTranslatorRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        return orm_objs  # [FullTranslatorRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_full_translator(translator_id: int) -> FullTranslatorRecord | None:
@@ -41,7 +41,7 @@ def get_full_translator(translator_id: int) -> FullTranslatorRecord | None:
         if not orm_obj:
             logger.warning(f"Full translator record with ID {translator_id} not found")
             return None
-        return FullTranslatorRecord(**orm_obj.to_dict())
+        return orm_obj  # FullTranslatorRecord(**orm_obj.to_dict())
 
 
 def get_full_translator_by_user(user: str) -> FullTranslatorRecord | None:
@@ -50,7 +50,7 @@ def get_full_translator_by_user(user: str) -> FullTranslatorRecord | None:
         orm_obj = session.query(FullTranslatorRecord).filter(FullTranslatorRecord.user == user).first()
         if not orm_obj:
             return None
-        return FullTranslatorRecord(**orm_obj.to_dict())
+        return orm_obj  # FullTranslatorRecord(**orm_obj.to_dict())
 
 
 def add_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
@@ -69,7 +69,7 @@ def add_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
             raise ValueError(f"Full translator '{user}' already exists") from None
 
         session.refresh(orm_obj)
-        return FullTranslatorRecord(**orm_obj.to_dict())
+        return orm_obj  # FullTranslatorRecord(**orm_obj.to_dict())
 
 
 def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
@@ -88,7 +88,7 @@ def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslat
 
         session.commit()
         session.refresh(orm_obj)
-        return FullTranslatorRecord(**orm_obj.to_dict())
+        return orm_obj  # FullTranslatorRecord(**orm_obj.to_dict())
 
 
 def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord:
@@ -99,7 +99,7 @@ def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord
             raise ValueError(f"Full translator record with ID {translator_id} not found")
 
         if not kwargs:
-            return FullTranslatorRecord(**orm_obj.to_dict())
+            return orm_obj  # FullTranslatorRecord(**orm_obj.to_dict())
 
         for key, value in kwargs.items():
             if hasattr(orm_obj, key):
@@ -107,7 +107,7 @@ def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord
 
         session.commit()
         session.refresh(orm_obj)
-        return FullTranslatorRecord(**orm_obj.to_dict())
+        return orm_obj  # FullTranslatorRecord(**orm_obj.to_dict())
 
 
 def delete_full_translator(translator_id: int) -> FullTranslatorRecord:
