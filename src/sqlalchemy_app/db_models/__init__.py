@@ -2,26 +2,29 @@ from .admin_models import (
     LanguageSettingRecord,
     SettingRecord,
 )
-from .public_models import (
+from .metrics_models import (
     AssessmentRecord,
-    EnwikiPageviewRecord,
+    RefsCountRecord,
+    WordRecord,
+)
+from .pages_models import (
+    PageRecord,
+    PagesUsersToMainRecord,
+    UserPageRecord,
+)
+from .public_models import (
     InProcessRecord,
     LangRecord,
     MdwikiRevidRecord,
-    PagesUsersToMainRecord,
     ProjectRecord,
-    RefsCountRecord,
     TranslateTypeRecord,
-    ViewsNewAllRecord,
-    ViewsNewRecord,
-    WordRecord,
+)
+from .qid_models import (
+    QidRecord,
 )
 from .shared_models import (
     CategoryRecord,
-    PageRecord,
-    QidRecord,
     ReportRecord,
-    UserPageRecord,
 )
 from .users_models import (
     CoordinatorRecord,
@@ -30,34 +33,43 @@ from .users_models import (
     UsersNoInprocessRecord,
     UserTokenRecord,
 )
+from .views_models import (
+    EnwikiPageviewRecord,
+    ViewsNewAllRecord,
+    ViewsNewRecord,
+)
 
 __all__ = [
     # admin_models
     "LanguageSettingRecord",
     "SettingRecord",
-    # public_models
+    # metrics_models
     "AssessmentRecord",
-    "EnwikiPageviewRecord",
+    "RefsCountRecord",
+    "WordRecord",
+    # pages_models
+    "PageRecord",
+    "UserPageRecord",
+    "PagesUsersToMainRecord",
+    # public_models
     "InProcessRecord",
     "LangRecord",
     "MdwikiRevidRecord",
-    "PagesUsersToMainRecord",
     "ProjectRecord",
-    "RefsCountRecord",
     "TranslateTypeRecord",
-    "ViewsNewRecord",
-    "ViewsNewAllRecord",
-    "WordRecord",
+    # qid_models
+    "QidRecord",
+    # shared_models
+    "ReportRecord",
+    "CategoryRecord",
     # users_models
     "CoordinatorRecord",
     "FullTranslatorRecord",
     "UsersNoInprocessRecord",
     "UserTokenRecord",
     "UserRecord",
-    # shared_models
-    "PageRecord",
-    "ReportRecord",
-    "CategoryRecord",
-    "UserPageRecord",
-    "QidRecord",
+    # views_models
+    "EnwikiPageviewRecord",
+    "ViewsNewRecord",
+    "ViewsNewAllRecord",
 ]
