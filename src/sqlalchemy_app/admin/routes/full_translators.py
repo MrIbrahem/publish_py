@@ -30,7 +30,7 @@ def _full_translators_dashboard():
 
     translators = list_full_translators()
     total = len(translators)
-    is_active = sum(1 for tr in translators if tr.active)
+    is_active = sum(1 for tr in translators if tr.is_active)
 
     return render_template(
         "admins/full_translators.html",

@@ -36,6 +36,24 @@ def reports():
     )
 
 
+@bp_main.get("/leaderboard")
+def leaderboard():
+    current_user_obj = current_user()
+    return render_template(
+        "leaderboard.html",
+        current_user=current_user_obj,
+    )
+
+
+@bp_main.get("/missing")
+def missing():
+    current_user_obj = current_user()
+    return render_template(
+        "missing.html",
+        current_user=current_user_obj,
+    )
+
+
 @bp_main.get("/favicon.ico")
 def favicon():
     return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")

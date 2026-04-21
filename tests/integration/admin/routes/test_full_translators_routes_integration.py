@@ -27,8 +27,8 @@ class TestFullTranslatorsDashboard:
             mock_coords.return_value = ["TestUser"]
             with patch("src.sqlalchemy_app.admin.routes.full_translators.list_full_translators") as mock_list:
                 mock_list.return_value = [
-                    MagicMock(user="Translator1", active=True),
-                    MagicMock(user="Translator2", active=False),
+                    MagicMock(user="Translator1", is_active=True),
+                    MagicMock(user="Translator2", is_active=False),
                 ]
 
                 response = auth_client.get("/admin/full_translators")

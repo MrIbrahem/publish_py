@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-from sqlalchemy import Column, Date, DateTime, Integer, MetaData, String, Table, func, text
+from sqlalchemy import Column, Date, DateTime, Integer, MetaData, String, Table, UniqueConstraint, func, text
 from sqlalchemy.orm import sessionmaker
 
 if sys:
@@ -178,7 +178,34 @@ def setup_db():
     )
     pages_users.create(engine)
 
-    BaseDb.metadata.create_all(engine)
+    # Create views_new table first (needed for views_new_all view)
+    views_new = Table(
+        "views_new",
+        meta,
+        Column("id", Integer, primary_key=True),
+        Column("target", String(120), nullable=False),
+        Column("lang", String(30), nullable=False),
+        Column("year", Integer, nullable=False),
+        Column("views", Integer, nullable=True),
+        UniqueConstraint("target", "lang", "year", name="target_lang_year"),
+    )
+    views_new.create(engine)
+
+    # Create views_new_all as a view
+    with engine.connect() as conn:
+        conn.execute(text("""
+            CREATE VIEW IF NOT EXISTS views_new_all AS
+            SELECT target, lang, SUM(views) as views
+            FROM views_new
+            GROUP BY target, lang
+        """))
+        conn.commit()
+
+    # Create all other tables except views_new_all (which is already created as a view)
+    for table in BaseDb.metadata.sorted_tables:
+        if table.name != "views_new_all":
+            table.create(engine, checkfirst=True)
+
     factory = sessionmaker(bind=engine, expire_on_commit=False)
 
     with patch.object(engine_mod, "_SessionFactory", factory):

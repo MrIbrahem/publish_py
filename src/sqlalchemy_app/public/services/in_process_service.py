@@ -166,6 +166,24 @@ def is_in_process(title: str, user: str, lang: str) -> bool:
     return record is not None
 
 
+def get_in_process_counts_by_user() -> List[dict]:
+    """Get count of in-process translations per user, sorted by count descending."""
+    with get_session() as session:
+        results = (
+            session.query(
+                _InProcessRecord.user,
+                func.count(_InProcessRecord.id).label("article_count"),
+            )
+            .group_by(_InProcessRecord.user)
+            .order_by(func.count(_InProcessRecord.id).desc())
+            .all()
+        )
+        return [
+            {"user": row.user, "article_count": row.article_count}
+            for row in results
+        ]
+
+
 __all__ = [
     "list_in_process",
     "list_in_process_by_user",
@@ -177,4 +195,5 @@ __all__ = [
     "delete_in_process",
     "delete_in_process_by_title_user_lang",
     "is_in_process",
+    "get_in_process_counts_by_user",
 ]

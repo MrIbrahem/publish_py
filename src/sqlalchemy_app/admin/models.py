@@ -48,7 +48,7 @@ class _FullTranslatorRecord(BaseDb):
     CREATE TABLE IF NOT EXISTS full_translators (
         id int unsigned NOT NULL AUTO_INCREMENT,
         user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-        active int NOT NULL DEFAULT '1',
+        is_active int NOT NULL DEFAULT '1',
         PRIMARY KEY (id),
         UNIQUE KEY user (user)
     )
@@ -58,13 +58,13 @@ class _FullTranslatorRecord(BaseDb):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user = Column(String(120), unique=True, nullable=False)
-    active = Column(Integer, nullable=False, default=1)
+    is_active = Column(Integer, nullable=False, default=1)
 
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "user": self.user,
-            "active": self.active,
+            "is_active": self.is_active,
         }
 
 
@@ -142,7 +142,7 @@ class _UsersNoInprocessRecord(BaseDb):
     CREATE TABLE IF NOT EXISTS users_no_inprocess (
         id int unsigned NOT NULL AUTO_INCREMENT,
         user varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-        active int NOT NULL DEFAULT '1',
+        is_active int NOT NULL DEFAULT '1',
         PRIMARY KEY (id),
         UNIQUE KEY user (user)
     )
@@ -153,13 +153,13 @@ class _UsersNoInprocessRecord(BaseDb):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user = Column(String(120), unique=True, nullable=False)
-    active = Column(Integer, nullable=False, default=1)
+    is_active = Column(Integer, nullable=False, default=1)
 
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "user": self.user,
-            "active": self.active,
+            "is_active": self.is_active,
         }
 
 

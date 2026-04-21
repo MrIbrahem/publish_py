@@ -50,11 +50,12 @@ def create_side(active_route):
     main_menu = {
         "Translations": [
             SidebarItem(
-                id="last_coord",
+                id="last",
                 admin=1,
-                href="last_coord",
+                href="last",
                 title="Recent",
                 icon="bi-clock-history",
+                ready=True,
             ),
             SidebarItem(
                 id="process",
@@ -62,6 +63,7 @@ def create_side(active_route):
                 href="process",
                 title="In Process",
                 icon="bi-hourglass",
+                ready=True,
             ),
             SidebarItem(
                 id="process_total",
@@ -69,6 +71,7 @@ def create_side(active_route):
                 href="process_total",
                 title="In Process (Total)",
                 icon="bi-hourglass-split",
+                ready=True,
             ),
             SidebarItem(
                 id="reports",

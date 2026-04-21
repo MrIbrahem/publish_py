@@ -17,21 +17,21 @@ class TestUsersNoInprocessRecord:
         record = UsersNoInprocessRecord(id=1, user="TestUser")
         assert record.id == 1
         assert record.user == "TestUser"
-        assert record.active == 1  # Default value
+        assert record.is_active == 1  # Default value
 
     def test_create_with_all_fields(self):
         """Test creating UsersNoInprocessRecord with all fields."""
-        record = UsersNoInprocessRecord(id=1, user="TestUser", active=0)
+        record = UsersNoInprocessRecord(id=1, user="TestUser", is_active=0)
         assert record.id == 1
         assert record.user == "TestUser"
-        assert record.active == 0
+        assert record.is_active == 0
 
     def test_to_dict(self):
         """Test converting UsersNoInprocessRecord to dictionary."""
-        record = UsersNoInprocessRecord(id=1, user="TestUser", active=1)
+        record = UsersNoInprocessRecord(id=1, user="TestUser", is_active=1)
         result = record.to_dict()
         assert result == {
             "id": 1,
             "user": "TestUser",
-            "active": 1,
+            "is_active": 1,
         }

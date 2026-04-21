@@ -31,14 +31,14 @@ class FullTranslatorRecord:
 
     id: int
     user: str
-    active: int = 1
+    is_active: int = 1
 
     def to_dict(self) -> dict:
         """Convert record to dictionary."""
         return {
             "id": self.id,
             "user": self.user,
-            "active": self.active,
+            "is_active": self.is_active,
         }
 
 
@@ -115,14 +115,14 @@ class UsersNoInprocessRecord:
 
     id: int
     user: str
-    active: int = 1
+    is_active: int = 1
 
     def to_dict(self) -> dict:
         """Convert record to dictionary."""
         return {
             "id": self.id,
             "user": self.user,
-            "active": self.active,
+            "is_active": self.is_active,
         }
 
 

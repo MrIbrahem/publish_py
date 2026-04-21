@@ -27,8 +27,8 @@ class TestUsersNoInprocessDashboard:
             mock_coords.return_value = ["TestUser"]
             with patch("src.sqlalchemy_app.admin.routes.users_no_inprocess.list_users_no_inprocess") as mock_list:
                 mock_list.return_value = [
-                    MagicMock(user="User1", active=True),
-                    MagicMock(user="User2", active=False),
+                    MagicMock(user="User1", is_active=True),
+                    MagicMock(user="User2", is_active=False),
                 ]
 
                 response = auth_client.get("/admin/users_no_inprocess")

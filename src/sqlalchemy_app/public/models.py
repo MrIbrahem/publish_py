@@ -4,7 +4,7 @@ Public domain models.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, func, text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, event, func, text
 
 from ..shared.engine import BaseDb
 
@@ -95,7 +95,7 @@ class _InProcessRecord(BaseDb):
             "cat": self.cat,
             "translate_type": self.translate_type,
             "word": self.word,
-            "add_date": self.add_date,
+            "add_date": str(self.add_date) if self.add_date else self.add_date,
         }
 
 
@@ -320,6 +320,35 @@ class _ViewsNewRecord(BaseDb):
         }
 
 
+class _ViewsNewAllRecord(BaseDb):
+    """
+    CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `views_new_all` AS
+        SELECT `v`.`target` AS `target`,
+               `v`.`lang` AS `lang`,
+               SUM(`v`.`views`) AS `views`
+        FROM `views_new` `v`
+        GROUP BY `v`.`target`, `v`.`lang`
+    """
+
+    __tablename__ = "views_new_all"
+
+    target = Column(String(120), primary_key=True, nullable=False)
+    lang = Column(String(30), primary_key=True, nullable=False)
+    views = Column(Integer, default=0, server_default=text("0"))
+
+    __table_args__ = (
+        # Prevent SQLAlchemy from trying to create this as a table
+        {'info': {'is_view': True}},
+    )
+
+    def to_dict(self) -> dict:
+        return {
+            "target": self.target,
+            "lang": self.lang,
+            "views": self.views,
+        }
+
+
 class _WordRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS words (
@@ -360,5 +389,6 @@ __all__ = [
     "_TranslateTypeRecord",
     "_UserRecord",
     "_ViewsNewRecord",
+    "_ViewsNewAllRecord",
     "_WordRecord",
 ]

@@ -71,19 +71,19 @@
                         <td>{{ translator.user }}</td>
                         <td class="text-center">
                             {% set endpoint_target = 'admin.deactivate_full_translator' if translator.is_active else 'admin.activate_full_translator' %}
-                            <form method="post"
-                                action="{{ url_for(endpoint_target, record_id=translator.id) }}"
+                            <form method="post" action="{{ url_for(endpoint_target, record_id=translator.id) }}"
                                 class="d-inline">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                 <div class="form-check form-switch d-inline-flex align-items-center">
-                                    <input type="hidden" name="active" id="translator-active-value-{{ translator.id }}"
-                                        value="{{ 1 if translator.active else 0 }}">
+                                    <input type="hidden" name="is_active"
+                                        id="translator-is_active-value-{{ translator.id }}"
+                                        value="{{ 1 if translator.is_active else 0 }}">
                                     <input class="form-check-input" type="checkbox" role="switch"
-                                        id="translator-active-{{ translator.id }}"
-                                        {% if translator.active %}checked{% endif %}
-                                        onchange="document.getElementById('translator-active-value-{{ translator.id }}').value = this.checked ? '1' : '0'; this.form.submit();">
-                                    <label class="visually-hidden" for="translator-active-{{ translator.id }}">Toggle
-                                        translator active state</label>
+                                        id="translator-is_active-{{ translator.id }}"
+                                        {% if translator.is_active %}checked{% endif %}
+                                        onchange="document.getElementById('translator-is_active-value-{{ translator.id }}').value = this.checked ? '1' : '0'; this.form.submit();">
+                                    <label class="visually-hidden" for="translator-is_active-{{ translator.id }}">Toggle
+                                        translator is_active state</label>
                                 </div>
                             </form>
                         </td>

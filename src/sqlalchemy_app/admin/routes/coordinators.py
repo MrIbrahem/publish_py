@@ -64,7 +64,7 @@ def _add_coordinator() -> ResponseReturnValue:
 
 
 def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
-    """Shared helper to update coordinator active status."""
+    """Shared helper to update coordinator is_active status."""
     action = "activate" if is_active else "deactivate"
     past_tense = "activated" if is_active else "deactivated"
     try:
