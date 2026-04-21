@@ -20,37 +20,24 @@ logger = logging.getLogger(__name__)
 
 @bp_leaderboard.get("/")
 def index():
-    current_user_obj = current_user()
     return render_template(
-        "index.html",
-        current_user=current_user_obj,
+        "leaderboard/index.html",
     )
 
 
-@bp_leaderboard.get("/reports")
-def reports():
-    current_user_obj = current_user()
+@bp_leaderboard.get("/langs/<string:lang_code>")
+def langs(lang_code: str):
     return render_template(
-        "reports.html",
-        current_user=current_user_obj,
+        "leaderboard/langs.html",
+        lang_code=lang_code,
     )
 
 
-@bp_leaderboard.get("/leaderboard")
-def leaderboard():
-    current_user_obj = current_user()
+@bp_leaderboard.get("/users/<string:username>")
+def users(username: str):
     return render_template(
-        "leaderboard.html",
-        current_user=current_user_obj,
-    )
-
-
-@bp_leaderboard.get("/missing")
-def missing():
-    current_user_obj = current_user()
-    return render_template(
-        "missing.html",
-        current_user=current_user_obj,
+        "leaderboard/users.html",
+        username=username,
     )
 
 

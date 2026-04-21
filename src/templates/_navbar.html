@@ -36,10 +36,10 @@
                     {% set nav_item_class = "nav-item col-lg-auto col-md-4 col-sm-6 col-6" %}
                     <li class="{{ nav_item_class }}">
                         {{ nav_link_with_args(
-                            'main.leaderboard',
+                            'leaderboard.index',
                             'bi-bar-chart-line',
                             'Leaderboard',
-                            url_for('main.leaderboard'),
+                            url_for('leaderboard.index'),
                             '/leaderboard',
                             )
                         }}

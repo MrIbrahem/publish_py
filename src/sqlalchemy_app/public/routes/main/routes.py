@@ -12,36 +12,28 @@ from flask import (
     send_from_directory,
 )
 
-from ....shared.auth.identity import current_user
-
 bp_main = Blueprint("main", __name__, url_prefix="")
 logger = logging.getLogger(__name__)
 
 
 @bp_main.get("/")
 def index():
-    current_user_obj = current_user()
     return render_template(
         "index.html",
-        current_user=current_user_obj,
     )
 
 
 @bp_main.get("/reports")
 def reports():
-    current_user_obj = current_user()
     return render_template(
         "reports.html",
-        current_user=current_user_obj,
     )
 
 
 @bp_main.get("/missing")
 def missing():
-    current_user_obj = current_user()
     return render_template(
         "missing.html",
-        current_user=current_user_obj,
     )
 
 
