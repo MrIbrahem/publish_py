@@ -1,4 +1,10 @@
-
+from .admin_models import (
+    CoordinatorRecord,
+    FullTranslatorRecord,
+    LanguageSettingRecord,
+    SettingRecord,
+    UsersNoInprocessRecord,
+)
 from .public_models import (
     AssessmentRecord,
     EnwikiPageviewRecord,
@@ -10,26 +16,17 @@ from .public_models import (
     RefsCountRecord,
     TranslateTypeRecord,
     UserRecord,
-    ViewsNewRecord,
     ViewsNewAllRecord,
+    ViewsNewRecord,
     WordRecord,
 )
-
 from .shared_models import (
-    PageRecord,
-    ReportRecord,
-    UserTokenRecord,
     CategoryRecord,
-    UserPageRecord,
+    PageRecord,
     QidRecord,
-)
-
-from .admin_models import (
-    CoordinatorRecord,
-    FullTranslatorRecord,
-    LanguageSettingRecord,
-    SettingRecord,
-    UsersNoInprocessRecord,
+    ReportRecord,
+    UserPageRecord,
+    UserTokenRecord,
 )
 
 __all__ = [
@@ -39,7 +36,6 @@ __all__ = [
     "LanguageSettingRecord",
     "SettingRecord",
     "UsersNoInprocessRecord",
-
     # public_models
     "AssessmentRecord",
     "EnwikiPageviewRecord",
@@ -54,7 +50,6 @@ __all__ = [
     "ViewsNewRecord",
     "ViewsNewAllRecord",
     "WordRecord",
-
     # shared_models
     "PageRecord",
     "ReportRecord",

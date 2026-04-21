@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from src.sqlalchemy_app.db_models import UserRecord
-from src.sqlalchemy_app.sqlalchemy_models import _UserRecord
 from src.sqlalchemy_app.public.services.user_service import (
     add_user,
     delete_user,
@@ -13,6 +12,7 @@ from src.sqlalchemy_app.public.services.user_service import (
     update_user_data,
     user_exists,
 )
+from src.sqlalchemy_app.sqlalchemy_models import _UserRecord
 
 
 def test_user_workflow():
