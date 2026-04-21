@@ -49,6 +49,12 @@ class PageRecord(BaseDb):
     deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
     mdwiki_revid = Column(Integer, nullable=True)
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "deleted" not in kwargs:
+            kwargs["deleted"] = 0
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -141,6 +147,16 @@ class PagesUsersToMainRecord(BaseDb):
     new_target = Column(String(255), nullable=False, default="")
     new_user = Column(String(255), nullable=False, default="")
     new_qid = Column(String(255), nullable=False, default="")
+
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "new_target" not in kwargs:
+            kwargs["new_target"] = ""
+        if "new_user" not in kwargs:
+            kwargs["new_user"] = ""
+        if "new_qid" not in kwargs:
+            kwargs["new_qid"] = ""
+        super().__init__(**kwargs)
 
     def to_dict(self) -> dict:
         return {

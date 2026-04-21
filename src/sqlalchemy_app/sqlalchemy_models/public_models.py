@@ -42,6 +42,16 @@ class InProcessRecord(BaseDb):
     word = Column(Integer, default=0, server_default=text("0"))
     add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "cat" not in kwargs:
+            kwargs["cat"] = "RTT"
+        if "translate_type" not in kwargs:
+            kwargs["translate_type"] = "lead"
+        if "word" not in kwargs:
+            kwargs["word"] = 0
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -143,6 +153,14 @@ class TranslateTypeRecord(BaseDb):
     tt_title = Column(String(120), unique=True, nullable=False)
     tt_lead = Column(Integer, nullable=False, default=1)
     tt_full = Column(Integer, nullable=False, default=0, server_default=text("0"))
+
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "tt_lead" not in kwargs:
+            kwargs["tt_lead"] = 1
+        if "tt_full" not in kwargs:
+            kwargs["tt_full"] = 0
+        super().__init__(**kwargs)
 
     def to_dict(self) -> dict:
         return {

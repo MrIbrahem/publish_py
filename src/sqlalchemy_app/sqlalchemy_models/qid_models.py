@@ -29,15 +29,9 @@ class QidRecord(BaseDb):
     title = Column(String(255), unique=True, nullable=False)
     add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "qid": self.qid,
-            "title": self.title,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-        }
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    def __post_init__(self) -> None:
         # Validate that required fields are not empty
         if not self.title:
             raise ValueError("Title cannot be empty")
@@ -48,6 +42,14 @@ class QidRecord(BaseDb):
         # Validate QID format (should start with Q followed by digits)
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "title": self.title,
+            "add_date": str(self.add_date) if self.add_date else self.add_date,
+        }
 
 
 __all__ = [

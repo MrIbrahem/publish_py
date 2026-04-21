@@ -43,6 +43,32 @@ class CategoryRecord(BaseDb):
     depth = Column(Integer, nullable=False, default=0)
     is_default = Column(Integer, nullable=False, default=0)
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "display" not in kwargs:
+            kwargs["display"] = ""
+        if "category2" not in kwargs:
+            kwargs["category2"] = ""
+        if "depth" not in kwargs:
+            kwargs["depth"] = 0
+        if "is_default" not in kwargs:
+            kwargs["is_default"] = 0
+
+        # Convert depth and is_default to int
+        if "depth" in kwargs:
+            kwargs["depth"] = int(kwargs["depth"]) if kwargs["depth"] is not None else 0
+        if "is_default" in kwargs:
+            kwargs["is_default"] = int(kwargs["is_default"]) if kwargs["is_default"] is not None else 0
+
+        super().__init__(**kwargs)
+
+        # Validate that required fields are not empty
+        if not self.category:
+            raise ValueError("Category name cannot be empty")
+
+        if not self.campaign:
+            raise ValueError("Campaign name cannot be empty")
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -53,17 +79,6 @@ class CategoryRecord(BaseDb):
             "depth": self.depth,
             "is_default": self.is_default,
         }
-
-    def __post_init__(self) -> None:
-        # Validate that required fields are not empty
-        if not self.category:
-            raise ValueError("Category name cannot be empty")
-
-        if not self.campaign:
-            raise ValueError("Campaign name cannot be empty")
-
-        self.depth = int(self.depth) or 0
-        self.is_default = int(self.is_default) or 0
 
 
 class ReportRecord(BaseDb):

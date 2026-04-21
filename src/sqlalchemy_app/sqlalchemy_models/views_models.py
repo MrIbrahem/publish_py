@@ -26,6 +26,12 @@ class EnwikiPageviewRecord(BaseDb):
     title = Column(String(120), unique=True, nullable=False)
     en_views = Column(Integer, default=0, server_default=text("0"))
 
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "en_views" not in kwargs:
+            kwargs["en_views"] = 0
+        super().__init__(**kwargs)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -57,6 +63,12 @@ class ViewsNewRecord(BaseDb):
     views = Column(Integer, default=0, server_default=text("0"))
 
     __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
+
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "views" not in kwargs:
+            kwargs["views"] = 0
+        super().__init__(**kwargs)
 
     def to_dict(self) -> dict:
         return {
