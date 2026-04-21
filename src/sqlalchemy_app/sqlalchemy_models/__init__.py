@@ -29,7 +29,7 @@ from .dashboard import (
 
 from .publish import ReportRecord
 
-from .user import (
+from .users import (
     CoordinatorRecord,
     FullTranslatorRecord,
     UserRecord,

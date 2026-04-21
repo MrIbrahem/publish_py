@@ -15,56 +15,6 @@ from sqlalchemy import Column, DateTime, Integer, String, func, text
 from ..shared.engine import BaseDb
 
 
-class InProcessRecord(BaseDb):
-    """
-    CREATE TABLE IF NOT EXISTS in_process (
-        id int unsigned NOT NULL AUTO_INCREMENT,
-        title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        user varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        lang varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-        cat varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT 'RTT',
-        translate_type varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'lead',
-        word int DEFAULT '0',
-        add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        KEY title (title)
-    )
-    """
-
-    __tablename__ = "in_process"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(255), nullable=False)
-    user = Column(String(255), nullable=False)
-    lang = Column(String(30), nullable=False)
-    cat = Column(String(255), default="RTT", server_default=text("'RTT'"))
-    translate_type = Column(String(20), default="lead", server_default=text("'lead'"))
-    word = Column(Integer, default=0, server_default=text("0"))
-    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-
-    def __init__(self, **kwargs):
-        # Apply Python-level defaults for fields not provided
-        if "cat" not in kwargs:
-            kwargs["cat"] = "RTT"
-        if "translate_type" not in kwargs:
-            kwargs["translate_type"] = "lead"
-        if "word" not in kwargs:
-            kwargs["word"] = 0
-        super().__init__(**kwargs)
-
-    def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "user": self.user,
-            "lang": self.lang,
-            "cat": self.cat,
-            "translate_type": self.translate_type,
-            "word": self.word,
-            "add_date": str(self.add_date) if self.add_date else self.add_date,
-        }
-
-
 class LangRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS langs (
@@ -113,28 +63,6 @@ class MdwikiRevidRecord(BaseDb):
         }
 
 
-class ProjectRecord(BaseDb):
-    """
-    CREATE TABLE IF NOT EXISTS projects (
-        g_id int unsigned NOT NULL AUTO_INCREMENT,
-        g_title varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-        PRIMARY KEY (g_id),
-        UNIQUE KEY g_title (g_title)
-    )
-    """
-
-    __tablename__ = "projects"
-
-    g_id = Column(Integer, primary_key=True, autoincrement=True)
-    g_title = Column(String(120), unique=True, nullable=False)
-
-    def to_dict(self) -> dict:
-        return {
-            "g_id": self.g_id,
-            "g_title": self.g_title,
-        }
-
-
 class TranslateTypeRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS translate_type (
@@ -172,7 +100,6 @@ class TranslateTypeRecord(BaseDb):
 
 
 __all__ = [
-    "InProcessRecord",
     "LangRecord",
     "MdwikiRevidRecord",
     "ProjectRecord",
