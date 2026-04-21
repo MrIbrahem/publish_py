@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 from flask import render_template, request
-
+from datetime import date, timedelta
 from ...public.routes.api.pages_query_service import list_pages_users, list_pages_with_views
 from ...public.services.lang_service import list_langs
 
@@ -39,4 +39,5 @@ def last_translations_dashboard() -> str:
         current_lang=lang,
         last_table=last_table,
         count=len(rows),
+        yesterday=(date.today() - timedelta(days=1)).isoformat(),
     )

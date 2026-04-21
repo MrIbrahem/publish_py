@@ -15,11 +15,13 @@
                     <span class="input-group-text">Namespace:</span>
                     <div class="form-control d-flex gap-3">
                         <div class="form-check form-check-inline mb-0">
-                            <input class="form-check-input" type="radio" name="last_table" id="radio_pages" value="pages" {% if last_table == 'pages' %}checked{% endif %}>
+                            <input class="form-check-input" type="radio" name="last_table" id="radio_pages"
+                                value="pages" {% if last_table == 'pages' %}checked{% endif %}>
                             <label class="form-check-label" for="radio_pages">Main</label>
                         </div>
                         <div class="form-check form-check-inline mb-0">
-                            <input class="form-check-input" type="radio" name="last_table" id="radio_pages_users" value="pages_users" {% if last_table == 'pages_users' %}checked{% endif %}>
+                            <input class="form-check-input" type="radio" name="last_table" id="radio_pages_users"
+                                value="pages_users" {% if last_table == 'pages_users' %}checked{% endif %}>
                             <label class="form-check-label" for="radio_pages_users">User</label>
                         </div>
                     </div>
@@ -30,7 +32,8 @@
                     <select class="form-select" id="lang" name="lang" aria-label="Language code">
                         <option value="All" {% if current_lang == 'All' %}selected{% endif %}>All</option>
                         {% for lang in languages %}
-                        <option value="{{ lang.code }}" {% if current_lang == lang.code %}selected{% endif %}>({{ lang.code }}) {{ lang.autonym }}</option>
+                        <option value="{{ lang.code }}" {% if current_lang == lang.code %}selected{% endif %}>
+                            ({{ lang.code }}) {{ lang.autonym }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -67,27 +70,32 @@
                         <td>{{ loop.index }}</td>
                         <td>
                             {% set display_user = row.user[:15] if row.user and row.user|length > 15 else row.user %}
-                            <a href="{{ url_for('admin.full_translators_dashboard') }}?user={{ row.user }}" data-bs-toggle="tooltip" title="{{ row.user }}">{{ display_user }}</a>
+                            <a href="/leaderboard/users/{{ row.user }}" data-bs-toggle="tooltip"
+                                title="{{ row.user }}">{{ display_user }}</a>
                         </td>
                         <td>
-                            <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}" target="_blank">{{ row.title }}</a>
+                            <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}"
+                                target="_blank">{{ row.title }}</a>
                         </td>
                         <td>{{ row.campaign or row.cat }}</td>
                         <td>
-                            <a href="/Translation_Dashboard/leaderboard.php?langcode={{ row.lang }}">{{ row.lang }}</a>:
-                            <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}" target="_blank">{{ row.target }}</a>
+                            <a href="/leaderboard/langs/{{ row.lang }}">{{ row.lang }}</a>:
+                            <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}"
+                                target="_blank">{{ row.target }}</a>
                         </td>
                         <td>{{ row.pupdate }}</td>
                         <td>
                             {% if last_table == 'pages' and row.views %}
-                            <a href="https://pageviews.wmcloud.org/?project={{ row.lang }}.wikipedia.org&platform=all-access&agent=all-agents&start={{ row.pupdate or '2019-01-01' }}&end={{ yesterday }}&redirects=0&pages={{ row.target | replace(' ', '_') | urlencode }}" target="_blank">{{ "{:,}".format(row.views) }}</a>
+                            <a href="https://pageviews.wmcloud.org/?project={{ row.lang }}.wikipedia.org&platform=all-access&agent=all-agents&start={{ row.pupdate or '2019-01-01' }}&end={{ yesterday }}&redirects=0&pages={{ row.target | replace(' ', '_') | urlencode }}"
+                                target="_blank">{{ "{:,}".format(row.views) }}</a>
                             {% else %}
                             <span class="text-muted">-</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if row.add_date %}
-                            <a href="//mdwikicx.toolforge.org/wiki/{{ row.lang }}/{{ row.title | replace(' ', '_') | urlencode }}" target="_blank">{{ row.add_date[:10] if 'T' in row.add_date else row.add_date }}</a>
+                            <a href="//mdwikicx.toolforge.org/wiki/{{ row.lang }}/{{ row.title | replace(' ', '_') | urlencode }}"
+                                target="_blank">{{ row.add_date[:10] if 'T' in row.add_date else row.add_date }}</a>
                             {% else %}
                             <span class="text-muted">-</span>
                             {% endif %}

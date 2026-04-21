@@ -159,11 +159,11 @@ def create_views_new_all_view(target, connection, **kw):
         if name not in existing_views:
             try:
                 connection.execute(text(query))
-                print(f"Successfully created view: {name}")
+                logger.info(f"Successfully created view: {name}")
             except Exception as e:
-                print(f"Error creating view {name}: {e}")
+                logger.exception(f"Error creating view {name}", exc_info=True)
         else:
-            print(f"View '{name}' already exists, skipping.")
+            logger.info(f"View '{name}' already exists, skipping.")
 
 
 __all__ = [

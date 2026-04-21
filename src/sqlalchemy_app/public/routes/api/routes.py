@@ -325,20 +325,20 @@ def get_pages_with_views() -> Response:
 
 @bp_api.route("/categories", methods=["GET"])
 @check_cors
-def list_categories_views() -> Response:
+def get_categories() -> Response:
     """
-    Handle pages_with_views API requests.
+    Handle categories API requests. Returns all category records.
     """
     try:
-        data = list_categories()
+        records = list_categories()
     except Exception:
-        logger.exception("Error fetching pages_with_views data")
-        return jsonify({"error": "An internal error occurred while fetching pages_with_views data"}), 500
+        logger.exception("Error fetching categories data")
+        return jsonify({"error": "An internal error occurred while fetching categories data"}), 500
 
-    data = [x.to_dict() for x in data]
+    records = [x.to_dict() for x in records]
     response_data = {
-        "results": data,
-        "count": len(data),
+        "results": records,
+        "count": len(records),
     }
 
     return jsonify(response_data)

@@ -1,7 +1,7 @@
 {% macro nav_link(endpoint, icon, text, url, title="") %}
 {% set _active = request and request.endpoint and request.endpoint.startswith(endpoint) %}
-<a class="nav-link {{ 'active fw-bold' if _active }}" href="{{ url }}" {% if _active %}aria-current="page"
-    {% endif %} title="{{ title }}">
+<a class="nav-link {{ 'active fw-bold' if _active }}" href="{{ url }}" {% if _active %}aria-current="page" {% endif %}
+    title="{{ title }}">
     <i class="bi {{ icon }}"></i> {{ text }}
 </a>
 {% endmacro %}
@@ -10,8 +10,8 @@
 {% macro nav_link_with_args(endpoint, icon, text, url, path) %}
 {# check endpoint and job_type in URL #}
 {% set _active = request and request.path and request.path.startswith(path) %}
-<a class="nav-link {{ 'active fw-bold' if _active }}" href="{{ url }}" {% if _active %}aria-current="page"
-    {% endif %} title="{{ text }}">
+<a class="nav-link {{ 'active fw-bold' if _active }}" href="{{ url }}" {% if _active %}aria-current="page" {% endif %}
+    title="{{ text }}">
     <i class="bi {{ icon }}"></i> {{ text }}
 </a>
 {% endmacro %}
@@ -48,7 +48,7 @@
                         {{ nav_link_with_args(
                             'main.missing',
                             'bi-card-list',
-                            'missing',
+                            'Missing',
                             url_for('main.missing'),
                             '/missing',
                             )

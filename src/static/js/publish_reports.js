@@ -94,7 +94,7 @@ function getTableColumns() {
     {
         data: 'lang',
         render: function (data, type) {
-            return `<a href="/Translation_Dashboard/leaderboard.php?langcode=${data}" target="_blank">${data}</a>`;
+            return `<a href="/leaderboard/langs/${data}" target="_blank">${data}</a>`;
         }
     },
     {
@@ -114,7 +114,7 @@ function getTableColumns() {
     {
         data: 'user',
         render: function (data, type) {
-            return `<a href="/Translation_Dashboard/leaderboard.php?user=${data}" target="_blank">${data}</a>`;
+            return `<a href="/leaderboard/users/${data}" target="_blank">${data}</a>`;
         }
     },
     {

@@ -66,7 +66,12 @@ def get_top_langs() -> Response:
     Returns:
         JSON response with language statistics
     """
-    limit = request.args.get("limit", 50)
+
+    limit = request.args.get("limit", default=50, type=int)
+    if limit is None or limit <= 0:
+        limit = 50
+    limit = min(limit, 1000)
+
     try:
         with get_session() as session:
             # Build the word count expression
@@ -186,7 +191,10 @@ def get_top_users() -> Response:
         JSON response with user statistics
     """
 
-    limit = request.args.get("limit", 50)
+    limit = request.args.get("limit", default=50, type=int)
+    if limit is None or limit <= 0:
+        limit = 50
+    limit = min(limit, 1000)
     try:
         with get_session() as session:
             # Build the word count expression
