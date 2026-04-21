@@ -17,7 +17,6 @@ class AssessmentRecord:
     importance: str | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "title": self.title,
@@ -34,7 +33,6 @@ class EnwikiPageviewRecord:
     en_views: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "title": self.title,
@@ -56,7 +54,6 @@ class InProcessRecord:
     add_date: Any | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "title": self.title,
@@ -79,7 +76,6 @@ class LangRecord:
     name: str
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "lang_id": self.lang_id,
             "code": self.code,
@@ -96,7 +92,6 @@ class MdwikiRevidRecord:
     revid: int
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "title": self.title,
             "revid": self.revid,
@@ -113,7 +108,6 @@ class PagesUsersToMainRecord:
     new_qid: str = ""
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "new_target": self.new_target,
@@ -130,7 +124,6 @@ class ProjectRecord:
     g_title: str
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "g_id": self.g_id,
             "g_title": self.g_title,
@@ -147,7 +140,6 @@ class RefsCountRecord:
     r_all_refs: int | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "r_id": self.r_id,
             "r_title": self.r_title,
@@ -166,7 +158,6 @@ class TranslateTypeRecord:
     tt_full: int = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "tt_id": self.tt_id,
             "tt_title": self.tt_title,
@@ -186,7 +177,6 @@ class ViewsNewRecord:
     views: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "target": self.target,
@@ -205,7 +195,6 @@ class ViewsNewAllRecord:
     views: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "target": self.target,
             "lang": self.lang,
@@ -223,7 +212,6 @@ class WordRecord:
     w_all_words: int | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "w_id": self.w_id,
             "w_title": self.w_title,

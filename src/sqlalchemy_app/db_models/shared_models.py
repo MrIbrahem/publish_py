@@ -22,7 +22,6 @@ class CategoryRecord:
     is_default: int = 0
 
     def to_dict(self) -> dict:
-        """Convert the CategoryRecord to a dictionary."""
         return {
             "id": self.id,
             "category": self.category,
@@ -94,7 +93,6 @@ class QidRecord:
     add_date: str
 
     def to_dict(self) -> dict:
-        """Convert the QidRecord to a dictionary."""
         return {
             "id": self.id,
             "qid": self.qid,

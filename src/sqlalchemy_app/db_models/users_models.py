@@ -38,9 +38,19 @@ class UserTokenRecord:
         access_secret = decrypt_value(self.access_secret)
         return access_key, access_secret
 
-    def __post_init__(self) -> None:
-        self.access_token = coerce_bytes(self.access_token)
-        self.access_secret = coerce_bytes(self.access_secret)
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            # "access_token": self.access_token,
+            # "access_secret": self.access_secret,
+            "access_token": coerce_bytes(self.access_token),
+            "access_secret": coerce_bytes(self.access_secret),
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "last_used_at": self.last_used_at,
+            "rotated_at": self.rotated_at,
+        }
 
 
 @dataclass
@@ -55,7 +65,6 @@ class UserRecord:
     reg_date: Any | None = None
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "user_id": self.user_id,
             "username": self.username,
@@ -75,7 +84,6 @@ class UsersNoInprocessRecord:
     is_active: int = 1
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "user": self.user,
@@ -92,12 +100,14 @@ class CoordinatorRecord:
     is_active: int = 1
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "username": self.username,
             "is_active": self.is_active,
         }
+
+    def __repr__(self) -> str:
+        return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
 @dataclass
@@ -109,7 +119,6 @@ class FullTranslatorRecord:
     is_active: int = 1
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "user": self.user,

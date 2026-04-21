@@ -19,7 +19,6 @@ class LanguageSettingRecord:
     add_en_lang: int | None = 0
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "lang_code": self.lang_code,
@@ -48,7 +47,6 @@ class SettingRecord:
     value_type: str = "boolean"
 
     def to_dict(self) -> dict:
-        """Convert record to dictionary."""
         return {
             "id": self.id,
             "key": self.key,

@@ -33,7 +33,6 @@ from .users_models import (
 
 __all__ = [
     # admin_models
-    "_CoordinatorRecord",
     "_LanguageSettingRecord",
     "_SettingRecord",
     # public_models
@@ -50,10 +49,11 @@ __all__ = [
     "_ViewsNewAllRecord",
     "_WordRecord",
     # users_models
+    "_CoordinatorRecord",
+    "_FullTranslatorRecord",
     "_UsersNoInprocessRecord",
     "_UserTokenRecord",
     "_UserRecord",
-    "_FullTranslatorRecord",
     # shared_models
     "_PageRecord",
     "_ReportRecord",
