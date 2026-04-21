@@ -188,10 +188,26 @@ def find_exists_or_update_page(
 
 def list_of_users_by_translations_count() -> dict[str, int]:
     """
-    select DISTINCT user, count(target) as count from pages where target != '' group by user order by count desc
+    Get a dictionary of users and their translation counts.
+
+    Returns:
+        Dictionary mapping username to count of published translations,
+        ordered by count descending.
     """
     result: dict[str, int] = {}
-
+    with get_session() as session:
+        # Query: SELECT user, COUNT(target) as count FROM pages WHERE target != '' GROUP BY user ORDER BY count DESC
+        rows = (
+            session.query(_PageRecord.user, func.count(_PageRecord.target).label("count"))
+            .filter(_PageRecord.target != "")
+            .filter(_PageRecord.target.isnot(None))
+            .group_by(_PageRecord.user)
+            .order_by(func.count(_PageRecord.target).desc())
+            .all()
+        )
+        for user, count in rows:
+            if user is not None:
+                result[user] = count
     return result
 
 

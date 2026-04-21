@@ -9,6 +9,8 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from sqlalchemy import func, text
 
+from ....shared.services.page_service import list_of_users_by_translations_count
+
 from ...services.in_process_service import get_in_process_counts_by_user
 
 from ....shared.services.category_service import list_categories
@@ -335,6 +337,29 @@ def list_categories_views() -> Response:
         return jsonify({"error": "An internal error occurred while fetching pages_with_views data"}), 500
 
     data = [x.to_dict() for x in data]
+    response_data = {
+        "results": data,
+        "count": len(data),
+    }
+
+    return jsonify(response_data)
+
+
+@bp_api.route("/users_by_translations_count", methods=["GET"])
+@check_cors
+def users_by_translations_count() -> Response:
+    """C
+    Handle pages_with_views API requests.
+    """
+    try:
+        data = list_of_users_by_translations_count()
+    except Exception:
+        logger.exception("Error fetching list_of_users_by_translations_count data")
+        return jsonify({"error": "An internal error occurred while fetching v data"}), 500
+
+    # sort data by value
+    data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True))
+
     response_data = {
         "results": data,
         "count": len(data),
