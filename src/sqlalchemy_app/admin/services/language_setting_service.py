@@ -9,9 +9,9 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import LanguageSettingRecord
+# from ...db_models import LanguageSettingRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _LanguageSettingRecord
+from ...sqlalchemy_models import LanguageSettingRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,27 +19,27 @@ logger = logging.getLogger(__name__)
 def list_language_settings() -> List[LanguageSettingRecord]:
     """Return all language setting records."""
     with get_session() as session:
-        orm_objs = session.query(_LanguageSettingRecord).order_by(_LanguageSettingRecord.id.asc()).all()
-        return [LanguageSettingRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
+        orm_objs = session.query(LanguageSettingRecord).order_by(LanguageSettingRecord.id.asc()).all()
+        return orm_objs  # [LanguageSettingRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_language_setting(setting_id: int) -> LanguageSettingRecord | None:
     """Get a language setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_LanguageSettingRecord).filter(_LanguageSettingRecord.id == setting_id).first()
+        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
         if not orm_obj:
             logger.warning(f"Language setting record with ID {setting_id} not found")
             return None
-        return LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
 
 
 def get_language_setting_by_code(lang_code: str) -> LanguageSettingRecord | None:
     """Get a language setting record by language code."""
     with get_session() as session:
-        orm_obj = session.query(_LanguageSettingRecord).filter(_LanguageSettingRecord.lang_code == lang_code).first()
+        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
         if not orm_obj:
             return None
-        return LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
 
 
 def add_language_setting(
@@ -54,7 +54,7 @@ def add_language_setting(
         raise ValueError("Language code is required")
 
     with get_session() as session:
-        orm_obj = _LanguageSettingRecord(
+        orm_obj = LanguageSettingRecord(
             lang_code=lang_code,
             move_dots=move_dots,
             expend=expend,
@@ -68,7 +68,7 @@ def add_language_setting(
             raise ValueError(f"Language setting for '{lang_code}' already exists") from None
 
         session.refresh(orm_obj)
-        return LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
 
 
 def add_or_update_language_setting(
@@ -83,13 +83,13 @@ def add_or_update_language_setting(
         raise ValueError("Language code is required")
 
     with get_session() as session:
-        orm_obj = session.query(_LanguageSettingRecord).filter(_LanguageSettingRecord.lang_code == lang_code).first()
+        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
         if orm_obj:
             orm_obj.move_dots = move_dots
             orm_obj.expend = expend
             orm_obj.add_en_lang = add_en_lang
         else:
-            orm_obj = _LanguageSettingRecord(
+            orm_obj = LanguageSettingRecord(
                 lang_code=lang_code,
                 move_dots=move_dots,
                 expend=expend,
@@ -99,13 +99,13 @@ def add_or_update_language_setting(
 
         session.commit()
         session.refresh(orm_obj)
-        return LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
 
 
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
     """Update a language setting record."""
     with get_session() as session:
-        orm_obj = session.query(_LanguageSettingRecord).filter(_LanguageSettingRecord.id == setting_id).first()
+        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
         if not orm_obj:
             raise ValueError(f"Language setting record with ID {setting_id} not found")
 
@@ -118,20 +118,18 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
 
         session.commit()
         session.refresh(orm_obj)
-        return LanguageSettingRecord(**orm_obj.to_dict())
+        return orm_obj  # LanguageSettingRecord(**orm_obj.to_dict())
 
 
-def delete_language_setting(setting_id: int) -> LanguageSettingRecord:
+def delete_language_setting(setting_id: int):
     """Delete a language setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_LanguageSettingRecord).filter(_LanguageSettingRecord.id == setting_id).first()
+        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
         if not orm_obj:
             raise ValueError(f"Language setting record with ID {setting_id} not found")
 
-        record = LanguageSettingRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
 
 
 __all__ = [

@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import logging
 
+from typing import Any, Optional
+
 from sqlalchemy import Column, Enum, Integer, String, text
 
 # from sqlalchemy.dialects.mysql import LONGTEXT
@@ -14,7 +16,7 @@ from ..shared.engine import LONGTEXT, BaseDb
 logger = logging.getLogger(__name__)
 
 
-class _LanguageSettingRecord(BaseDb):
+class LanguageSettingRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS language_settings (
         id int NOT NULL AUTO_INCREMENT,
@@ -45,7 +47,7 @@ class _LanguageSettingRecord(BaseDb):
         }
 
 
-class _SettingRecord(BaseDb):
+class SettingRecord(BaseDb):
     """
     CREATE TABLE IF NOT EXISTS new_settings (
         `id` INT NOT NULL AUTO_INCREMENT,
@@ -82,8 +84,25 @@ class _SettingRecord(BaseDb):
             "value_type": self.value_type,
         }
 
+    def __post_init__(self):
+        """Determine form type based on displayed value."""
+        self.value = self._parse_value(self.value, self.value_type)
+
+    def _parse_value(self, value: Optional[str], value_type: str) -> Any:
+        if value is None:
+            return None
+        if value_type == "boolean":
+            return "true" if value.lower() in ("1", "true", "yes", "on") else "false"
+        elif value_type == "integer":
+            try:
+                return int(value)
+            except ValueError:
+                return 0
+
+        return str(value)  # string
+
 
 __all__ = [
-    "_LanguageSettingRecord",
-    "_SettingRecord",
+    "LanguageSettingRecord",
+    "SettingRecord",
 ]

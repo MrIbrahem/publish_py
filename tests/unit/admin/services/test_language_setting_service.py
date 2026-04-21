@@ -10,8 +10,8 @@ from src.sqlalchemy_app.admin.services.language_setting_service import (
     list_language_settings,
     update_language_setting,
 )
-from src.sqlalchemy_app.db_models import LanguageSettingRecord
-from src.sqlalchemy_app.sqlalchemy_models import _LanguageSettingRecord
+# from src.sqlalchemy_app.db_models import LanguageSettingRecord
+from src.sqlalchemy_app.sqlalchemy_models import LanguageSettingRecord
 
 
 def test_language_setting_workflow():

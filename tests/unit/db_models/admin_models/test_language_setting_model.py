@@ -4,7 +4,7 @@ Unit tests for domain.models.language_setting module.
 Tests for LanguageSettingRecord.
 """
 
-from src.sqlalchemy_app.db_models import (
+from src.sqlalchemy_app.sqlalchemy_models import (
     LanguageSettingRecord,
 )
 
@@ -17,9 +17,9 @@ class TestLanguageSettingRecord:
         record = LanguageSettingRecord(id=1)
         assert record.id == 1
         assert record.lang_code is None
-        assert record.move_dots == 0  # Default value
         assert record.expend == 0
         assert record.add_en_lang == 0
+        assert record.move_dots == 0  # Default value
 
     def test_create_with_all_fields(self):
         """Test creating LanguageSettingRecord with all fields."""

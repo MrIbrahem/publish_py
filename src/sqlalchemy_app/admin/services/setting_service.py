@@ -9,9 +9,8 @@ from typing import Any, List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db_models import SettingRecord
 from ...shared.engine import get_session
-from ...sqlalchemy_models import _SettingRecord
+from ...sqlalchemy_models import SettingRecord
 
 logger = logging.getLogger(__name__)
 
@@ -19,14 +18,14 @@ logger = logging.getLogger(__name__)
 def list_settings() -> List[SettingRecord]:
     """Return all setting records."""
     with get_session() as session:
-        orm_objs = session.query(_SettingRecord).order_by(_SettingRecord.id.asc()).all()
+        orm_objs = session.query(SettingRecord).order_by(SettingRecord.id.asc()).all()
         return [SettingRecord(**orm_obj.to_dict()) for orm_obj in orm_objs]
 
 
 def get_setting(setting_id: int) -> SettingRecord | None:
     """Get a setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_SettingRecord).filter(_SettingRecord.id == setting_id).first()
+        orm_obj = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
         if not orm_obj:
             logger.warning(f"Setting record with ID {setting_id} not found")
             return None
@@ -36,7 +35,7 @@ def get_setting(setting_id: int) -> SettingRecord | None:
 def get_setting_by_key(key: str) -> SettingRecord | None:
     """Get a setting record by key."""
     with get_session() as session:
-        orm_obj = session.query(_SettingRecord).filter(_SettingRecord.key == key).first()
+        orm_obj = session.query(SettingRecord).filter(SettingRecord.key == key).first()
         if not orm_obj:
             return None
         return SettingRecord(**orm_obj.to_dict())
@@ -57,7 +56,7 @@ def add_setting(
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = _SettingRecord(
+        orm_obj = SettingRecord(
             key=key,
             title=title,
             value_type=value_type,
@@ -77,7 +76,7 @@ def add_setting(
 def update_value(setting_id: int, value: Any) -> SettingRecord:
     """Update a setting record value."""
     with get_session() as session:
-        orm_obj = session.query(_SettingRecord).filter(_SettingRecord.id == setting_id).first()
+        orm_obj = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
         if not orm_obj:
             raise ValueError(f"Setting record with ID {setting_id} not found")
 
@@ -90,7 +89,7 @@ def update_value(setting_id: int, value: Any) -> SettingRecord:
 def delete_setting(setting_id: int) -> SettingRecord:
     """Delete a setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(_SettingRecord).filter(_SettingRecord.id == setting_id).first()
+        orm_obj = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
         if not orm_obj:
             raise ValueError(f"Setting record with ID {setting_id} not found")
 

@@ -1,6 +1,6 @@
 from .admin_models import (
-    _LanguageSettingRecord,
-    _SettingRecord,
+    LanguageSettingRecord,
+    SettingRecord,
 )
 from .metrics_models import (
     _AssessmentRecord,
@@ -41,8 +41,8 @@ from .views_models import (
 
 __all__ = [
     # admin_models
-    "_LanguageSettingRecord",
-    "_SettingRecord",
+    "LanguageSettingRecord",
+    "SettingRecord",
     # metrics_models
     "_AssessmentRecord",
     "_RefsCountRecord",
