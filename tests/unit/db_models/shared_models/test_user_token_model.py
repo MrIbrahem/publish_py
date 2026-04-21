@@ -11,7 +11,7 @@ from src.sqlalchemy_app.sqlalchemy_models import UserTokenRecord
 
 
 @pytest.fixture
-def sample_token_record():
+def sample_token_record() -> UserTokenRecord:
     """Fixture for a sample UserTokenRecord."""
     return UserTokenRecord(
         user_id=12345,
@@ -28,7 +28,7 @@ def sample_token_record():
 class TestUserTokenRecord:
     """Tests for UserTokenRecord dataclass."""
 
-    def test_post_init_coerces_bytes(self):
+    def test_post_init_coerces_bytes(self) -> None:
         """Test that __post_init__ coerces access fields to bytes."""
         record = UserTokenRecord(
             user_id=1,
@@ -39,8 +39,8 @@ class TestUserTokenRecord:
         assert isinstance(record.access_token, bytes)
         assert isinstance(record.access_secret, bytes)
 
-    @patch("src.sqlalchemy_app.shared.core.crypto.decrypt_value")
-    def test_decrypted_returns_tuple(self, mock_decrypt, sample_token_record):
+    @patch("src.sqlalchemy_app.sqlalchemy_models.users.decrypt_value")
+    def test_decrypted_returns_tuple(self, mock_decrypt, sample_token_record: UserTokenRecord) -> None:
         """Test that decrypted returns tuple of decrypted values."""
         mock_decrypt.side_effect = ["decrypted_token", "decrypted_secret"]
 
