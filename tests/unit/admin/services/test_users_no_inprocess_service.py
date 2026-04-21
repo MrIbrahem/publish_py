@@ -12,7 +12,7 @@ from src.sqlalchemy_app.admin.services.users_no_inprocess_service import (
     should_hide_from_inprocess,
     update_users_no_inprocess,
 )
-from src.sqlalchemy_app.db_models import UsersNoInprocessRecord
+from src.sqlalchemy_app.sqlalchemy_models import UsersNoInprocessRecord
 from src.sqlalchemy_app.sqlalchemy_models import _UsersNoInprocessRecord
 
 

@@ -69,7 +69,7 @@ src/
 │       │   │   ├── publish_secret_checks.py
 │       │   ├── crypto.py
 │       │   ├── extensions.py
-│       ├── db_models/
+│       ├── sqlalchemy_models/
 │       ├── engine.py
 │       ├── models.py
 │       ├── services/

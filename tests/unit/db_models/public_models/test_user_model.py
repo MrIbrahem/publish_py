@@ -6,7 +6,7 @@ Tests for UserRecord.
 
 from datetime import datetime
 
-from src.sqlalchemy_app.db_models import UserRecord
+from src.sqlalchemy_app.sqlalchemy_models import UserRecord
 
 
 class TestUserRecord:

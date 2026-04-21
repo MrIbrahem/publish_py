@@ -39,6 +39,25 @@ from .views_models import (
     _ViewsNewRecord,
 )
 
+from .db_models import (
+    InProcessRecord,
+    LangRecord,
+    MdwikiRevidRecord,
+    ProjectRecord,
+    TranslateTypeRecord,
+    QidRecord,
+    CategoryRecord,
+    ReportRecord,
+    CoordinatorRecord,
+    FullTranslatorRecord,
+    UserRecord,
+    UsersNoInprocessRecord,
+    UserTokenRecord,
+    EnwikiPageviewRecord,
+    ViewsNewAllRecord,
+    ViewsNewRecord,
+)
+
 __all__ = [
     # admin_models
     "LanguageSettingRecord",
@@ -72,4 +91,27 @@ __all__ = [
     "_EnwikiPageviewRecord",
     "_ViewsNewRecord",
     "_ViewsNewAllRecord",
+
+
+    # public_models
+    "InProcessRecord",
+    "LangRecord",
+    "MdwikiRevidRecord",
+    "ProjectRecord",
+    "TranslateTypeRecord",
+    # qid_models
+    "QidRecord",
+    # shared_models
+    "ReportRecord",
+    "CategoryRecord",
+    # users_models
+    "CoordinatorRecord",
+    "FullTranslatorRecord",
+    "UsersNoInprocessRecord",
+    "UserTokenRecord",
+    "UserRecord",
+    # views_models
+    "EnwikiPageviewRecord",
+    "ViewsNewRecord",
+    "ViewsNewAllRecord",
 ]

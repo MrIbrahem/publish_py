@@ -9,7 +9,7 @@ from src.sqlalchemy_app.admin.services.setting_service import (
     list_settings,
     update_value,
 )
-# from src.sqlalchemy_app.db_models import SettingRecord
+# from src.sqlalchemy_app.sqlalchemy_models import SettingRecord
 from src.sqlalchemy_app.sqlalchemy_models import SettingRecord
 
 

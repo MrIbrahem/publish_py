@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.db_models import QidRecord
+from src.sqlalchemy_app.sqlalchemy_models import QidRecord
 from src.sqlalchemy_app.shared.services.qid_service import (
     add_qid,
     delete_qid,

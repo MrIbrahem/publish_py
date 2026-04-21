@@ -15,7 +15,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db_models import ProjectRecord, UserRecord
+from ...sqlalchemy_models import ProjectRecord, UserRecord
 from ...public.services.project_service import list_projects
 from ...public.services.user_service import (
     add_user,
