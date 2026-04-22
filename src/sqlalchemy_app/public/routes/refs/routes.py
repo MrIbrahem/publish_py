@@ -73,14 +73,22 @@ def process_new() -> str:
     title = request.form.get("title", "")
     text = request.form.get("text", "")
     lang = request.form.get("lang", "")
-    mdwiki_revid = request.form.get("mdwiki_revid", "")
+    mdwiki_revid_raw = request.form.get("mdwiki_revid", "").strip()
 
-    save = request.form.get("save", "")
-    infobox = request.form.get("infobox", "")
-    movedots = request.form.get("movedots", "")
+    try:
+        mdwiki_revid = int(mdwiki_revid_raw or 0)
+    except ValueError:
+        flash("Invalid MDWiki revision ID.", "warning")
+        mdwiki_revid = 0
+
+    save = request.form.get("save", "").lower() in {"1", "true", "on", "yes"}
+    infobox = request.form.get("infobox", "").lower() in {"1", "true", "on", "yes"}
+    movedots = request.form.get("movedots", "").lower() in {"1", "true", "on", "yes"}
+    # add_en_lang = request.form.get("add_en_lang", "").lower() in {"1", "true", "on", "yes"}
+    # add_category = request.form.get("add_category", "").lower() in {"1", "true", "on", "yes"}
 
     if not text and lang and title:
-        text = get_wikitext(title, project=f"{lang}.wikipedia.org")
+        text = get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
 
     try:
         result = do_changes_to_text_with_settings(
