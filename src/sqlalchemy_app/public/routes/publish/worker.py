@@ -6,8 +6,6 @@ import json
 import logging
 from typing import Any
 
-from ....shared.services.language_setting_service import LanguageSettingRecord, get_language_setting
-
 from ....config import settings
 from ....shared.clients import (
     get_revid,
@@ -25,6 +23,7 @@ from ....shared.services import (
     insert_user_page_target,
 )
 from ....shared.services.category_service import get_campaign_category
+from ....shared.services.language_setting_service import LanguageSettingRecord, get_language_setting_by_code
 from ....shared.utils.helpers import (
     determine_hashtag,
     do_changes_to_text_with_settings,
@@ -45,7 +44,7 @@ def load_language_settings(lang: str) -> LanguageSettingRecord:
     Returns:
         LanguageSettingRecord object
     """
-    return get_language_setting(lang) or LanguageSettingRecord()
+    return get_language_setting_by_code(lang) or LanguageSettingRecord()
 
 
 def _get_revid(sourcetitle) -> str:

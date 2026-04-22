@@ -14,13 +14,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..decorators import admin_required
 from ...shared.services.users_no_inprocess_service import (
     add_users_no_inprocess,
     delete_users_no_inprocess,
     list_users_no_inprocess,
     update_users_no_inprocess,
 )
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
