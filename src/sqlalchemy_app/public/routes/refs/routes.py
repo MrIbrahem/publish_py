@@ -1,7 +1,7 @@
 """
 Routes for the 'Fix References' feature.
 This blueprint provides a user interface for processing text to fix references
-using the `do_changes_to_text` service.
+using the `do_changes_to_text_with_settings` service.
 """
 
 import logging
@@ -17,7 +17,6 @@ from flask import (
 from ....shared.clients.text_api import get_wikitext
 
 from ....shared.utils.helpers.text_processor import (
-    # do_changes_to_text,
     do_changes_to_text_with_settings,
 )
 

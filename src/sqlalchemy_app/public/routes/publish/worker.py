@@ -6,6 +6,8 @@ import json
 import logging
 from typing import Any
 
+from src.sqlalchemy_app.admin.services.language_setting_service import LanguageSettingRecord, get_language_setting
+
 from ....config import settings
 from ....shared.clients import (
     get_revid,
@@ -25,13 +27,25 @@ from ....shared.services import (
 from ....shared.services.category_service import get_campaign_category
 from ....shared.utils.helpers import (
     determine_hashtag,
-    do_changes_to_text,
+    do_changes_to_text_with_settings,
     get_word_count,
     make_summary,
     to_do,
 )
 
 logger = logging.getLogger(__name__)
+
+
+def load_language_settings(lang: str) -> LanguageSettingRecord:
+    """Load language settings for the given language.
+
+    Args:
+        lang: Language code
+
+    Returns:
+        LanguageSettingRecord object
+    """
+    return get_language_setting(lang) or LanguageSettingRecord()
 
 
 def _get_revid(sourcetitle) -> str:
@@ -424,7 +438,20 @@ def _process_edit(
     tab["revid"] = mdwiki_revid
 
     # Apply text changes (fix references)
-    newtext = do_changes_to_text(sourcetitle, tab["title"], text, lang, mdwiki_revid)
+
+    language_setting = load_language_settings(lang)
+
+    newtext = do_changes_to_text_with_settings(
+        text=text,
+        title=title,
+        lang=lang,
+        source_title=sourcetitle,
+        mdwiki_revid=mdwiki_revid,
+        move_dots=language_setting.move_dots,
+        expend_infobox=language_setting.expend,
+        add_en_lang=language_setting.add_en_lang,
+        # add_category=add_category,
+    )
 
     if newtext:
         tab["fix_refs"] = "yes" if newtext != text else "no"
