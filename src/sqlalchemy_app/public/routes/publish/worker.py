@@ -6,7 +6,7 @@ import json
 import logging
 from typing import Any
 
-from ....shared.services.language_setting_service import LanguageSettingRecord, get_language_setting
+from ....shared.services.language_setting_service import LanguageSettingRecord, get_language_setting_by_code
 
 from ....config import settings
 from ....shared.clients import (
@@ -45,7 +45,7 @@ def load_language_settings(lang: str) -> LanguageSettingRecord:
     Returns:
         LanguageSettingRecord object
     """
-    return get_language_setting(lang) or LanguageSettingRecord()
+    return get_language_setting_by_code(lang) or LanguageSettingRecord()
 
 
 def _get_revid(sourcetitle) -> str:
