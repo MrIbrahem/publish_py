@@ -24,12 +24,12 @@ def do_changes_to_text_with_settings(
     text: str,
     title: str,
     lang: str,
+    source_title: str = "",
+    mdwiki_revid: int = 0,
     move_dots: bool = True,
     expend_infobox: bool = True,
     add_en_lang: bool = False,
     add_category: bool = False,
-    source_title: str = "",
-    mdwiki_revid: int = 0,
 ) -> str:
     if fix_one_page is None:
         return text
@@ -44,12 +44,12 @@ def do_changes_to_text_with_settings(
         text=text,
         title=title,
         lang=lang,
+        source_title=source_title,
+        mdwiki_revid=mdwiki_revid,
         move_dots=move_dots,
         expend_infobox=expend_infobox,
         add_en_lang=add_en_lang,
         add_category=add_category,
-        source_title=source_title,
-        mdwiki_revid=mdwiki_revid,
     )
 
 

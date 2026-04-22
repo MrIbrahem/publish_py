@@ -41,11 +41,11 @@ class TestRefsProcess:
             response = client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "Source Title",
+                    "source_title": "Source Title",
                     "title": "Target Title",
                     "text": "Text to process",
                     "lang": "en",
-                    "mdwikiRevid": "12345",
+                    "mdwiki_revid": "12345",
                 },
             )
 
@@ -59,11 +59,11 @@ class TestRefsProcess:
             client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "Source Title",
+                    "source_title": "Source Title",
                     "title": "Target Title",
                     "text": "Text to process",
                     "lang": "en",
-                    "mdwikiRevid": "12345",
+                    "mdwiki_revid": "12345",
                 },
             )
 
@@ -77,7 +77,7 @@ class TestRefsProcess:
             response = client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "Source Title",
+                    "source_title": "Source Title",
                     "title": "Target Title",
                     "text": "Text to process",
                     "lang": "en",
@@ -95,11 +95,11 @@ class TestRefsProcess:
             response = client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "My Source",
+                    "source_title": "My Source",
                     "title": "My Title",
                     "text": "My Text",
                     "lang": "ar",
-                    "mdwikiRevid": "54321",
+                    "mdwiki_revid": "54321",
                 },
             )
 
