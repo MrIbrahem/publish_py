@@ -35,35 +35,35 @@ class TestRefsProcess:
 
     def test_fixrefs_process_post_returns_200(self, client: FlaskClient):
         """Test that POST to fixrefs process returns 200."""
-        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text") as mock_do_changes:
+        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.return_value = "Processed text with fixed references"
 
             response = client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "Source Title",
+                    "source_title": "Source Title",
                     "title": "Target Title",
                     "text": "Text to process",
                     "lang": "en",
-                    "mdwikiRevid": "12345",
+                    "mdwiki_revid": "12345",
                 },
             )
 
             assert response.status_code == 200
 
     def test_fixrefs_process_calls_do_changes_to_text(self, client: FlaskClient):
-        """Test that fixrefs process calls do_changes_to_text."""
-        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text") as mock_do_changes:
+        """Test that fixrefs process calls do_changes_to_text_with_settings."""
+        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.return_value = "Processed text"
 
             client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "Source Title",
+                    "source_title": "Source Title",
                     "title": "Target Title",
                     "text": "Text to process",
                     "lang": "en",
-                    "mdwikiRevid": "12345",
+                    "mdwiki_revid": "12345",
                 },
             )
 
@@ -71,13 +71,13 @@ class TestRefsProcess:
 
     def test_fixrefs_process_handles_error(self, client: FlaskClient):
         """Test that fixrefs process handles errors gracefully."""
-        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text") as mock_do_changes:
+        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.side_effect = Exception("Processing error")
 
             response = client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "Source Title",
+                    "source_title": "Source Title",
                     "title": "Target Title",
                     "text": "Text to process",
                     "lang": "en",
@@ -89,17 +89,17 @@ class TestRefsProcess:
 
     def test_fixrefs_process_preserves_form_data(self, client: FlaskClient):
         """Test that fixrefs process preserves form data in template."""
-        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text") as mock_do_changes:
+        with patch("src.sqlalchemy_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.return_value = "Processed"
 
             response = client.post(
                 "/fixrefs/",
                 data={
-                    "sourceTitle": "My Source",
+                    "source_title": "My Source",
                     "title": "My Title",
                     "text": "My Text",
                     "lang": "ar",
-                    "mdwikiRevid": "54321",
+                    "mdwiki_revid": "54321",
                 },
             )
 

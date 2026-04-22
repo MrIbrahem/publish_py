@@ -16,7 +16,7 @@ from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 from ....sqlalchemy_models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
-from ...services.in_process_service import get_in_process_counts_by_user
+from ....shared.services.in_process_service import get_in_process_counts_by_user
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
 

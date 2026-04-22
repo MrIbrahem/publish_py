@@ -14,7 +14,7 @@ from flask import Flask, flash, render_template, request  # , g
 from .admin.routes.admin import (
     bp_admin,
 )
-from .admin.services.coordinator_service import active_coordinators
+from .shared.services.coordinator_service import active_coordinators
 from .config import settings
 from .public.routes import (
     bp_api,

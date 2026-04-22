@@ -99,7 +99,7 @@ class TestPostEndpoint:
             patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.sqlalchemy_app.public.routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.sqlalchemy_app.public.routes.publish.worker.get_revid_db") as mock_get_revid_db,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.do_changes_to_text") as mock_changes,
+            patch("src.sqlalchemy_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
             patch("src.sqlalchemy_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.sqlalchemy_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.sqlalchemy_app.public.routes.publish.worker.to_do") as mock_to_do,
@@ -154,7 +154,7 @@ class TestPostEndpoint:
         with (
             patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.sqlalchemy_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.do_changes_to_text") as mock_changes,
+            patch("src.sqlalchemy_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
             patch("src.sqlalchemy_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.sqlalchemy_app.public.routes.publish.worker.to_do") as mock_to_do,
             patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,

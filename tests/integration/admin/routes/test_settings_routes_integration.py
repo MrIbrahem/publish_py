@@ -25,7 +25,7 @@ class TestSettingsDashboard:
         """Test that settings dashboard lists settings."""
         with patch("src.sqlalchemy_app.admin.decorators.active_coordinators") as mock_coords:
             mock_coords.return_value = ["TestUser"]
-            with patch("src.sqlalchemy_app.admin.services.setting_service.list_settings") as mock_list:
+            with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
                 mock_setting = MagicMock()
                 mock_setting.key = "test_setting"
                 mock_setting.value_type = "boolean"
@@ -54,7 +54,7 @@ class TestCreateSetting:
         """Test creating setting with valid data."""
         with patch("src.sqlalchemy_app.admin.decorators.active_coordinators") as mock_coords:
             mock_coords.return_value = ["TestUser"]
-            with patch("src.sqlalchemy_app.admin.services.setting_service.add_setting") as mock_add:
+            with patch("src.sqlalchemy_app.shared.services.setting_service.add_setting") as mock_add:
                 mock_add.return_value = MagicMock(key="new_setting")
 
                 response = auth_client.post(
@@ -106,7 +106,7 @@ class TestUpdateSetting:
             mock_setting.value_type = "boolean"
             mock_setting.id = 1
 
-            with patch("src.sqlalchemy_app.admin.services.setting_service.list_settings") as mock_list:
+            with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
                 mock_list.return_value = [mock_setting]
 
                 response = auth_client.post(
@@ -126,7 +126,7 @@ class TestUpdateSetting:
             mock_setting.value_type = "boolean"
             mock_setting.id = 1
 
-            with patch("src.sqlalchemy_app.admin.services.setting_service.list_settings") as mock_list:
+            with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
                 mock_list.return_value = [mock_setting]
 
                 response = auth_client.post(

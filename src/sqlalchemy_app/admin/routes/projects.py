@@ -16,7 +16,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...public.services.project_service import (
+from ...shared.services.project_service import (
     add_project,
     delete_project,
     list_projects,
