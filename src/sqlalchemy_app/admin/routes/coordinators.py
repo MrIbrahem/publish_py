@@ -14,13 +14,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..decorators import admin_required
 from ...shared.services.coordinator_service import (
     add_coordinator,
     delete_coordinator,
     list_coordinators,
     set_coordinator_active,
 )
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

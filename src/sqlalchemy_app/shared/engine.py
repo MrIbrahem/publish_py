@@ -56,6 +56,7 @@ class BaseDb(DeclarativeBase):
 
         return data
 
+
 # ---------------------------------------------------------------------------
 # 2. Database connection — replaces db_driver.py entirely
 #    pool_pre_ping=True handles reconnect + retry automatically

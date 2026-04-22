@@ -15,6 +15,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
+from ...shared.services.page_service import list_of_users_by_translations_count
 from ...shared.services.project_service import list_projects
 from ...shared.services.user_service import (
     add_user,
@@ -26,7 +27,6 @@ from ...shared.services.user_service import (
     update_user,
     user_exists,
 )
-from ...shared.services.page_service import list_of_users_by_translations_count
 from ...sqlalchemy_models import ProjectRecord, UserRecord
 from ..decorators import admin_required
 

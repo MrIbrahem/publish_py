@@ -15,9 +15,7 @@ from flask import (
 )
 
 from ....shared.auth import oauth_required
-
 from ....shared.clients.text_api import get_wikitext
-
 from ....shared.utils.helpers.text_processor import (
     do_changes_to_text_with_settings,
 )
@@ -56,7 +54,7 @@ def test() -> str:
             "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
             "lang": "hy",
             "mdwiki_revid": 1458412,
-        }
+        },
     ]
     item = random.choice(tests_data)
 

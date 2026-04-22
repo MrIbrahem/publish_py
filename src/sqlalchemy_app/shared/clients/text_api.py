@@ -1,9 +1,9 @@
 import logging
+import re
 
 import requests
 
 from ...config import settings
-import re
 
 ALLOWED_WIKI_PROJECT = re.compile(r"^(?:[a-z0-9-]+\.wikipedia\.org|commons\.wikimedia\.org)$", re.IGNORECASE)
 
