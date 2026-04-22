@@ -5,6 +5,7 @@ using the `do_changes_to_text` service.
 """
 
 import logging
+import random
 
 from flask import (
     Blueprint,
@@ -12,10 +13,11 @@ from flask import (
     render_template,
     request,
 )
+
 from ....shared.clients.text_api import get_wikitext
 
 from ....shared.utils.helpers.text_processor import (
-    do_changes_to_text,
+    # do_changes_to_text,
     do_changes_to_text_with_settings,
 )
 
@@ -26,9 +28,42 @@ logger = logging.getLogger(__name__)
 @bp_fixrefs.route("/", methods=["GET"])
 def index() -> str:
     return render_template(
-        "fix-refs.html",
+        "fixrefs/index.html",
         result=None,
         form={},
+    )
+
+
+@bp_fixrefs.route("/test", methods=["GET"])
+def test() -> str:
+    tests_data = [
+        {
+            "source_title": "Decitabine/cedazuridine",
+            "title": "Decitabina/cedazuridina",
+            "lang": "es",
+            "mdwiki_revid": 1478161,
+        },
+        {
+            "source_title": "Tropicamide",
+            "title": "Usuario:Mr. Ibrahem/Tropicamida",
+            "lang": "es",
+            "mdwiki_revid": 1408734,
+        },
+        {
+            "source_title": "Fatty liver disease",
+            "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
+            "lang": "hy",
+            "mdwiki_revid": 1458412,
+        }
+    ]
+    item = random.choice(tests_data)
+
+    return render_template(
+        "fixrefs/index.html",
+        **item,
+        form={
+            "infobox": 1,
+        },
     )
 
 
@@ -71,7 +106,7 @@ def process_new() -> str:
         flash("No changes were made to the text.", "warning")
 
     return render_template(
-        "fix-refs.html",
+        "fixrefs/index.html",
         no_changes=no_changes,
         source_title=source_title,
         title=title,
