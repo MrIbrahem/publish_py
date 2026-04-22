@@ -99,7 +99,7 @@ class TestAddPagesUsersToMain:
     def test_raises_error_on_failure(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.sqlalchemy_app.public.services.pages_users_to_main_service.get_session") as mock_get_session:
+        with patch("src.sqlalchemy_app.shared.services.pages_users_to_main_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
