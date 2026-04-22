@@ -6,7 +6,7 @@ import json
 import logging
 from typing import Any
 
-from src.sqlalchemy_app.admin.services.language_setting_service import LanguageSettingRecord, get_language_setting
+from ....shared.services.language_setting_service import LanguageSettingRecord, get_language_setting
 
 from ....config import settings
 from ....shared.clients import (
