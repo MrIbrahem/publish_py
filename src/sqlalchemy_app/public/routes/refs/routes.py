@@ -14,6 +14,8 @@ from flask import (
     request,
 )
 
+from ....shared.auth import oauth_required
+
 from ....shared.clients.text_api import get_wikitext
 
 from ....shared.utils.helpers.text_processor import (
@@ -33,6 +35,7 @@ def index() -> str:
     )
 
 
+@oauth_required
 @bp_fixrefs.route("/test", methods=["GET"])
 def test() -> str:
     tests_data = [
@@ -66,6 +69,7 @@ def test() -> str:
     )
 
 
+@oauth_required
 @bp_fixrefs.route("/", methods=["POST"])
 def process_new() -> str:
 
