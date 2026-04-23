@@ -1,25 +1,26 @@
-
 # Overview
+
 This repository manages the final steps in the process of publishing Wikipedia articles that have been translated using the [ContentTranslation tool](https://github.com/mdwikicx/cx-1) in [medwiki.toolforge.org](http://medwiki.toolforge.org/). It takes the translated text in wikitext format, refines it further, and then publishes it to Wikipedia.
 
 # End points
-- ✔️ `/` [POST]
-- ✔️ `/` [GET]
-- ✔️ `/login` [GET]
-- ✔️ `/fixrefs` [GET, POST]
-- [ ] `/api` [GET]
-- [ ] `/new_html` [GET]
+
+-   ✔️ `/` [POST]
+-   ✔️ `/` [GET]
+-   ✔️ `/login` [GET]
+-   ✔️ `/fixrefs` [GET, POST]
+-   [ ] `/api` [GET]
+-   [ ] `/new_html` [GET]
 
 # Code sources
 
-| Endpoint | Method | Description | Source |
-|----------|--------|-------------|--------|
-| `/` | POST | publish | [PHP Source](https://github.com/Mdwiki-TD/publish) |
-| `/` | GET | publish_reports | [PHP Source](https://github.com/Mdwiki-TD/publish/tree/main/src/publish_reports) |
-| `/login` | GET | auth | [PHP Source](https://github.com/Mdwiki-TD/auth-repo) |
-| `/fixrefs` | GET, POST | - | [fix_refs_py](https://github.com/MrIbrahem/fix_refs_new_py) \| [PHP Source](https://github.com/Mdwiki-TD/fix_refs) |
-| `/api` | GET | - | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API) |
-| `/new_html` | GET | - | [mdwikicx/new_html](https://github.com/mdwikicx/new_html) |
+| Endpoint    | Method    | Description     | Source                                                                                                             |
+| ----------- | --------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `/`         | POST      | publish         | [PHP Source](https://github.com/Mdwiki-TD/publish)                                                                 |
+| `/`         | GET       | publish_reports | [PHP Source](https://github.com/Mdwiki-TD/publish/tree/main/src/publish_reports)                                   |
+| `/login`    | GET       | auth            | [PHP Source](https://github.com/Mdwiki-TD/auth-repo)                                                               |
+| `/fixrefs`  | GET, POST | -               | [fix_refs_py](https://github.com/MrIbrahem/fix_refs_new_py) \| [PHP Source](https://github.com/Mdwiki-TD/fix_refs) |
+| `/api`      | GET       | -               | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API)                                                            |
+| `/new_html` | GET       | -               | [mdwikicx/new_html](https://github.com/mdwikicx/new_html)                                                          |
 
 # API Documentation
 
@@ -31,26 +32,28 @@ Retrieves publish reports with optional filtering.
 
 **Query Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `year` | number | Filter by year (e.g., `2026`) |
-| `month` | number | Filter by month (1-12) |
-| `title` | string | Filter by page title |
-| `user` | string | Filter by username |
-| `lang` | string | Filter by language code |
-| `sourcetitle` | string | Filter by source title |
-| `result` | string | Filter by result status |
-| `select` | string | Comma-separated fields to return |
-| `limit` | number | Maximum results to return |
+| Parameter     | Type   | Description                      |
+| ------------- | ------ | -------------------------------- |
+| `year`        | number | Filter by year (e.g., `2026`)    |
+| `month`       | number | Filter by month (1-12)           |
+| `title`       | string | Filter by page title             |
+| `user`        | string | Filter by username               |
+| `lang`        | string | Filter by language code          |
+| `sourcetitle` | string | Filter by source title           |
+| `result`      | string | Filter by result status          |
+| `select`      | string | Comma-separated fields to return |
+| `limit`       | number | Maximum results to return        |
 
 **Special Filter Values:** `not_empty`, `empty`, `>0`, `all`
 
 **Example:**
+
 ```
 GET /api/publish_reports?year=2026&user=JohnDoe&limit=100
 ```
 
 **Response:**
+
 ```json
 {
     "results": [
@@ -74,9 +77,10 @@ For complete API documentation, see [docs/api.md](docs/api.md).
 For OpenAPI/Swagger specification, see [docs/openapi.yaml](docs/openapi.yaml).
 
 # How it's working
+
 Before publishing to Wikipedia, this process uses the [fix_refs](https://github.com/MrIbrahem/fix_refs_new_py) repository to make several changes to the wikitext. These changes include:
 
-* **Fixing References:** Correcting and standardizing reference formatting.
-* **Expanding Infoboxes:** Enhancing infoboxes with more relevant information.
-* **Adding Categories:** Ensuring appropriate categories are assigned to the articles.
-* **Other changes:** Adding and correcting other minor issues in wikitext.
+-   **Fixing References:** Correcting and standardizing reference formatting.
+-   **Expanding Infoboxes:** Enhancing infoboxes with more relevant information.
+-   **Adding Categories:** Ensuring appropriate categories are assigned to the articles.
+-   **Other changes:** Adding and correcting other minor issues in wikitext.
