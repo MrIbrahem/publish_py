@@ -99,7 +99,6 @@ class TestCheckCorsAccessControlAllowOrigin:
         assert result.headers["Access-Control-Allow-Origin"] == "https://api.partner.net"
 
     def test_denied_returns_403_without_cors_header(self, app, mock_load_request, mock_is_denied):
-
         result = check_cors(lambda: _make_response_with_headers())()
 
         assert result.status_code == 403

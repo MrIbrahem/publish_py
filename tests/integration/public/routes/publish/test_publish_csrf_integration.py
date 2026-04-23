@@ -217,7 +217,6 @@ class BasePublishTest:
 
 
 class TestSuccessFlows(BasePublishTest):
-
     def test_successful_edit(self, csrf_client, common_patches):
         # common_patches يغطي الـ happy-path بالكامل — لا شيء إضافي هنا
         response = self._post(
@@ -260,7 +259,6 @@ class TestSuccessFlows(BasePublishTest):
 
 
 class TestMetadataLogic(BasePublishTest):
-
     def test_tr_type_passed_correctly(self, csrf_client, common_patches):
         response = self._post(csrf_client, self._default_payload(tr_type="section"))
 
@@ -341,7 +339,6 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 
 class TestComplexWorkflows(BasePublishTest):
-
     def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
         with (patch("src.sqlalchemy_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,):
             mock_should_add.return_value = True

@@ -30,7 +30,6 @@ def _format_user(user: str) -> str:
 
 
 def get_cxtoken_for_user_wiki(wiki, user):
-
     # Get access credentials from database
     user_token = get_user_token_by_username(user)
 
