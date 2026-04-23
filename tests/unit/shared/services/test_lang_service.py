@@ -15,24 +15,24 @@ from src.sqlalchemy_app.sqlalchemy_models import LangRecord
 
 def test_lang_workflow():
     # Test add
-    l = add_lang("ar", "العربية", "Arabic")
-    assert l.code == "ar"
-    assert l.autonym == "العربية"
+    added = add_lang("ar", "العربية", "Arabic")
+    assert added.code == "ar"
+    assert added.autonym == "العربية"
 
     # Test get
-    l2 = get_lang(l.lang_id)
+    l2 = get_lang(added.lang_id)
     assert l2.code == "ar"
 
     # Test get by code
     l3 = get_lang_by_code("ar")
-    assert l3.lang_id == l.lang_id
+    assert l3.lang_id == added.lang_id
 
     # Test list
     all_l = list_langs()
     assert any(x.code == "ar" for x in all_l)
 
     # Test update
-    updated = update_lang(l.lang_id, autonym="Arabe")
+    updated = update_lang(added.lang_id, autonym="Arabe")
     assert updated.autonym == "Arabe"
 
     # Test add_or_update
@@ -40,8 +40,8 @@ def test_lang_workflow():
     assert l4.name == "Modern Standard Arabic"
 
     # Test delete
-    delete_lang(l.lang_id)
-    assert get_lang(l.lang_id) is None
+    delete_lang(added.lang_id)
+    assert get_lang(added.lang_id) is None
 
 
 class TestListLangs:
@@ -60,8 +60,8 @@ class TestGetLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        l = add_lang("es", "Español", "Spanish")
-        result = get_lang(l.lang_id)
+        added = add_lang("es", "Español", "Spanish")
+        result = get_lang(added.lang_id)
         assert isinstance(result, LangRecord)
         assert result.code == "es"
 
@@ -127,13 +127,13 @@ class TestUpdateLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        l = add_lang("hi", "हिन्दी", "Hindi")
-        updated = update_lang(l.lang_id, autonym="Hindi Autonym")
+        added = add_lang("hi", "हिन्दी", "Hindi")
+        updated = update_lang(added.lang_id, autonym="Hindi Autonym")
         assert updated.autonym == "Hindi Autonym"
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
-        l = add_lang("ja", "J", "J")
-        result = update_lang(l.lang_id)
+        added = add_lang("ja", "J", "J")
+        result = update_lang(added.lang_id)
         assert result.code == "ja"
 
     def test_raises_error_if_not_found(self, monkeypatch):
@@ -146,9 +146,9 @@ class TestDeleteLang:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        l = add_lang("ru", "Русский", "Russian")
-        delete_lang(l.lang_id)
-        assert get_lang(l.lang_id) is None
+        added = add_lang("ru", "Русский", "Russian")
+        delete_lang(added.lang_id)
+        assert get_lang(added.lang_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
         with pytest.raises(ValueError, match="not found"):
