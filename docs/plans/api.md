@@ -33,7 +33,7 @@ This document outlines the implementation plan for migrating the PHP `/api/index
 ## Current State
 
 ### Existing Database Handler
-**File:** [`src/app/db/db_publish_reports.py`](../src/app_main/db/db_publish_reports.py)
+**File:** [`src/app/db/db_publish_reports.py`](../../src/app_main/db/db_publish_reports.py)
 
 The existing `ReportsDB` class provides basic CRUD operations:
 - `list()` - Returns all records (no filtering)
@@ -48,7 +48,7 @@ The existing `ReportsDB` class provides basic CRUD operations:
 - Field selection (`select` parameter)
 
 ### Existing Routes Structure
-**File:** [`src/app/app_routes/__init__.py`](../src/app_main/app_routes/__init__.py)
+**File:** [`src/app/app_routes/__init__.py`](../../src/app_main/app_routes/__init__.py)
 
 ```python
 from .auth.routes import bp_auth

@@ -17,7 +17,10 @@ This repository manages the final steps in the process of publishing Wikipedia a
 
 # Translation Dashboard End points
 
-| Endpoint   | Method | Description        | Status |
-| ---------- | ------ | ------------------ | ------ |
-| `/`        | GET    | Homepage           | ✅     |
-| `/missing` | GET    | Missing pages page | ✅     |
+| Endpoint             | Method | Description           | Status |
+| -------------------- | ------ | --------------------- | ------ |
+| `/`                  | GET    | Homepage              |        |
+| `/missing`           | GET    | Missing pages report  |        |
+| `/leaderboard`       | GET    |                       | ✔️     |
+| `/leaderboard/langs` | GET    | languages leaderboard | ✔️     |
+| `/leaderboard/users` | GET    | users leaderboard     | ✔️     |

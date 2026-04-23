@@ -1,8 +1,8 @@
 # PHP to Python Integration Plan
 
 This plan outlines the migration of PHP endpoints to Python Flask routes, focusing on:
-- **cxtoken.routes** mirroring [php_src/endpoints/cxtoken.php](../php_src/endpoints/cxtoken.php)
-- **post.routes** mirroring [php_src/endpoints/post.php](../php_src/endpoints/post.php)
+- **cxtoken.routes** mirroring [php_src/endpoints/cxtoken.php](../../php_src/endpoints/cxtoken.php)
+- **post.routes** mirroring [php_src/endpoints/post.php](../../php_src/endpoints/post.php)
 
 ## Table of Contents
 
@@ -94,7 +94,7 @@ src/app/
 
 ### PHP Endpoint Analysis
 
-**File:** [php_src/endpoints/cxtoken.php](../php_src/endpoints/cxtoken.php)
+**File:** [php_src/endpoints/cxtoken.php](../../php_src/endpoints/cxtoken.php)
 
 **Request:**
 ```
@@ -123,7 +123,7 @@ GET /cxtoken.php?wiki={wiki}&user={username}
 
 ### Python Implementation Plan
 
-#### 1. Create [src/app/helpers/cors.py](../src/app_main/helpers/cors.py)
+#### 1. Create [src/app/helpers/cors.py](../../src/app_main/helpers/cors.py)
 
 ```python
 """CORS validation helpers."""
@@ -146,7 +146,7 @@ def is_allowed() -> str | None:
     return None
 ```
 
-#### 2. Create [src/app/services/oauth_client.py](../src/app_main/clients/oauth_client.py)
+#### 2. Create [src/app/services/oauth_client.py](../../src/app_main/clients/oauth_client.py)
 
 ```python
 """MediaWiki OAuth client wrapper."""
@@ -228,7 +228,7 @@ def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict:
     return result or {}
 ```
 
-#### 3. Update [src/app/app_routes/cxtoken/routes.py](../src/app_main/app_routes/cxtoken/routes.py)
+#### 3. Update [src/app/app_routes/cxtoken/routes.py](../../src/app_main/app_routes/cxtoken/routes.py)
 
 ```python
 """Content Translation token endpoint."""
@@ -319,7 +319,7 @@ __all__ = ["bp_cxtoken"]
 
 ### PHP Endpoint Analysis
 
-**File:** [php_src/endpoints/post.php](../php_src/endpoints/post.php)
+**File:** [php_src/endpoints/post.php](../../php_src/endpoints/post.php)
 
 **Request:**
 ```
@@ -370,7 +370,7 @@ POST /post.php
 
 ### Python Implementation Plan
 
-#### 1. Create [src/app/helpers/format.py](../src/app_main/helpers/format.py)
+#### 1. Create [src/app/helpers/format.py](../../src/app_main/helpers/format.py)
 
 ```python
 """Title and user formatting utilities."""
@@ -403,7 +403,7 @@ def make_summary(revid: str, sourcetitle: str, target_lang: str, hashtag: str = 
     return f"Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{target_lang} {hashtag}"
 ```
 
-#### 2. Create [src/app/services/mediawiki_api.py](../src/app_main/clients/mediawiki_api.py)
+#### 2. Create [src/app/services/mediawiki_api.py](../../src/app_main/clients/mediawiki_api.py)
 
 ```python
 """MediaWiki API client for edit operations."""
@@ -433,7 +433,7 @@ def publish_do_edit(api_params: dict, wiki: str, access_key: str, access_secret:
     return result
 ```
 
-#### 3. Create [src/app/services/revids_client.py](../src/app_main/clients/revids_client.py)
+#### 3. Create [src/app/services/revids_client.py](../../src/app_main/clients/revids_client.py)
 
 ```python
 """Revision ID lookup service."""
@@ -487,7 +487,7 @@ def get_revid_db(sourcetitle: str) -> str:
         return ""
 ```
 
-#### 4. Create [src/app/services/wikidata_client.py](../src/app_main/clients/wikidata_client.py)
+#### 4. Create [src/app/services/wikidata_client.py](../../src/app_main/clients/wikidata_client.py)
 
 ```python
 """Wikidata integration service."""
@@ -576,7 +576,7 @@ def link_to_wikidata(sourcetitle: str, lang: str, user: str, targettitle: str,
     return result
 ```
 
-#### 5. Create [src/app/helpers/files.py](../src/app_main/helpers/files.py)
+#### 5. Create [src/app/helpers/files.py](../../src/app_main/helpers/files.py)
 
 ```python
 """File logging utilities."""
@@ -628,7 +628,7 @@ def to_do(tab: dict[str, Any], file_name: str) -> None:
         logger.error(f"Error writing to file {file_path}: {e}")
 ```
 
-#### 6. Create [src/app/services/text_processor.py](../src/app_main/clients/text_processor.py)
+#### 6. Create [src/app/services/text_processor.py](../../src/app_main/clients/text_processor.py)
 
 ```python
 """Text processing utilities for page content."""
@@ -656,7 +656,7 @@ def do_changes_to_text(sourcetitle: str, title: str, text: str, lang: str, mdwik
     return text
 ```
 
-#### 7. Update [src/app/app_routes/post/routes.py](../src/app_main/app_routes/post/routes.py)
+#### 7. Update [src/app/app_routes/post/routes.py](../../src/app_main/app_routes/post/routes.py)
 
 ```python
 """Post/Publish endpoint for Content Translation."""
@@ -914,7 +914,7 @@ __all__ = ["bp_post"]
 
 ## Database Layer Updates
 
-### 1. Extend [src/app/users/store.py](../src/app_main/users/store.py)
+### 1. Extend [src/app/users/store.py](../../src/app_main/users/store.py)
 
 Add username lookup function:
 
@@ -958,7 +958,7 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
 The PHP code uses an `access_keys` table, while Python uses `user_tokens`.
 - use `user_tokens` insted of `access_keys` Table
 
-### 3. Extend [src/app/db/db_pages.py](../src/app_main/db/db_pages.py)
+### 3. Extend [src/app/db/db_pages.py](../../src/app_main/db/db_pages.py)
 
 Add `insert_page_target` method:
 
@@ -1058,7 +1058,7 @@ mwoauth>=0.3.7  # Alternative for OAuth
 
 ### Configuration Updates
 
-Add to [src/app/config.py](../src/app_main/config.py):
+Add to [src/app/config.py](../../src/app_main/config.py):
 
 ```python
 @dataclass(frozen=True)
