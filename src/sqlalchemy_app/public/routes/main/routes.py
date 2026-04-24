@@ -8,10 +8,14 @@ import logging
 
 from flask import (
     Blueprint,
+    flash,
     render_template,
+    request,
     send_from_directory,
 )
 
+
+from ....shared.services.category_service import list_categories
 from ....shared.services.lang_service import list_langs
 
 bp_main = Blueprint("main", __name__, url_prefix="")
@@ -20,10 +24,30 @@ logger = logging.getLogger(__name__)
 
 @bp_main.get("/")
 def index():
-    lang_tables = [x.to_dict() for x in list_langs()]
+    langs = [x.to_dict() for x in list_langs()]
+    langs_dict = {x["code"]: x for x in langs}
+    campaigns = [x.to_dict() for x in list_categories()]
+
+    code = request.args.get("code")
+    camp = request.args.get("camp")
+    tr_type = request.args.get("type")
+    lang_name = langs_dict.get(code, {}).get("name")
+
+    if code and not lang_name:
+        flash(f"Code: {code} is not valid wiki", "danger")
+
     return render_template(
         "index.html",
-        lang_tables=lang_tables,
+        settings={
+            "allow_whole_translate": True,
+        },
+        langs=langs,
+        campaigns=campaigns,
+        args={
+            "code": code,
+            "camp": camp,
+            "type": tr_type,
+        }
     )
 
 

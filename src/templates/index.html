@@ -16,7 +16,12 @@
                             <div class="mb-3">
                                 <label for="camp" class="form-label"><b>Campaign</b></label>
                                 <select dir='ltr' name='camp' id='camp' class='form-select' data-bs-theme="auto">
-                                    $camp_input
+                                    {% for cat in campaigns %}
+                                    <option data-tokens="{{ cat.campaign }}" value="{{ cat.campaign }}"
+                                        {{ 'selected' if cat.campaign == args.camp else '' }}>
+                                        {{ cat.campaign }}
+                                    </option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
@@ -29,21 +34,47 @@
                                         data-live-search-style="begins" data-bs-theme="auto" data-style='btn active'
                                         data-width="100%" required>
                                         {# Loop through language tables #}
-                                        {% for lang in lang_tables if lang.code %}
+                                        {% for lang in langs if lang.code %}
                                         <option data-tokens="{{ lang.code }}" value="{{ lang.code }}"
-                                            {{ 'selected' if lang.code == code else '' }}>
+                                            {{ 'selected' if lang.code == args.code else '' }}>
                                             ({{ lang.code }}) {{ lang.autonym }}
                                         </option>
                                         {% endfor %}
                                     </select>
-                                    $err
                                 </div>
                             </div>
                         </div>
-                        $in_typ
+                        {% if settings.allow_whole_translate %}
+                        <div class='col-10'>
+                            <div class="mb-3">
+                                <label for="type" class="form-label"><b>Type</b></label>
+                                <div class='form-control'>
+                                    <div class='form-check form-check-inline'>
+                                        <input type='radio' class='form-check-input' id='customRadio' name='type'
+                                            value='lead' {{ 'checked' if args.type == 'lead' else '' }}>
+                                        <label class='form-check-label' for='customRadio'>The lead only</label>
+                                    </div>
+                                    <div class='form-check form-check-inline'>
+                                        <input type='radio' class='form-check-input' id='customRadio2' name='type'
+                                            value='all' {{ 'checked' if args.type == 'all' else '' }}>
+                                        <label class='form-check-label' for='customRadio2'>The whole article</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <input type="hidden" name="type" value="lead" />
+                        {% endif %}
                         <div class='col-10'>
                             <h4 class='aligncenter mb-0'>
-                                $uiu
+                                {% if is_authenticated %}
+                                <input type="submit" name="doit" class="btn btn-outline-primary" value="Do it" />
+                                {% else %}
+                                <a role="button" class="btn btn-outline-primary" onclick="login()">
+                                    <i class="fas fa-sign-in-alt fa-sm fa-fw mr-1"></i><span
+                                        class="navtitles">Login</span>
+                                </a>
+                                {% endif %}
                             </h4>
                         </div>
                     </div>
@@ -56,4 +87,30 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function login() {
+        var camp = $('#camp').val() || '';
+        var code = $('#code').val() || '';
+        var type = $('input[name=type]:checked').val() || '';
+        var test = $('#test').val() || '';
+        var url = '/auth/index.php?a=login';
+        if (camp !== '') {
+            url += '&camp=' + encodeURIComponent(camp);
+        }
+        if (code !== '') {
+            url += '&code=' + encodeURIComponent(code);
+        }
+        if (type !== '') {
+            url += '&type=' + encodeURIComponent(type);
+        }
+        if (test !== '') {
+            url += '&test=' + encodeURIComponent(test);
+        }
+        window.location.href = url;
+    }
+
+</script>
 {% endblock %}
