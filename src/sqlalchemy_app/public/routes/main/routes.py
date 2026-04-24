@@ -14,7 +14,6 @@ from flask import (
     send_from_directory,
 )
 
-
 from ....shared.services.category_service import list_categories
 from ....shared.services.lang_service import list_langs
 
@@ -47,7 +46,7 @@ def index():
             "code": code,
             "camp": camp,
             "type": tr_type,
-        }
+        },
     )
 
 
