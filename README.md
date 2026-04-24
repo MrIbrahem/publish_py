@@ -116,8 +116,13 @@ ruff format src/ tests/
 # Development server
 python src/app.py
 
-# Production
+# Production in linux
 gunicorn --workers=4 --bind=0.0.0.0 --forwarded-allow-ips=* src.app:app
+
+# Production in windows
+pip install waitress
+waitress-serve --threads=4 --host=localhost --port=8080 src.app1:app
+
 ```
 
 ## How Publishing Works
