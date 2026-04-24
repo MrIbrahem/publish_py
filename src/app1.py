@@ -12,8 +12,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 pymysql.install_as_MySQLdb()
 
-# Load environment variables before any other imports or use `sys.path.insert(0, str(Path(__file__).parent))`
-# from env_config import load_environment  # auto-load load_environment()
+# Load environment variables before any other imports
+from env_config import load_environment  # auto-load load_environment()
 from sqlalchemy_app import create_app  # noqa: E402
 from sqlalchemy_app.config import DevelopmentConfig  # noqa: E402
 

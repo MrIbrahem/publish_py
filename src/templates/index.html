@@ -28,7 +28,13 @@
                                         placeholder='two letter code' data-live-search="true" data-container="body"
                                         data-live-search-style="begins" data-bs-theme="auto" data-style='btn active'
                                         data-width="100%" required>
-                                        $lang_list
+                                        {# Loop through language tables #}
+                                        {% for lang in lang_tables if lang.code %}
+                                        <option data-tokens="{{ lang.code }}" value="{{ lang.code }}"
+                                            {{ 'selected' if lang.code == code else '' }}>
+                                            ({{ lang.code }}) {{ lang.autonym }}
+                                        </option>
+                                        {% endfor %}
                                     </select>
                                     $err
                                 </div>

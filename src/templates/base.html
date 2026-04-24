@@ -4,7 +4,10 @@
 {% set cdn_base = "https://tools-static.wmflabs.org/cdnjs/ajax/libs" %}
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg')}}" sizes="any">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg')}}" type="image/svg+xml">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}WikiProjectMed Translation Dashboard{% endblock %}</title>
     <link rel='stylesheet' href='{{ cdn_base }}/bootstrap/5.3.3/css/bootstrap.min.css'>

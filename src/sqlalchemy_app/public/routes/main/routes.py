@@ -12,14 +12,18 @@ from flask import (
     send_from_directory,
 )
 
+from ....shared.services.lang_service import list_langs
+
 bp_main = Blueprint("main", __name__, url_prefix="")
 logger = logging.getLogger(__name__)
 
 
 @bp_main.get("/")
 def index():
+    lang_tables = [x.to_dict() for x in list_langs()]
     return render_template(
         "index.html",
+        lang_tables=lang_tables,
     )
 
 
