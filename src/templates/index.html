@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                         </div>
-                        {% if settings.allow_whole_translate %}
+                        {% if settings and settings.allow_whole_translate %}
                         <div class='col-10'>
                             <div class="mb-3">
                                 <label for="type" class="form-label"><b>Type</b></label>
@@ -96,7 +96,7 @@
         var code = $('#code').val() || '';
         var type = $('input[name=type]:checked').val() || '';
         var test = $('#test').val() || '';
-        var url = '/auth/index.php?a=login';
+        var url = '/login';
         if (camp !== '') {
             url += '&camp=' + encodeURIComponent(camp);
         }
