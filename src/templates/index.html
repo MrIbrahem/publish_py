@@ -72,7 +72,7 @@
                                 <input type="submit" name="doit" class="btn btn-outline-primary" value="Do it" />
                                 {% else %}
                                 <button type="submit" formaction="{{ url_for('auth.login') }}" formmethod="get"
-                                    class="btn btn-outline-primary">
+                                    formnovalidate class="btn btn-outline-primary">
                                     <i class="fas fa-sign-in-alt"></i> Login
                                 </button>
                                 {% endif %}
