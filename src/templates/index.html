@@ -5,12 +5,12 @@
     <div class='card'>
         <div class='card-header'>
             This tool looks for Wikidata items that have a page on mdwiki.org but not in another wikipedia language <a
-                href='?cat=RTT&depth=1&code=ceb&doit=Do+it'>(Example)</a>.
+                href='?cat=RTT&depth=1&code=ceb&doit=1'>(Example)</a>.
             <a href='//mdwiki.org/wiki/WikiProjectMed:Translation_task_force' target="_blank"><b>How to use.</b></a>
         </div>
         <div class='card-body mb-0'>
             <div class='mainindex'>
-                <form method='GET' action='{{ url_for("main.index")}}' class='form-inline'>
+                <form method='GET' action='{{ url_for("main.index")}}' class='form-inline' id="mainForm">
                     <div class='row'>
                         <div class='col-10'>
                             <div class="mb-3">
@@ -51,7 +51,8 @@
                                 <div class='form-control'>
                                     <div class='form-check form-check-inline'>
                                         <input type='radio' class='form-check-input' id='customRadio' name='type'
-                                            value='lead' {{ 'checked' if args.type == 'lead' else '' }}>
+                                            value='lead'
+                                            {{ 'checked' if args.type == 'lead' or not args.type else '' }}>
                                         <label class='form-check-label' for='customRadio'>The lead only</label>
                                     </div>
                                     <div class='form-check form-check-inline'>
@@ -70,10 +71,10 @@
                                 {% if is_authenticated %}
                                 <input type="submit" name="doit" class="btn btn-outline-primary" value="Do it" />
                                 {% else %}
-                                <a role="button" class="btn btn-outline-primary" onclick="login()">
-                                    <i class="fas fa-sign-in-alt fa-sm fa-fw mr-1"></i><span
-                                        class="navtitles">Login</span>
-                                </a>
+                                <button type="submit" formaction="{{ url_for('auth.login') }}" formmethod="get"
+                                    class="btn btn-outline-primary">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </button>
                                 {% endif %}
                             </h4>
                         </div>
@@ -91,26 +92,5 @@
 
 {% block extra_js %}
 <script>
-    function login() {
-        var camp = $('#camp').val() || '';
-        var code = $('#code').val() || '';
-        var type = $('input[name=type]:checked').val() || '';
-        var test = $('#test').val() || '';
-        var url = '/login';
-        if (camp !== '') {
-            url += '&camp=' + encodeURIComponent(camp);
-        }
-        if (code !== '') {
-            url += '&code=' + encodeURIComponent(code);
-        }
-        if (type !== '') {
-            url += '&type=' + encodeURIComponent(type);
-        }
-        if (test !== '') {
-            url += '&test=' + encodeURIComponent(test);
-        }
-        window.location.href = url;
-    }
-
 </script>
 {% endblock %}

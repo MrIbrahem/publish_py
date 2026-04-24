@@ -87,7 +87,11 @@
                         <a href="/profile" class="btn btn-outline-primary">{{ current_user.username }}</a>
                         <a href="/logout" class="btn btn-outline-primary">Logout</a>
                         {% else %}
-                        <a href="/login" class="btn btn-outline-primary">Login</a>
+                        <!-- <a href="/login" class="btn btn-outline-primary">Login</a> -->
+                        <button type="submit" form="mainForm" formaction="/login" formmethod="get"
+                            class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2"></i> <span class="navtitles">Login</span>
+                        </button>
                         {% endif %}
                         {% else %}
                         -
