@@ -24,6 +24,20 @@ def handle_form(request_data) -> Response:
     title = format_title(request_data.get("title", ""))
     text = request_data.get("text", "")
 
+    # Basic validation
+    if not user:
+        response = jsonify({"error": {"code": "invalid_input", "info": "User is required"}})
+        response.status_code = 400
+        return response
+    if not title:
+        response = jsonify({"error": {"code": "invalid_input", "info": "Title is required"}})
+        response.status_code = 400
+        return response
+    if not text:
+        response = jsonify({"error": {"code": "invalid_input", "info": "Text is required"}})
+        response.status_code = 400
+        return response
+
     # Build operation metadata
     tab = {
         "title": title,
