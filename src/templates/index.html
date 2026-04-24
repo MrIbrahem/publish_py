@@ -1,12 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="card shadow-sm">
-        <div class="card-header">
+<div class="container">
+    <div class='card'>
+        <div class='card-header'>
+            This tool looks for Wikidata items that have a page on mdwiki.org but not in another wikipedia language <a
+                href='?cat=RTT&depth=1&code=ceb&doit=Do+it'>(Example)</a>.
+            <a href='//mdwiki.org/wiki/WikiProjectMed:Translation_task_force' target="_blank"><b>How to use.</b></a>
         </div>
-        <div class="card-body">
-
+        <div class='card-body mb-0'>
+            <div class='mainindex'>
+                <form method='GET' action='{{ url_for("main.index")}}' class='form-inline'>
+                    <div class='row'>
+                        <div class='col-10'>
+                            <div class="mb-3">
+                                <label for="camp" class="form-label"><b>Campaign</b></label>
+                                <select dir='ltr' name='camp' id='camp' class='form-select' data-bs-theme="auto">
+                                    $camp_input
+                                </select>
+                            </div>
+                        </div>
+                        <div class='col-10'>
+                            <div class="mb-3">
+                                <label for="code" class="form-label"><b>Language</b></label>
+                                <div>
+                                    <select aria-label="Language code" class="selectpicker" id='code' name='code'
+                                        placeholder='two letter code' data-live-search="true" data-container="body"
+                                        data-live-search-style="begins" data-bs-theme="auto" data-style='btn active'
+                                        data-width="100%" required>
+                                        $lang_list
+                                    </select>
+                                    $err
+                                </div>
+                            </div>
+                        </div>
+                        $in_typ
+                        <div class='col-10'>
+                            <h4 class='aligncenter mb-0'>
+                                $uiu
+                            </h4>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-end">
+                    <img class='med-logo-big' src='{{ url_for('static', filename='favicon.svg')}}' decoding='async'
+                        alt='Wiki Project Med Foundation logo'>
+                </div>
+            </div>
         </div>
     </div>
 </div>
