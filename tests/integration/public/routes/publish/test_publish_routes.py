@@ -94,6 +94,7 @@ class TestPublishPost:
             response = client.post(
                 "/publish/",
                 data={
+                    "translate_type": "lead",
                     "user": "TestUser",
                     "title": "Test Page",
                     "target": "en",
@@ -120,6 +121,7 @@ class TestPublishFormData:
             response = client.post(
                 "/publish/",
                 data={
+                    "translate_type": "lead",
                     "user": "TestUser",
                     "title": "Test_Page",
                     "target": "en",
@@ -138,6 +140,7 @@ class TestPublishFormData:
             response = client.post(
                 "/publish/",
                 json={
+                    "translate_type": "lead",
                     "user": "TestUser",
                     "title": "Test Page",
                     "target": "en",
@@ -163,6 +166,7 @@ class TestPublishCaptcha:
             response = client.post(
                 "/publish/",
                 data={
+                    "translate_type": "lead",
                     "user": "TestUser",
                     "title": "Test Page",
                     "target": "en",
