@@ -19,10 +19,10 @@ class TestUsersNoInprocessDashboard:
 
     def test_users_no_inprocess_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that users no inprocess dashboard requires admin access."""
-        response = client.get("/admin/users_no_inprocess")
+        response = client.get("/admin/users_no_inprocess/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/users_no_inprocess/'
+        # With mock_admin_required, should render successfully
+        assert response.status_code == 200
 
     def test_users_no_inprocess_dashboard_lists_users(self, mock_admin_required, auth_client: FlaskClient):
         """Test that users no inprocess dashboard lists users."""
@@ -32,10 +32,10 @@ class TestUsersNoInprocessDashboard:
                 MagicMock(user="User2", is_active=False),
             ]
 
-            response = auth_client.get("/admin/users_no_inprocess")
+            response = auth_client.get("/admin/users_no_inprocess/")
 
-            assert response.status_code == 302
-            assert response.location == '/admin/users_no_inprocess/'
+            # Should render dashboard successfully
+            assert response.status_code == 200
 
 
 @pytest.mark.integration
