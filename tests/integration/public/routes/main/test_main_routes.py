@@ -18,7 +18,7 @@ class TestMainIndex:
         response = client.get("/")
 
         # May redirect or return 200
-        assert response.status_code in [200, 302]
+        assert response.status_code == 200
 
     def test_index_renders_template(self, client: FlaskClient):
         """Test that index route renders template."""
@@ -36,14 +36,14 @@ class TestMainReports:
         """Test that reports route returns 200."""
         response = client.get("/reports")
 
-        assert response.status_code in [200, 302]
+        assert response.status_code == 200
 
     def test_reports_renders_template(self, client: FlaskClient):
         """Test that reports route renders template."""
         response = client.get("/reports")
 
-        if response.status_code == 200:
-            assert response.content_type in ["text/html; charset=utf-8", "text/html"]
+        assert response.status_code == 200
+        assert response.content_type in ["text/html; charset=utf-8", "text/html"]
 
 
 @pytest.mark.integration
@@ -54,7 +54,7 @@ class TestMainFavicon:
         """Test that favicon route returns 200 or 404 if not present."""
         response = client.get("/favicon.ico")
 
-        assert response.status_code in [200, 404]
+        assert response.status_code == 404
 
     def test_favicon_returns_correct_mimetype(self, client: FlaskClient):
         """Test that favicon returns correct mimetype."""
@@ -62,3 +62,21 @@ class TestMainFavicon:
 
         if response.status_code == 200:
             assert "icon" in response.content_type or response.content_type == "image/x-icon"
+
+
+class TestMainRouteIntegration:
+    """Integration tests for main routes."""
+
+    def test_index_route_returns_html(self, client):
+        """Test that index route returns HTML."""
+        response = client.get("/")
+
+        # Should return HTML content
+        assert response.status_code == 200
+        assert response.content_type.startswith("text/html")
+
+    def test_404_for_nonexistent_route(self, client):
+        """Test that nonexistent routes return 404."""
+        response = client.get("/nonexistent-route")
+
+        assert response.status_code == 404

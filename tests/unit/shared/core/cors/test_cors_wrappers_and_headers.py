@@ -46,9 +46,8 @@ class TestValidateAccessControlAllowOrigin:
         assert "Access-Control-Allow-Origin" not in result.headers
 
     def test_response_without_headers_attribute_no_error(
-        self, app, mock_load_request, mock_is_allowed, mock_check_secret
+        self, app, mock_load_request, mock_is_allowed_medwiki, mock_check_secret
     ):
-        mock_is_allowed.return_value = "trusted.com"
         plain_response = "just a string"
         decorated = validate_access(lambda: plain_response)
 
@@ -104,8 +103,7 @@ class TestCheckCorsAccessControlAllowOrigin:
         assert result.status_code == 403
         assert "Access-Control-Allow-Origin" not in result.headers
 
-    def test_response_without_headers_attribute_no_error(self, app, mock_load_request, mock_is_allowed):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_response_without_headers_attribute_no_error(self, app, mock_load_request, mock_is_allowed_medwiki):
         plain_response = "just a string"
         decorated = check_cors(lambda: plain_response)
 

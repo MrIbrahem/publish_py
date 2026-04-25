@@ -121,6 +121,11 @@ def mock_is_allowed(mocker):
 
 
 @pytest.fixture
+def mock_is_allowed_medwiki(mocker):
+    return mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value="medwiki.toolforge.org")
+
+
+@pytest.fixture
 def mock_check_secret(mocker):
     return mocker.patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None)
 
@@ -216,3 +221,22 @@ def setup_db():
         yield
 
     engine.dispose()
+
+
+@pytest.fixture
+def mock_admin_required(mocker):
+    """Mock admin_required decorator to bypass authentication checks.
+
+    Inject this fixture into admin route tests to bypass authentication
+    so tests can focus on route functionality rather than auth.
+    """
+    # Mock current_user to return a valid user object
+    mock_user = MagicMock()
+    mock_user.username = "admin"
+    mocker.patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_user)
+
+    # Mock _get_cached_active_coordinators to return list with "admin"
+    mocker.patch(
+        "src.sqlalchemy_app.admin.decorators._get_cached_active_coordinators",
+        return_value=["admin"],
+    )

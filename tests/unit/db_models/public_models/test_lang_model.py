@@ -52,7 +52,7 @@ class TestLangRecordRedirects:
             code="ar",
             autonym="العربية",
             name="Arabic",
-            redirects=redirects_list
+            redirects=redirects_list,
         )
         assert record.redirects == redirects_list
         assert isinstance(record.redirects, list)
@@ -65,7 +65,7 @@ class TestLangRecordRedirects:
             code="en",
             autonym="English",
             name="English",
-            redirects=redirects_list
+            redirects=redirects_list,
         )
         result = record.to_dict()
         assert result["redirects"] == redirects_list
@@ -78,6 +78,6 @@ class TestLangRecordRedirects:
             lang_id=2,
             code="fr",
             autonym="Français",
-            name="French"
+            name="French",
         )
         assert record.redirects is None

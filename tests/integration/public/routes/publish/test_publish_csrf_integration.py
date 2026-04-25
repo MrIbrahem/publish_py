@@ -51,14 +51,12 @@ def csrf_client(csrf_app):
 class TestPublishEndpointWithDenyCSRF:
     """Integration tests for publish endpoint with CSRF enabled."""
 
-    def test_cors_validation_still_works(self, csrf_client):
+    def test_cors_validation_still_works(self, mock_is_denied, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.is_allowed_checker.is_allowed") as mock_deny,
             patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
-            mock_deny.return_value = None
             mock_get_token.return_value = None
             mock_load_reports_db_instance = MagicMock()
             mock_load_reports_db.return_value = mock_load_reports_db_instance
@@ -75,16 +73,7 @@ class TestPublishEndpointWithDenyCSRF:
 class TestPublishEndpointWithCSRF2:
     """Integration tests for publish endpoint with CSRF enabled."""
 
-    @pytest.fixture(autouse=True)
-    def mock_is_allowed(self):
-        """
-        auto allow all
-        """
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed") as mocked:
-            mocked.return_value = "medwiki.toolforge.org"
-            yield mocked
-
-    def test_options_preflight_with_csrf_enabled(self, csrf_client):
+    def test_options_preflight_with_csrf_enabled(self, mock_is_allowed_medwiki, csrf_client):
         """Test OPTIONS preflight request with CSRF enabled."""
         response = csrf_client.options(
             "/publish",
@@ -95,7 +84,7 @@ class TestPublishEndpointWithCSRF2:
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
 
-    def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
+    def test_no_access_returns_403_with_csrf_enabled(self, mock_is_allowed, csrf_client):
         """Test that no access error returns 403 even with CSRF enabled."""
         with (
             patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
@@ -123,7 +112,12 @@ class TestPublishEndpointWithCSRF2:
 
             assert response.status_code == 403
             data = response.get_json()
-            assert data["error"]["code"] == "noaccess"
+            assert data == {
+                'error': {
+                    'code': 'access_denied',
+                    'info': 'Access denied. Invalid or missing secret key.'
+                }
+            }
 
 
 class BasePublishTest:
@@ -223,7 +217,7 @@ class TestSuccessFlows(BasePublishTest):
             csrf_client,
             self._default_payload(
                 campaign="test_campaign",
-                tr_type="lead",
+                translate_type="lead",
             ),
         )
 
@@ -245,8 +239,7 @@ class TestSuccessFlows(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            assert to_do_calls[0][0][0].get("fix_refs") == "yes"
+        assert to_do_calls[0][0][0].get("fix_refs") == "yes"
 
     def test_revid_resolution(self, csrf_client, common_patches):
         common_patches["get_revid"].return_value = "67890"
@@ -260,12 +253,18 @@ class TestSuccessFlows(BasePublishTest):
 
 class TestMetadataLogic(BasePublishTest):
     def test_tr_type_passed_correctly(self, csrf_client, common_patches):
-        response = self._post(csrf_client, self._default_payload(tr_type="section"))
+        response = self._post(csrf_client, self._default_payload(translate_type="all"))
 
         assert response.status_code == 200
         calls = common_patches["insert_page_target"].call_args_list
-        if calls:
-            assert calls[0].kwargs.get("tr_type") == "section"
+        assert calls[0].kwargs.get("translate_type") == "all"
+
+    def test_bad_tr_type(self, csrf_client, common_patches):
+        response = self._post(csrf_client, self._default_payload(translate_type="test"))
+
+        assert response.status_code == 400
+        calls = common_patches["insert_page_target"].call_args_list
+        assert calls == []
 
     def test_words_field_in_tab(self, csrf_client, common_patches):
         with (patch("src.sqlalchemy_app.public.routes.publish.worker.get_word_count") as mock_word_count,):
@@ -275,10 +274,9 @@ class TestMetadataLogic(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            tab = to_do_calls[0][0][0]
-            assert "words" in tab
-            assert tab["words"] == 500
+        tab = to_do_calls[0][0][0]
+        assert "words" in tab
+        assert tab["words"] == 500
 
     def test_hashtag_logic(self, csrf_client, common_patches):
         response = self._post(
@@ -291,9 +289,8 @@ class TestMetadataLogic(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            summary = to_do_calls[0][0][0].get("summary", "")
-            assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
+        summary = to_do_calls[0][0][0].get("summary", "")
+        assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
 
     def test_empty_revid_fallback(self, csrf_client, common_patches):
         # نُعدّل الـ revid ليكون فارغاً
@@ -304,10 +301,9 @@ class TestMetadataLogic(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            tab = to_do_calls[0][0][0]
-            assert tab.get("revid") == "99999"
-            assert "empty revid" in tab
+        tab = to_do_calls[0][0][0]
+        assert tab.get("revid") == "99999"
+        assert "empty revid" in tab
 
 
 class TestErrorAndEdgeCases(BasePublishTest):

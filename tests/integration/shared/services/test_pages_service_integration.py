@@ -55,7 +55,7 @@ class TestPagesServiceIntegration:
         """Test insert_page_target through service layer."""
         result = insert_page_target(
             sourcetitle="SourceTitle",
-            tr_type="Lead",
+            translate_type="Lead",
             cat="Category:Health",
             lang="ar",
             user="TestUser",
@@ -74,7 +74,7 @@ class TestPagesServiceErrorHandling:
         """Test that errors from DB are returned through service."""
         result = insert_page_target(
             sourcetitle="Source",
-            tr_type="Lead",
+            translate_type="Lead",
             cat="Category",
             lang="ar",
             user="User",

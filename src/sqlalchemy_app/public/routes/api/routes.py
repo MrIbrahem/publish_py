@@ -7,10 +7,12 @@ import logging
 from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
+from marshmallow import ValidationError
 from sqlalchemy import func, text
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
+from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.services.category_service import list_categories
 from ....shared.services.in_process_service import get_in_process_counts_by_user
 from ....shared.services.lang_service import list_langs
@@ -69,21 +71,17 @@ def get_publish_reports() -> Response:
         JSON response with matching reports or error
     """
 
-    # Extract filter parameters
-    filters: Dict[str, Any] = {}
-    filter_params = ["year", "month", "title", "user", "lang", "sourcetitle", "result"]
+    # Validate query parameters using marshmallow schema
+    # Validate & coerce query parameters using marshmallow schema
+    raw = {k: v for k, v in request.args.items() if v != "" and str(v).lower() != "all"}
+    try:
+        validated = PublishReportsQuerySchema().load(raw)
+    except ValidationError as err:
+        return jsonify({"error": "Validation failed", "info": err.messages}), 400
 
-    for param in filter_params:
-        value = request.args.get(param)
-        if value is not None and value != "":
-            filters[param] = value
-
-    # Extract select fields
-    select_param = request.args.get("select")
-    select_fields = parse_select_fields(select_param)
-
-    # Extract limit
-    limit = request.args.get("limit", type=int)
+    limit = validated.pop("limit", None)
+    select_fields = parse_select_fields(validated.pop("select", None))
+    filters: Dict[str, Any] = validated
 
     try:
         # Query database

@@ -41,22 +41,20 @@ def client(app: Flask) -> FlaskClient:
 class TestCheckCorsOnCxtokenGet:
     """Tests for @check_cors decorator on cxtoken GET route with CORS_ENABLED."""
 
-    def test_get_disallowed_origin_returns_403(self, client):
+    def test_get_disallowed_origin_returns_403(self, mock_is_denied, client):
         """GET from disallowed origin returns 403."""
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None):
-            response = client.get(
-                "/cxtoken?wiki=en&user=TestUser",
-                headers={"Origin": "https://evil.com"},
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "access_denied"
-            assert "authorized domains" in data["error"]["info"]
+        response = client.get(
+            "/cxtoken?wiki=en&user=TestUser",
+            headers={"Origin": "https://evil.com"},
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "access_denied"
+        assert "authorized domains" in data["error"]["info"]
 
-    def test_get_allowed_origin_proceeds(self, client):
+    def test_get_allowed_origin_proceeds(self, mock_is_allowed_medwiki, client):
         """GET from allowed origin passes CORS check and reaches handler."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch(
                 "src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username",
                 return_value=None,
@@ -71,18 +69,16 @@ class TestCheckCorsOnCxtokenGet:
             assert data["error"]["code"] == "no access"
             assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
 
-    def test_get_no_origin_returns_403(self, client):
+    def test_get_no_origin_returns_403(self, mock_is_denied, client):
         """GET with no Origin header returns 403."""
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None):
-            response = client.get("/cxtoken?wiki=en&user=TestUser")
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "access_denied"
+        response = client.get("/cxtoken?wiki=en&user=TestUser")
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "access_denied"
 
-    def test_get_allowed_origin_returns_cxtoken(self, client):
+    def test_get_allowed_origin_returns_cxtoken(self, mock_is_allowed_medwiki, client):
         """GET from allowed origin returns cxtoken on success."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
@@ -104,33 +100,30 @@ class TestCheckCorsOnCxtokenGet:
 class TestCheckCorsOnCxtokenOptions:
     """Tests for @check_cors decorator on cxtoken OPTIONS route with CORS_ENABLED."""
 
-    def test_options_allowed_origin_returns_200(self, client):
+    def test_options_allowed_origin_returns_200(self, mock_is_allowed_medwiki, client):
         """OPTIONS preflight from allowed origin returns 200 with CORS headers."""
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN):
-            response = client.options(
-                "/cxtoken",
-                headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
-            )
-            assert response.status_code == 200
-            assert "Access-Control-Allow-Methods" in response.headers
-            assert response.headers["Access-Control-Allow-Origin"] == f"https://{ALLOWED_DOMAIN}"
+        response = client.options(
+            "/cxtoken",
+            headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
+        )
+        assert response.status_code == 200
+        assert "Access-Control-Allow-Methods" in response.headers
+        assert response.headers["Access-Control-Allow-Origin"] == f"https://{ALLOWED_DOMAIN}"
 
-    def test_options_disallowed_origin_returns_403(self, client):
+    def test_options_disallowed_origin_returns_403(self, mock_is_denied, client):
         """OPTIONS preflight from disallowed origin returns 403."""
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None):
-            response = client.options(
-                "/cxtoken",
-                headers={"Origin": "https://evil.com"},
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "access_denied"
+        response = client.options(
+            "/cxtoken",
+            headers={"Origin": "https://evil.com"},
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "access_denied"
 
-    def test_options_no_origin_returns_403(self, client):
+    def test_options_no_origin_returns_403(self, mock_is_denied, client):
         """OPTIONS preflight with no Origin header returns 403."""
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None):
-            response = client.options("/cxtoken")
-            assert response.status_code == 403
+        response = client.options("/cxtoken")
+        assert response.status_code == 403
 
 
 class TestCxtokenCorsOnIntegration:

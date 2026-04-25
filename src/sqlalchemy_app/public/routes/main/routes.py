@@ -29,7 +29,7 @@ def index():
 
     code = request.args.get("code")
     camp = request.args.get("camp")
-    tr_type = request.args.get("type")
+    translate_type = request.args.get("type")
     lang_name = langs_dict.get(code, {}).get("name")
 
     if code and not lang_name:
@@ -45,7 +45,7 @@ def index():
         args={
             "code": code,
             "camp": camp,
-            "type": tr_type,
+            "type": translate_type,
         },
     )
 

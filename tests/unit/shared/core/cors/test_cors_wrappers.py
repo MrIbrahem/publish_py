@@ -8,8 +8,8 @@ from src.sqlalchemy_app.shared.core.cors import check_cors, validate_access
 
 
 class TestValidateAccessDecorated:
-    def test_allowed_domain_calls_wrapped_function(self, app, mock_load_request, mock_is_allowed, mock_check_secret):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_allowed_domain_calls_wrapped_function(self, app, mock_load_request, mock_is_allowed_medwiki, mock_check_secret):
+
         mock_func = MagicMock(return_value="ok")
         decorated = validate_access(mock_func)
 
@@ -28,8 +28,8 @@ class TestValidateAccessDecorated:
         mock_func.assert_called_once()
         assert result == "ok"
 
-    def test_both_valid_calls_wrapped_function(self, app, mock_load_request, mock_is_allowed, mock_check_secret):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_both_valid_calls_wrapped_function(self, app, mock_load_request, mock_is_allowed_medwiki, mock_check_secret):
+
         mock_check_secret.return_value = "secret-host.com"
         mock_func = MagicMock(return_value="ok")
         decorated = validate_access(mock_func)
@@ -59,8 +59,8 @@ class TestValidateAccessDecorated:
         assert data["error"]["code"] == "access_denied"
         assert "secret key" in data["error"]["info"].lower()
 
-    def test_passes_args_and_kwargs(self, app, mock_load_request, mock_is_allowed, mock_check_secret):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_passes_args_and_kwargs(self, app, mock_load_request, mock_is_allowed_medwiki, mock_check_secret):
+
         mock_func = MagicMock(return_value="result")
         decorated = validate_access(mock_func)
 
@@ -68,8 +68,7 @@ class TestValidateAccessDecorated:
 
         mock_func.assert_called_once_with("arg1", key="value")
 
-    def test_preserves_function_metadata(self, app, mock_load_request, mock_is_allowed, mock_check_secret):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_preserves_function_metadata(self, app, mock_load_request, mock_is_allowed_medwiki, mock_check_secret):
 
         def my_func():
             """My docstring."""
@@ -81,8 +80,8 @@ class TestValidateAccessDecorated:
 
 
 class TestCheckCorsAccessDecorated:
-    def test_allowed_domain_calls_wrapped_function(self, app, mock_load_request, mock_is_allowed):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_allowed_domain_calls_wrapped_function(self, app, mock_load_request, mock_is_allowed_medwiki):
+
         mock_func = MagicMock(return_value="ok")
         decorated = check_cors(mock_func)
 
@@ -109,8 +108,8 @@ class TestCheckCorsAccessDecorated:
         assert data["error"]["code"] == "access_denied"
         assert "authorized domains" in data["error"]["info"]
 
-    def test_passes_args_and_kwargs(self, app, mock_load_request, mock_is_allowed):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_passes_args_and_kwargs(self, app, mock_load_request, mock_is_allowed_medwiki):
+
         mock_func = MagicMock(return_value="result")
         decorated = check_cors(mock_func)
 
@@ -118,8 +117,7 @@ class TestCheckCorsAccessDecorated:
 
         mock_func.assert_called_once_with("arg1", key="value")
 
-    def test_preserves_function_metadata(self, app, mock_load_request, mock_is_allowed):
-        mock_is_allowed.return_value = "trusted.com"
+    def test_preserves_function_metadata(self, app, mock_load_request, mock_is_allowed_medwiki):
 
         def my_func():
             """My docstring."""

@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from typing import Any, Tuple, Type
 
-from flask import Flask, flash, render_template, request  # , g
+from flask import Flask, flash, jsonify, render_template, request  # , g
 
 from .admin.routes.admin import (
     bp_admin,
@@ -133,18 +133,58 @@ def create_app(config_class: Type | None = None) -> Flask:
     # @app.teardown_appcontext
     # def _cleanup_connections(exception: Exception | None) -> None:  # pragma: no cover - teardown
 
+    @app.errorhandler(400)
+    def bad_request(e: Exception) -> Tuple[str, int]:
+        """Handle 400 errors"""
+        logger.warning("Bad request: %s", e)
+        if request.is_json or request.path.startswith("/api/"):
+            return jsonify({"error": "Bad request", "message": str(e)}), 400
+        flash("Bad request", "warning")
+        return render_template("index.html", title="Bad Request"), 400
+
+    @app.errorhandler(401)
+    def unauthorized(e: Exception) -> Tuple[str, int]:
+        """Handle 401 errors"""
+        logger.warning("Unauthorized: %s", e)
+        if request.is_json or request.path.startswith("/api/"):
+            return jsonify({"error": "Unauthorized", "message": "Authentication required"}), 401
+        flash("Please log in to access this page", "warning")
+        return render_template("index.html", title="Unauthorized"), 401
+
+    @app.errorhandler(403)
+    def forbidden(e: Exception) -> Tuple[str, int]:
+        """Handle 403 errors"""
+        logger.warning("Forbidden: %s", e)
+        if request.is_json or request.path.startswith("/api/"):
+            return jsonify({"error": "Forbidden", "message": "Access denied"}), 403
+        flash("Access denied", "danger")
+        return render_template("index.html", title="Access Denied"), 403
+
     @app.errorhandler(404)
     def page_not_found(e: Exception) -> Tuple[str, int]:
         """Handle 404 errors"""
         logger.error("Page not found: %s", e)
         logger.error(f"Request url: {request.url}")
+        if request.is_json or request.path.startswith("/api/"):
+            return jsonify({"error": "Not found", "message": str(e)}), 404
         flash("Page not found", "warning")
         return render_template("index.html", title="Page Not Found"), 404
+
+    @app.errorhandler(429)
+    def too_many_requests(e: Exception) -> Tuple[str, int]:
+        """Handle 429 rate limit errors"""
+        logger.warning("Rate limit exceeded: %s", e)
+        if request.is_json or request.path.startswith("/api/"):
+            return jsonify({"error": "Too many requests", "message": "Rate limit exceeded"}), 429
+        flash("Too many requests. Please try again later.", "warning")
+        return render_template("index.html", title="Rate Limit Exceeded"), 429
 
     @app.errorhandler(500)
     def internal_server_error(e: Exception) -> Tuple[str, int]:
         """Handle 500 errors"""
         logger.error("Internal Server Error: %s", e)
+        if request.is_json or request.path.startswith("/api/"):
+            return jsonify({"error": "Internal server error"}), 500
         flash("Internal Server Error", "danger")
         return render_template("index.html", title="Internal Server Error"), 500
 

@@ -42,7 +42,12 @@ def get_lang_by_code(code: str) -> LangRecord | None:
         return orm_obj
 
 
-def add_lang(code: str, autonym: str, name: str, redirects: list[str] | None = None,) -> LangRecord:
+def add_lang(
+    code: str,
+    autonym: str,
+    name: str,
+    redirects: list[str] | None = None,
+) -> LangRecord:
     """Add a new language record."""
     code = code.strip()
     if not code:
@@ -61,7 +66,12 @@ def add_lang(code: str, autonym: str, name: str, redirects: list[str] | None = N
         return orm_obj
 
 
-def add_or_update_lang(code: str, autonym: str, name: str, redirects: list[str] | None = None,) -> LangRecord:
+def add_or_update_lang(
+    code: str,
+    autonym: str,
+    name: str,
+    redirects: list[str] | None = None,
+) -> LangRecord:
     """Add or update a language record."""
     code = code.strip()
     if not code:

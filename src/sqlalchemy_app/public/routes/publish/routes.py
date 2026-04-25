@@ -8,8 +8,10 @@ This endpoint handles publishing translated pages to Wikipedia.
 import logging
 
 from flask import Blueprint, Response, jsonify, request
+from marshmallow import ValidationError
 
 from ....shared.core.cors import check_cors, validate_access
+from ....shared.schemas import PublishRequestSchema
 from ....shared.services.user_token_service import get_user_token_by_username
 from ....shared.utils.helpers.format import format_title, format_user
 from .worker import _handle_no_access, _process_edit
@@ -19,23 +21,38 @@ logger = logging.getLogger(__name__)
 
 
 def handle_form(request_data) -> Response:
+    # Validate using marshmallow schema
+    raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
+
+    # translate_type can be "all" - only include if present in request
+    translate_type = request_data.get("translate_type", "")
+    if translate_type:
+        raw["translate_type"] = translate_type
+
+    try:
+        validated_data = PublishRequestSchema().load(raw)
+    except ValidationError as err:
+        response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
+        response.status_code = 400
+        return response
+
     # Format inputs
-    user = format_user(request_data.get("user", ""))
-    title = format_title(request_data.get("title", ""))
-    text = request_data.get("text", "")
+    user = format_user(validated_data.get("user", ""))
+    title = format_title(validated_data.get("title", ""))
+    text = validated_data.get("text", "")
 
     # Build operation metadata
     tab = {
         "title": title,
         "summary": "",
-        "lang": request_data.get("target", ""),
+        "lang": validated_data.get("target", ""),
         "user": user,
-        "campaign": request_data.get("campaign", ""),
+        "campaign": validated_data.get("campaign", ""),
         "result": "",
         "edit": {},
-        "sourcetitle": request_data.get("sourcetitle", ""),
-        "request_revid": request_data.get("revid", "") or request_data.get("revision", ""),
-        "tr_type": request_data.get("tr_type", "lead"),
+        "sourcetitle": validated_data.get("sourcetitle", ""),
+        "request_revid": validated_data.get("revid", "") or validated_data.get("revision", ""),
+        "translate_type": validated_data.get("translate_type", "lead"),
         "words": 0,
     }
 
@@ -51,10 +68,10 @@ def handle_form(request_data) -> Response:
     access_key, access_secret = user_token.decrypted()
 
     # Add captcha parameters if present
-    if request_data.get("wpCaptchaId") and request_data.get("wpCaptchaWord"):
+    if validated_data.get("wpCaptchaId") and validated_data.get("wpCaptchaWord"):
         tab["wp_captcha_params"] = {
-            "wpCaptchaId": request_data["wpCaptchaId"],
-            "wpCaptchaWord": request_data["wpCaptchaWord"],
+            "wpCaptchaId": validated_data["wpCaptchaId"],
+            "wpCaptchaWord": validated_data["wpCaptchaWord"],
         }
 
     # Process the edit

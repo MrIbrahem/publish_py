@@ -9,10 +9,12 @@ It validates CORS, retrieves user access credentials, and returns tokens.
 import logging
 
 from flask import Blueprint, Response, jsonify, request
+from marshmallow import ValidationError
 
 from ....config import settings
 from ....shared.clients.oauth_client import get_cxtoken
 from ....shared.core.cors import check_cors
+from ....shared.schemas import CXTokenRequestSchema
 from ....shared.services.user_token_service import (
     delete_user_token_by_username,
     get_user_token_by_username,
@@ -89,14 +91,16 @@ def index() -> Response:
     Returns:
         JSON response with cxtoken data or error
     """
+    try:
+        validated_data = CXTokenRequestSchema().load(request.args)
+    except ValidationError as err:
+        response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
+        response.status_code = 400
+        return response
 
     # Get request parameters
-    wiki = request.args.get("wiki", "")
-    user = request.args.get("user", "")
-
-    # Validate parameters (maintain backward compatibility with tests)
-    if not wiki or not user:
-        return jsonify({"error": {"code": "no data", "info": "wiki or user is empty"}}), 400
+    wiki = validated_data.get("wiki", "")
+    user = validated_data.get("user", "")
 
     # Format user (apply special user mappings)
     user = _format_user(user)

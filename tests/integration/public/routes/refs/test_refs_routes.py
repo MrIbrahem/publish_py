@@ -19,14 +19,14 @@ class TestRefsIndex:
         """Test that fixrefs index route returns 200."""
         response = client.get("/fixrefs/")
 
-        assert response.status_code in [200, 302, 404]
+        assert response.status_code == 200
 
     def test_fixrefs_index_renders_template(self, client: FlaskClient):
         """Test that fixrefs index renders template."""
         response = client.get("/fixrefs/")
 
-        if response.status_code == 200:
-            assert response.content_type in ["text/html; charset=utf-8", "text/html"]
+        assert response.status_code == 200
+        assert response.content_type in ["text/html; charset=utf-8", "text/html"]
 
 
 @pytest.mark.integration
