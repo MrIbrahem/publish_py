@@ -42,8 +42,8 @@ class TestMainReports:
         """Test that reports route renders template."""
         response = client.get("/reports")
 
-        if response.status_code == 200:
-            assert response.content_type in ["text/html; charset=utf-8", "text/html"]
+        assert response.status_code == 200
+        assert response.content_type in ["text/html; charset=utf-8", "text/html"]
 
 
 @pytest.mark.integration
@@ -60,5 +60,5 @@ class TestMainFavicon:
         """Test that favicon returns correct mimetype."""
         response = client.get("/favicon.ico")
 
-        if response.status_code == 200:
-            assert "icon" in response.content_type or response.content_type == "image/x-icon"
+        assert response.status_code == 200
+        assert "icon" in response.content_type or response.content_type == "image/x-icon"

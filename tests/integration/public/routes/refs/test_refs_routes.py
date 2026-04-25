@@ -25,8 +25,8 @@ class TestRefsIndex:
         """Test that fixrefs index renders template."""
         response = client.get("/fixrefs/")
 
-        if response.status_code == 200:
-            assert response.content_type in ["text/html; charset=utf-8", "text/html"]
+        assert response.status_code == 200
+        assert response.content_type in ["text/html; charset=utf-8", "text/html"]
 
 
 @pytest.mark.integration

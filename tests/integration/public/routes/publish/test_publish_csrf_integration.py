@@ -245,8 +245,7 @@ class TestSuccessFlows(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            assert to_do_calls[0][0][0].get("fix_refs") == "yes"
+        assert to_do_calls[0][0][0].get("fix_refs") == "yes"
 
     def test_revid_resolution(self, csrf_client, common_patches):
         common_patches["get_revid"].return_value = "67890"
@@ -260,12 +259,18 @@ class TestSuccessFlows(BasePublishTest):
 
 class TestMetadataLogic(BasePublishTest):
     def test_tr_type_passed_correctly(self, csrf_client, common_patches):
-        response = self._post(csrf_client, self._default_payload(tr_type="section"))
+        response = self._post(csrf_client, self._default_payload(tr_type="all"))
 
         assert response.status_code == 200
         calls = common_patches["insert_page_target"].call_args_list
-        if calls:
-            assert calls[0].kwargs.get("tr_type") == "section"
+        assert calls[0].kwargs.get("tr_type") == "all"
+
+    def test_bad_tr_type(self, csrf_client, common_patches):
+        response = self._post(csrf_client, self._default_payload(tr_type="test"))
+
+        assert response.status_code == 400
+        calls = common_patches["insert_page_target"].call_args_list
+        assert calls == []
 
     def test_words_field_in_tab(self, csrf_client, common_patches):
         with (patch("src.sqlalchemy_app.public.routes.publish.worker.get_word_count") as mock_word_count,):
@@ -275,10 +280,9 @@ class TestMetadataLogic(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            tab = to_do_calls[0][0][0]
-            assert "words" in tab
-            assert tab["words"] == 500
+        tab = to_do_calls[0][0][0]
+        assert "words" in tab
+        assert tab["words"] == 500
 
     def test_hashtag_logic(self, csrf_client, common_patches):
         response = self._post(
@@ -291,9 +295,8 @@ class TestMetadataLogic(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            summary = to_do_calls[0][0][0].get("summary", "")
-            assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
+        summary = to_do_calls[0][0][0].get("summary", "")
+        assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
 
     def test_empty_revid_fallback(self, csrf_client, common_patches):
         # نُعدّل الـ revid ليكون فارغاً
@@ -304,10 +307,9 @@ class TestMetadataLogic(BasePublishTest):
 
         assert response.status_code == 200
         to_do_calls = common_patches["to_do"].call_args_list
-        if to_do_calls:
-            tab = to_do_calls[0][0][0]
-            assert tab.get("revid") == "99999"
-            assert "empty revid" in tab
+        tab = to_do_calls[0][0][0]
+        assert tab.get("revid") == "99999"
+        assert "empty revid" in tab
 
 
 class TestErrorAndEdgeCases(BasePublishTest):
