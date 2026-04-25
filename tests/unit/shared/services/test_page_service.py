@@ -16,7 +16,7 @@ from src.sqlalchemy_app.sqlalchemy_models import PageRecord
 def test_page_workflow():
     p = add_page(
         sourcetitle="COVID-19 pandemic",
-        tr_type="lead",
+        translate_type="lead",
         cat="History",
         lang="fr",
         user="Historian",
@@ -42,7 +42,7 @@ def test_page_workflow():
 
     success = insert_page_target(
         sourcetitle="Black Death",
-        tr_type="lead",
+        translate_type="lead",
         cat="History",
         lang="fr",
         user="Historian",

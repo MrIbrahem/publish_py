@@ -16,7 +16,7 @@ from src.sqlalchemy_app.sqlalchemy_models import UserPageRecord
 def test_user_page_workflow() -> None:
     p = add_user_page(
         sourcetitle="Influenza",
-        tr_type="lead",
+        translate_type="lead",
         cat="History",
         lang="de",
         user="user1",
@@ -41,7 +41,7 @@ def test_user_page_workflow() -> None:
 
     success = insert_user_page_target(
         sourcetitle="Malaria",
-        tr_type="lead",
+        translate_type="lead",
         cat="Medicine",
         lang="fr",
         user="French_Wiki",

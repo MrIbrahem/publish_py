@@ -223,7 +223,7 @@ class TestSuccessFlows(BasePublishTest):
             csrf_client,
             self._default_payload(
                 campaign="test_campaign",
-                tr_type="lead",
+                translate_type="lead",
             ),
         )
 
@@ -259,14 +259,14 @@ class TestSuccessFlows(BasePublishTest):
 
 class TestMetadataLogic(BasePublishTest):
     def test_tr_type_passed_correctly(self, csrf_client, common_patches):
-        response = self._post(csrf_client, self._default_payload(tr_type="all"))
+        response = self._post(csrf_client, self._default_payload(translate_type="all"))
 
         assert response.status_code == 200
         calls = common_patches["insert_page_target"].call_args_list
-        assert calls[0].kwargs.get("tr_type") == "all"
+        assert calls[0].kwargs.get("translate_type") == "all"
 
     def test_bad_tr_type(self, csrf_client, common_patches):
-        response = self._post(csrf_client, self._default_payload(tr_type="test"))
+        response = self._post(csrf_client, self._default_payload(translate_type="test"))
 
         assert response.status_code == 400
         calls = common_patches["insert_page_target"].call_args_list

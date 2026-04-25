@@ -227,7 +227,7 @@ def _add_to_db(
     campaign: str,
     sourcetitle: str,
     mdwiki_revid: str,
-    tr_type: str = "lead",
+    translate_type: str = "lead",
     words: int = 0,
 ) -> dict[str, Any]:
     """Add page to database.
@@ -240,7 +240,7 @@ def _add_to_db(
         campaign: Campaign name
         sourcetitle: Source page title
         mdwiki_revid: MDWiki revision ID
-        tr_type: Translation type
+        translate_type: Translation type
         words: Article words
 
     Returns:
@@ -263,7 +263,7 @@ def _add_to_db(
         cat,
         words,
         to_users_table,
-        tr_type=tr_type,
+        translate_type=translate_type,
     )
 
 
@@ -276,7 +276,7 @@ def insert_to_db(
     cat,
     word,
     to_users_table,
-    tr_type="lead",
+    translate_type="lead",
 ):
     # Normalize inputs
     sourcetitle = sourcetitle.replace("_", " ")
@@ -293,7 +293,7 @@ def insert_to_db(
 
     return insert_to_db_2(
         sourcetitle=sourcetitle,
-        tr_type=tr_type,
+        translate_type=translate_type,
         cat=cat,
         lang=lang,
         user=user,
@@ -308,7 +308,7 @@ def insert_to_db_2(
     sourcetitle: str,
     lang: str,
     user: str,
-    tr_type: str,
+    translate_type: str,
     cat: str,
     target: str,
     to_users_table: bool = False,
@@ -321,7 +321,7 @@ def insert_to_db_2(
 
     Args:
         sourcetitle: Page title
-        tr_type: Translation type
+        translate_type: Translation type
         cat: Category
         lang: Target language
         user: Username
@@ -363,7 +363,7 @@ def insert_to_db_2(
         # Insert new record
         add_done = insert_page_target(
             sourcetitle=sourcetitle,
-            tr_type=tr_type,
+            translate_type=translate_type,
             cat=cat,
             lang=lang,
             user=user,
@@ -375,7 +375,7 @@ def insert_to_db_2(
         # Insert new record
         add_done = insert_user_page_target(
             sourcetitle=sourcetitle,
-            tr_type=tr_type,
+            translate_type=translate_type,
             cat=cat,
             lang=lang,
             user=user,
@@ -422,7 +422,7 @@ def _process_edit(
     campaign = tab["campaign"]
     title = tab["title"]
     user = tab["user"]
-    tr_type = tab["tr_type"]
+    translate_type = tab["translate_type"]
 
     # Get word count (mirrors PHP $tab['words'] = $Words_table[$title] ?? 0)
     tab["words"] = get_word_count(sourcetitle)
@@ -499,7 +499,7 @@ def _process_edit(
             campaign,
             sourcetitle,
             mdwiki_revid,
-            tr_type=tr_type,
+            translate_type=translate_type,
             words=tab["words"],
         )
 

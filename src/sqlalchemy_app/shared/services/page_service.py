@@ -25,7 +25,7 @@ def list_pages() -> List[PageRecord]:
 
 def add_page(
     sourcetitle: str,
-    tr_type: str,
+    translate_type: str,
     cat: str,
     lang: str,
     user: str,
@@ -40,7 +40,7 @@ def add_page(
         orm_obj = PageRecord(
             title=sourcetitle,
             word=word,
-            translate_type=tr_type,
+            translate_type=translate_type,
             cat=cat,
             lang=lang,
             user=user,
@@ -65,7 +65,7 @@ def add_page(
 
 def insert_page_target(
     sourcetitle: str,
-    tr_type: str,
+    translate_type: str,
     cat: str,
     lang: str,
     user: str,
@@ -77,7 +77,7 @@ def insert_page_target(
     try:
         add_page(
             sourcetitle=sourcetitle,
-            tr_type=tr_type,
+            translate_type=translate_type,
             cat=cat,
             lang=lang,
             user=user,

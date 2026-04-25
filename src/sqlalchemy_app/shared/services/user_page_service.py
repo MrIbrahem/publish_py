@@ -25,7 +25,7 @@ def list_user_pages() -> List[UserPageRecord]:
 
 def add_user_page(
     sourcetitle: str,
-    tr_type: str,
+    translate_type: str,
     cat: str,
     lang: str,
     user: str,
@@ -40,7 +40,7 @@ def add_user_page(
         orm_obj = UserPageRecord(
             title=sourcetitle,
             word=word,
-            translate_type=tr_type,
+            translate_type=translate_type,
             cat=cat,
             lang=lang,
             user=user,
@@ -65,7 +65,7 @@ def add_user_page(
 
 def insert_user_page_target(
     sourcetitle: str,
-    tr_type: str,
+    translate_type: str,
     cat: str,
     lang: str,
     user: str,
@@ -77,7 +77,7 @@ def insert_user_page_target(
     try:
         add_user_page(
             sourcetitle=sourcetitle,
-            tr_type=tr_type,
+            translate_type=translate_type,
             cat=cat,
             lang=lang,
             user=user,
