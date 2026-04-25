@@ -3,6 +3,7 @@ Validation schemas using marshmallow.
 """
 
 from typing import ClassVar
+
 from flask import request
 from marshmallow import Schema, ValidationError, fields, post_load, validate, validates
 
@@ -35,10 +36,9 @@ class PublishRequestSchema(Schema):
 
 class PublishReportsQuerySchema(Schema):
     """Schema for /api/publish_reports query parameters validation."""
+
     # Special filter values
-    ALLOWED_SPECIAL_VALUES: ClassVar[frozenset[str]] = frozenset(
-        {"not_empty", "not_mt", "empty", "mt", ">0", "all"}
-    )
+    ALLOWED_SPECIAL_VALUES: ClassVar[frozenset[str]] = frozenset({"not_empty", "not_mt", "empty", "mt", ">0", "all"})
     year = fields.Int(validate=validate.Range(min=2000, max=2100))
     month = fields.Int(validate=validate.Range(min=1, max=12))
     title = fields.Str(validate=validate.Length(max=255))

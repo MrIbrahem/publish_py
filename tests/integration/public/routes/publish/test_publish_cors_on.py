@@ -86,9 +86,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_disallowed_origin_returns_403(self, mock_is_denied, client):
         """POST from disallowed origin without secret key returns 403."""
-        with (
-            patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),
-        ):
+        with (patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),):
             response = client.post(
                 "/publish/",
                 data=json.dumps({"user": "TestUser", "title": "Test Page"}),
@@ -190,9 +188,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_disallowed_origin_and_no_secret_key(self, mock_is_denied, client):
         """POST from disallowed origin without secret key returns specific error info."""
-        with (
-            patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),
-        ):
+        with (patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),):
             response = client.post(
                 "/publish/",
                 headers={"Origin": "https://evil.com"},
