@@ -23,6 +23,7 @@ class TestCoordinatorsDashboard:
 
         # Should redirect to login or require admin
         assert response.status_code == 200
+        assert response.location == '/admin/coordinators/'
 
     def test_coordinators_dashboard_lists_coordinators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that coordinators dashboard lists coordinators."""
@@ -36,6 +37,7 @@ class TestCoordinatorsDashboard:
 
             # May redirect or show dashboard
             assert response.status_code == 200
+            assert response.location == '/admin/coordinators/'
 
 
 @pytest.mark.integration
