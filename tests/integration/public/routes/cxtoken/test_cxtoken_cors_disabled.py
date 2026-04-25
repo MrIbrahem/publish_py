@@ -80,7 +80,7 @@ class TestCxtokenEndpoint:
 
             response = client.get("/cxtoken?wiki=en&user=UnknownUser")
 
-            assert response.status_code == 400
+            assert response.status_code == 403
             data = response.get_json()
             assert isinstance(data, dict)
             assert "error" in data
@@ -88,13 +88,10 @@ class TestCxtokenEndpoint:
 
             assert data == {
                 "error": {
-                    "code": "validation_error",
-                    "info": {
-                        "user": [
-                            "Length must be between 2 and 10.",
-                        ],
-                    },
+                    "code": "no access",
+                    "info": "no access",
                 },
+                'username': 'UnknownUser'
             }
 
     def test_returns_cxtoken_on_success(self, client):

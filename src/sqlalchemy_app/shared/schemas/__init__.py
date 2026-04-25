@@ -17,8 +17,8 @@ class PublishRequestSchema(Schema):
     revid = fields.Str(validate=validate.Length(max=50))
     revision = fields.Str(validate=validate.Length(max=50))
     campaign = fields.Str(validate=validate.Length(max=100))
-    # tr_type = fields.Str(validate=validate.Length(max=50))
-    tr_type = fields.Str(validate=validate.OneOf(["lead", "all"]))
+    # translate_type = fields.Str(validate=validate.Length(max=50))
+    translate_type = fields.Str(validate=validate.OneOf(["lead", "all"]))
     wpCaptchaId = fields.Str(validate=validate.Length(max=100))
     wpCaptchaWord = fields.Str(validate=validate.Length(max=50))
 

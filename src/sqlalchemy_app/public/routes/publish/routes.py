@@ -46,8 +46,7 @@ def handle_form(request_data) -> Response:
         "edit": {},
         "sourcetitle": validated_data.get("sourcetitle", ""),
         "request_revid": validated_data.get("revid", "") or validated_data.get("revision", ""),
-        "tr_type": validated_data.get("tr_type", "lead"),
-        "translate_type": validated_data.get("tr_type", "lead"),
+        "translate_type": validated_data.get("translate_type", "lead"),
         "words": 0,
     }
 
