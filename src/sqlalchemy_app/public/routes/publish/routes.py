@@ -22,9 +22,9 @@ logger = logging.getLogger(__name__)
 
 def handle_form(request_data) -> Response:
     # Validate using marshmallow schema
-    schema = PublishRequestSchema()
+    raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
     try:
-        validated_data = schema.load(request_data)
+        validated_data = PublishRequestSchema().load(raw)
     except ValidationError as err:
         response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
         response.status_code = 400

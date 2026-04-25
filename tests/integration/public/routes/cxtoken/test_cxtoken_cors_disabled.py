@@ -50,8 +50,19 @@ class TestCxtokenEndpoint:
 
         assert response.status_code == 400
         data = response.get_json()
-        assert "error" in data
-        assert data["error"]["code"] == "no data"
+        assert data == {
+            "error": {
+                "code": "validation_error",
+                "info": {
+                    "user": [
+                        "Missing data for required field.",
+                    ],
+                    "wiki": [
+                        "Missing data for required field.",
+                    ],
+                },
+            },
+        }
 
     def test_returns_error_for_missing_user(self, client):
         """Test that error is returned when user is missing."""
@@ -69,13 +80,22 @@ class TestCxtokenEndpoint:
 
             response = client.get("/cxtoken?wiki=en&user=UnknownUser")
 
-            assert response.status_code == 403
+            assert response.status_code == 400
             data = response.get_json()
             assert isinstance(data, dict)
-
             assert "error" in data
             assert isinstance(data["error"], dict)
-            assert data["error"]["code"] == "no access"
+
+            assert data == {
+                "error": {
+                    "code": "validation_error",
+                    "info": {
+                        "user": [
+                            "Length must be between 2 and 10.",
+                        ],
+                    },
+                },
+            }
 
     def test_returns_cxtoken_on_success(self, client):
         """Test that cxtoken is returned on success."""

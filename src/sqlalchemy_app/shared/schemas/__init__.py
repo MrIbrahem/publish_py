@@ -58,9 +58,8 @@ class PublishReportsQuerySchema(Schema):
 class CXTokenRequestSchema(Schema):
     """Schema for /cxtoken/ endpoint request validation."""
 
-    title = fields.Str(required=True, validate=validate.Length(min=1, max=255))
-    lang = fields.Str(required=True, validate=validate.Length(min=2, max=10))
-    source = fields.Str(validate=validate.Length(max=10))
+    wiki = fields.Str(required=True, validate=validate.Length(min=1, max=255))
+    user = fields.Str(required=True, validate=validate.Length(min=2, max=10))
 
 
 def validate_json(schema_class):

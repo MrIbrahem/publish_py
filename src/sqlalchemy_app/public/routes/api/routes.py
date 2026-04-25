@@ -73,7 +73,7 @@ def get_publish_reports() -> Response:
 
     # Validate query parameters using marshmallow schema
     # Validate & coerce query parameters using marshmallow schema
-    raw = {k: v for k, v in request.args.items() if v != ""}
+    raw = {k: v for k, v in request.args.items() if v != "" and str(v).lower() != "all"}
     try:
         validated = PublishReportsQuerySchema().load(raw)
     except ValidationError as err:
