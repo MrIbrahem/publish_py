@@ -112,7 +112,12 @@ class TestPublishEndpointWithCSRF2:
 
             assert response.status_code == 403
             data = response.get_json()
-            assert data["error"]["code"] == "noaccess"
+            assert data == {
+                'error': {
+                    'code': 'access_denied',
+                    'info': 'Access denied. Invalid or missing secret key.'
+                }
+            }
 
 
 class BasePublishTest:
