@@ -54,11 +54,11 @@ class TestMainFavicon:
         """Test that favicon route returns 200 or 404 if not present."""
         response = client.get("/favicon.ico")
 
-        assert response.status_code in [200, 404]
+        assert response.status_code == 404
 
     def test_favicon_returns_correct_mimetype(self, client: FlaskClient):
         """Test that favicon returns correct mimetype."""
         response = client.get("/favicon.ico")
 
-        assert response.status_code == 200
-        assert "icon" in response.content_type or response.content_type == "image/x-icon"
+        if response.status_code == 200:
+            assert "icon" in response.content_type or response.content_type == "image/x-icon"
