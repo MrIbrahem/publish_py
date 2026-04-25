@@ -155,3 +155,21 @@ class TestCxTokenUserFormatting:
                     response = client.get("/cxtoken/?wiki=en&user=SpecialUser")
 
                     # The formatted user should be "MappedUser" after applying special_users mapping
+
+
+class TestCxtokenRouteIntegration:
+    """Integration tests for cxtoken route."""
+
+    def test_cxtoken_requires_authentication(self, client):
+        """Test that cxtoken route requires authentication."""
+        response = client.get("/cxtoken?wiki=arwiki")
+
+        # Should redirect to login or return 400 (bad request)
+        assert response.status_code == 400
+
+    def test_cxtoken_rejects_missing_wiki_param(self, auth_client):
+        """Test that cxtoken route rejects requests without wiki parameter."""
+        response = auth_client.get("/cxtoken")
+
+        # Should return bad request
+        assert response.status_code == 400

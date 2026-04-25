@@ -62,3 +62,21 @@ class TestMainFavicon:
 
         if response.status_code == 200:
             assert "icon" in response.content_type or response.content_type == "image/x-icon"
+
+
+class TestMainRouteIntegration:
+    """Integration tests for main routes."""
+
+    def test_index_route_returns_html(self, client):
+        """Test that index route returns HTML."""
+        response = client.get("/")
+
+        # Should return HTML content
+        assert response.status_code == 200
+        assert response.content_type.startswith("text/html")
+
+    def test_404_for_nonexistent_route(self, client):
+        """Test that nonexistent routes return 404."""
+        response = client.get("/nonexistent-route")
+
+        assert response.status_code == 404

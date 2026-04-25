@@ -157,3 +157,24 @@ class TestLoginRequiredDecorator:
 
         assert response.status_code == 302
         assert "login-required" in response.location or "/" in response.location
+
+
+class TestAuthRouteIntegration:
+    """Integration tests for auth routes."""
+
+    def test_login_route_exists(self, client):
+        """Test that login route is accessible."""
+        response = client.get("/auth/login")
+
+        # Route may return various status codes depending on configuration
+        # Note: 500 is not allowed - server errors should fail the test
+        assert response.status_code == 302  # in [200, 302, 404]
+
+    def test_logout_route_exists(self, client):
+        """Test that logout route is accessible."""
+        response = client.get("/auth/logout")
+
+        # Should redirect after logout or succeed
+        # Note: 500 is not allowed - server errors should fail the test
+        assert response.status_code == 302  # in [302, 200, 404]
+

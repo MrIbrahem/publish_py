@@ -1,5 +1,7 @@
 """
 Integration tests for src/sqlalchemy_app/admin/routes/users_no_inprocess.py module.
+
+TODO: should mock admin_required decorator
 """
 
 from __future__ import annotations
