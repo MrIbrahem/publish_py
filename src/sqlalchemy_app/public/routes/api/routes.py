@@ -77,7 +77,7 @@ def get_publish_reports() -> Response:
     try:
         validated = PublishReportsQuerySchema().load(raw)
     except ValidationError as err:
-        return jsonify({"error": "Validation failed", "details": err.messages}), 400
+        return jsonify({"error": "Validation failed", "info": err.messages}), 400
 
     limit = validated.pop("limit", None)
     select_fields = parse_select_fields(validated.pop("select", None))
