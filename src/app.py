@@ -10,11 +10,11 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 # Load environment variables before any other imports
-from env_config import load_environment  # auto-load load_environment()
+from env_config import load_environment  # noqa: E402, F401
 
 from sqlalchemy_app import create_app  # noqa: E402
 from sqlalchemy_app.config import DevelopmentConfig  # noqa: E402
-from logger_config import configure_logging
+from logger_config import configure_logging  # noqa: E402
 
 configure_logging(logging.DEBUG)
 

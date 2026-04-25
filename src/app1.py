@@ -4,9 +4,12 @@ WSGI entry point for the Flask application for Development
 """
 
 from __future__ import annotations
+import sys
 import logging
 import pymysql
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
 pymysql.install_as_MySQLdb()
 
 # Load environment variables before any other imports
