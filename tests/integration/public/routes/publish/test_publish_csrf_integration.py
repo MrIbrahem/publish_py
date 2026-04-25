@@ -51,14 +51,12 @@ def csrf_client(csrf_app):
 class TestPublishEndpointWithDenyCSRF:
     """Integration tests for publish endpoint with CSRF enabled."""
 
-    def test_cors_validation_still_works(self, csrf_client):
+    def test_cors_validation_still_works(self, mock_is_denied, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.is_allowed_checker.is_allowed") as mock_deny,
             patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
             patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
-            mock_deny.return_value = None
             mock_get_token.return_value = None
             mock_load_reports_db_instance = MagicMock()
             mock_load_reports_db.return_value = mock_load_reports_db_instance

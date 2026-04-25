@@ -18,6 +18,16 @@ def mock_validate_access() -> MagicMock:
         mock_validate.return_value = lambda f: f
 
 
+@pytest.fixture
+def mock_user_token() -> MagicMock:
+
+    _mock = MagicMock()
+    _mock.decrypted.return_value = ("access_key", "access_secret")
+
+    with patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
+        mock_get_token.return_value = _mock
+
+
 @pytest.mark.integration
 class TestPublishPreflight:
     """Integration tests for the publish preflight endpoint."""
@@ -75,118 +85,94 @@ class TestPublishPost:
             data = response.get_json()
             assert "error" in data
 
-    def test_publish_with_valid_data(self, mock_validate_access, client: FlaskClient):
+    def test_publish_with_valid_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test publishing with valid data."""
 
-        mock_user_token = MagicMock()
-        mock_user_token.decrypted.return_value = ("access_key", "access_secret")
+        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+            mock_process.return_value = {"result": "success", "edit": {"newrevid": 12345}}
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
-            mock_get_token.return_value = mock_user_token
+            response = client.post(
+                "/publish/",
+                data={
+                    "user": "TestUser",
+                    "title": "Test Page",
+                    "target": "en",
+                    "text": "Test content",
+                    "sourcetitle": "Source Page",
+                },
+            )
 
-            with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
-                mock_process.return_value = {"result": "success", "edit": {"newrevid": 12345}}
-
-                response = client.post(
-                    "/publish/",
-                    data={
-                        "user": "TestUser",
-                        "title": "Test Page",
-                        "target": "en",
-                        "text": "Test content",
-                        "sourcetitle": "Source Page",
-                    },
-                )
-
-                assert response.status_code == 200
-                data = response.get_json()
-                assert "result" in data
+            assert response.status_code == 200
+            data = response.get_json()
+            assert "result" in data
 
 
 @pytest.mark.integration
 class TestPublishFormData:
     """Integration tests for publish form data handling."""
 
-    def test_publish_accepts_form_data(self, mock_validate_access, client: FlaskClient):
+    def test_publish_accepts_form_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test that publish accepts form data."""
 
-        mock_user_token = MagicMock()
-        mock_user_token.decrypted.return_value = ("access_key", "access_secret")
+        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+            mock_process.return_value = {"result": "success"}
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
-            mock_get_token.return_value = mock_user_token
+            response = client.post(
+                "/publish/",
+                data={
+                    "user": "TestUser",
+                    "title": "Test_Page",
+                    "target": "en",
+                    "text": "Test content",
+                },
+            )
 
-            with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
-                mock_process.return_value = {"result": "success"}
+            assert response.status_code == 200
 
-                response = client.post(
-                    "/publish/",
-                    data={
-                        "user": "TestUser",
-                        "title": "Test_Page",
-                        "target": "en",
-                        "text": "Test content",
-                    },
-                )
-
-                assert response.status_code == 200
-
-    def test_publish_accepts_json_data(self, mock_validate_access, client: FlaskClient):
+    def test_publish_accepts_json_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test that publish accepts JSON data."""
 
-        mock_user_token = MagicMock()
-        mock_user_token.decrypted.return_value = ("access_key", "access_secret")
+        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+            mock_process.return_value = {"result": "success"}
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
-            mock_get_token.return_value = mock_user_token
+            response = client.post(
+                "/publish/",
+                json={
+                    "user": "TestUser",
+                    "title": "Test Page",
+                    "target": "en",
+                    "text": "Test content",
+                },
+                content_type="application/json",
+            )
 
-            with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
-                mock_process.return_value = {"result": "success"}
-
-                response = client.post(
-                    "/publish/",
-                    json={
-                        "user": "TestUser",
-                        "title": "Test Page",
-                        "target": "en",
-                        "text": "Test content",
-                    },
-                    content_type="application/json",
-                )
-
-                # May accept or reject JSON
-                assert response.status_code == 200  # in [200, 400]
+            # May accept or reject JSON
+            assert response.status_code == 200  # in [200, 400]
 
 
 @pytest.mark.integration
 class TestPublishCaptcha:
     """Integration tests for captcha handling in publish."""
 
-    def test_publish_with_captcha_params(self, mock_validate_access, client: FlaskClient):
+    def test_publish_with_captcha_params(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test publishing with captcha parameters."""
 
-        mock_user_token = MagicMock()
-        mock_user_token.decrypted.return_value = ("access_key", "access_secret")
+        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+            mock_process.return_value = {"result": "success"}
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
-            mock_get_token.return_value = mock_user_token
+            response = client.post(
+                "/publish/",
+                data={
+                    "user": "TestUser",
+                    "title": "Test Page",
+                    "target": "en",
+                    "text": "Test content",
+                    "wpCaptchaId": "123",
+                    "wpCaptchaWord": "answer",
+                },
+            )
 
-            with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
-                mock_process.return_value = {"result": "success"}
-
-                response = client.post(
-                    "/publish/",
-                    data={
-                        "user": "TestUser",
-                        "title": "Test Page",
-                        "target": "en",
-                        "text": "Test content",
-                        "wpCaptchaId": "123",
-                        "wpCaptchaWord": "answer",
-                    },
-                )
-
-                assert response.status_code == 200
+            assert response.status_code == 200
 
 
 class TestPublishRouteIntegration:

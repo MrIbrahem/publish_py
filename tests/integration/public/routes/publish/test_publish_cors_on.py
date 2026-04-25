@@ -42,16 +42,15 @@ def client(app: Flask) -> FlaskClient:
 class TestCheckCorsOnPublish:
     """Tests for @check_cors decorator on publish OPTIONS route with CORS_ENABLED."""
 
-    def test_options_allowed_origin_returns_200(self, client):
+    def test_options_allowed_origin_returns_200(self, mock_is_allowed_medwiki, client):
         """OPTIONS preflight from allowed origin returns 200 with CORS headers."""
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN):
-            response = client.options(
-                "/publish/",
-                headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
-            )
-            assert response.status_code == 200
-            assert "Access-Control-Allow-Methods" in response.headers
-            assert response.headers["Access-Control-Allow-Origin"] == f"https://{ALLOWED_DOMAIN}"
+        response = client.options(
+            "/publish/",
+            headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
+        )
+        assert response.status_code == 200
+        assert "Access-Control-Allow-Methods" in response.headers
+        assert response.headers["Access-Control-Allow-Origin"] == f"https://{ALLOWED_DOMAIN}"
 
     def test_options_disallowed_origin_returns_403(self, mock_is_denied, client):
         """OPTIONS preflight from disallowed origin returns 403."""
@@ -71,16 +70,15 @@ class TestCheckCorsOnPublish:
         data = response.get_json()
         assert data["error"]["code"] == "access_denied"
 
-    def test_options_same_origin_passes_cors(self, client):
+    def test_options_same_origin_passes_cors(self, mock_is_allowed_medwiki, client):
         """OPTIONS from same origin (origin matches server host) passes CORS check."""
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN):
-            response = client.options(
-                "/publish/",
-                base_url=f"https://{ALLOWED_DOMAIN}",
-                headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
-            )
-            assert response.status_code == 200
-            assert "Access-Control-Allow-Methods" in response.headers
+        response = client.options(
+            "/publish/",
+            base_url=f"https://{ALLOWED_DOMAIN}",
+            headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
+        )
+        assert response.status_code == 200
+        assert "Access-Control-Allow-Methods" in response.headers
 
 
 class TestValidateAccessOnPublish:
@@ -101,10 +99,9 @@ class TestValidateAccessOnPublish:
             assert data["error"]["code"] == "access_denied"
             assert "Invalid or missing secret key" in data["error"]["info"]
 
-    def test_post_allowed_origin_proceeds_past_cors(self, client):
+    def test_post_allowed_origin_proceeds_past_cors(self, mock_is_allowed_medwiki, client):
         """POST from allowed origin passes CORS and reaches handler logic."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch(
                 "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
@@ -162,10 +159,9 @@ class TestValidateAccessOnPublish:
             data = response.get_json()
             assert data["error"]["code"] == "noaccess"
 
-    def test_post_allowed_origin_with_invalid_secret_key(self, client):
+    def test_post_allowed_origin_with_invalid_secret_key(self, mock_is_allowed_medwiki, client):
         """POST from allowed origin succeeds even if secret key is invalid."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=ALLOWED_DOMAIN),
             patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),
             patch(
                 "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
