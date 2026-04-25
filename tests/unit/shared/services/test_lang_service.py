@@ -101,6 +101,20 @@ class TestAddLang:
         with pytest.raises(ValueError, match="Language code is required"):
             add_lang("", "Autonym", "Name")
 
+    def test_add_lang_with_redirects(self):
+        """Test adding a new language with a list of redirects."""
+        redirects = ["ara", "ar-SA"]
+        record = add_lang("ar", "العربية", "Arabic", redirects=redirects)
+
+        assert record.code == "ar"
+        assert record.redirects == redirects
+        assert isinstance(record.redirects, list)
+
+    def test_add_lang_with_empty_redirects(self):
+        """Test adding a language with an empty list for redirects."""
+        record = add_lang("fr", "Français", "French", redirects=[])
+        assert record.redirects == []
+
 
 class TestAddOrUpdateLang:
     """Tests for add_or_update_lang function."""
@@ -115,6 +129,36 @@ class TestAddOrUpdateLang:
     def test_raises_error_if_no_code(self, monkeypatch):
         with pytest.raises(ValueError, match="Language code is required"):
             add_or_update_lang(" ", "A", "N")
+
+    def test_update_existing_redirects(self):
+        """Test updating redirects for an existing language record."""
+        # Initial creation
+        add_lang("es", "Español", "Spanish", redirects=["spa"])
+
+        # Update with new redirects
+        new_redirects = ["spa", "es-ES", "es-MX"]
+        record = add_or_update_lang("es", "Español", "Spanish", redirects=new_redirects)
+
+        assert record.redirects == new_redirects
+        assert len(record.redirects) == 3
+
+    def test_clear_redirects_on_update(self):
+        """Test clearing redirects (setting to None) on an existing record."""
+        # Initial creation with redirects
+        add_lang("de", "Deutsch", "German", redirects=["ger", "deu"])
+
+        # Update setting redirects to None
+        record = add_or_update_lang("de", "Deutsch", "German", redirects=None)
+
+        assert record.redirects is None
+
+    def test_add_new_with_redirects_via_upsert(self):
+        """Test that add_or_update_lang inserts redirects correctly for new records."""
+        redirects = ["jpn"]
+        record = add_or_update_lang("ja", "日本語", "Japanese", redirects=redirects)
+
+        assert record.code == "ja"
+        assert record.redirects == ["jpn"]
 
 
 class TestDeleteLang:
