@@ -20,12 +20,12 @@ This document outlines the implementation plan for migrating the PHP `/api/index
 
 ## Endpoint Overview
 
-| Property | Value |
-|----------|-------|
-| **PHP URL** | `/api/index.php?get=publish_reports` |
-| **Python URL** | `/api/publish_reports` |
-| **Method** | `GET` |
-| **Blueprint** | `bp_api` (new) or extend existing `bp_main` |
+| Property             | Value                                                           |
+| -------------------- | --------------------------------------------------------------- |
+| **PHP URL**          | `/api/index.php?get=publish_reports`                            |
+| **Python URL**       | `/api/publish_reports`                                          |
+| **Method**           | `GET`                                                           |
+| **Blueprint**        | `bp_api` (new) or extend existing `bp_main`                     |
 | **Database Handler** | `src/app/db/db_publish_reports.py` (existing - needs extension) |
 
 ---
@@ -33,22 +33,26 @@ This document outlines the implementation plan for migrating the PHP `/api/index
 ## Current State
 
 ### Existing Database Handler
-**File:** [`src/app/db/db_publish_reports.py`](../src/app_main/db/db_publish_reports.py)
+
+**File:** [`src/app/db/db_publish_reports.py`](../../src/app_main/db/db_publish_reports.py)
 
 The existing `ReportsDB` class provides basic CRUD operations:
-- `list()` - Returns all records (no filtering)
-- `add()` - Insert new record
-- `delete()` - Delete by ID
-- `_fetch_by_id()` - Fetch single record
+
+-   `list()` - Returns all records (no filtering)
+-   `add()` - Insert new record
+-   `delete()` - Delete by ID
+-   `_fetch_by_id()` - Fetch single record
 
 **Missing Functionality:**
-- Dynamic query filtering by parameters
-- Support for `year`, `month` extraction from `date`
-- Special value handling (`not_empty`, `empty`, `>0`)
-- Field selection (`select` parameter)
+
+-   Dynamic query filtering by parameters
+-   Support for `year`, `month` extraction from `date`
+-   Special value handling (`not_empty`, `empty`, `>0`)
+-   Field selection (`select` parameter)
 
 ### Existing Routes Structure
-**File:** [`src/app/app_routes/__init__.py`](../src/app_main/app_routes/__init__.py)
+
+**File:** [`src/app/app_routes/__init__.py`](../../src/app_main/app_routes/__init__.py)
 
 ```python
 from .auth.routes import bp_auth
@@ -75,12 +79,12 @@ src/app/
 
 ### Updated Files
 
-| File | Changes |
-|------|---------|
-| `src/app/db/db_publish_reports.py` | Add `query_with_filters()` method |
-| `src/app/app_routes/__init__.py` | Register new `bp_api` blueprint |
-| `src/app/app.py` (or main app file) | Register blueprint with prefix |
-| `src/templates/reports.html` | Update API endpoint URLs |
+| File                                | Changes                           |
+| ----------------------------------- | --------------------------------- |
+| `src/app/db/db_publish_reports.py`  | Add `query_with_filters()` method |
+| `src/app/app_routes/__init__.py`    | Register new `bp_api` blueprint   |
+| `src/app/app.py` (or main app file) | Register blueprint with prefix    |
+| `src/templates/reports.html`        | Update API endpoint URLs          |
 
 ---
 
@@ -337,28 +341,28 @@ app.register_blueprint(bp_api, url_prefix="/api")
 
 ### Available Filters
 
-| Parameter | Column/Expression | Type | Description |
-|-----------|-------------------|------|-------------|
-| `year` | `YEAR(date)` | number | Filter by year extracted from date |
-| `month` | `MONTH(date)` | number | Filter by month extracted from date |
-| `title` | `title` | text | Filter by page title |
-| `user` | `user` | text | Filter by username |
-| `lang` | `lang` | text | Filter by language code |
-| `sourcetitle` | `sourcetitle` | text | Filter by source title |
-| `result` | `result` | text | Filter by result status |
-| `select` | - | text | Comma-separated fields to return |
-| `limit` | - | number | Maximum results to return |
+| Parameter     | Column/Expression | Type   | Description                         |
+| ------------- | ----------------- | ------ | ----------------------------------- |
+| `year`        | `YEAR(date)`      | number | Filter by year extracted from date  |
+| `month`       | `MONTH(date)`     | number | Filter by month extracted from date |
+| `title`       | `title`           | text   | Filter by page title                |
+| `user`        | `user`            | text   | Filter by username                  |
+| `lang`        | `lang`            | text   | Filter by language code             |
+| `sourcetitle` | `sourcetitle`     | text   | Filter by source title              |
+| `result`      | `result`          | text   | Filter by result status             |
+| `select`      | -                 | text   | Comma-separated fields to return    |
+| `limit`       | -                 | number | Maximum results to return           |
 
 ---
 
 ## Special Value Handling
 
-| Value | Behavior | SQL Generated |
-|-------|----------|---------------|
-| `not_mt` / `not_empty` | Column is not empty | `(column != '' AND column IS NOT NULL)` |
-| `mt` / `empty` | Column is empty | `(column = '' OR column IS NULL)` |
-| `>0` / `&#62;0` | Column greater than 0 | `column > 0` |
-| `all` | Skip this filter | *(parameter ignored)* |
+| Value                  | Behavior              | SQL Generated                           |
+| ---------------------- | --------------------- | --------------------------------------- |
+| `not_mt` / `not_empty` | Column is not empty   | `(column != '' AND column IS NOT NULL)` |
+| `mt` / `empty`         | Column is empty       | `(column = '' OR column IS NULL)`       |
+| `>0` / `&#62;0`        | Column greater than 0 | `column > 0`                            |
+| `all`                  | Skip this filter      | _(parameter ignored)_                   |
 
 ---
 
@@ -371,15 +375,17 @@ The frontend template currently uses the PHP API endpoint. Update the following 
 #### Changes Required
 
 **Line 176** - Update filter options loader:
+
 ```javascript
 // OLD:
-$.getJSON('/api/index.php?get=publish_reports')
+$.getJSON("/api/index.php?get=publish_reports");
 
 // NEW:
-$.getJSON('/api/publish_reports')
+$.getJSON("/api/publish_reports");
 ```
 
 **Line 190** - Update DataTable AJAX URL:
+
 ```javascript
 // OLD:
 ajax: {
@@ -397,33 +403,33 @@ ajax: {
 #### Full Updated JavaScript Section
 
 ```javascript
-$(document).ready(function() {
+$(document).ready(function () {
     // Load filters once only
-    $.getJSON('/api/publish_reports')  // <-- UPDATED
-        .done(function(json) {
+    $.getJSON("/api/publish_reports") // <-- UPDATED
+        .done(function (json) {
             if (json && json.results) {
                 populateFilterOptions(json.results);
             }
         })
-        .fail(function(xhr, status, error) {
-            console.error('Failed to load filter options:', error);
+        .fail(function (xhr, status, error) {
+            console.error("Failed to load filter options:", error);
         });
 
     // DataTable setup
-    let table = $('#resultsTable').DataTable({
+    let table = $("#resultsTable").DataTable({
         ajax: {
-            url: '/api/publish_reports',  // <-- UPDATED
-            data: function(d) {
-                const formData = $('#filterForm').serializeArray();
-                formData.forEach(field => {
+            url: "/api/publish_reports", // <-- UPDATED
+            data: function (d) {
+                const formData = $("#filterForm").serializeArray();
+                formData.forEach((field) => {
                     if (field.value.trim()) {
                         d[field.name] = field.value;
                     }
                 });
             },
-            dataSrc: function(json) {
+            dataSrc: function (json) {
                 // ... rest of the code remains the same
-            }
+            },
         },
         // ... rest of DataTable config
     });
@@ -436,31 +442,37 @@ $(document).ready(function() {
 ## Example API Calls
 
 ### 1. Get all reports for a specific user
+
 ```
 GET /api/publish_reports?user=JohnDoe
 ```
 
 ### 2. Get reports for a specific year and month
+
 ```
 GET /api/publish_reports?year=2026&month=1
 ```
 
 ### 3. Get reports for a specific language and user
+
 ```
 GET /api/publish_reports?lang=ar&user=MrIbrahem
 ```
 
 ### 4. Get reports with non-empty results
+
 ```
 GET /api/publish_reports?result=not_empty
 ```
 
 ### 5. Get specific fields only
+
 ```
 GET /api/publish_reports?user=Admin&select=title,date,result
 ```
 
 ### 6. Combined filters with limit
+
 ```
 GET /api/publish_reports?year=2026&lang=en&limit=100
 ```
@@ -470,6 +482,7 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 ## Response Format
 
 ### Success Response
+
 ```json
 {
     "results": [
@@ -489,6 +502,7 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 ```
 
 ### Error Response
+
 ```json
 {
     "error": "Error description"
@@ -500,34 +514,39 @@ GET /api/publish_reports?year=2026&lang=en&limit=100
 ## Implementation Checklist
 
 ### Phase 1: Database Layer
-- [x] Add `PUBLISH_REPORTS_PARAMS` configuration to `db_publish_reports.py`
-- [x] Implement `query_with_filters()` method in `ReportsDB` class
-- [x] Add unit tests for new database method
+
+-   [x] Add `PUBLISH_REPORTS_PARAMS` configuration to `db_publish_reports.py`
+-   [x] Implement `query_with_filters()` method in `ReportsDB` class
+-   [x] Add unit tests for new database method
 
 ### Phase 2: Route Layer
-- [x] Create `src/app/app_routes/api/` directory
-- [x] Create `src/app/app_routes/api/__init__.py`
-- [x] Create `src/app/app_routes/api/routes.py` with `get_publish_reports()` endpoint
-- [x] Update `src/app/app_routes/__init__.py` to export `bp_api`
-- [x] Register blueprint in main app file
+
+-   [x] Create `src/app/app_routes/api/` directory
+-   [x] Create `src/app/app_routes/api/__init__.py`
+-   [x] Create `src/app/app_routes/api/routes.py` with `get_publish_reports()` endpoint
+-   [x] Update `src/app/app_routes/__init__.py` to export `bp_api`
+-   [x] Register blueprint in main app file
 
 ### Phase 3: Frontend Update
-- [x] Update `src/templates/reports.html` line 176: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
-- [x] Update `src/templates/reports.html` line 190: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
-- [x] Test frontend functionality with new endpoint
+
+-   [x] Update `src/templates/reports.html` line 176: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
+-   [x] Update `src/templates/reports.html` line 190: change `/api/index.php?get=publish_reports` to `/api/publish_reports`
+-   [x] Test frontend functionality with new endpoint
 
 ### Phase 4: Testing
-- [x] Test each parameter filter individually
-- [x] Test combined parameter filters
-- [x] Test special values (`not_empty`, `empty`, `>0`)
-- [x] Test `select` field filtering
-- [x] Test `limit` parameter
-- [x] Verify CORS handling
-- [x] Test frontend integration
+
+-   [x] Test each parameter filter individually
+-   [x] Test combined parameter filters
+-   [x] Test special values (`not_empty`, `empty`, `>0`)
+-   [x] Test `select` field filtering
+-   [x] Test `limit` parameter
+-   [x] Verify CORS handling
+-   [x] Test frontend integration
 
 ### Phase 5: Documentation
-- [x] Update API documentation (see `docs/api.md`)
-- [x] Add OpenAPI/Swagger spec (see `docs/openapi.yaml`)
+
+-   [x] Update API documentation (see `docs/api.md`)
+-   [x] Add OpenAPI/Swagger spec (see `docs/openapi.yaml`)
 
 ---
 

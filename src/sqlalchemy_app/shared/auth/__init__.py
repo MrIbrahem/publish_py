@@ -1,7 +1,7 @@
 """ """
 
 from .decorators import oauth_required
-from .identity import CurrentUser, current_user
+from .identity import CurrentUser
 
 __all__ = [
     "CurrentUser",

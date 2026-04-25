@@ -80,20 +80,38 @@
                     </li>
                     {% endif %}
                 </ul>
-                <div class="d-flex align-items-center">
-                    <span class="navbar-text">
-                        {% if oauth_enabled %}
-                        {% if current_user %}
-                        <a href="/profile" class="btn btn-outline-primary">{{ current_user.username }}</a>
-                        <a href="/logout" class="btn btn-outline-primary">Logout</a>
-                        {% else %}
-                        <a href="/login" class="btn btn-outline-primary">Login</a>
-                        {% endif %}
-                        {% else %}
-                        -
-                        {% endif %}
-                    </span>
-                </div>
+                <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
+                    <!-- <div class="d-flex align-items-center"> <span class="navbar-text"> -->
+                    {% if oauth_enabled %}
+                    {% if current_user %}
+                    <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
+                        <a href="/profile" class="nav-link py-2 px-0 px-lg-2">
+                            <i class="fas fa-user fa-sm fa-fw mr-2"></i> <span
+                                class="navtitles">{{ current_user.username }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('auth.logout') }}">
+                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i> <span
+                                class="d-lg-none navtitles">Logout</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
+                        <!-- <button type="submit" form="mainForm" formaction="{{ url_for('auth.login') }}" formmethod="get"
+                            formnovalidate class="nav-link py-2 px-0 px-lg-2 btn btn-link">
+                            <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2"></i> <span class="navtitles">Login</span>
+                        </button> -->
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('auth.login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% else %}
+                    -
+                    {% endif %}
+                    <!-- </span> </div> -->
+                </ul>
             </div>
         </div>
     </nav>

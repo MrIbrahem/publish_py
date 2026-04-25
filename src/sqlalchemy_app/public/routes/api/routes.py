@@ -13,6 +13,7 @@ from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.services.category_service import list_categories
 from ....shared.services.in_process_service import get_in_process_counts_by_user
+from ....shared.services.lang_service import list_langs
 from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
@@ -365,6 +366,27 @@ def users_by_translations_count() -> Response:
     response_data = {
         "results": data,
         "count": len(data),
+    }
+
+    return jsonify(response_data)
+
+
+@bp_api.route("/langs", methods=["GET"])
+@check_cors
+def get_langs() -> Response:
+    """
+    Handle langs API requests. Returns all language records.
+    """
+    try:
+        records = list_langs()
+    except Exception:
+        logger.exception("Error fetching langs data")
+        return jsonify({"error": "An internal error occurred while fetching langs data"}), 500
+
+    records = [x.to_dict() for x in records]
+    response_data = {
+        "results": records,
+        "count": len(records),
     }
 
     return jsonify(response_data)

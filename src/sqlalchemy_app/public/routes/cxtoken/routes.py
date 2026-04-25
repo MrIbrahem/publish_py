@@ -30,7 +30,6 @@ def _format_user(user: str) -> str:
 
 
 def get_cxtoken_for_user_wiki(wiki, user):
-
     # Get access credentials from database
     user_token = get_user_token_by_username(user)
 
@@ -95,7 +94,7 @@ def index() -> Response:
     wiki = request.args.get("wiki", "")
     user = request.args.get("user", "")
 
-    # Validate parameters
+    # Validate parameters (maintain backward compatibility with tests)
     if not wiki or not user:
         return jsonify({"error": {"code": "no data", "info": "wiki or user is empty"}}), 400
 

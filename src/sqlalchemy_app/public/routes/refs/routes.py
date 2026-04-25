@@ -70,7 +70,6 @@ def test() -> str:
 @oauth_required
 @bp_fixrefs.route("/", methods=["POST"])
 def process_new() -> str:
-
     source_title = request.form.get("source_title", "")
     title = request.form.get("title", "")
     text = request.form.get("text", "")

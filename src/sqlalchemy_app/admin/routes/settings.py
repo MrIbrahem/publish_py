@@ -40,7 +40,6 @@ class SettingsRoutes:
         self._setup_routes()
 
     def _setup_routes(self):
-
         @self.bp.get("/")
         @admin_required
         def dashboard():
@@ -90,7 +89,6 @@ class SettingsRoutes:
         @self.bp.post("/update")
         @admin_required
         def update():
-
             all_settings = service.list_settings()
             failed_keys: list[str] = []
             deleted_keys: list[str] = []
