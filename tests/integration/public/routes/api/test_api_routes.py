@@ -17,7 +17,7 @@ class TestPublishRouteIntegration:
         response = client.get("/api/publish")
 
         # Should return 404 (not found) or 405 (method not allowed)
-        assert response.status_code in [404, 405]
+        assert response.status_code == 404
 
     def test_publish_rejects_missing_csrf(self, app):
         """Test that publish route rejects requests without CSRF token when enabled."""
@@ -33,7 +33,7 @@ class TestPublishRouteIntegration:
         response = test_client.post("/api/publish", data={"title": "Test"})
 
         # Route may return 404 if not registered, 400 for missing CSRF, or 302/403 for auth issues
-        assert response.status_code in [400, 302, 403, 404]
+        assert response.status_code == 404
 
 
 class TestCxtokenRouteIntegration:
@@ -44,14 +44,14 @@ class TestCxtokenRouteIntegration:
         response = client.get("/cxtoken?wiki=arwiki")
 
         # Should redirect to login or return 400 (bad request)
-        assert response.status_code in [302, 400, 401, 403]
+        assert response.status_code == 400
 
     def test_cxtoken_rejects_missing_wiki_param(self, auth_client):
         """Test that cxtoken route rejects requests without wiki parameter."""
         response = auth_client.get("/cxtoken")
 
         # Should return bad request
-        assert response.status_code in [400, 422]
+        assert response.status_code == 400
 
 
 class TestAuthRouteIntegration:
@@ -63,7 +63,7 @@ class TestAuthRouteIntegration:
 
         # Route may return various status codes depending on configuration
         # Note: 500 is not allowed - server errors should fail the test
-        assert response.status_code in [200, 302, 404]
+        assert response.status_code == 302
 
     def test_logout_route_exists(self, client):
         """Test that logout route is accessible."""
@@ -71,7 +71,7 @@ class TestAuthRouteIntegration:
 
         # Should redirect after logout or succeed
         # Note: 500 is not allowed - server errors should fail the test
-        assert response.status_code in [302, 200, 404]
+        assert response.status_code == 302
 
 
 class TestMainRouteIntegration:
@@ -107,11 +107,11 @@ class TestCorsIntegration:
 
         # CORS headers may or may not be present depending on route configuration
         # The test verifies the endpoint is accessible
-        assert response.status_code in [200, 302, 404]
+        assert response.status_code == 200  # in [200, 302, 404]
 
     def test_preflight_request_handling(self, client):
         """Test that OPTIONS requests are handled for CORS preflight."""
         response = client.options("/")
 
         # Should be handled (may return 200 or 404 depending on route setup)
-        assert response.status_code in [200, 404]
+        assert response.status_code == 200  # in [200, 404]

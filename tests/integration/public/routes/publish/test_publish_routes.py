@@ -48,7 +48,7 @@ class TestPublishPost:
             response = client.post("/publish/", data={})
 
             # Should handle empty data gracefully
-            assert response.status_code in [200, 400, 403]
+            assert response.status_code == 400
 
     def test_publish_missing_user_token_returns_403(self, client: FlaskClient):
         """Test that missing user token returns 403."""
@@ -158,7 +158,7 @@ class TestPublishFormData:
                     )
 
                     # May accept or reject JSON
-                    assert response.status_code in [200, 400]
+                    assert response.status_code == 200  # in [200, 400]
 
 
 @pytest.mark.integration
