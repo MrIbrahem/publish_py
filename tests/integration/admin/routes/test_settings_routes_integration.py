@@ -21,7 +21,7 @@ class TestSettingsDashboard:
         """Test that settings dashboard requires admin access."""
         response = client.get("/admin/settings")
 
-        assert response.status_code == 302 # in [200, 302, 401, 403]
+        assert response.status_code == 302  # in [200, 302, 401, 403]
 
     def test_settings_dashboard_lists_settings(self, auth_client: FlaskClient):
         """Test that settings dashboard lists settings."""
@@ -36,7 +36,7 @@ class TestSettingsDashboard:
 
                 response = auth_client.get("/admin/settings")
 
-                assert response.status_code == 302 # in [200, 302]
+                assert response.status_code == 302  # in [200, 302]
 
 
 @pytest.mark.integration
@@ -50,7 +50,7 @@ class TestCreateSetting:
             data={"key": "new_setting", "title": "New Setting", "value_type": "boolean"},
         )
 
-        assert response.status_code == 302 # in [302, 401, 403]
+        assert response.status_code == 302  # in [302, 401, 403]
 
     def test_create_setting_with_valid_data(self, auth_client: FlaskClient):
         """Test creating setting with valid data."""
@@ -97,7 +97,7 @@ class TestUpdateSetting:
         """Test that updating settings requires admin access."""
         response = client.post("/admin/settings/update", data={"setting_test": "value"})
 
-        assert response.status_code == 302 # in [302, 401, 403]
+        assert response.status_code == 302  # in [302, 401, 403]
 
     def test_update_setting_with_valid_data(self, auth_client: FlaskClient):
         """Test updating setting with valid data."""
@@ -117,7 +117,7 @@ class TestUpdateSetting:
                     follow_redirects=False,
                 )
 
-                assert response.status_code == 302 # in [302, 200]
+                assert response.status_code == 302  # in [302, 200]
 
     def test_delete_setting_via_update(self, auth_client: FlaskClient):
         """Test deleting setting via update form."""
@@ -137,4 +137,4 @@ class TestUpdateSetting:
                     follow_redirects=False,
                 )
 
-                assert response.status_code == 302 # in [302, 200]
+                assert response.status_code == 302  # in [302, 200]

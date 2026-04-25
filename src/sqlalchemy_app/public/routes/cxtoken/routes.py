@@ -9,11 +9,11 @@ It validates CORS, retrieves user access credentials, and returns tokens.
 import logging
 
 from flask import Blueprint, Response, jsonify, request
+from marshmallow import ValidationError
 
 from ....config import settings
 from ....shared.clients.oauth_client import get_cxtoken
 from ....shared.core.cors import check_cors
-from marshmallow import ValidationError
 from ....shared.schemas import CXTokenRequestSchema
 from ....shared.services.user_token_service import (
     delete_user_token_by_username,

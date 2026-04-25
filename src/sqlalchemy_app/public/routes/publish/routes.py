@@ -8,9 +8,9 @@ This endpoint handles publishing translated pages to Wikipedia.
 import logging
 
 from flask import Blueprint, Response, jsonify, request
+from marshmallow import ValidationError
 
 from ....shared.core.cors import check_cors, validate_access
-from marshmallow import ValidationError
 from ....shared.schemas import PublishRequestSchema
 from ....shared.services.user_token_service import get_user_token_by_username
 from ....shared.utils.helpers.format import format_title, format_user
@@ -22,12 +22,7 @@ logger = logging.getLogger(__name__)
 
 def handle_form(request_data) -> Response:
     # Validate using marshmallow schema
-    raw = {
-        k: v
-        for k, v in request_data.items()
-        if v != ""
-        and (str(v).lower() != "all" and k != "translate_type")
-    }
+    raw = {k: v for k, v in request_data.items() if v != "" and (str(v).lower() != "all" and k != "translate_type")}
     try:
         validated_data = PublishRequestSchema().load(raw)
     except ValidationError as err:

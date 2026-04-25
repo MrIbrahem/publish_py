@@ -91,7 +91,7 @@ class TestCxtokenEndpoint:
                     "code": "no access",
                     "info": "no access",
                 },
-                'username': 'UnknownUser'
+                "username": "UnknownUser",
             }
 
     def test_returns_cxtoken_on_success(self, client):

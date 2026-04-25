@@ -10,7 +10,7 @@ Note: Several models have been moved to specialized modules:
 
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, JSON, text
+from sqlalchemy import JSON, Column, Integer, String, text
 
 from ..shared.engine import BaseDb
 

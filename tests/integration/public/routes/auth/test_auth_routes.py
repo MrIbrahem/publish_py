@@ -177,4 +177,3 @@ class TestAuthRouteIntegration:
         # Should redirect after logout or succeed
         # Note: 500 is not allowed - server errors should fail the test
         assert response.status_code == 302  # in [302, 200, 404]
-
