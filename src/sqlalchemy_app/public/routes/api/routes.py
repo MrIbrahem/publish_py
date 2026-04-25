@@ -72,19 +72,16 @@ def get_publish_reports() -> Response:
     """
 
     # Validate query parameters using marshmallow schema
-    schema = PublishReportsQuerySchema()
+    # Validate & coerce query parameters using marshmallow schema
+    raw = {k: v for k, v in request.args.items() if v != ""}
     try:
-        # Marshmallow handles type conversion and validation for all query parameters
-        params = schema.load(request.args)
+        validated = PublishReportsQuerySchema().load(raw)
     except ValidationError as err:
         return jsonify({"error": "Validation failed", "details": err.messages}), 400
 
-    # Separate filters from other control parameters
-    filter_keys = ["year", "month", "title", "user", "lang", "sourcetitle", "result"]
-    filters = {k: v for k, v in params.items() if k in filter_keys}
-
-    select_fields = parse_select_fields(params.get("select"))
-    limit = params.get("limit")
+    limit = validated.pop("limit", None)
+    select_fields = parse_select_fields(validated.pop("select", None))
+    filters: Dict[str, Any] = validated
 
     try:
         # Query database
