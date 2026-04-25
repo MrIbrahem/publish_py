@@ -69,7 +69,7 @@ class TestLangRecordRedirects:
         )
         result = record.to_dict()
         assert result["redirects"] == redirects_list
-        # التأكد من أن القيمة المسترجعة هي مصفوفة وليست نصاً عادياً
+        # assert redirects is list
         assert len(result["redirects"]) == 2
 
     def test_redirects_default_is_none(self):
