@@ -22,10 +22,12 @@ logger = logging.getLogger(__name__)
 
 def handle_form(request_data) -> Response:
     # Validate using marshmallow schema
-    raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
+    raw = {k: v for k, v in request_data.items() if v != ""}
 
-    # translate_type can be all
-    raw["translate_type"] = request_data.get("translate_type", "")
+    # translate_type can be "all" - only include if present in request
+    translate_type = request_data.get("translate_type", "")
+    if translate_type:
+        raw["translate_type"] = translate_type
 
     try:
         validated_data = PublishRequestSchema().load(raw)

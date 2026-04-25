@@ -82,9 +82,9 @@ class TestPublishPost:
                 },
             )
 
-            assert response.status_code == 403
             data = response.get_json()
             assert "error" in data
+            assert response.status_code == 403
 
     def test_publish_with_valid_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test publishing with valid data."""
@@ -104,9 +104,9 @@ class TestPublishPost:
                 },
             )
 
-            assert response.status_code == 200
             data = response.get_json()
             assert "result" in data
+            assert response.status_code == 200
 
 
 @pytest.mark.integration
