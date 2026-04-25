@@ -118,7 +118,6 @@ class LanguageSettings:
         self._setup_routes()
 
     def _setup_routes(self):
-
         @self.bp.get("/")
         @admin_required
         def dashboard():
