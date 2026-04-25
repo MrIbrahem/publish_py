@@ -12,20 +12,23 @@ from flask.testing import FlaskClient
 
 
 @pytest.fixture
-def mock_validate_access() -> MagicMock:
+def mock_validate_access():
     """Mock the validate_access function."""
     with patch("src.sqlalchemy_app.public.routes.publish.routes.validate_access") as mock_validate:
         mock_validate.return_value = lambda f: f
+        yield mock_validate
 
 
 @pytest.fixture
-def mock_user_token() -> MagicMock:
-
+def mock_user_token():
     _mock = MagicMock()
     _mock.decrypted.return_value = ("access_key", "access_secret")
 
-    with patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
-        mock_get_token.return_value = _mock
+    with patch(
+        "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
+        return_value=_mock,
+    ) as mock_get_token:
+        yield mock_get_token
 
 
 @pytest.mark.integration
