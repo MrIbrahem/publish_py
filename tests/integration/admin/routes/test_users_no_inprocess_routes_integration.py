@@ -19,7 +19,7 @@ class TestUsersNoInprocessDashboard:
         """Test that users no inprocess dashboard requires admin access."""
         response = client.get("/admin/users_no_inprocess")
 
-        assert response.status_code in [200, 302, 401, 403]
+        assert response.status_code == 302 # in [200, 302, 401, 403]
 
     def test_users_no_inprocess_dashboard_lists_users(self, auth_client: FlaskClient):
         """Test that users no inprocess dashboard lists users."""
@@ -33,7 +33,7 @@ class TestUsersNoInprocessDashboard:
 
                 response = auth_client.get("/admin/users_no_inprocess")
 
-                assert response.status_code in [200, 302]
+                assert response.status_code == 302 # in [200, 302]
 
 
 @pytest.mark.integration
@@ -44,7 +44,7 @@ class TestAddUserNoInprocess:
         """Test that adding user requires admin access."""
         response = client.post("/admin/users_no_inprocess/add", data={"username": "NewUser"})
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_add_user_no_inprocess_with_valid_data(self, auth_client: FlaskClient):
         """Test adding user with valid data."""
@@ -59,7 +59,7 @@ class TestAddUserNoInprocess:
                     follow_redirects=False,
                 )
 
-                assert response.status_code in [302, 200]
+                assert response.status_code == 302 # in [302, 200]
 
     def test_add_user_no_inprocess_without_username_fails(self, auth_client: FlaskClient):
         """Test that adding user without username fails."""
@@ -71,7 +71,7 @@ class TestAddUserNoInprocess:
                 follow_redirects=False,
             )
 
-            assert response.status_code in [302, 200]
+            assert response.status_code == 302 # in [302, 200]
 
 
 @pytest.mark.integration
@@ -82,7 +82,7 @@ class TestDeleteUserNoInprocess:
         """Test that deleting user requires admin access."""
         response = client.post("/admin/users_no_inprocess/1/delete")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_delete_user_no_inprocess_with_valid_id(self, auth_client: FlaskClient):
         """Test deleting user with valid ID."""
@@ -107,13 +107,13 @@ class TestActivateDeactivateUserNoInprocess:
         """Test that activating user requires admin access."""
         response = client.post("/admin/users_no_inprocess/1/activate")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_deactivate_user_no_inprocess_requires_admin(self, client: FlaskClient):
         """Test that deactivating user requires admin access."""
         response = client.post("/admin/users_no_inprocess/1/deactivate")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_activate_user_no_inprocess_with_valid_id(self, auth_client: FlaskClient):
         """Test activating user with valid ID."""

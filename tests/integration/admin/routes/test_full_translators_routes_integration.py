@@ -1,5 +1,7 @@
 """
 Integration tests for src/sqlalchemy_app/admin/routes/full_translators.py module.
+
+TODO: should mock admin_required decorator
 """
 
 from __future__ import annotations
@@ -19,7 +21,7 @@ class TestFullTranslatorsDashboard:
         """Test that full translators dashboard requires admin access."""
         response = client.get("/admin/full_translators")
 
-        assert response.status_code in [200, 302, 401, 403]
+        assert response.status_code == 302 # in [200, 302, 401, 403]
 
     def test_full_translators_dashboard_lists_translators(self, auth_client: FlaskClient):
         """Test that full translators dashboard lists translators."""
@@ -33,7 +35,7 @@ class TestFullTranslatorsDashboard:
 
                 response = auth_client.get("/admin/full_translators")
 
-                assert response.status_code in [200, 302]
+                assert response.status_code == 302 # in [200, 302]
 
 
 @pytest.mark.integration
@@ -44,7 +46,7 @@ class TestAddFullTranslator:
         """Test that adding full translator requires admin access."""
         response = client.post("/admin/full_translators/add", data={"username": "NewTranslator"})
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_add_full_translator_with_valid_data(self, auth_client: FlaskClient):
         """Test adding full translator with valid data."""
@@ -59,7 +61,7 @@ class TestAddFullTranslator:
                     follow_redirects=False,
                 )
 
-                assert response.status_code in [302, 200]
+                assert response.status_code == 302 # in [302, 200]
 
     def test_add_full_translator_without_username_fails(self, auth_client: FlaskClient):
         """Test that adding full translator without username fails."""
@@ -71,7 +73,7 @@ class TestAddFullTranslator:
                 follow_redirects=False,
             )
 
-            assert response.status_code in [302, 200]
+            assert response.status_code == 302 # in [302, 200]
 
 
 @pytest.mark.integration
@@ -82,7 +84,7 @@ class TestDeleteFullTranslator:
         """Test that deleting full translator requires admin access."""
         response = client.post("/admin/full_translators/1/delete")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_delete_full_translator_with_valid_id(self, auth_client: FlaskClient):
         """Test deleting full translator with valid ID."""
@@ -107,13 +109,13 @@ class TestActivateDeactivateFullTranslator:
         """Test that activating full translator requires admin access."""
         response = client.post("/admin/full_translators/1/activate")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_deactivate_full_translator_requires_admin(self, client: FlaskClient):
         """Test that deactivating full translator requires admin access."""
         response = client.post("/admin/full_translators/1/deactivate")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_activate_full_translator_with_valid_id(self, auth_client: FlaskClient):
         """Test activating full translator with valid ID."""

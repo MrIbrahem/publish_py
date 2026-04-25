@@ -1,5 +1,7 @@
 """
 Integration tests for src/sqlalchemy_app/admin/routes/language_settings.py module.
+
+TODO: should mock admin_required decorator
 """
 
 from __future__ import annotations
@@ -19,7 +21,7 @@ class TestLanguageSettingsDashboard:
         """Test that language settings dashboard requires admin access."""
         response = client.get("/admin/language_settings")
 
-        assert response.status_code in [200, 302, 401, 403]
+        assert response.status_code == 302 # in [200, 302, 401, 403]
 
     def test_language_settings_dashboard_lists_settings(self, auth_client: FlaskClient):
         """Test that language settings dashboard lists settings."""
@@ -39,7 +41,7 @@ class TestLanguageSettingsDashboard:
 
                     response = auth_client.get("/admin/language_settings")
 
-                    assert response.status_code in [200, 302]
+                    assert response.status_code == 302 # in [200, 302]
 
 
 @pytest.mark.integration
@@ -50,7 +52,7 @@ class TestAddLanguageSetting:
         """Test that adding language setting requires admin access."""
         response = client.post("/admin/language_settings/add", data={"lang_code": "fr"})
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_add_language_setting_with_valid_data(self, auth_client: FlaskClient):
         """Test adding language setting with valid data."""
@@ -70,7 +72,7 @@ class TestAddLanguageSetting:
                     follow_redirects=False,
                 )
 
-                assert response.status_code in [302, 200]
+                assert response.status_code == 302 # in [302, 200]
 
     def test_add_language_setting_without_lang_code_fails(self, auth_client: FlaskClient):
         """Test that adding language setting without lang_code fails."""
@@ -82,7 +84,7 @@ class TestAddLanguageSetting:
                 follow_redirects=False,
             )
 
-            assert response.status_code in [302, 200]
+            assert response.status_code == 302 # in [302, 200]
 
 
 @pytest.mark.integration
@@ -93,7 +95,7 @@ class TestUpdateLanguageSetting:
         """Test that updating language setting requires admin access."""
         response = client.post("/admin/language_settings/1/update", data={"move_dots": "1"})
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_update_language_setting_with_valid_data(self, auth_client: FlaskClient):
         """Test updating language setting with valid data."""
@@ -123,7 +125,7 @@ class TestDeleteLanguageSetting:
         """Test that deleting language setting requires admin access."""
         response = client.post("/admin/language_settings/1/delete")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302 # in [302, 401, 403]
 
     def test_delete_language_setting_with_valid_id(self, auth_client: FlaskClient):
         """Test deleting language setting with valid ID."""
