@@ -59,7 +59,7 @@ class CXTokenRequestSchema(Schema):
     """Schema for /cxtoken/ endpoint request validation."""
 
     wiki = fields.Str(required=True, validate=validate.Length(min=1, max=255))
-    user = fields.Str(required=True, validate=validate.Length(min=2, max=10))
+    user = fields.Str(required=True, validate=validate.Length(min=2, max=150))
 
 
 def validate_json(schema_class):
