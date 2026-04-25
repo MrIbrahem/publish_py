@@ -54,7 +54,7 @@ class TestAuthLogin:
                         response = client.get("/auth/login", follow_redirects=False)
 
                     # After rate limit exceeded, should redirect with warning
-                    assert response.status_code in [302, 429]
+                    assert response.status_code == 302  # in [302, 429]
 
     def test_login_starts_oauth_flow(self, app: Flask, client: FlaskClient):
         """Test that login starts OAuth flow when properly configured."""
