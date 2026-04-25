@@ -71,8 +71,10 @@ class TestPublishPost:
     def test_publish_missing_user_token_returns_403(self, mock_validate_access, client: FlaskClient):
         """Test that missing user token returns 403."""
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
-            mock_get_token.return_value = None
+        with patch(
+            "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
+            return_value=None,
+        ) as mock_get_token:
 
             response = client.post(
                 "/publish/",
