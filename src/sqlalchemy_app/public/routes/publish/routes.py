@@ -30,7 +30,7 @@ def handle_form(request_data) -> Response:
         raw["translate_type"] = translate_type
 
     try:
-        validated_data = PublishRequestSchema().load(raw)
+        validated_data = PublishRequestSchema().load(raw, unknown="exclude")
     except ValidationError as err:
         response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
         response.status_code = 400

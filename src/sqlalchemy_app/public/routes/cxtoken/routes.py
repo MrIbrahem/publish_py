@@ -92,7 +92,7 @@ def index() -> Response:
         JSON response with cxtoken data or error
     """
     try:
-        validated_data = CXTokenRequestSchema().load(request.args)
+        validated_data = CXTokenRequestSchema().load(request.args, unknown="exclude")
     except ValidationError as err:
         response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
         response.status_code = 400

@@ -123,6 +123,7 @@ class TestAdminRouteAccess:
         """Test that authenticated non-admin users are denied access."""
         # Mock current_user to return a non-admin user
         from src.sqlalchemy_app.shared.services.user_token_service import UserTokenRecord
+
         mock_user = UserTokenRecord(user_id=12345, username="TestUser")
         with patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_user):
             # Mock _get_cached_active_coordinators to return list without "TestUser"
