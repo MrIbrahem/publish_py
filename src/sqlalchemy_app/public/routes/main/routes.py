@@ -24,16 +24,22 @@ logger = logging.getLogger(__name__)
 @bp_main.get("/")
 def index():
     langs = [x.to_dict() for x in list_langs()]
-    langs_dict = {x["code"]: x for x in langs}
-    campaigns = [x.to_dict() for x in list_categories()]
-
-    code = request.args.get("code")
+    campaigns = list_categories()
+    campaigns_list = [x.to_dict() for x in campaigns]
     camp = request.args.get("camp")
-    tr_type = request.args.get("type")
+
+    camp_to_cats = [c.campaign for c in campaigns if c.campaign]
+    if camp and camp not in camp_to_cats:
+        flash(f"Campaign: {camp} is not valid campaign", "danger")
+
+    langs_dict = {x["code"]: x for x in langs}
+    code = request.args.get("code")
     lang_name = langs_dict.get(code, {}).get("name")
 
     if code and not lang_name:
         flash(f"Code: {code} is not valid wiki", "danger")
+
+    tr_type = request.args.get("type")
 
     return render_template(
         "index.html",
@@ -41,7 +47,7 @@ def index():
             "allow_whole_translate": True,
         },
         langs=langs,
-        campaigns=campaigns,
+        campaigns=campaigns_list,
         args={
             "code": code,
             "camp": camp,
