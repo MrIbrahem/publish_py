@@ -24,7 +24,6 @@ class LONGTEXT(TypeDecorator):
 
     def load_dialect_impl(self, dialect):
         if dialect.name == "mysql":
-
             return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
         return dialect.type_descriptor(Text())
 
