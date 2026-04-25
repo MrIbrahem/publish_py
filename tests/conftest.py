@@ -225,9 +225,13 @@ def mock_admin_required(mocker):
     This fixture automatically applies to all tests in this directory,
     allowing tests to focus on route functionality rather than auth.
     """
-    mock_req = MagicMock()
-    mock_req.username = "admin"
-    mocker.patch("src.sqlalchemy_app.admin.decorators._get_cached_active_coordinators", return_value={
-        "admin": mock_req,
-    })
-    mocker.patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_req)
+    # Mock current_user to return a valid user object
+    mock_user = MagicMock()
+    mock_user.username = "admin"
+    mocker.patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_user)
+
+    # Mock _get_cached_active_coordinators to return list with "admin"
+    mocker.patch(
+        "src.sqlalchemy_app.admin.decorators._get_cached_active_coordinators",
+        return_value=["admin"],
+    )
