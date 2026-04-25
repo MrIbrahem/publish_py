@@ -19,11 +19,10 @@ class TestCoordinatorsDashboard:
 
     def test_coordinators_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that coordinators dashboard requires admin access."""
-        response = client.get("/admin/coordinators")
+        response = client.get("/admin/coordinators/")
 
-        # Should redirect to login or require admin
+        # With mock_admin_required, should render successfully
         assert response.status_code == 200
-        assert response.location == '/admin/coordinators/'
 
     def test_coordinators_dashboard_lists_coordinators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that coordinators dashboard lists coordinators."""
@@ -33,11 +32,10 @@ class TestCoordinatorsDashboard:
                 MagicMock(username="Coordinator2", is_active=False),
             ]
 
-            response = auth_client.get("/admin/coordinators")
+            response = auth_client.get("/admin/coordinators/")
 
-            # May redirect or show dashboard
+            # Should render dashboard successfully
             assert response.status_code == 200
-            assert response.location == '/admin/coordinators/'
 
 
 @pytest.mark.integration
