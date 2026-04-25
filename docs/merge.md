@@ -13,7 +13,7 @@ This repository manages the final steps in the process of publishing Wikipedia a
 | `/api`                                                     |        | GET       | API              | [PHP Source](https://github.com/Mdwiki-TD/TD_API)                                                                  |
 | `/new_html`                                                |        | GET       | -                | [PHP Source](https://github.com/mdwikicx/new_html)                                                                 |
 | `/admin`                                                   |        | GET       | -                | [PHP Source](https://github.com/Mdwiki-TD/tdc/)                                                                    |
-| [Translation Dashboard](#Translation-Dashboard-End-points) |        | GET       | -                | [PHP Source](https://github.com/Mdwiki-TD/Translation-Dashboard)                                                   |
+| [Translation Dashboard](#translation-dashboard-end-points) |        | GET       | -                | [PHP Source](https://github.com/Mdwiki-TD/Translation-Dashboard)                                                   |
 
 # Translation Dashboard End points
 

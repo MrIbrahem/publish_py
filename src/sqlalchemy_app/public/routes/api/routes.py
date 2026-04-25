@@ -375,7 +375,7 @@ def users_by_translations_count() -> Response:
 @check_cors
 def get_langs() -> Response:
     """
-    Handle langs API requests. Returns all category records.
+    Handle langs API requests. Returns all language records.
     """
     try:
         records = list_langs()
