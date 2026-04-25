@@ -19,10 +19,10 @@ class TestSettingsDashboard:
 
     def test_settings_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that settings dashboard requires admin access."""
-        response = client.get("/admin/settings")
+        response = client.get("/admin/settings/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/settings/'
+        # With mock_admin_required, should render successfully
+        assert response.status_code == 200
 
     def test_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
         """Test that settings dashboard lists settings."""
@@ -34,10 +34,10 @@ class TestSettingsDashboard:
             mock_setting.to_dict.return_value = {"value": True}
             mock_list.return_value = [mock_setting]
 
-            response = auth_client.get("/admin/settings")
+            response = auth_client.get("/admin/settings/")
 
-            assert response.status_code == 302
-            assert response.location == '/admin/settings/'
+            # Should render dashboard successfully
+            assert response.status_code == 200
 
 
 @pytest.mark.integration
