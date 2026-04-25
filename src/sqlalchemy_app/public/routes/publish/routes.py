@@ -10,6 +10,7 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 
 from ....shared.core.cors import check_cors, validate_access
+from marshmallow import ValidationError
 from ....shared.schemas import PublishRequestSchema
 from ....shared.services.user_token_service import get_user_token_by_username
 from ....shared.utils.helpers.format import format_title, format_user
@@ -22,13 +23,12 @@ logger = logging.getLogger(__name__)
 def handle_form(request_data) -> Response:
     # Validate using marshmallow schema
     schema = PublishRequestSchema()
-    errors = schema.validate(request_data)
-    if errors:
-        response = jsonify({"error": {"code": "validation_error", "info": str(errors)}})
+    try:
+        validated_data = schema.load(request_data)
+    except ValidationError as err:
+        response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
         response.status_code = 400
         return response
-
-    validated_data = schema.load(request_data)
 
     # Format inputs
     user = format_user(validated_data.get("user", ""))

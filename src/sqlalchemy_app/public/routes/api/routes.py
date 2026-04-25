@@ -11,6 +11,7 @@ from sqlalchemy import func, text
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
+from marshmallow import ValidationError
 from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.services.category_service import list_categories
 from ....shared.services.in_process_service import get_in_process_counts_by_user
@@ -72,40 +73,18 @@ def get_publish_reports() -> Response:
 
     # Validate query parameters using marshmallow schema
     schema = PublishReportsQuerySchema()
-    filters: Dict[str, Any] = {}
-    filter_params = ["year", "month", "title", "user", "lang", "sourcetitle", "result"]
+    try:
+        # Marshmallow handles type conversion and validation for all query parameters
+        params = schema.load(request.args)
+    except ValidationError as err:
+        return jsonify({"error": "Validation failed", "details": err.messages}), 400
 
-    for param in filter_params:
-        value = request.args.get(param)
-        if value is not None and str(value).lower() != "all" and value != "":
-            # Convert to appropriate type
-            if param in ["year", "month"]:
-                try:
-                    filters[param] = int(value)
-                except ValueError:
-                    return jsonify({"error": f"Invalid {param} value, must be integer"}), 400
-            else:
-                filters[param] = value
+    # Separate filters from other control parameters
+    filter_keys = ["year", "month", "title", "user", "lang", "sourcetitle", "result"]
+    filters = {k: v for k, v in params.items() if k in filter_keys}
 
-    # Validate filters against schema
-    validation_errors = schema.validate(filters)
-    if validation_errors:
-        return jsonify({"error": "Validation failed", "details": validation_errors}), 400
-
-    # Extract select fields
-    select_param = request.args.get("select")
-    select_fields = parse_select_fields(select_param)
-
-    # Extract and validate limit
-    limit_str = request.args.get("limit")
-    limit = None
-    if limit_str:
-        try:
-            limit = int(limit_str)
-            if limit < 1 or limit > 1000:
-                return jsonify({"error": "limit must be between 1 and 1000"}), 400
-        except ValueError:
-            return jsonify({"error": "limit must be an integer"}), 400
+    select_fields = parse_select_fields(params.get("select"))
+    limit = params.get("limit")
 
     try:
         # Query database
@@ -397,7 +376,7 @@ def users_by_translations_count() -> Response:
 @check_cors
 def get_langs() -> Response:
     """
-    Handle langs API requests. Returns all category records.
+    Handle langs API requests. Returns all language records.
     """
     try:
         records = list_langs()
