@@ -54,7 +54,7 @@ class TestAddLanguageSetting:
         response = client.post("/admin/language_settings/add", data={"lang_code": "fr"})
 
         assert response.status_code == 302
-        assert response.location == '/admin/language_settings/'
+        assert response.location == "/admin/language_settings/"
 
     def test_add_language_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding language setting with valid data."""
@@ -74,7 +74,7 @@ class TestAddLanguageSetting:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/language_settings/'
+            assert response.location == "/admin/language_settings/"
 
     def test_add_language_setting_without_lang_code_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding language setting without lang_code fails."""
@@ -86,7 +86,7 @@ class TestAddLanguageSetting:
         )
 
         assert response.status_code == 302
-        assert response.location == '/admin/language_settings/'
+        assert response.location == "/admin/language_settings/"
 
 
 @pytest.mark.integration
@@ -98,7 +98,7 @@ class TestUpdateLanguageSetting:
         response = client.post("/admin/language_settings/1/update", data={"move_dots": "1"})
 
         assert response.status_code == 302
-        assert response.location == '/admin/language_settings/'
+        assert response.location == "/admin/language_settings/"
 
     def test_update_language_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test updating language setting with valid data."""
@@ -117,7 +117,7 @@ class TestUpdateLanguageSetting:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/language_settings/'
+            assert response.location == "/admin/language_settings/"
 
 
 @pytest.mark.integration
@@ -129,7 +129,7 @@ class TestDeleteLanguageSetting:
         response = client.post("/admin/language_settings/1/delete")
 
         assert response.status_code == 302
-        assert response.location == '/admin/language_settings/'
+        assert response.location == "/admin/language_settings/"
 
     def test_delete_language_setting_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting language setting with valid ID."""
@@ -143,4 +143,4 @@ class TestDeleteLanguageSetting:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/language_settings/'
+            assert response.location == "/admin/language_settings/"

@@ -47,7 +47,7 @@ class TestAddFullTranslator:
         response = client.post("/admin/full_translators/add", data={"username": "NewTranslator"})
 
         assert response.status_code == 302
-        assert response.location == '/admin/full_translators/'
+        assert response.location == "/admin/full_translators/"
 
     def test_add_full_translator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding full translator with valid data."""
@@ -61,7 +61,7 @@ class TestAddFullTranslator:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/full_translators/'
+            assert response.location == "/admin/full_translators/"
 
     def test_add_full_translator_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding full translator without username fails."""
@@ -72,7 +72,7 @@ class TestAddFullTranslator:
         )
 
         assert response.status_code == 302
-        assert response.location == '/admin/full_translators/'
+        assert response.location == "/admin/full_translators/"
 
 
 @pytest.mark.integration
@@ -84,7 +84,7 @@ class TestDeleteFullTranslator:
         response = client.post("/admin/full_translators/1/delete")
 
         assert response.status_code == 302
-        assert response.location == '/admin/full_translators/'
+        assert response.location == "/admin/full_translators/"
 
     def test_delete_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting full translator with valid ID."""
@@ -97,7 +97,7 @@ class TestDeleteFullTranslator:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/full_translators/'
+            assert response.location == "/admin/full_translators/"
 
 
 @pytest.mark.integration
@@ -109,14 +109,14 @@ class TestActivateDeactivateFullTranslator:
         response = client.post("/admin/full_translators/1/activate")
 
         assert response.status_code == 302
-        assert response.location == '/admin/full_translators/'
+        assert response.location == "/admin/full_translators/"
 
     def test_deactivate_full_translator_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that deactivating full translator requires admin access."""
         response = client.post("/admin/full_translators/1/deactivate")
 
         assert response.status_code == 302
-        assert response.location == '/admin/full_translators/'
+        assert response.location == "/admin/full_translators/"
 
     def test_activate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating full translator with valid ID."""
@@ -129,7 +129,7 @@ class TestActivateDeactivateFullTranslator:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/full_translators/'
+            assert response.location == "/admin/full_translators/"
 
     def test_deactivate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating full translator with valid ID."""
@@ -142,4 +142,4 @@ class TestActivateDeactivateFullTranslator:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/full_translators/'
+            assert response.location == "/admin/full_translators/"

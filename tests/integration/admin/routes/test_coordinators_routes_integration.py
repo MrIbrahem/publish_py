@@ -47,7 +47,7 @@ class TestAddCoordinator:
         response = client.post("/admin/coordinators/add", data={"username": "NewCoordinator"})
 
         assert response.status_code == 302
-        assert response.location == '/admin/coordinators/'
+        assert response.location == "/admin/coordinators/"
 
     def test_add_coordinator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding coordinator with valid data."""
@@ -62,7 +62,7 @@ class TestAddCoordinator:
 
             # Should redirect after successful add
             assert response.status_code == 302
-            assert response.location == '/admin/coordinators/'
+            assert response.location == "/admin/coordinators/"
 
     def test_add_coordinator_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding coordinator without username fails."""
@@ -74,7 +74,7 @@ class TestAddCoordinator:
 
         # Should redirect with error
         assert response.status_code == 302
-        assert response.location == '/admin/coordinators/'
+        assert response.location == "/admin/coordinators/"
 
 
 @pytest.mark.integration
@@ -86,7 +86,7 @@ class TestDeleteCoordinator:
         response = client.post("/admin/coordinators/1/delete")
 
         assert response.status_code == 302
-        assert response.location == '/admin/coordinators/'
+        assert response.location == "/admin/coordinators/"
 
     def test_delete_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting coordinator with valid ID."""
@@ -99,7 +99,7 @@ class TestDeleteCoordinator:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/coordinators/'
+            assert response.location == "/admin/coordinators/"
 
 
 @pytest.mark.integration
@@ -111,14 +111,14 @@ class TestActivateDeactivateCoordinator:
         response = client.post("/admin/coordinators/1/activate")
 
         assert response.status_code == 302
-        assert response.location == '/admin/coordinators/'
+        assert response.location == "/admin/coordinators/"
 
     def test_deactivate_coordinator_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that deactivating coordinator requires admin access."""
         response = client.post("/admin/coordinators/1/deactivate")
 
         assert response.status_code == 302
-        assert response.location == '/admin/coordinators/'
+        assert response.location == "/admin/coordinators/"
 
     def test_activate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating coordinator with valid ID."""
@@ -131,7 +131,7 @@ class TestActivateDeactivateCoordinator:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/coordinators/'
+            assert response.location == "/admin/coordinators/"
 
     def test_deactivate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating coordinator with valid ID."""
@@ -144,4 +144,4 @@ class TestActivateDeactivateCoordinator:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/coordinators/'
+            assert response.location == "/admin/coordinators/"

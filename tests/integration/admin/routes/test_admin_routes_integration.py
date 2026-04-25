@@ -22,7 +22,7 @@ class TestAdminIndex:
         response = client.get("/admin/")
 
         assert response.status_code == 302
-        assert response.location.endswith('/admin/last')
+        assert response.location.endswith("/admin/last")
 
     def test_admin_index_renders_dashboard(self, mock_admin_required, auth_client: FlaskClient):
         """Test that admin index renders dashboard."""
@@ -30,7 +30,7 @@ class TestAdminIndex:
         response = auth_client.get("/admin/")
 
         assert response.status_code == 302
-        assert response.location.endswith('/admin/last')
+        assert response.location.endswith("/admin/last")
 
 
 @pytest.mark.integration
@@ -44,7 +44,7 @@ class TestAdminSidebar:
         # Context processor runs for every admin request, just verify response is successful
         # The sidebar is injected via @bp_admin.app_context_processor decorator
         assert response.status_code == 302
-        assert response.location.endswith('/admin/last')
+        assert response.location.endswith("/admin/last")
 
 
 @pytest.mark.integration

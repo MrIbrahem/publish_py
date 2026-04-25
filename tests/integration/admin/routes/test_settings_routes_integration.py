@@ -52,7 +52,7 @@ class TestCreateSetting:
         )
 
         assert response.status_code == 302
-        assert response.location == '/admin/settings/'
+        assert response.location == "/admin/settings/"
 
     def test_create_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test creating setting with valid data."""
@@ -71,7 +71,7 @@ class TestCreateSetting:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/settings/'
+            assert response.location == "/admin/settings/"
 
     def test_create_setting_invalid_key_format(self, mock_admin_required, auth_client: FlaskClient):
         """Test that creating setting with invalid key format fails."""
@@ -88,7 +88,7 @@ class TestCreateSetting:
 
         # Should redirect with error flash
         assert response.status_code == 302
-        assert response.location == '/admin/settings/'
+        assert response.location == "/admin/settings/"
 
 
 @pytest.mark.integration
@@ -100,7 +100,7 @@ class TestUpdateSetting:
         response = client.post("/admin/settings/update", data={"setting_test": "value"})
 
         assert response.status_code == 302
-        assert response.location == '/admin/settings/'
+        assert response.location == "/admin/settings/"
 
     def test_update_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test updating setting with valid data."""
@@ -120,7 +120,7 @@ class TestUpdateSetting:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/settings/'
+            assert response.location == "/admin/settings/"
 
     def test_delete_setting_via_update(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting setting via update form."""
@@ -139,4 +139,4 @@ class TestUpdateSetting:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/settings/'
+            assert response.location == "/admin/settings/"

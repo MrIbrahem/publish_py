@@ -47,7 +47,7 @@ class TestAddUserNoInprocess:
         response = client.post("/admin/users_no_inprocess/add", data={"username": "NewUser"})
 
         assert response.status_code == 302
-        assert response.location == '/admin/users_no_inprocess/'
+        assert response.location == "/admin/users_no_inprocess/"
 
     def test_add_user_no_inprocess_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding user with valid data."""
@@ -61,7 +61,7 @@ class TestAddUserNoInprocess:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/users_no_inprocess/'
+            assert response.location == "/admin/users_no_inprocess/"
 
     def test_add_user_no_inprocess_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding user without username fails."""
@@ -72,7 +72,7 @@ class TestAddUserNoInprocess:
         )
 
         assert response.status_code == 302
-        assert response.location == '/admin/users_no_inprocess/'
+        assert response.location == "/admin/users_no_inprocess/"
 
 
 @pytest.mark.integration
@@ -84,7 +84,7 @@ class TestDeleteUserNoInprocess:
         response = client.post("/admin/users_no_inprocess/1/delete")
 
         assert response.status_code == 302
-        assert response.location == '/admin/users_no_inprocess/'
+        assert response.location == "/admin/users_no_inprocess/"
 
     def test_delete_user_no_inprocess_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting user with valid ID."""
@@ -97,7 +97,7 @@ class TestDeleteUserNoInprocess:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/users_no_inprocess/'
+            assert response.location == "/admin/users_no_inprocess/"
 
 
 @pytest.mark.integration
@@ -109,14 +109,14 @@ class TestActivateDeactivateUserNoInprocess:
         response = client.post("/admin/users_no_inprocess/1/activate")
 
         assert response.status_code == 302
-        assert response.location == '/admin/users_no_inprocess/'
+        assert response.location == "/admin/users_no_inprocess/"
 
     def test_deactivate_user_no_inprocess_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that deactivating user requires admin access."""
         response = client.post("/admin/users_no_inprocess/1/deactivate")
 
         assert response.status_code == 302
-        assert response.location == '/admin/users_no_inprocess/'
+        assert response.location == "/admin/users_no_inprocess/"
 
     def test_activate_user_no_inprocess_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating user with valid ID."""
@@ -130,7 +130,7 @@ class TestActivateDeactivateUserNoInprocess:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/users_no_inprocess/'
+            assert response.location == "/admin/users_no_inprocess/"
 
     def test_deactivate_user_no_inprocess_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating user with valid ID."""
@@ -144,4 +144,4 @@ class TestActivateDeactivateUserNoInprocess:
             )
 
             assert response.status_code == 302
-            assert response.location == '/admin/users_no_inprocess/'
+            assert response.location == "/admin/users_no_inprocess/"
