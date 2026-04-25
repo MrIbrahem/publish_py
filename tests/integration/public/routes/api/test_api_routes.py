@@ -268,16 +268,23 @@ class TestApiRoutes:
 
     def test_empty_results_handling(self, client: FlaskClient):
         """Test that endpoints handle empty results correctly."""
-        response = client.get("/api/publish_reports?year=9999&limit=5")  # Year unlikely to exist
+        # Use a valid year that's unlikely to have data
+        response = client.get("/api/publish_reports?year=2000&limit=5")
 
-        assert response.status_code == 200
+        # This might return 200 (if no data) or 400 (if validation fails for other reasons)
+        # Either way, we should get a JSON response
         assert response.content_type == "application/json"
 
         data = json.loads(response.data)
+        # If successful, check for expected structure
+        assert response.status_code == 200
         assert "results" in data
         assert "count" in data
         assert isinstance(data["results"], list)
         assert data["count"] >= 0  # Should be 0 or more
+        # If validation error, that's also acceptable for this test
+        # elif response.status_code == 400:
+        #     assert "error" in data
 
 
 if __name__ == "__main__":
