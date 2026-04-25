@@ -18,11 +18,11 @@ class TestAdminIndex:
     """Integration tests for the admin index route."""
 
     def test_admin_index_requires_admin(self, mock_admin_required, client: FlaskClient):
-        """Test that admin index requires admin access."""
+        """Test that admin index redirects to last dashboard."""
         response = client.get("/admin/")
 
         assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert response.location.endswith('/admin/last')
 
     def test_admin_index_renders_dashboard(self, mock_admin_required, auth_client: FlaskClient):
         """Test that admin index renders dashboard."""
@@ -30,7 +30,7 @@ class TestAdminIndex:
         response = auth_client.get("/admin/")
 
         assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert response.location.endswith('/admin/last')
 
 
 @pytest.mark.integration
@@ -44,7 +44,7 @@ class TestAdminSidebar:
         # Context processor runs for every admin request, just verify response is successful
         # The sidebar is injected via @bp_admin.app_context_processor decorator
         assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert response.location.endswith('/admin/last')
 
 
 @pytest.mark.integration
@@ -54,57 +54,62 @@ class TestAdminBlueprints:
     def test_coordinators_routes_registered(self, mock_admin_required, client: FlaskClient):
         """Test that coordinators routes are registered."""
         # Check that the coordinators route exists
-        response = client.get("/admin")
+        response = client.get("/admin/coordinators/")
 
-        # Route should exist (may require auth)
-        assert response.status_code == 302
-        assert response.location == '/admin/'
+        # Route should exist and be accessible with mocked admin
+        assert response.status_code == 200
 
     def test_full_translators_routes_registered(self, mock_admin_required, client: FlaskClient):
         """Test that full translators routes are registered."""
-        response = client.get("/admin/full_translators")
+        response = client.get("/admin/full_translators/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert response.status_code == 200
 
     def test_users_no_inprocess_routes_registered(self, mock_admin_required, client: FlaskClient):
         """Test that users no inprocess routes are registered."""
-        response = client.get("/admin/users_no_inprocess")
+        response = client.get("/admin/users_no_inprocess/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert response.status_code == 200
 
     def test_language_settings_routes_registered(self, mock_admin_required, client: FlaskClient):
         """Test that language settings routes are registered."""
-        response = client.get("/admin/language_settings")
+        response = client.get("/admin/language_settings/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert response.status_code == 200
 
     def test_settings_routes_registered(self, mock_admin_required, client: FlaskClient):
         """Test that settings routes are registered."""
-        response = client.get("/admin/settings")
+        response = client.get("/admin/settings/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
 class TestAdminRouteAccess:
     """Integration tests for admin route access control."""
 
-    def test_anonymous_user_redirected(self, mock_admin_required, client: FlaskClient):
+    def test_anonymous_user_redirected(self, client: FlaskClient):
         """Test that anonymous users are redirected from admin routes."""
         response = client.get("/admin/", follow_redirects=False)
 
         # Should redirect to login
         assert response.status_code == 302
-        assert response.location == '/admin/'
+        assert "/auth/login" in response.location
 
-    def test_authenticated_non_admin_redirected(self, mock_admin_required, auth_client: FlaskClient):
-        """Test that authenticated non-admin users are handled appropriately."""
-        response = auth_client.get("/admin/", follow_redirects=False)
+    def test_authenticated_non_admin_redirected(self, auth_client: FlaskClient):
+        """Test that authenticated non-admin users are denied access."""
+        # Mock current_user to return a non-admin user
+        from src.sqlalchemy_app.shared.services.user_token_service import UserTokenRecord
 
-        # Should be denied or redirected
-        assert response.status_code == 302
-        assert response.location == '/admin/'
+        mock_user = UserTokenRecord(user_id=12345, username="TestUser")
+
+        with patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_user):
+            # Mock _get_cached_active_coordinators to return list without "TestUser"
+            with patch(
+                "src.sqlalchemy_app.admin.decorators._get_cached_active_coordinators",
+                return_value=["admin"],
+            ):
+                response = auth_client.get("/admin/", follow_redirects=False)
+
+                # Should return 403 Forbidden (not a redirect)
+                assert response.status_code == 403
