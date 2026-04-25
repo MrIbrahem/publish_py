@@ -77,7 +77,7 @@ def get_publish_reports() -> Response:
 
     for param in filter_params:
         value = request.args.get(param)
-        if value is not None and value != "":
+        if value is not None and str(value).lower() != "all" and value != "":
             # Convert to appropriate type
             if param in ["year", "month"]:
                 try:

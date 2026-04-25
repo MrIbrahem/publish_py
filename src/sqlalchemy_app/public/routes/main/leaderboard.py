@@ -12,8 +12,6 @@ from flask import (
     send_from_directory,
 )
 
-from ....shared.auth.identity import current_user
-
 bp_leaderboard = Blueprint("leaderboard", __name__, url_prefix="/leaderboard")
 logger = logging.getLogger(__name__)
 
