@@ -10,7 +10,7 @@ Note: Several models have been moved to specialized modules:
 
 from __future__ import annotations
 
-from sqlalchemy import Column, DateTime, Integer, String, func, text
+from sqlalchemy import Column, Integer, String, JSON, text
 
 from ..shared.engine import BaseDb
 
@@ -22,6 +22,7 @@ class LangRecord(BaseDb):
         code varchar(20) NOT NULL,
         autonym varchar(70) NOT NULL,
         name varchar(70) NOT NULL,
+        redirects json DEFAULT NULL,
         PRIMARY KEY (lang_id)
     )
     """
@@ -32,6 +33,7 @@ class LangRecord(BaseDb):
     code = Column(String(20), nullable=False)
     autonym = Column(String(70), nullable=False)
     name = Column(String(70), nullable=False)
+    redirects = Column(JSON, nullable=True, server_default=text("NULL"))
 
 
 class MdwikiRevidRecord(BaseDb):
