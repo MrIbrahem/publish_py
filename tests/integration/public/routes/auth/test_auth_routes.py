@@ -21,7 +21,7 @@ class TestAuthLogin:
         with patch("src.sqlalchemy_app.public.routes.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
 
-            response = client.get("/login", follow_redirects=False)
+            response = client.get("/auth/login", follow_redirects=False)
 
             assert response.status_code == 302
             assert "/" in response.location or "error=oauth-not-configured" in response.location
@@ -51,7 +51,7 @@ class TestAuthLogin:
 
                     # Make 6 requests to exceed rate limit
                     for _ in range(6):
-                        response = client.get("/login", follow_redirects=False)
+                        response = client.get("/auth/login", follow_redirects=False)
 
                     # After rate limit exceeded, should redirect with warning
                     assert response.status_code in [302, 429]
@@ -69,7 +69,7 @@ class TestAuthLogin:
                 with patch("src.sqlalchemy_app.public.routes.auth.routes.login_rate_limiter") as mock_limiter:
                     mock_limiter.allow.return_value = True
 
-                    response = client.get("/login", follow_redirects=False)
+                    response = client.get("/auth/login", follow_redirects=False)
 
                     # Should redirect to OAuth provider
                     assert response.status_code == 302
@@ -84,7 +84,7 @@ class TestAuthCallback:
         with patch("src.sqlalchemy_app.public.routes.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
 
-            response = client.get("/callback?oauth_verifier=123&state=abc", follow_redirects=False)
+            response = client.get("/auth/callback?oauth_verifier=123&state=abc", follow_redirects=False)
 
             assert response.status_code == 302
 
@@ -104,7 +104,7 @@ class TestAuthCallback:
                 mock_limiter.allow.return_value = True
 
                 # Missing state should cause redirect
-                response = client.get("/callback?oauth_verifier=123", follow_redirects=False)
+                response = client.get("/auth/callback?oauth_verifier=123", follow_redirects=False)
 
                 assert response.status_code == 302
                 assert "error" in response.location
@@ -120,7 +120,7 @@ class TestAuthLogout:
             sess["uid"] = 12345
             sess["username"] = "TestUser"
 
-        response = client.get("/logout", follow_redirects=False)
+        response = client.get("/auth/logout", follow_redirects=False)
 
         assert response.status_code == 302
 
@@ -130,7 +130,7 @@ class TestAuthLogout:
 
     def test_logout_deletes_cookie(self, app: Flask, client: FlaskClient):
         """Test that logout deletes the authentication cookie."""
-        response = client.get("/logout", follow_redirects=False)
+        response = client.get("/auth/logout", follow_redirects=False)
 
         assert response.status_code == 302
         # Cookie should be set to delete

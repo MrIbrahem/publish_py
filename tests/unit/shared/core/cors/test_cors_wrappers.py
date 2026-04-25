@@ -19,7 +19,6 @@ class TestValidateAccessDecorated:
         assert result == "ok"
 
     def test_valid_secret_code_calls_wrapped_function(self, app, mock_load_request, mock_is_denied, mock_check_secret):
-
         mock_check_secret.return_value = "secret-host.com"
         mock_func = MagicMock(return_value="ok")
         decorated = validate_access(mock_func)
@@ -41,7 +40,6 @@ class TestValidateAccessDecorated:
         assert result == "ok"
 
     def test_neither_valid_returns_403(self, app, mock_load_request, mock_is_denied, mock_check_secret):
-
         mock_check_secret.return_value = None
         mock_func = MagicMock()
         decorated = validate_access(mock_func)
@@ -52,7 +50,6 @@ class TestValidateAccessDecorated:
         assert result.status_code == 403
 
     def test_neither_valid_returns_secret_key_error(self, app, mock_load_request, mock_is_denied, mock_check_secret):
-
         mock_check_secret.return_value = None
         decorated = validate_access(lambda: "ok")
 
@@ -95,7 +92,6 @@ class TestCheckCorsAccessDecorated:
         assert result == "ok"
 
     def test_denied_returns_403(self, app, mock_load_request, mock_is_denied):
-
         mock_func = MagicMock()
         decorated = check_cors(mock_func)
 
@@ -105,7 +101,6 @@ class TestCheckCorsAccessDecorated:
         assert result.status_code == 403
 
     def test_denied_returns_domain_error(self, app, mock_load_request, mock_is_denied):
-
         decorated = check_cors(lambda: "ok")
 
         result = decorated()

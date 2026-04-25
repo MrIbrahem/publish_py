@@ -4,7 +4,10 @@
 {% set cdn_base = "https://tools-static.wmflabs.org/cdnjs/ajax/libs" %}
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg')}}" sizes="any">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg')}}" type="image/svg+xml">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}WikiProjectMed Translation Dashboard{% endblock %}</title>
     <link rel='stylesheet' href='{{ cdn_base }}/bootstrap/5.3.3/css/bootstrap.min.css'>
@@ -13,6 +16,7 @@
     <link rel='stylesheet' href='{{ cdn_base }}/bootstrap-select/1.14.0-beta3/css/bootstrap-select.min.css'>
     <link rel="stylesheet" href="{{ cdn_base }}/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tdstyle.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
     <link rel='stylesheet' href='{{ cdn_base }}/datatables.net-bs5/2.3.4/dataTables.bootstrap5.min.css'>

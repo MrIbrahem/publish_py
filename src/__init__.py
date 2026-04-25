@@ -1,7 +1,6 @@
-"""Source package initialization.
-
+"""
+Source package initialization.
 Loads environment configuration on import for backward compatibility.
-New code should explicitly call load_environment() from env_config.
 """
 
 try:

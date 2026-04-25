@@ -8,7 +8,7 @@
                     target='_blank'>#mdwiki</a></h3>
         </div>
         <div class="card-body pb-0">
-            <form method="POST" action="/fixrefs/">
+            <form method="POST" action="{{ url_for('fixrefs.process_new')}}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <div class='container'>
                     <div class='row'>

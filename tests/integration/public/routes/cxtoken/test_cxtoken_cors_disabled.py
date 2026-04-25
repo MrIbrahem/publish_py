@@ -83,7 +83,6 @@ class TestCxtokenEndpoint:
             patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
-
             # Mock user token
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")

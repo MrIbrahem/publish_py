@@ -1,13 +1,96 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="card shadow-sm">
-        <div class="card-header">
+<div class="container">
+    <div class='card'>
+        <div class='card-header'>
+            This tool looks for Wikidata items that have a page on mdwiki.org but not in another wikipedia language <a
+                href='?cat=RTT&depth=1&code=ceb&doit=1'>(Example)</a>.
+            <a href='//mdwiki.org/wiki/WikiProjectMed:Translation_task_force' target="_blank"><b>How to use.</b></a>
         </div>
-        <div class="card-body">
-
+        <div class='card-body mb-0'>
+            <div class='mainindex'>
+                <form method='GET' action='{{ url_for("main.index")}}' class='form-inline' id="mainForm">
+                    <div class='row'>
+                        <div class='col-10'>
+                            <div class="mb-3">
+                                <label for="camp" class="form-label"><b>Campaign</b></label>
+                                <select dir='ltr' name='camp' id='camp' class='form-select' data-bs-theme="auto">
+                                    {% for cat in campaigns %}
+                                    <option data-tokens="{{ cat.campaign }}" value="{{ cat.campaign }}"
+                                        {{ 'selected' if cat.campaign == args.camp else '' }}>
+                                        {{ cat.campaign }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class='col-10'>
+                            <div class="mb-3">
+                                <label for="code" class="form-label"><b>Language</b></label>
+                                <div>
+                                    <select aria-label="Language code" class="selectpicker" id='code' name='code'
+                                        placeholder='two letter code' data-live-search="true" data-container="body"
+                                        data-live-search-style="begins" data-bs-theme="auto" data-style='btn active'
+                                        data-width="100%" required>
+                                        {# Loop through language tables #}
+                                        {% for lang in langs if lang.code %}
+                                        <option data-tokens="{{ lang.code }}" value="{{ lang.code }}"
+                                            {{ 'selected' if lang.code == args.code else '' }}>
+                                            ({{ lang.code }}) {{ lang.autonym }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {% if settings and settings.allow_whole_translate %}
+                        <div class='col-10'>
+                            <div class="mb-3">
+                                <label for="type" class="form-label"><b>Type</b></label>
+                                <div class='form-control'>
+                                    <div class='form-check form-check-inline'>
+                                        <input type='radio' class='form-check-input' id='customRadio' name='type'
+                                            value='lead'
+                                            {{ 'checked' if args.type == 'lead' or not args.type else '' }}>
+                                        <label class='form-check-label' for='customRadio'>The lead only</label>
+                                    </div>
+                                    <div class='form-check form-check-inline'>
+                                        <input type='radio' class='form-check-input' id='customRadio2' name='type'
+                                            value='all' {{ 'checked' if args.type == 'all' else '' }}>
+                                        <label class='form-check-label' for='customRadio2'>The whole article</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <input type="hidden" name="type" value="lead" />
+                        {% endif %}
+                        <div class='col-10'>
+                            <h4 class='aligncenter mb-0'>
+                                {% if is_authenticated %}
+                                <input type="submit" name="doit" class="btn btn-outline-primary" value="Do it" />
+                                {% else %}
+                                <button type="submit" formaction="{{ url_for('auth.login') }}" formmethod="get"
+                                    formnovalidate class="btn btn-outline-primary">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </button>
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-end">
+                    <img class='med-logo-big' src='{{ url_for('static', filename='favicon.svg')}}' decoding='async'
+                        alt='Wiki Project Med Foundation logo'>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+</script>
 {% endblock %}
