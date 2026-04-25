@@ -42,14 +42,14 @@ def get_lang_by_code(code: str) -> LangRecord | None:
         return orm_obj
 
 
-def add_lang(code: str, autonym: str, name: str) -> LangRecord:
+def add_lang(code: str, autonym: str, name: str, redirects: list[str] | None = None,) -> LangRecord:
     """Add a new language record."""
     code = code.strip()
     if not code:
         raise ValueError("Language code is required")
 
     with get_session() as session:
-        orm_obj = LangRecord(code=code, autonym=autonym, name=name)
+        orm_obj = LangRecord(code=code, autonym=autonym, name=name, redirects=redirects)
         session.add(orm_obj)
         try:
             session.commit()
@@ -61,7 +61,7 @@ def add_lang(code: str, autonym: str, name: str) -> LangRecord:
         return orm_obj
 
 
-def add_or_update_lang(code: str, autonym: str, name: str) -> LangRecord:
+def add_or_update_lang(code: str, autonym: str, name: str, redirects: list[str] | None = None,) -> LangRecord:
     """Add or update a language record."""
     code = code.strip()
     if not code:
@@ -72,28 +72,10 @@ def add_or_update_lang(code: str, autonym: str, name: str) -> LangRecord:
         if orm_obj:
             orm_obj.autonym = autonym
             orm_obj.name = name
+            orm_obj.redirects = redirects
         else:
-            orm_obj = LangRecord(code=code, autonym=autonym, name=name)
+            orm_obj = LangRecord(code=code, autonym=autonym, name=name, redirects=redirects)
             session.add(orm_obj)
-
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
-
-
-def update_lang(lang_id: int, **kwargs) -> LangRecord:
-    """Update a language record."""
-    with get_session() as session:
-        orm_obj = session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
-        if not orm_obj:
-            raise ValueError(f"Language record with ID {lang_id} not found")
-
-        if not kwargs:
-            return orm_obj
-
-        for key, value in kwargs.items():
-            if hasattr(orm_obj, key):
-                setattr(orm_obj, key, value)
 
         session.commit()
         session.refresh(orm_obj)
@@ -117,6 +99,5 @@ __all__ = [
     "get_lang_by_code",
     "add_lang",
     "add_or_update_lang",
-    "update_lang",
     "delete_lang",
 ]
