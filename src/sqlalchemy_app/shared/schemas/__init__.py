@@ -3,7 +3,7 @@ Validation schemas using marshmallow.
 """
 
 from flask import request
-from marshmallow import Schema, ValidationError, fields, validate, validates
+from marshmallow import Schema, ValidationError, fields, post_load, validate, validates
 
 
 class PublishRequestSchema(Schema):
@@ -17,21 +17,19 @@ class PublishRequestSchema(Schema):
     revid = fields.Str(validate=validate.Length(max=50))
     revision = fields.Str(validate=validate.Length(max=50))
     campaign = fields.Str(validate=validate.Length(max=100))
-    tr_type = fields.Str(validate=validate.OneOf(["lead", "translation"]))
+    # tr_type = fields.Str(validate=validate.Length(max=50))
+    tr_type = fields.Str(validate=validate.OneOf(["lead", "all"]))
     wpCaptchaId = fields.Str(validate=validate.Length(max=100))
     wpCaptchaWord = fields.Str(validate=validate.Length(max=50))
 
-    @validates("user")
-    def validate_user(self, value):
-        if not value or not value.strip():
-            raise ValidationError("User cannot be empty")
-        return value.strip()
-
-    @validates("title")
-    def validate_title(self, value):
-        if not value or not value.strip():
-            raise ValidationError("Title cannot be empty")
-        return value.strip()
+    @post_load
+    def process_fields(self, data, **kwargs):
+        """Clean up fields after load."""
+        if "user" in data:
+            data["user"] = data["user"].strip()
+        if "title" in data:
+            data["title"] = data["title"].strip()
+        return data
 
 
 class PublishReportsQuerySchema(Schema):

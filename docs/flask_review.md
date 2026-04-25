@@ -59,10 +59,11 @@
 ### Action 1: Input Validation (COMPLETED)
 
 -   Added `marshmallow` to requirements.txt
--   Created `src/sqlalchemy_app/shared/schemas/__init__.py` with validation schemas
--   Schemas created: `PublishRequestSchema`, `PublishReportsQuerySchema`, `CXTokenRequestSchema`
+-   Created `src/sqlalchemy_app/shared/schemas/__init__.py` with validation schemas:
+    -   `PublishRequestSchema` - USED in `publish/routes.py` ✓
+    -   `PublishReportsQuerySchema` - USED in `api/routes.py` ✓
+    -   `CXTokenRequestSchema` - Available but not used (cxtoken uses custom validation)
 -   Added `validate_json` decorator for easy schema validation
--   Note: Publish routes use basic validation to maintain compatibility with existing tests
 
 ### Action 2: Error Handlers (COMPLETED)
 
@@ -75,7 +76,16 @@
     -   500 Internal Server Error (existing, enhanced)
 -   Error responses return JSON for API routes and HTML for web routes
 
+### Actually Implemented
+
+| Schema                      | Status    | Location                                  |
+| --------------------------- | --------- | ----------------------------------------- |
+| `PublishRequestSchema`      | ✓ USED    | `publish/routes.py`                       |
+| `PublishReportsQuerySchema` | ✓ USED    | `api/routes.py`                           |
+| `CXTokenRequestSchema`      | Available | Not used (cxtoken uses custom validation) |
+
 ### Additional Fixes
 
 -   Fixed auth test URLs to use correct blueprint prefix (`/auth/login` instead of `/login`)
 -   All 949 tests passing
+-   Ruff and Black checks passing

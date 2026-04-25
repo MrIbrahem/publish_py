@@ -94,7 +94,7 @@ def index() -> Response:
     wiki = request.args.get("wiki", "")
     user = request.args.get("user", "")
 
-    # Validate parameters
+    # Validate parameters (maintain backward compatibility with tests)
     if not wiki or not user:
         return jsonify({"error": {"code": "no data", "info": "wiki or user is empty"}}), 400
 

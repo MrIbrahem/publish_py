@@ -10,6 +10,7 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 
 from ....shared.core.cors import check_cors, validate_access
+from ....shared.schemas import PublishRequestSchema
 from ....shared.services.user_token_service import get_user_token_by_username
 from ....shared.utils.helpers.format import format_title, format_user
 from .worker import _handle_no_access, _process_edit
@@ -19,37 +20,33 @@ logger = logging.getLogger(__name__)
 
 
 def handle_form(request_data) -> Response:
-    # Format inputs
-    user = format_user(request_data.get("user", ""))
-    title = format_title(request_data.get("title", ""))
-    text = request_data.get("text", "")
+    # Validate using marshmallow schema
+    schema = PublishRequestSchema()
+    errors = schema.validate(request_data)
+    if errors:
+        response = jsonify({"error": {"code": "validation_error", "info": str(errors)}})
+        response.status_code = 400
+        return response
 
-    # Basic validation
-    if not user:
-        response = jsonify({"error": {"code": "invalid_input", "info": "User is required"}})
-        response.status_code = 400
-        return response
-    if not title:
-        response = jsonify({"error": {"code": "invalid_input", "info": "Title is required"}})
-        response.status_code = 400
-        return response
-    if not text:
-        response = jsonify({"error": {"code": "invalid_input", "info": "Text is required"}})
-        response.status_code = 400
-        return response
+    validated_data = schema.load(request_data)
+
+    # Format inputs
+    user = format_user(validated_data.get("user", ""))
+    title = format_title(validated_data.get("title", ""))
+    text = validated_data.get("text", "")
 
     # Build operation metadata
     tab = {
         "title": title,
         "summary": "",
-        "lang": request_data.get("target", ""),
+        "lang": validated_data.get("target", ""),
         "user": user,
-        "campaign": request_data.get("campaign", ""),
+        "campaign": validated_data.get("campaign", ""),
         "result": "",
         "edit": {},
-        "sourcetitle": request_data.get("sourcetitle", ""),
-        "request_revid": request_data.get("revid", "") or request_data.get("revision", ""),
-        "tr_type": request_data.get("tr_type", "lead"),
+        "sourcetitle": validated_data.get("sourcetitle", ""),
+        "request_revid": validated_data.get("revid", "") or validated_data.get("revision", ""),
+        "tr_type": validated_data.get("tr_type", "lead"),
         "words": 0,
     }
 
@@ -65,10 +62,10 @@ def handle_form(request_data) -> Response:
     access_key, access_secret = user_token.decrypted()
 
     # Add captcha parameters if present
-    if request_data.get("wpCaptchaId") and request_data.get("wpCaptchaWord"):
+    if validated_data.get("wpCaptchaId") and validated_data.get("wpCaptchaWord"):
         tab["wp_captcha_params"] = {
-            "wpCaptchaId": request_data["wpCaptchaId"],
-            "wpCaptchaWord": request_data["wpCaptchaWord"],
+            "wpCaptchaId": validated_data["wpCaptchaId"],
+            "wpCaptchaWord": validated_data["wpCaptchaWord"],
         }
 
     # Process the edit

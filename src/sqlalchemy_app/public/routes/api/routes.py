@@ -70,7 +70,7 @@ def get_publish_reports() -> Response:
         JSON response with matching reports or error
     """
 
-    # Validate query parameters
+    # Validate query parameters using marshmallow schema
     schema = PublishReportsQuerySchema()
     filters: Dict[str, Any] = {}
     filter_params = ["year", "month", "title", "user", "lang", "sourcetitle", "result"]
@@ -78,7 +78,14 @@ def get_publish_reports() -> Response:
     for param in filter_params:
         value = request.args.get(param)
         if value is not None and value != "":
-            filters[param] = value
+            # Convert to appropriate type
+            if param in ["year", "month"]:
+                try:
+                    filters[param] = int(value)
+                except ValueError:
+                    return jsonify({"error": f"Invalid {param} value, must be integer"}), 400
+            else:
+                filters[param] = value
 
     # Validate filters against schema
     validation_errors = schema.validate(filters)
