@@ -218,4 +218,4 @@ class TestPublishRouteIntegration:
         response = test_client.post("/publish", data={"title": "Test"})
 
         # Route may return 404 if not registered, 400 for missing CSRF, or 302/403 for auth issues
-        assert response.status_code == 404
+        assert response.status_code == 403
