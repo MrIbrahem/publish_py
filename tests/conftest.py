@@ -216,3 +216,18 @@ def setup_db():
         yield
 
     engine.dispose()
+
+
+@pytest.fixture
+def mock_admin_required(mocker):
+    """Mock admin_required decorator to bypass authentication checks.
+
+    This fixture automatically applies to all tests in this directory,
+    allowing tests to focus on route functionality rather than auth.
+    """
+    mock_req = MagicMock()
+    mock_req.username = "admin"
+    mocker.patch("src.sqlalchemy_app.admin.decorators._get_cached_active_coordinators", return_value={
+        "admin": mock_req,
+    })
+    mocker.patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_req)
