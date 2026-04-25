@@ -192,10 +192,9 @@ class TestValidateAccessOnPublish:
             data = response.get_json()
             assert data["error"]["code"] == "noaccess"
 
-    def test_post_disallowed_origin_and_no_secret_key(self, client):
+    def test_post_disallowed_origin_and_no_secret_key(self, mock_is_denied, client):
         """POST from disallowed origin without secret key returns specific error info."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None),
             patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),
         ):
             response = client.post(
