@@ -19,7 +19,7 @@ class TestAdminIndex:
         """Test that admin index requires admin access."""
         response = client.get("/admin/")
 
-        assert response.status_code in [200, 302, 401, 403]
+        assert response.status_code == 302  # in [200, 302, 401, 403]
 
     def test_admin_index_renders_dashboard(self, auth_client: FlaskClient):
         """Test that admin index renders dashboard."""
@@ -27,7 +27,7 @@ class TestAdminIndex:
             mock_coords.return_value = ["TestUser"]
             response = auth_client.get("/admin/")
 
-            assert response.status_code in [200, 302]
+            assert response.status_code == 302  # in [200, 302]
 
 
 @pytest.mark.integration
@@ -43,7 +43,7 @@ class TestAdminSidebar:
 
             # Context processor runs for every admin request, just verify response is successful
             # The sidebar is injected via @bp_admin.app_context_processor decorator
-            assert response.status_code in [200, 302]
+            assert response.status_code == 302  # in [200, 302]
 
 
 @pytest.mark.integration
@@ -56,31 +56,31 @@ class TestAdminBlueprints:
         response = client.get("/admin/coordinators")
 
         # Route should exist (may require auth)
-        assert response.status_code in [200, 302, 401, 403, 404]
+        assert response.status_code == 302  # in [200, 302, 401, 403, 404]
 
     def test_full_translators_routes_registered(self, client: FlaskClient):
         """Test that full translators routes are registered."""
         response = client.get("/admin/full_translators")
 
-        assert response.status_code in [200, 302, 401, 403, 404]
+        assert response.status_code == 302  # in [200, 302, 401, 403, 404]
 
     def test_users_no_inprocess_routes_registered(self, client: FlaskClient):
         """Test that users no inprocess routes are registered."""
         response = client.get("/admin/users_no_inprocess")
 
-        assert response.status_code in [200, 302, 401, 403, 404]
+        assert response.status_code == 302  # in [200, 302, 401, 403, 404]
 
     def test_language_settings_routes_registered(self, client: FlaskClient):
         """Test that language settings routes are registered."""
         response = client.get("/admin/language_settings")
 
-        assert response.status_code in [200, 302, 401, 403, 404]
+        assert response.status_code == 302  # in [200, 302, 401, 403, 404]
 
     def test_settings_routes_registered(self, client: FlaskClient):
         """Test that settings routes are registered."""
         response = client.get("/admin/settings")
 
-        assert response.status_code in [200, 302, 401, 403, 404]
+        assert response.status_code == 302  # in [200, 302, 401, 403, 404]
 
 
 @pytest.mark.integration
@@ -92,7 +92,7 @@ class TestAdminRouteAccess:
         response = client.get("/admin/", follow_redirects=False)
 
         # Should redirect to login
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302  # in [302, 401, 403]
 
     def test_authenticated_non_admin_redirected(self, auth_client: FlaskClient):
         """Test that authenticated non-admin users are handled appropriately."""
@@ -101,4 +101,4 @@ class TestAdminRouteAccess:
             response = auth_client.get("/admin/", follow_redirects=False)
 
             # Should be denied or redirected
-            assert response.status_code in [302, 401, 403]
+            assert response.status_code == 302  # in [302, 401, 403]
