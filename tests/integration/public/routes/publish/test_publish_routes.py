@@ -74,6 +74,7 @@ class TestPublishPost:
             response = client.post(
                 "/publish/",
                 data={
+                    "translate_type": "lead",
                     "user": "TestUser",
                     "title": "Test Page",
                     "target": "en",
