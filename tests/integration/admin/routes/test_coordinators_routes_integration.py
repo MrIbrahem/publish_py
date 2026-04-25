@@ -1,5 +1,7 @@
 """
 Integration tests for src/sqlalchemy_app/admin/routes/coordinators.py module.
+
+TODO: should mock admin_required decorator
 """
 
 from __future__ import annotations
@@ -20,7 +22,7 @@ class TestCoordinatorsDashboard:
         response = client.get("/admin/coordinators")
 
         # Should redirect to login or require admin
-        assert response.status_code in [200, 302, 401, 403]
+        assert response.status_code == 302  # in [200, 302, 401, 403]
 
     def test_coordinators_dashboard_lists_coordinators(self, auth_client: FlaskClient):
         """Test that coordinators dashboard lists coordinators."""
@@ -35,7 +37,7 @@ class TestCoordinatorsDashboard:
                 response = auth_client.get("/admin/coordinators")
 
                 # May redirect or show dashboard
-                assert response.status_code in [200, 302]
+                assert response.status_code == 302  # in [200, 302]
 
 
 @pytest.mark.integration
@@ -46,7 +48,7 @@ class TestAddCoordinator:
         """Test that adding coordinator requires admin access."""
         response = client.post("/admin/coordinators/add", data={"username": "NewCoordinator"})
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302  # in [302, 401, 403]
 
     def test_add_coordinator_with_valid_data(self, auth_client: FlaskClient):
         """Test adding coordinator with valid data."""
@@ -62,7 +64,7 @@ class TestAddCoordinator:
                 )
 
                 # Should redirect after successful add
-                assert response.status_code in [302, 200]
+                assert response.status_code == 302  # in [302, 200]
 
     def test_add_coordinator_without_username_fails(self, auth_client: FlaskClient):
         """Test that adding coordinator without username fails."""
@@ -75,7 +77,7 @@ class TestAddCoordinator:
             )
 
             # Should redirect with error
-            assert response.status_code in [302, 200]
+            assert response.status_code == 302  # in [302, 200]
 
 
 @pytest.mark.integration
@@ -86,7 +88,7 @@ class TestDeleteCoordinator:
         """Test that deleting coordinator requires admin access."""
         response = client.post("/admin/coordinators/1/delete")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302  # in [302, 401, 403]
 
     def test_delete_coordinator_with_valid_id(self, auth_client: FlaskClient):
         """Test deleting coordinator with valid ID."""
@@ -111,13 +113,13 @@ class TestActivateDeactivateCoordinator:
         """Test that activating coordinator requires admin access."""
         response = client.post("/admin/coordinators/1/activate")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302  # in [302, 401, 403]
 
     def test_deactivate_coordinator_requires_admin(self, client: FlaskClient):
         """Test that deactivating coordinator requires admin access."""
         response = client.post("/admin/coordinators/1/deactivate")
 
-        assert response.status_code in [302, 401, 403]
+        assert response.status_code == 302  # in [302, 401, 403]
 
     def test_activate_coordinator_with_valid_id(self, auth_client: FlaskClient):
         """Test activating coordinator with valid ID."""
