@@ -98,13 +98,10 @@
                     </li>
                     {% else %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
-                        <!-- <button type="submit" form="mainForm" formaction="{{ url_for('auth.login') }}" formmethod="get"
+                        <button type="submit" form="mainForm" formaction="{{ url_for('auth.login') }}" formmethod="get"
                             formnovalidate class="nav-link py-2 px-0 px-lg-2 btn btn-link">
                             <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2"></i> <span class="navtitles">Login</span>
-                        </button> -->
-                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('auth.login') }}">
-                            <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
-                        </a>
+                        </button>
                     </li>
                     {% endif %}
                     {% else %}
