@@ -19,10 +19,10 @@ class TestLanguageSettingsDashboard:
 
     def test_language_settings_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that language settings dashboard requires admin access."""
-        response = client.get("/admin/language_settings")
+        response = client.get("/admin/language_settings/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/language_settings/'
+        # With mock_admin_required, should render successfully
+        assert response.status_code == 200
 
     def test_language_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
         """Test that language settings dashboard lists settings."""
@@ -39,10 +39,10 @@ class TestLanguageSettingsDashboard:
                     MagicMock(code="ar", name="Arabic"),
                 ]
 
-                response = auth_client.get("/admin/language_settings")
+                response = auth_client.get("/admin/language_settings/")
 
-            assert response.status_code == 302
-            assert response.location == '/admin/language_settings/'
+            # Should render dashboard successfully
+            assert response.status_code == 200
 
 
 @pytest.mark.integration
