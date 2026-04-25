@@ -121,6 +121,11 @@ def mock_is_allowed(mocker):
 
 
 @pytest.fixture
+def mock_is_allowed_medwiki(mocker):
+    return mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value="medwiki.toolforge.org")
+
+
+@pytest.fixture
 def mock_check_secret(mocker):
     return mocker.patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None)
 
