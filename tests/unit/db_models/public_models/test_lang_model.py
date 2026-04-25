@@ -37,4 +37,5 @@ class TestLangRecord:
             "code": "en",
             "autonym": "English",
             "name": "English",
+            "redirects": None,
         }
