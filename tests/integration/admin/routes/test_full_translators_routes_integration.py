@@ -19,10 +19,10 @@ class TestFullTranslatorsDashboard:
 
     def test_full_translators_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
         """Test that full translators dashboard requires admin access."""
-        response = client.get("/admin/full_translators")
+        response = client.get("/admin/full_translators/")
 
-        assert response.status_code == 302
-        assert response.location == '/admin/full_translators/'
+        # With mock_admin_required, should render successfully
+        assert response.status_code == 200
 
     def test_full_translators_dashboard_lists_translators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that full translators dashboard lists translators."""
@@ -32,10 +32,10 @@ class TestFullTranslatorsDashboard:
                 MagicMock(user="Translator2", is_active=False),
             ]
 
-            response = auth_client.get("/admin/full_translators")
+            response = auth_client.get("/admin/full_translators/")
 
-            assert response.status_code == 302
-            assert response.location == '/admin/full_translators/'
+            # Should render dashboard successfully
+            assert response.status_code == 200
 
 
 @pytest.mark.integration
