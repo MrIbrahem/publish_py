@@ -19,7 +19,7 @@ class TestRefsIndex:
         """Test that fixrefs index route returns 200."""
         response = client.get("/fixrefs/")
 
-        assert response.status_code in [200, 302, 404]
+        assert response.status_code == 200
 
     def test_fixrefs_index_renders_template(self, client: FlaskClient):
         """Test that fixrefs index renders template."""

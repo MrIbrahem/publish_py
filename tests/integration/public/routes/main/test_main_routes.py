@@ -18,7 +18,7 @@ class TestMainIndex:
         response = client.get("/")
 
         # May redirect or return 200
-        assert response.status_code in [200, 302]
+        assert response.status_code == 200
 
     def test_index_renders_template(self, client: FlaskClient):
         """Test that index route renders template."""
@@ -36,7 +36,7 @@ class TestMainReports:
         """Test that reports route returns 200."""
         response = client.get("/reports")
 
-        assert response.status_code in [200, 302]
+        assert response.status_code == 200
 
     def test_reports_renders_template(self, client: FlaskClient):
         """Test that reports route renders template."""
