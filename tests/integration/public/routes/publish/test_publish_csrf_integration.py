@@ -75,16 +75,7 @@ class TestPublishEndpointWithDenyCSRF:
 class TestPublishEndpointWithCSRF2:
     """Integration tests for publish endpoint with CSRF enabled."""
 
-    @pytest.fixture(autouse=True)
-    def mock_is_allowed(self):
-        """
-        auto allow all
-        """
-        with patch("src.sqlalchemy_app.shared.core.cors.is_allowed") as mocked:
-            mocked.return_value = "medwiki.toolforge.org"
-            yield mocked
-
-    def test_options_preflight_with_csrf_enabled(self, csrf_client):
+    def test_options_preflight_with_csrf_enabled(self, mock_is_allowed, csrf_client):
         """Test OPTIONS preflight request with CSRF enabled."""
         response = csrf_client.options(
             "/publish",
@@ -95,7 +86,7 @@ class TestPublishEndpointWithCSRF2:
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
 
-    def test_no_access_returns_403_with_csrf_enabled(self, csrf_client):
+    def test_no_access_returns_403_with_csrf_enabled(self, mock_is_allowed, csrf_client):
         """Test that no access error returns 403 even with CSRF enabled."""
         with (
             patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
