@@ -292,7 +292,3 @@ class TestApiRoutes:
         # If validation error, that's also acceptable for this test
         # elif response.status_code == 400:
         #     assert "error" in data
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])
