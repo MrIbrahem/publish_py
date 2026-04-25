@@ -73,7 +73,7 @@ class TestPublishEndpointWithDenyCSRF:
 class TestPublishEndpointWithCSRF2:
     """Integration tests for publish endpoint with CSRF enabled."""
 
-    def test_options_preflight_with_csrf_enabled(self, mock_is_allowed, csrf_client):
+    def test_options_preflight_with_csrf_enabled(self, mock_is_allowed_medwiki, csrf_client):
         """Test OPTIONS preflight request with CSRF enabled."""
         response = csrf_client.options(
             "/publish",
