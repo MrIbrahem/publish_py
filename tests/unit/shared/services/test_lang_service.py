@@ -8,7 +8,6 @@ from src.sqlalchemy_app.shared.services.lang_service import (
     get_lang,
     get_lang_by_code,
     list_langs,
-    update_lang,
 )
 from src.sqlalchemy_app.sqlalchemy_models import LangRecord
 
@@ -30,10 +29,6 @@ def test_lang_workflow():
     # Test list
     all_l = list_langs()
     assert any(x.code == "ar" for x in all_l)
-
-    # Test update
-    updated = update_lang(added.lang_id, autonym="Arabe")
-    assert updated.autonym == "Arabe"
 
     # Test add_or_update
     l4 = add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
@@ -120,25 +115,6 @@ class TestAddOrUpdateLang:
     def test_raises_error_if_no_code(self, monkeypatch):
         with pytest.raises(ValueError, match="Language code is required"):
             add_or_update_lang(" ", "A", "N")
-
-
-class TestUpdateLang:
-    """Tests for update_lang function."""
-
-    def test_delegates_to_store(self, monkeypatch):
-        """Test that function updates and returns record."""
-        added = add_lang("hi", "हिन्दी", "Hindi")
-        updated = update_lang(added.lang_id, autonym="Hindi Autonym")
-        assert updated.autonym == "Hindi Autonym"
-
-    def test_returns_record_if_no_kwargs(self, monkeypatch):
-        added = add_lang("ja", "J", "J")
-        result = update_lang(added.lang_id)
-        assert result.code == "ja"
-
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            update_lang(9999, autonym="Ar")
 
 
 class TestDeleteLang:
