@@ -2,6 +2,7 @@
 Validation schemas using marshmallow.
 """
 
+from typing import ClassVar
 from flask import request
 from marshmallow import Schema, ValidationError, fields, post_load, validate, validates
 
@@ -34,25 +35,22 @@ class PublishRequestSchema(Schema):
 
 class PublishReportsQuerySchema(Schema):
     """Schema for /api/publish_reports query parameters validation."""
-
+    # Special filter values
+    ALLOWED_SPECIAL_VALUES: ClassVar[frozenset[str]] = frozenset(
+        {"not_empty", "not_mt", "empty", "mt", ">0", "all"}
+    )
     year = fields.Int(validate=validate.Range(min=2000, max=2100))
     month = fields.Int(validate=validate.Range(min=1, max=12))
     title = fields.Str(validate=validate.Length(max=255))
     user = fields.Str(validate=validate.Length(max=120))
     lang = fields.Str(validate=validate.Length(min=2, max=10))
     sourcetitle = fields.Str(validate=validate.Length(max=255))
-    result = fields.Str(validate=validate.Length(max=50))
+    result = fields.Str(validate=validate.OneOf(sorted(ALLOWED_SPECIAL_VALUES)))
     select = fields.Str(validate=validate.Length(max=500))
     limit = fields.Int(validate=validate.Range(min=1, max=1000))
 
     # Special filter values
     ALLOWED_SPECIAL_VALUES = {"not_empty", "not_mt", "empty", "mt", ">0", "all"}
-
-    @validates("result")
-    def validate_result(self, value):
-        if value and value not in self.ALLOWED_SPECIAL_VALUES and len(value) > 50:
-            raise ValidationError("Invalid result value")
-        return value
 
 
 class CXTokenRequestSchema(Schema):
