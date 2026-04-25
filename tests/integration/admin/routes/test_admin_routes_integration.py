@@ -24,13 +24,18 @@ class TestAdminIndex:
         assert response.status_code == 302
         assert response.location.endswith("/admin/last")
 
-    def test_admin_index_renders_dashboard(self, mock_admin_required, auth_client: FlaskClient):
+    def test_admin_index_renders_dashboard_no_follow_redirects(self, mock_admin_required, auth_client: FlaskClient):
         """Test that admin index renders dashboard."""
 
         response = auth_client.get("/admin/")
 
         assert response.status_code == 302
         assert response.location.endswith("/admin/last")
+
+    def test_admin_index_renders_dashboard(self, mock_admin_required, auth_client: FlaskClient):
+        """Test that admin index renders dashboard."""
+        response = auth_client.get("/admin/", follow_redirects=True)
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
@@ -111,5 +116,20 @@ class TestAdminRouteAccess:
             ):
                 response = auth_client.get("/admin/", follow_redirects=False)
 
+                # Should return 403 Forbidden (not a redirect)
+                assert response.status_code == 403
+
+    def test_authenticated_non_admin_forbidden(self, auth_client: FlaskClient):
+        """Test that authenticated non-admin users are denied access."""
+        # Mock current_user to return a non-admin user
+        from src.sqlalchemy_app.shared.services.user_token_service import UserTokenRecord
+        mock_user = UserTokenRecord(user_id=12345, username="TestUser")
+        with patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_user):
+            # Mock _get_cached_active_coordinators to return list without "TestUser"
+            with patch(
+                "src.sqlalchemy_app.admin.decorators._get_cached_active_coordinators",
+                return_value=["admin"],
+            ):
+                response = auth_client.get("/admin/", follow_redirects=False)
                 # Should return 403 Forbidden (not a redirect)
                 assert response.status_code == 403

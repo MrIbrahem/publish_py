@@ -227,8 +227,8 @@ def setup_db():
 def mock_admin_required(mocker):
     """Mock admin_required decorator to bypass authentication checks.
 
-    This fixture automatically applies to all tests in this directory,
-    allowing tests to focus on route functionality rather than auth.
+    Inject this fixture into admin route tests to bypass authentication
+    so tests can focus on route functionality rather than auth.
     """
     # Mock current_user to return a valid user object
     mock_user = MagicMock()

@@ -167,9 +167,16 @@ class TestCxtokenRouteIntegration:
         # Should redirect to login or return 400 (bad request)
         assert response.status_code == 400
 
+    def test_cxtoken_rejects_missing_user_param(self, client):
+        """Test that cxtoken route rejects requests without user parameter."""
+        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+            mock_cors.return_value = lambda f: f
+            response = client.get("/cxtoken/?wiki=arwiki")
+            assert response.status_code == 400
+
     def test_cxtoken_rejects_missing_wiki_param(self, auth_client):
         """Test that cxtoken route rejects requests without wiki parameter."""
-        response = auth_client.get("/cxtoken")
-
-        # Should return bad request
-        assert response.status_code == 400
+        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+            mock_cors.return_value = lambda f: f
+            response = auth_client.get("/cxtoken/")
+            assert response.status_code == 400
