@@ -22,7 +22,12 @@ logger = logging.getLogger(__name__)
 
 def handle_form(request_data) -> Response:
     # Validate using marshmallow schema
-    raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
+    raw = {
+        k: v
+        for k, v in request_data.items()
+        if v != ""
+        and (str(v).lower() != "all" and k != "translate_type")
+    }
     try:
         validated_data = PublishRequestSchema().load(raw)
     except ValidationError as err:
