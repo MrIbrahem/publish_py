@@ -1,12 +1,23 @@
 #!/bin/bash
 # toolforge-jobs run update --image python3.13 --command "~/shs/update.sh && ~/shs/pip.sh" --wait
 
-export SUB_DIR_COPY="src"
-export COPY_TO_TARGET="requirements.txt"
-export CLEAN_INSTALL=1
 export USER_NAME="MrIbrahem"
+export SUB_DIR_COPY="src"
+export CLEAN_INSTALL=1
+
+# Optional clean of jsons files before copy to avoid issues with old jsons files
+export REMOVE_SRC_JSONS_BEFORE_COPY=0
+
+# Ensure the Python3 binary exists before compiling
 export PYTHON_BIN="python3"
+export COMPILE_PYTHON_FILES=1
+
+# additional file to copy to TARGET_DIR
+export COPY_TO_TARGET="requirements.txt"
+
+REPO_NAME=publish_py
+TARGET_DIR=~/www/python/src
 BRANCH="${1:-main}"
-REPO=publish_py
-TARGET_PATH=~/www/python/src
-$HOME/shs/deploy_repo.sh "$REPO" "$TARGET_PATH" "$BRANCH"
+
+# Run deploy
+$HOME/shs/deploy_repo.sh "$REPO_NAME" "$TARGET_DIR" "$BRANCH"
