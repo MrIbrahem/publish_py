@@ -66,7 +66,7 @@ if [ "$CLEAN_INSTALL" = "1" ] && [ -d "$TARGET_DIR" ]; then
     DIR_NAME=$(basename "$TARGET_DIR")
 
     # Set the destination path with a timestamp (e.g., ~/old_repos/src_backup_1715000)
-    DESTINATION="${OLD_REPOS_BASE}/${DIR_NAME}_backup_$(date +%s)"
+    DESTINATION="${OLD_REPOS_BASE}/${REPO_NAME}_${DIR_NAME}_backup_$(date +%s%N)_$$"
 
     echo ">>> Archiving old version to: $DESTINATION"
     mv "$TARGET_DIR" "$DESTINATION"
@@ -105,7 +105,7 @@ if [ "$COMPILE_PYTHON_FILES" = "1" ]; then
 
     # Compile all Python files to .pyc explicitly to avoid race conditions
     # Ensure the Python3 binary exists before compiling
-    if [ -x "$PYTHON_BIN" ]; then
+    if command -v "$PYTHON_BIN" >/dev/null 2>&1; then
         export PYTHONDONTWRITEBYTECODE=1
 
         # Compile all Python files in the TARGET_DIR
