@@ -15,6 +15,7 @@ from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 
+
 def list_targets_by_lang(lang: str) -> List[dict]:
     """Replicate all_qids_titles VIEW + JOIN with all_qids_exists.
 

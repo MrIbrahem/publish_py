@@ -2,13 +2,13 @@
 Shared db services, used in both admin and public blueprints
 """
 
+from .allqid_service import list_targets_by_lang
 from .page_service import (
     find_exists_or_update_page,
     insert_page_target,
     list_pages,
     list_pages_by_lang_cat,
 )
-from .allqid_service import list_targets_by_lang
 from .qid_service import list_qids
 from .report_service import (
     add_report,
