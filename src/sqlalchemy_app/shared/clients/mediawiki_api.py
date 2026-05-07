@@ -5,7 +5,6 @@ Mirrors: php_src/bots/api/do_edit.php
 
 import json
 import logging
-import urllib.parse
 from typing import Any
 
 import requests

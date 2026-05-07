@@ -5,6 +5,7 @@ Defines the main routes for the application, such as the homepage.
 from __future__ import annotations
 
 import logging
+import time
 
 from flask import (
     Blueprint,
@@ -15,10 +16,9 @@ from flask import (
     send_from_directory,
 )
 
-from .results_api import results_api_result
-
 from ....shared.services.category_service import list_categories
 from ....shared.services.lang_service import list_langs
+from .results_api import results_api_result
 
 bp_main = Blueprint("main", __name__, url_prefix="")
 logger = logging.getLogger(__name__)
@@ -29,8 +29,17 @@ def results_api():
     code = request.args.get("code")
     camp = request.args.get("camp")
     depth = request.args.get("depth")
-    result = results_api_result(code, camp, depth)
-    return jsonify(result)
+
+    start = time.time()
+    result_dict = results_api_result(code, camp, depth)
+    elapsed = time.time() - start
+
+    return jsonify(
+        {
+            "execution_time": round(elapsed, 6),
+            "results": result_dict,
+        }
+    )
 
 
 @bp_main.get("/")

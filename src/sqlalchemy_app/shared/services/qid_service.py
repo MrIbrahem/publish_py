@@ -8,7 +8,6 @@ import logging
 from typing import List
 
 from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
 
 from ...sqlalchemy_models import QidRecord
 from ..engine import get_session
