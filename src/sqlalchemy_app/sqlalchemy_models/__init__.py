@@ -19,7 +19,10 @@ from .public import (
     TranslateTypeRecord,
 )
 from .publish import ReportRecord
+from .all_articles import AllArticlesRecord
 from .qid import (
+    AllQidsExistRecord,
+    AllQidsRecord,
     QidRecord,
 )
 from .setting import (
@@ -40,6 +43,9 @@ from .views import (
 )
 
 __all__ = [
+    "AllArticlesRecord",
+    "AllQidsExistRecord",
+    "AllQidsRecord",
     "AssessmentRecord",
     "CategoryRecord",
     "CoordinatorRecord",

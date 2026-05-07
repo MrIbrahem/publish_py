@@ -23,6 +23,16 @@ def list_pages() -> List[PageRecord]:
         return orm_objs
 
 
+def list_pages_by_lang_cat(lang: str, cat: str) -> List[PageRecord]:
+    """Return pages filtered by language and category."""
+    with get_session() as session:
+        return (
+            session.query(PageRecord)
+            .filter(PageRecord.lang == lang, PageRecord.cat == cat)
+            .all()
+        )
+
+
 def add_page(
     sourcetitle: str,
     translate_type: str,
@@ -212,6 +222,7 @@ def list_of_users_by_translations_count() -> dict[str, int]:
 
 __all__ = [
     "list_pages",
+    "list_pages_by_lang_cat",
     "add_page",
     "update_page",
     "delete_page",
