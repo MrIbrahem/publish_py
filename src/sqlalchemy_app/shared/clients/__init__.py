@@ -4,7 +4,8 @@ Services for external API integration.
 Used in both admin and public blueprints.
 """
 
-from .mediawiki_api import get_mdwiki_cat_members, get_title_info, publish_do_edit
+from .mediawiki_api import get_title_info, publish_do_edit
+from .mdwiki_api import get_mdwiki_cat_members
 from .oauth_client import get_csrf_token, get_cxtoken, get_oauth_client, post_params
 from .revids_client import get_revid, get_revid_db
 from .wikidata_client import get_qid_for_mdtitle, link_to_wikidata
