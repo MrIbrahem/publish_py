@@ -21,7 +21,10 @@ def results_api_result(
 ) -> dict[str, Any]:
     code = code or "ar"
     camp = camp or "Hearing"
-    depth_int = max(0, int(depth or 1))
+    try:
+        depth_int = max(0, int(depth)) if depth else 1
+    except (ValueError, TypeError):
+        depth_int = 1
 
     cat = _resolve_campaign_to_category(camp)
 
