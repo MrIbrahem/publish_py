@@ -60,7 +60,7 @@ def _add_language_setting() -> ResponseReturnValue:
             add_en_lang=add_en_lang,
         )
     except ValueError as exc:
-        logger.warning(f"Unable to add language setting: {exc}")
+        logger.exception("Unable to add language setting")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to add language setting.")
@@ -84,7 +84,7 @@ def _update_language_setting(setting_id: int) -> ResponseReturnValue:
     try:
         record = update_language_setting(setting_id, **kwargs)
     except ValueError as exc:
-        logger.warning(f"Unable to update language setting: {exc}")
+        logger.exception("Unable to update language setting")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to update language setting.")
@@ -101,7 +101,7 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
     try:
         record = delete_language_setting(setting_id)
     except ValueError as exc:
-        logger.warning(f"Unable to delete language setting: {exc}")
+        logger.exception("Unable to delete language setting")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to delete language setting.")

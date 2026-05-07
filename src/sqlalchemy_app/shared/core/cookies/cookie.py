@@ -27,14 +27,14 @@ def extract_user_id(token: str) -> int | None:
     try:
         data = _serializer.loads(token, max_age=settings.cookie.max_age)
     except (BadSignature, BadTimeSignature):
-        logger.warning("Failed to extract user_id: invalid or expired token")
+        logger.exception("Failed to extract user_id: invalid or expired token")
         return None
     try:
         uid = int(data.get("uid"))
         logger.debug("Extracted user_id: %s", uid)
         return uid
     except (TypeError, ValueError):
-        logger.warning("Failed to extract user_id: invalid uid in data")
+        logger.exception("Failed to extract user_id: invalid uid in data")
         return None
 
 
@@ -50,7 +50,7 @@ def verify_state_token(token: str) -> str | None:
     try:
         data = _state_serializer.loads(token, max_age=settings.cookie.max_age)
     except (BadSignature, BadTimeSignature):
-        logger.warning("Failed to verify state token: invalid or expired")
+        logger.exception("Failed to verify state token: invalid or expired")
         return None
     nonce = data.get("nonce")
     if not isinstance(nonce, str):

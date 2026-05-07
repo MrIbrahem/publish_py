@@ -97,7 +97,7 @@ def _add_user() -> ResponseReturnValue:
             user_group=user_group,
         )
     except ValueError as exc:
-        logger.warning(f"Unable to add user: {exc}")
+        logger.exception("Unable to add user")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to add user.")
@@ -145,7 +145,7 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
     try:
         record = delete_user(record_id)
     except ValueError as exc:
-        logger.warning(f"Unable to delete user: {exc}")
+        logger.exception("Unable to delete user")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to delete user.")

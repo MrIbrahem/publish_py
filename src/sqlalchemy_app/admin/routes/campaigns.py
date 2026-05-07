@@ -58,7 +58,7 @@ def _add_campaign_and_category() -> ResponseReturnValue:
             campaign=campaign,
         )
     except ValueError as exc:
-        logger.warning(f"Unable to add category: {exc}")
+        logger.exception("Unable to add category")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to add category.")
@@ -91,7 +91,7 @@ def _update_category(
             is_default=is_default,
         )
     except ValueError as exc:
-        logger.warning(f"Unable to update category: {exc}")
+        logger.exception("Unable to update category")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to update category.")
@@ -106,7 +106,7 @@ def _delete_category(record_id: int) -> None:
     try:
         record = delete_category(record_id)
     except ValueError as exc:
-        logger.warning(f"Unable to delete category: {exc}")
+        logger.exception("Unable to delete category")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to delete category.")

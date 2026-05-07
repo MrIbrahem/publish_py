@@ -23,7 +23,7 @@ def load_environment() -> None:
     try:
         load_dotenv()
     except Exception:
-        logger.warning("Failed to load .env file from current working directory")
+        logger.exception("Failed to load .env file from current working directory")
 
 
 # Keep backward compatibility: auto-load on import for legacy code

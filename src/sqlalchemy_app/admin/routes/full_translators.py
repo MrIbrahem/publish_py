@@ -52,7 +52,7 @@ def _add_full_translator() -> ResponseReturnValue:
     try:
         record = add_full_translator(username)
     except ValueError as exc:
-        logger.warning(f"Unable to add full translator: {exc}")
+        logger.exception("Unable to add full translator")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to add full translator.")
@@ -97,7 +97,7 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
     try:
         record = delete_full_translator(translator_id)
     except ValueError as exc:
-        logger.warning(f"Unable to delete full translator: {exc}")
+        logger.exception("Unable to delete full translator")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to delete full translator.")

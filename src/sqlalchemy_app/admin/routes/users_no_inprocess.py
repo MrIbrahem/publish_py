@@ -52,7 +52,7 @@ def _add_user_no_inprocess() -> ResponseReturnValue:
     try:
         record = add_users_no_inprocess(username)
     except ValueError as exc:
-        logger.warning(f"Unable to add user: {exc}")
+        logger.exception("Unable to add user")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to add user.")
@@ -97,7 +97,7 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
     try:
         record = delete_users_no_inprocess(record_id)
     except ValueError as exc:
-        logger.warning(f"Unable to delete user: {exc}")
+        logger.exception("Unable to delete user")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to delete user.")

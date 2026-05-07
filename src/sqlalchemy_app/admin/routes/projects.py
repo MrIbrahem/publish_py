@@ -50,7 +50,7 @@ def _add_project() -> ResponseReturnValue:
             g_title=g_title,
         )
     except ValueError as exc:
-        logger.warning(f"Unable to add project: {exc}")
+        logger.exception("Unable to add project")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to add project.")
@@ -67,7 +67,7 @@ def _update_project(record_id: int, g_title: str) -> None:
     try:
         record = update_project_title(record_id, g_title)
     except ValueError as exc:
-        logger.warning(f"Unable to update project: {exc}")
+        logger.exception("Unable to update project")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to update project.")
@@ -82,7 +82,7 @@ def _delete_project(record_id: int) -> None:
     try:
         record = delete_project(record_id)
     except ValueError as exc:
-        logger.warning(f"Unable to delete project: {exc}")
+        logger.exception("Unable to delete project")
         flash(str(exc), "warning")
     except Exception:
         logger.exception("Unable to delete project.")
