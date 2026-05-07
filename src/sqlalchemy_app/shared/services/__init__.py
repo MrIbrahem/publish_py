@@ -8,7 +8,8 @@ from .page_service import (
     list_pages,
     list_pages_by_lang_cat,
 )
-from .qid_service import list_targets_by_lang
+from .allqid_service import list_targets_by_lang
+from .qid_service import list_qids
 from .report_service import (
     add_report,
     delete_report,
@@ -39,6 +40,7 @@ __all__ = [
     "list_pages_by_lang_cat",
     # qid_service
     "list_targets_by_lang",
+    "list_qids",
     # user_token_service
     "upsert_user_token",
     "get_user_token",

@@ -1,4 +1,4 @@
-"""MediaWiki API client for edit operations and category fetching.
+"""MediaWiki API client for edit operations.
 
 Mirrors: php_src/bots/api/do_edit.php
 """
