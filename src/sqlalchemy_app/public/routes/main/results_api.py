@@ -7,8 +7,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from flask import g
-
 from ....shared.clients.mediawiki_api import get_mdwiki_cat_members
 from ....shared.services.category_service import get_camp_to_cats
 from ....shared.services.in_process_service import list_in_process_by_lang
@@ -93,12 +91,8 @@ def _get_cat_exists_and_missing(
 
 
 def _get_exists_targets_by_lang(lang: str) -> dict[str, dict]:
-    key = f"exists_targets_{lang}"
-    if key in g:
-        return g[key]
     rows = list_targets_by_lang(lang)
     result = {row["title"]: row for row in rows}
-    g[key] = result
     return result
 
 
@@ -120,12 +114,7 @@ def _exists_expends(
 
 
 def _get_inprocess_for_titles(missing: list[str], code: str) -> dict[str, dict]:
-    key = f"inprocess_{code}"
-    if key in g:
-        records = g[key]
-    else:
-        records = list_in_process_by_lang(code)
-        g[key] = records
+    records = list_in_process_by_lang(code)
 
     missing_set = set(missing)
     return {
