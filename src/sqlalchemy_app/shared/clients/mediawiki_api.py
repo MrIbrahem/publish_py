@@ -104,9 +104,7 @@ class CategoryFetcher:
         self.timeout = self.options.get("timeout", 15)
         self.tables_dir = self.options.get("tablesDir", "")
 
-    def get_mdwiki_cat_members(
-        self, root_cat: str, depth: int = 0, use_cache: bool = True
-    ) -> list[str]:
+    def get_mdwiki_cat_members(self, root_cat: str, depth: int = 0, use_cache: bool = True) -> list[str]:
         """Fetch all page titles under a category up to given depth.
 
         Args:

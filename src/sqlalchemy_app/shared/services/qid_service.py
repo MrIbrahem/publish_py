@@ -7,10 +7,8 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from sqlalchemy import func
+from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
-
-from sqlalchemy import text
 
 from ...sqlalchemy_models import AllQidsRecord, QidRecord
 from ..engine import get_session
@@ -89,7 +87,8 @@ def list_targets_by_lang(lang: str) -> List[dict]:
     FROM all_qids_titles a JOIN all_qids_exists t ON t.qid = a.qid
     WHERE t.code = ? AND t.target != '' AND t.target IS NOT NULL
     """
-    sql = text("""
+    sql = text(
+        """
         SELECT qq.qid AS qid, q.title AS title, aa.category AS category,
                t.code AS code, t.target AS target
         FROM all_qids qq
@@ -98,7 +97,8 @@ def list_targets_by_lang(lang: str) -> List[dict]:
         JOIN all_qids_exists t ON t.qid = qq.qid
         WHERE t.code = :lang
           AND t.target != '' AND t.target IS NOT NULL
-    """)
+    """
+    )
     with get_session() as session:
         rows = session.execute(sql, {"lang": lang}).fetchall()
         return [dict(row._mapping) for row in rows]

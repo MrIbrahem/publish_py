@@ -1,3 +1,4 @@
+from .all_articles import AllArticlesRecord
 from .dashboard import (
     CategoryRecord,
     ProjectRecord,
@@ -19,7 +20,6 @@ from .public import (
     TranslateTypeRecord,
 )
 from .publish import ReportRecord
-from .all_articles import AllArticlesRecord
 from .qid import (
     AllQidsExistRecord,
     AllQidsRecord,

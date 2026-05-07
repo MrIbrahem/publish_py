@@ -26,11 +26,7 @@ def list_pages() -> List[PageRecord]:
 def list_pages_by_lang_cat(lang: str, cat: str) -> List[PageRecord]:
     """Return pages filtered by language and category."""
     with get_session() as session:
-        return (
-            session.query(PageRecord)
-            .filter(PageRecord.lang == lang, PageRecord.cat == cat)
-            .all()
-        )
+        return session.query(PageRecord).filter(PageRecord.lang == lang, PageRecord.cat == cat).all()
 
 
 def add_page(
