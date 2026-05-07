@@ -7,11 +7,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....shared.clients.mediawiki_api import get_mdwiki_cat_members
-from ....shared.services.category_service import get_camp_to_cats
-from ....shared.services.in_process_service import list_in_process_by_lang
-from ....shared.services.page_service import list_pages_by_lang_cat
-from ....shared.services.qid_service import list_targets_by_lang
+from ....shared.clients import get_mdwiki_cat_members
+from ....shared.services import get_camp_to_cats, list_in_process_by_lang, list_pages_by_lang_cat, list_targets_by_lang
 
 logger = logging.getLogger(__name__)
 
