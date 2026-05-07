@@ -30,7 +30,7 @@ def results_api_result(
 
     cat = _resolve_campaign_to_category(camp)
 
-    pages = _get_lang_pages_by_cat(code, cat)
+    pages = list_pages_by_lang_cat(code, cat)
     pages_by_title = {p.title: p for p in pages}
 
     items_exists, items_missing = _get_cat_exists_and_missing(pages_by_title, cat, depth_int, code)
@@ -63,15 +63,6 @@ def _resolve_campaign_to_category(camp: str) -> str:
     return cats.get(camp, camp)
 
 
-def _get_lang_pages_by_cat(lang: str, cat: str) -> list:
-    key = f"lang_pages_{lang}_{cat}"
-    if key in g:
-        return g[key]
-    result = list_pages_by_lang_cat(lang, cat)
-    g[key] = result
-    return result
-
-
 def _get_cat_exists_and_missing(
     pages_by_title: dict[str, Any],
     cat: str,
@@ -79,7 +70,7 @@ def _get_cat_exists_and_missing(
     code: str,
 ) -> tuple[dict, list]:
     if not pages_by_title:
-        pages_by_title = {p.title: p for p in _get_lang_pages_by_cat(code, cat)}
+        pages_by_title = {p.title: p for p in list_pages_by_lang_cat(code, cat)}
 
     members = get_mdwiki_cat_members(cat, depth, use_cache=True)
     member_set = set(members)
