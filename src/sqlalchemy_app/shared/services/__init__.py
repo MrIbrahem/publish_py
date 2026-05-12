@@ -2,11 +2,16 @@
 Shared db services, used in both admin and public blueprints
 """
 
+from .allqid_service import list_targets_by_lang
+from .category_service import get_camp_to_cats
+from .in_process_service import list_in_process_by_lang
 from .page_service import (
     find_exists_or_update_page,
     insert_page_target,
     list_pages,
+    list_pages_by_lang_cat,
 )
+from .qid_service import list_qids
 from .report_service import (
     add_report,
     delete_report,
@@ -30,10 +35,16 @@ from .user_token_service import (
 )
 
 __all__ = [
+    "list_in_process_by_lang",
+    "get_camp_to_cats",
     # page_service
     "find_exists_or_update_page",
     "insert_page_target",
     "list_pages",
+    "list_pages_by_lang_cat",
+    # qid_service
+    "list_targets_by_lang",
+    "list_qids",
     # user_token_service
     "upsert_user_token",
     "get_user_token",
