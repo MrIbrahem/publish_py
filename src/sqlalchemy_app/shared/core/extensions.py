@@ -6,15 +6,14 @@ and enable proper initialization order with the application factory pattern.
 """
 
 from flask import Blueprint, Flask
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 
 # Initialize extensions without binding to app
 csrf = CSRFProtect()
-
-# Future extensions can be added here:
-# db = SQLAlchemy()
-# login_manager = LoginManager()
-# migrate = Migrate()
+db = SQLAlchemy()
+migrate = Migrate()
 
 
 def csrf_init_app(app: Flask) -> None:

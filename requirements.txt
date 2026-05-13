@@ -15,4 +15,5 @@ cachetools
 validators
 sqlalchemy
 flask-sqlalchemy
+flask-migrate
 marshmallow

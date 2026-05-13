@@ -7,11 +7,15 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from contextlib import contextmanager
+
 from sqlalchemy import Text, create_engine, event, inspect, text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
+
+from .core.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -33,11 +37,13 @@ class LONGTEXT(TypeDecorator):
 # ---------------------------------------------------------------------------
 
 
-class BaseDb(DeclarativeBase):
+class BaseDb(db.Model):
     """
     Base class for database models.
     Provides common functionality like to_dict.
     """
+
+    __abstract__ = True
 
     def to_dict(self) -> dict[str, Any]:
         """Convert ORM object to dictionary."""
@@ -126,14 +132,12 @@ def init_db(db_url: str, create_tables: bool = False) -> None:
     _SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
 
 
+@contextmanager
 def get_session() -> Session:
     """Return a new session. Always use inside a `with` block."""
-    if _SessionFactory is None:
-        # For migration purposes, if not initialized, we might need a way to initialize it
-        # But according to instructions, we should just use it.
-        # In a real app, init_db would be called at startup.
-        raise RuntimeError("Call init_db() before using the database.")
-    return _SessionFactory()
+    # After migration to Flask-SQLAlchemy, we use db.session
+    # We yield it to support the context manager protocol 'with get_session() as session:'
+    yield db.session
 
 
 # -----------------------------------------------------------------------------

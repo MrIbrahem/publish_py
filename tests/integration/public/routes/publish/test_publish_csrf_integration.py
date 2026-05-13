@@ -12,7 +12,7 @@ from flask.app import Flask
 
 
 @pytest.fixture
-def csrf_app() -> Flask:
+def app() -> Flask:
     """Create a Flask app with CSRF protection enabled (like Production)."""
     import os
 
@@ -43,9 +43,9 @@ def csrf_app() -> Flask:
 
 
 @pytest.fixture
-def csrf_client(csrf_app):
+def csrf_client(app):
     """Create a test client with CSRF protection enabled."""
-    return csrf_app.test_client()
+    return app.test_client()
 
 
 class TestPublishEndpointWithDenyCSRF:

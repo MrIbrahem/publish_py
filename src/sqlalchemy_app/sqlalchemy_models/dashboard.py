@@ -6,8 +6,7 @@ from __future__ import annotations
 
 import logging
 
-from sqlalchemy import Column, Integer, String
-
+from ..shared.core.extensions import db
 from ..shared.engine import BaseDb
 
 logger = logging.getLogger(__name__)
@@ -30,13 +29,13 @@ class CategoryRecord(BaseDb):
 
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    category = Column(String(120), unique=True, nullable=False)
-    campaign = Column(String(120), nullable=False, default="")
-    display = Column(String(120), nullable=False, default="")
-    category2 = Column(String(120), nullable=False, default="")
-    depth = Column(Integer, nullable=False, default=0)
-    is_default = Column(Integer, nullable=False, default=0)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    category = db.Column(db.String(120), unique=True, nullable=False)
+    campaign = db.Column(db.String(120), nullable=False, default="")
+    display = db.Column(db.String(120), nullable=False, default="")
+    category2 = db.Column(db.String(120), nullable=False, default="")
+    depth = db.Column(db.Integer, nullable=False, default=0)
+    is_default = db.Column(db.Integer, nullable=False, default=0)
 
     def __init__(self, **kwargs):
         # Convert depth and is_default to int if provided as strings
@@ -71,8 +70,8 @@ class ProjectRecord(BaseDb):
 
     __tablename__ = "projects"
 
-    g_id = Column(Integer, primary_key=True, autoincrement=True)
-    g_title = Column(String(120), unique=True, nullable=False)
+    g_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    g_title = db.Column(db.String(120), unique=True, nullable=False)
 
 
 __all__ = [

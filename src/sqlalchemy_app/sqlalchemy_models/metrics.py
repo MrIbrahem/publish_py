@@ -4,8 +4,7 @@ Metrics domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String
-
+from ..shared.core.extensions import db
 from ..shared.engine import BaseDb
 
 
@@ -22,9 +21,9 @@ class AssessmentRecord(BaseDb):
 
     __tablename__ = "assessments"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), unique=True, nullable=False)
-    importance = Column(String(120), nullable=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(120), unique=True, nullable=False)
+    importance = db.Column(db.String(120), nullable=True)
 
 
 class RefsCountRecord(BaseDb):
@@ -41,10 +40,10 @@ class RefsCountRecord(BaseDb):
 
     __tablename__ = "refs_counts"
 
-    r_id = Column(Integer, primary_key=True, autoincrement=True)
-    r_title = Column(String(120), unique=True, nullable=False)
-    r_lead_refs = Column(Integer, nullable=True)
-    r_all_refs = Column(Integer, nullable=True)
+    r_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    r_title = db.Column(db.String(120), unique=True, nullable=False)
+    r_lead_refs = db.Column(db.Integer, nullable=True)
+    r_all_refs = db.Column(db.Integer, nullable=True)
 
 
 class WordRecord(BaseDb):
@@ -61,10 +60,10 @@ class WordRecord(BaseDb):
 
     __tablename__ = "words"
 
-    w_id = Column(Integer, primary_key=True, autoincrement=True)
-    w_title = Column(String(120), unique=True, nullable=False)
-    w_lead_words = Column(Integer, nullable=True)
-    w_all_words = Column(Integer, nullable=True)
+    w_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    w_title = db.Column(db.String(120), unique=True, nullable=False)
+    w_lead_words = db.Column(db.Integer, nullable=True)
+    w_all_words = db.Column(db.Integer, nullable=True)
 
 
 __all__ = [

@@ -160,76 +160,32 @@ def db_config():
 
 
 @pytest.fixture(autouse=True)
-def setup_db():
+def setup_db(app):
     """Initialize an in-memory SQLite database for tests."""
-    from src.sqlalchemy_app.shared import engine as engine_mod
-    from src.sqlalchemy_app.shared.engine import (
-        BaseDb,
-        build_engine,
-        init_db,
-    )
+    from src.sqlalchemy_app.shared.core.extensions import db
+    import flask
 
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
+    # Ensure the app is registered with SQLAlchemy
+    if "sqlalchemy" not in app.extensions:
+        app.config.setdefault("SQLALCHEMY_DATABASE_URI", "sqlite:///:memory:")
+        app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
+        db.init_app(app)
 
-    meta = MetaData()
-    pages_users = Table(
-        "pages_users",
-        meta,
-        Column("id", Integer, primary_key=True),
-        Column("title", String(120), nullable=False),
-        Column("word", Integer, nullable=True),
-        Column("translate_type", String(20), nullable=True),
-        Column("cat", String(120), nullable=True),
-        Column("lang", String(30), nullable=True),
-        Column("user", String(120), nullable=True),
-        Column("target", String(120), nullable=True),
-        Column("date", Date, nullable=True),
-        Column("pupdate", String(120), nullable=True),
-        Column("add_date", DateTime, nullable=False, server_default=func.current_timestamp()),
-        Column("deleted", Integer, nullable=False, server_default=text("0")),
-        Column("mdwiki_revid", Integer, nullable=True),
-    )
-    pages_users.create(engine)
+    with app.app_context():
+        # Double check that db is associated with this app
+        if not hasattr(flask.current_app, "extensions") or "sqlalchemy" not in flask.current_app.extensions:
+            db.init_app(flask.current_app)
 
-    # Create views_new table first (needed for views_new_all view)
-    views_new = Table(
-        "views_new",
-        meta,
-        Column("id", Integer, primary_key=True),
-        Column("target", String(120), nullable=False),
-        Column("lang", String(30), nullable=False),
-        Column("year", Integer, nullable=False),
-        Column("views", Integer, nullable=True),
-        UniqueConstraint("target", "lang", "year", name="target_lang_year"),
-    )
-    views_new.create(engine)
+        # Create all tables except views
+        real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
+        db.metadata.create_all(db.engine, tables=real_tables)
 
-    # Create views_new_all as a view
-    with engine.connect() as conn:
-        conn.execute(
-            text(
-                """
-            CREATE VIEW IF NOT EXISTS views_new_all AS
-            SELECT target, lang, SUM(views) as views
-            FROM views_new
-            GROUP BY target, lang
-        """
-            )
-        )
-        conn.commit()
-
-    # Create all other tables except views_new_all (which is already created as a view)
-    for table in BaseDb.metadata.sorted_tables:
-        if table.name != "views_new_all":
-            table.create(engine, checkfirst=True)
-
-    factory = sessionmaker(bind=engine, expire_on_commit=False)
-
-    with patch.object(engine_mod, "_SessionFactory", factory):
         yield
 
-    engine.dispose()
+        db.session.remove()
+        # Drop all tables except views
+        real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
+        db.metadata.drop_all(db.engine, tables=real_tables)
 
 
 @pytest.fixture
