@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
-from ....shared.engine import get_session
+from ....extensions import db
 from ....sqlalchemy_models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
@@ -26,29 +26,28 @@ def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
         ORDER BY pupdate DESC
         LIMIT 100
     """
-    with get_session() as session:
-        query = (
-            session.query(
-                UserPageRecord,
-                CategoryRecord.campaign.label("campaign"),
-            )
-            .outerjoin(CategoryRecord, UserPageRecord.cat == CategoryRecord.category)
-            .filter(UserPageRecord.target != "")
-            .filter(UserPageRecord.target.is_not(None))
+    query = (
+        db.session.query(
+            UserPageRecord,
+            CategoryRecord.campaign.label("campaign"),
         )
+        .outerjoin(CategoryRecord, UserPageRecord.cat == CategoryRecord.category)
+        .filter(UserPageRecord.target != "")
+        .filter(UserPageRecord.target.is_not(None))
+    )
 
-        if lang and lang != "All":
-            query = query.filter(UserPageRecord.lang == lang)
+    if lang and lang != "All":
+        query = query.filter(UserPageRecord.lang == lang)
 
-        results = query.order_by(UserPageRecord.pupdate.desc()).limit(limit).all()
+    results = query.order_by(UserPageRecord.pupdate.desc()).limit(limit).all()
 
-        return [
-            {
-                **row[0].to_dict(),
-                "campaign": row[1] if row[1] else row[0].cat,
-            }
-            for row in results
-        ]
+    return [
+        {
+            **row[0].to_dict(),
+            "campaign": row[1] if row[1] else row[0].cat,
+        }
+        for row in results
+    ]
 
 
 def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
@@ -64,32 +63,31 @@ def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, An
         FROM pages p
         WHERE p.target != ''
     """
-    with get_session() as session:
-        views_subquery = (
-            session.query(ViewsNewAllRecord.views)
-            .filter(ViewsNewAllRecord.target == PageRecord.target)
-            .filter(ViewsNewAllRecord.lang == PageRecord.lang)
-            .correlate(PageRecord)
-            .scalar_subquery()
-        )
+    views_subquery = (
+        db.session.query(ViewsNewAllRecord.views)
+        .filter(ViewsNewAllRecord.target == PageRecord.target)
+        .filter(ViewsNewAllRecord.lang == PageRecord.lang)
+        .correlate(PageRecord)
+        .scalar_subquery()
+    )
 
-        query = session.query(
-            PageRecord,
-            views_subquery.label("views"),
-        ).filter(PageRecord.target != "")
+    query = db.session.query(
+        PageRecord,
+        views_subquery.label("views"),
+    ).filter(PageRecord.target != "")
 
-        if lang and lang != "All":
-            query = query.filter(PageRecord.lang == lang)
+    if lang and lang != "All":
+        query = query.filter(PageRecord.lang == lang)
 
-        results = query.distinct().limit(limit).all()
+    results = query.distinct().limit(limit).all()
 
-        return [
-            {
-                **row[0].to_dict(),
-                "views": row[1],
-            }
-            for row in results
-        ]
+    return [
+        {
+            **row[0].to_dict(),
+            "views": row[1],
+        }
+        for row in results
+    ]
 
 
 __all__ = [

@@ -7,14 +7,14 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Integer, String, func
+from sqlalchemy import DateTime, Integer, String, func
 
-from ..shared.engine import LONGTEXT, BaseDb
+from ..extensions import LONGTEXT, Model, db
 
 logger = logging.getLogger(__name__)
 
 
-class ReportRecord(BaseDb):
+class ReportRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS publish_reports (
         id int NOT NULL AUTO_INCREMENT,
@@ -33,16 +33,16 @@ class ReportRecord(BaseDb):
 
     __tablename__ = "publish_reports"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-    title = Column(String(255), nullable=False)
-    user = Column(String(255), nullable=False)
-    lang = Column(String(255), nullable=False)
-    sourcetitle = Column(String(255), nullable=False)
-    result = Column(String(255), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    date = db.Column(db.DateTime, nullable=False, server_default=func.current_timestamp())
+    title = db.Column(db.String(255), nullable=False)
+    user = db.Column(db.String(255), nullable=False)
+    lang = db.Column(db.String(255), nullable=False)
+    sourcetitle = db.Column(db.String(255), nullable=False)
+    result = db.Column(db.String(255), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    data = Column(LONGTEXT, nullable=False)
+    data = db.Column(LONGTEXT, nullable=False)
 
 
 __all__ = [

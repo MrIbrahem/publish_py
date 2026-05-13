@@ -4,12 +4,12 @@ Metrics domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Integer, String
 
-from ..shared.engine import BaseDb
+from ..extensions import Model, db
 
 
-class AssessmentRecord(BaseDb):
+class AssessmentRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS assessments (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -22,12 +22,12 @@ class AssessmentRecord(BaseDb):
 
     __tablename__ = "assessments"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), unique=True, nullable=False)
-    importance = Column(String(120), nullable=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(120), unique=True, nullable=False)
+    importance = db.Column(db.String(120), nullable=True)
 
 
-class RefsCountRecord(BaseDb):
+class RefsCountRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS refs_counts (
         r_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -41,13 +41,13 @@ class RefsCountRecord(BaseDb):
 
     __tablename__ = "refs_counts"
 
-    r_id = Column(Integer, primary_key=True, autoincrement=True)
-    r_title = Column(String(120), unique=True, nullable=False)
-    r_lead_refs = Column(Integer, nullable=True)
-    r_all_refs = Column(Integer, nullable=True)
+    r_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    r_title = db.Column(db.String(120), unique=True, nullable=False)
+    r_lead_refs = db.Column(db.Integer, nullable=True)
+    r_all_refs = db.Column(db.Integer, nullable=True)
 
 
-class WordRecord(BaseDb):
+class WordRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS words (
         w_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -61,10 +61,10 @@ class WordRecord(BaseDb):
 
     __tablename__ = "words"
 
-    w_id = Column(Integer, primary_key=True, autoincrement=True)
-    w_title = Column(String(120), unique=True, nullable=False)
-    w_lead_words = Column(Integer, nullable=True)
-    w_all_words = Column(Integer, nullable=True)
+    w_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    w_title = db.Column(db.String(120), unique=True, nullable=False)
+    w_lead_words = db.Column(db.Integer, nullable=True)
+    w_all_words = db.Column(db.Integer, nullable=True)
 
 
 __all__ = [

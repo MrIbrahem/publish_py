@@ -10,23 +10,21 @@ from typing import Any, List
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
+from ...extensions import db
 from ...sqlalchemy_models import PageRecord
-from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 
 
 def list_pages() -> List[PageRecord]:
     """Return all pages."""
-    with get_session() as session:
-        orm_objs = session.query(PageRecord).order_by(PageRecord.id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(PageRecord).order_by(PageRecord.id.asc()).all()
+    return orm_objs
 
 
 def list_pages_by_lang_cat(lang: str, cat: str) -> List[PageRecord]:
     """Return pages filtered by language and category."""
-    with get_session() as session:
-        return session.query(PageRecord).filter(PageRecord.lang == lang, PageRecord.cat == cat).all()
+    return db.session.query(PageRecord).filter(PageRecord.lang == lang, PageRecord.cat == cat).all()
 
 
 def add_page(
@@ -42,31 +40,30 @@ def add_page(
     """Add a page and return the created record."""
     if not sourcetitle:
         raise ValueError("Title is required")
-    with get_session() as session:
-        orm_obj = PageRecord(
-            title=sourcetitle,
-            word=word,
-            translate_type=translate_type,
-            cat=cat,
-            lang=lang,
-            user=user,
-            pupdate=func.current_date(),
-            target=target,
-            mdwiki_revid=mdwiki_revid,
-        )
-        session.add(orm_obj)
-        try:
-            session.commit()
-            session.refresh(orm_obj)
-            return orm_obj
-        except IntegrityError as e:
-            logger.error(f"Failed to add page (integrity error): {e}")
-            session.rollback()
-            raise ValueError(f"Page with title '{sourcetitle}' already exists") from e
-        except Exception as e:
-            logger.error(f"Failed to add page: {e}")
-            session.rollback()
-            raise
+    orm_obj = PageRecord(
+        title=sourcetitle,
+        word=word,
+        translate_type=translate_type,
+        cat=cat,
+        lang=lang,
+        user=user,
+        pupdate=func.current_date(),
+        target=target,
+        mdwiki_revid=mdwiki_revid,
+    )
+    db.session.add(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+        return orm_obj
+    except IntegrityError as e:
+        logger.error(f"Failed to add page (integrity error): {e}")
+        db.session.rollback()
+        raise ValueError(f"Page with title '{sourcetitle}' already exists") from e
+    except Exception as e:
+        logger.error(f"Failed to add page: {e}")
+        db.session.rollback()
+        raise
 
 
 def insert_page_target(

@@ -15,6 +15,7 @@ from .admin.routes.admin import (
     bp_admin,
 )
 from .config import settings
+from .extensions import db, migrate
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -27,7 +28,6 @@ from .public.routes import (
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
-from .shared.engine import build_db_url, init_db
 from .shared.services.coordinator_service import active_coordinators
 
 logger = logging.getLogger(__name__)
@@ -108,9 +108,19 @@ def create_app(config_class: Type | None = None) -> Flask:
     # Initialize CSRF protection
     csrf_init_app(app)
 
+    # Initialize Flask-SQLAlchemy
+    db.init_app(app)
+    
+    # Initialize Flask-Migrate
+    migrate.init_app(app, db)
+
+    # Create tables if database is configured
     if oauth_enabled and settings.database_data.db_host:
-        db_url = build_db_url(settings.database_data.to_dict())
-        init_db(db_url, True)
+        with app.app_context():
+            # Import all models to ensure they are registered with SQLAlchemy
+            from . import sqlalchemy_models  # noqa: F401
+            
+            db.create_all()
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_leaderboard)

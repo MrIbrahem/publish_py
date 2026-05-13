@@ -1,75 +1,62 @@
 """
-engine.py
+engine.py - Compatibility layer for Flask-SQLAlchemy migration.
+
+This module provides backward compatibility for code that still uses the old
+get_session() pattern. It redirects to Flask-SQLAlchemy's db.session.
 """
 
 from __future__ import annotations
 
 import logging
-from typing import Any
+from contextlib import contextmanager
 
-from sqlalchemy import Text, create_engine, event, inspect, text
+from sqlalchemy import Text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
-from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
+
+from ..extensions import LONGTEXT, Model, db
 
 logger = logging.getLogger(__name__)
 
-
-class LONGTEXT(TypeDecorator):
-    """LONGTEXT for MySQL, Text for everything else."""
-
-    impl = Text
-    cache_ok = True
-
-    def load_dialect_impl(self, dialect):
-        if dialect.name == "mysql":
-            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
-        return dialect.type_descriptor(Text())
+# Export compatibility symbols
+BaseDb = Model  # For backward compatibility
 
 
-# ---------------------------------------------------------------------------
-# 1. Model — replaces coordinator_model.py + CREATE TABLE
-# ---------------------------------------------------------------------------
-
-
-class BaseDb(DeclarativeBase):
+@contextmanager
+def get_session():
     """
-    Base class for database models.
-    Provides common functionality like to_dict.
+    Compatibility wrapper that returns Flask-SQLAlchemy's session.
+    
+    This is a temporary compatibility layer. New code should use db.session directly.
+    The session is automatically managed by Flask-SQLAlchemy and will be cleaned up
+    after the request context ends.
+    
+    Usage:
+        with get_session() as session:
+            session.query(Model).all()
     """
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert ORM object to dictionary."""
-        data = {column.name: getattr(self, column.name) for column in self.__table__.columns}
-
-        if "add_date" in data and self.add_date:
-            data["add_date"] = self.add_date.isoformat() if hasattr(self.add_date, "isoformat") else str(self.add_date)
-
-        if "date" in data and self.date:
-            data["date"] = self.date.isoformat() if hasattr(self.date, "isoformat") else str(self.date)
-
-        for column in self.__table__.columns:
-            if column.nullable is False and data[column.name] is None:
-                data[column.name] = column.default
-
-        return data
+    # Return Flask-SQLAlchemy's session
+    # Note: Flask-SQLAlchemy manages the session lifecycle automatically
+    session = db.session
+    try:
+        yield session
+        # Flask-SQLAlchemy handles commit automatically, but we keep it for compatibility
+        # session.commit() is not needed here as it's handled by Flask-SQLAlchemy's request teardown
+    except Exception:
+        # Flask-SQLAlchemy handles rollback automatically on exceptions
+        session.rollback()
+        raise
 
 
-# ---------------------------------------------------------------------------
-# 2. Database connection — replaces db_driver.py entirely
-#    pool_pre_ping=True handles reconnect + retry automatically
-# ---------------------------------------------------------------------------
-
-
+# Deprecated functions - kept for backward compatibility
 def build_db_url(db_data: dict[str, str]) -> str:
     """
-
-    db_name: str
-    db_host: str
-    db_user: str | None
-    db_password: str | None
+    Build database URL from configuration dict.
+    
+    DEPRECATED: This function is deprecated. Database URL should be configured
+    through Flask-SQLAlchemy's SQLALCHEMY_DATABASE_URI config.
     """
+    logger.warning("build_db_url() is deprecated. Use SQLALCHEMY_DATABASE_URI config instead.")
     db_user = db_data["db_user"]
     db_password = db_data["db_password"]
     db_host = db_data["db_host"]
@@ -77,111 +64,26 @@ def build_db_url(db_data: dict[str, str]) -> str:
     return f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
 
 
-def build_engine(db_url: str) -> Engine:
-    """
-    Create a SQLAlchemy engine.
-    """
-    kwargs = {
-        "pool_pre_ping": True,  # replaces _ensure_connection and retry logic
-    }
-
-    if not db_url.startswith("sqlite"):
-        kwargs.update(
-            {
-                "pool_size": 5,
-                "max_overflow": 10,
-                "pool_recycle": 3600,  # recycle connections after 1 hour
-                "connect_args": {
-                    "connect_timeout": 5,
-                    "init_command": 'SET time_zone = "+00:00"',
-                    "charset": "utf8mb4",
-                    "collation": "utf8mb4_unicode_ci",
-                },
-            }
-        )
-    return create_engine(db_url, **kwargs)
-
-
-# ---------------------------------------------------------------------------
-# 3. SessionFactory singleton — replaces _COORDINATORS_STORE
-# ---------------------------------------------------------------------------
-
-
-_SessionFactory: sessionmaker | None = None
-
-
 def init_db(db_url: str, create_tables: bool = False) -> None:
     """
-    Initialize the engine and SessionFactory.
-    Call once at application startup.
-
-    create_tables=True: creates the table if it does not exist (useful for testing).
+    Initialize the database.
+    
+    DEPRECATED: This function is deprecated. Database initialization is now
+    handled by Flask-SQLAlchemy through db.init_app() in the application factory.
     """
-    global _SessionFactory
-    engine = build_engine(db_url)
-    if create_tables:
-        real_tables = [t for t in BaseDb.metadata.tables.values() if not t.info.get("is_view")]
-
-        BaseDb.metadata.create_all(engine, tables=real_tables)
-    _SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
-
-
-def get_session() -> Session:
-    """Return a new session. Always use inside a `with` block."""
-    if _SessionFactory is None:
-        # For migration purposes, if not initialized, we might need a way to initialize it
-        # But according to instructions, we should just use it.
-        # In a real app, init_db would be called at startup.
-        raise RuntimeError("Call init_db() before using the database.")
-    return _SessionFactory()
-
-
-# -----------------------------------------------------------------------------
-# Create views automatically when tables are created
-# -----------------------------------------------------------------------------
-
-
-@event.listens_for(BaseDb.metadata, "after_create")
-def create_views_new_all_view(target, connection, **kw):
-    inspector = inspect(connection)
-    existing_views = inspector.get_view_names()
-
-    views_to_create = {
-        table.name: table.info.get("create_query")
-        for table in target.tables.values()
-        if table.info.get("is_view") and table.info.get("create_query")
-    }
-
-    views_to_create[
-        "users_list"
-    ] = """
-        CREATE VIEW users_list AS
-            select
-                u.user_id AS user_id,
-                u.username AS username,
-                u.wiki AS wiki,
-                u.user_group AS user_group,
-                u.reg_date AS reg_date
-            from
-                users u
-    """
-
-    for name, query in views_to_create.items():
-        if name not in existing_views:
-            try:
-                connection.execute(text(query))
-                logger.info(f"Successfully created view: {name}")
-            except Exception as e:
-                logger.exception(f"Error creating view {name}", exc_info=True)
-        else:
-            logger.info(f"View '{name}' already exists, skipping.")
+    logger.warning(
+        "init_db() is deprecated. Database initialization is handled by Flask-SQLAlchemy. "
+        "Use db.init_app(app) in the application factory instead."
+    )
+    # This function is now a no-op as Flask-SQLAlchemy handles initialization
 
 
 __all__ = [
-    # Model
-    "BaseDb",
-    # Setup
-    "init_db",
+    # Compatibility exports
+    "BaseDb",  # Alias for Model
     "get_session",
     "LONGTEXT",
+    # Deprecated functions
+    "build_db_url",
+    "init_db",
 ]

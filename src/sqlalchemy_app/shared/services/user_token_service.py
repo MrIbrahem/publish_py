@@ -10,9 +10,9 @@ from typing import Optional
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
+from ...extensions import db
 from ...sqlalchemy_models import UserTokenRecord
 from ..core.crypto import encrypt_value
-from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -27,28 +27,27 @@ def upsert_user_token(*, user_id: int, username: str, access_key: str, access_se
     encrypted_secret = encrypt_value(access_secret)
     now = func.current_timestamp()
 
-    with get_session() as session:
-        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
-        if orm_obj:
-            orm_obj.username = username
-            orm_obj.access_token = encrypted_token
-            orm_obj.access_secret = encrypted_secret
-            orm_obj.updated_at = now
-            orm_obj.last_used_at = now
-            orm_obj.rotated_at = now
-        else:
-            orm_obj = UserTokenRecord(
-                user_id=user_id,
-                username=username,
-                access_token=encrypted_token,
-                access_secret=encrypted_secret,
-                created_at=now,
-                updated_at=now,
-                last_used_at=now,
-            )
-            session.add(orm_obj)
+    orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+    if orm_obj:
+        orm_obj.username = username
+        orm_obj.access_token = encrypted_token
+        orm_obj.access_secret = encrypted_secret
+        orm_obj.updated_at = now
+        orm_obj.last_used_at = now
+        orm_obj.rotated_at = now
+    else:
+        orm_obj = UserTokenRecord(
+            user_id=user_id,
+            username=username,
+            access_token=encrypted_token,
+            access_secret=encrypted_secret,
+            created_at=now,
+            updated_at=now,
+            last_used_at=now,
+        )
+        db.session.add(orm_obj)
 
-        session.commit()
+    db.session.commit()
 
 
 def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
@@ -57,11 +56,10 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
         return None
 
     user_id = int(user_id)
-    with get_session() as session:
-        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
-        if not orm_obj:
-            return None
-        return orm_obj
+    orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+    if not orm_obj:
+        return None
+    return orm_obj
 
 
 def delete_user_token(user_id: int) -> None:
@@ -69,9 +67,8 @@ def delete_user_token(user_id: int) -> None:
     if not user_id:
         return
 
-    with get_session() as session:
-        session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).delete()
-        session.commit()
+    db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).delete()
+    db.session.commit()
 
 
 def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:

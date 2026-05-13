@@ -333,6 +333,22 @@ class Config:
     WTF_CSRF_METHODS: list[str] = ["POST", "PUT", "PATCH", "DELETE"]  # default value
     # WTF_CSRF_SECRET_KEY: str = settings.secret_key # default value
 
+    # Flask-SQLAlchemy settings
+    SQLALCHEMY_DATABASE_URI: str | None = None
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {
+        "pool_pre_ping": True,  # Handle stale connections automatically
+        "pool_recycle": 3600,  # Recycle connections after 1 hour
+        "pool_size": 5,
+        "max_overflow": 10,
+        "connect_args": {
+            "connect_timeout": 5,
+            "init_command": 'SET time_zone = "+00:00"',
+            "charset": "utf8mb4",
+            "collation": "utf8mb4_unicode_ci",
+        },
+    }
+
     # Request handling
     MAX_CONTENT_LENGTH: int | None = 16 * 1024 * 1024  # 16MB default
 
@@ -343,6 +359,14 @@ class Config:
         self.SESSION_COOKIE_HTTPONLY = settings.cookie.httponly
         self.SESSION_COOKIE_SECURE = settings.cookie.secure
         self.SESSION_COOKIE_SAMESITE = settings.cookie.samesite
+
+        # Build database URI from settings if database is configured
+        if has_db_config():
+            db_config = settings.database_data
+            self.SQLALCHEMY_DATABASE_URI = (
+                f"mysql+pymysql://{db_config.db_user}:{db_config.db_password}"
+                f"@{db_config.db_host}/{db_config.db_name}"
+            )
 
         # Load SECRET_KEY_FALLBACKS from environment for key rotation support
         # Format: comma-separated list of fallback keys
@@ -382,6 +406,10 @@ class TestingConfig(Config):
 
     # Use a fixed test secret key
     SECRET_KEY: str = "test-secret-key-not-for-production"
+
+    # Use in-memory SQLite for testing
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {}  # SQLite doesn't need MySQL-specific options
 
     # Disable CORS for testing
     CORS_DISABLED: bool = True

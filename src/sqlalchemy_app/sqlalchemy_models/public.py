@@ -10,12 +10,12 @@ Note: Several models have been moved to specialized modules:
 
 from __future__ import annotations
 
-from sqlalchemy import JSON, Column, Integer, String, text
+from sqlalchemy import JSON, Integer, String, text
 
-from ..shared.engine import BaseDb
+from ..extensions import Model, db
 
 
-class LangRecord(BaseDb):
+class LangRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS langs (
         lang_id int NOT NULL AUTO_INCREMENT,
@@ -29,14 +29,14 @@ class LangRecord(BaseDb):
 
     __tablename__ = "langs"
 
-    lang_id = Column(Integer, primary_key=True, autoincrement=True)
-    code = Column(String(20), nullable=False)
-    autonym = Column(String(70), nullable=False)
-    name = Column(String(70), nullable=False)
-    redirects = Column(JSON, nullable=True, server_default=text("NULL"))
+    lang_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    code = db.Column(db.String(20), nullable=False)
+    autonym = db.Column(db.String(70), nullable=False)
+    name = db.Column(db.String(70), nullable=False)
+    redirects = db.Column(db.JSON, nullable=True, server_default=text("NULL"))
 
 
-class MdwikiRevidRecord(BaseDb):
+class MdwikiRevidRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS mdwiki_revids (
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -47,11 +47,11 @@ class MdwikiRevidRecord(BaseDb):
 
     __tablename__ = "mdwiki_revids"
 
-    title = Column(String(255), primary_key=True)
-    revid = Column(Integer, nullable=False)
+    title = db.Column(db.String(255), primary_key=True)
+    revid = db.Column(db.Integer, nullable=False)
 
 
-class TranslateTypeRecord(BaseDb):
+class TranslateTypeRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS translate_type (
         tt_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -65,10 +65,10 @@ class TranslateTypeRecord(BaseDb):
 
     __tablename__ = "translate_type"
 
-    tt_id = Column(Integer, primary_key=True, autoincrement=True)
-    tt_title = Column(String(120), unique=True, nullable=False)
-    tt_lead = Column(Integer, nullable=False, default=1)
-    tt_full = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    tt_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tt_title = db.Column(db.String(120), unique=True, nullable=False)
+    tt_lead = db.Column(db.Integer, nullable=False, default=1)
+    tt_full = db.Column(db.Integer, nullable=False, default=0, server_default=text("0"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided

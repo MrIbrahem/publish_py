@@ -4,12 +4,12 @@ Views domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, UniqueConstraint, text
+from sqlalchemy import Integer, String, UniqueConstraint, text
 
-from ..shared.engine import BaseDb
+from ..extensions import Model, db
 
 
-class EnwikiPageviewRecord(BaseDb):
+class EnwikiPageviewRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS enwiki_pageviews (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -22,9 +22,9 @@ class EnwikiPageviewRecord(BaseDb):
 
     __tablename__ = "enwiki_pageviews"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), unique=True, nullable=False)
-    en_views = Column(Integer, default=0, server_default=text("0"))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(120), unique=True, nullable=False)
+    en_views = db.Column(db.Integer, default=0, server_default=text("0"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -33,7 +33,7 @@ class EnwikiPageviewRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class ViewsNewRecord(BaseDb):
+class ViewsNewRecord(Model):
     """
     CREATE TABLE IF NOT EXISTS views_new (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -49,11 +49,11 @@ class ViewsNewRecord(BaseDb):
 
     __tablename__ = "views_new"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    target = Column(String(120), nullable=False)
-    lang = Column(String(30), nullable=False)
-    year = Column(Integer, nullable=False)
-    views = Column(Integer, default=0, server_default=text("0"))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    target = db.Column(db.String(120), nullable=False)
+    lang = db.Column(db.String(30), nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+    views = db.Column(db.Integer, default=0, server_default=text("0"))
 
     __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 
@@ -64,7 +64,7 @@ class ViewsNewRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class ViewsNewAllRecord(BaseDb):
+class ViewsNewAllRecord(Model):
     """
     CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `views_new_all` AS
         SELECT `v`.`target` AS `target`,
@@ -76,9 +76,9 @@ class ViewsNewAllRecord(BaseDb):
 
     __tablename__ = "views_new_all"
 
-    target = Column(String(120), primary_key=True, nullable=False)
-    lang = Column(String(30), primary_key=True, nullable=False)
-    views = Column(Integer, default=0, server_default=text("0"))
+    target = db.Column(db.String(120), primary_key=True, nullable=False)
+    lang = db.Column(db.String(30), primary_key=True, nullable=False)
+    views = db.Column(db.Integer, default=0, server_default=text("0"))
 
     __table_args__ = (
         # Prevent SQLAlchemy from trying to create this as a table
