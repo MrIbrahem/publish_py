@@ -172,7 +172,7 @@ class CategoryFetcher:
 def get_mdwiki_cat_members(cat: str, depth: int = 0, use_cache: bool = True) -> list[str]:
     """Convenience function: create fetcher with default options and fetch."""
     options = {
-        "tablesDir": os.getenv("JSON_TABLES_PATH", ""),
+        "tablesDir": os.getenv("TABLES_PATH", ""),
     }
     fetcher = CategoryFetcher(options)
     return fetcher.get_mdwiki_cat_members(cat, depth, use_cache)
