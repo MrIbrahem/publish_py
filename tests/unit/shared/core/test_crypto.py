@@ -8,7 +8,7 @@ from __future__ import annotations
 import pytest
 from cryptography.fernet import Fernet
 
-from src.sqlalchemy_app.shared.core.crypto import _require_fernet, decrypt_value, encrypt_value
+from src.main_app.shared.core.crypto import _require_fernet, decrypt_value, encrypt_value
 
 
 class TestEncryptValue:

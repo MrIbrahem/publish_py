@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.sqlalchemy_app.config import settings
-from src.sqlalchemy_app.shared.utils.helpers.format import (
+from src.main_app.config import settings
+from src.main_app.shared.utils.helpers.format import (
     determine_hashtag,
     format_title,
     format_user,

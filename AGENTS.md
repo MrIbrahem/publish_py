@@ -31,13 +31,13 @@ waitress-serve --threads=4 --host=localhost --port=8080 src.app:app
 
 ## Architecture
 
--   **Entry point**: `src/app.py` calls `create_app()` from `src/sqlalchemy_app/__init__.py`
--   **Blueprints** in `src/sqlalchemy_app/public/routes/` and `src/sqlalchemy_app/admin/routes/`:
+-   **Entry point**: `src/app.py` calls `create_app()` from `src/main_app/__init__.py`
+-   **Blueprints** in `src/main_app/public/routes/` and `src/main_app/admin/routes/`:
     -   `bp_api`, `bp_auth`, `bp_cxtoken`, `bp_main`, `bp_publish`, `bp_fixrefs`, `bp_leaderboard`, `bp_admin`
--   **Services**: `src/sqlalchemy_app/shared/services/` (mediawiki_api, wikidata_client, oauth_client, text_processor)
--   **Config**: Frozen dataclasses with `@lru_cache` in `src/sqlalchemy_app/config.py`
-    -   Access via `from sqlalchemy_app.config import settings`
--   **DB layer**: `src/sqlalchemy_app/shared/engine.py` and `sqlalchemy_models/`
+-   **Services**: `src/main_app/shared/services/` (mediawiki_api, wikidata_client, oauth_client, text_processor)
+-   **Config**: Frozen dataclasses with `@lru_cache` in `src/main_app/config.py`
+    -   Access via `from main_app.config import settings`
+-   **DB layer**: `src/main_app/shared/engine.py` and `sqlalchemy_models/`
 
 ## Critical Conventions
 
@@ -61,4 +61,4 @@ See `src/example.env` for template.
 -   Test markers: `@pytest.mark.unit`, `@pytest.mark.network`
 -   Tests use in-memory SQLite (`sqlite:///:memory:`)
 -   `pytest.ini` excludes network tests by default (`-m "not network"`)
--   Coverage enabled by default (src/sqlalchemy_app)
+-   Coverage enabled by default (src/main_app)

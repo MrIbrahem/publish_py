@@ -1,5 +1,5 @@
 """
-Integration tests for src/sqlalchemy_app/public/routes/publish/routes.py module.
+Integration tests for src/main_app/public/routes/publish/routes.py module.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from flask.testing import FlaskClient
 @pytest.fixture
 def mock_validate_access2():
     """Mock the validate_access function."""
-    with patch("src.sqlalchemy_app.public.routes.publish.routes.validate_access") as mock_validate:
+    with patch("src.main_app.public.routes.publish.routes.validate_access") as mock_validate:
         mock_validate.return_value = lambda f: f
         yield mock_validate
 
@@ -23,8 +23,8 @@ def mock_validate_access2():
 def mock_validate_access():
     """Bypass CORS/secret checks performed by `validate_access` at request time."""
     with (
-        patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value="https://example.com"),
-        patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=True),
+        patch("src.main_app.shared.core.cors.is_allowed", return_value="https://example.com"),
+        patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=True),
     ):
         yield
 
@@ -35,7 +35,7 @@ def mock_user_token():
     _mock.decrypted.return_value = ("access_key", "access_secret")
 
     with patch(
-        "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
+        "src.main_app.public.routes.publish.routes.get_user_token_by_username",
         return_value=_mock,
     ) as mock_get_token:
         yield mock_get_token
@@ -82,7 +82,7 @@ class TestPublishPost:
         """Test that missing user token returns 403."""
 
         with patch(
-            "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
+            "src.main_app.public.routes.publish.routes.get_user_token_by_username",
             return_value=None,
         ) as mock_get_token:
 
@@ -104,7 +104,7 @@ class TestPublishPost:
     def test_publish_with_valid_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test publishing with valid data."""
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success", "edit": {"newrevid": 12345}}
 
             response = client.post(
@@ -131,7 +131,7 @@ class TestPublishFormData:
     def test_publish_accepts_form_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test that publish accepts form data."""
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success"}
 
             response = client.post(
@@ -150,7 +150,7 @@ class TestPublishFormData:
     def test_publish_accepts_json_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test that publish accepts JSON data."""
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success"}
 
             response = client.post(
@@ -176,7 +176,7 @@ class TestPublishCaptcha:
     def test_publish_with_captcha_params(self, mock_user_token, mock_validate_access, client: FlaskClient):
         """Test publishing with captcha parameters."""
 
-        with patch("src.sqlalchemy_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success"}
 
             response = client.post(

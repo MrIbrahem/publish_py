@@ -7,9 +7,9 @@
 
 | Status | File                                         | Issue                                                            |
 | ------ | -------------------------------------------- | ---------------------------------------------------------------- |
-| PASS   | src/sqlalchemy_app/**init**.py               | Correct application factory pattern with `create_app()`          |
-| PASS   | src/sqlalchemy_app/shared/core/extensions.py | `init_app` pattern used for CSRF extension                       |
-| PASS   | src/sqlalchemy_app/config.py                 | No hardcoded secrets; all config from environment variables      |
+| PASS   | src/main_app/**init**.py               | Correct application factory pattern with `create_app()`          |
+| PASS   | src/main_app/shared/core/extensions.py | `init_app` pattern used for CSRF extension                       |
+| PASS   | src/main_app/config.py                 | No hardcoded secrets; all config from environment variables      |
 
 ### Blueprint Organization
 
@@ -58,7 +58,7 @@
 ### Action 1: Input Validation (COMPLETED)
 
 -   Added `marshmallow` to requirements.txt
--   Created `src/sqlalchemy_app/shared/schemas/__init__.py` with validation schemas:
+-   Created `src/main_app/shared/schemas/__init__.py` with validation schemas:
     -   `PublishRequestSchema` - USED in `publish/routes.py` ✓
     -   `PublishReportsQuerySchema` - USED in `api/routes.py` ✓
     -   `CXTokenRequestSchema` - Available but not used (cxtoken uses custom validation)
@@ -66,7 +66,7 @@
 
 ### Action 2: Error Handlers (COMPLETED)
 
--   Added error handlers to `src/sqlalchemy_app/__init__.py` for:
+-   Added error handlers to `src/main_app/__init__.py` for:
     -   400 Bad Request
     -   401 Unauthorized
     -   403 Forbidden

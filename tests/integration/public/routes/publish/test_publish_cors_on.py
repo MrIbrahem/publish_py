@@ -27,7 +27,7 @@ def app() -> Flask:
     app.config["TESTING"] = True
     app.config["CORS_DISABLED"] = False
 
-    from src.sqlalchemy_app.public.routes.publish.routes import bp_publish
+    from src.main_app.public.routes.publish.routes import bp_publish
 
     app.register_blueprint(bp_publish)
     return app
@@ -86,7 +86,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_disallowed_origin_returns_403(self, mock_is_denied, client):
         """POST from disallowed origin without secret key returns 403."""
-        with (patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),):
+        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),):
             response = client.post(
                 "/publish/",
                 data=json.dumps({"user": "TestUser", "title": "Test Page"}),
@@ -101,10 +101,10 @@ class TestValidateAccessOnPublish:
         """POST from allowed origin passes CORS and reaches handler logic."""
         with (
             patch(
-                "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
+                "src.main_app.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_reports_db,
+            patch("src.main_app.public.routes.publish.worker.add_report") as mock_reports_db,
         ):
             mock_reports_db.return_value = None
 
@@ -129,12 +129,12 @@ class TestValidateAccessOnPublish:
     def test_post_with_valid_secret_key_bypasses_cors(self, mock_is_denied, client):
         """POST with valid secret key bypasses CORS even from disallowed origin."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value="evil.com"),
+            patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value="evil.com"),
             patch(
-                "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
+                "src.main_app.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_reports_db,
+            patch("src.main_app.public.routes.publish.worker.add_report") as mock_reports_db,
         ):
             mock_reports_db.return_value = None
 
@@ -160,12 +160,12 @@ class TestValidateAccessOnPublish:
     def test_post_allowed_origin_with_invalid_secret_key(self, mock_is_allowed_medwiki, client):
         """POST from allowed origin succeeds even if secret key is invalid."""
         with (
-            patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),
+            patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),
             patch(
-                "src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username",
+                "src.main_app.public.routes.publish.routes.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_reports_db,
+            patch("src.main_app.public.routes.publish.worker.add_report") as mock_reports_db,
         ):
             mock_reports_db.return_value = None
 
@@ -188,7 +188,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_disallowed_origin_and_no_secret_key(self, mock_is_denied, client):
         """POST from disallowed origin without secret key returns specific error info."""
-        with (patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None),):
+        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),):
             response = client.post(
                 "/publish/",
                 headers={"Origin": "https://evil.com"},

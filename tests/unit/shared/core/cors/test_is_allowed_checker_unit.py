@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.sqlalchemy_app.shared.core.cors.is_allowed_checker import get_host
+from src.main_app.shared.core.cors.is_allowed_checker import get_host
 
 
 class TestGetHost:

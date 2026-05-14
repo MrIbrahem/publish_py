@@ -11,8 +11,8 @@ pymysql.install_as_MySQLdb()
 
 # environment variables in production already in toolforge envvars no need to run load_dotenv()
 
-from sqlalchemy_app import create_app  # noqa: E402
-from sqlalchemy_app.config import DevelopmentConfig  # noqa: E402
+from main_app import create_app  # noqa: E402
+from main_app.config import DevelopmentConfig  # noqa: E402
 from logger_config import configure_logging  # noqa: E402
 
 configure_logging(logging.WARNING)

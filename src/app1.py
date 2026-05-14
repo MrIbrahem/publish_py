@@ -21,8 +21,8 @@ except Exception:
     logging.warning("Failed to load .env file from current working directory")
 
 # import app here
-from sqlalchemy_app import create_app  # noqa: E402
-from sqlalchemy_app.config import DevelopmentConfig  # noqa: E402
+from main_app import create_app  # noqa: E402
+from main_app.config import DevelopmentConfig  # noqa: E402
 
 from logger_config import configure_logging  # noqa: E402
 

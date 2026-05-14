@@ -7,7 +7,7 @@ Flask web application for publishing Wikipedia articles translated via ContentTr
 ## Architecture
 
 ```
-src/sqlalchemy_app/
+src/main_app/
 ├── __init__.py           # Flask application factory (create_app)
 ├── config.py             # Configuration dataclasses with @lru_cache settings
 ├── admin/                # Admin routes and sidebar

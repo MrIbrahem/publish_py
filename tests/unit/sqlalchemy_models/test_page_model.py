@@ -6,7 +6,7 @@ Tests for PageRecord.
 
 import pytest
 
-from src.sqlalchemy_app.sqlalchemy_models import PageRecord
+from src.main_app.sqlalchemy_models import PageRecord
 
 
 @pytest.fixture

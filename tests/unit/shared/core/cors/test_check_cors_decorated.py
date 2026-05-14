@@ -4,7 +4,7 @@ Tests for cors wrappers module, to test response.headers["Access-Control-Allow-O
 
 from unittest.mock import MagicMock
 
-from src.sqlalchemy_app.shared.core.cors import check_cors
+from src.main_app.shared.core.cors import check_cors
 
 
 def _make_response_with_headers() -> MagicMock:
@@ -24,7 +24,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
             host_url="",
         )
         app.config["CORS_DISABLED"] = True
-        mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -40,7 +40,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
             host_url="https://books.google.com",
         )
         app.config["CORS_DISABLED"] = True
-        mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -61,8 +61,8 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="http://localhost",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=response)
-        mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=[])
+        mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.main_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=[])
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -79,7 +79,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="https://books.google.com",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -96,10 +96,8 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="https://ar.wikipedia.org",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=response)
-        mocker.patch(
-            "src.sqlalchemy_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com"]
-        )
+        mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.main_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com"])
 
         decorated = check_cors(lambda: _make_response_with_headers())
         result = decorated()
@@ -115,9 +113,9 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             host_url="http://localhost",
         )
         app.config["CORS_DISABLED"] = False
-        mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=response)
+        mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
         mocker.patch(
-            "src.sqlalchemy_app.shared.core.cors.is_allowed_checker._get_allowed_domains",
+            "src.main_app.shared.core.cors.is_allowed_checker._get_allowed_domains",
             return_value=["z.com.net", "z.wikipedia.org"],
         )
 

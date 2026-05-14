@@ -1,5 +1,5 @@
 """
-Integration tests for src/sqlalchemy_app/public/routes/api/routes.py module.
+Integration tests for src/main_app/public/routes/api/routes.py module.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
 
-from src.sqlalchemy_app.shared.schemas import PublishReportsQuerySchema
+from src.main_app.shared.schemas import PublishReportsQuerySchema
 
 
 @pytest.mark.integration
@@ -240,7 +240,7 @@ class TestApiRoutes:
 
     def test_publish_reports_internal_error_handling(self, client: FlaskClient):
         """Test that publish_reports handles internal errors gracefully."""
-        with patch("src.sqlalchemy_app.public.routes.api.routes.query_reports_with_filters") as mock_query:
+        with patch("src.main_app.public.routes.api.routes.query_reports_with_filters") as mock_query:
             mock_query.side_effect = Exception("Database error")
 
             response = client.get("/api/publish_reports?limit=5")
@@ -254,7 +254,7 @@ class TestApiRoutes:
 
     def test_in_process_internal_error_handling(self, client: FlaskClient):
         """Test that in_process handles internal errors gracefully."""
-        with patch("src.sqlalchemy_app.public.routes.api.routes.get_session") as mock_session:
+        with patch("src.main_app.public.routes.api.routes.get_session") as mock_session:
             mock_session.side_effect = Exception("Database error")
 
             response = client.get("/api/in_process?limit=5")
