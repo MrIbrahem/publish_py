@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.pages_users_to_main_service import (
     add_pages_users_to_main,
     delete_pages_users_to_main,
@@ -13,6 +14,7 @@ from src.sqlalchemy_app.sqlalchemy_models import PagesUsersToMainRecord
 
 def test_pages_users_to_main_workflow():
     from sqlalchemy import text
+
     from src.sqlalchemy_app.shared.engine import get_session
 
     with get_session() as session:
@@ -47,6 +49,7 @@ class TestListPagesUsersToMain:
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
         from sqlalchemy import text
+
         from src.sqlalchemy_app.shared.engine import get_session
 
         with get_session() as session:
@@ -65,6 +68,7 @@ class TestGetPagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
         from sqlalchemy import text
+
         from src.sqlalchemy_app.shared.engine import get_session
 
         with get_session() as session:
@@ -86,6 +90,7 @@ class TestAddPagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
         from sqlalchemy import text
+
         from src.sqlalchemy_app.shared.engine import get_session
 
         with get_session() as session:
@@ -113,6 +118,7 @@ class TestUpdatePagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
         from sqlalchemy import text
+
         from src.sqlalchemy_app.shared.engine import get_session
 
         with get_session() as session:
@@ -125,6 +131,7 @@ class TestUpdatePagesUsersToMain:
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         from sqlalchemy import text
+
         from src.sqlalchemy_app.shared.engine import get_session
 
         with get_session() as session:
@@ -145,6 +152,7 @@ class TestDeletePagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         from sqlalchemy import text
+
         from src.sqlalchemy_app.shared.engine import get_session
 
         with get_session() as session:

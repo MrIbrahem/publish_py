@@ -66,7 +66,7 @@ The Python implementation is a thorough port of the PHP publish endpoint, coveri
 
 -   **What it does in PHP**: `load_env.php` explicitly sets environment variables with `putenv()`.
 -   **Where**: `load_env.php`
--   **Impact**: **Not applicable** — Python uses `.env` file via `env_config.py` module. This is an architectural difference, not a bug.
+-   **Impact**: **Not applicable** — Python uses `.env` file via `load_dotenv()`. This is an architectural difference, not a bug.
 
 ---
 

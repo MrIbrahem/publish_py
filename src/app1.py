@@ -8,12 +8,18 @@ import sys
 import logging
 import pymysql
 from pathlib import Path
+from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
 pymysql.install_as_MySQLdb()
 
 # Load environment variables before any other imports
-from env_config import load_environment  # auto-load load_environment()
+
+try:
+    load_dotenv()
+except Exception:
+    logging.warning("Failed to load .env file from current working directory")
+
 from sqlalchemy_app import create_app  # noqa: E402
 from sqlalchemy_app.config import DevelopmentConfig  # noqa: E402
 

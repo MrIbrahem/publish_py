@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,

@@ -1,5 +1,5 @@
 """
-Results API — mirrors PHP Results\GetResults\get_results_new.
+Results API — mirrors PHP Results/GetResults/get_results_new.
 """
 
 from __future__ import annotations

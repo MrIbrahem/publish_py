@@ -7,6 +7,7 @@ Tests for token cache.
 import time
 
 import pytest
+
 from src.sqlalchemy_app.public.routes.cxtoken.cache import (
     CxToken,
     cache,

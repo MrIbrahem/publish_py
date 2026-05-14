@@ -8,6 +8,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.core.cors.publish_secret_checks import (
     _get_publish_secret_code,
     check_publish_secret_code,

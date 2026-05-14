@@ -73,7 +73,7 @@ Base `Database` class in `db_driver.py` provides:
 
 ## Important Conventions
 
--   **Import order**: `env_config.py` must be imported first (loads .env)
+-   **Import order**: `load_dotenv()` must be imported first (loads .env)
 -   **Line length**: 120 characters
 -   **Quotes**: Double quotes
 -   **CSRF protection**: Enabled via Flask-WTF on all POST routes

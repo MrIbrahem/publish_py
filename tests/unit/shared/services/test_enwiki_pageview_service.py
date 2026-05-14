@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,

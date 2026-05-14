@@ -1,6 +1,7 @@
 """Tests for helpers.format module."""
 
 import pytest
+
 from src.sqlalchemy_app.config import settings
 from src.sqlalchemy_app.shared.utils.helpers.format import (
     determine_hashtag,

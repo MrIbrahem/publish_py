@@ -7,6 +7,7 @@ Tests for current user helpers.
 from unittest.mock import MagicMock
 
 import pytest
+
 from src.sqlalchemy_app.shared.auth.identity import (
     CurrentUser,
     _resolve_user_id,
