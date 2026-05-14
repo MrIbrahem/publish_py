@@ -22,7 +22,7 @@ def app() -> Flask:
     app.config["TESTING"] = True
     app.config["CORS_DISABLED"] = True
 
-    from src.sqlalchemy_app.public.routes.publish.routes import bp_publish
+    from src.main_app.public.routes.publish.routes import bp_publish
 
     app.register_blueprint(bp_publish)
     return app
@@ -53,9 +53,9 @@ class TestPostEndpoint:
     def test_no_access_returns_when_user_not_found(self, client):
         """Test that no access error is returned when user not found."""
         with (
-            patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
+            patch("src.main_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
+            patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
             mock_load_reports_db.return_value = None
@@ -96,19 +96,19 @@ class TestPostEndpoint:
     def test_successful_edit_returns_success(self, client):
         """Test that successful edit returns success result."""
         with (
-            patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.get_revid_db") as mock_get_revid_db,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.insert_page_target") as mock_insert_page,
+            patch("src.main_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
+            patch("src.main_app.public.routes.publish.worker.get_revid_db") as mock_get_revid_db,
+            patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
+            patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
+            patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
+            patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
+            patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
+            patch("src.main_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.main_app.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
+            patch("src.main_app.public.routes.publish.worker.insert_page_target") as mock_insert_page,
             patch(
-                "src.sqlalchemy_app.public.routes.publish.worker.get_campaign_category"
+                "src.main_app.public.routes.publish.worker.get_campaign_category"
             ) as mock_get_campaign_category,
         ):
             # Mock user token
@@ -152,12 +152,12 @@ class TestPostEndpoint:
     def test_handles_captcha_response(self, client):
         """Test that captcha response is handled correctly."""
         with (
-            patch("src.sqlalchemy_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.sqlalchemy_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
+            patch("src.main_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
+            patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
+            patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
+            patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
+            patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
             # Mock user token
             mock_token = MagicMock()

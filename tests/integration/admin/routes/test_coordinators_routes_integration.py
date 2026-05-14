@@ -1,5 +1,5 @@
 """
-Integration tests for src/sqlalchemy_app/admin/routes/coordinators.py module.
+Integration tests for src/main_app/admin/routes/coordinators.py module.
 
 TODO: should mock admin_required decorator
 """
@@ -26,7 +26,7 @@ class TestCoordinatorsDashboard:
 
     def test_coordinators_dashboard_lists_coordinators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that coordinators dashboard lists coordinators."""
-        with patch("src.sqlalchemy_app.admin.routes.coordinators.list_coordinators") as mock_list:
+        with patch("src.main_app.admin.routes.coordinators.list_coordinators") as mock_list:
             mock_list.return_value = [
                 MagicMock(username="Coordinator1", is_active=True),
                 MagicMock(username="Coordinator2", is_active=False),
@@ -51,7 +51,7 @@ class TestAddCoordinator:
 
     def test_add_coordinator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding coordinator with valid data."""
-        with patch("src.sqlalchemy_app.admin.routes.coordinators.add_coordinator") as mock_add:
+        with patch("src.main_app.admin.routes.coordinators.add_coordinator") as mock_add:
             mock_add.return_value = MagicMock(username="NewCoordinator")
 
             response = auth_client.post(
@@ -90,7 +90,7 @@ class TestDeleteCoordinator:
 
     def test_delete_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting coordinator with valid ID."""
-        with patch("src.sqlalchemy_app.admin.routes.coordinators.delete_coordinator") as mock_delete:
+        with patch("src.main_app.admin.routes.coordinators.delete_coordinator") as mock_delete:
             mock_delete.return_value = MagicMock(username="DeletedCoordinator")
 
             response = auth_client.post(
@@ -122,7 +122,7 @@ class TestActivateDeactivateCoordinator:
 
     def test_activate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating coordinator with valid ID."""
-        with patch("src.sqlalchemy_app.admin.routes.coordinators.set_coordinator_active") as mock_set:
+        with patch("src.main_app.admin.routes.coordinators.set_coordinator_active") as mock_set:
             mock_set.return_value = MagicMock(username="ActivatedCoordinator")
 
             response = auth_client.post(
@@ -135,7 +135,7 @@ class TestActivateDeactivateCoordinator:
 
     def test_deactivate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating coordinator with valid ID."""
-        with patch("src.sqlalchemy_app.admin.routes.coordinators.set_coordinator_active") as mock_set:
+        with patch("src.main_app.admin.routes.coordinators.set_coordinator_active") as mock_set:
             mock_set.return_value = MagicMock(username="DeactivatedCoordinator")
 
             response = auth_client.post(

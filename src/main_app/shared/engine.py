@@ -113,7 +113,7 @@ def build_engine(db_url: str) -> Engine:
 # ---------------------------------------------------------------------------
 
 @contextmanager
-def get_session() -> Session:
+def get_session():
     """Return a new session. Always use inside a `with` block."""
     # After migration to Flask-SQLAlchemy, we use db.session
     # We yield it to support the context manager protocol 'with get_session() as session:'

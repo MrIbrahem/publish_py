@@ -4,8 +4,8 @@ Unit tests for domain.models.setting module.
 Tests for SettingRecord.
 """
 
-# from src.sqlalchemy_app.sqlalchemy_models import SettingRecord
-from src.sqlalchemy_app.sqlalchemy_models import SettingRecord
+# from src.main_app.sqlalchemy_models import SettingRecord
+from src.main_app.sqlalchemy_models import SettingRecord
 
 
 class TestSettingRecord:

@@ -6,7 +6,7 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.public.routes.publish.worker import (
+from src.main_app.public.routes.publish.worker import (
     _get_errors_file,
     _get_revid,
     _handle_no_access,

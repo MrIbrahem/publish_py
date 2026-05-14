@@ -41,20 +41,20 @@ gunicorn --workers=4 --bind=0.0.0.0 --forwarded-allow-ips=* src.app:app
 ### Application Factory
 
 ```python
-from sqlalchemy_app import create_app
+from main_app import create_app
 app = create_app()
 ```
 
 ### Key Directories
 
--   `src/sqlalchemy_app/app_routes/` - Flask blueprints: `bp_api`, `bp_auth`, `bp_cxtoken`, `bp_main`, `bp_post`, `bp_fixrefs`
--   `src/sqlalchemy_app/db/` - Database classes inheriting from `db_driver.py` (`DbPublishReports`, `DbPages`, `DbQids`)
--   `src/sqlalchemy_app/services/` - External integrations (mediawiki_api, wikidata_client, oauth_client, text_processor)
--   `src/sqlalchemy_app/users/` - User context (`current.py`) and storage (`store.py`)
+-   `src/main_app/app_routes/` - Flask blueprints: `bp_api`, `bp_auth`, `bp_cxtoken`, `bp_main`, `bp_post`, `bp_fixrefs`
+-   `src/main_app/db/` - Database classes inheriting from `db_driver.py` (`DbPublishReports`, `DbPages`, `DbQids`)
+-   `src/main_app/services/` - External integrations (mediawiki_api, wikidata_client, oauth_client, text_processor)
+-   `src/main_app/users/` - User context (`current.py`) and storage (`store.py`)
 
 ### Configuration
 
-Frozen dataclasses with `@lru_cache` singletons in `src/sqlalchemy_app/config.py`. Access via `from sqlalchemy_app.config import settings`.
+Frozen dataclasses with `@lru_cache` singletons in `src/main_app/config.py`. Access via `from main_app.config import settings`.
 
 ### Database Pattern
 

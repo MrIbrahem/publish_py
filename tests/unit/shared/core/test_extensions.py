@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from flask import Blueprint, Flask
-from src.sqlalchemy_app.shared.core.extensions import csrf, csrf_exempt, csrf_init_app
+from src.main_app.shared.core.extensions import csrf, csrf_exempt, csrf_init_app
 
 
 class TestCsrfInitApp:
@@ -107,8 +107,8 @@ class TestCsrfSingleton:
 
     def test_csrf_is_singleton(self):
         """Test that csrf is a singleton instance."""
-        from src.sqlalchemy_app.shared.core.extensions import csrf as csrf1
-        from src.sqlalchemy_app.shared.core.extensions import csrf as csrf2
+        from src.main_app.shared.core.extensions import csrf as csrf1
+        from src.main_app.shared.core.extensions import csrf as csrf2
 
         assert csrf1 is csrf2
 

@@ -275,7 +275,7 @@ def results_api():
 ## Directory Layout
 
 ```
-src/sqlalchemy_app/
+src/main_app/
 ├── public/
 │   └── routes/
 │       └── main/
