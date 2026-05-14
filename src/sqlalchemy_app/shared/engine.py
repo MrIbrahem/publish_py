@@ -112,26 +112,6 @@ def build_engine(db_url: str) -> Engine:
 # 3. SessionFactory singleton — replaces _COORDINATORS_STORE
 # ---------------------------------------------------------------------------
 
-
-_SessionFactory: sessionmaker | None = None
-
-
-def init_db(db_url: str, create_tables: bool = False) -> None:
-    """
-    Initialize the engine and SessionFactory.
-    Call once at application startup.
-
-    create_tables=True: creates the table if it does not exist (useful for testing).
-    """
-    global _SessionFactory
-    engine = build_engine(db_url)
-    if create_tables:
-        real_tables = [t for t in BaseDb.metadata.tables.values() if not t.info.get("is_view")]
-
-        BaseDb.metadata.create_all(engine, tables=real_tables)
-    _SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
-
-
 @contextmanager
 def get_session() -> Session:
     """Return a new session. Always use inside a `with` block."""
@@ -185,7 +165,6 @@ __all__ = [
     # Model
     "BaseDb",
     # Setup
-    "init_db",
     "get_session",
     "LONGTEXT",
 ]

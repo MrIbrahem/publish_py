@@ -27,7 +27,7 @@ from .public.routes import (
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
-from .shared.engine import build_db_url, init_db
+from .shared.engine import build_db_url
 from .shared.services.coordinator_service import active_coordinators
 
 logger = logging.getLogger(__name__)
@@ -117,10 +117,6 @@ def create_app(config_class: Type | None = None) -> Flask:
 
     db.init_app(app)
     migrate.init_app(app, db)
-
-    if db_url:
-        # For legacy compatibility
-        init_db(db_url, True)
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_leaderboard)
