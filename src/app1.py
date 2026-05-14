@@ -19,7 +19,7 @@ _env_file_path = str(Path(__file__).parent.parent.parent / ".env")
 try:
     load_dotenv(_env_file_path)
 except Exception:
-    logging.warning("Failed to load .env file from current working directory")
+    logging.warning(f"Failed to load .env file from {str(_env_file_path)}")
 
 # import app here
 from main_app import create_app  # noqa: E402
