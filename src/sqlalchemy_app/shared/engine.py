@@ -10,10 +10,6 @@ from __future__ import annotations
 import logging
 from contextlib import contextmanager
 
-from sqlalchemy import Text
-from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
-from sqlalchemy.types import TypeDecorator
-
 from ..extensions import LONGTEXT, Model, db
 
 logger = logging.getLogger(__name__)
@@ -64,20 +60,6 @@ def build_db_url(db_data: dict[str, str]) -> str:
     return f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
 
 
-def init_db(db_url: str, create_tables: bool = False) -> None:
-    """
-    Initialize the database.
-
-    DEPRECATED: This function is deprecated. Database initialization is now
-    handled by Flask-SQLAlchemy through db.init_app() in the application factory.
-    """
-    logger.warning(
-        "init_db() is deprecated. Database initialization is handled by Flask-SQLAlchemy. "
-        "Use db.init_app(app) in the application factory instead."
-    )
-    # This function is now a no-op as Flask-SQLAlchemy handles initialization
-
-
 __all__ = [
     # Compatibility exports
     "BaseDb",  # Alias for Model
@@ -85,5 +67,4 @@ __all__ = [
     "LONGTEXT",
     # Deprecated functions
     "build_db_url",
-    "init_db",
 ]

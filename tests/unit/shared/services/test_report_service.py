@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.engine import BaseDb, build_engine, get_session, init_db
+from src.sqlalchemy_app.shared.engine import get_session
 from src.sqlalchemy_app.shared.services.report_service import (
     add_report,
     delete_report,
