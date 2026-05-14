@@ -41,7 +41,7 @@ waitress-serve --threads=4 --host=localhost --port=8080 src.app:app
 
 ## Critical Conventions
 
--   **Import order**: `env_config.py` must be imported first (loads .env)
+-   **Import order**: `load_dotenv()` must be imported first (loads .env)
 -   **Line length**: 120 characters (Black, isort, ruff all configured)
 -   **Quotes**: Double quotes (ruff `quote-style = "double"`)
 -   **CSRF**: Enabled via Flask-WTF on all POST routes

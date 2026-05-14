@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.setting_service import (
     add_setting,
     delete_setting,

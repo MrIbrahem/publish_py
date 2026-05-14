@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.assessment_service import (
     add_assessment,
     add_or_update_assessment,

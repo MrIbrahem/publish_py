@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
 from src.sqlalchemy_app.shared.utils.helpers.words import clear_words_cache, get_word_count
 
 

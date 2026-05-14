@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.user_service import (
     add_user,
     delete_user,

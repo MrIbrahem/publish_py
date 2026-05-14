@@ -454,13 +454,13 @@ def start_task():
 
 ### 9. Import Order Convention ⚠️ NON-COMPLIANT
 
-**Status**: env_config.py must be imported first, but implementation is fragile
+**Status**: envconfig must be imported first, but implementation is fragile
 
 **Current Implementation**:
 
 ```python
 # src/app.py
-from env_config import _env_file_path  # type: ignore # Triggers environment configuration
+from envconfig import _env_file_path  # type: ignore # Triggers environment configuration
 ```
 
 **Problem**: Relies on side effects during import, which is fragile.
@@ -635,7 +635,6 @@ The application does not have any critical security issues or active violations 
 | CSRF Time Limit              | ✅ **CONFIGURED**  | `WTF_CSRF_TIME_LIMIT` attribute in Config class (default: None)                  |
 | Blueprint `__init__.py`      | ✅ **POPULATED**   | All blueprint directories have proper `__init__.py` exports                      |
 | SECRET_KEY_FALLBACKS         | ✅ **IMPLEMENTED** | Support for `FLASK_SECRET_KEY_FALLBACKS` env variable                            |
-| env_config Import Pattern    | ✅ **REFACTORED**  | Now uses explicit `load_environment()` function                                  |
 
 ### Updated Compliance Score: **B+ (85%)**
 

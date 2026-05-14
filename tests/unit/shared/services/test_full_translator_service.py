@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,

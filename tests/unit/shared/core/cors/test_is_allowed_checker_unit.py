@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+
 from src.sqlalchemy_app.shared.core.cors.is_allowed_checker import get_host
 
 

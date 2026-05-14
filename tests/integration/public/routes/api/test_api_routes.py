@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
+
 from src.sqlalchemy_app.shared.schemas import PublishReportsQuerySchema
 
 

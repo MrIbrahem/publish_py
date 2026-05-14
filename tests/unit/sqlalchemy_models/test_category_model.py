@@ -5,6 +5,7 @@ Tests for CategoryRecord.
 """
 
 import pytest
+
 from src.sqlalchemy_app.sqlalchemy_models import CategoryRecord
 
 

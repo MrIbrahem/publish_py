@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.word_service import (
     add_or_update_word,
     add_word,

@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 
 import pytest
+
 from src.sqlalchemy_app.admin.routes.settings import _parse_setting_value
 
 

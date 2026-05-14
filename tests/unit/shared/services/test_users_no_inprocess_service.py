@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from src.sqlalchemy_app.shared.services.users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,

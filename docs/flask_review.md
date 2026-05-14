@@ -8,7 +8,6 @@
 | Status | File                                         | Issue                                                            |
 | ------ | -------------------------------------------- | ---------------------------------------------------------------- |
 | PASS   | src/sqlalchemy_app/**init**.py               | Correct application factory pattern with `create_app()`          |
-| PASS   | src/app.py                                   | `env_config.py` imported first (loads .env before other imports) |
 | PASS   | src/sqlalchemy_app/shared/core/extensions.py | `init_app` pattern used for CSRF extension                       |
 | PASS   | src/sqlalchemy_app/config.py                 | No hardcoded secrets; all config from environment variables      |
 

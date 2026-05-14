@@ -1,6 +1,7 @@
 """Tests for clients.text_processor module."""
 
 import pytest
+
 from src.sqlalchemy_app.shared.utils.helpers.text_processor import DoChangesToText1, do_changes_to_text
 
 
