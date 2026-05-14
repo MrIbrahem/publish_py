@@ -210,11 +210,11 @@ def setup_db():
         conn.execute(
             text(
                 """
-            CREATE VIEW IF NOT EXISTS views_new_all AS
-            SELECT target, lang, SUM(views) as views
-            FROM views_new
-            GROUP BY target, lang
-        """
+                CREATE VIEW IF NOT EXISTS views_new_all AS
+                SELECT target, lang, SUM(views) as views
+                FROM views_new
+                GROUP BY target, lang
+                """
             )
         )
         conn.commit()
