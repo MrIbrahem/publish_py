@@ -1,5 +1,5 @@
 """
-Integration tests for src/sqlalchemy_app/admin/routes/users_no_inprocess.py module.
+Integration tests for src/main_app/admin/routes/users_no_inprocess.py module.
 
 TODO: should mock admin_required decorator
 """
@@ -26,7 +26,7 @@ class TestUsersNoInprocessDashboard:
 
     def test_users_no_inprocess_dashboard_lists_users(self, mock_admin_required, auth_client: FlaskClient):
         """Test that users no inprocess dashboard lists users."""
-        with patch("src.sqlalchemy_app.admin.routes.users_no_inprocess.list_users_no_inprocess") as mock_list:
+        with patch("src.main_app.admin.routes.users_no_inprocess.list_users_no_inprocess") as mock_list:
             mock_list.return_value = [
                 MagicMock(user="User1", is_active=True),
                 MagicMock(user="User2", is_active=False),
@@ -51,7 +51,7 @@ class TestAddUserNoInprocess:
 
     def test_add_user_no_inprocess_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding user with valid data."""
-        with patch("src.sqlalchemy_app.admin.routes.users_no_inprocess.add_users_no_inprocess") as mock_add:
+        with patch("src.main_app.admin.routes.users_no_inprocess.add_users_no_inprocess") as mock_add:
             mock_add.return_value = MagicMock(user="NewUser")
 
             response = auth_client.post(
@@ -88,7 +88,7 @@ class TestDeleteUserNoInprocess:
 
     def test_delete_user_no_inprocess_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting user with valid ID."""
-        with patch("src.sqlalchemy_app.admin.routes.users_no_inprocess.delete_users_no_inprocess") as mock_delete:
+        with patch("src.main_app.admin.routes.users_no_inprocess.delete_users_no_inprocess") as mock_delete:
             mock_delete.return_value = MagicMock(user="DeletedUser")
 
             response = auth_client.post(
@@ -121,7 +121,7 @@ class TestActivateDeactivateUserNoInprocess:
     def test_activate_user_no_inprocess_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating user with valid ID."""
 
-        with patch("src.sqlalchemy_app.admin.routes.users_no_inprocess.update_users_no_inprocess") as mock_update:
+        with patch("src.main_app.admin.routes.users_no_inprocess.update_users_no_inprocess") as mock_update:
             mock_update.return_value = MagicMock(username="ActivatedUser")
 
             response = auth_client.post(
@@ -135,7 +135,7 @@ class TestActivateDeactivateUserNoInprocess:
     def test_deactivate_user_no_inprocess_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating user with valid ID."""
 
-        with patch("src.sqlalchemy_app.admin.routes.users_no_inprocess.update_users_no_inprocess") as mock_update:
+        with patch("src.main_app.admin.routes.users_no_inprocess.update_users_no_inprocess") as mock_update:
             mock_update.return_value = MagicMock(username="DeactivatedUser")
 
             response = auth_client.post(

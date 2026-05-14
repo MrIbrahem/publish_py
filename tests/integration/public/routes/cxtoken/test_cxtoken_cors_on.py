@@ -26,7 +26,7 @@ def app() -> Flask:
     app.config["TESTING"] = True
     app.config["CORS_DISABLED"] = False
 
-    from src.sqlalchemy_app.public.routes.cxtoken.routes import bp_cxtoken
+    from src.main_app.public.routes.cxtoken.routes import bp_cxtoken
 
     app.register_blueprint(bp_cxtoken)
     return app
@@ -56,7 +56,7 @@ class TestCheckCorsOnCxtokenGet:
         """GET from allowed origin passes CORS check and reaches handler."""
         with (
             patch(
-                "src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username",
+                "src.main_app.public.routes.cxtoken.routes.get_user_token_by_username",
                 return_value=None,
             ),
         ):
@@ -79,8 +79,8 @@ class TestCheckCorsOnCxtokenGet:
     def test_get_allowed_origin_returns_cxtoken(self, mock_is_allowed_medwiki, client):
         """GET from allowed origin returns cxtoken on success."""
         with (
-            patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
+            patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
             mock_token = MagicMock()
             mock_token.decrypted.return_value = ("access_key", "access_secret")
@@ -132,7 +132,7 @@ class TestCxtokenCorsOnIntegration:
     def test_get_same_origin_passes_real_cors(self, app, client):
         """GET from same origin passes real CORS check."""
         with patch(
-            "src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username",
+            "src.main_app.public.routes.cxtoken.routes.get_user_token_by_username",
             return_value=None,
         ):
             response = client.get(

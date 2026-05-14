@@ -1,14 +1,14 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.engine import get_session
-from src.sqlalchemy_app.shared.services.report_service import (
+from src.main_app.shared.engine import get_session
+from src.main_app.shared.services.report_service import (
     add_report,
     delete_report,
     list_reports,
     query_reports_with_filters,
 )
-from src.sqlalchemy_app.sqlalchemy_models import ReportRecord
+from src.main_app.sqlalchemy_models import ReportRecord
 
 
 def test_report_workflow():

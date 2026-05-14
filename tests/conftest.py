@@ -45,8 +45,8 @@ if sys:
 
 
 # Import after environment setup
-from src.sqlalchemy_app import create_app
-from src.sqlalchemy_app.config import TestingConfig
+from src.main_app import create_app
+from src.main_app.config import TestingConfig
 
 
 @pytest.fixture(autouse=True)
@@ -121,35 +121,35 @@ def auth_client(app):
 
 @pytest.fixture
 def mock_is_denied(mocker):
-    return mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None)
+    return mocker.patch("src.main_app.shared.core.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_is_allowed(mocker):
-    return mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value=None)
+    return mocker.patch("src.main_app.shared.core.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_is_allowed_medwiki(mocker):
-    return mocker.patch("src.sqlalchemy_app.shared.core.cors.is_allowed", return_value="medwiki.toolforge.org")
+    return mocker.patch("src.main_app.shared.core.cors.is_allowed", return_value="medwiki.toolforge.org")
 
 
 @pytest.fixture
 def mock_check_secret(mocker):
-    return mocker.patch("src.sqlalchemy_app.shared.core.cors.check_publish_secret_code", return_value=None)
+    return mocker.patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None)
 
 
 @pytest.fixture
 def mock_load_request(mocker):
     mock_req = MagicMock()
-    mocker.patch("src.sqlalchemy_app.shared.core.cors._load_request", return_value=mock_req)
+    mocker.patch("src.main_app.shared.core.cors._load_request", return_value=mock_req)
     return mock_req
 
 
 @pytest.fixture
 def db_config():
     """Fixture for DbConfig instance."""
-    from src.sqlalchemy_app.config import DbConfig
+    from src.main_app.config import DbConfig
 
     return DbConfig(
         db_name="test_db",
@@ -169,10 +169,10 @@ def mock_admin_required(mocker):
     # Mock current_user to return a valid user object
     mock_user = MagicMock()
     mock_user.username = "admin"
-    mocker.patch("src.sqlalchemy_app.admin.decorators.current_user", return_value=mock_user)
+    mocker.patch("src.main_app.admin.decorators.current_user", return_value=mock_user)
 
     # Mock _get_cached_active_coordinators to return list with "admin"
     mocker.patch(
-        "src.sqlalchemy_app.admin.decorators._get_cached_active_coordinators",
+        "src.main_app.admin.decorators._get_cached_active_coordinators",
         return_value=["admin"],
     )

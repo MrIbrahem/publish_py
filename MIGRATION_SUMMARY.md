@@ -15,7 +15,7 @@ Successfully completed the migration of the `publish_py` project from standalone
 ### ✅ Phase 2: Extensions Module
 - **Status**: Complete
 - **Changes**:
-  - Created `src/sqlalchemy_app/extensions.py`
+  - Created `src/main_app/extensions.py`
   - Initialized `db = SQLAlchemy()`
   - Initialized `migrate = Migrate()`
   - Preserved custom `LONGTEXT` type for MySQL compatibility
@@ -24,7 +24,7 @@ Successfully completed the migration of the `publish_py` project from standalone
 ### ✅ Phase 3: Application Initialization
 - **Status**: Complete
 - **Changes**:
-  - Updated `src/sqlalchemy_app/__init__.py`
+  - Updated `src/main_app/__init__.py`
   - Replaced manual `init_db()` with `db.init_app(app)`
   - Added `migrate.init_app(app, db)`
   - Ensured all models are imported before `db.create_all()`
@@ -32,7 +32,7 @@ Successfully completed the migration of the `publish_py` project from standalone
 ### ✅ Phase 4: Configuration
 - **Status**: Complete
 - **Changes**:
-  - Updated `src/sqlalchemy_app/config.py`
+  - Updated `src/main_app/config.py`
   - Added `SQLALCHEMY_DATABASE_URI` configuration
   - Set `SQLALCHEMY_TRACK_MODIFICATIONS = False`
   - Configured `SQLALCHEMY_ENGINE_OPTIONS` with:
@@ -69,7 +69,7 @@ Successfully completed the migration of the `publish_py` project from standalone
 ### ✅ Phase 6: Compatibility Layer
 - **Status**: Complete
 - **Changes**:
-  - Converted `src/sqlalchemy_app/shared/engine.py` to compatibility layer
+  - Converted `src/main_app/shared/engine.py` to compatibility layer
   - `get_session()` now wraps `db.session`
   - `BaseDb` aliased to `Model` for backward compatibility
   - Deprecated functions (`init_db`, `build_db_url`) kept with warnings
@@ -118,13 +118,13 @@ Successfully completed the migration of the `publish_py` project from standalone
 
 ### Core Infrastructure (5 files)
 1. `requirements.txt` - Added flask-migrate
-2. `src/sqlalchemy_app/__init__.py` - Application factory updates
-3. `src/sqlalchemy_app/config.py` - Flask-SQLAlchemy configuration
-4. `src/sqlalchemy_app/extensions.py` - Created new extensions module
-5. `src/sqlalchemy_app/shared/engine.py` - Compatibility layer
+2. `src/main_app/__init__.py` - Application factory updates
+3. `src/main_app/config.py` - Flask-SQLAlchemy configuration
+4. `src/main_app/extensions.py` - Created new extensions module
+5. `src/main_app/shared/engine.py` - Compatibility layer
 
 ### Models (10 files)
-All files in `src/sqlalchemy_app/sqlalchemy_models/`:
+All files in `src/main_app/sqlalchemy_models/`:
 - all_articles.py
 - dashboard.py
 - metrics.py
@@ -137,15 +137,15 @@ All files in `src/sqlalchemy_app/sqlalchemy_models/`:
 - views.py
 
 ### Services (4 files)
-Sample of `src/sqlalchemy_app/shared/services/`:
+Sample of `src/main_app/shared/services/`:
 - coordinator_service.py
 - page_service.py
 - user_service.py
 - user_token_service.py
 
 ### API Routes (2 files)
-- `src/sqlalchemy_app/public/routes/api/pages_query_service.py`
-- `src/sqlalchemy_app/public/routes/api/routes.py`
+- `src/main_app/public/routes/api/pages_query_service.py`
+- `src/main_app/public/routes/api/routes.py`
 
 ### Documentation (2 files)
 - `MIGRATION_GUIDE.md` - Usage instructions

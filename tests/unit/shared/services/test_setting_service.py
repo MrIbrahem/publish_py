@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.services.setting_service import (
+from src.main_app.shared.services.setting_service import (
     add_setting,
     delete_setting,
     get_setting,
@@ -10,8 +10,8 @@ from src.sqlalchemy_app.shared.services.setting_service import (
     update_value,
 )
 
-# from src.sqlalchemy_app.sqlalchemy_models import SettingRecord
-from src.sqlalchemy_app.sqlalchemy_models import SettingRecord
+# from src.main_app.sqlalchemy_models import SettingRecord
+from src.main_app.sqlalchemy_models import SettingRecord
 
 
 def test_setting_workflow():

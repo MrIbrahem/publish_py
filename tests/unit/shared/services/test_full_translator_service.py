@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.services.full_translator_service import (
+from src.main_app.shared.services.full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,
     delete_full_translator,
@@ -12,7 +12,7 @@ from src.sqlalchemy_app.shared.services.full_translator_service import (
     list_full_translators,
     update_full_translator,
 )
-from src.sqlalchemy_app.sqlalchemy_models import FullTranslatorRecord
+from src.main_app.sqlalchemy_models import FullTranslatorRecord
 
 
 def test_full_translator_workflow():

@@ -8,7 +8,7 @@ This project has been successfully migrated from standalone SQLAlchemy to Flask-
 - Added `flask-sqlalchemy` and `flask-migrate` to `requirements.txt`
 
 ### 2. Extensions Module
-- Created `src/sqlalchemy_app/extensions.py` with centralized `db` and `migrate` objects
+- Created `src/main_app/extensions.py` with centralized `db` and `migrate` objects
 - Moved `LONGTEXT` custom type to extensions module
 - Created `Model` base class with `to_dict()` mixin functionality
 
@@ -151,7 +151,7 @@ with app.app_context():
 ```
 
 ### Issue: Migration conflicts
-**Solution**: 
+**Solution**:
 1. Backup your database
 2. Review migration file
 3. Manually adjust if needed

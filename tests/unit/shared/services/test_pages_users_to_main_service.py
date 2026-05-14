@@ -1,19 +1,19 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.services.pages_users_to_main_service import (
+from src.main_app.shared.services.pages_users_to_main_service import (
     add_pages_users_to_main,
     delete_pages_users_to_main,
     get_pages_users_to_main,
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
-from src.sqlalchemy_app.sqlalchemy_models import PagesUsersToMainRecord
+from src.main_app.sqlalchemy_models import PagesUsersToMainRecord
 
 
 def test_pages_users_to_main_workflow():
     from sqlalchemy import text
-    from src.sqlalchemy_app.shared.engine import get_session
+    from src.main_app.shared.engine import get_session
 
     with get_session() as session:
         session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
@@ -47,7 +47,7 @@ class TestListPagesUsersToMain:
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
         from sqlalchemy import text
-        from src.sqlalchemy_app.shared.engine import get_session
+        from src.main_app.shared.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (10, 'Malaria'), (20, 'Cholera')"))
@@ -65,7 +65,7 @@ class TestGetPagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
         from sqlalchemy import text
-        from src.sqlalchemy_app.shared.engine import get_session
+        from src.main_app.shared.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (30, 'Dengue fever')"))
@@ -86,7 +86,7 @@ class TestAddPagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
         from sqlalchemy import text
-        from src.sqlalchemy_app.shared.engine import get_session
+        from src.main_app.shared.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (40, 'Yellow fever')"))
@@ -99,7 +99,7 @@ class TestAddPagesUsersToMain:
     def test_raises_error_on_failure(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.sqlalchemy_app.shared.services.pages_users_to_main_service.get_session") as mock_get_session:
+        with patch("src.main_app.shared.services.pages_users_to_main_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
@@ -113,7 +113,7 @@ class TestUpdatePagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
         from sqlalchemy import text
-        from src.sqlalchemy_app.shared.engine import get_session
+        from src.main_app.shared.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (50, 'Zika virus')"))
@@ -125,7 +125,7 @@ class TestUpdatePagesUsersToMain:
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         from sqlalchemy import text
-        from src.sqlalchemy_app.shared.engine import get_session
+        from src.main_app.shared.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (51, 'T')"))
@@ -145,7 +145,7 @@ class TestDeletePagesUsersToMain:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         from sqlalchemy import text
-        from src.sqlalchemy_app.shared.engine import get_session
+        from src.main_app.shared.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (60, 'Ebola virus')"))

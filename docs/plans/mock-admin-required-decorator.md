@@ -11,7 +11,7 @@ This results in weak tests that only assert `response.status_code == 302` instea
 
 ## Root Cause
 
-The `auth_client` fixture sets `session["uid"] = 12345`, but `get_user_token(12345)` returns `None` because no corresponding user exists in the test database. The `admin_required` decorator (in `src/sqlalchemy_app/admin/decorators.py`) calls `current_user()` which fails, causing a 302 redirect.
+The `auth_client` fixture sets `session["uid"] = 12345`, but `get_user_token(12345)` returns `None` because no corresponding user exists in the test database. The `admin_required` decorator (in `src/main_app/admin/decorators.py`) calls `current_user()` which fails, causing a 302 redirect.
 
 ## Solution: Mock the `admin_required` Decorator
 
@@ -39,7 +39,7 @@ def mock_admin_required():
     allowing tests to focus on route functionality rather than auth.
     """
     # Mock the decorator to simply return the original function unchanged
-    with patch("src.sqlalchemy_app.admin.decorators.admin_required", lambda f: f):
+    with patch("src.main_app.admin.decorators.admin_required", lambda f: f):
         yield
 ```
 
@@ -52,7 +52,7 @@ def mock_admin_required():
 
 For each of the 6 test files, update the tests to:
 
-1. Remove individual `patch("src.sqlalchemy_app.admin.decorators.active_coordinators")` calls
+1. Remove individual `patch("src.main_app.admin.decorators.active_coordinators")` calls
 2. Change assertions from `response.status_code == 302` to meaningful assertions
 
 **Files to update:**
@@ -70,9 +70,9 @@ Before:
 
 ```python
 def test_settings_dashboard_lists_settings(self, auth_client: FlaskClient):
-    with patch("src.sqlalchemy_app.admin.decorators.active_coordinators") as mock_coords:
+    with patch("src.main_app.admin.decorators.active_coordinators") as mock_coords:
         mock_coords.return_value = ["TestUser"]
-        with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
+        with patch("src.main_app.shared.services.setting_service.list_settings") as mock_list:
             mock_setting = MagicMock()
             mock_list.return_value = [mock_setting]
             response = auth_client.get("/admin/settings")
@@ -83,7 +83,7 @@ After:
 
 ```python
 def test_settings_dashboard_lists_settings(self, auth_client: FlaskClient):
-    with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
+    with patch("src.main_app.shared.services.setting_service.list_settings") as mock_list:
         mock_setting = MagicMock()
         mock_list.return_value = [mock_setting]
         response = auth_client.get("/admin/settings")

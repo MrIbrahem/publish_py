@@ -8,7 +8,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.core.cors.publish_secret_checks import (
+from src.main_app.shared.core.cors.publish_secret_checks import (
     _get_publish_secret_code,
     check_publish_secret_code,
 )
@@ -22,7 +22,7 @@ class TestGetPublishSecretCode:
         mock_settings = MagicMock()
         mock_settings.publish_secret_code = "my_secret_code"
 
-        monkeypatch.setattr("src.sqlalchemy_app.shared.core.cors.publish_secret_checks.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.shared.core.cors.publish_secret_checks.settings", mock_settings)
 
         result = _get_publish_secret_code()
 
@@ -33,7 +33,7 @@ class TestGetPublishSecretCode:
         mock_settings = MagicMock()
         mock_settings.publish_secret_code = ""
 
-        monkeypatch.setattr("src.sqlalchemy_app.shared.core.cors.publish_secret_checks.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.shared.core.cors.publish_secret_checks.settings", mock_settings)
 
         result = _get_publish_secret_code()
 
@@ -46,7 +46,7 @@ class TestCheckPublishSecretCode:
     def test_returns_none_when_no_secret_configured(self, app, monkeypatch):
         """Test that None is returned when no secret is configured."""
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.publish_secret_checks._get_publish_secret_code", lambda: ""
+            "src.main_app.shared.core.cors.publish_secret_checks._get_publish_secret_code", lambda: ""
         )
 
         with app.test_request_context():
@@ -57,7 +57,7 @@ class TestCheckPublishSecretCode:
     def test_returns_none_when_no_header_present(self, app, monkeypatch):
         """Test that None is returned when X-Secret-Key header is missing."""
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
+            "src.main_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
             lambda: "expected_secret",
         )
 
@@ -69,7 +69,7 @@ class TestCheckPublishSecretCode:
     def test_returns_none_when_header_does_not_match(self, app, monkeypatch):
         """Test that None is returned when header value does not match."""
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
+            "src.main_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
             lambda: "expected_secret",
         )
 
@@ -81,7 +81,7 @@ class TestCheckPublishSecretCode:
     def test_returns_host_when_header_matches(self, app, monkeypatch):
         """Test that host is returned when header value matches."""
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
+            "src.main_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
             lambda: "correct_secret",
         )
 
@@ -93,7 +93,7 @@ class TestCheckPublishSecretCode:
     def test_uses_request_host_when_origin_missing(self, app, monkeypatch):
         """Test that request host is used when Origin header is missing."""
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
+            "src.main_app.shared.core.cors.publish_secret_checks._get_publish_secret_code",
             lambda: "correct_secret",
         )
 
@@ -105,10 +105,10 @@ class TestCheckPublishSecretCode:
     def test_uses_timing_safe_comparison(self, app, monkeypatch):
         """Test that timing-safe comparison is used (hmac.compare_digest)."""
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.publish_secret_checks._get_publish_secret_code", lambda: "secret"
+            "src.main_app.shared.core.cors.publish_secret_checks._get_publish_secret_code", lambda: "secret"
         )
 
-        with patch("src.sqlalchemy_app.shared.core.cors.publish_secret_checks.hmac.compare_digest") as mock_compare:
+        with patch("src.main_app.shared.core.cors.publish_secret_checks.hmac.compare_digest") as mock_compare:
             mock_compare.return_value = True
 
             with app.test_request_context(headers={"X-Secret-Key": "secret"}):

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from src.sqlalchemy_app.shared.services.qid_service import (
+from src.main_app.shared.services.qid_service import (
     add_qid,
     delete_qid,
     get_page_qid,
@@ -9,7 +9,7 @@ from src.sqlalchemy_app.shared.services.qid_service import (
     list_qids,
     update_qid,
 )
-from src.sqlalchemy_app.sqlalchemy_models import QidRecord
+from src.main_app.sqlalchemy_models import QidRecord
 
 
 def test_qid_workflow():

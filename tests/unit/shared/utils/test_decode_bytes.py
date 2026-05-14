@@ -3,7 +3,7 @@ Tests for shared.utils.decode_bytes module.
 """
 
 import pytest
-from src.sqlalchemy_app.shared.utils.decode_bytes import coerce_bytes
+from src.main_app.shared.utils.decode_bytes import coerce_bytes
 
 
 class TestCoerceBytes:

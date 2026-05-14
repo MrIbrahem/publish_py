@@ -1,5 +1,5 @@
 """
-Integration tests for src/sqlalchemy_app/admin/routes/settings.py module.
+Integration tests for src/main_app/admin/routes/settings.py module.
 
 TODO: should mock admin_required decorator
 """
@@ -27,7 +27,7 @@ class TestSettingsDashboard:
     def test_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
         """Test that settings dashboard lists settings."""
 
-        with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
+        with patch("src.main_app.shared.services.setting_service.list_settings") as mock_list:
             mock_setting = MagicMock()
             mock_setting.key = "test_setting"
             mock_setting.value_type = "boolean"
@@ -57,7 +57,7 @@ class TestCreateSetting:
     def test_create_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test creating setting with valid data."""
 
-        with patch("src.sqlalchemy_app.shared.services.setting_service.add_setting") as mock_add:
+        with patch("src.main_app.shared.services.setting_service.add_setting") as mock_add:
             mock_add.return_value = MagicMock(key="new_setting")
 
             response = auth_client.post(
@@ -110,7 +110,7 @@ class TestUpdateSetting:
         mock_setting.value_type = "boolean"
         mock_setting.id = 1
 
-        with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
+        with patch("src.main_app.shared.services.setting_service.list_settings") as mock_list:
             mock_list.return_value = [mock_setting]
 
             response = auth_client.post(
@@ -129,7 +129,7 @@ class TestUpdateSetting:
         mock_setting.value_type = "boolean"
         mock_setting.id = 1
 
-        with patch("src.sqlalchemy_app.shared.services.setting_service.list_settings") as mock_list:
+        with patch("src.main_app.shared.services.setting_service.list_settings") as mock_list:
             mock_list.return_value = [mock_setting]
 
             response = auth_client.post(

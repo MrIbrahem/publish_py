@@ -16,9 +16,9 @@ class TestCorsIntegration1:
         """Test that CORS headers are set for allowed origins."""
         # Mock is_allowed to return an allowed origin
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com"
+            "src.main_app.shared.core.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com"
         )
-        monkeypatch.setattr("src.sqlalchemy_app.shared.core.cors.is_allowed", lambda req: "https://example.com")
+        monkeypatch.setattr("src.main_app.shared.core.cors.is_allowed", lambda req: "https://example.com")
 
         response = client.get("/", headers={"Origin": "https://example.com"})
 
@@ -41,9 +41,9 @@ class TestCorsIntegration2:
         """Test that CORS headers are set for allowed origins."""
         # Mock is_allowed to return an allowed origin
         monkeypatch.setattr(
-            "src.sqlalchemy_app.shared.core.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com"
+            "src.main_app.shared.core.cors.is_allowed_checker.is_allowed", lambda req: "https://example.com"
         )
-        monkeypatch.setattr("src.sqlalchemy_app.shared.core.cors.is_allowed", lambda req: "https://example.com")
+        monkeypatch.setattr("src.main_app.shared.core.cors.is_allowed", lambda req: "https://example.com")
 
         response = client.get("/", headers={"Origin": "https://example.com"})
 

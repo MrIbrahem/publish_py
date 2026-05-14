@@ -9,8 +9,8 @@ You will receive these files:
     -   `src/results_api_php`
 
 -   Python source:
-    -   `src/sqlalchemy_app/public/routes/main/routes.py`
-    -   `src/sqlalchemy_app/public/routes/main/results_api.py`
+    -   `src/main_app/public/routes/main/routes.py`
+    -   `src/main_app/public/routes/main/results_api.py`
 
 The PHP code currently works and returns real results.
 The Python code currently only parses query parameters and returns an empty result.
