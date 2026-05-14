@@ -15,8 +15,9 @@ pymysql.install_as_MySQLdb()
 
 # Load environment variables before any other imports
 
+_env_file_path = str(Path(__file__).parent.parent.parent / ".env")
 try:
-    load_dotenv()
+    load_dotenv(_env_file_path)
 except Exception:
     logging.warning("Failed to load .env file from current working directory")
 
