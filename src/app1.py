@@ -1,6 +1,6 @@
 """
 # isort:skip_file
-WSGI entry point for the Flask application for Development
+WSGI development entry point for the app.
 """
 
 from __future__ import annotations
