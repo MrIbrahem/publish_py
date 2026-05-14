@@ -26,11 +26,11 @@ BaseDb = Model  # For backward compatibility
 def get_session():
     """
     Compatibility wrapper that returns Flask-SQLAlchemy's session.
-    
+
     This is a temporary compatibility layer. New code should use db.session directly.
     The session is automatically managed by Flask-SQLAlchemy and will be cleaned up
     after the request context ends.
-    
+
     Usage:
         with get_session() as session:
             session.query(Model).all()
@@ -52,7 +52,7 @@ def get_session():
 def build_db_url(db_data: dict[str, str]) -> str:
     """
     Build database URL from configuration dict.
-    
+
     DEPRECATED: This function is deprecated. Database URL should be configured
     through Flask-SQLAlchemy's SQLALCHEMY_DATABASE_URI config.
     """
@@ -67,7 +67,7 @@ def build_db_url(db_data: dict[str, str]) -> str:
 def init_db(db_url: str, create_tables: bool = False) -> None:
     """
     Initialize the database.
-    
+
     DEPRECATED: This function is deprecated. Database initialization is now
     handled by Flask-SQLAlchemy through db.init_app() in the application factory.
     """

@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ...extensions import db
 from ...sqlalchemy_models import PageRecord
+from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 

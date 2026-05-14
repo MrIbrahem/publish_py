@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ...extensions import db
 from ...sqlalchemy_models import UserRecord
+from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -73,10 +74,10 @@ def add_user(
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-            raise ValueError(f"User '{username}' already exists") from None
+        raise ValueError(f"User '{username}' already exists") from None
 
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def update_user(

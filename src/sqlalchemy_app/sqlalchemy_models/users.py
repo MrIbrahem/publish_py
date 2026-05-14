@@ -78,7 +78,9 @@ class UserRecord(Model):
     username = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=False, default="")
     wiki = db.Column(db.String(255), nullable=False, default="")
-    user_group = db.Column(db.String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'"))
+    user_group = db.Column(
+        db.String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'")
+    )
     reg_date = db.Column(db.DateTime, nullable=False, server_default=func.current_timestamp())
 
     def __init__(self, **kwargs):

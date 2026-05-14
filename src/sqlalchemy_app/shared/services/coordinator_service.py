@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ...extensions import db
 from ...sqlalchemy_models import CoordinatorRecord
+from ..engine import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +74,8 @@ def add_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
     # Refresh to get the ID and other defaults
     db.session.refresh(record)
     active_coordinators.cache_clear()
-        # return record
-        return CoordinatorRecord(**record.to_dict())
+    # return record
+    return CoordinatorRecord(**record.to_dict())
 
 
 def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:

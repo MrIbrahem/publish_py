@@ -110,7 +110,7 @@ def create_app(config_class: Type | None = None) -> Flask:
 
     # Initialize Flask-SQLAlchemy
     db.init_app(app)
-    
+
     # Initialize Flask-Migrate
     migrate.init_app(app, db)
 
@@ -119,7 +119,7 @@ def create_app(config_class: Type | None = None) -> Flask:
         with app.app_context():
             # Import all models to ensure they are registered with SQLAlchemy
             from . import sqlalchemy_models  # noqa: F401
-            
+
             db.create_all()
 
     app.register_blueprint(bp_main)
