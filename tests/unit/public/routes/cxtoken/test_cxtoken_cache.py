@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from src.sqlalchemy_app.public.routes.cxtoken.cache import (
+from src.main_app.public.routes.cxtoken.cache import (
     CxToken,
     cache,
     get_from_store,
@@ -19,7 +19,7 @@ from src.sqlalchemy_app.public.routes.cxtoken.cache import (
 @pytest.fixture(autouse=True)
 def clear_cache_fixture():
     """Clear cache before and after each test."""
-    from src.sqlalchemy_app.public.routes.cxtoken.cache import cache
+    from src.main_app.public.routes.cxtoken.cache import cache
 
     cache.clear()
     yield

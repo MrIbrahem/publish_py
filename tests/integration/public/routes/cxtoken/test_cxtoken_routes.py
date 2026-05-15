@@ -1,5 +1,5 @@
 """
-Integration tests for src/sqlalchemy_app/public/routes/cxtoken/routes.py module.
+Integration tests for src/main_app/public/routes/cxtoken/routes.py module.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ class TestCxTokenGet:
 
     def test_missing_parameters_returns_400(self, client: FlaskClient):
         """Test that missing wiki/user parameters returns 400."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
             response = client.get("/cxtoken/")
@@ -48,7 +48,7 @@ class TestCxTokenGet:
 
     def test_missing_wiki_returns_400(self, client: FlaskClient):
         """Test that missing wiki parameter returns 400."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
             response = client.get("/cxtoken/?user=TestUser")
@@ -57,7 +57,7 @@ class TestCxTokenGet:
 
     def test_missing_user_returns_400(self, client: FlaskClient):
         """Test that missing user parameter returns 400."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
             response = client.get("/cxtoken/?wiki=en")
@@ -66,10 +66,10 @@ class TestCxTokenGet:
 
     def test_no_user_token_returns_403(self, client: FlaskClient):
         """Test that request without valid user token returns 403."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+            with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
                 mock_get_token.return_value = None
 
                 response = client.get("/cxtoken/?wiki=en&user=TestUser")
@@ -80,19 +80,19 @@ class TestCxTokenGet:
 
     def test_valid_request_returns_cxtoken(self, client: FlaskClient):
         """Test that valid request returns cxtoken."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
             mock_user_token = MagicMock()
             mock_user_token.decrypted.return_value = ("access_key", "access_secret")
 
-            with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+            with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
                 mock_get_token.return_value = mock_user_token
 
-                with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
+                with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
                     mock_get_cxtoken.return_value = {"csrftoken": "test_token_123"}
 
-                    with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.store_jwt"):
+                    with patch("src.main_app.public.routes.cxtoken.routes.store_jwt"):
                         response = client.get("/cxtoken/?wiki=en&user=TestUser")
 
                         assert response.status_code == 200
@@ -106,10 +106,10 @@ class TestCxTokenCache:
 
     def test_cached_cxtoken_returned_from_cache(self, client: FlaskClient):
         """Test that cached cxtoken is returned from cache."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_from_store") as mock_from_store:
+            with patch("src.main_app.public.routes.cxtoken.routes.get_from_store") as mock_from_store:
                 mock_from_store.return_value = {"csrftoken": "cached_token_123"}
 
                 response = client.get("/cxtoken/?wiki=en&user=TestUser")
@@ -125,13 +125,13 @@ class TestCxTokenUserFormatting:
 
     def test_user_underscores_replaced_with_spaces(self, client: FlaskClient):
         """Test that underscores in username are replaced with spaces."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+            with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
                 mock_get_token.return_value = None
 
-                with patch("src.sqlalchemy_app.public.routes.cxtoken.routes._format_user") as mock_format:
+                with patch("src.main_app.public.routes.cxtoken.routes._format_user") as mock_format:
                     mock_format.return_value = "Test User"
 
                     response = client.get("/cxtoken/?wiki=en&user=Test_User")
@@ -141,15 +141,13 @@ class TestCxTokenUserFormatting:
 
     def test_special_users_mapping_applied(self, client: FlaskClient):
         """Test that special user mappings are applied."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.settings") as mock_settings:
+            with patch("src.main_app.public.routes.cxtoken.routes.settings") as mock_settings:
                 mock_settings.users.special_users = {"SpecialUser": "MappedUser"}
 
-                with patch(
-                    "src.sqlalchemy_app.public.routes.cxtoken.routes.get_user_token_by_username"
-                ) as mock_get_token:
+                with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
                     mock_get_token.return_value = None
 
                     response = client.get("/cxtoken/?wiki=en&user=SpecialUser")
@@ -169,14 +167,14 @@ class TestCxtokenRouteIntegration:
 
     def test_cxtoken_rejects_missing_user_param(self, client):
         """Test that cxtoken route rejects requests without user parameter."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
             response = client.get("/cxtoken/?wiki=arwiki")
             assert response.status_code == 400
 
     def test_cxtoken_rejects_missing_wiki_param(self, auth_client):
         """Test that cxtoken route rejects requests without wiki parameter."""
-        with patch("src.sqlalchemy_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
+        with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
             response = auth_client.get("/cxtoken/")
             assert response.status_code == 400

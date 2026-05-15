@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.sqlalchemy_app.shared.services.in_process_service import (
+from src.main_app.shared.services.in_process_service import (
     add_in_process,
     delete_in_process,
     delete_in_process_by_title_user_lang,
@@ -14,7 +14,7 @@ from src.sqlalchemy_app.shared.services.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
-from src.sqlalchemy_app.sqlalchemy_models import InProcessRecord
+from src.main_app.sqlalchemy_models import InProcessRecord
 
 
 def test_in_process_workflow():
@@ -133,7 +133,7 @@ class TestAddInProcess:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.sqlalchemy_app.shared.services.in_process_service.get_session") as mock_get_session:
+        with patch("src.main_app.shared.services.in_process_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session

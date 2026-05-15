@@ -53,7 +53,7 @@ def generate_domain_test_placeholders(src_root, test_root):
 if __name__ == "__main__":
     main_path = Path(__file__).parent.parent
 
-    SOURCE_DIR = main_path / "src/sqlalchemy_app"
+    SOURCE_DIR = main_path / "src/main_app"
     TEST_DIR = main_path / "tests/unit"
 
     print(f"SOURCE_DIR: {SOURCE_DIR}")

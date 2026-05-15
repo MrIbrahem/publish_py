@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.sqlalchemy_app.shared.utils.helpers.files import _get_rand_id, get_reports_dir, to_do
+from src.main_app.shared.utils.helpers.files import _get_rand_id, get_reports_dir, to_do
 
 
 class TestGetRandId:
@@ -38,7 +38,7 @@ class TestGetReportsDir:
                 flask_data_dir=Path(tmpdir),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.sqlalchemy_app.shared.utils.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.main_app.shared.utils.helpers.files.settings", mock_settings)
 
             reports_dir = get_reports_dir()
             assert reports_dir.exists()
@@ -52,7 +52,7 @@ class TestGetReportsDir:
                 flask_data_dir=Path(tmpdir),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.sqlalchemy_app.shared.utils.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.main_app.shared.utils.helpers.files.settings", mock_settings)
 
             reports_dir = get_reports_dir()
             now = datetime.now()
@@ -77,7 +77,7 @@ class TestToDo:
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.sqlalchemy_app.shared.utils.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.main_app.shared.utils.helpers.files.settings", mock_settings)
 
             tab = {"title": "Test Page", "user": "TestUser"}
             to_do(tab, "success")
@@ -105,7 +105,7 @@ class TestToDo:
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.sqlalchemy_app.shared.utils.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.main_app.shared.utils.helpers.files.settings", mock_settings)
 
             tab = {"title": "Test Page", "user": "TestUser"}
             to_do(tab, "success")
@@ -139,7 +139,7 @@ class TestToDo:
                 publish_reports_dir=Path(f"{tmpdir}/publish_reports/reports_by_day"),
             )
             mock_settings = SimpleNamespace(paths=mock_paths)
-            monkeypatch.setattr("src.sqlalchemy_app.shared.utils.helpers.files.settings", mock_settings)
+            monkeypatch.setattr("src.main_app.shared.utils.helpers.files.settings", mock_settings)
 
             tab = {"title": "Test"}
             to_do(tab, "test")

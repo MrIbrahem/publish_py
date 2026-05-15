@@ -11,7 +11,7 @@ def rename_test_files_recursive(root_dir):
 
     # Matches the import line and captures the service name in Group 1
     # Note: (?:...) is a non-capturing group for the module path
-    import_pattern = re.compile(r"from src\.sqlalchemy_app\.(?:admin|public|shared)\.services\.(.*?) import \(")
+    import_pattern = re.compile(r"from src\.main_app\.(?:admin|public|shared)\.services\.(.*?) import \(")
 
     if not os.path.exists(root_dir):
         print(f"Directory '{root_dir}' not found.")

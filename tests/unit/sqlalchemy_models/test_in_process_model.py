@@ -6,7 +6,7 @@ Tests for InProcessRecord.
 
 from datetime import datetime
 
-from src.sqlalchemy_app.sqlalchemy_models import InProcessRecord
+from src.main_app.sqlalchemy_models import InProcessRecord
 
 
 class TestInProcessRecord:

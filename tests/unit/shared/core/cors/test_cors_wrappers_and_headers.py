@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.sqlalchemy_app.shared.core.cors import check_cors, validate_access
+from src.main_app.shared.core.cors import check_cors, validate_access
 
 
 def _make_response_with_headers():

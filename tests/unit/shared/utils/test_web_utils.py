@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.sqlalchemy_app.shared.utils.web_utils import parse_select_fields
+from src.main_app.shared.utils.web_utils import parse_select_fields
 
 
 class TestParseSelectFields:

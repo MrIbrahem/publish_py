@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.sqlalchemy_app.shared.services.user_service import (
+from src.main_app.shared.services.user_service import (
     add_user,
     delete_user,
     get_user,
@@ -12,7 +12,7 @@ from src.sqlalchemy_app.shared.services.user_service import (
     update_user_data,
     user_exists,
 )
-from src.sqlalchemy_app.sqlalchemy_models import UserRecord
+from src.main_app.sqlalchemy_models import UserRecord
 
 
 def test_user_workflow():
@@ -98,7 +98,7 @@ class TestAddUser:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.sqlalchemy_app.shared.services.user_service.get_session") as mock_get_session:
+        with patch("src.main_app.shared.services.user_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
