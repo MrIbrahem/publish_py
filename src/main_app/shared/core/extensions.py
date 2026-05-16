@@ -12,13 +12,33 @@ Usage:
 """
 
 from __future__ import annotations
+import logging
 from typing import Any
 
 from flask import Blueprint, Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, text
+
+from sqlalchemy import Text
+from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
+from sqlalchemy.types import TypeDecorator
+
+logger = logging.getLogger(__name__)
+
+
+class LONGTEXT(TypeDecorator):
+    """LONGTEXT for MySQL, Text for everything else."""
+
+    impl = Text
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "mysql":
+            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
+        return dialect.type_descriptor(Text())
+
 
 class Base:
     """
@@ -75,6 +95,42 @@ def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
     """Exempt a blueprint from CSRF protection."""
     if app.config.get("WTF_CSRF_ENABLED"):
         csrf.exempt(bp_publish)
+
+
+@event.listens_for(db.metadata, "after_create")
+def create_views_new_all_view(target, connection, **kw):
+    inspector = inspect(connection)
+    existing_views = inspector.get_view_names()
+
+    views_to_create = {
+        table.name: table.info.get("create_query")
+        for table in target.tables.values()
+        if table.info.get("is_view") and table.info.get("create_query")
+    }
+
+    views_to_create[
+        "users_list"
+    ] = """
+        CREATE VIEW users_list AS
+            select
+                u.user_id AS user_id,
+                u.username AS username,
+                u.wiki AS wiki,
+                u.user_group AS user_group,
+                u.reg_date AS reg_date
+            from
+                users u
+    """
+
+    for name, query in views_to_create.items():
+        if name not in existing_views:
+            try:
+                connection.execute(text(query))
+                logger.info(f"Successfully created view: {name}")
+            except Exception as e:
+                logger.exception(f"Error creating view {name}", exc_info=True)
+        else:
+            logger.info(f"View '{name}' already exists, skipping.")
 
 
 __all__ = [

@@ -9,9 +9,7 @@ from typing import Any, Optional
 
 from sqlalchemy import Column, Enum, Integer, String, text
 
-# from sqlalchemy.dialects.mysql import LONGTEXT
-from ..shared.engine import LONGTEXT
-from ..shared.core.extensions import db
+from ..shared.core.extensions import db, LONGTEXT
 logger = logging.getLogger(__name__)
 
 
