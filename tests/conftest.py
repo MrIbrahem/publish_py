@@ -160,15 +160,19 @@ def db_config():
 
 
 @pytest.fixture(autouse=True)
-def setup_db(app):
+def setup_db():
     """Initialize an in-memory SQLite database for tests."""
     from src.main_app.shared import engine as engine_mod
-    from src.main_app.shared.engine import BaseDb
+    from src.main_app.shared.engine import BaseDb, build_engine
     from src.main_app.shared.core.extensions import db
 
-    # Use the same engine that Flask-SQLAlchemy already created from
-    # TestingConfig.SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    engine = db.engine
+    # Try to use Flask-SQLAlchemy's engine if available (from TestingConfig)
+    try:
+        engine = db.engine
+    except RuntimeError:
+        # Fallback: create standalone in-memory engine
+        engine = build_engine("sqlite:///:memory:")
+
     engine_mod._SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
 
     meta = MetaData()
