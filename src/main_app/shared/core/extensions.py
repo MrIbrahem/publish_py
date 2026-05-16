@@ -19,7 +19,7 @@ from flask import Blueprint, Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import MetaData, text
+from sqlalchemy import MetaData, event, inspect, text
 
 from sqlalchemy import Text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
