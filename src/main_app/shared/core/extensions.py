@@ -28,18 +28,6 @@ from sqlalchemy.types import TypeDecorator
 logger = logging.getLogger(__name__)
 
 
-class LONGTEXT(TypeDecorator):
-    """LONGTEXT for MySQL, Text for everything else."""
-
-    impl = Text
-    cache_ok = True
-
-    def load_dialect_impl(self, dialect):
-        if dialect.name == "mysql":
-            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
-        return dialect.type_descriptor(Text())
-
-
 class Base:
     """
     Base class for database models.
@@ -131,6 +119,18 @@ def create_views_new_all_view(target, connection, **kw):
                 logger.exception(f"Error creating view {name}", exc_info=True)
         else:
             logger.info(f"View '{name}' already exists, skipping.")
+
+
+class LONGTEXT(TypeDecorator):
+    """LONGTEXT for MySQL, Text for everything else."""
+
+    impl = Text
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "mysql":
+            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
+        return dialect.type_descriptor(Text())
 
 
 __all__ = [
