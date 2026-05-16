@@ -29,9 +29,14 @@ def csrf_app() -> Flask:
             "WTF_CSRF_SSL_STRICT": False,
             "TESTING": True,
             "CORS_DISABLED": False,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
         }
     )
     app.url_map.strict_slashes = False
+
+    from src.main_app.shared.core.extensions import db
+
+    db.init_app(app)
 
     csrf = CSRFProtect(app)
     from src.main_app.public.routes.publish.routes import bp_publish
