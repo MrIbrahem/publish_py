@@ -160,17 +160,18 @@ def db_config():
 
 
 @pytest.fixture(autouse=True)
-def setup_db():
-    """Initialize an in-memory SQLite database for tests."""
-    from src.main_app.shared import engine as engine_mod
-    from src.main_app.shared.engine import (
-        BaseDb,
-        build_engine,
-        init_db,
-    )
+def setup_db(app):
+    """Initialize an in-memory SQLite database for tests.
 
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
+    Uses Flask-SQLAlchemy's db instance so services that call db.session
+    work correctly within the app context.
+    """
+    from src.main_app.shared import engine as engine_mod
+    from src.main_app.shared.core.extensions import db
+    from src.main_app.shared.engine import BaseDb
+
+    # app fixture already pushes app_context, so db.engine is available
+    engine = db.engine
 
     meta = MetaData()
     pages_users = Table(
@@ -190,7 +191,7 @@ def setup_db():
         Column("deleted", Integer, nullable=False, server_default=text("0")),
         Column("mdwiki_revid", Integer, nullable=True),
     )
-    pages_users.create(engine)
+    pages_users.create(engine, checkfirst=True)
 
     # Create views_new table first (needed for views_new_all view)
     views_new = Table(
@@ -203,7 +204,7 @@ def setup_db():
         Column("views", Integer, nullable=True),
         UniqueConstraint("target", "lang", "year", name="target_lang_year"),
     )
-    views_new.create(engine)
+    views_new.create(engine, checkfirst=True)
 
     # Create views_new_all as a view
     with engine.connect() as conn:
@@ -219,17 +220,19 @@ def setup_db():
         )
         conn.commit()
 
-    # Create all other tables except views_new_all (which is already created as a view)
-    for table in BaseDb.metadata.sorted_tables:
-        if table.name != "views_new_all":
-            table.create(engine, checkfirst=True)
+    # Create all ORM model tables (except views)
+    real_tables = [t for t in BaseDb.metadata.tables.values() if not t.info.get("is_view")]
+    BaseDb.metadata.create_all(engine, tables=real_tables, checkfirst=True)
 
+    # Also set up legacy _SessionFactory pointing to the SAME engine
+    # so any remaining get_session() calls in tests still work
     factory = sessionmaker(bind=engine, expire_on_commit=False)
 
     with patch.object(engine_mod, "_SessionFactory", factory):
         yield
 
-    engine.dispose()
+    # Clean up session state between tests
+    db.session.remove()
 
 
 @pytest.fixture
