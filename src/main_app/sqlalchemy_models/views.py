@@ -22,9 +22,9 @@ class EnwikiPageviewRecord(db.Model):
 
     __tablename__ = "enwiki_pageviews"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), unique=True, nullable=False)
-    en_views = Column(Integer, default=0, server_default=text("0"))
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    title =db.Column(String(120), unique=True, nullable=False)
+    en_views =db.Column(Integer, default=0, server_default=text("0"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -49,11 +49,11 @@ class ViewsNewRecord(db.Model):
 
     __tablename__ = "views_new"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    target = Column(String(120), nullable=False)
-    lang = Column(String(30), nullable=False)
-    year = Column(Integer, nullable=False)
-    views = Column(Integer, default=0, server_default=text("0"))
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    target =db.Column(String(120), nullable=False)
+    lang =db.Column(String(30), nullable=False)
+    year =db.Column(Integer, nullable=False)
+    views =db.Column(Integer, default=0, server_default=text("0"))
 
     __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 
@@ -76,9 +76,9 @@ class ViewsNewAllRecord(db.Model):
 
     __tablename__ = "views_new_all"
 
-    target = Column(String(120), primary_key=True, nullable=False)
-    lang = Column(String(30), primary_key=True, nullable=False)
-    views = Column(Integer, default=0, server_default=text("0"))
+    target =db.Column(String(120), primary_key=True, nullable=False)
+    lang =db.Column(String(30), primary_key=True, nullable=False)
+    views =db.Column(Integer, default=0, server_default=text("0"))
 
     __table_args__ = (
         # Prevent SQLAlchemy from trying to create this as a table

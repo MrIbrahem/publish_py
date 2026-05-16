@@ -35,19 +35,19 @@ class PageRecord(db.Model):
 
     __tablename__ = "pages"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), nullable=False)
-    word = Column(Integer, nullable=True)
-    translate_type = Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
-    cat = Column(String(120), nullable=True)
-    lang = Column(String(30), nullable=True)
-    user = Column(String(120), nullable=True)
-    target = Column(String(120), nullable=True)
-    date = Column(Date, nullable=True)
-    pupdate = Column(String(120), nullable=True)
-    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-    deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
-    mdwiki_revid = Column(Integer, nullable=True)
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    title =db.Column(String(120), nullable=False)
+    word =db.Column(Integer, nullable=True)
+    translate_type =db.Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
+    cat =db.Column(String(120), nullable=True)
+    lang =db.Column(String(30), nullable=True)
+    user =db.Column(String(120), nullable=True)
+    target =db.Column(String(120), nullable=True)
+    date =db.Column(Date, nullable=True)
+    pupdate =db.Column(String(120), nullable=True)
+    add_date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    deleted =db.Column(Integer, nullable=False, default=0, server_default=text("0"))
+    mdwiki_revid =db.Column(Integer, nullable=True)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -80,19 +80,19 @@ class UserPageRecord(db.Model):
 
     __tablename__ = "pages_users"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), nullable=False)
-    word = Column(Integer, nullable=True)
-    translate_type = Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
-    cat = Column(String(120), nullable=True)
-    lang = Column(String(30), nullable=True)
-    user = Column(String(120), nullable=True)
-    target = Column(String(120), nullable=True)
-    date = Column(Date, nullable=True)
-    pupdate = Column(String(120), nullable=True)
-    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-    deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
-    mdwiki_revid = Column(Integer, nullable=True)
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    title =db.Column(String(120), nullable=False)
+    word =db.Column(Integer, nullable=True)
+    translate_type =db.Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
+    cat =db.Column(String(120), nullable=True)
+    lang =db.Column(String(30), nullable=True)
+    user =db.Column(String(120), nullable=True)
+    target =db.Column(String(120), nullable=True)
+    date =db.Column(Date, nullable=True)
+    pupdate =db.Column(String(120), nullable=True)
+    add_date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    deleted =db.Column(Integer, nullable=False, default=0, server_default=text("0"))
+    mdwiki_revid =db.Column(Integer, nullable=True)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -115,10 +115,10 @@ class PagesUsersToMainRecord(db.Model):
 
     __tablename__ = "pages_users_to_main"
 
-    id = Column(Integer, ForeignKey("pages_users.id"), primary_key=True)
-    new_target = Column(String(255), nullable=False, default="")
-    new_user = Column(String(255), nullable=False, default="")
-    new_qid = Column(String(255), nullable=False, default="")
+    id =db.Column(Integer, ForeignKey("pages_users.id"), primary_key=True)
+    new_target =db.Column(String(255), nullable=False, default="")
+    new_user =db.Column(String(255), nullable=False, default="")
+    new_qid =db.Column(String(255), nullable=False, default="")
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -149,14 +149,14 @@ class InProcessRecord(db.Model):
 
     __tablename__ = "in_process"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(255), nullable=False)
-    user = Column(String(255), nullable=False)
-    lang = Column(String(30), nullable=False)
-    cat = Column(String(255), default="RTT", server_default=text("'RTT'"))
-    translate_type = Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
-    word = Column(Integer, default=0, server_default=text("0"))
-    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    title =db.Column(String(255), nullable=False)
+    user =db.Column(String(255), nullable=False)
+    lang =db.Column(String(30), nullable=False)
+    cat =db.Column(String(255), default="RTT", server_default=text("'RTT'"))
+    translate_type =db.Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
+    word =db.Column(Integer, default=0, server_default=text("0"))
+    add_date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided

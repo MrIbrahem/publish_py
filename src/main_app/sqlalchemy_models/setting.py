@@ -28,11 +28,11 @@ class LanguageSettingRecord(db.Model):
 
     __tablename__ = "language_settings"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    lang_code = Column(String(20), unique=True, nullable=True)
-    move_dots = Column(Integer, default=0, server_default=text("0"))
-    expend = Column(Integer, default=0, server_default=text("0"))
-    add_en_lang = Column(Integer, default=0, server_default=text("0"))
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    lang_code =db.Column(String(20), unique=True, nullable=True)
+    move_dots =db.Column(Integer, default=0, server_default=text("0"))
+    expend =db.Column(Integer, default=0, server_default=text("0"))
+    add_en_lang =db.Column(Integer, default=0, server_default=text("0"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -60,14 +60,14 @@ class SettingRecord(db.Model):
 
     __tablename__ = "new_settings"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    key = Column(String(190), unique=True, nullable=False)
-    title = Column(String(500), nullable=False)
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    key =db.Column(String(190), unique=True, nullable=False)
+    title =db.Column(String(500), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    value = Column(LONGTEXT, nullable=True)
+    value =db.Column(LONGTEXT, nullable=True)
 
-    value_type = Column(
+    value_type =db.Column(
         Enum("boolean", "string", "integer", name="setting_value_type"),
         nullable=False,
         default="boolean",

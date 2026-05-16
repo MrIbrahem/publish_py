@@ -22,9 +22,9 @@ class AllArticlesRecord(db.Model):
 
     __tablename__ = "all_articles"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    article_id = Column(String(255), unique=True, nullable=False)
-    category = Column(String(255), nullable=True)
+    id = db.Column(Integer, primary_key=True, autoincrement=True)
+    article_id =db.Column(String(255), unique=True, nullable=False)
+    category =db.Column(String(255), nullable=True)
 
 
 __all__ = [

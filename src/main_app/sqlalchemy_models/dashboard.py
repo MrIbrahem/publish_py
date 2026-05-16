@@ -30,13 +30,13 @@ class CategoryRecord(db.Model):
 
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    category = Column(String(120), unique=True, nullable=False)
-    campaign = Column(String(120), nullable=False, default="")
-    display = Column(String(120), nullable=False, default="")
-    category2 = Column(String(120), nullable=False, default="")
-    depth = Column(Integer, nullable=False, default=0)
-    is_default = Column(Integer, nullable=False, default=0)
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    category =db.Column(String(120), unique=True, nullable=False)
+    campaign =db.Column(String(120), nullable=False, default="")
+    display =db.Column(String(120), nullable=False, default="")
+    category2 =db.Column(String(120), nullable=False, default="")
+    depth =db.Column(Integer, nullable=False, default=0)
+    is_default =db.Column(Integer, nullable=False, default=0)
 
     def __init__(self, **kwargs):
         # Convert depth and is_default to int if provided as strings
@@ -71,8 +71,8 @@ class ProjectRecord(db.Model):
 
     __tablename__ = "projects"
 
-    g_id = Column(Integer, primary_key=True, autoincrement=True)
-    g_title = Column(String(120), unique=True, nullable=False)
+    g_id =db.Column(Integer, primary_key=True, autoincrement=True)
+    g_title =db.Column(String(120), unique=True, nullable=False)
 
 
 __all__ = [

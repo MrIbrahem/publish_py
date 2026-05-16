@@ -31,16 +31,16 @@ class ReportRecord(db.Model):
 
     __tablename__ = "publish_reports"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-    title = Column(String(255), nullable=False)
-    user = Column(String(255), nullable=False)
-    lang = Column(String(255), nullable=False)
-    sourcetitle = Column(String(255), nullable=False)
-    result = Column(String(255), nullable=False)
+    id =db.Column(Integer, primary_key=True, autoincrement=True)
+    date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    title =db.Column(String(255), nullable=False)
+    user =db.Column(String(255), nullable=False)
+    lang =db.Column(String(255), nullable=False)
+    sourcetitle =db.Column(String(255), nullable=False)
+    result =db.Column(String(255), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    data = Column(LONGTEXT, nullable=False)
+    data =db.Column(LONGTEXT, nullable=False)
 
 
 __all__ = [
