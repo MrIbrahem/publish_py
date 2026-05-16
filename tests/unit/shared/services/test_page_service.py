@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.engine import get_session
+from src.main_app.shared.core.extensions import db
 from src.main_app.shared.services.page_service import (
     add_page,
     delete_page,
@@ -32,12 +32,11 @@ def test_page_workflow():
     updated = update_page(p.id, "COVID-19", "COVID-19.html")
     assert updated.title == "COVID-19"
 
-    with get_session() as session:
-        orm_p = session.query(PageRecord).filter(PageRecord.id == p.id).first()
-        orm_p.lang = "en"
-        orm_p.user = "WikiUser"
-        orm_p.target = ""
-        session.commit()
+    orm_p = db.session.query(PageRecord).filter(PageRecord.id == p.id).first()
+    orm_p.lang = "en"
+    orm_p.user = "WikiUser"
+    orm_p.target = ""
+    db.session.commit()
 
     assert find_exists_or_update_page("COVID-19", "en", "WikiUser", "Pandemic_target.html") is True
 
@@ -126,9 +125,8 @@ class TestFindExistsOrUpdate:
     def test_updates_target_if_empty(self, monkeypatch):
         """Test that function updates target if empty."""
         # Manual insert to set specific fields
-        with get_session() as session:
-            session.add(PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
-            session.commit()
+        db.session.add(PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
+        db.session.commit()
 
         result = find_exists_or_update_page("Philosophy", "en", "PhilAuthor", "Philosophy_article.html")
         assert result is True
@@ -144,9 +142,8 @@ class TestFindExistsOrUpdate:
         assert result is False
 
     def test_handles_exception_on_commit(self, monkeypatch):
-        with get_session() as session:
-            session.add(PageRecord(title="Error_Page", lang="en", user="U", target=""))
-            session.commit()
+        db.session.add(PageRecord(title="Error_Page", lang="en", user="U", target=""))
+        db.session.commit()
         with patch("src.main_app.shared.services.page_service.db.session") as mock_session:
             mock_session.query.return_value.filter.return_value.all.return_value = [MagicMock(target="")]
             mock_session.commit.side_effect = Exception("DB Error")

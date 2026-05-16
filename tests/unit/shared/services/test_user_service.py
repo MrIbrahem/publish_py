@@ -1,7 +1,8 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
+from src.main_app.shared.core.extensions import db
 from src.main_app.shared.services.user_service import (
     add_user,
     delete_user,
@@ -98,10 +99,7 @@ class TestAddUser:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.shared.services.user_service.get_session") as mock_get_session:
-            mock_session = MagicMock()
-            mock_session.commit.side_effect = IntegrityError(None, None, None)
-            mock_get_session.return_value.__enter__.return_value = mock_session
+        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
             with pytest.raises(ValueError, match="already exists"):
                 add_user("Duplicate")
 
