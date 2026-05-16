@@ -40,3 +40,4 @@ app2.py
 /tests2
 /src1
 /src/results_api_php_code
+*.php

@@ -8,7 +8,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 # --- Data Classes for Configuration Sections ---
 
@@ -90,7 +90,7 @@ class Settings:
     revids_api_url: str
     wikidata_domain: str
     is_localhost: Callable[[str], bool]
-    has_db_config: callable
+    # has_db_config: callable
 
     # Nested configurations
     database_data: DbConfig
