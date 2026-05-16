@@ -104,6 +104,7 @@ class Settings:
 
 # --- Helper Functions ---
 
+
 def _env_bool(name: str, default: bool = False) -> bool:
     """Convert environment variable to boolean."""
     value = os.getenv(name)
