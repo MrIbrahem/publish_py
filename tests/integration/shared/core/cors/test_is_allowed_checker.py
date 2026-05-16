@@ -7,14 +7,24 @@ from typing import Any, Generator
 import pytest
 from flask import Flask
 
+from src.main_app.config import TestingConfig
+
 
 @pytest.fixture
 def app() -> Generator[Flask, Any, None]:
     """Create a test Flask application."""
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.config["TESTING"] = True
-    app.config["CORS_DISABLED"] = False
+    app.config.from_object(TestingConfig)
+
+    from src.main_app.shared.core.extensions import db
+
+    db.init_app(app)
+
+    with app.app_context():
+        real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
+        db.metadata.create_all(db.engine, tables=real_tables)
+
     yield app
 
 
