@@ -9,6 +9,7 @@ import pytest
 from flask import Flask
 from flask.testing import FlaskClient
 
+from src.main_app.config import TestingConfig
 ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
 
@@ -23,10 +24,7 @@ def app() -> Flask:
     app.url_map.strict_slashes = False
     app.secret_key = "test_secret"
 
-    app.config["TESTING"] = True
-    app.config["CORS_DISABLED"] = False
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
-
+    app.config.from_object(TestingConfig)
     from src.main_app.shared.core.extensions import db
 
     db.init_app(app)
