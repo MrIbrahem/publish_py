@@ -47,6 +47,7 @@ if sys:
 # Import after environment setup
 from src.main_app import create_app  # noqa: E402
 from src.main_app.config import TestingConfig  # noqa: E402
+from src.main_app.shared.core.extensions import db as _db  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
