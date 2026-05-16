@@ -4,13 +4,11 @@ import os
 import sys
 from pathlib import Path
 from typing import Any, Generator
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from flask.app import Flask
 from flask.testing import FlaskClient
-from sqlalchemy import Column, Date, DateTime, Integer, MetaData, String, Table, UniqueConstraint, func, text
-from sqlalchemy.orm import sessionmaker
 
 if sys:
     os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
@@ -177,7 +175,7 @@ def setup_db(app):
             for table in _db.metadata.tables.values():
                 if table.info.get("is_view") and table.info.get("create_query"):
                     try:
-                        conn.execute(text(table.info["create_query"]))
+                        conn.execute(_db.text(table.info["create_query"]))
                         conn.commit()
                     except Exception:
                         conn.rollback()
@@ -191,7 +189,7 @@ def setup_db(app):
             for table in _db.metadata.tables.values():
                 if table.info.get("is_view"):
                     try:
-                        conn.execute(text(f"DROP VIEW IF EXISTS {table.name}"))
+                        conn.execute(_db.text(f"DROP VIEW IF EXISTS {table.name}"))
                     except Exception:
                         pass
             conn.commit()

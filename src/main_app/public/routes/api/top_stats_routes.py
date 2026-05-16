@@ -9,7 +9,7 @@ import logging
 from typing import Any, Dict, List
 
 from flask import Response, jsonify, request
-from sqlalchemy import Integer, case, cast, func
+from sqlalchemy import case, cast
 
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
@@ -86,7 +86,7 @@ def get_top_langs() -> Response:
         # Build the views expression (CAST to UNSIGNED)
         views_expr = case(
             (ViewsNewAllRecord.views.is_(None) | (ViewsNewAllRecord.views == ""), 0),
-            else_=cast(ViewsNewAllRecord.views, Integer),
+            else_=cast(ViewsNewAllRecord.views, db.Integer),
         )
 
         # Query with joins
@@ -208,7 +208,7 @@ def get_top_users() -> Response:
         # Build the views expression (CAST to UNSIGNED)
         views_expr = case(
             (ViewsNewAllRecord.views.is_(None) | (ViewsNewAllRecord.views == ""), 0),
-            else_=cast(ViewsNewAllRecord.views, Integer),
+            else_=cast(ViewsNewAllRecord.views, db.Integer),
         )
 
         # Query with joins
