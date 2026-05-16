@@ -8,7 +8,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 
 # --- Data Classes for Configuration Sections ---
 
@@ -20,7 +20,7 @@ class DbConfig:
     db_user: str | None
     db_password: str | None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "db_name": self.db_name,
             "db_host": self.db_host,
@@ -90,6 +90,7 @@ class Settings:
     revids_api_url: str
     wikidata_domain: str
     is_localhost: Callable[[str], bool]
+    has_db_config: callable
 
     # Nested configurations
     database_data: DbConfig
@@ -102,7 +103,6 @@ class Settings:
 
 
 # --- Helper Functions ---
-
 
 def _env_bool(name: str, default: bool = False) -> bool:
     """Convert environment variable to boolean."""
@@ -134,6 +134,18 @@ def resolve_path(_path) -> Path:
 
 
 def _load_database_config() -> DbConfig:
+    """
+    Construct a DbConfig populated from environment variables.
+
+    Reads DB_NAME and DB_HOST (defaulting to empty string) and TOOL_REPLICA_USER and TOOL_REPLICA_PASSWORD (defaulting to None) and returns a DbConfig with those values.
+
+    Returns:
+        DbConfig: Configuration with fields:
+            - db_name: from DB_NAME (default "").
+            - db_host: from DB_HOST (default "").
+            - db_user: from TOOL_REPLICA_USER (or None).
+            - db_password: from TOOL_REPLICA_PASSWORD (or None).
+    """
     return DbConfig(
         db_name=os.getenv("TOOL_TOOLSDB_DBNAME", ""),
         db_host=os.getenv("TOOL_TOOLSDB_HOST", ""),
