@@ -12,10 +12,10 @@ from __future__ import annotations
 
 from sqlalchemy import JSON, Column, Integer, String, text
 
-from ..shared.engine import BaseDb
+from ..shared.core.extensions import db
 
 
-class LangRecord(BaseDb):
+class LangRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS langs (
         lang_id int NOT NULL AUTO_INCREMENT,
@@ -36,7 +36,7 @@ class LangRecord(BaseDb):
     redirects = Column(JSON, nullable=True, server_default=text("NULL"))
 
 
-class MdwikiRevidRecord(BaseDb):
+class MdwikiRevidRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS mdwiki_revids (
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -51,7 +51,7 @@ class MdwikiRevidRecord(BaseDb):
     revid = Column(Integer, nullable=False)
 
 
-class TranslateTypeRecord(BaseDb):
+class TranslateTypeRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS translate_type (
         tt_id int unsigned NOT NULL AUTO_INCREMENT,

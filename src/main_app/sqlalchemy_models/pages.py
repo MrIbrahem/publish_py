@@ -8,10 +8,10 @@ from typing import Any
 
 from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String, func, text
 
-from ..shared.engine import BaseDb
+from ..shared.core.extensions import db
 
 
-class PageRecord(BaseDb):
+class PageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -56,7 +56,7 @@ class PageRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class UserPageRecord(BaseDb):
+class UserPageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -101,7 +101,7 @@ class UserPageRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class PagesUsersToMainRecord(BaseDb):
+class PagesUsersToMainRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users_to_main (
         id int unsigned NOT NULL,
@@ -131,7 +131,7 @@ class PagesUsersToMainRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class InProcessRecord(BaseDb):
+class InProcessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS in_process (
         id int unsigned NOT NULL AUTO_INCREMENT,

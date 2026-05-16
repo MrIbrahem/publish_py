@@ -8,12 +8,12 @@ import logging
 
 from sqlalchemy import Column, Integer, String
 
-from ..shared.engine import BaseDb
+from ..shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
 
-class CategoryRecord(BaseDb):
+class CategoryRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS categories (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -59,7 +59,7 @@ class CategoryRecord(BaseDb):
             raise ValueError("Campaign name cannot be empty")
 
 
-class ProjectRecord(BaseDb):
+class ProjectRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS projects (
         g_id int unsigned NOT NULL AUTO_INCREMENT,

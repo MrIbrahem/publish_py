@@ -6,10 +6,10 @@ from __future__ import annotations
 
 from sqlalchemy import Column, Integer, String, UniqueConstraint, text
 
-from ..shared.engine import BaseDb
+from ..shared.core.extensions import db
 
 
-class EnwikiPageviewRecord(BaseDb):
+class EnwikiPageviewRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS enwiki_pageviews (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -33,7 +33,7 @@ class EnwikiPageviewRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class ViewsNewRecord(BaseDb):
+class ViewsNewRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS views_new (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -64,7 +64,7 @@ class ViewsNewRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class ViewsNewAllRecord(BaseDb):
+class ViewsNewAllRecord(db.Model):
     """
     CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `views_new_all` AS
         SELECT `v`.`target` AS `target`,

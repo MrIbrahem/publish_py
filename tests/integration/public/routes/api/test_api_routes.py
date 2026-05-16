@@ -254,8 +254,8 @@ class TestApiRoutes:
 
     def test_in_process_internal_error_handling(self, client: FlaskClient):
         """Test that in_process handles internal errors gracefully."""
-        with patch("src.main_app.public.routes.api.routes.get_session") as mock_session:
-            mock_session.side_effect = Exception("Database error")
+        with patch("src.main_app.public.routes.api.routes.db.session.query") as mock_query:
+            mock_query.side_effect = Exception("Database error")
 
             response = client.get("/api/in_process?limit=5")
 

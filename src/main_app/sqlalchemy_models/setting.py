@@ -11,11 +11,11 @@ from sqlalchemy import Column, Enum, Integer, String, text
 
 # from sqlalchemy.dialects.mysql import LONGTEXT
 from ..shared.engine import LONGTEXT, BaseDb
-
+from ..shared.core.extensions import db
 logger = logging.getLogger(__name__)
 
 
-class LanguageSettingRecord(BaseDb):
+class LanguageSettingRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS language_settings (
         id int NOT NULL AUTO_INCREMENT,
@@ -47,7 +47,7 @@ class LanguageSettingRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class SettingRecord(BaseDb):
+class SettingRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS new_settings (
         `id` INT NOT NULL AUTO_INCREMENT,

@@ -160,17 +160,16 @@ def db_config():
 
 
 @pytest.fixture(autouse=True)
-def setup_db():
+def setup_db(app):
     """Initialize an in-memory SQLite database for tests."""
     from src.main_app.shared import engine as engine_mod
-    from src.main_app.shared.engine import (
-        BaseDb,
-        build_engine,
-        init_db,
-    )
+    from src.main_app.shared.engine import BaseDb
+    from src.main_app.shared.core.extensions import db
 
-    init_db("sqlite:///:memory:")
-    engine = build_engine("sqlite:///:memory:")
+    # Use the same engine that Flask-SQLAlchemy already created from
+    # TestingConfig.SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    engine = db.engine
+    engine_mod._SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
 
     meta = MetaData()
     pages_users = Table(
@@ -219,17 +218,12 @@ def setup_db():
         )
         conn.commit()
 
-    # Create all other tables except views_new_all (which is already created as a view)
+    # Create all other tables from BaseDb metadata
     for table in BaseDb.metadata.sorted_tables:
-        if table.name != "views_new_all":
+        if table.name not in ("views_new_all", "pages_users", "views_new"):
             table.create(engine, checkfirst=True)
 
-    factory = sessionmaker(bind=engine, expire_on_commit=False)
-
-    with patch.object(engine_mod, "_SessionFactory", factory):
-        yield
-
-    engine.dispose()
+    yield
 
 
 @pytest.fixture

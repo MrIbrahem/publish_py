@@ -6,10 +6,10 @@ from __future__ import annotations
 
 from sqlalchemy import Column, DateTime, Integer, String, func
 
-from ..shared.engine import BaseDb
+from ..shared.core.extensions import db
 
 
-class QidRecord(BaseDb):
+class QidRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS qids (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -44,7 +44,7 @@ class QidRecord(BaseDb):
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
 
-class AllQidsRecord(BaseDb):
+class AllQidsRecord(db.Model):
     """
     CREATE TABLE all_qids (
         qid varchar(255) NOT NULL,
@@ -62,7 +62,7 @@ class AllQidsRecord(BaseDb):
     category = Column(String(255), nullable=True)
 
 
-class AllQidsExistRecord(BaseDb):
+class AllQidsExistRecord(db.Model):
     """
     CREATE TABLE all_qids_exists (
         id int NOT NULL AUTO_INCREMENT,

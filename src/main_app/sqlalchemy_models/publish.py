@@ -10,11 +10,11 @@ from typing import Any
 from sqlalchemy import Column, DateTime, Integer, String, func
 
 from ..shared.engine import LONGTEXT, BaseDb
-
+from ..shared.core.extensions import db
 logger = logging.getLogger(__name__)
 
 
-class ReportRecord(BaseDb):
+class ReportRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS publish_reports (
         id int NOT NULL AUTO_INCREMENT,

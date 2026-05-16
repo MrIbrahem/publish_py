@@ -6,10 +6,10 @@ from __future__ import annotations
 
 from sqlalchemy import Column, Integer, String
 
-from ..shared.engine import BaseDb
+from ..shared.core.extensions import db
 
 
-class AllArticlesRecord(BaseDb):
+class AllArticlesRecord(db.Model):
     """
     CREATE TABLE all_articles (
         id int NOT NULL AUTO_INCREMENT,

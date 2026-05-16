@@ -6,10 +6,10 @@ from __future__ import annotations
 
 from sqlalchemy import Column, Integer, String
 
-from ..shared.engine import BaseDb
+from ..shared.core.extensions import db
 
 
-class AssessmentRecord(BaseDb):
+class AssessmentRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS assessments (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -27,7 +27,7 @@ class AssessmentRecord(BaseDb):
     importance = Column(String(120), nullable=True)
 
 
-class RefsCountRecord(BaseDb):
+class RefsCountRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS refs_counts (
         r_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -47,7 +47,7 @@ class RefsCountRecord(BaseDb):
     r_all_refs = Column(Integer, nullable=True)
 
 
-class WordRecord(BaseDb):
+class WordRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS words (
         w_id int unsigned NOT NULL AUTO_INCREMENT,
