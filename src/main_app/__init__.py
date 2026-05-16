@@ -26,7 +26,7 @@ from .public.routes import (
 )
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
-from .shared.core.extensions import csrf_exempt, csrf_init_app
+from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
 from .shared.engine import build_db_url, init_db
 from .shared.services.coordinator_service import active_coordinators
 
@@ -108,6 +108,12 @@ def create_app(config_class: Type | None = None) -> Flask:
     # Initialize CSRF protection
     csrf_init_app(app)
 
+    # Initialize Flask-SQLAlchemy (new)
+    if app.config.get("SQLALCHEMY_DATABASE_URI"):
+        db.init_app(app)
+        migrate.init_app(app, db)
+
+    # Legacy DB initialization (kept for backward compatibility during migration)
     if oauth_enabled and settings.database_data.db_host:
         db_url = build_db_url(settings.database_data.to_dict())
         init_db(db_url, True)

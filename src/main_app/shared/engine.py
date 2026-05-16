@@ -127,11 +127,27 @@ def init_db(db_url: str, create_tables: bool = False) -> None:
 
 
 def get_session() -> Session:
-    """Return a new session. Always use inside a `with` block."""
+    """Return a new session. Always use inside a `with` block.
+
+    NOTE: This function is maintained for backward compatibility during
+    the Flask-SQLAlchemy migration. New code should use db.session directly:
+
+        from main_app.shared.core.extensions import db
+        db.session.query(Model)...
+
+    Once all services are migrated, this function will be removed.
+    """
     if _SessionFactory is None:
-        # For migration purposes, if not initialized, we might need a way to initialize it
-        # But according to instructions, we should just use it.
-        # In a real app, init_db would be called at startup.
+        # Try to use Flask-SQLAlchemy's session if available (migration path)
+        try:
+            from flask import current_app
+
+            if current_app and current_app.extensions.get("sqlalchemy"):
+                from .core.extensions import db
+
+                return db.session
+        except RuntimeError:
+            pass  # Outside app context, fall through to error
         raise RuntimeError("Call init_db() before using the database.")
     return _SessionFactory()
 
