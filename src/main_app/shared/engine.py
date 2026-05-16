@@ -13,6 +13,8 @@ from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
 
+from .core.extensions import db
+
 logger = logging.getLogger(__name__)
 
 
@@ -85,7 +87,7 @@ _SessionFactory: sessionmaker | None = None
 # -----------------------------------------------------------------------------
 
 
-@event.listens_for(BaseDb.metadata, "after_create")
+@event.listens_for(db.metadata, "after_create")
 def create_views_new_all_view(target, connection, **kw):
     inspector = inspect(connection)
     existing_views = inspector.get_view_names()
