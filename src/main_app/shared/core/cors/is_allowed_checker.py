@@ -53,6 +53,11 @@ def is_allowed(request: Request) -> str | None:
 
     origin_host = get_host(origin) if origin else ""
 
+    # If both Origin and Referer are missing, it's likely a direct request
+    # or from a client that doesn't send these headers (like tests).
+    if not origin and not referer:
+        return make_url(request.host_url) or "*"
+
     if current_app.config.get("CORS_DISABLED"):
         logger.warning(f"CORS is disabled. Access allowed: referer={referer}, origin={origin}")
         # # return origin_host or "*"
