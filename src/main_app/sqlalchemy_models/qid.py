@@ -25,7 +25,7 @@ class QidRecord(db.Model):
     id =db.Column(db.Integer, primary_key=True, autoincrement=True)
     qid =db.Column(db.String(20), nullable=False)
     title =db.Column(db.String(255), unique=True, nullable=False)
-    add_date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    add_date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

@@ -30,7 +30,7 @@ class ReportRecord(db.Model):
     __tablename__ = "publish_reports"
 
     id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     title =db.Column(db.String(255), nullable=False)
     user =db.Column(db.String(255), nullable=False)
     lang =db.Column(db.String(255), nullable=False)

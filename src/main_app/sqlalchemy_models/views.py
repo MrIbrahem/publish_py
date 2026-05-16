@@ -4,8 +4,6 @@ Views domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-, UniqueConstraint, text
-
 from ..shared.core.extensions import db
 
 
@@ -55,7 +53,7 @@ class ViewsNewRecord(db.Model):
     year =db.Column(db.Integer, nullable=False)
     views =db.Column(db.Integer, default=0, server_default=db.text("0"))
 
-    __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
+    __table_args__ = (db.UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided

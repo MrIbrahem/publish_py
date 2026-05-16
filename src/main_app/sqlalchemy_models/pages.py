@@ -34,7 +34,7 @@ class PageRecord(db.Model):
     id =db.Column(db.Integer, primary_key=True, autoincrement=True)
     title =db.Column(db.String(120), nullable=False)
     word =db.Column(db.Integer, nullable=True)
-    translate_type =db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
+    translate_type =db.Column(db.String(20), nullable=False, default="lead", server_default=db.db.text("'lead'"))
     cat =db.Column(db.String(120), nullable=True)
     lang =db.Column(db.String(30), nullable=True)
     user =db.Column(db.String(120), nullable=True)
@@ -42,7 +42,7 @@ class PageRecord(db.Model):
     date =db.Column(db.Date, nullable=True)
     pupdate =db.Column(db.String(120), nullable=True)
     add_date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
-    deleted =db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
+    deleted =db.Column(db.Integer, nullable=False, default=0, server_default=db.db.text("0"))
     mdwiki_revid =db.Column(db.Integer, nullable=True)
 
     def __init__(self, **kwargs):
@@ -79,7 +79,7 @@ class UserPageRecord(db.Model):
     id =db.Column(db.Integer, primary_key=True, autoincrement=True)
     title =db.Column(db.String(120), nullable=False)
     word =db.Column(db.Integer, nullable=True)
-    translate_type =db.Column(db.String(20), nullable=False, default="lead", server_default=text("'lead'"))
+    translate_type =db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
     cat =db.Column(db.String(120), nullable=True)
     lang =db.Column(db.String(30), nullable=True)
     user =db.Column(db.String(120), nullable=True)
@@ -87,7 +87,7 @@ class UserPageRecord(db.Model):
     date =db.Column(db.Date, nullable=True)
     pupdate =db.Column(db.String(120), nullable=True)
     add_date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
-    deleted =db.Column(db.Integer, nullable=False, default=0, server_default=text("0"))
+    deleted =db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
     mdwiki_revid =db.Column(db.Integer, nullable=True)
 
     def __init__(self, **kwargs):
@@ -149,9 +149,9 @@ class InProcessRecord(db.Model):
     title =db.Column(db.String(255), nullable=False)
     user =db.Column(db.String(255), nullable=False)
     lang =db.Column(db.String(30), nullable=False)
-    cat =db.Column(db.String(255), default="RTT", server_default=text("'RTT'"))
-    translate_type =db.Column(db.String(20), nullable=False, default="lead", server_default=text("'lead'"))
-    word =db.Column(db.Integer, default=0, server_default=text("0"))
+    cat =db.Column(db.String(255), default="RTT", server_default=db.text("'RTT'"))
+    translate_type =db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
+    word =db.Column(db.Integer, default=0, server_default=db.text("0"))
     add_date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs):

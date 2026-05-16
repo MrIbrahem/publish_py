@@ -66,7 +66,7 @@ class SettingRecord(db.Model):
     value =db.Column(LONGTEXT, nullable=True)
 
     value_type =db.Column(
-        Enum("boolean", "string", "integer", name="setting_value_type"),
+        db.Enum("boolean", "string", "integer", name="setting_value_type"),
         nullable=False,
         default="boolean",
     )

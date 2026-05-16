@@ -31,7 +31,7 @@ class LangRecord(db.Model):
     code =db.Column(db.String(20), nullable=False)
     autonym =db.Column(db.String(70), nullable=False)
     name =db.Column(db.String(70), nullable=False)
-    redirects =db.Column(JSON, nullable=True, server_default=db.text("NULL"))
+    redirects =db.Column(db.JSON, nullable=True, server_default=db.text("NULL"))
 
 
 class MdwikiRevidRecord(db.Model):

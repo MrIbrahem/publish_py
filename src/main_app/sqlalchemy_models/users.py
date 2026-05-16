@@ -31,19 +31,19 @@ class UserTokenRecord(db.Model):
 
     user_id =db.Column(db.Integer, primary_key=True)
     username =db.Column(db.String(255), unique=True, nullable=False)
-    access_token =db.Column(LargeBinary(1024), nullable=False)
-    access_secret =db.Column(LargeBinary(1024), nullable=False)
+    access_token =db.Column(db.LargeBinary(1024), nullable=False)
+    access_secret =db.Column(db.LargeBinary(1024), nullable=False)
 
-    created_at =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    created_at =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     updated_at =db.Column(
-        DateTime,
+        db.DateTime,
         nullable=False,
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
+        server_default=db.func.current_timestamp(),
+        server_onupdate=db.func.current_timestamp(),
         # server_default=db.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
     )
-    last_used_at =db.Column(DateTime, nullable=True, server_default=func.current_timestamp())
-    rotated_at =db.Column(DateTime, nullable=True)
+    last_used_at =db.Column(db.DateTime, nullable=True, server_default=db.func.current_timestamp())
+    rotated_at =db.Column(db.DateTime, nullable=True)
 
     @validates("access_token", "access_secret")
     def validate_bytes(self, key, value):
@@ -77,7 +77,7 @@ class UserRecord(db.Model):
     email =db.Column(db.String(255), nullable=False, default="")
     wiki =db.Column(db.String(255), nullable=False, default="")
     user_group =db.Column(db.String(120), nullable=False, default="Uncategorized", server_default=db.text("'Uncategorized'"))
-    reg_date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    reg_date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
