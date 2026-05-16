@@ -94,9 +94,9 @@ def get_top_langs() -> Response:
             db.session.query(
                 PageRecord.lang,
                 LangRecord.name.label("lang_name"),
-                func.count(PageRecord.target).label("targets"),
-                func.sum(word_expr).label("words"),
-                func.sum(views_expr).label("views"),
+                db.func.count(PageRecord.target).label("targets"),
+                db.func.sum(word_expr).label("words"),
+                db.func.sum(views_expr).label("views"),
             )
             .outerjoin(WordRecord, WordRecord.w_title == PageRecord.title)
             .outerjoin(
@@ -111,7 +111,7 @@ def get_top_langs() -> Response:
             .filter(PageRecord.lang != "")
             .filter(PageRecord.lang.is_not(None))
             .group_by(PageRecord.lang, LangRecord.name)
-            .order_by(func.count(PageRecord.target).desc())
+            .order_by(db.func.count(PageRecord.target).desc())
         )
 
         if limit:
@@ -215,9 +215,9 @@ def get_top_users() -> Response:
         query = (
             db.session.query(
                 PageRecord.user,
-                func.count(PageRecord.target).label("targets"),
-                func.sum(word_expr).label("words"),
-                func.sum(views_expr).label("views"),
+                db.func.count(PageRecord.target).label("targets"),
+                db.func.sum(word_expr).label("words"),
+                db.func.sum(views_expr).label("views"),
             )
             .outerjoin(WordRecord, WordRecord.w_title == PageRecord.title)
             .outerjoin(
@@ -231,7 +231,7 @@ def get_top_users() -> Response:
             .filter(PageRecord.lang != "")
             .filter(PageRecord.lang.is_not(None))
             .group_by(PageRecord.user)
-            .order_by(func.count(PageRecord.target).desc())
+            .order_by(db.func.count(PageRecord.target).desc())
         )
 
         if limit:

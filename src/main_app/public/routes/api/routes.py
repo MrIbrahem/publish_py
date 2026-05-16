@@ -8,7 +8,6 @@ from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy import func, text
 
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
@@ -119,8 +118,8 @@ def publish_reports_stats() -> Response:
         # Query distinct year, month, lang, user, result using SQLAlchemy
         results = (
             db.session.query(
-                func.extract("year", ReportRecord.date).label("year"),
-                func.extract("month", ReportRecord.date).label("month"),
+                db.func.extract("year", ReportRecord.date).label("year"),
+                db.func.extract("month", ReportRecord.date).label("month"),
                 ReportRecord.lang,
                 ReportRecord.user,
                 ReportRecord.result,

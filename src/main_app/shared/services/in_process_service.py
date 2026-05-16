@@ -155,10 +155,10 @@ def get_in_process_counts_by_user() -> List[dict]:
     results = (
         db.session.query(
             InProcessRecord.user,
-            func.count(InProcessRecord.id).label("article_count"),
+            db.func.count(InProcessRecord.id).label("article_count"),
         )
         .group_by(InProcessRecord.user)
-        .order_by(func.count(InProcessRecord.id).desc())
+        .order_by(db.func.count(InProcessRecord.id).desc())
         .all()
     )
     return [{"user": row.user, "article_count": row.article_count} for row in results]

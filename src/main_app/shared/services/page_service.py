@@ -200,7 +200,7 @@ def list_of_users_by_translations_count() -> dict[str, int]:
         .filter(PageRecord.target != "")
         .filter(PageRecord.target.isnot(None))
         .group_by(PageRecord.user)
-        .order_by(func.count(PageRecord.target).desc())
+        .order_by(db.func.count(PageRecord.target).desc())
         .all()
     )
     for user, count in rows:
