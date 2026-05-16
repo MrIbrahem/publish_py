@@ -13,7 +13,6 @@ from flask import Flask, flash, jsonify, render_template, request  # , g
 
 from .config import settings
 from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
-from .shared.engine import build_db_url
 from .admin.routes.admin import (
     bp_admin,
 )
@@ -31,6 +30,21 @@ from .shared.core.cookies import CookieHeaderClient
 from .shared.services.coordinator_service import active_coordinators
 
 logger = logging.getLogger(__name__)
+
+
+def build_db_url(db_data: dict[str, str]) -> str:
+    """
+
+    db_name: str
+    db_host: str
+    db_user: str | None
+    db_password: str | None
+    """
+    db_user = db_data["db_user"]
+    db_password = db_data["db_password"]
+    db_host = db_data["db_host"]
+    db_name = db_data["db_name"]
+    return f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
 
 
 def context_data() -> dict[str, Any]:
