@@ -356,31 +356,36 @@ class Config:
         if fallbacks_str:
             self.SECRET_KEY_FALLBACKS = [key.strip() for key in fallbacks_str.split(",") if key.strip()]
 
-        # Build SQLAlchemy database URI from environment config
-        db_cfg = settings.database_data
-        if db_cfg.db_host:
-            from urllib.parse import quote_plus
+        # Only set DB URI and engine options if not already defined by subclass
+        # (e.g., TestingConfig sets SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:")
+        if self.SQLALCHEMY_DATABASE_URI is None:
+            # Build SQLAlchemy database URI from environment config
+            db_cfg = settings.database_data
+            if db_cfg.db_host:
+                from urllib.parse import quote_plus
 
-            password = quote_plus(db_cfg.db_password or "")
-            self.SQLALCHEMY_DATABASE_URI = (
-                f"mysql+pymysql://{db_cfg.db_user}:{password}"
-                f"@{db_cfg.db_host}/{db_cfg.db_name}"
-                f"?charset=utf8mb4"
-            )
+                password = quote_plus(db_cfg.db_password or "")
+                self.SQLALCHEMY_DATABASE_URI = (
+                    f"mysql+pymysql://{db_cfg.db_user}:{password}"
+                    f"@{db_cfg.db_host}/{db_cfg.db_name}"
+                    f"?charset=utf8mb4"
+                )
 
-        # Engine options (matches current build_engine() kwargs)
-        self.SQLALCHEMY_ENGINE_OPTIONS = {
-            "pool_pre_ping": True,
-            "pool_size": 5,
-            "max_overflow": 10,
-            "pool_recycle": 3600,
-            "connect_args": {
-                "connect_timeout": 5,
-                "init_command": 'SET time_zone = "+00:00"',
-                "charset": "utf8mb4",
-                "collation": "utf8mb4_unicode_ci",
-            },
-        }
+        # Only set MySQL-specific engine options if URI is MySQL (not SQLite)
+        uri = self.SQLALCHEMY_DATABASE_URI or ""
+        if uri.startswith("mysql") and not self.SQLALCHEMY_ENGINE_OPTIONS:
+            self.SQLALCHEMY_ENGINE_OPTIONS = {
+                "pool_pre_ping": True,
+                "pool_size": 5,
+                "max_overflow": 10,
+                "pool_recycle": 3600,
+                "connect_args": {
+                    "connect_timeout": 5,
+                    "init_command": 'SET time_zone = "+00:00"',
+                    "charset": "utf8mb4",
+                    "collation": "utf8mb4_unicode_ci",
+                },
+            }
 
 
 class DevelopmentConfig(Config):
