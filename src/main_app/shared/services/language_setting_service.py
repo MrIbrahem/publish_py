@@ -10,35 +10,32 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ...sqlalchemy_models import LanguageSettingRecord
-from ..engine import get_session
+from ..core.extensions import db
 
 logger = logging.getLogger(__name__)
 
 
 def list_language_settings() -> List[LanguageSettingRecord]:
     """Return all language setting records."""
-    with get_session() as session:
-        orm_objs = session.query(LanguageSettingRecord).order_by(LanguageSettingRecord.id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(LanguageSettingRecord).order_by(LanguageSettingRecord.id.asc()).all()
+    return orm_objs
 
 
 def get_language_setting(setting_id: int) -> LanguageSettingRecord | None:
     """Get a language setting record by ID."""
-    with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
-        if not orm_obj:
-            logger.warning(f"Language setting record with ID {setting_id} not found")
-            return None
-        return orm_obj
+    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+    if not orm_obj:
+        logger.warning(f"Language setting record with ID {setting_id} not found")
+        return None
+    return orm_obj
 
 
 def get_language_setting_by_code(lang_code: str) -> LanguageSettingRecord | None:
     """Get a language setting record by language code."""
-    with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
-        if not orm_obj:
-            return None
-        return orm_obj
+    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
+    if not orm_obj:
+        return None
+    return orm_obj
 
 
 def add_language_setting(
@@ -52,22 +49,21 @@ def add_language_setting(
     if not lang_code:
         raise ValueError("Language code is required")
 
-    with get_session() as session:
-        orm_obj = LanguageSettingRecord(
-            lang_code=lang_code,
-            move_dots=move_dots,
-            expend=expend,
-            add_en_lang=add_en_lang,
-        )
-        session.add(orm_obj)
-        try:
-            session.commit()
-        except IntegrityError:
-            session.rollback()
-            raise ValueError(f"Language setting for '{lang_code}' already exists") from None
+    orm_obj = LanguageSettingRecord(
+        lang_code=lang_code,
+        move_dots=move_dots,
+        expend=expend,
+        add_en_lang=add_en_lang,
+    )
+    db.session.add(orm_obj)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise ValueError(f"Language setting for '{lang_code}' already exists") from None
 
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def add_or_update_language_setting(
@@ -81,54 +77,51 @@ def add_or_update_language_setting(
     if not lang_code:
         raise ValueError("Language code is required")
 
-    with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
-        if orm_obj:
-            orm_obj.move_dots = move_dots
-            orm_obj.expend = expend
-            orm_obj.add_en_lang = add_en_lang
-        else:
-            orm_obj = LanguageSettingRecord(
-                lang_code=lang_code,
-                move_dots=move_dots,
-                expend=expend,
-                add_en_lang=add_en_lang,
-            )
-            session.add(orm_obj)
+    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
+    if orm_obj:
+        orm_obj.move_dots = move_dots
+        orm_obj.expend = expend
+        orm_obj.add_en_lang = add_en_lang
+    else:
+        orm_obj = LanguageSettingRecord(
+            lang_code=lang_code,
+            move_dots=move_dots,
+            expend=expend,
+            add_en_lang=add_en_lang,
+        )
+        db.session.add(orm_obj)
 
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
     """Update a language setting record."""
-    with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
-        if not orm_obj:
-            raise ValueError(f"Language setting record with ID {setting_id} not found")
+    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+    if not orm_obj:
+        raise ValueError(f"Language setting record with ID {setting_id} not found")
 
-        if not kwargs:
-            return orm_obj
-
-        for key, value in kwargs.items():
-            if hasattr(orm_obj, key):
-                setattr(orm_obj, key, value)
-
-        session.commit()
-        session.refresh(orm_obj)
+    if not kwargs:
         return orm_obj
+
+    for key, value in kwargs.items():
+        if hasattr(orm_obj, key):
+            setattr(orm_obj, key, value)
+
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def delete_language_setting(setting_id: int):
     """Delete a language setting record by ID."""
-    with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
-        if not orm_obj:
-            raise ValueError(f"Language setting record with ID {setting_id} not found")
+    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+    if not orm_obj:
+        raise ValueError(f"Language setting record with ID {setting_id} not found")
 
-        session.delete(orm_obj)
-        session.commit()
+    db.session.delete(orm_obj)
+    db.session.commit()
 
 
 __all__ = [

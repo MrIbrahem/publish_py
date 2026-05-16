@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from ...sqlalchemy_models import CategoryRecord
-from ..engine import get_session
+from ..core.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -37,32 +37,31 @@ def add_category(
     # fallback display to campaign name if display name is not provided
     display = display or campaign
 
-    with get_session() as session:
-        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.category == category).first()
-        if orm_obj:
-            orm_obj.campaign = campaign
-            orm_obj.display = display
-            orm_obj.category2 = category2
-            orm_obj.depth = depth
-        else:
-            orm_obj = CategoryRecord(
-                category=category,
-                campaign=campaign,
-                display=display,
-                category2=category2,
-                depth=depth,
-            )
-            session.add(orm_obj)
+    orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.category == category).first()
+    if orm_obj:
+        orm_obj.campaign = campaign
+        orm_obj.display = display
+        orm_obj.category2 = category2
+        orm_obj.depth = depth
+    else:
+        orm_obj = CategoryRecord(
+            category=category,
+            campaign=campaign,
+            display=display,
+            category2=category2,
+            depth=depth,
+        )
+        db.session.add(orm_obj)
 
-        session.commit()
-        session.refresh(orm_obj)
-        record = CategoryRecord(**orm_obj.to_dict())
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    record = CategoryRecord(**orm_obj.to_dict())
 
-        if is_default:
-            # set this category as default by unsetting default flag on all other categories
-            record = set_default_category(session, orm_obj)
+    if is_default:
+        # set this category as default by unsetting default flag on all other categories
+        record = set_default_category(db.session, orm_obj)
 
-        return record
+    return record
 
 
 def update_category(
@@ -75,54 +74,50 @@ def update_category(
     is_default: int = 0,
 ) -> CategoryRecord:
     """Update category."""
-    with get_session() as session:
-        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
-        if not orm_obj:
-            raise ValueError(f"Category with ID {category_id} not found")
+    orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
+    if not orm_obj:
+        raise ValueError(f"Category with ID {category_id} not found")
 
-        orm_obj.category = category
-        orm_obj.campaign = campaign
-        orm_obj.display = display
-        orm_obj.category2 = category2
-        orm_obj.depth = depth
+    orm_obj.category = category
+    orm_obj.campaign = campaign
+    orm_obj.display = display
+    orm_obj.category2 = category2
+    orm_obj.depth = depth
 
-        session.commit()
-        session.refresh(orm_obj)
-        record = CategoryRecord(**orm_obj.to_dict())
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    record = CategoryRecord(**orm_obj.to_dict())
 
-        if is_default:
-            # set this category as default by unsetting default flag on all other categories
-            record = set_default_category(session, orm_obj)
+    if is_default:
+        # set this category as default by unsetting default flag on all other categories
+        record = set_default_category(db.session, orm_obj)
 
-        return record
+    return record
 
 
 def delete_category(category_id: int) -> None:
     """Delete a category."""
-    with get_session() as session:
-        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
-        if not orm_obj:
-            raise ValueError(f"Category with ID {category_id} not found")
+    orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
+    if not orm_obj:
+        raise ValueError(f"Category with ID {category_id} not found")
 
-        session.delete(orm_obj)
-        session.commit()
+    db.session.delete(orm_obj)
+    db.session.commit()
 
 
 def get_campaign_category(campaign: str) -> CategoryRecord | None:
     """Get the category for a campaign."""
-    with get_session() as session:
-        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.campaign == campaign).first()
-        if not orm_obj:
-            logger.warning(f"Campaign {campaign} not found")
-            return None
-        return orm_obj
+    orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.campaign == campaign).first()
+    if not orm_obj:
+        logger.warning(f"Campaign {campaign} not found")
+        return None
+    return orm_obj
 
 
 def list_categories() -> List[CategoryRecord]:
     """Return all categories."""
-    with get_session() as session:
-        orm_objs = session.query(CategoryRecord).order_by(CategoryRecord.id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(CategoryRecord).order_by(CategoryRecord.id.asc()).all()
+    return orm_objs
 
 
 def get_camp_to_cats() -> dict[str, str]:

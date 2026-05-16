@@ -11,7 +11,7 @@ from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
 from ...sqlalchemy_models import AllQidsRecord, QidRecord
-from ..engine import get_session
+from ..core.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +36,8 @@ def list_targets_by_lang(lang: str) -> List[dict]:
           AND t.target != '' AND t.target IS NOT NULL
     """
     )
-    with get_session() as session:
-        rows = session.execute(sql, {"lang": lang}).fetchall()
-        return [dict(row._mapping) for row in rows]
+    rows = db.session.execute(sql, {"lang": lang}).fetchall()
+    return [dict(row._mapping) for row in rows]
 
 
 __all__ = [
