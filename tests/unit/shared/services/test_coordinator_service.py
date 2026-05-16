@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.engine import init_db
 from src.main_app.shared.services.coordinator_service import (
     active_coordinators,
     add_coordinator,

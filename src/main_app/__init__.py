@@ -11,10 +11,12 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, jsonify, render_template, request  # , g
 
+from .config import settings
+from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
+from .shared.engine import build_db_url
 from .admin.routes.admin import (
     bp_admin,
 )
-from .config import settings
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -26,8 +28,6 @@ from .public.routes import (
 )
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
-from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
-from .shared.engine import build_db_url, init_db
 from .shared.services.coordinator_service import active_coordinators
 
 logger = logging.getLogger(__name__)
@@ -116,7 +116,6 @@ def create_app(config_class: Type | None = None) -> Flask:
     # Legacy DB initialization (kept for backward compatibility during migration)
     if oauth_enabled and settings.database_data.db_host:
         db_url = build_db_url(settings.database_data.to_dict())
-        init_db(db_url, True)
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_leaderboard)

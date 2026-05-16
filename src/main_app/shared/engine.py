@@ -27,11 +27,6 @@ class LONGTEXT(TypeDecorator):
             return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
         return dialect.type_descriptor(Text())
 
-
-# ---------------------------------------------------------------------------
-# 1. Model — replaces coordinator_model.py + CREATE TABLE
-# ---------------------------------------------------------------------------
-
 # ---------------------------------------------------------------------------
 # 2. Database connection — replaces db_driver.py entirely
 #    pool_pre_ping=True handles reconnect + retry automatically
@@ -85,49 +80,6 @@ def build_engine(db_url: str) -> Engine:
 
 _SessionFactory: sessionmaker | None = None
 
-
-def init_db(db_url: str, create_tables: bool = False) -> None:
-    """
-    Initialize the engine and SessionFactory.
-    Call once at application startup.
-
-    create_tables=True: creates the table if it does not exist (useful for testing).
-    """
-    global _SessionFactory
-    engine = build_engine(db_url)
-    if create_tables:
-        real_tables = [t for t in BaseDb.metadata.tables.values() if not t.info.get("is_view")]
-
-        BaseDb.metadata.create_all(engine, tables=real_tables)
-    _SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
-
-
-def get_session() -> Session:
-    """Return a new session. Always use inside a `with` block.
-
-    NOTE: This function is maintained for backward compatibility during
-    the Flask-SQLAlchemy migration. New code should use db.session directly:
-
-        from main_app.shared.core.extensions import db
-        db.session.query(Model)...
-
-    Once all services are migrated, this function will be removed.
-    """
-    if _SessionFactory is None:
-        # Try to use Flask-SQLAlchemy's session if available (migration path)
-        try:
-            from flask import current_app
-
-            if current_app and current_app.extensions.get("sqlalchemy"):
-                from .core.extensions import db
-
-                return db.session
-        except RuntimeError:
-            pass  # Outside app context, fall through to error
-        raise RuntimeError("Call init_db() before using the database.")
-    return _SessionFactory()
-
-
 # -----------------------------------------------------------------------------
 # Create views automatically when tables are created
 # -----------------------------------------------------------------------------
@@ -170,10 +122,5 @@ def create_views_new_all_view(target, connection, **kw):
 
 
 __all__ = [
-    # Model
-    "BaseDb",
-    # Setup
-    "init_db",
-    "get_session",
     "LONGTEXT",
 ]

@@ -45,9 +45,8 @@ if sys:
 
 
 # Import after environment setup
-from src.main_app import create_app
-from src.main_app.config import TestingConfig
-from src.main_app.extensions import db as _db  # noqa: E402
+from src.main_app import create_app  # noqa: E402
+from src.main_app.config import TestingConfig  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -60,7 +59,7 @@ def disable_network(request, mocker):
 
 
 @pytest.fixture
-def app() -> Generator[Flask, Any, None]:
+def app() -> Generator[Flask, Any]:
     """Create and configure a test Flask application.
 
     Yields:
