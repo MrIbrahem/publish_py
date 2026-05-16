@@ -199,3 +199,22 @@ def setup_db(app):
         # Drop only real tables
         real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
         _db.metadata.drop_all(_db.engine, tables=real_tables)
+
+
+@pytest.fixture
+def mock_admin_required(mocker):
+    """Mock admin_required decorator to bypass authentication checks.
+
+    Inject this fixture into admin route tests to bypass authentication
+    so tests can focus on route functionality rather than auth.
+    """
+    # Mock current_user to return a valid user object
+    mock_user = MagicMock()
+    mock_user.username = "admin"
+    mocker.patch("src.main_app.admin.decorators.current_user", return_value=mock_user)
+
+    # Mock _get_cached_active_coordinators to return list with "admin"
+    mocker.patch(
+        "src.main_app.admin.decorators._get_cached_active_coordinators",
+        return_value=["admin"],
+    )
