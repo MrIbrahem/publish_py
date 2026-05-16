@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy import func, text
+from sqlalchemy import func
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
