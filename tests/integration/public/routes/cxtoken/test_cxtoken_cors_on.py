@@ -25,6 +25,11 @@ def app() -> Flask:
 
     app.config["TESTING"] = True
     app.config["CORS_DISABLED"] = False
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+
+    from src.main_app.shared.core.extensions import db
+
+    db.init_app(app)
 
     from src.main_app.public.routes.cxtoken.routes import bp_cxtoken
 
