@@ -3,9 +3,6 @@ All Articles domain models - SQLAlchemy ORM.
 """
 
 from __future__ import annotations
-
-from sqlalchemy import Column, Integer, String
-
 from ..shared.core.extensions import db
 
 
@@ -22,9 +19,9 @@ class AllArticlesRecord(db.Model):
 
     __tablename__ = "all_articles"
 
-    id = db.Column(Integer, primary_key=True, autoincrement=True)
-    article_id =db.Column(String(255), unique=True, nullable=False)
-    category =db.Column(String(255), nullable=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    article_id =db.Column(db.String(255), unique=True, nullable=False)
+    category =db.Column(db.String(255), nullable=True)
 
 
 __all__ = [

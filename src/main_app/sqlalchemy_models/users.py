@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import Column, Date, DateTime, Integer, LargeBinary, String, func, text
 from sqlalchemy.orm import validates
 
 from ..shared.core.crypto import decrypt_value
@@ -30,8 +29,8 @@ class UserTokenRecord(db.Model):
 
     __tablename__ = "user_tokens"
 
-    user_id =db.Column(Integer, primary_key=True)
-    username =db.Column(String(255), unique=True, nullable=False)
+    user_id =db.Column(db.Integer, primary_key=True)
+    username =db.Column(db.String(255), unique=True, nullable=False)
     access_token =db.Column(LargeBinary(1024), nullable=False)
     access_secret =db.Column(LargeBinary(1024), nullable=False)
 
@@ -41,7 +40,7 @@ class UserTokenRecord(db.Model):
         nullable=False,
         server_default=func.current_timestamp(),
         server_onupdate=func.current_timestamp(),
-        # server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        # server_default=db.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
     )
     last_used_at =db.Column(DateTime, nullable=True, server_default=func.current_timestamp())
     rotated_at =db.Column(DateTime, nullable=True)
@@ -73,11 +72,11 @@ class UserRecord(db.Model):
 
     __tablename__ = "users"
 
-    user_id =db.Column(Integer, primary_key=True, autoincrement=True)
-    username =db.Column(String(255), nullable=False)
-    email =db.Column(String(255), nullable=False, default="")
-    wiki =db.Column(String(255), nullable=False, default="")
-    user_group =db.Column(String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'"))
+    user_id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username =db.Column(db.String(255), nullable=False)
+    email =db.Column(db.String(255), nullable=False, default="")
+    wiki =db.Column(db.String(255), nullable=False, default="")
+    user_group =db.Column(db.String(120), nullable=False, default="Uncategorized", server_default=db.text("'Uncategorized'"))
     reg_date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
     def __init__(self, **kwargs):
@@ -105,9 +104,9 @@ class UsersNoInprocessRecord(db.Model):
 
     __tablename__ = "users_no_inprocess"
 
-    id =db.Column(Integer, primary_key=True, autoincrement=True)
-    user =db.Column(String(120), unique=True, nullable=False)
-    is_active =db.Column(Integer, nullable=False, default=1)
+    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user =db.Column(db.String(120), unique=True, nullable=False)
+    is_active =db.Column(db.Integer, nullable=False, default=1)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -130,9 +129,9 @@ class CoordinatorRecord(db.Model):
 
     __tablename__ = "coordinators"
 
-    id: int =db.Column(Integer, primary_key=True, autoincrement=True)
-    username: str =db.Column(String(120), unique=True, nullable=False)
-    is_active: int =db.Column(Integer, nullable=False, default=1)
+    id: int =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username: str =db.Column(db.String(120), unique=True, nullable=False)
+    is_active: int =db.Column(db.Integer, nullable=False, default=1)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -157,9 +156,9 @@ class FullTranslatorRecord(db.Model):
 
     __tablename__ = "full_translators"
 
-    id =db.Column(Integer, primary_key=True, autoincrement=True)
-    user =db.Column(String(120), unique=True, nullable=False)
-    is_active =db.Column(Integer, nullable=False, default=1)
+    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user =db.Column(db.String(120), unique=True, nullable=False)
+    is_active =db.Column(db.Integer, nullable=False, default=1)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided

@@ -4,8 +4,6 @@ QID domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, DateTime, Integer, String, func
-
 from ..shared.core.extensions import db
 
 
@@ -24,9 +22,9 @@ class QidRecord(db.Model):
 
     __tablename__ = "qids"
 
-    id =db.Column(Integer, primary_key=True, autoincrement=True)
-    qid =db.Column(String(20), nullable=False)
-    title =db.Column(String(255), unique=True, nullable=False)
+    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    qid =db.Column(db.String(20), nullable=False)
+    title =db.Column(db.String(255), unique=True, nullable=False)
     add_date =db.Column(DateTime, nullable=False, server_default=func.current_timestamp())
 
     def __init__(self, **kwargs):
@@ -57,9 +55,9 @@ class AllQidsRecord(db.Model):
 
     __tablename__ = "all_qids"
 
-    id =db.Column(Integer, primary_key=True, autoincrement=True)
-    qid =db.Column(String(255), unique=True, nullable=False)
-    category =db.Column(String(255), nullable=True)
+    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    qid =db.Column(db.String(255), unique=True, nullable=False)
+    category =db.Column(db.String(255), nullable=True)
 
 
 class AllQidsExistRecord(db.Model):
@@ -77,10 +75,10 @@ class AllQidsExistRecord(db.Model):
 
     __tablename__ = "all_qids_exists"
 
-    id =db.Column(Integer, primary_key=True, autoincrement=True)
-    qid =db.Column(String(255), nullable=False)
-    code =db.Column(String(25), nullable=False)
-    target =db.Column(String(255), nullable=False)
+    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    qid =db.Column(db.String(255), nullable=False)
+    code =db.Column(db.String(25), nullable=False)
+    target =db.Column(db.String(255), nullable=False)
 
 
 __all__ = [

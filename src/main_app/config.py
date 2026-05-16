@@ -423,8 +423,8 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
     SQLALCHEMY_ENGINE_OPTIONS: dict = {}  # SQLite doesn't need MySQL options
 
-    # Disable CORS for testing
-    CORS_DISABLED: bool = True
+    # Enable CORS for testing by default (individual tests override if needed)
+    CORS_DISABLED: bool = False
 
 
 class ProductionConfig(Config):
