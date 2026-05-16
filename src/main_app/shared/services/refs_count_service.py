@@ -10,35 +10,32 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ...sqlalchemy_models import RefsCountRecord
-from ..engine import get_session
+from ..core.extensions import db
 
 logger = logging.getLogger(__name__)
 
 
 def list_refs_counts() -> List[RefsCountRecord]:
     """Return all refs_count records."""
-    with get_session() as session:
-        orm_objs = session.query(RefsCountRecord).order_by(RefsCountRecord.r_id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(RefsCountRecord).order_by(RefsCountRecord.r_id.asc()).all()
+    return orm_objs
 
 
 def get_refs_count(refs_id: int) -> RefsCountRecord | None:
     """Get a refs_count record by ID."""
-    with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
-        if not orm_obj:
-            logger.warning(f"RefsCount record with ID {refs_id} not found")
-            return None
-        return orm_obj
+    orm_obj = db.session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+    if not orm_obj:
+        logger.warning(f"RefsCount record with ID {refs_id} not found")
+        return None
+    return orm_obj
 
 
 def get_refs_count_by_title(title: str) -> RefsCountRecord | None:
     """Get a refs_count record by title."""
-    with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_title == title).first()
-        if not orm_obj:
-            return None
-        return orm_obj
+    orm_obj = db.session.query(RefsCountRecord).filter(RefsCountRecord.r_title == title).first()
+    if not orm_obj:
+        return None
+    return orm_obj
 
 
 def add_refs_count(
@@ -51,17 +48,16 @@ def add_refs_count(
     if not r_title:
         raise ValueError("Title is required")
 
-    with get_session() as session:
-        orm_obj = RefsCountRecord(r_title=r_title, r_lead_refs=r_lead_refs, r_all_refs=r_all_refs)
-        session.add(orm_obj)
-        try:
-            session.commit()
-        except IntegrityError:
-            session.rollback()
-            raise ValueError(f"Refs count for '{r_title}' already exists") from None
+    orm_obj = RefsCountRecord(r_title=r_title, r_lead_refs=r_lead_refs, r_all_refs=r_all_refs)
+    db.session.add(orm_obj)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise ValueError(f"Refs count for '{r_title}' already exists") from None
 
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def add_or_update_refs_count(
@@ -74,50 +70,47 @@ def add_or_update_refs_count(
     if not r_title:
         raise ValueError("Title is required")
 
-    with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_title == r_title).first()
-        if orm_obj:
-            orm_obj.r_lead_refs = r_lead_refs
-            orm_obj.r_all_refs = r_all_refs
-        else:
-            orm_obj = RefsCountRecord(r_title=r_title, r_lead_refs=r_lead_refs, r_all_refs=r_all_refs)
-            session.add(orm_obj)
+    orm_obj = db.session.query(RefsCountRecord).filter(RefsCountRecord.r_title == r_title).first()
+    if orm_obj:
+        orm_obj.r_lead_refs = r_lead_refs
+        orm_obj.r_all_refs = r_all_refs
+    else:
+        orm_obj = RefsCountRecord(r_title=r_title, r_lead_refs=r_lead_refs, r_all_refs=r_all_refs)
+        db.session.add(orm_obj)
 
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
     """Update a refs_count record."""
-    with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
-        if not orm_obj:
-            raise ValueError(f"RefsCount record with ID {refs_id} not found")
+    orm_obj = db.session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+    if not orm_obj:
+        raise ValueError(f"RefsCount record with ID {refs_id} not found")
 
-        if not kwargs:
-            return orm_obj
-
-        for key, value in kwargs.items():
-            if hasattr(orm_obj, key):
-                setattr(orm_obj, key, value)
-
-        session.commit()
-        session.refresh(orm_obj)
+    if not kwargs:
         return orm_obj
+
+    for key, value in kwargs.items():
+        if hasattr(orm_obj, key):
+            setattr(orm_obj, key, value)
+
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def delete_refs_count(refs_id: int) -> RefsCountRecord:
     """Delete a refs_count record by ID."""
-    with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
-        if not orm_obj:
-            raise ValueError(f"RefsCount record with ID {refs_id} not found")
+    orm_obj = db.session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+    if not orm_obj:
+        raise ValueError(f"RefsCount record with ID {refs_id} not found")
 
-        record = RefsCountRecord(**orm_obj.to_dict())
-        session.delete(orm_obj)
-        session.commit()
-        return record
+    record = RefsCountRecord(**orm_obj.to_dict())
+    db.session.delete(orm_obj)
+    db.session.commit()
+    return record
 
 
 def get_ref_counts_for_title(title: str) -> tuple[int | None, int | None]:

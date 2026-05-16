@@ -11,7 +11,7 @@ from marshmallow import ValidationError
 from sqlalchemy import func, text
 
 from ....shared.core.cors import check_cors
-from ....shared.engine import get_session
+from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.services.category_service import list_categories
 from ....shared.services.in_process_service import get_in_process_counts_by_user
@@ -116,31 +116,30 @@ def publish_reports_stats() -> Response:
         JSON response with distinct filter values
     """
     try:
-        with get_session() as session:
-            # Query distinct year, month, lang, user, result using SQLAlchemy
-            results = (
-                session.query(
-                    func.extract("year", ReportRecord.date).label("year"),
-                    func.extract("month", ReportRecord.date).label("month"),
-                    ReportRecord.lang,
-                    ReportRecord.user,
-                    ReportRecord.result,
-                )
-                .distinct()
-                .all()
+        # Query distinct year, month, lang, user, result using SQLAlchemy
+        results = (
+            db.session.query(
+                func.extract("year", ReportRecord.date).label("year"),
+                func.extract("month", ReportRecord.date).label("month"),
+                ReportRecord.lang,
+                ReportRecord.user,
+                ReportRecord.result,
             )
+            .distinct()
+            .all()
+        )
 
-            # Convert results to list of dicts
-            data: List[Dict[str, Any]] = [
-                {
-                    "year": int(row.year) if row.year else None,
-                    "month": int(row.month) if row.month else None,
-                    "lang": row.lang,
-                    "user": row.user,
-                    "result": row.result,
-                }
-                for row in results
-            ]
+        # Convert results to list of dicts
+        data: List[Dict[str, Any]] = [
+            {
+                "year": int(row.year) if row.year else None,
+                "month": int(row.month) if row.month else None,
+                "lang": row.lang,
+                "user": row.user,
+                "result": row.result,
+            }
+            for row in results
+        ]
 
     except Exception:
         logger.exception("Error fetching publish_reports_stats")
@@ -175,46 +174,45 @@ def get_in_process() -> Response:
     limit = request.args.get("limit", default=500, type=int)
     limit = max(1, min(limit, 5000))
     try:
-        with get_session() as session:
-            # Perform the JOIN query using SQLAlchemy
-            query = (
-                session.query(
-                    InProcessRecord.id,
-                    InProcessRecord.title,
-                    InProcessRecord.user,
-                    InProcessRecord.lang,
-                    InProcessRecord.cat,
-                    InProcessRecord.translate_type,
-                    InProcessRecord.word,
-                    InProcessRecord.add_date,
-                    CategoryRecord.campaign.label("campaign"),
-                    LangRecord.autonym.label("autonym"),
-                )
-                .outerjoin(CategoryRecord, InProcessRecord.cat == CategoryRecord.category)
-                .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
+        # Perform the JOIN query using SQLAlchemy
+        query = (
+            db.session.query(
+                InProcessRecord.id,
+                InProcessRecord.title,
+                InProcessRecord.user,
+                InProcessRecord.lang,
+                InProcessRecord.cat,
+                InProcessRecord.translate_type,
+                InProcessRecord.word,
+                InProcessRecord.add_date,
+                CategoryRecord.campaign.label("campaign"),
+                LangRecord.autonym.label("autonym"),
             )
+            .outerjoin(CategoryRecord, InProcessRecord.cat == CategoryRecord.category)
+            .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
+        )
 
-            if lang and lang != "All":
-                query = query.filter(InProcessRecord.lang == lang)
+        if lang and lang != "All":
+            query = query.filter(InProcessRecord.lang == lang)
 
-            results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()
+        results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()
 
-            # Convert results to list of dicts
-            data: List[Dict[str, Any]] = [
-                {
-                    "id": row.id,
-                    "title": row.title,
-                    "user": row.user,
-                    "lang": row.lang,
-                    "cat": row.cat,
-                    "translate_type": row.translate_type,
-                    "word": row.word,
-                    "add_date": row.add_date.isoformat() if row.add_date else None,
-                    "campaign": row.campaign if row.campaign else row.cat,
-                    "autonym": row.autonym if row.autonym else row.lang,
-                }
-                for row in results
-            ]
+        # Convert results to list of dicts
+        data: List[Dict[str, Any]] = [
+            {
+                "id": row.id,
+                "title": row.title,
+                "user": row.user,
+                "lang": row.lang,
+                "cat": row.cat,
+                "translate_type": row.translate_type,
+                "word": row.word,
+                "add_date": row.add_date.isoformat() if row.add_date else None,
+                "campaign": row.campaign if row.campaign else row.cat,
+                "autonym": row.autonym if row.autonym else row.lang,
+            }
+            for row in results
+        ]
 
     except Exception:
         logger.exception("Error fetching in_process data")

@@ -11,16 +11,15 @@ from sqlalchemy import extract, func, text
 from sqlalchemy.exc import IntegrityError
 
 from ...sqlalchemy_models import ReportRecord
-from ..engine import get_session
+from ..core.extensions import db
 
 logger = logging.getLogger(__name__)
 
 
 def list_reports() -> List[ReportRecord]:
     """Return all report records."""
-    with get_session() as session:
-        orm_objs = session.query(ReportRecord).order_by(ReportRecord.id.desc()).all()
-        return orm_objs
+    orm_objs = db.session.query(ReportRecord).order_by(ReportRecord.id.desc()).all()
+    return orm_objs
 
 
 def add_report(
@@ -32,33 +31,31 @@ def add_report(
     data: str,
 ) -> ReportRecord:
     """Add a new report record."""
-    with get_session() as session:
-        orm_obj = ReportRecord(
-            title=title,
-            user=user,
-            lang=lang,
-            sourcetitle=sourcetitle,
-            result=result,
-            data=data,
-            date=func.now(),
-        )
-        session.add(orm_obj)
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
+    orm_obj = ReportRecord(
+        title=title,
+        user=user,
+        lang=lang,
+        sourcetitle=sourcetitle,
+        result=result,
+        data=data,
+        date=func.now(),
+    )
+    db.session.add(orm_obj)
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def delete_report(report_id: int) -> ReportRecord:
     """Delete a report record by ID."""
-    with get_session() as session:
-        orm_obj = session.query(ReportRecord).filter(ReportRecord.id == report_id).first()
-        if not orm_obj:
-            raise LookupError(f"Report id {report_id} was not found")
+    orm_obj = db.session.query(ReportRecord).filter(ReportRecord.id == report_id).first()
+    if not orm_obj:
+        raise LookupError(f"Report id {report_id} was not found")
 
-        record = ReportRecord(**orm_obj.to_dict())
-        session.delete(orm_obj)
-        session.commit()
-        return record
+    record = ReportRecord(**orm_obj.to_dict())
+    db.session.delete(orm_obj)
+    db.session.commit()
+    return record
 
 
 def query_reports_with_filters(
@@ -76,43 +73,42 @@ def query_reports_with_filters(
         "result": ReportRecord.result,
     }
 
-    with get_session() as session:
-        query = session.query(ReportRecord)
+    query = db.session.query(ReportRecord)
 
-        for name, value in filters.items():
-            if str(value).lower() == "all":
-                continue
+    for name, value in filters.items():
+        if str(value).lower() == "all":
+            continue
 
-            # Year/Month filters
-            if name == "year":
-                # query = query.filter(func.year(ReportRecord.date) == value)
-                query = query.filter(extract("year", ReportRecord.date) == int(value))
+        # Year/Month filters
+        if name == "year":
+            # query = query.filter(func.year(ReportRecord.date) == value)
+            query = query.filter(extract("year", ReportRecord.date) == int(value))
 
-            elif name == "month":
-                # query = query.filter(func.month(ReportRecord.date) == value)
-                query = query.filter(extract("month", ReportRecord.date) == int(value))
-            elif name in COLUMN_MAP:
-                # to match ReportsDB methods
-                column = COLUMN_MAP[name]
-                if value in ("not_mt", "not_empty"):
-                    query = query.filter(column != "", column.isnot(None))
-                elif value in ("mt", "empty"):
-                    query = query.filter((column == "") | (column.is_(None)))
-                elif value in (">0", "&#62;0"):
-                    # query = query.filter(column > 0)
-                    # This seems to be for numeric results if any?
-                    pass
-                else:
-                    query = query.filter(column == value)
+        elif name == "month":
+            # query = query.filter(func.month(ReportRecord.date) == value)
+            query = query.filter(extract("month", ReportRecord.date) == int(value))
+        elif name in COLUMN_MAP:
+            # to match ReportsDB methods
+            column = COLUMN_MAP[name]
+            if value in ("not_mt", "not_empty"):
+                query = query.filter(column != "", column.isnot(None))
+            elif value in ("mt", "empty"):
+                query = query.filter((column == "") | (column.is_(None)))
+            elif value in (">0", "&#62;0"):
+                # query = query.filter(column > 0)
+                # This seems to be for numeric results if any?
+                pass
+            else:
+                query = query.filter(column == value)
 
-        query = query.order_by(ReportRecord.id.desc())
+    query = query.order_by(ReportRecord.id.desc())
 
-        if limit:
-            query = query.limit(limit)
+    if limit:
+        query = query.limit(limit)
 
-        orm_objs = query.all()
+    orm_objs = query.all()
 
-        return orm_objs
+    return orm_objs
 
 
 __all__ = [
