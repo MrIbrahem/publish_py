@@ -47,6 +47,7 @@ if sys:
 # Import after environment setup
 from src.main_app import create_app
 from src.main_app.config import TestingConfig
+from src.main_app.extensions import db as _db  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -160,90 +161,41 @@ def db_config():
 
 
 @pytest.fixture(autouse=True)
-def setup_db():
-    """Initialize an in-memory SQLite database for tests."""
-    from src.main_app.shared import engine as engine_mod
-    from src.main_app.shared.engine import BaseDb, build_engine
-    from src.main_app.shared.core.extensions import db
+def setup_db(app):
+    """Initialize an in-memory SQLite database for tests using Flask-SQLAlchemy.
 
-    # Try to use Flask-SQLAlchemy's engine if available (from TestingConfig)
-    try:
-        engine = db.engine
-    except RuntimeError:
-        # Fallback: create standalone in-memory engine
-        engine = build_engine("sqlite:///:memory:")
-
-    engine_mod._SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
-
-    meta = MetaData()
-    pages_users = Table(
-        "pages_users",
-        meta,
-        Column("id", Integer, primary_key=True),
-        Column("title", String(120), nullable=False),
-        Column("word", Integer, nullable=True),
-        Column("translate_type", String(20), nullable=True),
-        Column("cat", String(120), nullable=True),
-        Column("lang", String(30), nullable=True),
-        Column("user", String(120), nullable=True),
-        Column("target", String(120), nullable=True),
-        Column("date", Date, nullable=True),
-        Column("pupdate", String(120), nullable=True),
-        Column("add_date", DateTime, nullable=False, server_default=func.current_timestamp()),
-        Column("deleted", Integer, nullable=False, server_default=text("0")),
-        Column("mdwiki_revid", Integer, nullable=True),
-    )
-    pages_users.create(engine)
-
-    # Create views_new table first (needed for views_new_all view)
-    views_new = Table(
-        "views_new",
-        meta,
-        Column("id", Integer, primary_key=True),
-        Column("target", String(120), nullable=False),
-        Column("lang", String(30), nullable=False),
-        Column("year", Integer, nullable=False),
-        Column("views", Integer, nullable=True),
-        UniqueConstraint("target", "lang", "year", name="target_lang_year"),
-    )
-    views_new.create(engine)
-
-    # Create views_new_all as a view
-    with engine.connect() as conn:
-        conn.execute(
-            text(
-                """
-                CREATE VIEW IF NOT EXISTS views_new_all AS
-                SELECT target, lang, SUM(views) as views
-                FROM views_new
-                GROUP BY target, lang
-                """
-            )
-        )
-        conn.commit()
-
-    # Create all other tables from BaseDb metadata
-    for table in BaseDb.metadata.sorted_tables:
-        if table.name not in ("views_new_all", "pages_users", "views_new"):
-            table.create(engine, checkfirst=True)
-
-    yield
-
-
-@pytest.fixture
-def mock_admin_required(mocker):
-    """Mock admin_required decorator to bypass authentication checks.
-
-    Inject this fixture into admin route tests to bypass authentication
-    so tests can focus on route functionality rather than auth.
+    Creates all real tables (skipping views) and creates views manually.
+    The Flask-SQLAlchemy session (db.session) is used throughout tests.
     """
-    # Mock current_user to return a valid user object
-    mock_user = MagicMock()
-    mock_user.username = "admin"
-    mocker.patch("src.main_app.admin.decorators.current_user", return_value=mock_user)
+    with app.app_context():
+        # Create only real tables; skip view-backed mapped classes
+        real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
+        _db.metadata.create_all(_db.engine, tables=real_tables)
 
-    # Mock _get_cached_active_coordinators to return list with "admin"
-    mocker.patch(
-        "src.main_app.admin.decorators._get_cached_active_coordinators",
-        return_value=["admin"],
-    )
+        # Create views manually (SQLite-compatible CREATE VIEW)
+        with _db.engine.connect() as conn:
+            for table in _db.metadata.tables.values():
+                if table.info.get("is_view") and table.info.get("create_query"):
+                    try:
+                        conn.execute(text(table.info["create_query"]))
+                        conn.commit()
+                    except Exception:
+                        conn.rollback()
+
+        yield
+
+        _db.session.remove()
+
+        # Drop views first (SQLite requires DROP VIEW, not DROP TABLE)
+        with _db.engine.connect() as conn:
+            for table in _db.metadata.tables.values():
+                if table.info.get("is_view"):
+                    try:
+                        conn.execute(text(f"DROP VIEW IF EXISTS {table.name}"))
+                    except Exception:
+                        pass
+            conn.commit()
+
+        # Drop only real tables
+        real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
+        _db.metadata.drop_all(_db.engine, tables=real_tables)

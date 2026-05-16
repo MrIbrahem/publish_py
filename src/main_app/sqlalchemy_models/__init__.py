@@ -1,4 +1,3 @@
-from .all_articles import AllArticlesRecord
 from .dashboard import (
     CategoryRecord,
     ProjectRecord,
@@ -42,10 +41,10 @@ from .views import (
     ViewsNewRecord,
 )
 
+from .all_articles import AllArticlesRecord
+
 __all__ = [
     "AllArticlesRecord",
-    "AllQidsExistRecord",
-    "AllQidsRecord",
     "AssessmentRecord",
     "CategoryRecord",
     "CoordinatorRecord",
