@@ -44,6 +44,8 @@ from .views import (
 
 __all__ = [
     "AllArticlesRecord",
+    "AllQidsExistRecord",
+    "AllQidsRecord",
     "AssessmentRecord",
     "CategoryRecord",
     "CoordinatorRecord",

@@ -29,7 +29,6 @@
 
 ---
 
-
 ## 1. Current Architecture Assessment
 
 ### 1.1 Current Project Structure
@@ -112,14 +111,14 @@ def create_app(config_class=None):
 
 ### 1.3 Identified Anti-Patterns
 
-| Anti-Pattern | Location | Risk Level | Description |
-|---|---|---|---|
-| Global mutable state | `engine.py` (`_SessionFactory`) | **High** | Module-level singleton makes testing difficult |
-| Manual session lifecycle | All services | **Medium** | `with get_session() as session:` requires discipline |
-| No request-scoped sessions | Services | **High** | Sessions not tied to Flask request lifecycle |
-| Mixed concerns in engine.py | `engine.py` | **Medium** | Base class, engine, session, views all in one file |
-| No migration tooling | Project-wide | **High** | `create_all()` used instead of proper migrations |
-| Tight coupling to MySQL | `engine.py` | **Low** | `connect_args` specific to MySQL |
+| Anti-Pattern                | Location                        | Risk Level | Description                                          |
+| --------------------------- | ------------------------------- | ---------- | ---------------------------------------------------- |
+| Global mutable state        | `engine.py` (`_SessionFactory`) | **High**   | Module-level singleton makes testing difficult       |
+| Manual session lifecycle    | All services                    | **Medium** | `with get_session() as session:` requires discipline |
+| No request-scoped sessions  | Services                        | **High**   | Sessions not tied to Flask request lifecycle         |
+| Mixed concerns in engine.py | `engine.py`                     | **Medium** | Base class, engine, session, views all in one file   |
+| No migration tooling        | Project-wide                    | **High**   | `create_all()` used instead of proper migrations     |
+| Tight coupling to MySQL     | `engine.py`                     | **Low**    | `connect_args` specific to MySQL                     |
 
 ### 1.4 Migration Risk Analysis
 
@@ -158,20 +157,19 @@ services/* ──> get_session() ───────────────�
 
 ---
 
-
 ## 2. Migration Strategy
 
 ### 2.1 Incremental vs Full Migration
 
-| Criteria | Incremental (Recommended) | Full Rewrite |
-|---|---|---|
-| **Risk** | Low - changes isolated per phase | High - all-or-nothing |
-| **Rollback** | Easy - revert single phase | Difficult - entire app affected |
-| **Testing** | Validate after each phase | Only validate at end |
-| **Downtime** | Zero | Potential downtime |
-| **Team coordination** | Minimal blocking | High blocking |
-| **Timeline** | 2-3 weeks | 1-2 weeks (if no issues) |
-| **Recommended for** | Production systems | Greenfield rewrites |
+| Criteria              | Incremental (Recommended)        | Full Rewrite                    |
+| --------------------- | -------------------------------- | ------------------------------- |
+| **Risk**              | Low - changes isolated per phase | High - all-or-nothing           |
+| **Rollback**          | Easy - revert single phase       | Difficult - entire app affected |
+| **Testing**           | Validate after each phase        | Only validate at end            |
+| **Downtime**          | Zero                             | Potential downtime              |
+| **Team coordination** | Minimal blocking                 | High blocking                   |
+| **Timeline**          | 2-3 weeks                        | 1-2 weeks (if no issues)        |
+| **Recommended for**   | Production systems               | Greenfield rewrites             |
 
 **Decision: Incremental Migration** - This project is in production on Toolforge. Zero-downtime incremental approach is mandatory.
 
@@ -337,7 +335,6 @@ csrf = CSRFProtect()
 
 ---
 
-
 ## 4. Flask-SQLAlchemy Setup
 
 ### 4.1 Installation
@@ -348,6 +345,7 @@ pip install flask-migrate>=4.0.0
 ```
 
 Update `requirements.txt`:
+
 ```
 flask-sqlalchemy>=3.1.0
 flask-migrate>=4.0.0
@@ -450,14 +448,14 @@ def build_sqlalchemy_uri(db_config: DbConfig) -> str | None:
 
 ### 4.5 Session Management Differences
 
-| Aspect | Plain SQLAlchemy (Current) | Flask-SQLAlchemy (Target) |
-|---|---|---|
+| Aspect           | Plain SQLAlchemy (Current)  | Flask-SQLAlchemy (Target)      |
+| ---------------- | --------------------------- | ------------------------------ |
 | Session creation | `get_session()` manual call | `db.session` proxy (automatic) |
-| Session scope | Manual `with` block | Request-scoped (auto-removed) |
-| Commit | Explicit `session.commit()` | Explicit `db.session.commit()` |
-| Rollback | Explicit in `except` block | Auto on unhandled exception |
-| Teardown | Manual close in `with` | Auto at end of request |
-| Thread safety | Developer responsibility | Scoped session handles it |
+| Session scope    | Manual `with` block         | Request-scoped (auto-removed)  |
+| Commit           | Explicit `session.commit()` | Explicit `db.session.commit()` |
+| Rollback         | Explicit in `except` block  | Auto on unhandled exception    |
+| Teardown         | Manual close in `with`      | Auto at end of request         |
+| Thread safety    | Developer responsibility    | Scoped session handles it      |
 
 ---
 
@@ -484,10 +482,11 @@ db = SQLAlchemy(model_class=BaseDb)
 ```
 
 This means:
-- All existing models continue to work unchanged
-- `to_dict()` method preserved
-- No import changes in model files
-- Relationships, mixins, everything stays the same
+
+-   All existing models continue to work unchanged
+-   `to_dict()` method preserved
+-   No import changes in model files
+-   Relationships, mixins, everything stays the same
 
 ### 5.3 Strategy B: Full Migration (If Deeper Integration Desired)
 
@@ -622,7 +621,6 @@ db = SQLAlchemy(metadata=metadata, model_class=BaseDb)
 ```
 
 ---
-
 
 ## 6. Session & Transaction Management
 
@@ -939,7 +937,6 @@ def include_object(object, name, type_, reflected, compare_to):
 
 ---
 
-
 ## 8. Application Factory Pattern
 
 ### 8.1 Refactored `create_app()` Implementation
@@ -1091,9 +1088,9 @@ convention = {
 metadata = MetaData(naming_convention=convention)
 
 # Flask-SQLAlchemy instance
-# model_class=None means we use db.Model as base (Strategy B)
-# For Strategy A, pass model_class=BaseDb
-db = SQLAlchemy(metadata=metadata)
+# Strategy A: Use existing BaseDb
+from ..engine import BaseDb
+db = SQLAlchemy(metadata=metadata, model_class=BaseDb)
 
 # Flask-Migrate instance
 migrate = Migrate()
@@ -1296,24 +1293,23 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    env:
-      FLASK_SECRET_KEY: "ci-test-key"
-      USE_MW_OAUTH: "false"
-      SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
+    test:
+        runs-on: ubuntu-latest
+        env:
+            FLASK_SECRET_KEY: "ci-test-key"
+            USE_MW_OAUTH: "false"
+            SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: pytest --tb=short -q
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+            - run: pip install -r requirements.txt -r requirements-dev.txt
+            - run: pytest --tb=short -q
 ```
 
 ---
-
 
 ## 10. Performance & Scalability
 
@@ -1462,6 +1458,7 @@ from .models.users import UserRecord  # Circular!
 ```
 
 **Solution:** Always use string references in relationships:
+
 ```python
 # Use string class name - avoids import
 user = relationship("UserRecord", backref="pages")  # String, not class
@@ -1522,6 +1519,7 @@ migrations/versions/
 ```
 
 **Solution:**
+
 ```bash
 # After pulling conflicting migrations:
 flask db merge heads -m "merge migrations"
@@ -1530,13 +1528,13 @@ flask db merge heads -m "merge migrations"
 
 ### 11.5 Production Deployment Risks
 
-| Risk | Mitigation |
-|---|---|
-| Long-running migration locks tables | Use `ALTER TABLE ... ALGORITHM=INPLACE` for MySQL |
-| Migration fails mid-way | Always test on staging with production-like data volume |
-| Rollback needed after data migration | Keep data migrations separate from schema migrations |
+| Risk                                                 | Mitigation                                                                           |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Long-running migration locks tables                  | Use `ALTER TABLE ... ALGORITHM=INPLACE` for MySQL                                    |
+| Migration fails mid-way                              | Always test on staging with production-like data volume                              |
+| Rollback needed after data migration                 | Keep data migrations separate from schema migrations                                 |
 | `expire_on_commit=True` (default) causing lazy loads | Set `expire_on_commit=False` in engine options or access needed fields before commit |
-| `SQLALCHEMY_TRACK_MODIFICATIONS=True` (old default) | Always set to `False` - causes memory overhead |
+| `SQLALCHEMY_TRACK_MODIFICATIONS=True` (old default)  | Always set to `False` - causes memory overhead                                       |
 
 ### 11.6 The `expire_on_commit` Gotcha
 
@@ -1568,7 +1566,6 @@ SQLALCHEMY_ENGINE_OPTIONS = {
 ```
 
 ---
-
 
 ## 12. Step-by-Step Execution Timeline
 
@@ -1620,24 +1617,24 @@ SQLALCHEMY_ENGINE_OPTIONS = {
 
 ### 12.2 Team Responsibilities
 
-| Role | Responsibilities |
-|---|---|
-| **Tech Lead** | Architecture decisions, code review, rollback decisions |
-| **Backend Dev 1** | Extensions setup, config migration, create_app refactor |
-| **Backend Dev 2** | Model migration, service layer refactoring |
-| **QA Engineer** | Test refactoring, integration tests, staging validation |
-| **DevOps** | CI/CD updates, staging deployment, production deployment |
+| Role              | Responsibilities                                         |
+| ----------------- | -------------------------------------------------------- |
+| **Tech Lead**     | Architecture decisions, code review, rollback decisions  |
+| **Backend Dev 1** | Extensions setup, config migration, create_app refactor  |
+| **Backend Dev 2** | Model migration, service layer refactoring               |
+| **QA Engineer**   | Test refactoring, integration tests, staging validation  |
+| **DevOps**        | CI/CD updates, staging deployment, production deployment |
 
 ### 12.3 Validation Checkpoints
 
-| Checkpoint | Criteria | Owner |
-|---|---|---|
-| **CP-1: Foundation** | `flask db current` returns revision; all existing tests pass | Backend Dev 1 |
-| **CP-2: Models** | All models importable via Flask-SQLAlchemy; `db.session.query(Model)` works | Backend Dev 2 |
-| **CP-3: Services** | All service functions use `db.session`; no `get_session()` calls remain | Backend Dev 2 |
-| **CP-4: Tests** | Test suite passes with >90% coverage on service layer | QA Engineer |
-| **CP-5: Staging** | All API endpoints return correct responses on staging | QA + Tech Lead |
-| **CP-6: Production** | Zero errors for 24h after deployment | DevOps + Tech Lead |
+| Checkpoint           | Criteria                                                                    | Owner              |
+| -------------------- | --------------------------------------------------------------------------- | ------------------ |
+| **CP-1: Foundation** | `flask db current` returns revision; all existing tests pass                | Backend Dev 1      |
+| **CP-2: Models**     | All models importable via Flask-SQLAlchemy; `db.session.query(Model)` works | Backend Dev 2      |
+| **CP-3: Services**   | All service functions use `db.session`; no `get_session()` calls remain     | Backend Dev 2      |
+| **CP-4: Tests**      | Test suite passes with >90% coverage on service layer                       | QA Engineer        |
+| **CP-5: Staging**    | All API endpoints return correct responses on staging                       | QA + Tech Lead     |
+| **CP-6: Production** | Zero errors for 24h after deployment                                        | DevOps + Tech Lead |
 
 ### 12.4 Rollback Plan
 
@@ -1664,6 +1661,7 @@ Issue detected in production?
 ```
 
 **Pre-deployment rollback preparation:**
+
 ```bash
 # Before deploying, record current state
 flask db current > /tmp/pre_migration_revision.txt
@@ -1954,106 +1952,114 @@ def publish_batch(page_ids: list[int], publisher_id: int) -> dict:
 
 ---
 
-
 ## 14. Final Deliverables
 
 ### 14.1 Migration Checklist
 
 #### Phase 1: Foundation
-- [ ] `flask-sqlalchemy>=3.1.0` added to requirements.txt
-- [ ] `flask-migrate>=4.0.0` added to requirements.txt
-- [ ] `extensions.py` created with `db`, `migrate`, `csrf` instances
-- [ ] `SQLALCHEMY_DATABASE_URI` added to all Config classes
-- [ ] `SQLALCHEMY_TRACK_MODIFICATIONS = False` set
-- [ ] `SQLALCHEMY_ENGINE_OPTIONS` configured per environment
-- [ ] `create_app()` calls `db.init_app(app)` and `migrate.init_app(app, db)`
-- [ ] `flask db init` executed successfully
-- [ ] Baseline migration created and stamped
-- [ ] Existing test suite passes unchanged
+
+-   [ ] `flask-sqlalchemy>=3.1.0` added to requirements.txt
+-   [ ] `flask-migrate>=4.0.0` added to requirements.txt
+-   [ ] `extensions.py` created with `db`, `migrate`, `csrf` instances
+-   [ ] `SQLALCHEMY_DATABASE_URI` added to all Config classes
+-   [ ] `SQLALCHEMY_TRACK_MODIFICATIONS = False` set
+-   [ ] `SQLALCHEMY_ENGINE_OPTIONS` configured per environment
+-   [ ] `create_app()` calls `db.init_app(app)` and `migrate.init_app(app, db)`
+-   [ ] `flask db init` executed successfully
+-   [ ] Baseline migration created and stamped
+-   [ ] Existing test suite passes unchanged
 
 #### Phase 2: Models
-- [ ] BaseDb registered with Flask-SQLAlchemy OR models rewritten
-- [ ] All models importable from consolidated location
-- [ ] `to_dict()` method preserved on all models
-- [ ] Relationships verified and working
-- [ ] Custom types (LONGTEXT) working correctly
-- [ ] Naming convention applied to metadata
+
+-   [ ] BaseDb registered with Flask-SQLAlchemy OR models rewritten
+-   [ ] All models importable from consolidated location
+-   [ ] `to_dict()` method preserved on all models
+-   [ ] Relationships verified and working
+-   [ ] Custom types (LONGTEXT) working correctly
+-   [ ] Naming convention applied to metadata
 
 #### Phase 3: Services
-- [ ] All `get_session()` calls replaced with `db.session`
-- [ ] All manual `session.commit()` / `session.rollback()` reviewed
-- [ ] Error handling uses `db.session.rollback()` where appropriate
-- [ ] No dangling session references
-- [ ] Deprecation warnings added to old `get_session()` (if kept temporarily)
+
+-   [ ] All `get_session()` calls replaced with `db.session`
+-   [ ] All manual `session.commit()` / `session.rollback()` reviewed
+-   [ ] Error handling uses `db.session.rollback()` where appropriate
+-   [ ] No dangling session references
+-   [ ] Deprecation warnings added to old `get_session()` (if kept temporarily)
 
 #### Phase 4: Testing
-- [ ] `conftest.py` updated with new fixtures
-- [ ] Test database uses SQLite in-memory (or test MySQL)
-- [ ] All tests pass with new session management
-- [ ] Integration tests cover critical API endpoints
-- [ ] Coverage maintained at pre-migration levels
+
+-   [ ] `conftest.py` updated with new fixtures
+-   [ ] Test database uses SQLite in-memory (or test MySQL)
+-   [ ] All tests pass with new session management
+-   [ ] Integration tests cover critical API endpoints
+-   [ ] Coverage maintained at pre-migration levels
 
 #### Phase 5: Cleanup
-- [ ] Old `engine.py` removed or reduced to utility types only
-- [ ] `models/` directory removed (if consolidated)
-- [ ] All deprecated compatibility shims removed
-- [ ] Import paths updated project-wide
-- [ ] No remaining references to `init_db()` or `get_session()`
+
+-   [ ] Old `engine.py` removed or reduced to utility types only
+-   [ ] `models/` directory removed (if consolidated)
+-   [ ] All deprecated compatibility shims removed
+-   [ ] Import paths updated project-wide
+-   [ ] No remaining references to `init_db()` or `get_session()`
 
 #### Phase 6: Deployment
-- [ ] Staging deployment successful
-- [ ] `flask db upgrade` runs without error on staging
-- [ ] Smoke tests pass on staging
-- [ ] Production deployment executed
-- [ ] 24-hour monitoring shows no regressions
-- [ ] Rollback procedure tested and documented
+
+-   [ ] Staging deployment successful
+-   [ ] `flask db upgrade` runs without error on staging
+-   [ ] Smoke tests pass on staging
+-   [ ] Production deployment executed
+-   [ ] 24-hour monitoring shows no regressions
+-   [ ] Rollback procedure tested and documented
 
 ---
 
 ### 14.2 Risk Matrix
 
-| Risk | Probability | Impact | Severity | Mitigation |
-|---|---|---|---|---|
-| Session leak in production | Low | High | **High** | Flask-SQLAlchemy auto-cleanup; add monitoring |
-| Circular import in models | Medium | Medium | **Medium** | Strict import rules; extensions pattern |
-| Migration breaks existing schema | Low | Critical | **High** | Baseline migration + stamp; staging validation |
-| Performance regression | Medium | Medium | **Medium** | Connection pool tuning; query monitoring |
-| Application context errors | Medium | Low | **Low** | Ensure all DB access within request/app context |
-| Test suite failures | High | Low | **Low** | Incremental test migration; maintain old fixtures |
-| Production downtime during deploy | Low | High | **High** | Zero-downtime deployment; feature flag for DB layer |
-| Rollback needed post-deploy | Low | Medium | **Medium** | Pre-tested rollback procedure; DB snapshots |
-| Data corruption from session misuse | Very Low | Critical | **Medium** | Code review; transaction isolation in tests |
-| Third-party lib incompatibility | Very Low | Medium | **Low** | Pin versions; test in isolated environment |
+| Risk                                | Probability | Impact   | Severity   | Mitigation                                          |
+| ----------------------------------- | ----------- | -------- | ---------- | --------------------------------------------------- |
+| Session leak in production          | Low         | High     | **High**   | Flask-SQLAlchemy auto-cleanup; add monitoring       |
+| Circular import in models           | Medium      | Medium   | **Medium** | Strict import rules; extensions pattern             |
+| Migration breaks existing schema    | Low         | Critical | **High**   | Baseline migration + stamp; staging validation      |
+| Performance regression              | Medium      | Medium   | **Medium** | Connection pool tuning; query monitoring            |
+| Application context errors          | Medium      | Low      | **Low**    | Ensure all DB access within request/app context     |
+| Test suite failures                 | High        | Low      | **Low**    | Incremental test migration; maintain old fixtures   |
+| Production downtime during deploy   | Low         | High     | **High**   | Zero-downtime deployment; feature flag for DB layer |
+| Rollback needed post-deploy         | Low         | Medium   | **Medium** | Pre-tested rollback procedure; DB snapshots         |
+| Data corruption from session misuse | Very Low    | Critical | **Medium** | Code review; transaction isolation in tests         |
+| Third-party lib incompatibility     | Very Low    | Medium   | **Low**    | Pin versions; test in isolated environment          |
 
 ---
 
 ### 14.3 QA Validation Checklist
 
 #### Functional Tests
-- [ ] User authentication and authorization works
-- [ ] All CRUD operations on pages succeed
-- [ ] Coordinator management functions correctly
-- [ ] Publish workflow completes end-to-end
-- [ ] API endpoints return correct status codes and data
-- [ ] Error responses are properly formatted
-- [ ] Pagination works on list endpoints
-- [ ] Search/filter queries return correct results
+
+-   [ ] User authentication and authorization works
+-   [ ] All CRUD operations on pages succeed
+-   [ ] Coordinator management functions correctly
+-   [ ] Publish workflow completes end-to-end
+-   [ ] API endpoints return correct status codes and data
+-   [ ] Error responses are properly formatted
+-   [ ] Pagination works on list endpoints
+-   [ ] Search/filter queries return correct results
 
 #### Non-Functional Tests
-- [ ] Response time within acceptable limits (<200ms for reads, <500ms for writes)
-- [ ] No connection pool exhaustion under normal load
-- [ ] Memory usage stable over extended operation
-- [ ] No session leak detected (monitor session count)
-- [ ] Concurrent requests handled correctly (no race conditions)
-- [ ] Database reconnection works after transient failures
+
+-   [ ] Response time within acceptable limits (<200ms for reads, <500ms for writes)
+-   [ ] No connection pool exhaustion under normal load
+-   [ ] Memory usage stable over extended operation
+-   [ ] No session leak detected (monitor session count)
+-   [ ] Concurrent requests handled correctly (no race conditions)
+-   [ ] Database reconnection works after transient failures
 
 #### Regression Tests
-- [ ] All existing API contracts unchanged
-- [ ] Date/time formatting consistent with pre-migration
-- [ ] Unicode data (Arabic text) handled correctly
-- [ ] NULL vs empty string handling preserved
-- [ ] Default values applied correctly
-- [ ] Views (users_list) still functional
+
+-   [ ] All existing API contracts unchanged
+-   [ ] Date/time formatting consistent with pre-migration
+-   [ ] Unicode data (Arabic text) handled correctly
+-   [ ] NULL vs empty string handling preserved
+-   [ ] Default values applied correctly
+-   [ ] Views (users_list) still functional
 
 ---
 
@@ -2110,45 +2116,51 @@ POST-DEPLOYMENT (First 24 hours)
 **Decision:** Use Strategy A (register existing BaseDb with Flask-SQLAlchemy's `model_class` parameter).
 
 **Rationale:**
-- Minimizes code changes across 10+ model files
-- Preserves existing `to_dict()` implementation
-- Avoids breaking service layer imports
-- Can migrate to Strategy B incrementally later if desired
+
+-   Minimizes code changes across 10+ model files
+-   Preserves existing `to_dict()` implementation
+-   Avoids breaking service layer imports
+-   Can migrate to Strategy B incrementally later if desired
 
 **Consequences:**
-- Models don't get Flask-SQLAlchemy convenience methods (e.g., `Model.query`)
-- Must use `db.session.query(Model)` instead of `Model.query`
-- Custom TypeDecorators (LONGTEXT) work without modification
+
+-   Models don't get Flask-SQLAlchemy convenience methods (e.g., `Model.query`)
+-   Must use `db.session.query(Model)` instead of `Model.query`
+-   Custom TypeDecorators (LONGTEXT) work without modification
 
 ### ADR-002: Session Management Pattern
 
 **Decision:** Use Flask-SQLAlchemy's request-scoped `db.session` for all operations.
 
 **Rationale:**
-- Eliminates manual session lifecycle management
-- Prevents session leaks
-- Integrates with Flask's request/response cycle
-- Simplifies error handling (auto-rollback on unhandled exceptions)
+
+-   Eliminates manual session lifecycle management
+-   Prevents session leaks
+-   Integrates with Flask's request/response cycle
+-   Simplifies error handling (auto-rollback on unhandled exceptions)
 
 **Consequences:**
-- Background tasks must explicitly manage application context
-- CLI commands get automatic context from Flask
-- Testing requires proper fixture setup
+
+-   Background tasks must explicitly manage application context
+-   CLI commands get automatic context from Flask
+-   Testing requires proper fixture setup
 
 ### ADR-003: Migration Tooling
 
 **Decision:** Use Flask-Migrate (Alembic) for schema migrations.
 
 **Rationale:**
-- Replaces unsafe `create_all()` in production
-- Provides reversible migrations
-- Enables team collaboration on schema changes
-- Industry standard for Flask + SQLAlchemy projects
+
+-   Replaces unsafe `create_all()` in production
+-   Provides reversible migrations
+-   Enables team collaboration on schema changes
+-   Industry standard for Flask + SQLAlchemy projects
 
 **Consequences:**
-- New workflow for schema changes (generate → review → apply)
-- Must maintain migration history in version control
-- Baseline migration needed for existing database
+
+-   New workflow for schema changes (generate → review → apply)
+-   Must maintain migration history in version control
+-   Baseline migration needed for existing database
 
 ---
 
@@ -2190,7 +2202,7 @@ flask db merge heads             # Merge conflicting migrations
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: May 2026*
-*Authors: Engineering Team*
-*Status: Ready for Review*
+_Document Version: 1.0_
+_Last Updated: May 2026_
+_Authors: Engineering Team_
+_Status: Ready for Review_

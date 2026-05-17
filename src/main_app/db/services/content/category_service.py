@@ -9,8 +9,8 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from ...db.models import CategoryRecord
-from ..core.extensions import db
+from ...models import CategoryRecord
+from ....shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
