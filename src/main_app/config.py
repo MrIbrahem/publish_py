@@ -90,6 +90,7 @@ class Settings:
     revids_api_url: str
     wikidata_domain: str
     is_localhost: Callable[[str], bool]
+    # has_db_config: callable
 
     # Nested configurations
     database_data: DbConfig
@@ -134,6 +135,17 @@ def resolve_path(_path) -> Path:
 
 
 def _load_database_config() -> DbConfig:
+    """
+    Construct a DbConfig populated from environment variables.
+
+    Reads TOOL_TOOLSDB_DBNAME and TOOL_TOOLSDB_HOST (defaulting to empty string) and TOOL_TOOLSDB_USER and TOOL_TOOLSDB_PASSWORD (defaulting to None) and returns a DbConfig with those values.
+    Returns:
+        DbConfig: Configuration with fields:
+            - db_name: from TOOL_TOOLSDB_DBNAME (default "").
+            - db_host: from TOOL_TOOLSDB_HOST (default "").
+            - db_user: from TOOL_TOOLSDB_USER (or None).
+            - db_password: from TOOL_TOOLSDB_PASSWORD (or None).
+    """
     return DbConfig(
         db_name=os.getenv("TOOL_TOOLSDB_DBNAME", ""),
         db_host=os.getenv("TOOL_TOOLSDB_HOST", ""),
