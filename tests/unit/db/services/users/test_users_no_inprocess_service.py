@@ -49,7 +49,8 @@ def test_users_no_inprocess_workflow():
     assert should_hide_from_inprocess("User_1") is True
 
     # Test delete
-    delete_users_no_inprocess(rec.id)
+    deleted = delete_users_no_inprocess(rec.id)
+    assert deleted is True
     assert get_users_no_inprocess(rec.id) is None
 
 

@@ -54,7 +54,8 @@ def test_views_new_workflow():
     assert v4.views == 1700000
 
     # Test delete
-    delete_views_new(v.id)
+    deleted = delete_views_new(v.id)
+    assert deleted is True
     assert get_views_new(v.id) is None
 
 

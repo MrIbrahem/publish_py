@@ -43,7 +43,8 @@ def test_language_setting_workflow():
     assert ls4.expend == 1
 
     # Test delete
-    delete_language_setting(ls.id)
+    deleted = delete_language_setting(ls.id)
+    assert deleted is True
     assert get_language_setting(ls.id) is None
 
 

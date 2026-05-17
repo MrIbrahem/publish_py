@@ -15,13 +15,11 @@ from ...models import CategoryRecord
 logger = logging.getLogger(__name__)
 
 
-def set_default_category(session: Session, orm_obj) -> CategoryRecord:
+def set_default_category(session: Session) -> None:
     session.query(CategoryRecord).update({CategoryRecord.is_default: 0})
-    orm_obj.is_default = 1
-    session.commit()
-    session.refresh(orm_obj)
-    record = CategoryRecord(**orm_obj.to_dict())
-    return record
+    # orm_obj.is_default = 1
+    # session.commit()
+    # session.refresh(orm_obj)
 
 
 def add_category(
@@ -53,15 +51,15 @@ def add_category(
         )
         db.session.add(orm_obj)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    record = CategoryRecord(**orm_obj.to_dict())
-
     if is_default:
         # set this category as default by unsetting default flag on all other categories
-        record = set_default_category(db.session, orm_obj)
+        set_default_category(db.session)
+        orm_obj.is_default = 1
 
-    return record
+    db.session.commit()
+    db.session.refresh(orm_obj)
+
+    return orm_obj
 
 
 def update_category(
@@ -84,15 +82,15 @@ def update_category(
     orm_obj.category2 = category2
     orm_obj.depth = depth
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    record = CategoryRecord(**orm_obj.to_dict())
-
     if is_default:
         # set this category as default by unsetting default flag on all other categories
-        record = set_default_category(db.session, orm_obj)
+        set_default_category(db.session)
+        orm_obj.is_default = 1
 
-    return record
+    db.session.commit()
+    db.session.refresh(orm_obj)
+
+    return orm_obj
 
 
 def delete_category(category_id: int) -> None:

@@ -27,7 +27,9 @@ def upsert_user_token(*, user_id: int, username: str, access_key: str, access_se
     encrypted_secret = encrypt_value(access_secret)
     now = func.current_timestamp()
 
-    orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+    # orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+    # # user_id is the primary key for UserTokenRecord
+    orm_obj = db.session.get(UserTokenRecord, user_id)
     if orm_obj:
         orm_obj.username = username
         orm_obj.access_token = encrypted_token
@@ -56,7 +58,10 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
         return None
 
     user_id = int(user_id)
-    orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+    # orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+
+    # # user_id is the primary key for UserTokenRecord
+    orm_obj = db.session.get(UserTokenRecord, user_id)
     if not orm_obj:
         return None
     return orm_obj
@@ -67,8 +72,11 @@ def delete_user_token(user_id: int) -> None:
     if not user_id:
         return
 
-    db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).delete()
-    db.session.commit()
+    # # user_id is the primary key for UserTokenRecord
+    orm_obj = db.session.get(UserTokenRecord, user_id)
+    if orm_obj:
+        db.session.delete(orm_obj)
+        db.session.commit()
 
 
 def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
@@ -88,9 +96,10 @@ def delete_user_token_by_username(username: str) -> None:
     username = username.strip()
     if not username:
         return
-
-    db.session.query(UserTokenRecord).filter(UserTokenRecord.username == username).delete()
-    db.session.commit()
+    orm_obj = get_user_token_by_username(username)
+    if orm_obj:
+        db.session.delete(orm_obj)
+        db.session.commit()
 
 
 __all__ = [

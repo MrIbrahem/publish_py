@@ -56,7 +56,8 @@ def test_translate_type_workflow():
     assert tt4.tt_lead == 0
 
     # Test delete
-    delete_translate_type(tt.tt_id)
+    deleted = delete_translate_type(tt.tt_id)
+    assert deleted is True
     assert get_translate_type(tt.tt_id) is None
 
 

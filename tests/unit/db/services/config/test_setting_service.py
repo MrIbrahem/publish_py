@@ -37,7 +37,8 @@ def test_setting_workflow():
     assert updated.value == "MDWiki"
 
     # Test delete
-    delete_setting(s.id)
+    deleted = delete_setting(s.id)
+    assert deleted is True
     assert get_setting(s.id) is None
 
 

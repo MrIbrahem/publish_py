@@ -114,14 +114,18 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
     return orm_obj
 
 
-def delete_language_setting(setting_id: int):
+def delete_language_setting(setting_id: int) -> bool:
     """Delete a language setting record by ID."""
-    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+    # orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+    orm_obj = db.session.get(LanguageSettingRecord, setting_id)
     if not orm_obj:
         raise ValueError(f"Language setting record with ID {setting_id} not found")
 
     db.session.delete(orm_obj)
     db.session.commit()
+
+    deleted = db.session.get(LanguageSettingRecord, setting_id)
+    return deleted is None
 
 
 __all__ = [

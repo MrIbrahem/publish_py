@@ -101,16 +101,18 @@ def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
     return orm_obj
 
 
-def delete_refs_count(refs_id: int) -> RefsCountRecord:
+def delete_refs_count(refs_id: int) -> bool:
     """Delete a refs_count record by ID."""
-    orm_obj = db.session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+    # orm_obj = db.session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+    orm_obj = db.session.get(RefsCountRecord, refs_id)
     if not orm_obj:
         raise ValueError(f"RefsCount record with ID {refs_id} not found")
 
-    record = RefsCountRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(RefsCountRecord, refs_id)
+    return deleted is None
 
 
 def get_ref_counts_for_title(title: str) -> tuple[int | None, int | None]:

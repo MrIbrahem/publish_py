@@ -37,7 +37,8 @@ def test_pages_users_to_main_workflow():
     assert updated.new_target == "Hépatite B (maladie)"
 
     # Test delete
-    delete_pages_users_to_main(1)
+    deleted = delete_pages_users_to_main(1)
+    assert deleted is True
     assert get_pages_users_to_main(1) is None
 
 
