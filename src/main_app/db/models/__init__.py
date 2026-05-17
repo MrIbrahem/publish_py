@@ -1,42 +1,42 @@
-from .all_articles import AllArticlesRecord
-from .dashboard import (
+from ...models.all_articles import AllArticlesRecord
+from ...models.dashboard import (
     CategoryRecord,
     ProjectRecord,
 )
-from .metrics import (
+from ...models.metrics import (
     AssessmentRecord,
     RefsCountRecord,
     WordRecord,
 )
-from .pages import (
+from ...models.pages import (
     InProcessRecord,
     PageRecord,
     PagesUsersToMainRecord,
     UserPageRecord,
 )
-from .public import (
+from ...models.public import (
     LangRecord,
     MdwikiRevidRecord,
     TranslateTypeRecord,
 )
-from .publish import ReportRecord
-from .qid import (
+from ...models.publish import ReportRecord
+from ...models.qid import (
     AllQidsExistRecord,
     AllQidsRecord,
     QidRecord,
 )
-from .setting import (
+from ...models.setting import (
     LanguageSettingRecord,
     SettingRecord,
 )
-from .users import (
+from ...models.users import (
     CoordinatorRecord,
     FullTranslatorRecord,
     UserRecord,
     UsersNoInprocessRecord,
     UserTokenRecord,
 )
-from .views import (
+from ...models.views import (
     EnwikiPageviewRecord,
     ViewsNewAllRecord,
     ViewsNewRecord,

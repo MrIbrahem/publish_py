@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.main_app.models import UserTokenRecord
+from src.main_app.db.models import UserTokenRecord
 
 
 @pytest.fixture

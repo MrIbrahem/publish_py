@@ -4,7 +4,7 @@ Unit tests for domain.models.pages_users_to_main module.
 Tests for PagesUsersToMainRecord.
 """
 
-from src.main_app.models import PagesUsersToMainRecord
+from src.main_app.db.models import PagesUsersToMainRecord
 
 
 class TestPagesUsersToMainRecord:

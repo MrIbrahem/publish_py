@@ -4,7 +4,7 @@ Unit tests for domain.models.users_no_inprocess module.
 Tests for UsersNoInprocessRecord.
 """
 
-from src.main_app.models import UsersNoInprocessRecord
+from src.main_app.db.models import UsersNoInprocessRecord
 
 
 class TestUsersNoInprocessRecord:

@@ -12,7 +12,7 @@ from src.main_app.shared.services.config.setting_service import (
 )
 
 # from src.main_app.models import SettingRecord
-from src.main_app.models import SettingRecord
+from src.main_app.db.models import SettingRecord
 
 
 def test_setting_workflow():

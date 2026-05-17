@@ -14,7 +14,7 @@ from src.main_app.shared.services.pages.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
-from src.main_app.models import InProcessRecord
+from src.main_app.db.models import InProcessRecord
 
 
 def test_in_process_workflow():

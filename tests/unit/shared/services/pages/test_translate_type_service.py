@@ -15,7 +15,7 @@ from src.main_app.shared.services.pages.translate_type_service import (
     list_translate_types,
     update_translate_type,
 )
-from src.main_app.models import TranslateTypeRecord
+from src.main_app.db.models import TranslateTypeRecord
 
 
 def test_translate_type_workflow():

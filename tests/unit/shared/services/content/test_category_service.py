@@ -10,7 +10,7 @@ from src.main_app.shared.services.content.category_service import (
     list_categories,
     update_category,
 )
-from src.main_app.models import CategoryRecord
+from src.main_app.db.models import CategoryRecord
 
 
 def test_category_workflow() -> None:

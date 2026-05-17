@@ -15,7 +15,7 @@ from src.main_app.shared.services.users.coordinator_service import (
     set_coordinator_active,
     update_coordinator,
 )
-from src.main_app.models import CoordinatorRecord
+from src.main_app.db.models import CoordinatorRecord
 
 
 def test_coordinator_workflow():

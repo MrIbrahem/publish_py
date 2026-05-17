@@ -5,7 +5,7 @@ Tests for SettingRecord.
 """
 
 # from src.main_app.models import SettingRecord
-from src.main_app.models import SettingRecord
+from src.main_app.db.models import SettingRecord
 
 
 class TestSettingRecord:

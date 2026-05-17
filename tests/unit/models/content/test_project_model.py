@@ -4,7 +4,7 @@ Unit tests for domain.models.project module.
 Tests for ProjectRecord.
 """
 
-from src.main_app.models import ProjectRecord
+from src.main_app.db.models import ProjectRecord
 
 
 class TestProjectRecord:
