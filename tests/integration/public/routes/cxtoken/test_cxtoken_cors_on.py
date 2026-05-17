@@ -4,7 +4,7 @@ with CORS_ENABLED (CORS_DISABLED=False).
 """
 
 from unittest.mock import MagicMock, patch
-
+import os
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
@@ -17,15 +17,13 @@ ALLOWED_DOMAIN = "medwiki.toolforge.org"
 @pytest.fixture
 def app() -> Flask:
     """Create a test Flask application with CORS enabled."""
-    import os
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", f"{ALLOWED_DOMAIN},mdwikicx.toolforge.org")
 
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.secret_key = "test_secret"
-
     app.config.from_object(TestingConfig)
+    app.config.update({"CORS_DISABLED": False})
     from src.main_app.shared.core.extensions import db
 
     db.init_app(app)
