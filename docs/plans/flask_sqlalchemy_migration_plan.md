@@ -50,7 +50,7 @@ src/
 │   │   └── utils/                  # Utility modules
 │   ├── admin/                      # Admin blueprint
 │   ├── public/                     # Public blueprint
-│   └── sqlalchemy_models/          # ORM models (BaseDb-based)
+│   └── models/          # ORM models (BaseDb-based)
 │       ├── all_articles.py
 │       ├── dashboard.py
 │       ├── metrics.py
@@ -153,7 +153,7 @@ services/* ──> get_session() ───────────────�
           session.query(Model)...
                     │
                     ▼
-         sqlalchemy_models/* ──> BaseDb (DeclarativeBase)
+         models/* ──> BaseDb (DeclarativeBase)
 ```
 
 ---
@@ -277,7 +277,7 @@ src/
 │   │   ├── __init__.py
 │   │   ├── routes/
 │   │   └── services/
-│   └── sqlalchemy_models/              # DEPRECATED → redirect imports to shared/models/
+│   └── models/              # DEPRECATED → redirect imports to shared/models/
 ├── migrations/                         # NEW: Alembic migrations directory
 │   ├── alembic.ini
 │   ├── env.py
@@ -293,7 +293,7 @@ Blueprints remain unchanged. The key change is how services within blueprints ac
 ```python
 # BEFORE (admin/services/coordinator_service.py)
 from ...shared.engine import get_session
-from ...sqlalchemy_models.users import CoordinatorRecord
+from ...models.users import CoordinatorRecord
 
 def list_coordinators():
     with get_session() as session:
@@ -519,7 +519,7 @@ class ModelMixin:
 
 ```python
 # ==================== BEFORE ====================
-# src/main_app/sqlalchemy_models/users.py
+# src/main_app/models/users.py
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from ..shared.engine import BaseDb
@@ -535,7 +535,7 @@ class UserRecord(BaseDb):
 
 
 # ==================== AFTER (Strategy A - Minimal) ====================
-# src/main_app/sqlalchemy_models/users.py
+# src/main_app/models/users.py
 # NO CHANGES NEEDED - BaseDb is registered with Flask-SQLAlchemy
 
 
@@ -1045,7 +1045,7 @@ def _register_error_handlers(app: Flask) -> None:
 def _register_context(app: Flask) -> None:
     """Register context processors and Jinja filters."""
     from .shared.auth.identity import current_user
-    from .shared.services.coordinator_service import active_coordinators
+    from .db.services.coordinator_service import active_coordinators
 
     @app.context_processor
     def _inject_data():
@@ -1205,7 +1205,7 @@ from main_app.shared.engine import get_session
 
 def test_get_coordinator():
     mock_session = MagicMock()
-    with patch("main_app.shared.services.coordinator_service.get_session") as mock_gs:
+    with patch("main_app.db.services.coordinator_service.get_session") as mock_gs:
         mock_gs.return_value.__enter__ = MagicMock(return_value=mock_session)
         mock_gs.return_value.__exit__ = MagicMock(return_value=False)
         # ... test logic
@@ -1224,7 +1224,7 @@ def test_get_coordinator(db, session):
     session.commit()
 
     # Act
-    from main_app.shared.services.coordinator_service import get_coordinator
+    from main_app.db.services.coordinator_service import get_coordinator
     result = get_coordinator(coordinator.id)
 
     # Assert
@@ -1689,7 +1689,7 @@ from __future__ import annotations
 import logging
 from typing import Optional
 from ..engine import get_session
-from ...sqlalchemy_models.pages import PageRecord
+from ...models.pages import PageRecord
 
 logger = logging.getLogger(__name__)
 
@@ -1843,7 +1843,7 @@ def delete_page(page_id: int) -> bool:
 # ════════════════════════════════════════════════════════════════
 
 from flask import Blueprint, jsonify, request, abort
-from ...shared.services.page_service import (
+from ...db.services.page_service import (
     get_page, get_pages_by_user, create_page, update_page, delete_page
 )
 from ...shared.auth.identity import login_required, current_user
@@ -1995,7 +1995,7 @@ def publish_batch(page_ids: list[int], publisher_id: int) -> dict:
 
 #### Phase 5: Cleanup
 - [ ] Old `engine.py` removed or reduced to utility types only
-- [ ] `sqlalchemy_models/` directory removed (if consolidated)
+- [ ] `models/` directory removed (if consolidated)
 - [ ] All deprecated compatibility shims removed
 - [ ] Import paths updated project-wide
 - [ ] No remaining references to `init_db()` or `get_session()`

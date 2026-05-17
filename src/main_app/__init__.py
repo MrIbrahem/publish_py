@@ -27,7 +27,7 @@ from .public.routes import (
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
-from .shared.services.coordinator_service import active_coordinators
+from .db.services.coordinator_service import active_coordinators
 
 logger = logging.getLogger(__name__)
 
