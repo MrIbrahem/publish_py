@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import EnwikiPageviewRecord
 from src.main_app.shared.services.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
@@ -12,7 +13,6 @@ from src.main_app.shared.services.enwiki_pageview_service import (
     list_enwiki_pageviews,
     update_enwiki_pageview,
 )
-from src.main_app.db.models import EnwikiPageviewRecord
 
 
 def test_enwiki_pageview_workflow():

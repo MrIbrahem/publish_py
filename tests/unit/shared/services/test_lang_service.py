@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import LangRecord
 from src.main_app.shared.services.lang_service import (
     add_lang,
     add_or_update_lang,
@@ -10,7 +11,6 @@ from src.main_app.shared.services.lang_service import (
     get_lang_by_code,
     list_langs,
 )
-from src.main_app.db.models import LangRecord
 
 
 def test_lang_workflow():

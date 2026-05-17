@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import ReportRecord
 from src.main_app.shared.engine import BaseDb, build_engine, get_session, init_db
 from src.main_app.shared.services.report_service import (
     add_report,
@@ -9,7 +10,6 @@ from src.main_app.shared.services.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-from src.main_app.db.models import ReportRecord
 
 
 def test_report_workflow():
