@@ -14,7 +14,7 @@ from ....shared.clients import (
     link_to_wikidata,
     publish_do_edit,
 )
-from ....shared.services import (
+from ....db.services import (
     add_report,
     find_exists_or_update_page,
     find_exists_or_update_user_page,
