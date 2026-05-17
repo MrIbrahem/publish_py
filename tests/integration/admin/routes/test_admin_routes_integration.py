@@ -104,7 +104,7 @@ class TestAdminRouteAccess:
     def test_authenticated_non_admin_redirected(self, auth_client: FlaskClient):
         """Test that authenticated non-admin users are denied access."""
         # Mock current_user to return a non-admin user
-        from src.main_app.shared.services.user_token_service import UserTokenRecord
+        from src.main_app.db.services.users.user_token_service import UserTokenRecord
 
         mock_user = UserTokenRecord(user_id=12345, username="TestUser")
 
@@ -122,7 +122,7 @@ class TestAdminRouteAccess:
     def test_authenticated_non_admin_forbidden(self, auth_client: FlaskClient):
         """Test that authenticated non-admin users are denied access."""
         # Mock current_user to return a non-admin user
-        from src.main_app.shared.services.user_token_service import UserTokenRecord
+        from src.main_app.db.services.users.user_token_service import UserTokenRecord
 
         mock_user = UserTokenRecord(user_id=12345, username="TestUser")
         with patch("src.main_app.admin.decorators.current_user", return_value=mock_user):

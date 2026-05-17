@@ -4,7 +4,7 @@ import pytest
 
 from src.main_app.db.models import UserPageRecord
 from src.main_app.shared.core.extensions import db
-from src.main_app.shared.services.user_page_service import (
+from src.main_app.db.services.pages.user_page_service import (
     add_user_page,
     delete_user_page,
     find_exists_or_update_user_page,

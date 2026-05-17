@@ -1045,7 +1045,7 @@ def _register_error_handlers(app: Flask) -> None:
 def _register_context(app: Flask) -> None:
     """Register context processors and Jinja filters."""
     from .shared.auth.identity import current_user
-    from .shared.services.coordinator_service import active_coordinators
+    from .db.services.users.coordinator_service import active_coordinators
 
     @app.context_processor
     def _inject_data():
@@ -1205,7 +1205,7 @@ from main_app.shared.engine import get_session
 
 def test_get_coordinator():
     mock_session = MagicMock()
-    with patch("main_app.shared.services.coordinator_service.get_session") as mock_gs:
+    with patch("main_app.db.services.users.coordinator_service.get_session") as mock_gs:
         mock_gs.return_value.__enter__ = MagicMock(return_value=mock_session)
         mock_gs.return_value.__exit__ = MagicMock(return_value=False)
         # ... test logic
@@ -1224,7 +1224,7 @@ def test_get_coordinator(db, session):
     session.commit()
 
     # Act
-    from main_app.shared.services.coordinator_service import get_coordinator
+    from main_app.db.services.users.coordinator_service import get_coordinator
     result = get_coordinator(coordinator.id)
 
     # Assert
@@ -1843,7 +1843,7 @@ def delete_page(page_id: int) -> bool:
 # ════════════════════════════════════════════════════════════════
 
 from flask import Blueprint, jsonify, request, abort
-from ...shared.services.page_service import (
+from ...db.services.pages.page_service import (
     get_page, get_pages_by_user, create_page, update_page, delete_page
 )
 from ...shared.auth.identity import login_required, current_user

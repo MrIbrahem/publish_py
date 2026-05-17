@@ -4,7 +4,7 @@ import pytest
 
 from src.main_app.db.models import LangRecord
 from src.main_app.shared.core.extensions import db
-from src.main_app.shared.services.lang_service import (
+from src.main_app.db.services.content.lang_service import (
     add_lang,
     add_or_update_lang,
     delete_lang,
