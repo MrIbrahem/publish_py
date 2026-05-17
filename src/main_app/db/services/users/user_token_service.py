@@ -28,7 +28,7 @@ def upsert_user_token(*, user_id: int, username: str, access_key: str, access_se
     now = func.current_timestamp()
 
     with get_session() as session:
-        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+        orm_obj = session.get(UserTokenRecord, user_id)
         if orm_obj:
             orm_obj.username = username
             orm_obj.access_token = encrypted_token
@@ -58,7 +58,7 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
 
     user_id = int(user_id)
     with get_session() as session:
-        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+        orm_obj = session.get(UserTokenRecord, user_id)
         if not orm_obj:
             return None
         return orm_obj
@@ -70,7 +70,7 @@ def delete_user_token(user_id: int) -> bool:
         return
 
     with get_session() as session:
-        orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.id == user_id).first()
+        orm_obj = session.get(UserTokenRecord, user_id)
         if not orm_obj:
             return
 
@@ -94,15 +94,20 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
         return orm_obj
 
 
-def delete_user_token_by_username(username: str) -> None:
+def delete_user_token_by_username(username: str) -> bool:
     """Remove the stored OAuth credentials for the given username."""
     username = username.strip()
     if not username:
-        return
-
+        return False
+    orm_obj = get_user_token_by_username(username)
+    if not orm_obj:
+        return False
     with get_session() as session:
-        session.query(UserTokenRecord).filter(UserTokenRecord.username == username).delete()
+        session.delete(orm_obj)
         session.commit()
+
+    deleted = get_user_token_by_username(username)
+    return deleted is None
 
 
 __all__ = [
