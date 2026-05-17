@@ -8,16 +8,18 @@ from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy import func, text
+from sqlalchemy import func
 
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
 from ....shared.schemas import PublishReportsQuerySchema
-from ....shared.services.category_service import list_categories
-from ....shared.services.in_process_service import get_in_process_counts_by_user
-from ....shared.services.lang_service import list_langs
-from ....shared.services.page_service import list_of_users_by_translations_count
-from ....shared.services.report_service import query_reports_with_filters
+from ....shared.services import (
+    get_in_process_counts_by_user,
+    list_categories,
+    list_langs,
+    list_of_users_by_translations_count,
+    query_reports_with_filters,
+)
 from ....shared.utils.web_utils import parse_select_fields
 from ....sqlalchemy_models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
 from .pages_query_service import list_pages_users, list_pages_with_views
