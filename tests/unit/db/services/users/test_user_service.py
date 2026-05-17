@@ -31,7 +31,8 @@ def test_user_workflow():
 
     assert user_exists("Wiki_User") is True
 
-    delete_user(u.user_id)
+    deleted = delete_user(u.user_id)
+    assert deleted is True
     assert get_user(u.user_id) is None
 
 
@@ -133,7 +134,8 @@ class TestDeleteUser:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         u = add_user("Temporary_Account")
-        delete_user(u.user_id)
+        deleted = delete_user(u.user_id)
+        assert deleted is True
         assert get_user(u.user_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

@@ -164,7 +164,8 @@ class TestDeleteEnwikiPageview:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         p = add_enwiki_pageview("Pathology")
-        delete_enwiki_pageview(p.id)
+        deleted = delete_enwiki_pageview(p.id)
+        assert deleted is True
         assert get_enwiki_pageview(p.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

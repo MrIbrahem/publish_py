@@ -19,10 +19,14 @@ def test_user_token_workflow():
     t = get_user_token(12345)
     assert t.username == "ExampleWikiEditor"
     assert get_user_token_by_username("ExampleWikiEditor").user_id == 12345
+
     delete_user_token_by_username("ExampleWikiEditor")
     assert get_user_token(12345) is None
+
     upsert_user_token(user_id=67890, username="TrustedContributor", access_key="key2", access_secret="secret2")
-    delete_user_token(67890)
+
+    deleted = delete_user_token(67890)
+    assert deleted is True
     assert get_user_token(67890) is None
 
 
@@ -77,7 +81,8 @@ class TestDeleteUserToken:
     def test_deletes_the_token(self, monkeypatch):
         """Test that function deletes the token."""
         upsert_user_token(user_id=200, username="TranslatorHelper", access_key="k1", access_secret="s1")
-        delete_user_token(200)
+        deleted = delete_user_token(200)
+        assert deleted is True
         assert get_user_token(200) is None
 
 

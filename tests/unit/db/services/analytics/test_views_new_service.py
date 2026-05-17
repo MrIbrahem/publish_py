@@ -186,7 +186,8 @@ class TestDeleteViewsNew:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         v = add_views_new("Asthma", "en", 2023)
-        delete_views_new(v.id)
+        deleted = delete_views_new(v.id)
+        assert deleted is True
         assert get_views_new(v.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

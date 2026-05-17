@@ -138,7 +138,8 @@ class TestDeletePagesUsersToMain:
         db.session.commit()
 
         add_pages_users_to_main(id=60, new_target="Ebola")
-        delete_pages_users_to_main(60)
+        deleted = delete_pages_users_to_main(60)
+        assert deleted is True
         assert get_pages_users_to_main(60) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

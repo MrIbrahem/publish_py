@@ -167,7 +167,8 @@ class TestDeleteLang:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         added = add_lang("ru", "Русский", "Russian")
-        delete_lang(added.lang_id)
+        deleted = delete_lang(added.lang_id)
+        assert deleted is True
         assert get_lang(added.lang_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

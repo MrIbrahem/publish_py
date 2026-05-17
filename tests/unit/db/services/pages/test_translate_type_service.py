@@ -183,7 +183,8 @@ class TestDeleteTranslateType:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         tt = add_translate_type("Pathology report")
-        delete_translate_type(tt.tt_id)
+        deleted = delete_translate_type(tt.tt_id)
+        assert deleted is True
         assert get_translate_type(tt.tt_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

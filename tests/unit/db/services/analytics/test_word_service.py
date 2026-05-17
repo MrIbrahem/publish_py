@@ -155,7 +155,8 @@ class TestDeleteWord:
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function deletes the record."""
         w = add_word("T-cell")
-        delete_word(w.w_id)
+        deleted = delete_word(w.w_id)
+        assert deleted is True
         assert get_word(w.w_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

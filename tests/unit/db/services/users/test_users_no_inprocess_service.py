@@ -162,7 +162,8 @@ class TestDeleteUsersNoInprocess:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         rec = add_users_no_inprocess("To_Delete")
-        delete_users_no_inprocess(rec.id)
+        deleted = delete_users_no_inprocess(rec.id)
+        assert deleted is True
         assert get_users_no_inprocess(rec.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

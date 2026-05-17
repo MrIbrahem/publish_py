@@ -162,7 +162,8 @@ class TestDeleteFullTranslator:
     def test_deletes_translator(self, monkeypatch):
         """Test that delete_full_translator calls store delete."""
         ft = add_full_translator("Delete_Trans")
-        delete_full_translator(ft.id)
+        deleted = delete_full_translator(ft.id)
+        assert deleted is True
         assert get_full_translator(ft.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
