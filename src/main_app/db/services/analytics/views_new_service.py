@@ -46,7 +46,7 @@ def list_views_by_lang(lang: str) -> List[ViewsNewRecord]:
 def get_views_new(view_id: int) -> ViewsNewRecord | None:
     """Get a views_new record by ID."""
     with get_session() as session:
-        orm_obj = session.query(ViewsNewRecord).filter(ViewsNewRecord.id == view_id).first()
+        orm_obj = session.get(ViewsNewRecord, view_id)
         if not orm_obj:
             logger.warning(f"ViewsNew record with ID {view_id} not found")
             return None
@@ -133,7 +133,7 @@ def add_or_update_views_new(
 def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
     """Update a views_new record."""
     with get_session() as session:
-        orm_obj = session.query(ViewsNewRecord).filter(ViewsNewRecord.id == view_id).first()
+        orm_obj = session.get(ViewsNewRecord, view_id)
         if not orm_obj:
             raise ValueError(f"ViewsNew record with ID {view_id} not found")
 
@@ -149,17 +149,18 @@ def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
         return orm_obj
 
 
-def delete_views_new(view_id: int) -> ViewsNewRecord:
+def delete_views_new(view_id: int) -> bool:
     """Delete a views_new record by ID."""
     with get_session() as session:
-        orm_obj = session.query(ViewsNewRecord).filter(ViewsNewRecord.id == view_id).first()
+        orm_obj = session.get(ViewsNewRecord, view_id)
         if not orm_obj:
             raise ValueError(f"ViewsNew record with ID {view_id} not found")
 
-        record = ViewsNewRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.get(ViewsNewRecord, view_id)
+        return deleted is None
 
 
 def get_total_views_for_target(target: str) -> int:
