@@ -49,7 +49,8 @@ def test_full_translator_workflow():
     assert is_full_translator("Global_Translator") is True
 
     # Test delete
-    delete_full_translator(ft.id)
+    deleted = delete_full_translator(ft.id)
+    assert deleted is True
     assert get_full_translator(ft.id) is None
 
 
