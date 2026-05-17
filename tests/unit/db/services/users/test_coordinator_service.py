@@ -3,8 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import CoordinatorRecord
-from src.main_app.shared.engine import init_db
-from src.main_app.shared.services.coordinator_service import (
+from src.main_app.db.services.users.coordinator_service import (
     active_coordinators,
     add_coordinator,
     add_or_update_coordinator,
@@ -16,6 +15,7 @@ from src.main_app.shared.services.coordinator_service import (
     set_coordinator_active,
     update_coordinator,
 )
+from src.main_app.shared.engine import init_db
 
 
 def test_coordinator_workflow():
@@ -60,7 +60,8 @@ def test_coordinator_workflow():
     assert c4.is_active == 0
 
     # Test delete
-    delete_coordinator(c.id)
+    deleted = delete_coordinator(c.id)
+    assert deleted is True
     assert get_coordinator(c.id) is None
 
 
@@ -174,7 +175,8 @@ class TestDeleteCoordinator:
     def test_deletes_coordinator(self, monkeypatch):
         """Test that delete_coordinator calls store delete."""
         c = add_coordinator("Delete_Me")
-        delete_coordinator(c.id)
+        deleted = delete_coordinator(c.id)
+        assert deleted is True
         assert get_coordinator(c.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

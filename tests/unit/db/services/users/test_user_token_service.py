@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import UserTokenRecord
-from src.main_app.shared.services.user_token_service import (
+from src.main_app.db.services.users.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,
     get_user_token,
@@ -19,10 +19,15 @@ def test_user_token_workflow():
     t = get_user_token(12345)
     assert t.username == "ExampleWikiEditor"
     assert get_user_token_by_username("ExampleWikiEditor").user_id == 12345
-    delete_user_token_by_username("ExampleWikiEditor")
+
+    deleted = delete_user_token_by_username("ExampleWikiEditor")
+    assert deleted is True
     assert get_user_token(12345) is None
+
     upsert_user_token(user_id=67890, username="TrustedContributor", access_key="key2", access_secret="secret2")
-    delete_user_token(67890)
+
+    deleted = delete_user_token(67890)
+    assert deleted is True
     assert get_user_token(67890) is None
 
 
@@ -77,7 +82,8 @@ class TestDeleteUserToken:
     def test_deletes_the_token(self, monkeypatch):
         """Test that function deletes the token."""
         upsert_user_token(user_id=200, username="TranslatorHelper", access_key="k1", access_secret="s1")
-        delete_user_token(200)
+        deleted = delete_user_token(200)
+        assert deleted is True
         assert get_user_token(200) is None
 
 
@@ -109,14 +115,16 @@ class TestDeleteUserTokenByUsername:
 
     def test_returns_none_for_empty_username(self, monkeypatch):
         """Test that None is returned for empty username."""
-        assert delete_user_token_by_username("") is None
+        assert delete_user_token_by_username("") is False
 
     def test_deletes_by_user_id_when_found(self, monkeypatch):
         """Test that token is deleted by user_id when username found."""
-        upsert_user_token(user_id=500, username="OneTimeUser", access_key="k1", access_secret="s1")
-        delete_user_token_by_username("OneTimeUser")
-        assert get_user_token(500) is None
+        upsert_user_token(user_id=5000, username="OneTimeUser", access_key="k1", access_secret="s1")
+        deleted = delete_user_token_by_username("OneTimeUser")
+        assert get_user_token(5000) is None
+        assert deleted is True
 
     def test_skips_delete_when_user_not_found(self, monkeypatch):
         """Test that delete is skipped when username not found."""
-        delete_user_token_by_username("NonExistentUser")
+        deleted = delete_user_token_by_username("NonExistentUser")
+        assert deleted is False

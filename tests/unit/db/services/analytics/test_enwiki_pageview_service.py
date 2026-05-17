@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import EnwikiPageviewRecord
-from src.main_app.shared.services.enwiki_pageview_service import (
+from src.main_app.db.services.analytics.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
     delete_enwiki_pageview,
@@ -46,7 +46,8 @@ def test_enwiki_pageview_workflow():
     assert p4.en_views == 10000
 
     # Test delete
-    delete_enwiki_pageview(p.id)
+    deleted = delete_enwiki_pageview(p.id)
+    assert deleted is True
     assert get_enwiki_pageview(p.id) is None
 
 
@@ -163,7 +164,8 @@ class TestDeleteEnwikiPageview:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         p = add_enwiki_pageview("Pathology")
-        delete_enwiki_pageview(p.id)
+        deleted = delete_enwiki_pageview(p.id)
+        assert deleted is True
         assert get_enwiki_pageview(p.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

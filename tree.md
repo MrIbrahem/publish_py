@@ -23,6 +23,7 @@ src/
 │   │   └── sidebar.py
 │   ├── config.py
 │   ├── db/
+│   │   ├── __init__.py
 │   │   ├── models/
 │   │   │   ├── __init__.py
 │   │   │   ├── all_articles.py
@@ -43,13 +44,45 @@ src/
 │   │   │   ├── views.py
 │   │   │   └── wikidata/
 │   │   └── services/
+│   │       ├── __init__.py
 │   │       ├── analytics/
+│   │       │   ├── __init__.py
+│   │       │   ├── assessment_service.py
+│   │       │   ├── enwiki_pageview_service.py
+│   │       │   ├── mdwiki_revid_service.py
+│   │       │   ├── refs_count_service.py
+│   │       │   ├── views_new_service.py
+│   │       │   └── word_service.py
 │   │       ├── config/
+│   │       │   ├── __init__.py
+│   │       │   ├── language_setting_service.py
+│   │       │   └── setting_service.py
 │   │       ├── content/
+│   │       │   ├── __init__.py
+│   │       │   ├── category_service.py
+│   │       │   ├── lang_service.py
+│   │       │   └── project_service.py
 │   │       ├── pages/
+│   │       │   ├── __init__.py
+│   │       │   ├── in_process_service.py
+│   │       │   ├── page_service.py
+│   │       │   ├── translate_type_service.py
+│   │       │   └── user_page_service.py
 │   │       ├── reports/
+│   │       │   ├── __init__.py
+│   │       │   ├── pages_users_to_main_service.py
+│   │       │   └── report_service.py
 │   │       ├── users/
+│   │       │   ├── __init__.py
+│   │       │   ├── coordinator_service.py
+│   │       │   ├── full_translator_service.py
+│   │       │   ├── user_service.py
+│   │       │   ├── user_token_service.py
+│   │       │   └── users_no_inprocess_service.py
 │   │       └── wikidata/
+│   │           ├── __init__.py
+│   │           ├── allqid_service.py
+│   │           └── qid_service.py
 │   ├── public/
 │   │   ├── __init__.py
 │   │   └── routes/
@@ -106,35 +139,8 @@ src/
 │       │   │   └── publish_secret_checks.py
 │       │   ├── crypto.py
 │       │   └── extensions.py
-│       ├── engine.py
 │       ├── schemas/
 │       │   └── __init__.py
-│       ├── services/
-│       │   ├── __init__.py
-│       │   ├── allqid_service.py
-│       │   ├── assessment_service.py
-│       │   ├── category_service.py
-│       │   ├── coordinator_service.py
-│       │   ├── enwiki_pageview_service.py
-│       │   ├── full_translator_service.py
-│       │   ├── in_process_service.py
-│       │   ├── lang_service.py
-│       │   ├── language_setting_service.py
-│       │   ├── mdwiki_revid_service.py
-│       │   ├── page_service.py
-│       │   ├── pages_users_to_main_service.py
-│       │   ├── project_service.py
-│       │   ├── qid_service.py
-│       │   ├── refs_count_service.py
-│       │   ├── report_service.py
-│       │   ├── setting_service.py
-│       │   ├── translate_type_service.py
-│       │   ├── user_page_service.py
-│       │   ├── user_service.py
-│       │   ├── user_token_service.py
-│       │   ├── users_no_inprocess_service.py
-│       │   ├── views_new_service.py
-│       │   └── word_service.py
 │       └── utils/
 │           ├── __init__.py
 │           ├── decode_bytes.py

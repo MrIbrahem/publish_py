@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import TranslateTypeRecord
-from src.main_app.shared.services.translate_type_service import (
+from src.main_app.db.services.pages.translate_type_service import (
     add_or_update_translate_type,
     add_translate_type,
     can_translate_full,
@@ -56,7 +56,8 @@ def test_translate_type_workflow():
     assert tt4.tt_lead == 0
 
     # Test delete
-    delete_translate_type(tt.tt_id)
+    deleted = delete_translate_type(tt.tt_id)
+    assert deleted is True
     assert get_translate_type(tt.tt_id) is None
 
 
@@ -182,7 +183,8 @@ class TestDeleteTranslateType:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         tt = add_translate_type("Pathology report")
-        delete_translate_type(tt.tt_id)
+        deleted = delete_translate_type(tt.tt_id)
+        assert deleted is True
         assert get_translate_type(tt.tt_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

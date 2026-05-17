@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import FullTranslatorRecord
-from src.main_app.shared.services.full_translator_service import (
+from src.main_app.db.services.users.full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,
     delete_full_translator,
@@ -49,7 +49,8 @@ def test_full_translator_workflow():
     assert is_full_translator("Global_Translator") is True
 
     # Test delete
-    delete_full_translator(ft.id)
+    deleted = delete_full_translator(ft.id)
+    assert deleted is True
     assert get_full_translator(ft.id) is None
 
 
@@ -161,7 +162,8 @@ class TestDeleteFullTranslator:
     def test_deletes_translator(self, monkeypatch):
         """Test that delete_full_translator calls store delete."""
         ft = add_full_translator("Delete_Trans")
-        delete_full_translator(ft.id)
+        deleted = delete_full_translator(ft.id)
+        assert deleted is True
         assert get_full_translator(ft.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

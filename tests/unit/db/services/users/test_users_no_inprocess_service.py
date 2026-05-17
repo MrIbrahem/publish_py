@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import UsersNoInprocessRecord
-from src.main_app.shared.services.users_no_inprocess_service import (
+from src.main_app.db.services.users.users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,
     delete_users_no_inprocess,
@@ -49,7 +49,8 @@ def test_users_no_inprocess_workflow():
     assert should_hide_from_inprocess("User_1") is True
 
     # Test delete
-    delete_users_no_inprocess(rec.id)
+    deleted = delete_users_no_inprocess(rec.id)
+    assert deleted is True
     assert get_users_no_inprocess(rec.id) is None
 
 
@@ -161,7 +162,8 @@ class TestDeleteUsersNoInprocess:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         rec = add_users_no_inprocess("To_Delete")
-        delete_users_no_inprocess(rec.id)
+        deleted = delete_users_no_inprocess(rec.id)
+        assert deleted is True
         assert get_users_no_inprocess(rec.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

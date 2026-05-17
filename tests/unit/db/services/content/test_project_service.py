@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import ProjectRecord
-from src.main_app.shared.services.project_service import (
+from src.main_app.db.services.content.project_service import (
     add_project,
     delete_project,
     get_project,
@@ -35,7 +35,8 @@ def test_project_workflow():
     assert updated.g_title == "WP:MED"
 
     # Test delete
-    delete_project(p.g_id)
+    deleted = delete_project(p.g_id)
+    assert deleted is True
     assert get_project(p.g_id) is None
 
 
@@ -120,7 +121,8 @@ class TestDeleteProject:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         p = add_project("WikiProject Temporary")
-        delete_project(p.g_id)
+        deleted = delete_project(p.g_id)
+        assert deleted is True
         assert get_project(p.g_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import LangRecord
-from src.main_app.shared.services.lang_service import (
+from src.main_app.db.services.content.lang_service import (
     add_lang,
     add_or_update_lang,
     delete_lang,
@@ -36,7 +36,8 @@ def test_lang_workflow():
     assert l4.name == "Modern Standard Arabic"
 
     # Test delete
-    delete_lang(added.lang_id)
+    deleted = delete_lang(added.lang_id)
+    assert deleted is True
     assert get_lang(added.lang_id) is None
 
 
@@ -91,7 +92,7 @@ class TestAddLang:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.shared.services.lang_service.get_session") as mock_get_session:
+        with patch("src.main_app.db.services.content.lang_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
@@ -168,7 +169,8 @@ class TestDeleteLang:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         added = add_lang("ru", "Русский", "Russian")
-        delete_lang(added.lang_id)
+        deleted = delete_lang(added.lang_id)
+        assert deleted is True
         assert get_lang(added.lang_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

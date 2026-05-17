@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import PagesUsersToMainRecord
-from src.main_app.shared.services.pages_users_to_main_service import (
+from src.main_app.db.services.reports.pages_users_to_main_service import (
     add_pages_users_to_main,
     delete_pages_users_to_main,
     get_pages_users_to_main,
@@ -39,7 +39,8 @@ def test_pages_users_to_main_workflow():
     assert updated.new_target == "Hépatite B (maladie)"
 
     # Test delete
-    delete_pages_users_to_main(1)
+    deleted = delete_pages_users_to_main(1)
+    assert deleted is True
     assert get_pages_users_to_main(1) is None
 
 
@@ -104,7 +105,7 @@ class TestAddPagesUsersToMain:
     def test_raises_error_on_failure(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.shared.services.pages_users_to_main_service.get_session") as mock_get_session:
+        with patch("src.main_app.db.services.reports.pages_users_to_main_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
@@ -160,7 +161,8 @@ class TestDeletePagesUsersToMain:
             session.commit()
 
         add_pages_users_to_main(id=60, new_target="Ebola")
-        delete_pages_users_to_main(60)
+        deleted = delete_pages_users_to_main(60)
+        assert deleted is True
         assert get_pages_users_to_main(60) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import InProcessRecord
-from src.main_app.shared.services.in_process_service import (
+from src.main_app.db.services.pages.in_process_service import (
     add_in_process,
     delete_in_process,
     delete_in_process_by_title_user_lang,
@@ -55,7 +55,8 @@ def test_in_process_workflow():
 
     # Test delete by ID
     ip_new = add_in_process("Common cold", "Medical_Student", "es")
-    delete_in_process(ip_new.id)
+    deleted = delete_in_process(ip_new.id)
+    assert deleted is True
     assert get_in_process(ip_new.id) is None
 
 
@@ -133,7 +134,7 @@ class TestAddInProcess:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.shared.services.in_process_service.get_session") as mock_get_session:
+        with patch("src.main_app.db.services.pages.in_process_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session
@@ -174,7 +175,8 @@ class TestDeleteInProcess:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         ip = add_in_process("Allergy", "Immune_Expert", "en")
-        delete_in_process(ip.id)
+        deleted = delete_in_process(ip.id)
+        assert deleted is True
         assert get_in_process(ip.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

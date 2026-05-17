@@ -37,7 +37,7 @@ waitress-serve --threads=4 --host=localhost --port=8080 src.app:app
 -   **Services**: `src/main_app/shared/services/` (mediawiki_api, wikidata_client, oauth_client, text_processor)
 -   **Config**: Frozen dataclasses with `@lru_cache` in `src/main_app/config.py`
     -   Access via `from main_app.config import settings`
--   **DB layer**: `src/main_app/shared/engine.py` and `sqlalchemy_models/`
+-   **DB layer**: `src/main_app/shared/engine.py` and `models/`
 
 ## Critical Conventions
 

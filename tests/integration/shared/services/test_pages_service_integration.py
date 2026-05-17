@@ -18,7 +18,7 @@ These tests complement the unit tests by verifying the service-to-DB integration
 
 from unittest.mock import MagicMock, patch
 
-from src.main_app.shared.services.page_service import (
+from src.main_app.db.services.pages.page_service import (
     add_page,
     delete_page,
     find_exists_or_update_page,
@@ -43,8 +43,8 @@ class TestPagesServiceIntegration:
         result = update_page(result.id, "UpdatedPage", "UpdatedFile")
         assert result.title == "UpdatedPage"
 
-        result = delete_page(result.id)
-        assert result.title == "UpdatedPage"
+        deleted = delete_page(result.id)
+        assert deleted is True
 
     def test_find_exists_or_update_integration(self):
         """Test find_exists_or_update_page through service layer."""

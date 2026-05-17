@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# from src.main_app.sqlalchemy_models import SettingRecord
+# from src.main_app.db.models import SettingRecord
 from src.main_app.db.models import SettingRecord
-from src.main_app.shared.services.setting_service import (
+from src.main_app.db.services.config.setting_service import (
     add_setting,
     delete_setting,
     get_setting,
@@ -37,7 +37,8 @@ def test_setting_workflow():
     assert updated.value == "MDWiki"
 
     # Test delete
-    delete_setting(s.id)
+    deleted = delete_setting(s.id)
+    assert deleted is True
     assert get_setting(s.id) is None
 
 
@@ -124,7 +125,8 @@ class TestDeleteSetting:
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_setting calls store delete."""
         s = add_setting("temporary_key", "Will be deleted")
-        delete_setting(s.id)
+        deleted = delete_setting(s.id)
+        assert deleted is True
         assert get_setting(s.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import AssessmentRecord
-from src.main_app.shared.services.assessment_service import (
+from src.main_app.db.services.analytics.assessment_service import (
     add_assessment,
     add_or_update_assessment,
     delete_assessment,
@@ -41,7 +41,8 @@ def test_assessment_workflow():
     assert a4.importance == "Mid"
 
     # Test delete
-    delete_assessment(a.id)
+    deleted = delete_assessment(a.id)
+    assert deleted is True
     assert get_assessment(a.id) is None
 
 
@@ -142,7 +143,8 @@ class TestDeleteAssessment:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         a = add_assessment("Measles")
-        delete_assessment(a.id)
+        deleted = delete_assessment(a.id)
+        assert deleted is True
         assert get_assessment(a.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

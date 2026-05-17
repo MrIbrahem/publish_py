@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import WordRecord
-from src.main_app.shared.services.word_service import (
+from src.main_app.db.services.analytics.word_service import (
     add_or_update_word,
     add_word,
     delete_word,
@@ -47,7 +47,8 @@ def test_word_workflow():
     assert w4.w_lead_words == 700
 
     # Test delete
-    delete_word(w.w_id)
+    deleted = delete_word(w.w_id)
+    assert deleted is True
     assert get_word(w.w_id) is None
 
 
@@ -154,7 +155,8 @@ class TestDeleteWord:
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function deletes the record."""
         w = add_word("T-cell")
-        delete_word(w.w_id)
+        deleted = delete_word(w.w_id)
+        assert deleted is True
         assert get_word(w.w_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

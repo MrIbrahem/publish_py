@@ -2,9 +2,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# from src.main_app.sqlalchemy_models import LanguageSettingRecord
+# from src.main_app.db.models import LanguageSettingRecord
 from src.main_app.db.models import LanguageSettingRecord
-from src.main_app.shared.services.language_setting_service import (
+from src.main_app.db.services.config.language_setting_service import (
     add_language_setting,
     add_or_update_language_setting,
     delete_language_setting,
@@ -43,7 +43,8 @@ def test_language_setting_workflow():
     assert ls4.expend == 1
 
     # Test delete
-    delete_language_setting(ls.id)
+    deleted = delete_language_setting(ls.id)
+    assert deleted is True
     assert get_language_setting(ls.id) is None
 
 
@@ -143,7 +144,8 @@ class TestDeleteLanguageSetting:
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_language_setting calls store delete."""
         ls = add_language_setting("de")
-        delete_language_setting(ls.id)
+        deleted = delete_language_setting(ls.id)
+        assert deleted is True
         assert get_language_setting(ls.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
