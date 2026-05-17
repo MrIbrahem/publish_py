@@ -72,8 +72,11 @@ def delete_user_token(user_id: int) -> None:
     if not user_id:
         return
 
-    db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).delete()
-    db.session.commit()
+    # # user_id is the primary key for UserTokenRecord
+    orm_obj = db.session.get(UserTokenRecord, user_id)
+    if orm_obj:
+        db.session.delete(orm_obj)
+        db.session.commit()
 
 
 def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
@@ -93,9 +96,10 @@ def delete_user_token_by_username(username: str) -> None:
     username = username.strip()
     if not username:
         return
-
-    db.session.query(UserTokenRecord).filter(UserTokenRecord.username == username).delete()
-    db.session.commit()
+    orm_obj = get_user_token_by_username(username)
+    if orm_obj:
+        db.session.delete(orm_obj)
+        db.session.commit()
 
 
 __all__ = [

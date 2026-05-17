@@ -23,7 +23,8 @@ def list_assessments() -> List[AssessmentRecord]:
 
 def get_assessment(assessment_id: int) -> AssessmentRecord | None:
     """Get an assessment record by ID."""
-    orm_obj = db.session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
+    # orm_obj = db.session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
+    orm_obj = db.session.get(AssessmentRecord, assessment_id)
     if not orm_obj:
         logger.warning(f"Assessment record with ID {assessment_id} not found")
         return None
@@ -76,7 +77,7 @@ def add_or_update_assessment(title: str, importance: str | None = None) -> Asses
 
 def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
     """Update an assessment record."""
-    orm_obj = db.session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
+    orm_obj = db.session.get(AssessmentRecord, assessment_id)
     if not orm_obj:
         raise ValueError(f"Assessment record with ID {assessment_id} not found")
 
@@ -92,16 +93,17 @@ def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
     return orm_obj
 
 
-def delete_assessment(assessment_id: int) -> AssessmentRecord:
+def delete_assessment(assessment_id: int) -> bool:
     """Delete an assessment record by ID."""
-    orm_obj = db.session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
+    orm_obj = db.session.get(AssessmentRecord, assessment_id)
     if not orm_obj:
         raise ValueError(f"Assessment record with ID {assessment_id} not found")
 
-    record = AssessmentRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(AssessmentRecord, assessment_id)
+    return deleted is None
 
 
 __all__ = [
