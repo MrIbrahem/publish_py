@@ -98,17 +98,18 @@ def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
         return orm_obj
 
 
-def delete_assessment(assessment_id: int) -> AssessmentRecord:
+def delete_assessment(assessment_id: int) -> bool:
     """Delete an assessment record by ID."""
     with get_session() as session:
         orm_obj = session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
         if not orm_obj:
             raise ValueError(f"Assessment record with ID {assessment_id} not found")
 
-        record = AssessmentRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.get(AssessmentRecord, assessment_id)
+        return deleted is None
 
 
 __all__ = [
