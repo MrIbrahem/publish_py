@@ -7,7 +7,7 @@ from sqlalchemy import Column, Date, DateTime, Integer, LargeBinary, String, fun
 from sqlalchemy.orm import validates
 
 from ...shared.core.crypto import decrypt_value
-from ...shared.core.engine import LONGTEXT, BaseDb
+from ...shared.core.extensions import LONGTEXT, BaseDb
 from ...shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)

@@ -10,7 +10,7 @@ from typing import Any, Optional
 from sqlalchemy import Column, Enum, Integer, String, text
 
 # from sqlalchemy.dialects.mysql import LONGTEXT
-from ...shared.core.engine import LONGTEXT, BaseDb
+from ...shared.core.extensions import LONGTEXT, BaseDb
 
 logger = logging.getLogger(__name__)
 

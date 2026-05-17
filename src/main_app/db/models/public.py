@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from sqlalchemy import JSON, Column, Integer, String, text
 
-from ...shared.core.engine import BaseDb
+from ...shared.core.extensions import BaseDb
 
 
 class LangRecord(BaseDb):

@@ -9,7 +9,7 @@ from typing import Any
 
 from sqlalchemy import Column, DateTime, Integer, String, func
 
-from ...shared.core.engine import LONGTEXT, BaseDb
+from ...shared.core.extensions import LONGTEXT, BaseDb
 
 logger = logging.getLogger(__name__)
 

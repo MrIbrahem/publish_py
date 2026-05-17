@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, List
 
 from ....db.models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
-from ....shared.core.engine import get_session
+from ....shared.core.extensions import get_session
 
 logger = logging.getLogger(__name__)
 

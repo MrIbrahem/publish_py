@@ -11,7 +11,7 @@ from src.main_app.db.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.main_app.shared.core.engine import get_session
+from src.main_app.shared.core.extensions import get_session
 
 
 def test_user_page_workflow() -> None:

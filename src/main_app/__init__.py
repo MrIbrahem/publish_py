@@ -28,7 +28,7 @@ from .public.routes import (
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
-from .shared.core.engine import init_db
+from .shared.core.extensions import init_db
 
 logger = logging.getLogger(__name__)
 
