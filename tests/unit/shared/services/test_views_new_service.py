@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import ViewsNewRecord
 from src.main_app.shared.services.views_new_service import (
     add_or_update_views_new,
     add_views_new,
@@ -14,7 +15,6 @@ from src.main_app.shared.services.views_new_service import (
     list_views_new,
     update_views_new,
 )
-from src.main_app.models import ViewsNewRecord
 
 
 def test_views_new_workflow():

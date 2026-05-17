@@ -4,7 +4,7 @@ Unit tests for domain.models.language_setting module.
 Tests for LanguageSettingRecord.
 """
 
-from src.main_app.models import LanguageSettingRecord
+from src.main_app.db.models import LanguageSettingRecord
 
 
 class TestLanguageSettingRecord:

@@ -4,7 +4,7 @@ Unit tests for domain.models.lang module.
 Tests for LangRecord.
 """
 
-from src.main_app.models import LangRecord
+from src.main_app.db.models import LangRecord
 
 
 class TestLangRecord:

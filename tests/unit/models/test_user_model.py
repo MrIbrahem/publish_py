@@ -6,7 +6,7 @@ Tests for UserRecord.
 
 from datetime import datetime
 
-from src.main_app.models import UserRecord
+from src.main_app.db.models import UserRecord
 
 
 class TestUserRecord:

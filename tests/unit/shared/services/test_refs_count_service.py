@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import RefsCountRecord
 from src.main_app.shared.services.refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,
@@ -12,7 +13,6 @@ from src.main_app.shared.services.refs_count_service import (
     list_refs_counts,
     update_refs_count,
 )
-from src.main_app.models import RefsCountRecord
 
 
 def test_refs_count_workflow():

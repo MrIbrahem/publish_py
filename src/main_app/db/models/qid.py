@@ -22,10 +22,10 @@ class QidRecord(db.Model):
 
     __tablename__ = "qids"
 
-    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    qid =db.Column(db.String(20), nullable=False)
-    title =db.Column(db.String(255), unique=True, nullable=False)
-    add_date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    qid = db.Column(db.String(20), nullable=False)
+    title = db.Column(db.String(255), unique=True, nullable=False)
+    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -55,9 +55,9 @@ class AllQidsRecord(db.Model):
 
     __tablename__ = "all_qids"
 
-    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    qid =db.Column(db.String(255), unique=True, nullable=False)
-    category =db.Column(db.String(255), nullable=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    qid = db.Column(db.String(255), unique=True, nullable=False)
+    category = db.Column(db.String(255), nullable=True)
 
 
 class AllQidsExistRecord(db.Model):
@@ -75,10 +75,10 @@ class AllQidsExistRecord(db.Model):
 
     __tablename__ = "all_qids_exists"
 
-    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    qid =db.Column(db.String(255), nullable=False)
-    code =db.Column(db.String(25), nullable=False)
-    target =db.Column(db.String(255), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    qid = db.Column(db.String(255), nullable=False)
+    code = db.Column(db.String(25), nullable=False)
+    target = db.Column(db.String(255), nullable=False)
 
 
 __all__ = [

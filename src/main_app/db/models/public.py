@@ -27,11 +27,11 @@ class LangRecord(db.Model):
 
     __tablename__ = "langs"
 
-    lang_id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    code =db.Column(db.String(20), nullable=False)
-    autonym =db.Column(db.String(70), nullable=False)
-    name =db.Column(db.String(70), nullable=False)
-    redirects =db.Column(db.JSON, nullable=True, server_default=db.text("NULL"))
+    lang_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    code = db.Column(db.String(20), nullable=False)
+    autonym = db.Column(db.String(70), nullable=False)
+    name = db.Column(db.String(70), nullable=False)
+    redirects = db.Column(db.JSON, nullable=True, server_default=db.text("NULL"))
 
 
 class MdwikiRevidRecord(db.Model):
@@ -45,8 +45,8 @@ class MdwikiRevidRecord(db.Model):
 
     __tablename__ = "mdwiki_revids"
 
-    title =db.Column(db.String(255), primary_key=True)
-    revid =db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String(255), primary_key=True)
+    revid = db.Column(db.Integer, nullable=False)
 
 
 class TranslateTypeRecord(db.Model):
@@ -63,10 +63,10 @@ class TranslateTypeRecord(db.Model):
 
     __tablename__ = "translate_type"
 
-    tt_id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    tt_title =db.Column(db.String(120), unique=True, nullable=False)
-    tt_lead =db.Column(db.Integer, nullable=False, default=1)
-    tt_full =db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
+    tt_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tt_title = db.Column(db.String(120), unique=True, nullable=False)
+    tt_lead = db.Column(db.Integer, nullable=False, default=1)
+    tt_full = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
