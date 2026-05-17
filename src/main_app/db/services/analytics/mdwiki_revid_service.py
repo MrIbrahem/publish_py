@@ -25,7 +25,7 @@ def list_mdwiki_revids() -> List[MdwikiRevidRecord]:
 def get_mdwiki_revid_by_title(title: str) -> MdwikiRevidRecord | None:
     """Get an mdwiki_revid record by title."""
     with get_session() as session:
-        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
+        orm_obj = session.get(MdwikiRevidRecord, title)
         if not orm_obj:
             return None
         return orm_obj
@@ -57,7 +57,7 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
         raise ValueError("Title is required")
 
     with get_session() as session:
-        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
+        orm_obj = session.get(MdwikiRevidRecord, title)
         if orm_obj:
             orm_obj.revid = revid
         else:
@@ -72,7 +72,8 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
 def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
     """Update an mdwiki_revid record."""
     with get_session() as session:
-        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
+        # orm_obj = session.query (MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
+        orm_obj = session.get(MdwikiRevidRecord, title)
         if not orm_obj:
             raise ValueError(f"MDWiki revid record for '{title}' not found")
 
@@ -82,17 +83,18 @@ def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
         return orm_obj
 
 
-def delete_mdwiki_revid(title: str) -> MdwikiRevidRecord:
+def delete_mdwiki_revid(title: str) -> bool:
     """Delete an mdwiki_revid record by title."""
     with get_session() as session:
-        orm_obj = session.query(MdwikiRevidRecord).filter(MdwikiRevidRecord.title == title).first()
+        orm_obj = session.get(MdwikiRevidRecord, title)
         if not orm_obj:
             raise ValueError(f"MDWiki revid record for '{title}' not found")
 
-        record = MdwikiRevidRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.get(MdwikiRevidRecord, title)
+        return deleted is None
 
 
 def get_revid_for_title(title: str) -> int | None:
