@@ -345,6 +345,11 @@ class Config:
     WTF_CSRF_METHODS: list[str] = ["POST", "PUT", "PATCH", "DELETE"]  # default value
     # WTF_CSRF_SECRET_KEY: str = settings.secret_key # default value
 
+    # Flask-SQLAlchemy settings
+    SQLALCHEMY_DATABASE_URI: str | None = None
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {}
+
     # Request handling
     MAX_CONTENT_LENGTH: int | None = 16 * 1024 * 1024  # 16MB default
 
@@ -362,6 +367,37 @@ class Config:
         fallbacks_str = os.getenv("FLASK_SECRET_KEY_FALLBACKS", "")
         if fallbacks_str:
             self.SECRET_KEY_FALLBACKS = [key.strip() for key in fallbacks_str.split(",") if key.strip()]
+
+        # Only set DB URI and engine options if not already defined by subclass
+        # (e.g., TestingConfig sets SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:")
+        if self.SQLALCHEMY_DATABASE_URI is None:
+            # Build SQLAlchemy database URI from environment config
+            db_cfg = settings.database_data
+            if db_cfg.db_host:
+                from urllib.parse import quote_plus
+
+                password = quote_plus(db_cfg.db_password or "")
+                self.SQLALCHEMY_DATABASE_URI = (
+                    f"mysql+pymysql://{db_cfg.db_user}:{password}"
+                    f"@{db_cfg.db_host}/{db_cfg.db_name}"
+                    f"?charset=utf8mb4"
+                )
+
+        # Only set MySQL-specific engine options if URI is MySQL (not SQLite)
+        uri = self.SQLALCHEMY_DATABASE_URI or ""
+        if uri.startswith("mysql") and not self.SQLALCHEMY_ENGINE_OPTIONS:
+            self.SQLALCHEMY_ENGINE_OPTIONS = {
+                "pool_pre_ping": True,
+                "pool_size": 5,
+                "max_overflow": 10,
+                "pool_recycle": 3600,
+                "connect_args": {
+                    "connect_timeout": 5,
+                    "init_command": 'SET time_zone = "+00:00"',
+                    "charset": "utf8mb4",
+                    "collation": "utf8mb4_unicode_ci",
+                },
+            }
 
 
 class DevelopmentConfig(Config):
@@ -394,6 +430,10 @@ class TestingConfig(Config):
 
     # Use a fixed test secret key
     SECRET_KEY: str = "test-secret-key-not-for-production"
+
+    # Use SQLite in-memory for tests (no MySQL dependency)
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {}  # SQLite doesn't need MySQL options
 
     # Disable CORS for testing
     CORS_DISABLED: bool = True
