@@ -72,7 +72,7 @@ Before:
 def test_settings_dashboard_lists_settings(self, auth_client: FlaskClient):
     with patch("src.main_app.admin.decorators.active_coordinators") as mock_coords:
         mock_coords.return_value = ["TestUser"]
-        with patch("src.main_app.db.services.setting_service.list_settings") as mock_list:
+        with patch("src.main_app.db.services.config.setting_service.list_settings") as mock_list:
             mock_setting = MagicMock()
             mock_list.return_value = [mock_setting]
             response = auth_client.get("/admin/settings")
@@ -83,7 +83,7 @@ After:
 
 ```python
 def test_settings_dashboard_lists_settings(self, auth_client: FlaskClient):
-    with patch("src.main_app.db.services.setting_service.list_settings") as mock_list:
+    with patch("src.main_app.db.services.config.setting_service.list_settings") as mock_list:
         mock_setting = MagicMock()
         mock_list.return_value = [mock_setting]
         response = auth_client.get("/admin/settings")

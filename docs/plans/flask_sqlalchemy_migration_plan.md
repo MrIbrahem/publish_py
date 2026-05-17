@@ -1841,7 +1841,7 @@ def delete_page(page_id: int) -> bool:
 # ════════════════════════════════════════════════════════════════
 
 from flask import Blueprint, jsonify, request, abort
-from ...db.services.page_service import (
+from ...db.services.pages.page_service import (
     get_page, get_pages_by_user, create_page, update_page, delete_page
 )
 from ...shared.auth.identity import login_required, current_user
