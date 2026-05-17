@@ -15,7 +15,7 @@ from .admin.routes.admin import (
     bp_admin,
 )
 from .config import settings
-from .db.services.coordinator_service import active_coordinators
+from .db.services.users.coordinator_service import active_coordinators
 from .public.routes import (
     bp_api,
     bp_auth,

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import LangRecord
-from src.main_app.db.services.lang_service import (
+from src.main_app.db.services.content.lang_service import (
     add_lang,
     add_or_update_lang,
     delete_lang,
@@ -91,7 +91,7 @@ class TestAddLang:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.db.services.lang_service.get_session") as mock_get_session:
+        with patch("src.main_app.db.services.content.lang_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             mock_get_session.return_value.__enter__.return_value = mock_session

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import CoordinatorRecord
-from src.main_app.db.services.coordinator_service import (
+from src.main_app.db.services.users.coordinator_service import (
     active_coordinators,
     add_coordinator,
     add_or_update_coordinator,

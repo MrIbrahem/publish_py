@@ -14,7 +14,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.coordinator_service import (
+from ...db.services.users.coordinator_service import (
     add_coordinator,
     delete_coordinator,
     list_coordinators,
