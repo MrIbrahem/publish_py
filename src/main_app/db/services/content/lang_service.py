@@ -104,7 +104,6 @@ def delete_lang(lang_id: int) -> bool:
     return deleted is None
 
 
-
 __all__ = [
     "list_langs",
     "get_lang",
