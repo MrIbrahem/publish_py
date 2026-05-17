@@ -7,6 +7,8 @@ import pytest
 from flask import Flask
 from flask.testing import FlaskClient
 
+from src.main_app.config import TestingConfig
+
 
 @pytest.fixture
 def app() -> Flask:
@@ -17,11 +19,8 @@ def app() -> Flask:
 
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.secret_key = "test_secret"
-
-    app.config["TESTING"] = True
-    app.config["CORS_DISABLED"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config.from_object(TestingConfig)
+    app.config.update({"CORS_DISABLED": True})
 
     from src.main_app.shared.core.extensions import db
 

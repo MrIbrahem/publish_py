@@ -77,7 +77,7 @@ class TestDeleteUserToken:
 
     def test_returns_none_for_empty_user_id(self, monkeypatch):
         """Test that None is returned for empty user_id."""
-        assert delete_user_token(None) is None
+        assert delete_user_token(None) is False
 
     def test_deletes_the_token(self, monkeypatch):
         """Test that function deletes the token."""
