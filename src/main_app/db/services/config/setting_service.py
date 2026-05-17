@@ -86,17 +86,18 @@ def update_value(setting_id: int, value: Any) -> SettingRecord:
         return orm_obj
 
 
-def delete_setting(setting_id: int) -> SettingRecord:
+def delete_setting(setting_id: int) -> bool:
     """Delete a setting record by ID."""
     with get_session() as session:
         orm_obj = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
         if not orm_obj:
             raise ValueError(f"Setting record with ID {setting_id} not found")
 
-        record = SettingRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
+        return deleted is None
 
 
 __all__ = [

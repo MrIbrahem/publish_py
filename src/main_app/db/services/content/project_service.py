@@ -93,17 +93,18 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
         return orm_obj
 
 
-def delete_project(project_id: int) -> ProjectRecord:
+def delete_project(project_id: int) -> bool:
     """Delete a project record by ID."""
     with get_session() as session:
         orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
         if not orm_obj:
             raise ValueError(f"Project record with ID {project_id} not found")
 
-        record = ProjectRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
+        return deleted is None
 
 
 __all__ = [
