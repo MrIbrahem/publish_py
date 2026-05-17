@@ -7,13 +7,11 @@ and enable proper initialization order with the application factory pattern.
 
 from __future__ import annotations
 
-from flask import Blueprint, Flask
-from flask_wtf.csrf import CSRFProtect
-
-
 import logging
 from typing import Any
 
+from flask import Blueprint, Flask
+from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import Text, create_engine, event, inspect, text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 from sqlalchemy.engine.base import Engine
@@ -75,6 +73,7 @@ class BaseDb(DeclarativeBase):
 # 2. Database connection — replaces db_driver.py entirely
 #    pool_pre_ping=True handles reconnect + retry automatically
 # ---------------------------------------------------------------------------
+
 
 def build_engine(db_url: str) -> Engine:
     """
