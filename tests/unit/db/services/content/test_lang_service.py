@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import LangRecord
-from src.main_app.shared.core.extensions import db
 from src.main_app.db.services.content.lang_service import (
     add_lang,
     add_or_update_lang,
@@ -12,6 +11,7 @@ from src.main_app.db.services.content.lang_service import (
     get_lang_by_code,
     list_langs,
 )
+from src.main_app.shared.core.extensions import db
 
 
 def test_lang_workflow():

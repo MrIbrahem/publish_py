@@ -291,7 +291,7 @@ Blueprints remain unchanged. The key change is how services within blueprints ac
 ```python
 # BEFORE (admin/services/coordinator_service.py)
 from ...shared.engine import get_session
-from ...models.users import CoordinatorRecord
+from ...db.models.users import CoordinatorRecord
 
 def list_coordinators():
     with get_session() as session:
@@ -1687,7 +1687,7 @@ from __future__ import annotations
 import logging
 from typing import Optional
 from ..engine import get_session
-from ...models.pages import PageRecord
+from ...db.models.pages import PageRecord
 
 logger = logging.getLogger(__name__)
 
@@ -1774,7 +1774,7 @@ import logging
 from typing import Optional
 from sqlalchemy.exc import IntegrityError
 from ..core.extensions import db
-from ..models.pages import PageRecord
+from ..db.models.pages import PageRecord
 
 logger = logging.getLogger(__name__)
 
@@ -1916,8 +1916,8 @@ def delete_existing_page(page_id: int):
 ```python
 # Complex transaction with savepoints
 from ..core.extensions import db
-from ..models.publish import PublishRecord
-from ..models.pages import PageRecord
+from ..db.models.publish import PublishRecord
+from ..db.models.pages import PageRecord
 
 def publish_batch(page_ids: list[int], publisher_id: int) -> dict:
     """

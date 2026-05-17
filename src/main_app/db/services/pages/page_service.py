@@ -10,8 +10,8 @@ from typing import Any, List
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...models import PageRecord
 from ....shared.core.extensions import db
+from ...models import PageRecord
 
 logger = logging.getLogger(__name__)
 

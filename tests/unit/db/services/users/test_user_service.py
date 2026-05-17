@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserRecord
-from src.main_app.shared.core.extensions import db
 from src.main_app.db.services.users.user_service import (
     add_user,
     delete_user,
@@ -14,6 +13,7 @@ from src.main_app.db.services.users.user_service import (
     update_user_data,
     user_exists,
 )
+from src.main_app.shared.core.extensions import db
 
 
 def test_user_workflow():

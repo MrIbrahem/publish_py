@@ -9,8 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...models import WordRecord
 from ....shared.core.extensions import db
+from ...models import WordRecord
 
 logger = logging.getLogger(__name__)
 

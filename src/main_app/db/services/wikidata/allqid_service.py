@@ -10,8 +10,8 @@ from typing import List
 from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
-from ...models import AllQidsRecord, QidRecord
 from ....shared.core.extensions import db
+from ...models import AllQidsRecord, QidRecord
 
 logger = logging.getLogger(__name__)
 

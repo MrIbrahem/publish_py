@@ -15,6 +15,7 @@ from .admin.routes.admin import (
     bp_admin,
 )
 from .config import settings
+from .db.services.users.coordinator_service import active_coordinators
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -27,7 +28,6 @@ from .public.routes import (
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
-from .db.services.users.coordinator_service import active_coordinators
 
 logger = logging.getLogger(__name__)
 
