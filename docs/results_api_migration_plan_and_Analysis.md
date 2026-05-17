@@ -287,7 +287,7 @@ src/main_app/
 │       ├── in_process_service.py    # Already has list_in_process_by_lang()
 │       ├── category_service.py      # Already has get_camp_to_cats()
 │       └── mediawiki_api.py         # NEW: CategoryFetcher replacement
-├── sqlalchemy_models/
+├── models/
 │   ├── __init__.py                  # Add new models
 │   ├── qid.py                      # Add AllQidsExistRecord, AllQidsRecord
 │   └── all_articles.py             # NEW: AllArticlesRecord
@@ -295,7 +295,7 @@ src/main_app/
 
 ## Models to Add
 
-### `AllQidsExistRecord` (in `sqlalchemy_models/qid.py`)
+### `AllQidsExistRecord` (in `models/qid.py`)
 ```python
 class AllQidsExistRecord(BaseDb):
     """Maps to all_qids_exists table in DB_NAME_NEW."""
@@ -308,7 +308,7 @@ class AllQidsExistRecord(BaseDb):
     target = Column(String(255), nullable=False)
 ```
 
-### `AllQidsRecord` (in `sqlalchemy_models/qid.py`)
+### `AllQidsRecord` (in `models/qid.py`)
 ```python
 class AllQidsRecord(BaseDb):
     """Maps to all_qids table in DB_NAME_NEW."""
@@ -318,7 +318,7 @@ class AllQidsRecord(BaseDb):
     qid = Column(String(255), primary_key=True)
 ```
 
-### `AllArticlesRecord` (in `sqlalchemy_models/all_articles.py`)
+### `AllArticlesRecord` (in `models/all_articles.py`)
 ```python
 class AllArticlesRecord(BaseDb):
     """Maps to all_articles table in DB_NAME_NEW."""
@@ -456,12 +456,12 @@ class CategoryFetcher:
 
 ## Phase 1: Data Layer — Models & Queries
 
-1. **Add `AllQidsExistRecord` model** in `sqlalchemy_models/qid.py`
-2. **Add `AllQidsRecord` model** in `sqlalchemy_models/qid.py`
-3. **Add `AllArticlesRecord` model** in `sqlalchemy_models/all_articles.py`
+1. **Add `AllQidsExistRecord` model** in `models/qid.py`
+2. **Add `AllQidsRecord` model** in `models/qid.py`
+3. **Add `AllArticlesRecord` model** in `models/all_articles.py`
 4. **Add `list_pages_by_lang_cat(lang, cat)`** to `page_service.py`
 5. **Add `list_targets_by_lang(lang)`** to `qid_service.py` — raw SQL replicating the VIEW + JOIN
-6. **Update `__init__.py`** of `sqlalchemy_models` and `shared/services/` to export new classes
+6. **Update `__init__.py`** of `models` and `shared/services/` to export new classes
 
 ## Phase 2: MW API Client
 
@@ -614,10 +614,10 @@ from typing import Any
 
 from flask import g
 
-from ...shared.services.category_service import get_camp_to_cats
-from ...shared.services.in_process_service import list_in_process_by_lang
-from ...shared.services.page_service import list_pages_by_lang_cat
-from ...shared.services.qid_service import list_targets_by_lang
+from ...db.services.category_service import get_camp_to_cats
+from ...db.services.in_process_service import list_in_process_by_lang
+from ...db.services.page_service import list_pages_by_lang_cat
+from ...db.services.qid_service import list_targets_by_lang
 from .mediawiki_api import get_mdwiki_cat_members
 
 logger = logging.getLogger(__name__)

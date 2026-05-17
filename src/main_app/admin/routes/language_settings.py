@@ -14,8 +14,8 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...shared.services.lang_service import list_langs
-from ...shared.services.language_setting_service import (
+from ...db.services.lang_service import list_langs
+from ...db.services.language_setting_service import (
     add_language_setting,
     delete_language_setting,
     list_language_settings,

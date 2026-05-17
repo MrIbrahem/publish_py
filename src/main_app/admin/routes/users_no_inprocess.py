@@ -14,7 +14,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...shared.services.users_no_inprocess_service import (
+from ...db.services.users_no_inprocess_service import (
     add_users_no_inprocess,
     delete_users_no_inprocess,
     list_users_no_inprocess,

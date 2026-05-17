@@ -138,14 +138,13 @@ def _load_database_config() -> DbConfig:
     """
     Construct a DbConfig populated from environment variables.
 
-    Reads DB_NAME and DB_HOST (defaulting to empty string) and TOOL_REPLICA_USER and TOOL_REPLICA_PASSWORD (defaulting to None) and returns a DbConfig with those values.
-
+    Reads TOOL_TOOLSDB_DBNAME and TOOL_TOOLSDB_HOST (defaulting to empty string) and TOOL_TOOLSDB_USER and TOOL_TOOLSDB_PASSWORD (defaulting to None) and returns a DbConfig with those values.
     Returns:
         DbConfig: Configuration with fields:
-            - db_name: from DB_NAME (default "").
-            - db_host: from DB_HOST (default "").
-            - db_user: from TOOL_REPLICA_USER (or None).
-            - db_password: from TOOL_REPLICA_PASSWORD (or None).
+            - db_name: from TOOL_TOOLSDB_DBNAME (default "").
+            - db_host: from TOOL_TOOLSDB_HOST (default "").
+            - db_user: from TOOL_TOOLSDB_USER (or None).
+            - db_password: from TOOL_TOOLSDB_PASSWORD (or None).
     """
     return DbConfig(
         db_name=os.getenv("TOOL_TOOLSDB_DBNAME", ""),

@@ -7,8 +7,8 @@ from datetime import date, timedelta
 
 from flask import render_template, request
 
+from ...db.services.lang_service import list_langs
 from ...public.routes.api.pages_query_service import list_pages_users, list_pages_with_views
-from ...shared.services.lang_service import list_langs
 
 logger = logging.getLogger(__name__)
 
