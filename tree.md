@@ -79,11 +79,10 @@ src/
 │   │       │   ├── user_service.py
 │   │       │   ├── user_token_service.py
 │   │       │   └── users_no_inprocess_service.py
-│   │       ├── wikidata/
-│   │       │   ├── __init__.py
-│   │       │   ├── allqid_service.py
-│   │       │   └── qid_service.py
-│   │       └── z.md
+│   │       └── wikidata/
+│   │           ├── __init__.py
+│   │           ├── allqid_service.py
+│   │           └── qid_service.py
 │   ├── public/
 │   │   ├── __init__.py
 │   │   └── routes/
