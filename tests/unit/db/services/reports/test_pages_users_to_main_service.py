@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -10,16 +10,14 @@ from src.main_app.db.services.reports.pages_users_to_main_service import (
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
+from src.main_app.shared.core.extensions import db
 
 
 def test_pages_users_to_main_workflow():
     from sqlalchemy import text
 
-    from src.main_app.shared.core.extensions import get_session
-
-    with get_session() as session:
-        session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
-        session.commit()
+    db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
+    db.session.commit()
 
     # Test add
     p = add_pages_users_to_main(id=1, new_target="Hépatite B", new_user="French_Editor", new_qid="Q181056")
@@ -51,11 +49,8 @@ class TestListPagesUsersToMain:
         """Test that function returns list from store."""
         from sqlalchemy import text
 
-        from src.main_app.shared.core.extensions import get_session
-
-        with get_session() as session:
-            session.execute(text("INSERT INTO pages_users (id, title) VALUES (10, 'Malaria'), (20, 'Cholera')"))
-            session.commit()
+        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (10, 'Malaria'), (20, 'Cholera')"))
+        db.session.commit()
 
         add_pages_users_to_main(id=10, new_target="Paludisme")
         add_pages_users_to_main(id=20, new_target="Choléra")
@@ -70,11 +65,8 @@ class TestGetPagesUsersToMain:
         """Test that function returns record by ID."""
         from sqlalchemy import text
 
-        from src.main_app.shared.core.extensions import get_session
-
-        with get_session() as session:
-            session.execute(text("INSERT INTO pages_users (id, title) VALUES (30, 'Dengue fever')"))
-            session.commit()
+        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (30, 'Dengue fever')"))
+        db.session.commit()
 
         add_pages_users_to_main(id=30, new_target="Dengue")
         result = get_pages_users_to_main(30)
@@ -92,11 +84,8 @@ class TestAddPagesUsersToMain:
         """Test that function adds and returns record."""
         from sqlalchemy import text
 
-        from src.main_app.shared.core.extensions import get_session
-
-        with get_session() as session:
-            session.execute(text("INSERT INTO pages_users (id, title) VALUES (40, 'Yellow fever')"))
-            session.commit()
+        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (40, 'Yellow fever')"))
+        db.session.commit()
 
         record = add_pages_users_to_main(id=40, new_target="Fièvre jaune")
         assert record.id == 40
@@ -105,10 +94,7 @@ class TestAddPagesUsersToMain:
     def test_raises_error_on_failure(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.db.services.reports.pages_users_to_main_service.get_session") as mock_get_session:
-            mock_session = MagicMock()
-            mock_session.commit.side_effect = IntegrityError(None, None, None)
-            mock_get_session.return_value.__enter__.return_value = mock_session
+        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
             with pytest.raises(ValueError, match="Failed to add"):
                 add_pages_users_to_main(id=9999)
 
@@ -120,11 +106,8 @@ class TestUpdatePagesUsersToMain:
         """Test that function updates and returns record."""
         from sqlalchemy import text
 
-        from src.main_app.shared.core.extensions import get_session
-
-        with get_session() as session:
-            session.execute(text("INSERT INTO pages_users (id, title) VALUES (50, 'Zika virus')"))
-            session.commit()
+        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (50, 'Zika virus')"))
+        db.session.commit()
 
         add_pages_users_to_main(id=50, new_target="Virus Zika")
         updated = update_pages_users_to_main(50, new_target="Zika")
@@ -133,11 +116,8 @@ class TestUpdatePagesUsersToMain:
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         from sqlalchemy import text
 
-        from src.main_app.shared.core.extensions import get_session
-
-        with get_session() as session:
-            session.execute(text("INSERT INTO pages_users (id, title) VALUES (51, 'T')"))
-            session.commit()
+        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (51, 'T')"))
+        db.session.commit()
         add_pages_users_to_main(id=51)
         result = update_pages_users_to_main(51)
         assert result.id == 51
@@ -154,11 +134,8 @@ class TestDeletePagesUsersToMain:
         """Test that function deletes the record."""
         from sqlalchemy import text
 
-        from src.main_app.shared.core.extensions import get_session
-
-        with get_session() as session:
-            session.execute(text("INSERT INTO pages_users (id, title) VALUES (60, 'Ebola virus')"))
-            session.commit()
+        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (60, 'Ebola virus')"))
+        db.session.commit()
 
         add_pages_users_to_main(id=60, new_target="Ebola")
         deleted = delete_pages_users_to_main(60)

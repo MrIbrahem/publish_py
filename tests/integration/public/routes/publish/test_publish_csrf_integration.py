@@ -29,9 +29,18 @@ def csrf_app() -> Flask:
             "WTF_CSRF_SSL_STRICT": False,
             "TESTING": True,
             "CORS_DISABLED": False,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
         }
     )
     app.url_map.strict_slashes = False
+
+    from src.main_app.shared.core.extensions import db
+
+    db.init_app(app)
+
+    with app.app_context():
+        real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
+        db.metadata.create_all(db.engine, tables=real_tables)
 
     csrf = CSRFProtect(app)
     from src.main_app.public.routes.publish.routes import bp_publish

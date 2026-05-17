@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -15,6 +15,7 @@ from src.main_app.db.services.pages.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
+from src.main_app.shared.core.extensions import db
 
 
 def test_in_process_workflow():
@@ -134,10 +135,7 @@ class TestAddInProcess:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.db.services.pages.in_process_service.get_session") as mock_get_session:
-            mock_session = MagicMock()
-            mock_session.commit.side_effect = IntegrityError(None, None, None)
-            mock_get_session.return_value.__enter__.return_value = mock_session
+        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
             with pytest.raises(ValueError, match="already exists"):
                 add_in_process("Duplicate", "User", "en")
 

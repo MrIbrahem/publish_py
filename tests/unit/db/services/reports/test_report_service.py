@@ -9,7 +9,7 @@ from src.main_app.db.services.reports.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-from src.main_app.shared.core.extensions import get_session
+from src.main_app.shared.core.extensions import db
 
 
 def test_report_workflow():
@@ -85,20 +85,18 @@ class TestQueryReportsWithFilters:
     def test_filters_by_year_month(self):
         from datetime import datetime
 
-        with get_session() as session:
-            # SQLite current_timestamp is UTC
-            session.add(
-                ReportRecord(
-                    title="Old Report",
-                    user="U",
-                    lang="en",
-                    sourcetitle="S",
-                    result="ok",
-                    data="{}",
-                    date=datetime(2020, 5, 1),
-                )
+        db.session.add(
+            ReportRecord(
+                title="Old Report",
+                user="U",
+                lang="en",
+                sourcetitle="S",
+                result="ok",
+                data="{}",
+                date=datetime(2020, 5, 1),
             )
-            session.commit()
+        )
+        db.session.commit()
 
         results = query_reports_with_filters({"year": 2020, "month": 5})
         assert len(results) == 1
@@ -112,8 +110,7 @@ class TestQueryReportsWithFilters:
     def test_filters_empty(self):
         # We can't easily add a report with empty title via service because it's not handled there,
         # but we can via manual insert.
-        with get_session() as session:
-            session.add(ReportRecord(title="", user="U", lang="en", sourcetitle="S", result="ok", data="{}"))
-            session.commit()
+        db.session.add(ReportRecord(title="", user="U", lang="en", sourcetitle="S", result="ok", data="{}"))
+        db.session.commit()
         results = query_reports_with_filters({"title": "empty"})
         assert len(results) >= 1

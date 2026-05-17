@@ -11,7 +11,7 @@ from src.main_app.db.services.pages.page_service import (
     list_pages,
     update_page,
 )
-from src.main_app.shared.core.extensions import get_session
+from src.main_app.shared.core.extensions import db
 
 
 def test_page_workflow():
@@ -32,12 +32,11 @@ def test_page_workflow():
     updated = update_page(p.id, "COVID-19", "COVID-19.html")
     assert updated.title == "COVID-19"
 
-    with get_session() as session:
-        orm_p = session.get(PageRecord, p.id)
-        orm_p.lang = "en"
-        orm_p.user = "WikiUser"
-        orm_p.target = ""
-        session.commit()
+    orm_p = db.session.get(PageRecord, p.id)
+    orm_p.lang = "en"
+    orm_p.user = "WikiUser"
+    orm_p.target = ""
+    db.session.commit()
 
     assert find_exists_or_update_page("COVID-19", "en", "WikiUser", "Pandemic_target.html") is True
 
@@ -85,10 +84,8 @@ class TestAddPage:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.db.services.pages.page_service.get_session") as mock_get_session:
-            mock_session = MagicMock()
+        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
             mock_session.commit.side_effect = IntegrityError(None, None, None)
-            mock_get_session.return_value.__enter__.return_value = mock_session
             with pytest.raises(ValueError, match="already exists"):
                 add_page("Duplicate", "lead", "Test", "en", "TestUser", "t1.html")
 
@@ -128,9 +125,8 @@ class TestFindExistsOrUpdate:
     def test_updates_target_if_empty(self, monkeypatch):
         """Test that function updates target if empty."""
         # Manual insert to set specific fields
-        with get_session() as session:
-            session.add(PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
-            session.commit()
+        db.session.add(PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
+        db.session.commit()
 
         result = find_exists_or_update_page("Philosophy", "en", "PhilAuthor", "Philosophy_article.html")
         assert result is True
@@ -146,14 +142,11 @@ class TestFindExistsOrUpdate:
         assert result is False
 
     def test_handles_exception_on_commit(self, monkeypatch):
-        with get_session() as session:
-            session.add(PageRecord(title="Error_Page", lang="en", user="U", target=""))
-            session.commit()
-        with patch("src.main_app.db.services.pages.page_service.get_session") as mock_get_session:
-            mock_session = MagicMock()
+        db.session.add(PageRecord(title="Error_Page", lang="en", user="U", target=""))
+        db.session.commit()
+        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
             mock_session.query.return_value.filter.return_value.all.return_value = [MagicMock(target="")]
             mock_session.commit.side_effect = Exception("DB Error")
-            mock_get_session.return_value.__enter__.return_value = mock_session
 
             # Function returns True because record exists, but commit fails.
             result = find_exists_or_update_page("Error_Page", "en", "U", "T")
@@ -189,10 +182,8 @@ class TestInsertPageTarget:
         assert p.word == 1200
 
     def test_handles_exception(self, monkeypatch):
-        with patch("src.main_app.db.services.pages.page_service.get_session") as mock_get_session:
-            mock_session = MagicMock()
+        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
             mock_session.commit.side_effect = Exception("DB Error")
-            mock_get_session.return_value.__enter__.return_value = mock_session
 
             success = insert_page_target("Error", "t", "c", "l", "u", "t")
             assert success is False
