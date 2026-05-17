@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db.models import AssessmentRecord
+rom ...models import AssessmentRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)

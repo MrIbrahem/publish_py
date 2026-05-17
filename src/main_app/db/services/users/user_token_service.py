@@ -10,7 +10,7 @@ from typing import Optional
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...db.models import UserTokenRecord
+rom ...models import UserTokenRecord
 from ..core.crypto import encrypt_value
 from ..engine import get_session
 
