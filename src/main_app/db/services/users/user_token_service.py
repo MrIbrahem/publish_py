@@ -72,7 +72,7 @@ def delete_user_token(user_id: int) -> None:
     if not user_id:
         return
 
-    db.session.query(UserTokenRecord, user_id).filter(UserTokenRecord.user_id == user_id).delete()
+    db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).delete()
     db.session.commit()
 
 
