@@ -43,8 +43,8 @@ class TestPagesServiceIntegration:
         result = update_page(result.id, "UpdatedPage", "UpdatedFile")
         assert result.title == "UpdatedPage"
 
-        result = delete_page(result.id)
-        assert result.title == "UpdatedPage"
+        deleted = delete_page(result.id)
+        assert deleted is True
 
     def test_find_exists_or_update_integration(self):
         """Test find_exists_or_update_page through service layer."""
