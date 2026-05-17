@@ -32,7 +32,7 @@ def test_user_page_workflow() -> None:
     assert updated.title == "Flu"
 
     with get_session() as session:
-        orm_p = session.query(UserPageRecord).filter(UserPageRecord.id == p.id).first()
+        orm_p = session.get(UserPageRecord, p.id)
         orm_p.lang = "es"
         orm_p.user = "Spanish_Editor"
         orm_p.target = ""

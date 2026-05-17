@@ -76,7 +76,7 @@ def update_category(
 ) -> CategoryRecord:
     """Update category."""
     with get_session() as session:
-        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
+        orm_obj = session.get(CategoryRecord, category_id)
         if not orm_obj:
             raise ValueError(f"Category with ID {category_id} not found")
 
@@ -97,15 +97,18 @@ def update_category(
         return record
 
 
-def delete_category(category_id: int) -> None:
+def delete_category(category_id: int) -> bool:
     """Delete a category."""
     with get_session() as session:
-        orm_obj = session.query(CategoryRecord).filter(CategoryRecord.id == category_id).first()
+        orm_obj = session.get(CategoryRecord, category_id)
         if not orm_obj:
             raise ValueError(f"Category with ID {category_id} not found")
 
         session.delete(orm_obj)
         session.commit()
+
+        deleted = session.get(CategoryRecord, category_id)
+        return deleted is None
 
 
 def get_campaign_category(campaign: str) -> CategoryRecord | None:

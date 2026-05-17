@@ -25,7 +25,7 @@ def list_language_settings() -> List[LanguageSettingRecord]:
 def get_language_setting(setting_id: int) -> LanguageSettingRecord | None:
     """Get a language setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+        orm_obj = session.get(LanguageSettingRecord, setting_id)
         if not orm_obj:
             logger.warning(f"Language setting record with ID {setting_id} not found")
             return None
@@ -104,7 +104,7 @@ def add_or_update_language_setting(
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
     """Update a language setting record."""
     with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+        orm_obj = session.get(LanguageSettingRecord, setting_id)
         if not orm_obj:
             raise ValueError(f"Language setting record with ID {setting_id} not found")
 
@@ -123,12 +123,15 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
 def delete_language_setting(setting_id: int):
     """Delete a language setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
+        orm_obj = session.get(LanguageSettingRecord, setting_id)
         if not orm_obj:
             raise ValueError(f"Language setting record with ID {setting_id} not found")
 
         session.delete(orm_obj)
         session.commit()
+
+        deleted = session.get(LanguageSettingRecord, setting_id)
+        return deleted is None
 
 
 __all__ = [

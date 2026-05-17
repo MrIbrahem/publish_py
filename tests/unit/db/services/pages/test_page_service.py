@@ -33,7 +33,7 @@ def test_page_workflow():
     assert updated.title == "COVID-19"
 
     with get_session() as session:
-        orm_p = session.query(PageRecord).filter(PageRecord.id == p.id).first()
+        orm_p = session.get(PageRecord, p.id)
         orm_p.lang = "en"
         orm_p.user = "WikiUser"
         orm_p.target = ""

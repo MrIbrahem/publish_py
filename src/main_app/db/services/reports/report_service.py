@@ -51,14 +51,14 @@ def add_report(
 def delete_report(report_id: int) -> bool:
     """Delete a report record by ID."""
     with get_session() as session:
-        orm_obj = session.query(ReportRecord).filter(ReportRecord.id == report_id).first()
+        orm_obj = session.get(ReportRecord, report_id)
         if not orm_obj:
             raise LookupError(f"Report id {report_id} was not found")
 
         session.delete(orm_obj)
         session.commit()
 
-        deleted = session.query(ReportRecord).filter(ReportRecord.id == report_id).first()
+        deleted = session.get(ReportRecord, report_id)
         return deleted is None
 
 

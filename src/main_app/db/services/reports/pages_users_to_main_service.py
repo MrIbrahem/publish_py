@@ -25,7 +25,7 @@ def list_pages_users_to_main() -> List[PagesUsersToMainRecord]:
 def get_pages_users_to_main(record_id: int) -> PagesUsersToMainRecord | None:
     """Get a pages_users_to_main record by ID."""
     with get_session() as session:
-        orm_obj = session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == record_id).first()
+        orm_obj = session.get(PagesUsersToMainRecord, record_id)
         if not orm_obj:
             logger.warning(f"PagesUsersToMain record with ID {record_id} not found")
             return None
@@ -55,7 +55,7 @@ def add_pages_users_to_main(
 def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainRecord:
     """Update a pages_users_to_main record."""
     with get_session() as session:
-        orm_obj = session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == record_id).first()
+        orm_obj = session.get(PagesUsersToMainRecord, record_id)
         if not orm_obj:
             raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
 
@@ -74,14 +74,14 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
 def delete_pages_users_to_main(record_id: int) -> bool:
     """Delete a pages_users_to_main record by ID."""
     with get_session() as session:
-        orm_obj = session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == record_id).first()
+        orm_obj = session.get(PagesUsersToMainRecord, record_id)
         if not orm_obj:
             raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
 
         session.delete(orm_obj)
         session.commit()
 
-        deleted = session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == record_id).first()
+        deleted = session.get(PagesUsersToMainRecord, record_id)
         return deleted is None
 
 

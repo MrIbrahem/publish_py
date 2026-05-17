@@ -25,7 +25,7 @@ def list_words() -> List[WordRecord]:
 def get_word(word_id: int) -> WordRecord | None:
     """Get a word record by ID."""
     with get_session() as session:
-        orm_obj = session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
+        orm_obj = session.get(WordRecord, word_id)
         if not orm_obj:
             logger.warning(f"Word record with ID {word_id} not found")
             return None
@@ -91,7 +91,7 @@ def add_or_update_word(
 def update_word(word_id: int, **kwargs) -> WordRecord:
     """Update a word record."""
     with get_session() as session:
-        orm_obj = session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
+        orm_obj = session.get(WordRecord, word_id)
         if not orm_obj:
             raise ValueError(f"Word record with ID {word_id} not found")
 
@@ -110,14 +110,14 @@ def update_word(word_id: int, **kwargs) -> WordRecord:
 def delete_word(word_id: int) -> bool:
     """Delete a word record by ID."""
     with get_session() as session:
-        orm_obj = session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
+        orm_obj = session.get(WordRecord, word_id)
         if not orm_obj:
             raise ValueError(f"Word record with ID {word_id} not found")
 
         session.delete(orm_obj)
         session.commit()
 
-        deleted = session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
+        deleted = session.get(WordRecord, word_id)
         return deleted is None
 
 

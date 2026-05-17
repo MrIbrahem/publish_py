@@ -25,7 +25,7 @@ def list_settings() -> List[SettingRecord]:
 def get_setting(setting_id: int) -> SettingRecord | None:
     """Get a setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
+        orm_obj = session.get(SettingRecord, setting_id)
         if not orm_obj:
             logger.warning(f"Setting record with ID {setting_id} not found")
             return None
@@ -76,7 +76,7 @@ def add_setting(
 def update_value(setting_id: int, value: Any) -> SettingRecord:
     """Update a setting record value."""
     with get_session() as session:
-        orm_obj: SettingRecord = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
+        orm_obj: SettingRecord = session.get(SettingRecord, setting_id)
         if not orm_obj:
             raise ValueError(f"Setting record with ID {setting_id} not found")
 
@@ -89,14 +89,14 @@ def update_value(setting_id: int, value: Any) -> SettingRecord:
 def delete_setting(setting_id: int) -> bool:
     """Delete a setting record by ID."""
     with get_session() as session:
-        orm_obj = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
+        orm_obj = session.get(SettingRecord, setting_id)
         if not orm_obj:
             raise ValueError(f"Setting record with ID {setting_id} not found")
 
         session.delete(orm_obj)
         session.commit()
 
-        deleted = session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
+        deleted = session.get(SettingRecord, setting_id)
         return deleted is None
 
 

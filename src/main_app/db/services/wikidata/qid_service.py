@@ -33,7 +33,7 @@ def add_qid(title: str, qid: str) -> QidRecord:
 def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
     """Update a QID record."""
     with get_session() as session:
-        orm_obj = session.query(QidRecord).filter(QidRecord.id == qid_id).first()
+        orm_obj = session.get(QidRecord, qid_id)
         if not orm_obj:
             raise ValueError(f"QID record with ID {qid_id} not found")
 
@@ -44,15 +44,18 @@ def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
         return orm_obj
 
 
-def delete_qid(qid_id: int) -> None:
+def delete_qid(qid_id: int) -> bool:
     """Delete a QID record."""
     with get_session() as session:
-        orm_obj = session.query(QidRecord).filter(QidRecord.id == qid_id).first()
+        orm_obj = session.get(QidRecord, qid_id)
         if not orm_obj:
             raise ValueError(f"QID record with ID {qid_id} not found")
 
         session.delete(orm_obj)
         session.commit()
+
+        deleted = session.get(QidRecord, qid_id)
+        return deleted is None
 
 
 def get_page_qid(title: str) -> QidRecord | None:

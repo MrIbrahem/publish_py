@@ -44,7 +44,7 @@ def list_in_process_by_lang(lang: str) -> List[InProcessRecord]:
 def get_in_process(process_id: int) -> InProcessRecord | None:
     """Get an in_process record by ID."""
     with get_session() as session:
-        orm_obj = session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
+        orm_obj = session.get(InProcessRecord, process_id)
         if not orm_obj:
             logger.warning(f"In-process record with ID {process_id} not found")
             return None
@@ -110,7 +110,7 @@ def add_in_process(
 def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
     """Update an in_process record."""
     with get_session() as session:
-        orm_obj = session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
+        orm_obj = session.get(InProcessRecord, process_id)
         if not orm_obj:
             raise ValueError(f"In-process record with ID {process_id} not found")
 
@@ -129,14 +129,14 @@ def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
 def delete_in_process(process_id: int) -> bool:
     """Delete an in_process record by ID."""
     with get_session() as session:
-        orm_obj = session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
+        orm_obj = session.get(InProcessRecord, process_id)
         if not orm_obj:
             raise ValueError(f"In-process record with ID {process_id} not found")
 
         session.delete(orm_obj)
         session.commit()
 
-        deleted = session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
+        deleted = session.get(InProcessRecord, process_id)
         return deleted is None
 
 

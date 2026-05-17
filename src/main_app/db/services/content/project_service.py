@@ -25,7 +25,7 @@ def list_projects() -> List[ProjectRecord]:
 def get_project(project_id: int) -> ProjectRecord | None:
     """Get a project record by ID."""
     with get_session() as session:
-        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
+        orm_obj = session.get(ProjectRecord, project_id)
         if not orm_obj:
             logger.warning(f"Project record with ID {project_id} not found")
             return None
@@ -63,7 +63,7 @@ def add_project(g_title: str) -> ProjectRecord:
 def update_project(project_id: int, **kwargs) -> ProjectRecord:
     """Update a project record."""
     with get_session() as session:
-        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
+        orm_obj = session.get(ProjectRecord, project_id)
         if not orm_obj:
             raise ValueError(f"Project record with ID {project_id} not found")
 
@@ -82,7 +82,7 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord:
 def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
     """Update a project record."""
     with get_session() as session:
-        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
+        orm_obj = session.get(ProjectRecord, project_id)
         if not orm_obj:
             raise ValueError(f"Project record with ID {project_id} not found")
 
@@ -96,14 +96,14 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
 def delete_project(project_id: int) -> bool:
     """Delete a project record by ID."""
     with get_session() as session:
-        orm_obj = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
+        orm_obj = session.get(ProjectRecord, project_id)
         if not orm_obj:
             raise ValueError(f"Project record with ID {project_id} not found")
 
         session.delete(orm_obj)
         session.commit()
 
-        deleted = session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
+        deleted = session.get(ProjectRecord, project_id)
         return deleted is None
 
 

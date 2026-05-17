@@ -123,7 +123,7 @@ def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
         return CoordinatorRecord(**record.to_dict())
 
 
-def delete_coordinator(coordinator_id: int) -> None:
+def delete_coordinator(coordinator_id: int) -> bool:
     """Delete a coordinator record by ID."""
     with get_session() as session:
         # record = session.query(CoordinatorRecord).filter(CoordinatorRecord.id == coordinator_id).first()
@@ -133,6 +133,9 @@ def delete_coordinator(coordinator_id: int) -> None:
         session.delete(record)
         session.commit()
         active_coordinators.cache_clear()
+
+        deleted = session.get(CoordinatorRecord, coordinator_id)
+        return deleted is None
 
 
 def is_coordinator(username: str) -> bool:

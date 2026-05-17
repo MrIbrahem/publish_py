@@ -106,7 +106,7 @@ def update_user_page(
 ) -> UserPageRecord:
     """Update page."""
     with get_session() as session:
-        orm_obj = session.query(UserPageRecord).filter(UserPageRecord.id == page_id).first()
+        orm_obj = session.get(UserPageRecord, page_id)
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
@@ -137,7 +137,7 @@ def update_user_page(
 def delete_user_page(page_id: int) -> bool:
     """Delete a page."""
     with get_session() as session:
-        orm_obj = session.query(UserPageRecord).filter(UserPageRecord.id == page_id).first()
+        orm_obj = session.get(UserPageRecord, page_id)
         if not orm_obj:
             raise LookupError(f"Page id {page_id} was not found")
 
