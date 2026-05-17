@@ -51,7 +51,7 @@ class TestUserServiceIntegration:
         assert result is None
 
         result = delete_user_token_by_username("   ")
-        assert result is None
+        assert result is False
 
     def test_lookup_error_handling(self):
         """Test service handles LookupError from DB layer."""

@@ -89,9 +89,7 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
 
     with get_session() as session:
         orm_obj = session.query(UserTokenRecord).filter(UserTokenRecord.username == username).first()
-        if not orm_obj:
-            return None
-        return orm_obj
+        return orm_obj or None
 
 
 def delete_user_token_by_username(username: str) -> bool:
