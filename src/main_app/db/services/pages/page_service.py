@@ -183,6 +183,7 @@ def find_exists_or_update_page(
             except Exception as e:
                 logger.error(f"Failed to update page target: {e}")
                 db.session.rollback()
+                # raise
 
     return len(orm_objs) > 0
 
