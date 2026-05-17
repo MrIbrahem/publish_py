@@ -16,8 +16,8 @@ from flask import (
     send_from_directory,
 )
 
-from ....db.services.category_service import list_categories
-from ....db.services.lang_service import list_langs
+from ....db.services.content.category_service import list_categories
+from ....db.services.content.lang_service import list_langs
 from .results_api import results_api_result
 
 bp_main = Blueprint("main", __name__, url_prefix="")

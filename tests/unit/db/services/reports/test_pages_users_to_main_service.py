@@ -4,7 +4,7 @@ import pytest
 
 from src.main_app.db.models import PagesUsersToMainRecord
 from src.main_app.shared.core.extensions import db
-from src.main_app.db.services.pages_users_to_main_service import (
+from src.main_app.db.services.reports.pages_users_to_main_service import (
     add_pages_users_to_main,
     delete_pages_users_to_main,
     get_pages_users_to_main,

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import ViewsNewRecord
-from src.main_app.db.services.views_new_service import (
+from src.main_app.db.services.analytics.views_new_service import (
     add_or_update_views_new,
     add_views_new,
     delete_views_new,

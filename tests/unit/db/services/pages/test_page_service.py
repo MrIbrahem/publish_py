@@ -4,7 +4,7 @@ import pytest
 
 from src.main_app.db.models import PageRecord
 from src.main_app.shared.core.extensions import db
-from src.main_app.db.services.page_service import (
+from src.main_app.db.services.pages.page_service import (
     add_page,
     delete_page,
     find_exists_or_update_page,
@@ -84,7 +84,7 @@ class TestAddPage:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch("src.main_app.db.services.page_service.db.session") as mock_session:
+        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
             mock_session.commit.side_effect = IntegrityError(None, None, None)
             with pytest.raises(ValueError, match="already exists"):
                 add_page("Duplicate", "lead", "Test", "en", "TestUser", "t1.html")
@@ -144,7 +144,7 @@ class TestFindExistsOrUpdate:
     def test_handles_exception_on_commit(self, monkeypatch):
         db.session.add(PageRecord(title="Error_Page", lang="en", user="U", target=""))
         db.session.commit()
-        with patch("src.main_app.db.services.page_service.db.session") as mock_session:
+        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
             mock_session.query.return_value.filter.return_value.all.return_value = [MagicMock(target="")]
             mock_session.commit.side_effect = Exception("DB Error")
 
@@ -182,7 +182,7 @@ class TestInsertPageTarget:
         assert p.word == 1200
 
     def test_handles_exception(self, monkeypatch):
-        with patch("src.main_app.db.services.page_service.db.session") as mock_session:
+        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
             mock_session.commit.side_effect = Exception("DB Error")
 
             success = insert_page_target("Error", "t", "c", "l", "u", "t")

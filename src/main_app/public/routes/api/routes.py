@@ -13,11 +13,11 @@ from ....db.models import CategoryRecord, InProcessRecord, LangRecord, ReportRec
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
-from ....db.services.category_service import list_categories
-from ....db.services.in_process_service import get_in_process_counts_by_user
-from ....db.services.lang_service import list_langs
-from ....db.services.page_service import list_of_users_by_translations_count
-from ....db.services.report_service import query_reports_with_filters
+from ....db.services.content.category_service import list_categories
+from ....db.services.pages.in_process_service import get_in_process_counts_by_user
+from ....db.services.content.lang_service import list_langs
+from ....db.services.pages.page_service import list_of_users_by_translations_count
+from ....db.services.reports.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users

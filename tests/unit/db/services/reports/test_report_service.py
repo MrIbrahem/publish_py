@@ -4,7 +4,7 @@ import pytest
 
 from src.main_app.db.models import ReportRecord
 from src.main_app.shared.core.extensions import db
-from src.main_app.db.services.report_service import (
+from src.main_app.db.services.reports.report_service import (
     add_report,
     delete_report,
     list_reports,
