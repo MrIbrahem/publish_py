@@ -120,7 +120,7 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
         return orm_obj
 
 
-def delete_language_setting(setting_id: int):
+def delete_language_setting(setting_id: int) -> bool:
     """Delete a language setting record by ID."""
     with get_session() as session:
         orm_obj = session.get(LanguageSettingRecord, setting_id)
