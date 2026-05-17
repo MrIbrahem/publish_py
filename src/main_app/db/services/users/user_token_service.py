@@ -94,15 +94,19 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
     return orm_obj
 
 
-def delete_user_token_by_username(username: str) -> None:
+def delete_user_token_by_username(username: str) -> bool:
     """Remove the stored OAuth credentials for the given username."""
     username = username.strip()
     if not username:
-        return
+        return False
     orm_obj = get_user_token_by_username(username)
-    if orm_obj:
-        db.session.delete(orm_obj)
-        db.session.commit()
+    if not orm_obj:
+        return False
+    db.session.delete(orm_obj)
+    db.session.commit()
+
+    deleted = get_user_token_by_username(username)
+    return deleted is None
 
 
 __all__ = [
