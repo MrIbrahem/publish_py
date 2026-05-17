@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.qid_service import (
+from src.main_app.shared.services.wikidata.qid_service import (
     add_qid,
     delete_qid,
     get_page_qid,

@@ -3,7 +3,7 @@ Shared db services, used in both admin and public blueprints
 
 """
 
-from .allqid_service import list_targets_by_lang
+from .wikidata.allqid_service import list_targets_by_lang
 from .category_service import (
     add_category,
     delete_category,
@@ -43,7 +43,7 @@ from .page_service import (
     list_pages_by_lang_cat,
     update_page,
 )
-from .qid_service import list_qids
+from .wikidata.qid_service import list_qids
 from .report_service import (
     add_report,
     delete_report,
