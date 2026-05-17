@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
+
 from src.main_app.config import TestingConfig
 
 

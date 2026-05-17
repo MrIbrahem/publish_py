@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
+from ....db.models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
@@ -18,7 +19,6 @@ from ....shared.services.lang_service import list_langs
 from ....shared.services.page_service import list_of_users_by_translations_count
 from ....shared.services.report_service import query_reports_with_filters
 from ....shared.utils.web_utils import parse_select_fields
-from ....db.models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
 

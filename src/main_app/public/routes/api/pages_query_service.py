@@ -7,8 +7,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
-from ....shared.core.extensions import db
 from ....db.models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
+from ....shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,8 @@ from __future__ import annotations
 
 import logging
 
-from ...shared.core.extensions import db, LONGTEXT
+from ...shared.core.extensions import LONGTEXT, db
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,16 +30,16 @@ class ReportRecord(db.Model):
 
     __tablename__ = "publish_reports"
 
-    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    date =db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
-    title =db.Column(db.String(255), nullable=False)
-    user =db.Column(db.String(255), nullable=False)
-    lang =db.Column(db.String(255), nullable=False)
-    sourcetitle =db.Column(db.String(255), nullable=False)
-    result =db.Column(db.String(255), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    title = db.Column(db.String(255), nullable=False)
+    user = db.Column(db.String(255), nullable=False)
+    lang = db.Column(db.String(255), nullable=False)
+    sourcetitle = db.Column(db.String(255), nullable=False)
+    result = db.Column(db.String(255), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    data =db.Column(LONGTEXT, nullable=False)
+    data = db.Column(LONGTEXT, nullable=False)
 
 
 __all__ = [

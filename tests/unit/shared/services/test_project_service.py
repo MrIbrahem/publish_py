@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import ProjectRecord
 from src.main_app.shared.services.project_service import (
     add_project,
     delete_project,
@@ -10,7 +11,6 @@ from src.main_app.shared.services.project_service import (
     list_projects,
     update_project,
 )
-from src.main_app.db.models import ProjectRecord
 
 
 def test_project_workflow():

@@ -7,7 +7,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from ...shared.core.extensions import db, LONGTEXT
+from ...shared.core.extensions import LONGTEXT, db
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,11 +27,11 @@ class LanguageSettingRecord(db.Model):
 
     __tablename__ = "language_settings"
 
-    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    lang_code =db.Column(db.String(20), unique=True, nullable=True)
-    move_dots =db.Column(db.Integer, default=0, server_default=db.text("0"))
-    expend =db.Column(db.Integer, default=0, server_default=db.text("0"))
-    add_en_lang =db.Column(db.Integer, default=0, server_default=db.text("0"))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    lang_code = db.Column(db.String(20), unique=True, nullable=True)
+    move_dots = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    expend = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    add_en_lang = db.Column(db.Integer, default=0, server_default=db.text("0"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -58,14 +59,14 @@ class SettingRecord(db.Model):
 
     __tablename__ = "new_settings"
 
-    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
-    key =db.Column(db.String(190), unique=True, nullable=False)
-    title =db.Column(db.String(500), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    key = db.Column(db.String(190), unique=True, nullable=False)
+    title = db.Column(db.String(500), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    value =db.Column(LONGTEXT, nullable=True)
+    value = db.Column(LONGTEXT, nullable=True)
 
-    value_type =db.Column(
+    value_type = db.Column(
         db.Enum("boolean", "string", "integer", name="setting_value_type"),
         nullable=False,
         default="boolean",

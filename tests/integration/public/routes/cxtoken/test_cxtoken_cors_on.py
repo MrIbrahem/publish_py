@@ -10,6 +10,7 @@ from flask import Flask
 from flask.testing import FlaskClient
 
 from src.main_app.config import TestingConfig
+
 ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
 
