@@ -47,6 +47,23 @@ tests/
     │       ├── test_language_settings_routes.py
     │       ├── test_settings_routes.py
     │       └── test_users_no_inprocess_routes.py
+    ├── db/
+    │   ├── models/
+    │   │   ├── analytics/
+    │   │   ├── config/
+    │   │   ├── content/
+    │   │   ├── pages/
+    │   │   ├── reports/
+    │   │   ├── users/
+    │   │   └── wikidata/
+    │   └── services/
+    │       ├── analytics/
+    │       ├── config/
+    │       ├── content/
+    │       ├── pages/
+    │       ├── reports/
+    │       ├── users/
+    │       └── wikidata/
     ├── models/
     │   ├── analytics/
     │   │   ├── test_assessment_model.py

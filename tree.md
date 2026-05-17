@@ -22,18 +22,68 @@ src/
 │   │   │   └── users_no_inprocess.py
 │   │   └── sidebar.py
 │   ├── config.py
-│   ├── models/
+│   ├── db/
 │   │   ├── __init__.py
-│   │   ├── all_articles.py
-│   │   ├── dashboard.py
-│   │   ├── metrics.py
-│   │   ├── pages.py
-│   │   ├── public.py
-│   │   ├── publish.py
-│   │   ├── qid.py
-│   │   ├── setting.py
-│   │   ├── users.py
-│   │   └── views.py
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── all_articles.py
+│   │   │   ├── analytics/
+│   │   │   ├── config/
+│   │   │   ├── content/
+│   │   │   ├── dashboard.py
+│   │   │   ├── metrics.py
+│   │   │   ├── pages/
+│   │   │   ├── pages.py
+│   │   │   ├── public.py
+│   │   │   ├── publish.py
+│   │   │   ├── qid.py
+│   │   │   ├── reports/
+│   │   │   ├── setting.py
+│   │   │   ├── users/
+│   │   │   ├── users.py
+│   │   │   ├── views.py
+│   │   │   └── wikidata/
+│   │   └── services/
+│   │       ├── __init__.py
+│   │       ├── analytics/
+│   │       │   ├── __init__.py
+│   │       │   ├── assessment_service.py
+│   │       │   ├── enwiki_pageview_service.py
+│   │       │   ├── mdwiki_revid_service.py
+│   │       │   ├── refs_count_service.py
+│   │       │   ├── views_new_service.py
+│   │       │   └── word_service.py
+│   │       ├── config/
+│   │       │   ├── __init__.py
+│   │       │   ├── language_setting_service.py
+│   │       │   └── setting_service.py
+│   │       ├── content/
+│   │       │   ├── __init__.py
+│   │       │   ├── category_service.py
+│   │       │   ├── lang_service.py
+│   │       │   └── project_service.py
+│   │       ├── pages/
+│   │       │   ├── __init__.py
+│   │       │   ├── in_process_service.py
+│   │       │   ├── page_service.py
+│   │       │   ├── translate_type_service.py
+│   │       │   └── user_page_service.py
+│   │       ├── reports/
+│   │       │   ├── __init__.py
+│   │       │   ├── pages_users_to_main_service.py
+│   │       │   └── report_service.py
+│   │       ├── users/
+│   │       │   ├── __init__.py
+│   │       │   ├── coordinator_service.py
+│   │       │   ├── full_translator_service.py
+│   │       │   ├── user_service.py
+│   │       │   ├── user_token_service.py
+│   │       │   └── users_no_inprocess_service.py
+│   │       ├── wikidata/
+│   │       │   ├── __init__.py
+│   │       │   ├── allqid_service.py
+│   │       │   └── qid_service.py
+│   │       └── z.md
 │   ├── public/
 │   │   ├── __init__.py
 │   │   └── routes/
@@ -93,47 +143,6 @@ src/
 │       ├── engine.py
 │       ├── schemas/
 │       │   └── __init__.py
-│       ├── services/
-│       │   ├── __init__.py
-│       │   ├── analytics/
-│       │   │   ├── __init__.py
-│       │   │   ├── assessment_service.py
-│       │   │   ├── enwiki_pageview_service.py
-│       │   │   ├── mdwiki_revid_service.py
-│       │   │   ├── refs_count_service.py
-│       │   │   ├── views_new_service.py
-│       │   │   └── word_service.py
-│       │   ├── config/
-│       │   │   ├── __init__.py
-│       │   │   ├── language_setting_service.py
-│       │   │   └── setting_service.py
-│       │   ├── content/
-│       │   │   ├── __init__.py
-│       │   │   ├── category_service.py
-│       │   │   ├── lang_service.py
-│       │   │   └── project_service.py
-│       │   ├── pages/
-│       │   │   ├── __init__.py
-│       │   │   ├── in_process_service.py
-│       │   │   ├── page_service.py
-│       │   │   ├── translate_type_service.py
-│       │   │   └── user_page_service.py
-│       │   ├── reports/
-│       │   │   ├── __init__.py
-│       │   │   ├── pages_users_to_main_service.py
-│       │   │   └── report_service.py
-│       │   ├── users/
-│       │   │   ├── __init__.py
-│       │   │   ├── coordinator_service.py
-│       │   │   ├── full_translator_service.py
-│       │   │   ├── user_service.py
-│       │   │   ├── user_token_service.py
-│       │   │   └── users_no_inprocess_service.py
-│       │   ├── wikidata/
-│       │   │   ├── __init__.py
-│       │   │   ├── allqid_service.py
-│       │   │   └── qid_service.py
-│       │   └── z.md
 │       └── utils/
 │           ├── __init__.py
 │           ├── decode_bytes.py
