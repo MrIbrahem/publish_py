@@ -8,7 +8,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 # --- Data Classes for Configuration Sections ---
 
@@ -20,7 +20,7 @@ class DbConfig:
     db_user: str | None
     db_password: str | None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "db_name": self.db_name,
             "db_host": self.db_host,
