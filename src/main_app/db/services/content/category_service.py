@@ -72,7 +72,7 @@ def update_category(
     is_default: int = 0,
 ) -> CategoryRecord:
     """Update category."""
-    orm_obj = db.session.session.get(CategoryRecord, category_id)
+    orm_obj = db.session.get(CategoryRecord, category_id)
     if not orm_obj:
         raise ValueError(f"Category with ID {category_id} not found")
 
@@ -95,7 +95,7 @@ def update_category(
 
 def delete_category(category_id: int) -> None:
     """Delete a category."""
-    orm_obj = db.session.session.get(CategoryRecord, category_id)
+    orm_obj = db.session.get(CategoryRecord, category_id)
     if not orm_obj:
         raise ValueError(f"Category with ID {category_id} not found")
 
