@@ -13,7 +13,7 @@ from src.main_app.shared.services.language_setting_service import (
 )
 
 # from src.main_app.sqlalchemy_models import LanguageSettingRecord
-from src.main_app.sqlalchemy_models import LanguageSettingRecord
+from src.main_app.db.models import LanguageSettingRecord
 
 
 def test_language_setting_workflow():

@@ -10,7 +10,7 @@ from src.main_app.shared.services.qid_service import (
     list_qids,
     update_qid,
 )
-from src.main_app.sqlalchemy_models import QidRecord
+from src.main_app.db.models import QidRecord
 
 
 def test_qid_workflow():

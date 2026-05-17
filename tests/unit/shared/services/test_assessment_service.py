@@ -11,7 +11,7 @@ from src.main_app.shared.services.assessment_service import (
     list_assessments,
     update_assessment,
 )
-from src.main_app.sqlalchemy_models import AssessmentRecord
+from src.main_app.db.models import AssessmentRecord
 
 
 def test_assessment_workflow():

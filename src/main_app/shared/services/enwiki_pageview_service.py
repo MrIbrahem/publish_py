@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import EnwikiPageviewRecord
+from ...db.models import EnwikiPageviewRecord
 from ..engine import get_session
 
 logger = logging.getLogger(__name__)
