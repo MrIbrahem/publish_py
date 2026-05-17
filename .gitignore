@@ -43,3 +43,4 @@ app2.py
 *.php
 /tree
 rep.py
+src/main_app/db/services/_main_service.py
