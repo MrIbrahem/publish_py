@@ -614,10 +614,10 @@ from typing import Any
 
 from flask import g
 
-from ...db.services.category_service import get_camp_to_cats
-from ...db.services.in_process_service import list_in_process_by_lang
-from ...db.services.page_service import list_pages_by_lang_cat
-from ...db.services.qid_service import list_targets_by_lang
+from ...db.services.content.category_service import get_camp_to_cats
+from ...db.services.pages.in_process_service import list_in_process_by_lang
+from ...db.services.pages.page_service import list_pages_by_lang_cat
+from ...db.services.wikidata.qid_service import list_targets_by_lang
 from .mediawiki_api import get_mdwiki_cat_members
 
 logger = logging.getLogger(__name__)
