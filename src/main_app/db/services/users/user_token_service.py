@@ -11,7 +11,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.crypto import encrypt_value
-from ....shared.engine import get_session
+from ....shared.core.engine import get_session
 from ...models import UserTokenRecord
 
 logger = logging.getLogger(__name__)

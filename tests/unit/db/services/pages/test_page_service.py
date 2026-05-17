@@ -11,7 +11,7 @@ from src.main_app.db.services.pages.page_service import (
     list_pages,
     update_page,
 )
-from src.main_app.shared.engine import get_session
+from src.main_app.shared.core.engine import get_session
 
 
 def test_page_workflow():

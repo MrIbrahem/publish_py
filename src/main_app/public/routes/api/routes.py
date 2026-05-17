@@ -19,7 +19,7 @@ from ....db.services import (
     query_reports_with_filters,
 )
 from ....shared.core.cors import check_cors
-from ....shared.engine import get_session
+from ....shared.core.engine import get_session
 from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.utils.web_utils import parse_select_fields
 from .pages_query_service import list_pages_users, list_pages_with_views

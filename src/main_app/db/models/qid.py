@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from sqlalchemy import Column, DateTime, Integer, String, func
 
-from ...shared.engine import BaseDb
+from ...shared.core.engine import BaseDb
 
 
 class QidRecord(BaseDb):

@@ -1,8 +1,15 @@
 """
-engine.py
+Flask extensions initialization.
+
+This module centralizes Flask extensions to prevent circular imports
+and enable proper initialization order with the application factory pattern.
 """
 
 from __future__ import annotations
+
+from flask import Blueprint, Flask
+from flask_wtf.csrf import CSRFProtect
+
 
 import logging
 from typing import Any
@@ -14,6 +21,14 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
 
 logger = logging.getLogger(__name__)
+
+# Initialize extensions without binding to app
+csrf = CSRFProtect()
+
+# Future extensions can be added here:
+# db = SQLAlchemy()
+# login_manager = LoginManager()
+# migrate = Migrate()
 
 
 class LONGTEXT(TypeDecorator):
@@ -161,6 +176,16 @@ def create_views_new_all_view(target, connection, **kw):
             logger.info(f"View '{name}' already exists, skipping.")
 
 
+def csrf_init_app(app: Flask) -> None:
+    # Initialize CSRF protection
+    csrf.init_app(app)
+
+
+def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
+    if app.config.get("WTF_CSRF_ENABLED"):
+        csrf.exempt(bp_publish)
+
+
 __all__ = [
     # Model
     "BaseDb",
@@ -168,4 +193,5 @@ __all__ = [
     "init_db",
     "get_session",
     "LONGTEXT",
+    "csrf_init_app",
 ]

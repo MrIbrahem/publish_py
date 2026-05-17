@@ -15,7 +15,7 @@ from src.main_app.db.services.reports.pages_users_to_main_service import (
 def test_pages_users_to_main_workflow():
     from sqlalchemy import text
 
-    from src.main_app.shared.engine import get_session
+    from src.main_app.shared.core.engine import get_session
 
     with get_session() as session:
         session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
@@ -51,7 +51,7 @@ class TestListPagesUsersToMain:
         """Test that function returns list from store."""
         from sqlalchemy import text
 
-        from src.main_app.shared.engine import get_session
+        from src.main_app.shared.core.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (10, 'Malaria'), (20, 'Cholera')"))
@@ -70,7 +70,7 @@ class TestGetPagesUsersToMain:
         """Test that function returns record by ID."""
         from sqlalchemy import text
 
-        from src.main_app.shared.engine import get_session
+        from src.main_app.shared.core.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (30, 'Dengue fever')"))
@@ -92,7 +92,7 @@ class TestAddPagesUsersToMain:
         """Test that function adds and returns record."""
         from sqlalchemy import text
 
-        from src.main_app.shared.engine import get_session
+        from src.main_app.shared.core.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (40, 'Yellow fever')"))
@@ -120,7 +120,7 @@ class TestUpdatePagesUsersToMain:
         """Test that function updates and returns record."""
         from sqlalchemy import text
 
-        from src.main_app.shared.engine import get_session
+        from src.main_app.shared.core.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (50, 'Zika virus')"))
@@ -133,7 +133,7 @@ class TestUpdatePagesUsersToMain:
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         from sqlalchemy import text
 
-        from src.main_app.shared.engine import get_session
+        from src.main_app.shared.core.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (51, 'T')"))
@@ -154,7 +154,7 @@ class TestDeletePagesUsersToMain:
         """Test that function deletes the record."""
         from sqlalchemy import text
 
-        from src.main_app.shared.engine import get_session
+        from src.main_app.shared.core.engine import get_session
 
         with get_session() as session:
             session.execute(text("INSERT INTO pages_users (id, title) VALUES (60, 'Ebola virus')"))
