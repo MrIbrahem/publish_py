@@ -175,7 +175,8 @@ class TestDeleteCoordinator:
     def test_deletes_coordinator(self, monkeypatch):
         """Test that delete_coordinator calls store delete."""
         c = add_coordinator("Delete_Me")
-        delete_coordinator(c.id)
+        deleted = delete_coordinator(c.id)
+        assert deleted is True
         assert get_coordinator(c.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

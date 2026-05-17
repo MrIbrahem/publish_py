@@ -151,7 +151,8 @@ class TestDeleteRefsCount:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         r = add_refs_count("Diazepam")
-        delete_refs_count(r.r_id)
+        deleted = delete_refs_count(r.r_id)
+        assert deleted is True
         assert get_refs_count(r.r_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

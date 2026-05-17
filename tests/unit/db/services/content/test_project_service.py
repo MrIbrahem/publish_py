@@ -121,7 +121,8 @@ class TestDeleteProject:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         p = add_project("WikiProject Temporary")
-        delete_project(p.g_id)
+        deleted = delete_project(p.g_id)
+        assert deleted is True
         assert get_project(p.g_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):

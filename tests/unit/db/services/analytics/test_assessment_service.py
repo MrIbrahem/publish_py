@@ -143,7 +143,8 @@ class TestDeleteAssessment:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         a = add_assessment("Measles")
-        delete_assessment(a.id)
+        deleted = delete_assessment(a.id)
+        assert deleted is True
         assert get_assessment(a.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
