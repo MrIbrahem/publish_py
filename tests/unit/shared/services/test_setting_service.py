@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.setting_service import (
+from src.main_app.shared.services.config.setting_service import (
     add_setting,
     delete_setting,
     get_setting,

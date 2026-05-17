@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.shared.engine import BaseDb, build_engine, get_session, init_db
-from src.main_app.shared.services.report_service import (
+from src.main_app.shared.services.reports.report_service import (
     add_report,
     delete_report,
     list_reports,

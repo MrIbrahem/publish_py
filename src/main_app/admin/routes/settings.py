@@ -8,7 +8,7 @@ from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from ...shared.services import setting_service as service
+from ...shared.services.config import setting_service as service
 from ..decorators import admin_required
 
 

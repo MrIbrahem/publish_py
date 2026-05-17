@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.in_process_service import (
+from src.main_app.shared.services.pages.in_process_service import (
     add_in_process,
     delete_in_process,
     delete_in_process_by_title_user_lang,

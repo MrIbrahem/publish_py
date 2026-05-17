@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.refs_count_service import (
+from src.main_app.shared.services.analytics.refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,
     delete_refs_count,

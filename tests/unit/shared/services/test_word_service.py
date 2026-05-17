@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.word_service import (
+from src.main_app.shared.services.analytics.word_service import (
     add_or_update_word,
     add_word,
     delete_word,

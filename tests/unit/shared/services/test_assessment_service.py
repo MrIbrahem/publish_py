@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.assessment_service import (
+from src.main_app.shared.services.analytics.assessment_service import (
     add_assessment,
     add_or_update_assessment,
     delete_assessment,

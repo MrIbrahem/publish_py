@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.category_service import (
+from src.main_app.shared.services.content.category_service import (
     add_category,
     delete_category,
     get_camp_to_cats,

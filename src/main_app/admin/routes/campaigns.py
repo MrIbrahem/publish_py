@@ -16,7 +16,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...shared.services.category_service import (
+from ...shared.services.content.category_service import (
     add_category,
     delete_category,
     get_camp_to_cats,

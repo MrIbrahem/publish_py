@@ -4,7 +4,7 @@ Shared db services, used in both admin and public blueprints
 """
 
 from .wikidata.allqid_service import list_targets_by_lang
-from .category_service import (
+from .content.category_service import (
     add_category,
     delete_category,
     get_camp_to_cats,
@@ -12,7 +12,7 @@ from .category_service import (
     list_categories,
     update_category,
 )
-from .in_process_service import (
+from .pages.in_process_service import (
     add_in_process,
     delete_in_process,
     delete_in_process_by_title_user_lang,
@@ -25,7 +25,7 @@ from .in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
-from .lang_service import (
+from .content.lang_service import (
     add_lang,
     add_or_update_lang,
     delete_lang,
@@ -33,7 +33,7 @@ from .lang_service import (
     get_lang_by_code,
     list_langs,
 )
-from .page_service import (
+from .pages.page_service import (
     add_page,
     delete_page,
     find_exists_or_update_page,
@@ -44,13 +44,13 @@ from .page_service import (
     update_page,
 )
 from .wikidata.qid_service import list_qids
-from .report_service import (
+from .reports.report_service import (
     add_report,
     delete_report,
     list_reports,
     query_reports_with_filters,
 )
-from .user_page_service import (
+from .pages.user_page_service import (
     add_user_page,
     delete_user_page,
     find_exists_or_update_user_page,
@@ -58,7 +58,7 @@ from .user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from .user_token_service import (
+from .users.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,
     get_user_token,

@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.lang_service import (
+from src.main_app.shared.services.content.lang_service import (
     add_lang,
     add_or_update_lang,
     delete_lang,

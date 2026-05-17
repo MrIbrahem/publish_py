@@ -28,7 +28,7 @@ from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
 from .shared.engine import build_db_url, init_db
-from .shared.services.coordinator_service import active_coordinators
+from .shared.services.users.coordinator_service import active_coordinators
 
 logger = logging.getLogger(__name__)
 

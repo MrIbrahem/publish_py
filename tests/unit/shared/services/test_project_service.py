@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.project_service import (
+from src.main_app.shared.services.content.project_service import (
     add_project,
     delete_project,
     get_project,

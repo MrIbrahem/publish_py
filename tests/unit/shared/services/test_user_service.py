@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.user_service import (
+from src.main_app.shared.services.users.user_service import (
     add_user,
     delete_user,
     get_user,

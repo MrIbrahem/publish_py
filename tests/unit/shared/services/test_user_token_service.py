@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.services.user_token_service import (
+from src.main_app.shared.services.users.user_token_service import (
     delete_user_token,
     delete_user_token_by_username,
     get_user_token,
