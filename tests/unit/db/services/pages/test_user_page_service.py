@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserPageRecord
-from src.main_app.shared.core.extensions import db
 from src.main_app.db.services.pages.user_page_service import (
     add_user_page,
     delete_user_page,
@@ -12,6 +11,7 @@ from src.main_app.db.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
+from src.main_app.shared.core.extensions import db
 
 
 def test_user_page_workflow() -> None:

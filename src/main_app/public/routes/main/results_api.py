@@ -7,8 +7,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....shared.clients import get_mdwiki_cat_members
 from ....db.services import get_camp_to_cats, list_in_process_by_lang, list_pages_by_lang_cat, list_targets_by_lang
+from ....shared.clients import get_mdwiki_cat_members
 
 logger = logging.getLogger(__name__)
 

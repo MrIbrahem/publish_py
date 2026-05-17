@@ -9,8 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...models import UsersNoInprocessRecord
 from ....shared.core.extensions import db
+from ...models import UsersNoInprocessRecord
 
 logger = logging.getLogger(__name__)
 

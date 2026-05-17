@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import InProcessRecord
-from src.main_app.shared.core.extensions import db
 from src.main_app.db.services.pages.in_process_service import (
     add_in_process,
     delete_in_process,
@@ -16,6 +15,7 @@ from src.main_app.db.services.pages.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
+from src.main_app.shared.core.extensions import db
 
 
 def test_in_process_workflow():
