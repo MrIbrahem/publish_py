@@ -22,8 +22,8 @@ from ....shared.services import (
     insert_page_target,
     insert_user_page_target,
 )
-from ....shared.services.content.category_service import get_campaign_category
 from ....shared.services.config.language_setting_service import LanguageSettingRecord, get_language_setting_by_code
+from ....shared.services.content.category_service import get_campaign_category
 from ....shared.utils.helpers import (
     determine_hashtag,
     do_changes_to_text_with_settings,

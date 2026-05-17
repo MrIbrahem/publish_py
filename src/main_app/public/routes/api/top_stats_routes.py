@@ -11,9 +11,9 @@ from typing import Any, Dict, List
 from flask import Response, jsonify, request
 from sqlalchemy import Integer, case, cast, func
 
+from ....db.models import LangRecord, PageRecord, ViewsNewAllRecord, WordRecord
 from ....shared.core.cors import check_cors
 from ....shared.engine import get_session
-from ....db.models import LangRecord, PageRecord, ViewsNewAllRecord, WordRecord
 
 logger = logging.getLogger(__name__)
 

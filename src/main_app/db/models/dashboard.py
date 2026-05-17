@@ -8,7 +8,7 @@ import logging
 
 from sqlalchemy import Column, Integer, String
 
-from ..shared.engine import BaseDb
+from ...shared.engine import BaseDb
 
 logger = logging.getLogger(__name__)
 

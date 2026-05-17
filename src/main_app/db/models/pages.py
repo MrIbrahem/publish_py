@@ -8,7 +8,7 @@ from typing import Any
 
 from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String, func, text
 
-from ..shared.engine import BaseDb
+from ...shared.engine import BaseDb
 
 
 class PageRecord(BaseDb):

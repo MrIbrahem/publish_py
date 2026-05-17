@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import CoordinatorRecord
 from src.main_app.shared.engine import init_db
 from src.main_app.shared.services.users.coordinator_service import (
     active_coordinators,
@@ -15,7 +16,6 @@ from src.main_app.shared.services.users.coordinator_service import (
     set_coordinator_active,
     update_coordinator,
 )
-from src.main_app.db.models import CoordinatorRecord
 
 
 def test_coordinator_workflow():

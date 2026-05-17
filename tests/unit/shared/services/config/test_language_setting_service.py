@@ -2,6 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+# from src.main_app.models import LanguageSettingRecord
+from src.main_app.db.models import LanguageSettingRecord
 from src.main_app.shared.services.config.language_setting_service import (
     add_language_setting,
     add_or_update_language_setting,
@@ -11,9 +13,6 @@ from src.main_app.shared.services.config.language_setting_service import (
     list_language_settings,
     update_language_setting,
 )
-
-# from src.main_app.models import LanguageSettingRecord
-from src.main_app.db.models import LanguageSettingRecord
 
 
 def test_language_setting_workflow():

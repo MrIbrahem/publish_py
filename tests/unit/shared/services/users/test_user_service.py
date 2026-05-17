@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import UserRecord
 from src.main_app.shared.services.users.user_service import (
     add_user,
     delete_user,
@@ -12,7 +13,6 @@ from src.main_app.shared.services.users.user_service import (
     update_user_data,
     user_exists,
 )
-from src.main_app.db.models import UserRecord
 
 
 def test_user_workflow():

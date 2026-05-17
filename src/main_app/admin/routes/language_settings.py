@@ -14,13 +14,13 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...shared.services.content.lang_service import list_langs
 from ...shared.services.config.language_setting_service import (
     add_language_setting,
     delete_language_setting,
     list_language_settings,
     update_language_setting,
 )
+from ...shared.services.content.lang_service import list_langs
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)

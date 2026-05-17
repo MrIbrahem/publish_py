@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import PageRecord
 from src.main_app.shared.engine import BaseDb, build_engine, get_session, init_db
 from src.main_app.shared.services.pages.page_service import (
     add_page,
@@ -11,7 +12,6 @@ from src.main_app.shared.services.pages.page_service import (
     list_pages,
     update_page,
 )
-from src.main_app.db.models import PageRecord
 
 
 def test_page_workflow():

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from sqlalchemy import Column, Integer, String
 
-from ..shared.engine import BaseDb
+from ...shared.engine import BaseDb
 
 
 class AssessmentRecord(BaseDb):

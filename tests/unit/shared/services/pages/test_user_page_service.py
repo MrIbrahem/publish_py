@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.models import UserPageRecord
 from src.main_app.shared.engine import get_session
 from src.main_app.shared.services.pages.user_page_service import (
     add_user_page,
@@ -11,7 +12,6 @@ from src.main_app.shared.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.main_app.db.models import UserPageRecord
 
 
 def test_user_page_workflow() -> None:
