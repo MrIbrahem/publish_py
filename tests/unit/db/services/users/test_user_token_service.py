@@ -19,9 +19,12 @@ def test_user_token_workflow():
     t = get_user_token(12345)
     assert t.username == "ExampleWikiEditor"
     assert get_user_token_by_username("ExampleWikiEditor").user_id == 12345
+
     delete_user_token_by_username("ExampleWikiEditor")
     assert get_user_token(12345) is None
+
     upsert_user_token(user_id=67890, username="TrustedContributor", access_key="key2", access_secret="secret2")
+
     deleted = delete_user_token(67890)
     assert deleted is True
     assert get_user_token(67890) is None
