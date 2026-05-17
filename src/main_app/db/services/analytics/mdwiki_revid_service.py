@@ -9,8 +9,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...db.models import MdwikiRevidRecord
-from ..core.extensions import db
+from ...models import MdwikiRevidRecord
+from ....shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
