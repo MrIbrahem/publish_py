@@ -145,7 +145,6 @@ tests/
         │   │   └── test_publish_secret_checks.py
         │   ├── test_crypto.py
         │   └── test_extensions.py
-        ├── services/
         └── utils/
             ├── helpers/
             │   ├── test_files.py
