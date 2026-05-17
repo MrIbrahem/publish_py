@@ -38,7 +38,7 @@ def list_users_by_group(user_group: str) -> List[UserRecord]:
 def get_user(user_id: int) -> UserRecord | None:
     """Get a user record by ID."""
     with get_session() as session:
-        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+        orm_obj = session.get(UserRecord, user_id)
         if not orm_obj:
             logger.warning(f"User record with ID {user_id} not found")
             return None
@@ -98,7 +98,7 @@ def update_user(
         raise ValueError("Username is required")
 
     with get_session() as session:
-        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+        orm_obj = session.get(UserRecord, user_id)
         if not orm_obj:
             raise ValueError(f"User record with ID {user_id} not found")
 
@@ -118,7 +118,7 @@ def update_user_data(
 ) -> UserRecord:
     """Update a user record."""
     with get_session() as session:
-        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+        orm_obj = session.get(UserRecord, user_id)
         if not orm_obj:
             raise ValueError(f"User record with ID {user_id} not found")
 
@@ -134,17 +134,18 @@ def update_user_data(
         return orm_obj
 
 
-def delete_user(user_id: int) -> UserRecord:
+def delete_user(user_id: int) -> bool:
     """Delete a user record by ID."""
     with get_session() as session:
-        orm_obj = session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+        orm_obj = session.get(UserRecord, user_id)
         if not orm_obj:
             raise ValueError(f"User record with ID {user_id} not found")
 
-        record = UserRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.get(UserRecord, user_id)
+        return deleted is None
 
 
 def user_exists(username: str) -> bool:
