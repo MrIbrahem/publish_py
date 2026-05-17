@@ -9,8 +9,8 @@ from typing import List
 
 from sqlalchemy import func
 
-rom ...models import QidRecord
-from ..engine import get_session
+from ....shared.engine import get_session
+from ...models import QidRecord
 
 logger = logging.getLogger(__name__)
 

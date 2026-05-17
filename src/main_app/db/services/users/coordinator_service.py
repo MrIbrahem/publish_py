@@ -10,8 +10,8 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-rom ...models import CoordinatorRecord
-from ..engine import get_session
+from ....shared.engine import get_session
+from ...models import CoordinatorRecord
 
 logger = logging.getLogger(__name__)
 

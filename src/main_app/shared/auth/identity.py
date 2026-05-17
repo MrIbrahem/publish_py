@@ -8,8 +8,8 @@ from typing import Optional
 from flask import g, request, session
 
 from ...config import settings
+from ...db.services.users.user_token_service import UserTokenRecord, get_user_token
 from ..core.cookies.cookie import extract_user_id
-from ..services.users.user_token_service import UserTokenRecord, get_user_token
 
 
 @dataclass(frozen=True)

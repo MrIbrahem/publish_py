@@ -10,9 +10,9 @@ from typing import Optional
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-rom ...models import UserTokenRecord
-from ..core.crypto import encrypt_value
-from ..engine import get_session
+from ....shared.core.crypto import encrypt_value
+from ....shared.engine import get_session
+from ...models import UserTokenRecord
 
 logger = logging.getLogger(__name__)
 
