@@ -164,7 +164,8 @@ class TestCorsDisabled:
         with app.test_request_context(base_url="http://localhost/", headers={}):
             from flask import request
 
-            assert is_allowed(request) == "http://localhost"
+            # assert is_allowed(request) == "http://localhost"
+            assert is_allowed(request) == "*"
 
     def test_disabled_bypasses_denied_domain(self, app: Flask) -> None:
         """Even a normally-denied domain passes when CORS_DISABLED."""

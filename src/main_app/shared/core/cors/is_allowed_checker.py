@@ -56,7 +56,7 @@ def is_allowed(request: Request) -> str | None:
     # TODO: check this, it was added by AI Agent
     # If both Origin and Referer are missing, it's likely a direct request
     # or from a client that doesn't send these headers (like tests).
-    if not origin and not referer:
+    if not origin and not referer and not current_app.config.get("CORS_DISABLED"):
         return make_url(request.host_url) or "*"
 
     if current_app.config.get("CORS_DISABLED"):
