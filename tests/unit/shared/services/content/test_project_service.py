@@ -10,7 +10,7 @@ from src.main_app.shared.services.content.project_service import (
     list_projects,
     update_project,
 )
-from src.main_app.sqlalchemy_models import ProjectRecord
+from src.main_app.models import ProjectRecord
 
 
 def test_project_workflow():

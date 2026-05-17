@@ -13,7 +13,7 @@ from src.main_app.shared.services.users.users_no_inprocess_service import (
     should_hide_from_inprocess,
     update_users_no_inprocess,
 )
-from src.main_app.sqlalchemy_models import UsersNoInprocessRecord
+from src.main_app.models import UsersNoInprocessRecord
 
 
 def test_users_no_inprocess_workflow():

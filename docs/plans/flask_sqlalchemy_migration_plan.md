@@ -49,7 +49,7 @@ src/
 │   │   └── utils/                  # Utility modules
 │   ├── admin/                      # Admin blueprint
 │   ├── public/                     # Public blueprint
-│   └── sqlalchemy_models/          # ORM models (BaseDb-based)
+│   └── models/          # ORM models (BaseDb-based)
 │       ├── all_articles.py
 │       ├── dashboard.py
 │       ├── metrics.py
@@ -152,7 +152,7 @@ services/* ──> get_session() ───────────────�
           session.query(Model)...
                     │
                     ▼
-         sqlalchemy_models/* ──> BaseDb (DeclarativeBase)
+         models/* ──> BaseDb (DeclarativeBase)
 ```
 
 ---
@@ -275,7 +275,7 @@ src/
 │   │   ├── __init__.py
 │   │   ├── routes/
 │   │   └── services/
-│   └── sqlalchemy_models/              # DEPRECATED → redirect imports to shared/models/
+│   └── models/              # DEPRECATED → redirect imports to shared/models/
 ├── migrations/                         # NEW: Alembic migrations directory
 │   ├── alembic.ini
 │   ├── env.py
@@ -291,7 +291,7 @@ Blueprints remain unchanged. The key change is how services within blueprints ac
 ```python
 # BEFORE (admin/services/coordinator_service.py)
 from ...shared.engine import get_session
-from ...sqlalchemy_models.users import CoordinatorRecord
+from ...models.users import CoordinatorRecord
 
 def list_coordinators():
     with get_session() as session:
@@ -518,7 +518,7 @@ class ModelMixin:
 
 ```python
 # ==================== BEFORE ====================
-# src/main_app/sqlalchemy_models/users.py
+# src/main_app/models/users.py
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from ..shared.engine import BaseDb
@@ -534,7 +534,7 @@ class UserRecord(BaseDb):
 
 
 # ==================== AFTER (Strategy A - Minimal) ====================
-# src/main_app/sqlalchemy_models/users.py
+# src/main_app/models/users.py
 # NO CHANGES NEEDED - BaseDb is registered with Flask-SQLAlchemy
 
 
@@ -1687,7 +1687,7 @@ from __future__ import annotations
 import logging
 from typing import Optional
 from ..engine import get_session
-from ...sqlalchemy_models.pages import PageRecord
+from ...models.pages import PageRecord
 
 logger = logging.getLogger(__name__)
 
@@ -1997,7 +1997,7 @@ def publish_batch(page_ids: list[int], publisher_id: int) -> dict:
 #### Phase 5: Cleanup
 
 -   [ ] Old `engine.py` removed or reduced to utility types only
--   [ ] `sqlalchemy_models/` directory removed (if consolidated)
+-   [ ] `models/` directory removed (if consolidated)
 -   [ ] All deprecated compatibility shims removed
 -   [ ] Import paths updated project-wide
 -   [ ] No remaining references to `init_db()` or `get_session()`

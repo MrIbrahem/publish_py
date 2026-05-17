@@ -11,7 +11,7 @@ from src.main_app.shared.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.main_app.sqlalchemy_models import UserPageRecord
+from src.main_app.models import UserPageRecord
 
 
 def test_user_page_workflow() -> None:

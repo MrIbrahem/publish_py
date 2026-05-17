@@ -13,7 +13,7 @@ from src.main_app.shared.services.users.full_translator_service import (
     list_full_translators,
     update_full_translator,
 )
-from src.main_app.sqlalchemy_models import FullTranslatorRecord
+from src.main_app.models import FullTranslatorRecord
 
 
 def test_full_translator_workflow():

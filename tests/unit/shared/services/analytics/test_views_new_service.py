@@ -14,7 +14,7 @@ from src.main_app.shared.services.analytics.views_new_service import (
     list_views_new,
     update_views_new,
 )
-from src.main_app.sqlalchemy_models import ViewsNewRecord
+from src.main_app.models import ViewsNewRecord
 
 
 def test_views_new_workflow():

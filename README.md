@@ -23,8 +23,8 @@ src/main_app/
 │   ├── clients/         # External API clients (MediaWiki, Wikidata, OAuth)
 │   ├── auth/            # Authentication decorators and identity
 │   ├── core/            # CORS, cookies, crypto utilities
-│   └── sqlalchemy_models/  # SQLAlchemy ORM models
-└── sqlalchemy_models/   # Database models (pages, users, metrics, etc.)
+│   └── models/  # SQLAlchemy ORM models
+└── models/   # Database models (pages, users, metrics, etc.)
 ```
 
 ## Configuration

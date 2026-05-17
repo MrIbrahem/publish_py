@@ -12,8 +12,8 @@ from src.main_app.shared.services.config.language_setting_service import (
     update_language_setting,
 )
 
-# from src.main_app.sqlalchemy_models import LanguageSettingRecord
-from src.main_app.sqlalchemy_models import LanguageSettingRecord
+# from src.main_app.models import LanguageSettingRecord
+from src.main_app.models import LanguageSettingRecord
 
 
 def test_language_setting_workflow():

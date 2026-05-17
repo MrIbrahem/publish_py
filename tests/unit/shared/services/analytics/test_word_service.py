@@ -12,7 +12,7 @@ from src.main_app.shared.services.analytics.word_service import (
     list_words,
     update_word,
 )
-from src.main_app.sqlalchemy_models import WordRecord
+from src.main_app.models import WordRecord
 
 
 def test_word_workflow():

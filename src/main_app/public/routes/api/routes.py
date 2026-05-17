@@ -21,7 +21,7 @@ from ....shared.services import (
     query_reports_with_filters,
 )
 from ....shared.utils.web_utils import parse_select_fields
-from ....sqlalchemy_models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
+from ....models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
 
