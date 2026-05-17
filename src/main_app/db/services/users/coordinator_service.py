@@ -19,8 +19,7 @@ logger = logging.getLogger(__name__)
 def list_coordinators() -> List[CoordinatorRecord]:
     """Return all coordinator records."""
     orm_objs = db.session.query(CoordinatorRecord).order_by(CoordinatorRecord.id).all()
-    # return orm_objs
-    return [CoordinatorRecord(**record.to_dict()) for record in orm_objs]
+    return orm_objs
 
 
 @functools.lru_cache(maxsize=1)
@@ -43,8 +42,7 @@ def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
     if not record:
         logger.warning(f"Coordinator record with ID {coordinator_id} not found")
         return None
-    # return record
-    return CoordinatorRecord(**record.to_dict())
+    return record
 
 
 def get_coordinator_by_user(username: str) -> CoordinatorRecord | None:
@@ -53,7 +51,7 @@ def get_coordinator_by_user(username: str) -> CoordinatorRecord | None:
     record = db.session.query(CoordinatorRecord).filter_by(username=username).first()
     if not record:
         return None
-    return CoordinatorRecord(**record.to_dict())
+    return record
 
 
 def add_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
@@ -73,8 +71,7 @@ def add_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
     # Refresh to get the ID and other defaults
     db.session.refresh(record)
     active_coordinators.cache_clear()
-    # return record
-    return CoordinatorRecord(**record.to_dict())
+    return record
 
 
 def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorRecord:
@@ -92,8 +89,7 @@ def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorR
     db.session.commit()
     db.session.refresh(record)
     active_coordinators.cache_clear()
-    # return record
-    return CoordinatorRecord(**record.to_dict())
+    return record
 
 
 def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
@@ -104,7 +100,7 @@ def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
         raise ValueError(f"Coordinator with ID {coordinator_id} not found")
 
     if not kwargs:
-        return CoordinatorRecord(**record.to_dict())
+        return record
 
     for key, value in kwargs.items():
         if hasattr(record, key):
@@ -112,8 +108,8 @@ def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
     db.session.commit()
     db.session.refresh(record)
     active_coordinators.cache_clear()
-    # return record
-    return CoordinatorRecord(**record.to_dict())
+
+    return record
 
 
 def delete_coordinator(coordinator_id: int) -> None:
@@ -125,6 +121,9 @@ def delete_coordinator(coordinator_id: int) -> None:
     db.session.delete(record)
     db.session.commit()
     active_coordinators.cache_clear()
+
+    deleted = db.session.get(CoordinatorRecord, coordinator_id)
+    return deleted is None
 
 
 def is_coordinator(username: str) -> bool:
