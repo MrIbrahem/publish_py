@@ -16,7 +16,7 @@ def app() -> Generator[Flask, Any, None]:
     app = Flask(__name__)
     app.url_map.strict_slashes = False
     app.config.from_object(TestingConfig)
-    app.config.update({"CORS_DISABLED": True})
+    app.config.update({"CORS_DISABLED": False})
 
     from src.main_app.shared.core.extensions import db
 
