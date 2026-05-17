@@ -126,17 +126,18 @@ def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
     return orm_obj
 
 
-def delete_translate_type(tt_id: int) -> TranslateTypeRecord:
+def delete_translate_type(tt_id: int) -> bool:
     """Delete a translate_type record by ID."""
     # tt_id is the primary key for TranslateTypeRecord
     orm_obj = db.session.get(TranslateTypeRecord, tt_id)
     if not orm_obj:
         raise ValueError(f"TranslateType record with ID {tt_id} not found")
 
-    record = TranslateTypeRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(TranslateTypeRecord, tt_id)
+    return deleted is None
 
 
 def can_translate_lead(title: str) -> bool:

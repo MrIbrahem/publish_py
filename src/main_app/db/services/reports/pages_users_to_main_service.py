@@ -67,16 +67,18 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
     return orm_obj
 
 
-def delete_pages_users_to_main(record_id: int) -> PagesUsersToMainRecord:
+def delete_pages_users_to_main(record_id: int) -> bool:
     """Delete a pages_users_to_main record by ID."""
-    orm_obj = db.session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == record_id).first()
+    # orm_obj = db.session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == record_id).first()
+    orm_obj = db.session.get(PagesUsersToMainRecord, record_id)
     if not orm_obj:
         raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
 
-    record = PagesUsersToMainRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(PagesUsersToMainRecord, record_id)
+    return deleted is None
 
 
 __all__ = [

@@ -132,16 +132,17 @@ def update_user_data(
     return orm_obj
 
 
-def delete_user(user_id: int) -> UserRecord:
+def delete_user(user_id: int) -> bool:
     """Delete a user record by ID."""
     orm_obj = db.session.get(UserRecord, user_id)
     if not orm_obj:
         raise ValueError(f"User record with ID {user_id} not found")
 
-    record = UserRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(UserRecord, user_id)
+    return deleted is None
 
 
 def user_exists(username: str) -> bool:

@@ -103,16 +103,18 @@ def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecor
     return orm_obj
 
 
-def delete_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord:
+def delete_users_no_inprocess(record_id: int) -> bool:
     """Delete a users_no_inprocess record by ID."""
-    orm_obj = db.session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.id == record_id).first()
+    # orm_obj = db.session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.id == record_id).first()
+    orm_obj = db.session.get(UsersNoInprocessRecord, record_id)
     if not orm_obj:
         raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
 
-    record = UsersNoInprocessRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(UsersNoInprocessRecord, record_id)
+    return deleted is None
 
 
 def should_hide_from_inprocess(user: str) -> bool:
