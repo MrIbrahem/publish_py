@@ -61,22 +61,6 @@ class BaseDb(DeclarativeBase):
 #    pool_pre_ping=True handles reconnect + retry automatically
 # ---------------------------------------------------------------------------
 
-
-def build_db_url(db_data: dict[str, str]) -> str:
-    """
-
-    db_name: str
-    db_host: str
-    db_user: str | None
-    db_password: str | None
-    """
-    db_user = db_data["db_user"]
-    db_password = db_data["db_password"]
-    db_host = db_data["db_host"]
-    db_name = db_data["db_name"]
-    return f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}"
-
-
 def build_engine(db_url: str) -> Engine:
     """
     Create a SQLAlchemy engine.

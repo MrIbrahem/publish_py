@@ -9,7 +9,7 @@ from src.main_app.db.services.reports.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-from src.main_app.shared.engine import BaseDb, build_engine, get_session, init_db
+from src.main_app.shared.engine import get_session
 
 
 def test_report_workflow():

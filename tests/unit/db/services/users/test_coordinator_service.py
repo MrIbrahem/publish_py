@@ -15,7 +15,6 @@ from src.main_app.db.services.users.coordinator_service import (
     set_coordinator_active,
     update_coordinator,
 )
-from src.main_app.shared.engine import init_db
 
 
 def test_coordinator_workflow():
