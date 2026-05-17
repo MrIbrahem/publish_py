@@ -32,7 +32,7 @@ def get_top_enwiki_pageviews(limit: int = 100) -> List[EnwikiPageviewRecord]:
 def get_enwiki_pageview(pageview_id: int) -> EnwikiPageviewRecord | None:
     """Get an enwiki pageview record by ID."""
     with get_session() as session:
-        orm_obj = session.query(EnwikiPageviewRecord).filter(EnwikiPageviewRecord.id == pageview_id).first()
+        orm_obj = session.get(EnwikiPageviewRecord, pageview_id)
         if not orm_obj:
             logger.warning(f"Enwiki pageview record with ID {pageview_id} not found")
             return None
@@ -89,7 +89,7 @@ def add_or_update_enwiki_pageview(title: str, en_views: int | None = 0) -> Enwik
 def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
     """Update an enwiki pageview record."""
     with get_session() as session:
-        orm_obj = session.query(EnwikiPageviewRecord).filter(EnwikiPageviewRecord.id == pageview_id).first()
+        orm_obj = session.get(EnwikiPageviewRecord, pageview_id)
         if not orm_obj:
             raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
 
@@ -105,17 +105,18 @@ def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
         return orm_obj
 
 
-def delete_enwiki_pageview(pageview_id: int) -> EnwikiPageviewRecord:
+def delete_enwiki_pageview(pageview_id: int) -> bool:
     """Delete an enwiki pageview record by ID."""
     with get_session() as session:
-        orm_obj = session.query(EnwikiPageviewRecord).filter(EnwikiPageviewRecord.id == pageview_id).first()
+        orm_obj = session.get(EnwikiPageviewRecord, pageview_id)
         if not orm_obj:
             raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
 
-        record = EnwikiPageviewRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.get(EnwikiPageviewRecord, pageview_id)
+        return deleted is None
 
 
 __all__ = [
