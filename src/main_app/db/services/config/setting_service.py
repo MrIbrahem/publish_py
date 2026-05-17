@@ -9,7 +9,7 @@ from typing import Any, List
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import get_session
+from ....shared.core.extensions import db
 from ...models import SettingRecord
 
 logger = logging.getLogger(__name__)
@@ -17,28 +17,25 @@ logger = logging.getLogger(__name__)
 
 def list_settings() -> List[SettingRecord]:
     """Return all setting records."""
-    with get_session() as session:
-        orm_objs = session.query(SettingRecord).order_by(SettingRecord.id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(SettingRecord).order_by(SettingRecord.id.asc()).all()
+    return orm_objs
 
 
 def get_setting(setting_id: int) -> SettingRecord | None:
     """Get a setting record by ID."""
-    with get_session() as session:
-        orm_obj = session.get(SettingRecord, setting_id)
-        if not orm_obj:
-            logger.warning(f"Setting record with ID {setting_id} not found")
-            return None
-        return orm_obj
+    orm_obj = db.session.get(SettingRecord, setting_id)
+    if not orm_obj:
+        logger.warning(f"Setting record with ID {setting_id} not found")
+        return None
+    return orm_obj
 
 
 def get_setting_by_key(key: str) -> SettingRecord | None:
     """Get a setting record by key."""
-    with get_session() as session:
-        orm_obj = session.query(SettingRecord).filter(SettingRecord.key == key).first()
-        if not orm_obj:
-            return None
-        return orm_obj
+    orm_obj = db.session.query(SettingRecord).filter(SettingRecord.key == key).first()
+    if not orm_obj:
+        return None
+    return orm_obj
 
 
 def add_setting(
@@ -55,49 +52,47 @@ def add_setting(
     if not title:
         raise ValueError("Title is required")
 
-    with get_session() as session:
-        orm_obj = SettingRecord(
-            key=key,
-            title=title,
-            value_type=value_type,
-            value=str(value) if value is not None else None,
-        )
-        session.add(orm_obj)
-        try:
-            session.commit()
-        except IntegrityError:
-            session.rollback()
-            raise ValueError(f"Setting with key '{key}' already exists") from None
+    orm_obj = SettingRecord(
+        key=key,
+        title=title,
+        value_type=value_type,
+        value=str(value) if value is not None else None,
+    )
+    db.session.add(orm_obj)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise ValueError(f"Setting with key '{key}' already exists") from None
 
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def update_value(setting_id: int, value: Any) -> SettingRecord:
     """Update a setting record value."""
-    with get_session() as session:
-        orm_obj: SettingRecord = session.get(SettingRecord, setting_id)
-        if not orm_obj:
-            raise ValueError(f"Setting record with ID {setting_id} not found")
+    orm_obj: SettingRecord = db.session.get(SettingRecord, setting_id)
+    if not orm_obj:
+        raise ValueError(f"Setting record with ID {setting_id} not found")
 
-        orm_obj.value = value  # str(value) if value is not None else None
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
+    orm_obj.value = value  # str(value) if value is not None else None
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def delete_setting(setting_id: int) -> bool:
     """Delete a setting record by ID."""
-    with get_session() as session:
-        orm_obj = session.get(SettingRecord, setting_id)
-        if not orm_obj:
-            raise ValueError(f"Setting record with ID {setting_id} not found")
+    # orm_obj = db.session.query(SettingRecord).filter(SettingRecord.id == setting_id).first()
+    orm_obj = db.session.get(SettingRecord, setting_id)
+    if not orm_obj:
+        raise ValueError(f"Setting record with ID {setting_id} not found")
 
-        session.delete(orm_obj)
-        session.commit()
+    db.session.delete(orm_obj)
+    db.session.commit()
 
-        deleted = session.get(SettingRecord, setting_id)
-        return deleted is None
+    deleted = db.session.get(SettingRecord, setting_id)
+    return deleted is None
 
 
 __all__ = [

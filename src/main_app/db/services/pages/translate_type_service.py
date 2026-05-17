@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import get_session
+from ....shared.core.extensions import db
 from ...models import TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
@@ -17,52 +17,49 @@ logger = logging.getLogger(__name__)
 
 def list_translate_types() -> List[TranslateTypeRecord]:
     """Return all translate_type records."""
-    with get_session() as session:
-        orm_objs = session.query(TranslateTypeRecord).order_by(TranslateTypeRecord.tt_id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(TranslateTypeRecord).order_by(TranslateTypeRecord.tt_id.asc()).all()
+    return orm_objs
 
 
 def list_lead_enabled_types() -> List[TranslateTypeRecord]:
     """Return translate_type records with lead enabled."""
-    with get_session() as session:
-        orm_objs = (
-            session.query(TranslateTypeRecord)
-            .filter(TranslateTypeRecord.tt_lead == 1)
-            .order_by(TranslateTypeRecord.tt_id.asc())
-            .all()
-        )
-        return orm_objs
+    orm_objs = (
+        db.session.query(TranslateTypeRecord)
+        .filter(TranslateTypeRecord.tt_lead == 1)
+        .order_by(TranslateTypeRecord.tt_id.asc())
+        .all()
+    )
+    return orm_objs
 
 
 def list_full_enabled_types() -> List[TranslateTypeRecord]:
     """Return translate_type records with full enabled."""
-    with get_session() as session:
-        orm_objs = (
-            session.query(TranslateTypeRecord)
-            .filter(TranslateTypeRecord.tt_full == 1)
-            .order_by(TranslateTypeRecord.tt_id.asc())
-            .all()
-        )
-        return orm_objs
+    orm_objs = (
+        db.session.query(TranslateTypeRecord)
+        .filter(TranslateTypeRecord.tt_full == 1)
+        .order_by(TranslateTypeRecord.tt_id.asc())
+        .all()
+    )
+    return orm_objs
 
 
 def get_translate_type(tt_id: int) -> TranslateTypeRecord | None:
     """Get a translate_type record by ID."""
-    with get_session() as session:
-        orm_obj = session.get(TranslateTypeRecord, tt_id)
-        if not orm_obj:
-            logger.warning(f"TranslateType record with ID {tt_id} not found")
-            return None
-        return orm_obj
+    # orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_id == tt_id).first()
+    # tt_id is the primary key for TranslateTypeRecord
+    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
+    if not orm_obj:
+        logger.warning(f"TranslateType record with ID {tt_id} not found")
+        return None
+    return orm_obj
 
 
 def get_translate_type_by_title(title: str) -> TranslateTypeRecord | None:
     """Get a translate_type record by title."""
-    with get_session() as session:
-        orm_obj = session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_title == title).first()
-        if not orm_obj:
-            return None
-        return orm_obj
+    orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_title == title).first()
+    if not orm_obj:
+        return None
+    return orm_obj
 
 
 def add_translate_type(
@@ -75,17 +72,16 @@ def add_translate_type(
     if not tt_title:
         raise ValueError("Title is required")
 
-    with get_session() as session:
-        orm_obj = TranslateTypeRecord(tt_title=tt_title, tt_lead=tt_lead, tt_full=tt_full)
-        session.add(orm_obj)
-        try:
-            session.commit()
-        except IntegrityError:
-            session.rollback()
-            raise ValueError(f"Translate type '{tt_title}' already exists") from None
+    orm_obj = TranslateTypeRecord(tt_title=tt_title, tt_lead=tt_lead, tt_full=tt_full)
+    db.session.add(orm_obj)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise ValueError(f"Translate type '{tt_title}' already exists") from None
 
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def add_or_update_translate_type(
@@ -98,51 +94,50 @@ def add_or_update_translate_type(
     if not tt_title:
         raise ValueError("Title is required")
 
-    with get_session() as session:
-        orm_obj = session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_title == tt_title).first()
-        if orm_obj:
-            orm_obj.tt_lead = tt_lead
-            orm_obj.tt_full = tt_full
-        else:
-            orm_obj = TranslateTypeRecord(tt_title=tt_title, tt_lead=tt_lead, tt_full=tt_full)
-            session.add(orm_obj)
+    orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_title == tt_title).first()
+    if orm_obj:
+        orm_obj.tt_lead = tt_lead
+        orm_obj.tt_full = tt_full
+    else:
+        orm_obj = TranslateTypeRecord(tt_title=tt_title, tt_lead=tt_lead, tt_full=tt_full)
+        db.session.add(orm_obj)
 
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
     """Update a translate_type record."""
-    with get_session() as session:
-        orm_obj = session.get(TranslateTypeRecord, tt_id)
-        if not orm_obj:
-            raise ValueError(f"TranslateType record with ID {tt_id} not found")
+    # tt_id is the primary key for TranslateTypeRecord
+    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
+    if not orm_obj:
+        raise ValueError(f"TranslateType record with ID {tt_id} not found")
 
-        if not kwargs:
-            return orm_obj
-
-        for key, value in kwargs.items():
-            if hasattr(orm_obj, key):
-                setattr(orm_obj, key, value)
-
-        session.commit()
-        session.refresh(orm_obj)
+    if not kwargs:
         return orm_obj
+
+    for key, value in kwargs.items():
+        if hasattr(orm_obj, key):
+            setattr(orm_obj, key, value)
+
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def delete_translate_type(tt_id: int) -> bool:
     """Delete a translate_type record by ID."""
-    with get_session() as session:
-        orm_obj = session.get(TranslateTypeRecord, tt_id)
-        if not orm_obj:
-            raise ValueError(f"TranslateType record with ID {tt_id} not found")
+    # tt_id is the primary key for TranslateTypeRecord
+    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
+    if not orm_obj:
+        raise ValueError(f"TranslateType record with ID {tt_id} not found")
 
-        session.delete(orm_obj)
-        session.commit()
+    db.session.delete(orm_obj)
+    db.session.commit()
 
-        deleted = session.get(TranslateTypeRecord, tt_id)
-        return deleted is None
+    deleted = db.session.get(TranslateTypeRecord, tt_id)
+    return deleted is None
 
 
 def can_translate_lead(title: str) -> bool:

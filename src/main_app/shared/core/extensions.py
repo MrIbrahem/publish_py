@@ -3,6 +3,12 @@ Flask extensions initialization.
 
 This module centralizes Flask extensions to prevent circular imports
 and enable proper initialization order with the application factory pattern.
+
+IMPORT RULE: Always import extensions from this module.
+Never instantiate extensions elsewhere.
+
+Usage:
+    from main_app.shared.core.extensions import db, migrate, csrf
 """
 
 from __future__ import annotations
@@ -11,42 +17,17 @@ import logging
 from typing import Any
 
 from flask import Blueprint, Flask
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import Text, create_engine, event, inspect, text
+from sqlalchemy import MetaData, Text, event, inspect, text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
-from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.types import TypeDecorator
 
 logger = logging.getLogger(__name__)
 
-# Initialize extensions without binding to app
-csrf = CSRFProtect()
 
-# Future extensions can be added here:
-# db = SQLAlchemy()
-# login_manager = LoginManager()
-# migrate = Migrate()
-
-
-class LONGTEXT(TypeDecorator):
-    """LONGTEXT for MySQL, Text for everything else."""
-
-    impl = Text
-    cache_ok = True
-
-    def load_dialect_impl(self, dialect):
-        if dialect.name == "mysql":
-            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
-        return dialect.type_descriptor(Text())
-
-
-# ---------------------------------------------------------------------------
-# 1. Model — replaces coordinator_model.py + CREATE TABLE
-# ---------------------------------------------------------------------------
-
-
-class BaseDb(DeclarativeBase):
+class Base:
     """
     Base class for database models.
     Provides common functionality like to_dict.
@@ -69,77 +50,41 @@ class BaseDb(DeclarativeBase):
         return data
 
 
-# ---------------------------------------------------------------------------
-# 2. Database connection — replaces db_driver.py entirely
-#    pool_pre_ping=True handles reconnect + retry automatically
-# ---------------------------------------------------------------------------
+# Naming convention for constraints (required for reliable Alembic migrations)
+convention = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
+
+metadata = MetaData(naming_convention=convention)
+
+# Flask-SQLAlchemy instance
+# Uses existing BaseDb (DeclarativeBase) as model_class so all existing
+# models continue to work unchanged.
+db = SQLAlchemy(metadata=metadata, model_class=Base)
+
+# Flask-Migrate instance (Alembic integration)
+migrate = Migrate()
+
+# CSRF Protection
+csrf = CSRFProtect()
 
 
-def build_engine(db_url: str) -> Engine:
-    """
-    Create a SQLAlchemy engine.
-    """
-    kwargs = {
-        "pool_pre_ping": True,  # replaces _ensure_connection and retry logic
-    }
-
-    if not db_url.startswith("sqlite"):
-        kwargs.update(
-            {
-                "pool_size": 5,
-                "max_overflow": 10,
-                "pool_recycle": 3600,  # recycle connections after 1 hour
-                "connect_args": {
-                    "connect_timeout": 5,
-                    "init_command": 'SET time_zone = "+00:00"',
-                    "charset": "utf8mb4",
-                    "collation": "utf8mb4_unicode_ci",
-                },
-            }
-        )
-    return create_engine(db_url, **kwargs)
+def csrf_init_app(app: Flask) -> None:
+    """Initialize CSRF protection."""
+    csrf.init_app(app)
 
 
-# ---------------------------------------------------------------------------
-# 3. SessionFactory singleton — replaces _COORDINATORS_STORE
-# ---------------------------------------------------------------------------
+def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
+    """Exempt a blueprint from CSRF protection."""
+    if app.config.get("WTF_CSRF_ENABLED"):
+        csrf.exempt(bp_publish)
 
 
-_SessionFactory: sessionmaker | None = None
-
-
-def init_db(db_url: str, create_tables: bool = False) -> None:
-    """
-    Initialize the engine and SessionFactory.
-    Call once at application startup.
-
-    create_tables=True: creates the table if it does not exist (useful for testing).
-    """
-    global _SessionFactory
-    engine = build_engine(db_url)
-    if create_tables:
-        real_tables = [t for t in BaseDb.metadata.tables.values() if not t.info.get("is_view")]
-
-        BaseDb.metadata.create_all(engine, tables=real_tables)
-    _SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
-
-
-def get_session() -> Session:
-    """Return a new session. Always use inside a `with` block."""
-    if _SessionFactory is None:
-        # For migration purposes, if not initialized, we might need a way to initialize it
-        # But according to instructions, we should just use it.
-        # In a real app, init_db would be called at startup.
-        raise RuntimeError("Call init_db() before using the database.")
-    return _SessionFactory()
-
-
-# -----------------------------------------------------------------------------
-# Create views automatically when tables are created
-# -----------------------------------------------------------------------------
-
-
-@event.listens_for(BaseDb.metadata, "after_create")
+@event.listens_for(db.metadata, "after_create")
 def create_views_new_all_view(target, connection, **kw):
     inspector = inspect(connection)
     existing_views = inspector.get_view_names()
@@ -175,22 +120,22 @@ def create_views_new_all_view(target, connection, **kw):
             logger.info(f"View '{name}' already exists, skipping.")
 
 
-def csrf_init_app(app: Flask) -> None:
-    # Initialize CSRF protection
-    csrf.init_app(app)
+class LONGTEXT(TypeDecorator):
+    """LONGTEXT for MySQL, Text for everything else."""
 
+    impl = Text
+    cache_ok = True
 
-def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
-    if app.config.get("WTF_CSRF_ENABLED"):
-        csrf.exempt(bp_publish)
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "mysql":
+            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
+        return dialect.type_descriptor(Text())
 
 
 __all__ = [
-    # Model
-    "BaseDb",
-    # Setup
-    "init_db",
-    "get_session",
-    "LONGTEXT",
+    "db",
+    "migrate",
+    "csrf",
     "csrf_init_app",
+    "csrf_exempt",
 ]
