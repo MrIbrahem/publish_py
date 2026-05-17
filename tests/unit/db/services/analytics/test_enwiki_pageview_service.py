@@ -46,7 +46,8 @@ def test_enwiki_pageview_workflow():
     assert p4.en_views == 10000
 
     # Test delete
-    delete_enwiki_pageview(p.id)
+    deleted = delete_enwiki_pageview(p.id)
+    assert deleted is True
     assert get_enwiki_pageview(p.id) is None
 
 

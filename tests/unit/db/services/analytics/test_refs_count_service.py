@@ -47,7 +47,8 @@ def test_refs_count_workflow():
     assert r4.r_lead_refs == 25
 
     # Test delete
-    delete_refs_count(r.r_id)
+    deleted = delete_refs_count(r.r_id)
+    assert deleted is True
     assert get_refs_count(r.r_id) is None
 
 

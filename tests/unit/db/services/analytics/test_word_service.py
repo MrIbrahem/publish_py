@@ -47,7 +47,8 @@ def test_word_workflow():
     assert w4.w_lead_words == 700
 
     # Test delete
-    delete_word(w.w_id)
+    deleted = delete_word(w.w_id)
+    assert deleted is True
     assert get_word(w.w_id) is None
 
 

@@ -41,7 +41,8 @@ def test_assessment_workflow():
     assert a4.importance == "Mid"
 
     # Test delete
-    delete_assessment(a.id)
+    deleted = delete_assessment(a.id)
+    assert deleted is True
     assert get_assessment(a.id) is None
 
 

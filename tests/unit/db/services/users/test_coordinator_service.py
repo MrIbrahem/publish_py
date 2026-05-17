@@ -60,7 +60,8 @@ def test_coordinator_workflow():
     assert c4.is_active == 0
 
     # Test delete
-    delete_coordinator(c.id)
+    deleted = delete_coordinator(c.id)
+    assert deleted is True
     assert get_coordinator(c.id) is None
 
 

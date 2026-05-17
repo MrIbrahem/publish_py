@@ -36,7 +36,8 @@ def test_lang_workflow():
     assert l4.name == "Modern Standard Arabic"
 
     # Test delete
-    delete_lang(added.lang_id)
+    deleted = delete_lang(added.lang_id)
+    assert deleted is True
     assert get_lang(added.lang_id) is None
 
 

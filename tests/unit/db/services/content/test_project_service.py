@@ -35,7 +35,8 @@ def test_project_workflow():
     assert updated.g_title == "WP:MED"
 
     # Test delete
-    delete_project(p.g_id)
+    deleted = delete_project(p.g_id)
+    assert deleted is True
     assert get_project(p.g_id) is None
 
 
