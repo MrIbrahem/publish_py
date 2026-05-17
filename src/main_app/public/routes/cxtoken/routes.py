@@ -12,7 +12,7 @@ from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
 from ....config import settings
-from ....db.services.user_token_service import (
+from ....db.services.users.user_token_service import (
     delete_user_token_by_username,
     get_user_token_by_username,
 )

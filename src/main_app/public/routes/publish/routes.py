@@ -10,7 +10,7 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
-from ....db.services.user_token_service import get_user_token_by_username
+from ....db.services.users.user_token_service import get_user_token_by_username
 from ....shared.core.cors import check_cors, validate_access
 from ....shared.schemas import PublishRequestSchema
 from ....shared.utils.helpers.format import format_title, format_user
