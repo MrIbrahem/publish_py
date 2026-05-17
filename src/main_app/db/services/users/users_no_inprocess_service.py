@@ -34,7 +34,7 @@ def list_active_users_no_inprocess() -> List[UsersNoInprocessRecord]:
 
 def get_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord | None:
     """Get a users_no_inprocess record by ID."""
-    orm_obj = db.session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.id == record_id).first()
+    orm_obj = db.session.get(UsersNoInprocessRecord, record_id)
     if not orm_obj:
         logger.warning(f"UsersNoInprocess record with ID {record_id} not found")
         return None
@@ -87,7 +87,7 @@ def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoIn
 
 def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecord:
     """Update a users_no_inprocess record."""
-    orm_obj = db.session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.id == record_id).first()
+    orm_obj = db.session.get(UsersNoInprocessRecord, record_id)
     if not orm_obj:
         raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
 
