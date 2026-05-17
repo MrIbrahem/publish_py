@@ -4,14 +4,10 @@ Pages domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from typing import Any
-
-from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String, func, text
-
-from ...shared.core.extensions import BaseDb
+from ...shared.core.extensions import db
 
 
-class PageRecord(BaseDb):
+class PageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -35,19 +31,19 @@ class PageRecord(BaseDb):
 
     __tablename__ = "pages"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), nullable=False)
-    word = Column(Integer, nullable=True)
-    translate_type = Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
-    cat = Column(String(120), nullable=True)
-    lang = Column(String(30), nullable=True)
-    user = Column(String(120), nullable=True)
-    target = Column(String(120), nullable=True)
-    date = Column(Date, nullable=True)
-    pupdate = Column(String(120), nullable=True)
-    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-    deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
-    mdwiki_revid = Column(Integer, nullable=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(120), nullable=False)
+    word = db.Column(db.Integer, nullable=True)
+    translate_type = db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
+    cat = db.Column(db.String(120), nullable=True)
+    lang = db.Column(db.String(30), nullable=True)
+    user = db.Column(db.String(120), nullable=True)
+    target = db.Column(db.String(120), nullable=True)
+    date = db.Column(db.Date, nullable=True)
+    pupdate = db.Column(db.String(120), nullable=True)
+    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    deleted = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
+    mdwiki_revid = db.Column(db.Integer, nullable=True)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -56,7 +52,7 @@ class PageRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class UserPageRecord(BaseDb):
+class UserPageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -80,19 +76,19 @@ class UserPageRecord(BaseDb):
 
     __tablename__ = "pages_users"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(120), nullable=False)
-    word = Column(Integer, nullable=True)
-    translate_type = Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
-    cat = Column(String(120), nullable=True)
-    lang = Column(String(30), nullable=True)
-    user = Column(String(120), nullable=True)
-    target = Column(String(120), nullable=True)
-    date = Column(Date, nullable=True)
-    pupdate = Column(String(120), nullable=True)
-    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-    deleted = Column(Integer, nullable=False, default=0, server_default=text("0"))
-    mdwiki_revid = Column(Integer, nullable=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(120), nullable=False)
+    word = db.Column(db.Integer, nullable=True)
+    translate_type = db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
+    cat = db.Column(db.String(120), nullable=True)
+    lang = db.Column(db.String(30), nullable=True)
+    user = db.Column(db.String(120), nullable=True)
+    target = db.Column(db.String(120), nullable=True)
+    date = db.Column(db.Date, nullable=True)
+    pupdate = db.Column(db.String(120), nullable=True)
+    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    deleted = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
+    mdwiki_revid = db.Column(db.Integer, nullable=True)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -101,7 +97,7 @@ class UserPageRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class PagesUsersToMainRecord(BaseDb):
+class PagesUsersToMainRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users_to_main (
         id int unsigned NOT NULL,
@@ -115,10 +111,10 @@ class PagesUsersToMainRecord(BaseDb):
 
     __tablename__ = "pages_users_to_main"
 
-    id = Column(Integer, ForeignKey("pages_users.id"), primary_key=True)
-    new_target = Column(String(255), nullable=False, default="")
-    new_user = Column(String(255), nullable=False, default="")
-    new_qid = Column(String(255), nullable=False, default="")
+    id = db.Column(db.Integer, db.ForeignKey("pages_users.id"), primary_key=True)
+    new_target = db.Column(db.String(255), nullable=False, default="")
+    new_user = db.Column(db.String(255), nullable=False, default="")
+    new_qid = db.Column(db.String(255), nullable=False, default="")
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -131,7 +127,7 @@ class PagesUsersToMainRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class InProcessRecord(BaseDb):
+class InProcessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS in_process (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -149,14 +145,14 @@ class InProcessRecord(BaseDb):
 
     __tablename__ = "in_process"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(255), nullable=False)
-    user = Column(String(255), nullable=False)
-    lang = Column(String(30), nullable=False)
-    cat = Column(String(255), default="RTT", server_default=text("'RTT'"))
-    translate_type = Column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
-    word = Column(Integer, default=0, server_default=text("0"))
-    add_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(255), nullable=False)
+    user = db.Column(db.String(255), nullable=False)
+    lang = db.Column(db.String(30), nullable=False)
+    cat = db.Column(db.String(255), default="RTT", server_default=db.text("'RTT'"))
+    translate_type = db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
+    word = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided

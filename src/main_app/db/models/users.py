@@ -2,17 +2,16 @@ from __future__ import annotations
 
 import logging
 
-from sqlalchemy import Column, DateTime, Integer, LargeBinary, String, func, text
 from sqlalchemy.orm import validates
 
 from ...shared.core.crypto import decrypt_value
-from ...shared.core.extensions import BaseDb
+from ...shared.core.extensions import db
 from ...shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 
 
-class UserTokenRecord(BaseDb):
+class UserTokenRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS user_tokens (
         user_id int NOT NULL,
@@ -30,21 +29,21 @@ class UserTokenRecord(BaseDb):
 
     __tablename__ = "user_tokens"
 
-    user_id = Column(Integer, primary_key=True)
-    username = Column(String(255), unique=True, nullable=False)
-    access_token = Column(LargeBinary(1024), nullable=False)
-    access_secret = Column(LargeBinary(1024), nullable=False)
+    user_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), unique=True, nullable=False)
+    access_token = db.Column(db.LargeBinary(1024), nullable=False)
+    access_secret = db.Column(db.LargeBinary(1024), nullable=False)
 
-    created_at = Column(DateTime, nullable=False, server_default=func.current_timestamp())
-    updated_at = Column(
-        DateTime,
+    created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    updated_at = db.Column(
+        db.DateTime,
         nullable=False,
-        server_default=func.current_timestamp(),
-        server_onupdate=func.current_timestamp(),
-        # server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        server_default=db.func.current_timestamp(),
+        server_onupdate=db.func.current_timestamp(),
+        # server_default=db.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
     )
-    last_used_at = Column(DateTime, nullable=True, server_default=func.current_timestamp())
-    rotated_at = Column(DateTime, nullable=True)
+    last_used_at = db.Column(db.DateTime, nullable=True, server_default=db.func.current_timestamp())
+    rotated_at = db.Column(db.DateTime, nullable=True)
 
     @validates("access_token", "access_secret")
     def validate_bytes(self, key, value):
@@ -58,7 +57,7 @@ class UserTokenRecord(BaseDb):
         return access_key, access_secret
 
 
-class UserRecord(BaseDb):
+class UserRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS users (
         user_id int NOT NULL AUTO_INCREMENT,
@@ -73,12 +72,14 @@ class UserRecord(BaseDb):
 
     __tablename__ = "users"
 
-    user_id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(255), nullable=False)
-    email = Column(String(255), nullable=False, default="")
-    wiki = Column(String(255), nullable=False, default="")
-    user_group = Column(String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'"))
-    reg_date = Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False, default="")
+    wiki = db.Column(db.String(255), nullable=False, default="")
+    user_group = db.Column(
+        db.String(120), nullable=False, default="Uncategorized", server_default=db.text("'Uncategorized'")
+    )
+    reg_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -91,7 +92,7 @@ class UserRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class UsersNoInprocessRecord(BaseDb):
+class UsersNoInprocessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS users_no_inprocess (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -105,9 +106,9 @@ class UsersNoInprocessRecord(BaseDb):
 
     __tablename__ = "users_no_inprocess"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user = Column(String(120), unique=True, nullable=False)
-    is_active = Column(Integer, nullable=False, default=1)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user = db.Column(db.String(120), unique=True, nullable=False)
+    is_active = db.Column(db.Integer, nullable=False, default=1)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -116,7 +117,7 @@ class UsersNoInprocessRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class CoordinatorRecord(BaseDb):
+class CoordinatorRecord(db.Model):
     """
     ORM model for the coordinators table.
     CREATE TABLE IF NOT EXISTS coordinators (
@@ -130,9 +131,9 @@ class CoordinatorRecord(BaseDb):
 
     __tablename__ = "coordinators"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    username: str = Column(String(120), unique=True, nullable=False)
-    is_active: int = Column(Integer, nullable=False, default=1)
+    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username: str = db.Column(db.String(120), unique=True, nullable=False)
+    is_active: int = db.Column(db.Integer, nullable=False, default=1)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -144,7 +145,7 @@ class CoordinatorRecord(BaseDb):
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
-class FullTranslatorRecord(BaseDb):
+class FullTranslatorRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS full_translators (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -157,9 +158,9 @@ class FullTranslatorRecord(BaseDb):
 
     __tablename__ = "full_translators"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user = Column(String(120), unique=True, nullable=False)
-    is_active = Column(Integer, nullable=False, default=1)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user = db.Column(db.String(120), unique=True, nullable=False)
+    is_active = db.Column(db.Integer, nullable=False, default=1)
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided

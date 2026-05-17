@@ -7,15 +7,12 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from sqlalchemy import Column, Enum, Integer, String, text
-
-# from sqlalchemy.dialects.mysql import LONGTEXT
-from ...shared.core.extensions import LONGTEXT, BaseDb
+from ...shared.core.extensions import LONGTEXT, db
 
 logger = logging.getLogger(__name__)
 
 
-class LanguageSettingRecord(BaseDb):
+class LanguageSettingRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS language_settings (
         id int NOT NULL AUTO_INCREMENT,
@@ -30,11 +27,11 @@ class LanguageSettingRecord(BaseDb):
 
     __tablename__ = "language_settings"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    lang_code = Column(String(20), unique=True, nullable=True)
-    move_dots = Column(Integer, default=0, server_default=text("0"))
-    expend = Column(Integer, default=0, server_default=text("0"))
-    add_en_lang = Column(Integer, default=0, server_default=text("0"))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    lang_code = db.Column(db.String(20), unique=True, nullable=True)
+    move_dots = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    expend = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    add_en_lang = db.Column(db.Integer, default=0, server_default=db.text("0"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
@@ -47,7 +44,7 @@ class LanguageSettingRecord(BaseDb):
         super().__init__(**kwargs)
 
 
-class SettingRecord(BaseDb):
+class SettingRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS new_settings (
         `id` INT NOT NULL AUTO_INCREMENT,
@@ -62,15 +59,15 @@ class SettingRecord(BaseDb):
 
     __tablename__ = "new_settings"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    key = Column(String(190), unique=True, nullable=False)
-    title = Column(String(500), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    key = db.Column(db.String(190), unique=True, nullable=False)
+    title = db.Column(db.String(500), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    value = Column(LONGTEXT, nullable=True)
+    value = db.Column(LONGTEXT, nullable=True)
 
-    value_type = Column(
-        Enum("boolean", "string", "integer", name="setting_value_type"),
+    value_type = db.Column(
+        db.Enum("boolean", "string", "integer", name="setting_value_type"),
         nullable=False,
         default="boolean",
     )
