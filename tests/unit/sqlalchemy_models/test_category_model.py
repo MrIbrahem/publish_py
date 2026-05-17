@@ -6,7 +6,7 @@ Tests for CategoryRecord.
 
 import pytest
 
-from src.main_app.sqlalchemy_models import CategoryRecord
+from src.main_app.models import CategoryRecord
 
 
 class TestCategoryRecord:

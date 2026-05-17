@@ -3,7 +3,7 @@ All Articles domain models - SQLAlchemy ORM.
 """
 
 from __future__ import annotations
-from ..shared.core.extensions import db
+from ...shared.core.extensions import db
 
 
 class AllArticlesRecord(db.Model):

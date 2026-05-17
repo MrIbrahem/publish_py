@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import InProcessRecord
+from ...db.models import InProcessRecord
 from ..core.extensions import db
 
 logger = logging.getLogger(__name__)

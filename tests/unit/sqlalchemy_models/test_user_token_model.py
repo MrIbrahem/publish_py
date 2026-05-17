@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.main_app.sqlalchemy_models import UserTokenRecord
+from src.main_app.models import UserTokenRecord
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ class TestUserTokenRecord:
         assert isinstance(record.access_token, bytes)
         assert isinstance(record.access_secret, bytes)
 
-    @patch("src.main_app.sqlalchemy_models.users.decrypt_value")
+    @patch("src.main_app.models.users.decrypt_value")
     def test_decrypted_returns_tuple(self, mock_decrypt, sample_token_record: UserTokenRecord) -> None:
         """Test that decrypted returns tuple of decrypted values."""
         mock_decrypt.side_effect = ["decrypted_token", "decrypted_secret"]

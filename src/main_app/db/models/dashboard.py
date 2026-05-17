@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 
 
-from ..shared.core.extensions import db
+from ...shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ QID domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from ..shared.core.extensions import db
+from ...shared.core.extensions import db
 
 
 class QidRecord(db.Model):

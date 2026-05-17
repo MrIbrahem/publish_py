@@ -11,7 +11,7 @@ from src.main_app.shared.services.page_service import (
     list_pages,
     update_page,
 )
-from src.main_app.sqlalchemy_models import PageRecord
+from src.main_app.models import PageRecord
 
 
 def test_page_workflow():

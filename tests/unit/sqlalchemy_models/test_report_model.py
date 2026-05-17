@@ -6,7 +6,7 @@ Tests for ReportRecord.
 
 from datetime import datetime
 
-from src.main_app.sqlalchemy_models import ReportRecord
+from src.main_app.models import ReportRecord
 
 
 class TestReportRecord:

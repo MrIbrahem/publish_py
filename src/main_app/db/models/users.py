@@ -5,9 +5,9 @@ from typing import Any
 
 from sqlalchemy.orm import validates
 
-from ..shared.core.crypto import decrypt_value
-from ..shared.utils.decode_bytes import coerce_bytes
-from ..shared.core.extensions import db
+from ...shared.core.crypto import decrypt_value
+from ...shared.utils.decode_bytes import coerce_bytes
+from ...shared.core.extensions import db
 logger = logging.getLogger(__name__)
 
 
