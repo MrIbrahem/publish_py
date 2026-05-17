@@ -15,8 +15,8 @@ from ....db.services import (
     insert_page_target,
     insert_user_page_target,
 )
-from ....db.services.content.category_service import get_campaign_category
 from ....db.services.config.language_setting_service import LanguageSettingRecord, get_language_setting_by_code
+from ....db.services.content.category_service import get_campaign_category
 from ....shared.clients import (
     get_revid,
     get_revid_db,

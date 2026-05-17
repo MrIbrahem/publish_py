@@ -1088,9 +1088,9 @@ convention = {
 metadata = MetaData(naming_convention=convention)
 
 # Flask-SQLAlchemy instance
-# model_class=None means we use db.Model as base (Strategy B)
-# For Strategy A, pass model_class=BaseDb
-db = SQLAlchemy(metadata=metadata)
+# Strategy A: Use existing BaseDb
+from ..engine import BaseDb
+db = SQLAlchemy(metadata=metadata, model_class=BaseDb)
 
 # Flask-Migrate instance
 migrate = Migrate()
