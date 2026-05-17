@@ -70,7 +70,7 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
 def delete_user_token(user_id: int) -> bool:
     """Remove the stored OAuth credentials for the given user id."""
     if not user_id:
-        return
+        return False
 
     # # user_id is the primary key for UserTokenRecord
     orm_obj = db.session.get(UserTokenRecord, user_id)
