@@ -4,7 +4,7 @@ Unit tests for domain.models.mdwiki_revid module.
 Tests for MdwikiRevidRecord.
 """
 
-from src.main_app.models import MdwikiRevidRecord
+from src.main_app.db.models import MdwikiRevidRecord
 
 
 class TestMdwikiRevidRecord:

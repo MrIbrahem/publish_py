@@ -6,7 +6,7 @@ Tests for QidRecord.
 
 import pytest
 
-from src.main_app.models import QidRecord
+from src.main_app.db.models import QidRecord
 
 
 class TestQidRecord:

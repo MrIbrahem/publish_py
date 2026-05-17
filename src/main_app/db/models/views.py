@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from sqlalchemy import Column, Integer, String, UniqueConstraint, text
 
-from ..shared.engine import BaseDb
+from ...shared.engine import BaseDb
 
 
 class EnwikiPageviewRecord(BaseDb):

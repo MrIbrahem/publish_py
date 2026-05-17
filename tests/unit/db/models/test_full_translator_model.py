@@ -4,7 +4,7 @@ Unit tests for domain.models.full_translator module.
 Tests for FullTranslatorRecord.
 """
 
-from src.main_app.models import FullTranslatorRecord
+from src.main_app.db.models import FullTranslatorRecord
 
 
 class TestFullTranslatorRecord:
