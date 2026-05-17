@@ -24,7 +24,9 @@ def list_langs() -> List[LangRecord]:
 
 def get_lang(lang_id: int) -> LangRecord | None:
     """Get a language record by ID."""
-    orm_obj = db.session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
+    # orm_obj = db.session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
+    # lang_id is the primary key for LangRecord
+    orm_obj = db.session.get(LangRecord, lang_id)
     if not orm_obj:
         logger.warning(f"Language record with ID {lang_id} not found")
         return None
@@ -89,7 +91,9 @@ def add_or_update_lang(
 
 def delete_lang(lang_id: int):
     """Delete a language record by ID."""
-    orm_obj = db.session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
+    # orm_obj = db.session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
+    # lang_id is the primary key for LangRecord
+    orm_obj = db.session.get(LangRecord, lang_id)
     if not orm_obj:
         raise ValueError(f"Language record with ID {lang_id} not found")
 

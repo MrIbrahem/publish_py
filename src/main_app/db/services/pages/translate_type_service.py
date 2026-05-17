@@ -45,7 +45,9 @@ def list_full_enabled_types() -> List[TranslateTypeRecord]:
 
 def get_translate_type(tt_id: int) -> TranslateTypeRecord | None:
     """Get a translate_type record by ID."""
-    orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_id == tt_id).first()
+    # orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_id == tt_id).first()
+    # tt_id is the primary key for TranslateTypeRecord
+    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
     if not orm_obj:
         logger.warning(f"TranslateType record with ID {tt_id} not found")
         return None
@@ -107,7 +109,8 @@ def add_or_update_translate_type(
 
 def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
     """Update a translate_type record."""
-    orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_id == tt_id).first()
+    # tt_id is the primary key for TranslateTypeRecord
+    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
     if not orm_obj:
         raise ValueError(f"TranslateType record with ID {tt_id} not found")
 
@@ -125,7 +128,8 @@ def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
 
 def delete_translate_type(tt_id: int) -> TranslateTypeRecord:
     """Delete a translate_type record by ID."""
-    orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_id == tt_id).first()
+    # tt_id is the primary key for TranslateTypeRecord
+    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
     if not orm_obj:
         raise ValueError(f"TranslateType record with ID {tt_id} not found")
 

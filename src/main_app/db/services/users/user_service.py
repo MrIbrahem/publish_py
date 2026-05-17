@@ -34,8 +34,13 @@ def list_users_by_group(user_group: str) -> List[UserRecord]:
 
 
 def get_user(user_id: int) -> UserRecord | None:
-    """Get a user record by ID."""
-    orm_obj = db.session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+    """
+    Get a user record by ID.
+    """
+    # db\.session\.query\((\w+)\).filter\(\1\.(id|\w+_id) == (id|\w+_id)\)\.first\(\)
+    # orm_obj = db.session.get(UserRecord, user_id)
+    # user_id is the primary key for UserRecord
+    orm_obj = db.session.get(UserRecord, user_id)
     if not orm_obj:
         logger.warning(f"User record with ID {user_id} not found")
         return None
@@ -92,7 +97,7 @@ def update_user(
     if not username:
         raise ValueError("Username is required")
 
-    orm_obj = db.session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+    orm_obj = db.session.get(UserRecord, user_id)
     if not orm_obj:
         raise ValueError(f"User record with ID {user_id} not found")
 
@@ -111,7 +116,7 @@ def update_user_data(
     **kwargs,
 ) -> UserRecord:
     """Update a user record."""
-    orm_obj = db.session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+    orm_obj = db.session.get(UserRecord, user_id)
     if not orm_obj:
         raise ValueError(f"User record with ID {user_id} not found")
 
@@ -129,7 +134,7 @@ def update_user_data(
 
 def delete_user(user_id: int) -> UserRecord:
     """Delete a user record by ID."""
-    orm_obj = db.session.query(UserRecord).filter(UserRecord.user_id == user_id).first()
+    orm_obj = db.session.get(UserRecord, user_id)
     if not orm_obj:
         raise ValueError(f"User record with ID {user_id} not found")
 
