@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import UsersNoInprocessRecord
-from src.main_app.shared.services.users.users_no_inprocess_service import (
+from src.main_app.db.services.users.users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,
     delete_users_no_inprocess,

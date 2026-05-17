@@ -3,8 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import UserPageRecord
-from src.main_app.shared.engine import get_session
-from src.main_app.shared.services.pages.user_page_service import (
+from src.main_app.db.services.pages.user_page_service import (
     add_user_page,
     delete_user_page,
     find_exists_or_update_user_page,
@@ -12,6 +11,7 @@ from src.main_app.shared.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
+from src.main_app.shared.engine import get_session
 
 
 def test_user_page_workflow() -> None:
@@ -140,7 +140,7 @@ class TestInsertUserPageTarget:
         assert any(p.title == "Pathology" for p in list_user_pages())
 
     def test_handles_exception(self, monkeypatch):
-        with patch("src.main_app.shared.services.user_page_service.get_session") as mock_get_session:
+        with patch("src.main_app.db.services.user_page_service.get_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.commit.side_effect = Exception("DB Error")
             mock_get_session.return_value.__enter__.return_value = mock_session

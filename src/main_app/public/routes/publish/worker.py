@@ -7,14 +7,7 @@ import logging
 from typing import Any
 
 from ....config import settings
-from ....shared.clients import (
-    get_revid,
-    get_revid_db,
-    get_title_info,
-    link_to_wikidata,
-    publish_do_edit,
-)
-from ....shared.services import (
+from ....db.services import (
     add_report,
     find_exists_or_update_page,
     find_exists_or_update_user_page,
@@ -22,8 +15,15 @@ from ....shared.services import (
     insert_page_target,
     insert_user_page_target,
 )
-from ....shared.services.config.language_setting_service import LanguageSettingRecord, get_language_setting_by_code
-from ....shared.services.content.category_service import get_campaign_category
+from ....db.services.config.language_setting_service import LanguageSettingRecord, get_language_setting_by_code
+from ....db.services.content.category_service import get_campaign_category
+from ....shared.clients import (
+    get_revid,
+    get_revid_db,
+    get_title_info,
+    link_to_wikidata,
+    publish_do_edit,
+)
 from ....shared.utils.helpers import (
     determine_hashtag,
     do_changes_to_text_with_settings,

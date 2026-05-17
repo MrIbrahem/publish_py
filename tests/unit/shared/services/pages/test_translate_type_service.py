@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import TranslateTypeRecord
-from src.main_app.shared.services.pages.translate_type_service import (
+from src.main_app.db.services.pages.translate_type_service import (
     add_or_update_translate_type,
     add_translate_type,
     can_translate_full,

@@ -4,7 +4,7 @@ import pytest
 
 # from src.main_app.models import SettingRecord
 from src.main_app.db.models import SettingRecord
-from src.main_app.shared.services.config.setting_service import (
+from src.main_app.db.services.config.setting_service import (
     add_setting,
     delete_setting,
     get_setting,
