@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, List
 
 from ....shared.core.extensions import db
-from ....sqlalchemy_models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
+from ....db.models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
 
 logger = logging.getLogger(__name__)
 

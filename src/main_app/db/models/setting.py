@@ -1,0 +1,99 @@
+"""
+Admin domain models.
+"""
+
+from __future__ import annotations
+
+import logging
+from typing import Any, Optional
+
+from ...shared.core.extensions import db, LONGTEXT
+logger = logging.getLogger(__name__)
+
+
+class LanguageSettingRecord(db.Model):
+    """
+    CREATE TABLE IF NOT EXISTS language_settings (
+        id int NOT NULL AUTO_INCREMENT,
+        lang_code varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+        move_dots tinyint DEFAULT '0',
+        expend tinyint DEFAULT '0',
+        add_en_lang tinyint DEFAULT '0',
+        PRIMARY KEY (id),
+        UNIQUE KEY lang_code (lang_code)
+    )
+    """
+
+    __tablename__ = "language_settings"
+
+    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    lang_code =db.Column(db.String(20), unique=True, nullable=True)
+    move_dots =db.Column(db.Integer, default=0, server_default=db.text("0"))
+    expend =db.Column(db.Integer, default=0, server_default=db.text("0"))
+    add_en_lang =db.Column(db.Integer, default=0, server_default=db.text("0"))
+
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "move_dots" not in kwargs:
+            kwargs["move_dots"] = 0
+        if "expend" not in kwargs:
+            kwargs["expend"] = 0
+        if "add_en_lang" not in kwargs:
+            kwargs["add_en_lang"] = 0
+        super().__init__(**kwargs)
+
+
+class SettingRecord(db.Model):
+    """
+    CREATE TABLE IF NOT EXISTS new_settings (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `key` VARCHAR(190) NOT NULL,
+        `title` VARCHAR(500) NOT NULL,
+        `value` text DEFAULT NULL,
+        `value_type` enum ('boolean', 'string', 'integer', 'json') NOT NULL DEFAULT 'boolean',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY unique_key (`key`)
+    )
+    """
+
+    __tablename__ = "new_settings"
+
+    id =db.Column(db.Integer, primary_key=True, autoincrement=True)
+    key =db.Column(db.String(190), unique=True, nullable=False)
+    title =db.Column(db.String(500), nullable=False)
+
+    # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
+    value =db.Column(LONGTEXT, nullable=True)
+
+    value_type =db.Column(
+        db.Enum("boolean", "string", "integer", name="setting_value_type"),
+        nullable=False,
+        default="boolean",
+    )
+
+    def __init__(self, **kwargs):
+        # Apply Python-level defaults for fields not provided
+        if "value_type" not in kwargs:
+            kwargs["value_type"] = "boolean"
+        super().__init__(**kwargs)
+        # Parse value based on value_type after initialization
+        self.value = self._parse_value(self.value, self.value_type)
+
+    def _parse_value(self, value: Optional[str], value_type: str) -> Any:
+        if value is None:
+            return None
+        if value_type == "boolean":
+            return "true" if str(value).lower() in ("1", "true", "yes", "on") else "false"
+        elif value_type == "integer":
+            try:
+                return int(value)
+            except (ValueError, TypeError):
+                return 0
+
+        return str(value)  # string
+
+
+__all__ = [
+    "LanguageSettingRecord",
+    "SettingRecord",
+]

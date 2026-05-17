@@ -9,7 +9,7 @@ from src.main_app.shared.services.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-from src.main_app.sqlalchemy_models import ReportRecord
+from src.main_app.db.models import ReportRecord
 
 
 def test_report_workflow():

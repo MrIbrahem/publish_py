@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy import func
 
-from ...sqlalchemy_models import QidRecord
+from ...db.models import QidRecord
 from ..core.extensions import db
 
 logger = logging.getLogger(__name__)

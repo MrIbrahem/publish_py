@@ -27,7 +27,7 @@ from ...shared.services.user_service import (
     update_user,
     user_exists,
 )
-from ...sqlalchemy_models import ProjectRecord, UserRecord
+from ...db.models import ProjectRecord, UserRecord
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)

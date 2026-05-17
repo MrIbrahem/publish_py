@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ...sqlalchemy_models import ProjectRecord
+from ...db.models import ProjectRecord
 from ..core.extensions import db
 
 logger = logging.getLogger(__name__)

@@ -9,7 +9,7 @@ from src.main_app.shared.services.user_token_service import (
     get_user_token_by_username,
     upsert_user_token,
 )
-from src.main_app.sqlalchemy_models import UserTokenRecord
+from src.main_app.db.models import UserTokenRecord
 
 
 def test_user_token_workflow():

@@ -13,7 +13,7 @@ from sqlalchemy import case, cast
 
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
-from ....sqlalchemy_models import LangRecord, PageRecord, ViewsNewAllRecord, WordRecord
+from ....db.models import LangRecord, PageRecord, ViewsNewAllRecord, WordRecord
 
 logger = logging.getLogger(__name__)
 
