@@ -25,7 +25,7 @@ def list_refs_counts() -> List[RefsCountRecord]:
 def get_refs_count(refs_id: int) -> RefsCountRecord | None:
     """Get a refs_count record by ID."""
     with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+        orm_obj = session.get(RefsCountRecord, refs_id)
         if not orm_obj:
             logger.warning(f"RefsCount record with ID {refs_id} not found")
             return None
@@ -91,7 +91,7 @@ def add_or_update_refs_count(
 def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
     """Update a refs_count record."""
     with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+        orm_obj = session.get(RefsCountRecord, refs_id)
         if not orm_obj:
             raise ValueError(f"RefsCount record with ID {refs_id} not found")
 
@@ -107,17 +107,19 @@ def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
         return orm_obj
 
 
-def delete_refs_count(refs_id: int) -> RefsCountRecord:
+def delete_refs_count(refs_id: int) -> bool:
     """Delete a refs_count record by ID."""
     with get_session() as session:
-        orm_obj = session.query(RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+        # orm_obj = session.query( RefsCountRecord).filter(RefsCountRecord.r_id == refs_id).first()
+        orm_obj = session.get(RefsCountRecord, refs_id)
         if not orm_obj:
             raise ValueError(f"RefsCount record with ID {refs_id} not found")
 
-        record = RefsCountRecord(**orm_obj.to_dict())
         session.delete(orm_obj)
         session.commit()
-        return record
+
+        deleted = session.get(RefsCountRecord, refs_id)
+        return deleted is None
 
 
 def get_ref_counts_for_title(title: str) -> tuple[int | None, int | None]:
