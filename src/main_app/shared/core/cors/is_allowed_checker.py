@@ -53,6 +53,7 @@ def is_allowed(request: Request) -> str | None:
 
     origin_host = get_host(origin) if origin else ""
 
+    # TODO: check this, it was added by AI Agent
     # If both Origin and Referer are missing, it's likely a direct request
     # or from a client that doesn't send these headers (like tests).
     if not origin and not referer:

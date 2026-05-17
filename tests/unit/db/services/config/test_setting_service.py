@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# from src.main_app.models import SettingRecord
+# from src.main_app.db.models import SettingRecord
 from src.main_app.db.models import SettingRecord
 from src.main_app.db.services.config.setting_service import (
     add_setting,

@@ -58,7 +58,7 @@ def disable_network(request, mocker):
 
 
 @pytest.fixture
-def app() -> Generator[Flask, Any, Any]:
+def app() -> Generator[Flask, Any]:
     """Create and configure a test Flask application.
 
     Yields:

@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# from src.main_app.models import LanguageSettingRecord
+# from src.main_app.db.models import LanguageSettingRecord
 from src.main_app.db.models import LanguageSettingRecord
 from src.main_app.db.services.config.language_setting_service import (
     add_language_setting,
