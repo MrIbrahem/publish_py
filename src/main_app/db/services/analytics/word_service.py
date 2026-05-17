@@ -101,16 +101,18 @@ def update_word(word_id: int, **kwargs) -> WordRecord:
     return orm_obj
 
 
-def delete_word(word_id: int) -> WordRecord:
+def delete_word(word_id: int) -> bool:
     """Delete a word record by ID."""
-    orm_obj = db.session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
+    # orm_obj = db.session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
+    orm_obj = db.session.get(WordRecord, word_id)
     if not orm_obj:
         raise ValueError(f"Word record with ID {word_id} not found")
 
-    record = WordRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(WordRecord, word_id)
+    return deleted is None
 
 
 def get_word_counts_for_title(title: str) -> tuple[int | None, int | None]:

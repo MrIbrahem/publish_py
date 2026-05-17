@@ -141,16 +141,18 @@ def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
     return orm_obj
 
 
-def delete_views_new(view_id: int) -> ViewsNewRecord:
+def delete_views_new(view_id: int) -> bool:
     """Delete a views_new record by ID."""
-    orm_obj = db.session.query(ViewsNewRecord).filter(ViewsNewRecord.id == view_id).first()
+    # orm_obj = db.session.query(ViewsNewRecord).filter(ViewsNewRecord.id == view_id).first()
+    orm_obj = db.session.get(ViewsNewRecord, view_id)
     if not orm_obj:
         raise ValueError(f"ViewsNew record with ID {view_id} not found")
 
-    record = ViewsNewRecord(**orm_obj.to_dict())
     db.session.delete(orm_obj)
     db.session.commit()
-    return record
+
+    deleted = db.session.get(ViewsNewRecord, view_id)
+    return deleted is None
 
 
 def get_total_views_for_target(target: str) -> int:
