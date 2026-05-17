@@ -80,12 +80,36 @@ tests/
     │   │       └── test_qid_model.py
     │   └── services/
     │       ├── analytics/
+    │       │   ├── test_assessment_service.py
+    │       │   ├── test_enwiki_pageview_service.py
+    │       │   ├── test_mdwiki_revid_service.py
+    │       │   ├── test_refs_count_service.py
+    │       │   ├── test_views_new_service.py
+    │       │   └── test_word_service.py
     │       ├── config/
+    │       │   ├── test_language_setting_service.py
+    │       │   └── test_setting_service.py
     │       ├── content/
+    │       │   ├── test_category_service.py
+    │       │   ├── test_lang_service.py
+    │       │   └── test_project_service.py
     │       ├── pages/
+    │       │   ├── test_in_process_service.py
+    │       │   ├── test_page_service.py
+    │       │   ├── test_translate_type_service.py
+    │       │   └── test_user_page_service.py
     │       ├── reports/
+    │       │   ├── test_pages_users_to_main_service.py
+    │       │   └── test_report_service.py
     │       ├── users/
+    │       │   ├── test_coordinator_service.py
+    │       │   ├── test_full_translator_service.py
+    │       │   ├── test_user_service.py
+    │       │   ├── test_user_token_service.py
+    │       │   └── test_users_no_inprocess_service.py
     │       └── wikidata/
+    │           ├── test_allqid_service.py
+    │           └── test_qid_service.py
     ├── public/
     │   └── routes/
     │       ├── api/
@@ -121,38 +145,6 @@ tests/
         │   │   └── test_publish_secret_checks.py
         │   ├── test_crypto.py
         │   └── test_extensions.py
-        ├── services/
-        │   ├── analytics/
-        │   │   ├── test_assessment_service.py
-        │   │   ├── test_enwiki_pageview_service.py
-        │   │   ├── test_mdwiki_revid_service.py
-        │   │   ├── test_refs_count_service.py
-        │   │   ├── test_views_new_service.py
-        │   │   └── test_word_service.py
-        │   ├── config/
-        │   │   ├── test_language_setting_service.py
-        │   │   └── test_setting_service.py
-        │   ├── content/
-        │   │   ├── test_category_service.py
-        │   │   ├── test_lang_service.py
-        │   │   └── test_project_service.py
-        │   ├── pages/
-        │   │   ├── test_in_process_service.py
-        │   │   ├── test_page_service.py
-        │   │   ├── test_translate_type_service.py
-        │   │   └── test_user_page_service.py
-        │   ├── reports/
-        │   │   ├── test_pages_users_to_main_service.py
-        │   │   └── test_report_service.py
-        │   ├── users/
-        │   │   ├── test_coordinator_service.py
-        │   │   ├── test_full_translator_service.py
-        │   │   ├── test_user_service.py
-        │   │   ├── test_user_token_service.py
-        │   │   └── test_users_no_inprocess_service.py
-        │   └── wikidata/
-        │       ├── test_allqid_service.py
-        │       └── test_qid_service.py
         └── utils/
             ├── helpers/
             │   ├── test_files.py
