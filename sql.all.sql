@@ -16,7 +16,8 @@ SET
 SET
     NAMES utf8mb4;
 
-CREATE TABLE all_articles (
+CREATE TABLE
+    all_articles (
         id int NOT NULL AUTO_INCREMENT,
         article_id varchar(255) NOT NULL,
         category varchar(255) DEFAULT NULL,
@@ -24,7 +25,8 @@ CREATE TABLE all_articles (
         UNIQUE KEY article_id (article_id)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE all_exists (
+CREATE TABLE
+    all_exists (
         id int NOT NULL AUTO_INCREMENT,
         article_id varchar(255) NOT NULL,
         code varchar(25) NOT NULL,
@@ -33,7 +35,8 @@ CREATE TABLE all_exists (
         CONSTRAINT all_exists_ibfk_1 FOREIGN KEY (article_id) REFERENCES all_articles (article_id)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE all_qids (
+CREATE TABLE
+    all_qids (
         qid varchar(255) NOT NULL,
         category varchar(255) DEFAULT NULL,
         id int NOT NULL AUTO_INCREMENT,
@@ -41,7 +44,8 @@ CREATE TABLE all_qids (
         UNIQUE KEY qid (qid)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE all_qids_exists (
+CREATE TABLE
+    all_qids_exists (
         id int NOT NULL AUTO_INCREMENT,
         qid varchar(255) NOT NULL,
         code varchar(25) NOT NULL,
@@ -51,7 +55,8 @@ CREATE TABLE all_qids_exists (
         CONSTRAINT all_qids_exists_ibfk_1 FOREIGN KEY (qid) REFERENCES all_qids (qid)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE publish_reports (
+CREATE TABLE
+    publish_reports (
         id int NOT NULL AUTO_INCREMENT,
         date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         title varchar(255) NOT NULL,
@@ -65,16 +70,8 @@ CREATE TABLE publish_reports (
             PRIMARY KEY (id),
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE VIEW all_articles_titles AS
-select
-    q.qid AS qid,
-    aa.article_id AS title,
-    aa.category AS category
-from
-    all_articles aa
-    left join qids q on aa.article_id = q.title;
-
-CREATE VIEW all_qids_titles AS
+CREATE VIEW
+    all_qids_titles AS
 select
     qq.qid AS qid,
     q.title AS title,
@@ -85,8 +82,6 @@ from
     left join all_articles aa on aa.article_id = q.title;
 
 -- 2026-04-21 01:21:15 UTC
-
-
 -- Adminer 5.3.0 MariaDB 5.5.5-10.6.22-MariaDB-log dump
 SET
     NAMES utf8;
@@ -103,7 +98,8 @@ SET
 SET
     NAMES utf8mb4;
 
-CREATE TABLE access_keys (
+CREATE TABLE
+    access_keys (
         id int (11) NOT NULL AUTO_INCREMENT,
         user_name varchar(255) NOT NULL DEFAULT '',
         access_key varchar(255) NOT NULL DEFAULT '',
@@ -113,7 +109,8 @@ CREATE TABLE access_keys (
         UNIQUE KEY user_name (user_name)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE assessments (
+CREATE TABLE
+    assessments (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) NOT NULL,
         importance varchar(120) DEFAULT NULL,
@@ -122,7 +119,8 @@ CREATE TABLE assessments (
         KEY idx_assessments_title (title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE categories (
+CREATE TABLE
+    categories (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         category varchar(120) NOT NULL,
         category2 varchar(120) NOT NULL DEFAULT '',
@@ -134,7 +132,8 @@ CREATE TABLE categories (
         UNIQUE KEY category (category)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE coordinators (
+CREATE TABLE
+    coordinators (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         username varchar(120) NOT NULL,
         is_active int (11) NOT NULL DEFAULT 1,
@@ -142,7 +141,8 @@ CREATE TABLE coordinators (
         UNIQUE KEY username (username)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE enwiki_pageviews (
+CREATE TABLE
+    enwiki_pageviews (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) NOT NULL,
         en_views int (6) DEFAULT 0,
@@ -151,7 +151,8 @@ CREATE TABLE enwiki_pageviews (
         KEY idx_enwiki_pageviews_title (title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE full_translators (
+CREATE TABLE
+    full_translators (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         user varchar(120) NOT NULL,
         is_active int (11) NOT NULL DEFAULT 1,
@@ -159,7 +160,8 @@ CREATE TABLE full_translators (
         UNIQUE KEY user (user)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE in_process (
+CREATE TABLE
+    in_process (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         title varchar(255) NOT NULL,
         user varchar(255) NOT NULL,
@@ -172,7 +174,8 @@ CREATE TABLE in_process (
         KEY title (title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE keys_new (
+CREATE TABLE
+    keys_new (
         id int (11) NOT NULL AUTO_INCREMENT,
         u_n text NOT NULL,
         a_k text NOT NULL,
@@ -181,7 +184,8 @@ CREATE TABLE keys_new (
         PRIMARY KEY (id)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE langs (
+CREATE TABLE
+    langs (
         lang_id int (11) NOT NULL AUTO_INCREMENT,
         code varchar(20) NOT NULL,
         autonym varchar(70) NOT NULL,
@@ -190,7 +194,8 @@ CREATE TABLE langs (
         PRIMARY KEY (lang_id)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE language_settings (
+CREATE TABLE
+    language_settings (
         id int (11) NOT NULL AUTO_INCREMENT,
         lang_code varchar(20) DEFAULT NULL,
         move_dots tinyint (4) DEFAULT 0,
@@ -200,13 +205,15 @@ CREATE TABLE language_settings (
         UNIQUE KEY lang_code (lang_code)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE mdwiki_revids (
+CREATE TABLE
+    mdwiki_revids (
         title varchar(255) NOT NULL,
         revid int (11) NOT NULL,
         PRIMARY KEY (title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE pages (
+CREATE TABLE
+    pages (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) NOT NULL,
         word int (6) DEFAULT NULL,
@@ -225,7 +232,8 @@ CREATE TABLE pages (
         KEY target (target)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE pages_users (
+CREATE TABLE
+    pages_users (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) NOT NULL,
         word int (6) DEFAULT NULL,
@@ -244,7 +252,8 @@ CREATE TABLE pages_users (
         KEY target (target)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE pages_users_to_main (
+CREATE TABLE
+    pages_users_to_main (
         id int (6) unsigned NOT NULL,
         new_target varchar(255) NOT NULL DEFAULT '',
         new_user varchar(255) NOT NULL DEFAULT '',
@@ -253,14 +262,16 @@ CREATE TABLE pages_users_to_main (
         CONSTRAINT pages_users_to_main_ibfk_1 FOREIGN KEY (id) REFERENCES pages_users (id)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE projects (
+CREATE TABLE
+    projects (
         g_id int (6) unsigned NOT NULL AUTO_INCREMENT,
         g_title varchar(120) NOT NULL,
         PRIMARY KEY (g_id),
         UNIQUE KEY g_title (g_title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE qids (
+CREATE TABLE
+    qids (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) NOT NULL,
         qid varchar(120) DEFAULT NULL,
@@ -269,7 +280,8 @@ CREATE TABLE qids (
         KEY idx_qids_title (title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE qids_others (
+CREATE TABLE
+    qids_others (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         title varchar(120) NOT NULL,
         qid varchar(120) DEFAULT NULL,
@@ -278,7 +290,8 @@ CREATE TABLE qids_others (
         KEY idx_title (title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE refs_counts (
+CREATE TABLE
+    refs_counts (
         r_id int (6) unsigned NOT NULL AUTO_INCREMENT,
         r_title varchar(120) NOT NULL,
         r_lead_refs int (6) DEFAULT NULL,
@@ -288,7 +301,8 @@ CREATE TABLE refs_counts (
         KEY idx_refs_counts_r_title (r_title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE settings (
+CREATE TABLE
+    settings (
         id int (11) NOT NULL AUTO_INCREMENT,
         title varchar(500) NOT NULL,
         displayed varchar(500) NOT NULL,
@@ -300,7 +314,8 @@ CREATE TABLE settings (
         KEY idx_title (title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE translate_type (
+CREATE TABLE
+    translate_type (
         tt_id int (6) unsigned NOT NULL AUTO_INCREMENT,
         tt_title varchar(120) NOT NULL,
         tt_lead int (11) NOT NULL DEFAULT 1,
@@ -310,7 +325,8 @@ CREATE TABLE translate_type (
         KEY idx_tt_title (tt_title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE users (
+CREATE TABLE
+    users (
         user_id int (11) NOT NULL AUTO_INCREMENT,
         username varchar(255) NOT NULL,
         email varchar(255) NOT NULL DEFAULT '',
@@ -320,7 +336,8 @@ CREATE TABLE users (
         PRIMARY KEY (user_id)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE users_no_inprocess (
+CREATE TABLE
+    users_no_inprocess (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         user varchar(120) NOT NULL,
         is_active int (11) NOT NULL DEFAULT 1,
@@ -328,7 +345,8 @@ CREATE TABLE users_no_inprocess (
         UNIQUE KEY user (user)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE views_new (
+CREATE TABLE
+    views_new (
         id int (6) unsigned NOT NULL AUTO_INCREMENT,
         target varchar(120) NOT NULL,
         lang varchar(30) NOT NULL,
@@ -339,7 +357,8 @@ CREATE TABLE views_new (
         KEY target (target)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE words (
+CREATE TABLE
+    words (
         w_id int (6) unsigned NOT NULL AUTO_INCREMENT,
         w_title varchar(120) NOT NULL,
         w_lead_words int (6) DEFAULT NULL,
@@ -349,44 +368,8 @@ CREATE TABLE words (
         KEY idx_words_w_title (w_title)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-CREATE VIEW users_list AS
-SELECT
-    user_id,
-    username,
-    wiki,
-    user_group,
-    reg_date
-FROM
-    users;
-
-CREATE VIEW titles_infos AS
-select
-    ase.title AS title,
-    ase.importance AS importance,
-    rc.r_lead_refs AS r_lead_refs,
-    rc.r_all_refs AS r_all_refs,
-    ep.en_views AS en_views,
-    w.w_lead_words AS w_lead_words,
-    w.w_all_words AS w_all_words,
-    q.qid AS qid
-from
-    assessments ase
-    left join enwiki_pageviews ep on ase.title = ep.title
-    left join qids q on q.title = ase.title
-    left join refs_counts rc on rc.r_title = ase.title
-    left join words w on w.w_title = ase.title;
-
-CREATE VIEW users_list AS
-select
-    users.user_id AS user_id,
-    users.username AS username,
-    users.wiki AS wiki,
-    users.user_group AS user_group,
-    users.reg_date AS reg_date
-from
-    users;
-
-CREATE VIEW views_new_all AS
+CREATE VIEW
+    views_new_all AS
 select
     v.target AS target,
     v.lang AS lang,

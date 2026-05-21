@@ -2059,7 +2059,7 @@ def publish_batch(page_ids: list[int], publisher_id: int) -> dict:
 -   [ ] Unicode data (Arabic text) handled correctly
 -   [ ] NULL vs empty string handling preserved
 -   [ ] Default values applied correctly
--   [ ] Views (users_list) still functional
+-   [ ] Views (users) still functional
 
 ---
 

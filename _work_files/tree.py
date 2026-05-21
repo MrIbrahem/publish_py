@@ -14,7 +14,7 @@ tree: str = DisplayTree(
     ignoreList=["__pycache__", "old", "app1.py", "example.env", "*.html", "app_main"],
     onlyFiles=False,
     onlyDirs=False,
-    sortBy=0,
+    sortBy=2,
     raiseException=False,
     printErrorTraceback=False,
 )
@@ -34,7 +34,7 @@ test_tree: str = DisplayTree(
     ignoreList=["__pycache__", "old", "app1.py", "example.env", "*.html"],
     onlyFiles=False,
     onlyDirs=False,
-    sortBy=0,
+    sortBy=2,
     raiseException=False,
     printErrorTraceback=False,
 )

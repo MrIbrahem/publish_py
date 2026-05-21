@@ -95,20 +95,6 @@ def create_views_new_all_view(target, connection, **kw):
         if table.info.get("is_view") and table.info.get("create_query")
     }
 
-    views_to_create[
-        "users_list"
-    ] = """
-        CREATE VIEW users_list AS
-            select
-                u.user_id AS user_id,
-                u.username AS username,
-                u.wiki AS wiki,
-                u.user_group AS user_group,
-                u.reg_date AS reg_date
-            from
-                users u
-    """
-
     for name, query in views_to_create.items():
         if name not in existing_views:
             try:
