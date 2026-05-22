@@ -161,8 +161,9 @@ def db_config():
 
 
 @pytest.fixture(autouse=True)
-def setup_db(app):
-    """Initialize an in-memory SQLite database for tests using Flask-SQLAlchemy.
+def setup_db(app: Flask):
+    """
+    Initialize an in-memory SQLite database for tests using Flask-SQLAlchemy.
 
     Creates all real tables (skipping views) and creates views manually.
     The Flask-SQLAlchemy session (db.session) is used throughout tests.
