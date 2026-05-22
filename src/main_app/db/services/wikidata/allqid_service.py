@@ -17,8 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def list_targets_by_lang(lang: str) -> List[dict]:
-    """
-    """
+    """ """
     sql = text(
         """
             SELECT

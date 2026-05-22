@@ -3,8 +3,9 @@ Tests for check_cors on cxtoken routes
 with CORS_ENABLED (CORS_DISABLED=False).
 """
 
-from unittest.mock import MagicMock, patch
 import os
+from unittest.mock import MagicMock, patch
+
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
