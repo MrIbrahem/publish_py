@@ -55,6 +55,7 @@ class AllQidsExistRecord(db.Model):
     """
 
     __tablename__ = "all_qids_exists"
+    __table_args__ = (db.UniqueConstraint("qid", "code", name="qid_code"),)
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     qid = db.Column(db.String(255), nullable=False)

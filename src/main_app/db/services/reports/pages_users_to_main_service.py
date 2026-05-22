@@ -62,8 +62,12 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
         if hasattr(orm_obj, key):
             setattr(orm_obj, key, value)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -75,7 +79,11 @@ def delete_pages_users_to_main(record_id: int) -> bool:
         raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
 
     db.session.delete(orm_obj)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
     deleted = db.session.get(PagesUsersToMainRecord, record_id)
     return deleted is None

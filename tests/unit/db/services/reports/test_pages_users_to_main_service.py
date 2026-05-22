@@ -12,6 +12,8 @@ from src.main_app.db.services.reports.pages_users_to_main_service import (
 )
 from src.main_app.shared.core.extensions import db
 
+pytestmark = pytest.mark.unit
+
 
 def test_pages_users_to_main_workflow():
     from sqlalchemy import text

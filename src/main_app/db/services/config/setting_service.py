@@ -70,13 +70,22 @@ def add_setting(
 
 
 def update_value(setting_id: int, value: Any) -> SettingRecord:
-    """Update a setting record value."""
+    """Update a setting record value.
+
+    Normalizes the input identically to ``add_setting`` so the persisted
+    type stays consistent across creation and updates: non-``None`` values
+    are coerced to ``str``; ``None`` is stored as ``None``.
+    """
     orm_obj: SettingRecord = db.session.get(SettingRecord, setting_id)
     if not orm_obj:
         raise ValueError(f"Setting record with ID {setting_id} not found")
 
-    orm_obj.value = value  # str(value) if value is not None else None
-    db.session.commit()
+    orm_obj.value = str(value) if value is not None else None
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
     db.session.refresh(orm_obj)
     return orm_obj
 

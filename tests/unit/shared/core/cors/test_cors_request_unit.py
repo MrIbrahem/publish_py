@@ -6,6 +6,8 @@ import pytest
 
 from src.main_app.shared.core.cors import is_allowed
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture
 def mock_request(mocker):

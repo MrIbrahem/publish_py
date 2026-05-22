@@ -13,6 +13,8 @@ from src.main_app.db.services.content.lang_service import (
 )
 from src.main_app.shared.core.extensions import db
 
+pytestmark = pytest.mark.unit
+
 
 def test_lang_workflow():
     # Test add

@@ -3,6 +3,8 @@
 Mirrors: php_src/endpoints/index.php?get=publish_reports
 """
 
+from __future__ import annotations
+
 import logging
 from typing import Any, Dict, List
 

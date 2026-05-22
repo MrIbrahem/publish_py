@@ -158,14 +158,14 @@ class TestCorsDisabled:
 
             assert is_allowed(request) == "https://unknown.com"
 
-    def test_disabled_without_origin_returns_host_url(self, app: Flask) -> None:
+    def test_disabled_without_origin_returns_wildcard(self, app: Flask) -> None:
+        """When CORS is disabled and no Origin header is present, return '*'."""
         app.config["CORS_DISABLED"] = True
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
         with app.test_request_context(base_url="http://localhost/", headers={}):
             from flask import request
 
-            # assert is_allowed(request) == "http://localhost"
             assert is_allowed(request) == "*"
 
     def test_disabled_bypasses_denied_domain(self, app: Flask) -> None:

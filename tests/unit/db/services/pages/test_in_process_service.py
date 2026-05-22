@@ -17,6 +17,8 @@ from src.main_app.db.services.pages.in_process_service import (
 )
 from src.main_app.shared.core.extensions import db
 
+pytestmark = pytest.mark.unit
+
 
 def test_in_process_workflow():
     # Test add

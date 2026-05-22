@@ -86,7 +86,11 @@ def add_or_update_coordinator(username: str, is_active: int = 1) -> CoordinatorR
     else:
         record = CoordinatorRecord(username=username, is_active=is_active)
         db.session.add(record)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
     db.session.refresh(record)
     active_coordinators.cache_clear()
     return record
@@ -105,21 +109,32 @@ def update_coordinator(coordinator_id: int, **kwargs) -> CoordinatorRecord:
     for key, value in kwargs.items():
         if hasattr(record, key):
             setattr(record, key, value)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
     db.session.refresh(record)
     active_coordinators.cache_clear()
 
     return record
 
 
-def delete_coordinator(coordinator_id: int) -> None:
-    """Delete a coordinator record by ID."""
+def delete_coordinator(coordinator_id: int) -> bool:
+    """Delete a coordinator record by ID.
+
+    Returns True when the record was deleted successfully, False otherwise.
+    """
     # record = db.session.query(CoordinatorRecord).filter(CoordinatorRecord.id == coordinator_id).first()
     record = db.session.get(CoordinatorRecord, coordinator_id)
     if not record:
         raise ValueError(f"Coordinator with ID {coordinator_id} not found")
     db.session.delete(record)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
     active_coordinators.cache_clear()
 
     deleted = db.session.get(CoordinatorRecord, coordinator_id)

@@ -15,6 +15,8 @@ from src.main_app.db.services.users.user_service import (
 )
 from src.main_app.shared.core.extensions import db
 
+pytestmark = pytest.mark.unit
+
 
 def test_user_workflow():
     u = add_user("Wiki_User", "jh@example.com", "enwiki", "Editor")

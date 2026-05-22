@@ -114,8 +114,12 @@ def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
         if hasattr(orm_obj, key):
             setattr(orm_obj, key, value)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -127,7 +131,11 @@ def delete_in_process(process_id: int) -> bool:
         raise ValueError(f"In-process record with ID {process_id} not found")
 
     db.session.delete(orm_obj)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
     deleted = db.session.get(InProcessRecord, process_id)
     return deleted is None
@@ -142,7 +150,11 @@ def delete_in_process_by_title_user_lang(title: str, user: str, lang: str) -> bo
         .filter(InProcessRecord.lang == lang)
         .delete()
     )
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
     return result > 0
 
 

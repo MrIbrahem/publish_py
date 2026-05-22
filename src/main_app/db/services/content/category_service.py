@@ -55,6 +55,8 @@ def add_category(
         # set this category as default by unsetting default flag on all other categories
         set_default_category(db.session)
         orm_obj.is_default = 1
+    else:
+        orm_obj.is_default = 0
 
     db.session.commit()
     db.session.refresh(orm_obj)
@@ -86,6 +88,8 @@ def update_category(
         # set this category as default by unsetting default flag on all other categories
         set_default_category(db.session)
         orm_obj.is_default = 1
+    else:
+        orm_obj.is_default = 0
 
     db.session.commit()
     db.session.refresh(orm_obj)
