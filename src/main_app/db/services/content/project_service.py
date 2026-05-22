@@ -103,7 +103,6 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
 
 def delete_project(project_id: int) -> bool:
     """Delete a project record by ID."""
-    # orm_obj = db.session.query(ProjectRecord).filter(ProjectRecord.g_id == project_id).first()
     orm_obj = db.session.get(ProjectRecord, project_id)
     if not orm_obj:
         raise ValueError(f"Project record with ID {project_id} not found")

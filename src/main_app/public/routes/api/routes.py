@@ -10,13 +10,16 @@ from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
+from sqlalchemy import func
 
 from ....db.models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
-from ....db.services.content.category_service import list_categories
-from ....db.services.content.lang_service import list_langs
-from ....db.services.pages.in_process_service import get_in_process_counts_by_user
-from ....db.services.pages.page_service import list_of_users_by_translations_count
-from ....db.services.reports.report_service import query_reports_with_filters
+from ....db.services import (
+    get_in_process_counts_by_user,
+    list_categories,
+    list_langs,
+    list_of_users_by_translations_count,
+    query_reports_with_filters,
+)
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
