@@ -1,5 +1,10 @@
 # Plan — Port `results_2026` PHP module to the `bp_main.get("/")` index() route in publish_py
 
+> **Corrigendum (post-implementation, after sql.sql review):**
+> Earlier sections of this plan claim "the publish_py-side equivalent of `category_members` is `all_articles`" and recommend swapping the table name. **That is wrong.** Per `Translation-Dashboard/sql.sql`, `all_articles` and `category_members` are two distinct tables: `all_articles` has `UNIQUE(article_id)` (one row per article, with its primary category) while `category_members` has `UNIQUE(category, article_id)` (true many-to-many membership). The PHP queries explicitly need the many-to-many table.
+>
+> **Implementation uses `category_members` directly,** backed by a new `CategoryMemberRecord` SQLAlchemy model (`src/main_app/db/models/category_members.py`) so the table is auto-created at app launch alongside the other models. Treat `§3 Database queries` and `§9 row 1` of this plan as updated accordingly.
+
 **Scope:** Replicate the behavior of `Translation-Dashboard/src/backend/results_2026/*.php` (the new "2026" results pipeline) inside the existing Flask `index()` route at `publish_py/src/main_app/public/routes/main/routes.py`. Both repos share the same MySQL/MariaDB database, so the table names referenced here must remain identical.
 
 **Status:** Planning only — no code is written until this plan is reviewed and approved.

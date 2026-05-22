@@ -7,9 +7,11 @@ PHP source:
       - missing_by_lang_and_category($lang_code, $category)
       - exists_by_lang_and_category($lang_code, $category)
 
-The PHP queries reference ``category_members``; in the publish_py schema the
-equivalent table is ``all_articles`` (same ``article_id`` / ``category``
-columns), as already used by ``allqid_service.list_targets_by_lang``.
+The queries hit the shared MariaDB ``category_members`` table directly. That
+is a many-to-many membership table with ``UNIQUE(category, article_id)``,
+distinct from ``all_articles`` (which is ``UNIQUE(article_id)`` and stores
+each article's primary category only). The matching SQLAlchemy model is
+``CategoryMemberRecord`` so the table is created when the Flask app launches.
 """
 
 from __future__ import annotations
@@ -37,7 +39,7 @@ _MISSING_SQL = text(
         q.qid          AS qid,
         w.w_lead_words AS w_lead_words,
         w.w_all_words  AS w_all_words
-    FROM all_articles c
+    FROM category_members c
     JOIN qids q                   ON q.title    = c.article_id
     LEFT JOIN all_qids_exists aq  ON aq.qid     = q.qid AND aq.code = :lang
     LEFT JOIN assessments ase     ON ase.title  = c.article_id
@@ -65,7 +67,7 @@ _EXISTS_SQL = text(
         w.w_lead_words AS w_lead_words,
         w.w_all_words  AS w_all_words,
         aq.target      AS target
-    FROM all_articles c
+    FROM category_members c
     JOIN qids q                   ON q.title    = c.article_id
     LEFT JOIN all_qids_exists aq  ON aq.qid     = q.qid AND aq.code = :lang
     LEFT JOIN assessments ase     ON ase.title  = c.article_id

@@ -6,11 +6,9 @@ PHP source:
       - count_category_members($category)
       - statics_by_category($category)
 
-The PHP queries reference ``category_members``; in the publish_py schema the
-equivalent table is ``all_articles`` (same ``article_id`` / ``category``
-columns), matching the convention already used by
-``allqid_service.list_targets_by_lang`` and
-``results_2026_service``.
+Queries hit the shared MariaDB ``category_members`` table directly (the
+many-to-many membership table; backed by ``CategoryMemberRecord`` so the
+table is created when the Flask app launches).
 """
 
 from __future__ import annotations
@@ -29,7 +27,7 @@ logger = logging.getLogger(__name__)
 _COUNT_MEMBERS_SQL = text(
     """
     SELECT COUNT(c.article_id) AS members
-    FROM all_articles c
+    FROM category_members c
     WHERE c.category = :cat
     """
 )
@@ -41,7 +39,7 @@ _STATS_BY_CATEGORY_SQL = text(
     SELECT
         aq.code   AS language_code,
         COUNT(*)  AS available_title_count
-    FROM all_articles c
+    FROM category_members c
     JOIN qids q              ON q.title = c.article_id
     JOIN all_qids_exists aq  ON aq.qid  = q.qid
     WHERE c.category = :cat
