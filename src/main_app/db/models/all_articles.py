@@ -4,12 +4,10 @@ All Articles domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String
-
-from ...shared.core.extensions import BaseDb
+from ...shared.core.extensions import db
 
 
-class AllArticlesRecord(BaseDb):
+class AllArticlesRecord(db.Model):
     """
     CREATE TABLE all_articles (
         id int NOT NULL AUTO_INCREMENT,
@@ -22,9 +20,9 @@ class AllArticlesRecord(BaseDb):
 
     __tablename__ = "all_articles"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    article_id = Column(String(255), unique=True, nullable=False)
-    category = Column(String(255), nullable=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    article_id = db.Column(db.String(255), unique=True, nullable=False)
+    category = db.Column(db.String(255), nullable=True)
 
 
 __all__ = [

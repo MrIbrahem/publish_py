@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -11,7 +11,7 @@ from src.main_app.db.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.main_app.shared.core.extensions import get_session
+from src.main_app.shared.core.extensions import db
 
 
 def test_user_page_workflow() -> None:
@@ -31,12 +31,11 @@ def test_user_page_workflow() -> None:
     updated = update_user_page(p.id, "Flu", "Flu.html")
     assert updated.title == "Flu"
 
-    with get_session() as session:
-        orm_p = session.get(UserPageRecord, p.id)
-        orm_p.lang = "es"
-        orm_p.user = "Spanish_Editor"
-        orm_p.target = ""
-        session.commit()
+    orm_p = db.session.query(UserPageRecord).filter(UserPageRecord.id == p.id).first()
+    orm_p.lang = "es"
+    orm_p.user = "Spanish_Editor"
+    orm_p.target = ""
+    db.session.commit()
 
     assert find_exists_or_update_user_page("Flu", "es", "Spanish_Editor", "Gripe_target.html") is True
 
@@ -118,9 +117,8 @@ class TestFindExistsOrUpdateUserPage:
     """Tests for find_exists_or_update_user_page function."""
 
     def test_updates_target_if_empty(self, monkeypatch):
-        with get_session() as session:
-            session.add(UserPageRecord(title="Psychiatry", lang="en", user="Dr_Smith", target=""))
-            session.commit()
+        db.session.add(UserPageRecord(title="Psychiatry", lang="en", user="Dr_Smith", target=""))
+        db.session.commit()
 
         result = find_exists_or_update_user_page("Psychiatry", "en", "Dr_Smith", "Mental_Health.html")
         assert result is True
@@ -140,10 +138,7 @@ class TestInsertUserPageTarget:
         assert any(p.title == "Pathology" for p in list_user_pages())
 
     def test_handles_exception(self, monkeypatch):
-        with patch("src.main_app.db.services.pages.user_page_service.get_session") as mock_get_session:
-            mock_session = MagicMock()
-            mock_session.commit.side_effect = Exception("DB Error")
-            mock_get_session.return_value.__enter__.return_value = mock_session
+        with patch.object(db.session, "commit", side_effect=Exception("DB Error")):
 
             success = insert_user_page_target("Error_Page", "t", "c", "l", "u", "t")
             assert success is False

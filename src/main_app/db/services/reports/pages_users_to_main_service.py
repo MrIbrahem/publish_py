@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import get_session
+from ....shared.core.extensions import db
 from ...models import PagesUsersToMainRecord
 
 logger = logging.getLogger(__name__)
@@ -17,19 +17,17 @@ logger = logging.getLogger(__name__)
 
 def list_pages_users_to_main() -> List[PagesUsersToMainRecord]:
     """Return all pages_users_to_main records."""
-    with get_session() as session:
-        orm_objs = session.query(PagesUsersToMainRecord).order_by(PagesUsersToMainRecord.id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(PagesUsersToMainRecord).order_by(PagesUsersToMainRecord.id.asc()).all()
+    return orm_objs
 
 
 def get_pages_users_to_main(record_id: int) -> PagesUsersToMainRecord | None:
     """Get a pages_users_to_main record by ID."""
-    with get_session() as session:
-        orm_obj = session.get(PagesUsersToMainRecord, record_id)
-        if not orm_obj:
-            logger.warning(f"PagesUsersToMain record with ID {record_id} not found")
-            return None
-        return orm_obj
+    orm_obj = db.session.get(PagesUsersToMainRecord, record_id)
+    if not orm_obj:
+        logger.warning(f"PagesUsersToMain record with ID {record_id} not found")
+        return None
+    return orm_obj
 
 
 def add_pages_users_to_main(
@@ -39,50 +37,48 @@ def add_pages_users_to_main(
     new_qid: str = "",
 ) -> PagesUsersToMainRecord:
     """Add a new pages_users_to_main record."""
-    with get_session() as session:
-        orm_obj = PagesUsersToMainRecord(id=id, new_target=new_target, new_user=new_user, new_qid=new_qid)
-        session.add(orm_obj)
-        try:
-            session.commit()
-        except IntegrityError as e:
-            session.rollback()
-            raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
+    orm_obj = PagesUsersToMainRecord(id=id, new_target=new_target, new_user=new_user, new_qid=new_qid)
+    db.session.add(orm_obj)
+    try:
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
 
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainRecord:
     """Update a pages_users_to_main record."""
-    with get_session() as session:
-        orm_obj = session.get(PagesUsersToMainRecord, record_id)
-        if not orm_obj:
-            raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
+    orm_obj = db.session.get(PagesUsersToMainRecord, record_id)
+    if not orm_obj:
+        raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
 
-        if not kwargs:
-            return orm_obj
-
-        for key, value in kwargs.items():
-            if hasattr(orm_obj, key):
-                setattr(orm_obj, key, value)
-
-        session.commit()
-        session.refresh(orm_obj)
+    if not kwargs:
         return orm_obj
+
+    for key, value in kwargs.items():
+        if hasattr(orm_obj, key):
+            setattr(orm_obj, key, value)
+
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def delete_pages_users_to_main(record_id: int) -> bool:
     """Delete a pages_users_to_main record by ID."""
-    with get_session() as session:
-        orm_obj = session.get(PagesUsersToMainRecord, record_id)
-        if not orm_obj:
-            raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
+    # orm_obj = db.session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == record_id).first()
+    orm_obj = db.session.get(PagesUsersToMainRecord, record_id)
+    if not orm_obj:
+        raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
 
-        session.delete(orm_obj)
-        session.commit()
+    db.session.delete(orm_obj)
+    db.session.commit()
 
-        deleted = session.get(PagesUsersToMainRecord, record_id)
-        return deleted is None
+    deleted = db.session.get(PagesUsersToMainRecord, record_id)
+    return deleted is None
 
 
 __all__ = [

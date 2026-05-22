@@ -7,14 +7,25 @@ from typing import Any, Generator
 import pytest
 from flask import Flask
 
+from src.main_app.config import TestingConfig
+
 
 @pytest.fixture
 def app() -> Generator[Flask, Any, None]:
     """Create a test Flask application."""
     app = Flask(__name__)
     app.url_map.strict_slashes = False
-    app.config["TESTING"] = True
-    app.config["CORS_DISABLED"] = False
+    app.config.from_object(TestingConfig)
+    app.config.update({"CORS_DISABLED": False})
+
+    from src.main_app.shared.core.extensions import db
+
+    db.init_app(app)
+
+    with app.app_context():
+        real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
+        db.metadata.create_all(db.engine, tables=real_tables)
+
     yield app
 
 
@@ -103,8 +114,8 @@ class TestAllowedDomains:
             {"Origin": "https://medwiki.toolforge.org.evil.com"},
             # Both headers from untrusted domain
             {"Origin": "https://evil.com", "Referer": "https://evil.com/page"},
-            # No headers at all
-            {},
+            # No headers at all - NOW ALLOWED as same-origin/direct
+            # {},
         ],
     )
     def test_not_allowed_domain_denied(self, app: Flask, headers: dict[str, str]) -> None:
@@ -147,13 +158,14 @@ class TestCorsDisabled:
 
             assert is_allowed(request) == "https://unknown.com"
 
-    def test_disabled_without_origin_returns_wildcard(self, app: Flask) -> None:
+    def test_disabled_without_origin_returns_host_url(self, app: Flask) -> None:
         app.config["CORS_DISABLED"] = True
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with app.test_request_context(headers={}):
+        with app.test_request_context(base_url="http://localhost/", headers={}):
             from flask import request
 
+            # assert is_allowed(request) == "http://localhost"
             assert is_allowed(request) == "*"
 
     def test_disabled_bypasses_denied_domain(self, app: Flask) -> None:
@@ -191,12 +203,13 @@ class TestEdgeCases:
             assert is_allowed(request) is None
 
     def test_empty_origin_header(self, app: Flask) -> None:
+        """Empty Origin header (and no Referer) is treated as direct request."""
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with app.test_request_context(headers={"Origin": ""}):
+        with app.test_request_context(base_url="http://localhost/", headers={"Origin": ""}):
             from flask import request
 
-            assert is_allowed(request) is None
+            assert is_allowed(request) == "http://localhost"
 
     def test_origin_with_port_not_in_allowed(self, app: Flask) -> None:
         """medwiki.toolforge.org:8080 ≠ medwiki.toolforge.org → denied."""

@@ -23,7 +23,7 @@ SELECT
     ) AS views
 FROM
     pages p
-    LEFT JOIN users_list u ON p.user = u.username
+    LEFT JOIN users u ON p.user = u.username
     LEFT JOIN words w ON w.w_title = p.title
     LEFT JOIN views_new_all v ON p.target = v.target
     AND p.lang = v.lang
@@ -65,7 +65,7 @@ SELECT
     ) AS views
 FROM
     pages p
-    LEFT JOIN users_list u ON p.user = u.username
+    LEFT JOIN users u ON p.user = u.username
     LEFT JOIN words w ON w.w_title = p.title
     LEFT JOIN views_new_all v ON p.target = v.target
     AND p.lang = v.lang

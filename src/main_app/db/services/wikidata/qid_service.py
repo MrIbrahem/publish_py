@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy import func
 
-from ....shared.core.extensions import get_session
+from ....shared.core.extensions import db
 from ...models import QidRecord
 
 logger = logging.getLogger(__name__)
@@ -17,62 +17,57 @@ logger = logging.getLogger(__name__)
 
 def add_qid(title: str, qid: str) -> QidRecord:
     """Add or update a QID for a title."""
-    with get_session() as session:
-        orm_obj = session.query(QidRecord).filter(QidRecord.title == title).first()
-        if orm_obj:
-            orm_obj.qid = qid
-        else:
-            orm_obj = QidRecord(title=title, qid=qid, add_date=func.now())
-            session.add(orm_obj)
+    orm_obj = db.session.query(QidRecord).filter(QidRecord.title == title).first()
+    if orm_obj:
+        orm_obj.qid = qid
+    else:
+        orm_obj = QidRecord(title=title, qid=qid, add_date=func.now())
+        db.session.add(orm_obj)
 
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
     """Update a QID record."""
-    with get_session() as session:
-        orm_obj = session.get(QidRecord, qid_id)
-        if not orm_obj:
-            raise ValueError(f"QID record with ID {qid_id} not found")
+    orm_obj = db.session.get(QidRecord, qid_id)
+    if not orm_obj:
+        raise ValueError(f"QID record with ID {qid_id} not found")
 
-        orm_obj.title = title
-        orm_obj.qid = qid
-        session.commit()
-        session.refresh(orm_obj)
-        return orm_obj
+    orm_obj.title = title
+    orm_obj.qid = qid
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
 
 
 def delete_qid(qid_id: int) -> bool:
     """Delete a QID record."""
-    with get_session() as session:
-        orm_obj = session.get(QidRecord, qid_id)
-        if not orm_obj:
-            raise ValueError(f"QID record with ID {qid_id} not found")
+    orm_obj = db.session.get(QidRecord, qid_id)
+    if not orm_obj:
+        raise ValueError(f"QID record with ID {qid_id} not found")
 
-        session.delete(orm_obj)
-        session.commit()
+    db.session.delete(orm_obj)
+    db.session.commit()
 
-        deleted = session.get(QidRecord, qid_id)
-        return deleted is None
+    deleted = db.session.get(QidRecord, qid_id)
+    return deleted is None
 
 
 def get_page_qid(title: str) -> QidRecord | None:
     """Get the QID for a page title."""
-    with get_session() as session:
-        orm_obj = session.query(QidRecord).filter(QidRecord.title == title).first()
-        if not orm_obj:
-            logger.warning(f"QID for title {title} not found")
-            return None
-        return orm_obj
+    orm_obj = db.session.query(QidRecord).filter(QidRecord.title == title).first()
+    if not orm_obj:
+        logger.warning(f"QID for title {title} not found")
+        return None
+    return orm_obj
 
 
 def list_qids() -> List[QidRecord]:
     """Return all QID records."""
-    with get_session() as session:
-        orm_objs = session.query(QidRecord).order_by(QidRecord.id.asc()).all()
-        return orm_objs
+    orm_objs = db.session.query(QidRecord).order_by(QidRecord.id.asc()).all()
+    return orm_objs
 
 
 def get_title_to_qid() -> dict[str, str]:

@@ -18,6 +18,10 @@ def app() -> Flask:
     app.secret_key = "test_secret"
     app.config.from_object(TestingConfig)
 
+    from src.main_app.shared.core.extensions import db
+
+    db.init_app(app)
+
     # Import and register the blueprint
     from src.main_app.public.routes.cxtoken.routes import bp_cxtoken
 

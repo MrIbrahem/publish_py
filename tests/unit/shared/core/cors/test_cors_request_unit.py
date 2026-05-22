@@ -39,7 +39,7 @@ class TestCORSValidation:
             ({"Origin": "https://trusted.com.attacker.com"}, None),
             ({"Origin": "https://nottrusted.com"}, None),
             ({"Origin": "https://sub.trusted.com"}, None),
-            ({}, None),
+            ({}, "https://mysite.com"),
         ],
     )
     def test_cors_validation(self, mock_request, headers, expected):
