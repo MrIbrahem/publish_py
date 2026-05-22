@@ -99,10 +99,13 @@ def query_reports_with_filters(
             elif value in ("mt", "empty"):
                 query = query.filter((column == "") | (column.is_(None)))
             elif value in (">0", "&#62;0"):
+                # query = query.filter(column > 0)
+                # This seems to be for numeric results if any?
+                pass
                 # Apply a numeric ">0" predicate. For string columns,
                 # cast to integer so the comparison is meaningful in SQL.
                 # If the column type is unknown / non-comparable, raise.
-                col_type = getattr(column, "type", None)
+                """col_type = getattr(column, "type", None)
                 if isinstance(col_type, (SAInteger, SANumeric)):
                     query = query.filter(column > 0)
                 else:
@@ -111,7 +114,7 @@ def query_reports_with_filters(
                     except Exception as exc:
                         raise ValueError(
                             f"Filter '>0' is not supported for column '{name}' of type {col_type!r}"
-                        ) from exc
+                        ) from exc"""
             else:
                 query = query.filter(column == value)
 

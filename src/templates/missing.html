@@ -31,7 +31,8 @@
                         <td data-content="Autonym">{{ row.autonym }}</td>
                         <td data-content="Exists Articles">{{ "{:,}".format(row.exists) }}</td>
                         <td data-content="Missing Articles" data-search="{{ row.missing }}">
-                            <a href="{{ url_for('main.index', cat=category, depth=1, doit='Do+it', code=row.langcode, type='lead') }}">{{ "{:,}".format(row.missing) }}</a>
+                            <a
+                                href="{{ url_for('main.index', cat=category, depth=1, doit='Do+it', code=row.langcode, type='lead') }}">{{ "{:,}".format(row.missing) }}</a>
                         </td>
                     </tr>
                     {% endfor %}

@@ -97,7 +97,7 @@ def update_category(
     return orm_obj
 
 
-def delete_category(category_id: int) -> None:
+def delete_category(category_id: int) -> bool:
     """Delete a category."""
     orm_obj = db.session.get(CategoryRecord, category_id)
     if not orm_obj:
@@ -105,6 +105,9 @@ def delete_category(category_id: int) -> None:
 
     db.session.delete(orm_obj)
     db.session.commit()
+
+    deleted = db.session.get(CategoryRecord, category_id)
+    return deleted is None
 
 
 def get_campaign_category(campaign: str) -> CategoryRecord | None:

@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 def list_langs() -> List[LangRecord]:
     """Return all language records."""
     orm_objs = db.session.query(LangRecord).order_by(LangRecord.lang_id.asc()).all()
-    # return orm_objs
     return orm_objs
 
 
