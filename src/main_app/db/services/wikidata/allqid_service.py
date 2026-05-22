@@ -11,7 +11,7 @@ from sqlalchemy import func, text
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
-from ...models import AllQidsRecord, QidRecord
+from ...models import QidRecord
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +21,20 @@ def list_targets_by_lang(lang: str) -> List[dict]:
     """
     sql = text(
         """
-        SELECT qq.qid AS qid, q.title AS title, aa.category AS category,
-               t.code AS code, t.target AS target
-        FROM all_qids qq
-        LEFT JOIN qids q ON qq.qid = q.qid
-        LEFT JOIN all_articles aa ON aa.article_id = q.title
-        JOIN all_qids_exists t ON t.qid = qq.qid
-        WHERE t.code = :lang
-          AND t.target != '' AND t.target IS NOT NULL
+            SELECT
+                t.qid AS qid,
+                q.title AS title,
+                aa.category AS category,
+                t.code AS code,
+                t.target AS target
+            FROM
+                qids q
+                JOIN all_qids_exists t ON t.qid = q.qid
+                LEFT JOIN all_articles aa ON aa.article_id = q.title
+            WHERE
+                t.code = :lang
+            AND
+                t.target != '' AND t.target IS NOT NULL
     """
     )
     rows = db.session.execute(sql, {"lang": lang}).fetchall()
