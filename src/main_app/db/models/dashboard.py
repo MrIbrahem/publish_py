@@ -30,11 +30,11 @@ class CategoryRecord(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     category = db.Column(db.String(120), unique=True, nullable=False)
-    campaign = db.Column(db.String(120), nullable=False, default="")
-    display = db.Column(db.String(120), nullable=False, default="")
-    category2 = db.Column(db.String(120), nullable=False, default="")
-    depth = db.Column(db.Integer, nullable=False, default=0)
-    is_default = db.Column(db.Integer, nullable=False, default=0)
+    campaign = db.Column(db.String(120), nullable=False, default="", server_default=db.text("''"))
+    display = db.Column(db.String(120), nullable=False, default="", server_default=db.text("''"))
+    category2 = db.Column(db.String(120), nullable=False, default="", server_default=db.text("''"))
+    depth = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
+    is_default = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
 
     def __init__(self, **kwargs):
         # Convert depth and is_default to int if provided as strings
