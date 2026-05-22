@@ -112,9 +112,9 @@ class PagesUsersToMainRecord(db.Model):
     __tablename__ = "pages_users_to_main"
 
     id = db.Column(db.Integer, db.ForeignKey("pages_users.id"), primary_key=True)
-    new_target = db.Column(db.String(255), nullable=False, default="")
-    new_user = db.Column(db.String(255), nullable=False, default="")
-    new_qid = db.Column(db.String(255), nullable=False, default="")
+    new_target = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
+    new_user = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
+    new_qid = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
 
     def __init__(self, **kwargs):
         # Apply Python-level defaults for fields not provided
