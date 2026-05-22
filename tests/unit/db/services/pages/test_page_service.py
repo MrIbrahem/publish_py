@@ -13,6 +13,8 @@ from src.main_app.db.services.pages.page_service import (
 )
 from src.main_app.shared.core.extensions import db
 
+pytestmark = pytest.mark.unit
+
 
 def test_page_workflow():
     p = add_page(
@@ -148,9 +150,11 @@ class TestFindExistsOrUpdate:
             mock_session.query.return_value.filter.return_value.all.return_value = [MagicMock(target="")]
             mock_session.commit.side_effect = Exception("DB Error")
 
-            # Function returns True because record exists, but commit fails.
+            # Commit fails after rollback, so we must return False
+            # (the previous behavior of returning True swallowed real failures).
             result = find_exists_or_update_page("Error_Page", "en", "U", "T")
-            assert result is True
+            assert result is False
+            mock_session.rollback.assert_called_once()
 
 
 class TestInsertPageTarget:

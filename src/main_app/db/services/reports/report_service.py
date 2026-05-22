@@ -7,8 +7,10 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import extract, func, text
+from sqlalchemy import Numeric, cast, extract, func, text
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.types import Integer as SAInteger
+from sqlalchemy.types import Numeric as SANumeric
 
 from ....shared.core.extensions import db
 from ...models import ReportRecord
@@ -97,9 +99,19 @@ def query_reports_with_filters(
             elif value in ("mt", "empty"):
                 query = query.filter((column == "") | (column.is_(None)))
             elif value in (">0", "&#62;0"):
-                # query = query.filter(column > 0)
-                # This seems to be for numeric results if any?
-                pass
+                # Apply a numeric ">0" predicate. For string columns,
+                # cast to integer so the comparison is meaningful in SQL.
+                # If the column type is unknown / non-comparable, raise.
+                col_type = getattr(column, "type", None)
+                if isinstance(col_type, (SAInteger, SANumeric)):
+                    query = query.filter(column > 0)
+                else:
+                    try:
+                        query = query.filter(cast(column, SAInteger) > 0)
+                    except Exception as exc:
+                        raise ValueError(
+                            f"Filter '>0' is not supported for column '{name}' of type {col_type!r}"
+                        ) from exc
             else:
                 query = query.filter(column == value)
 

@@ -102,8 +102,12 @@ def add_or_update_translate_type(
         orm_obj = TranslateTypeRecord(tt_title=tt_title, tt_lead=tt_lead, tt_full=tt_full)
         db.session.add(orm_obj)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -121,8 +125,12 @@ def update_translate_type(tt_id: int, **kwargs) -> TranslateTypeRecord:
         if hasattr(orm_obj, key):
             setattr(orm_obj, key, value)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -134,7 +142,11 @@ def delete_translate_type(tt_id: int) -> bool:
         raise ValueError(f"TranslateType record with ID {tt_id} not found")
 
     db.session.delete(orm_obj)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
     deleted = db.session.get(TranslateTypeRecord, tt_id)
     return deleted is None

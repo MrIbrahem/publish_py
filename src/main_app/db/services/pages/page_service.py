@@ -131,8 +131,13 @@ def update_page(
     if deleted is not None:
         orm_obj.deleted = deleted
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        logger.exception("Failed to update page")
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -144,7 +149,12 @@ def delete_page(page_id: int) -> bool:
         raise LookupError(f"Page id {page_id} was not found")
 
     db.session.delete(orm_obj)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        logger.exception("Failed to delete page")
+        db.session.rollback()
+        raise
 
     deleted = db.session.get(PageRecord, page_id)
     return deleted is None
@@ -156,7 +166,12 @@ def find_exists_or_update_page(
     user: str,
     target: str,
 ) -> bool:
-    """Check if record exists and update target if empty."""
+    """Check if record exists and update target if empty.
+
+    Returns True only when matching records exist *and* any necessary
+    update committed successfully (or no update was needed). Returns
+    False when the commit fails after a rollback.
+    """
 
     # Check existence
     orm_objs = (
@@ -169,23 +184,25 @@ def find_exists_or_update_page(
         .all()
     )
 
-    if orm_objs:
-        changed = False
-        for obj in orm_objs:
-            # Update target if it's empty or NULL
-            if not obj.target:
-                obj.target = target
-                obj.pupdate = func.current_date()
-                changed = True
-        if changed:
-            try:
-                db.session.commit()
-            except Exception as e:
-                logger.error(f"Failed to update page target: {e}")
-                db.session.rollback()
-                # raise
+    if not orm_objs:
+        return False
 
-    return len(orm_objs) > 0
+    changed = False
+    for obj in orm_objs:
+        # Update target if it's empty or NULL
+        if not obj.target:
+            obj.target = target
+            obj.pupdate = func.current_date()
+            changed = True
+    if changed:
+        try:
+            db.session.commit()
+        except Exception:
+            logger.exception("Failed to update page target")
+            db.session.rollback()
+            return False
+
+    return True
 
 
 def list_of_users_by_translations_count() -> dict[str, int]:

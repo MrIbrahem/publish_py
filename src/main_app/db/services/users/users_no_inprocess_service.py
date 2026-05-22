@@ -80,8 +80,12 @@ def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoIn
         orm_obj = UsersNoInprocessRecord(user=user, is_active=is_active)
         db.session.add(orm_obj)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -98,8 +102,12 @@ def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecor
         if hasattr(orm_obj, key):
             setattr(orm_obj, key, value)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -111,7 +119,11 @@ def delete_users_no_inprocess(record_id: int) -> bool:
         raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
 
     db.session.delete(orm_obj)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
     deleted = db.session.get(UsersNoInprocessRecord, record_id)
     return deleted is None

@@ -66,7 +66,17 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord:
         return orm_obj
 
     for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
+        if not hasattr(orm_obj, key):
+            continue
+        # Apply the same title validation/normalization as add_project()
+        if key in ("title", "g_title"):
+            if not isinstance(value, str):
+                raise ValueError("Project title must be a string")
+            stripped = value.strip()
+            if not stripped:
+                raise ValueError("Project title is required")
+            setattr(orm_obj, key, stripped)
+        else:
             setattr(orm_obj, key, value)
 
     db.session.commit()
@@ -79,6 +89,10 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
     orm_obj = db.session.get(ProjectRecord, project_id)
     if not orm_obj:
         raise ValueError(f"Project record with ID {project_id} not found")
+
+    g_title = g_title.strip() if isinstance(g_title, str) else g_title
+    if not g_title:
+        raise ValueError("Project title is required")
 
     orm_obj.g_title = g_title
 

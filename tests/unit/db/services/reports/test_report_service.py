@@ -11,6 +11,8 @@ from src.main_app.db.services.reports.report_service import (
 )
 from src.main_app.shared.core.extensions import db
 
+pytestmark = pytest.mark.unit
+
 
 def test_report_workflow():
     r = add_report("Malaria", "User:Admin", "en", "Malaria_source", "success", '{"status": "published"}')

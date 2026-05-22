@@ -22,7 +22,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData, Text, event, inspect, text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
-from sqlalchemy.types import TypeDecorator
+from sqlalchemy.engine import Connection, Dialect
+from sqlalchemy.types import TypeDecorator, TypeEngine
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,7 @@ def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
 
 
 @event.listens_for(db.metadata, "after_create")
-def create_views_new_all_view(target, connection, **kw):
+def create_views_new_all_view(target: MetaData, connection: Connection, **kw: Any) -> None:
     inspector = inspect(connection)
     existing_views = inspector.get_view_names()
 
@@ -112,7 +113,7 @@ class LONGTEXT(TypeDecorator):
     impl = Text
     cache_ok = True
 
-    def load_dialect_impl(self, dialect):
+    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine:
         if dialect.name == "mysql":
             return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
         return dialect.type_descriptor(Text())

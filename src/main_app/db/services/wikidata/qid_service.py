@@ -24,8 +24,12 @@ def add_qid(title: str, qid: str) -> QidRecord:
         orm_obj = QidRecord(title=title, qid=qid, add_date=func.now())
         db.session.add(orm_obj)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -37,8 +41,12 @@ def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
 
     orm_obj.title = title
     orm_obj.qid = qid
-    db.session.commit()
-    db.session.refresh(orm_obj)
+    try:
+        db.session.commit()
+        db.session.refresh(orm_obj)
+    except Exception:
+        db.session.rollback()
+        raise
     return orm_obj
 
 
@@ -49,7 +57,11 @@ def delete_qid(qid_id: int) -> bool:
         raise ValueError(f"QID record with ID {qid_id} not found")
 
     db.session.delete(orm_obj)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
     deleted = db.session.get(QidRecord, qid_id)
     return deleted is None

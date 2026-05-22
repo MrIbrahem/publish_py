@@ -49,7 +49,11 @@ def upsert_user_token(*, user_id: int, username: str, access_key: str, access_se
         )
         db.session.add(orm_obj)
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
@@ -68,15 +72,25 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
 
 
 def delete_user_token(user_id: int) -> bool:
-    """Remove the stored OAuth credentials for the given user id."""
+    """Remove the stored OAuth credentials for the given user id.
+
+    Returns ``True`` if a row was deleted, ``False`` if no row existed
+    for ``user_id`` (mirroring :func:`delete_user_token_by_username`).
+    """
     if not user_id:
         return False
 
     # # user_id is the primary key for UserTokenRecord
     orm_obj = db.session.get(UserTokenRecord, user_id)
-    if orm_obj:
-        db.session.delete(orm_obj)
+    if not orm_obj:
+        return False
+
+    db.session.delete(orm_obj)
+    try:
         db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
     deleted = db.session.get(UserTokenRecord, user_id)
     return deleted is None
@@ -103,7 +117,11 @@ def delete_user_token_by_username(username: str) -> bool:
     if not orm_obj:
         return False
     db.session.delete(orm_obj)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
     deleted = get_user_token_by_username(username)
     return deleted is None
