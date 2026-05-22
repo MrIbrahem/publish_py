@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import logging
 import time
+from datetime import datetime, timezone
 from typing import Any
 
 from flask import (
@@ -21,6 +22,10 @@ from flask import (
 from ....db.services.config.setting_service import get_setting_by_key
 from ....db.services.content.category_service import list_categories
 from ....db.services.content.lang_service import get_lang_by_code, list_langs
+from ....db.services.pages.missing_stats_service import (
+    count_category_members,
+    statics_by_category,
+)
 from ....db.services.users.coordinator_service import active_coordinators
 from ....db.services.users.full_translator_service import is_full_translator
 from ....shared.auth.identity import current_user
@@ -213,8 +218,60 @@ def reports():
 
 @bp_main.get("/missing")
 def missing():
+    # logic from src/missing.php — Top languages by missing articles in Category:RTT.
+    category = request.args.get("cat") or "RTT"
+
+    try:
+        stats = statics_by_category(category)
+    except Exception:
+        logger.exception("statics_by_category failed for cat=%r", category)
+        flash("Failed to load missing statistics — please try again.", "danger")
+        stats = []
+
+    try:
+        total = count_category_members(category)
+    except Exception:
+        logger.exception("count_category_members failed for cat=%r", category)
+        total = 0
+
+    # PHP merges per-language stats with the langs lookup (autonym + name).
+    langs_lookup: dict[str, dict] = {}
+    try:
+        for lang in list_langs():
+            data = lang.to_dict() if hasattr(lang, "to_dict") else dict(lang)
+            code = data.get("code")
+            if code:
+                langs_lookup[code] = data
+    except Exception:
+        logger.exception("list_langs failed while building missing-stats page")
+
+    rows: list[dict] = []
+    for stat in stats:
+        langcode = stat.get("language_code") or ""
+        if not langcode:
+            continue
+        lang_data = langs_lookup.get(langcode, {})
+        autonym = lang_data.get("autonym") or "! autonym"
+        langname = lang_data.get("name") or "! langname"
+        exists = int(stat.get("available_title_count") or 0)
+        # PHP: $missing = (int)$length - (int)$exists;
+        missing_count = max(total - exists, 0)
+        rows.append(
+            {
+                "langcode": langcode,
+                "langname": langname,
+                "autonym": autonym,
+                "exists": exists,
+                "missing": missing_count,
+            }
+        )
+
     return render_template(
         "missing.html",
+        category=category,
+        total=total,
+        rows=rows,
+        generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
     )
 
 
