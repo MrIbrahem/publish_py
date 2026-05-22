@@ -175,16 +175,6 @@ CREATE TABLE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE
-    keys_new (
-        id int (11) NOT NULL AUTO_INCREMENT,
-        u_n text NOT NULL,
-        a_k text NOT NULL,
-        a_s text NOT NULL,
-        created_at timestamp NOT NULL DEFAULT current_timestamp(),
-        PRIMARY KEY (id)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-
-CREATE TABLE
     langs (
         lang_id int (11) NOT NULL AUTO_INCREMENT,
         code varchar(20) NOT NULL,
