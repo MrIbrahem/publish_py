@@ -12,7 +12,7 @@ from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 from sqlalchemy import func
 
-from ....db.models import CategoryRecord, InProcessRecord, LangRecord, ReportRecord
+from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
 from ....db.services import (
     get_in_process_counts_by_user,
     list_categories,
@@ -346,6 +346,33 @@ def get_categories() -> Response:
     }
 
     return jsonify(response_data)
+
+
+@bp_api.route("/distinct_langs", methods=["GET"])
+@check_cors
+def get_distinct_langs() -> Response:
+    """
+    Return distinct languages from pages joined with categories.
+
+    SELECT DISTINCT lang FROM pages p
+    LEFT JOIN categories ca ON p.cat = ca.category
+    WHERE (p.lang != '' AND p.lang IS NOT NULL)
+    """
+    try:
+        results = (
+            db.session.query(PageRecord.lang)
+            .distinct()
+            .outerjoin(CategoryRecord, PageRecord.cat == CategoryRecord.category)
+            .filter(PageRecord.lang != "", PageRecord.lang.isnot(None))
+            .order_by(PageRecord.lang)
+            .all()
+        )
+        data = [{"lang": row.lang} for row in results]
+    except Exception:
+        logger.exception("Error fetching distinct langs data")
+        return jsonify({"error": "An internal error occurred while fetching distinct langs data"}), 500
+
+    return jsonify({"results": data, "count": len(data)})
 
 
 @bp_api.route("/users_by_translations_count", methods=["GET"])

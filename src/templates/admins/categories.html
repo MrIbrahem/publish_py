@@ -32,7 +32,7 @@
 
 {% block extra_js %}
 <script>
-    const langs_url = `/api.php?get=pages&select=lang&distinct=1&lang=not_empty`;
+    const langs_url = `{{ url_for('api.get_distinct_langs') }}`;
     const rest_api = `https://www.wikidata.org/w/rest.php/wikibase/v1/entities/items/Q107014860/sitelinks`;
 
     $('#categories_table').DataTable({
