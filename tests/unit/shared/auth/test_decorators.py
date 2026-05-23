@@ -26,7 +26,7 @@ class TestOAuthRequired:
             consumer_key="test_key",
             consumer_secret="test_secret",
             encryption_key="test_encryption_key",
-            enabled=True,
+
         )
         # Patch the entire settings object, not just oauth
         monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
@@ -57,7 +57,7 @@ class TestOAuthRequired:
             consumer_key="test_key",
             consumer_secret="test_secret",
             encryption_key="test_encryption_key",
-            enabled=True,
+
         )
         monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
 

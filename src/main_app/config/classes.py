@@ -78,6 +78,17 @@ class UsersConfig:
 
 
 @dataclass(frozen=True)
+class SecurityConfig:
+    """Security configuration for Flask 3.1+ features."""
+
+    secret_key: str
+    max_content_length: int  # Maximum request size in bytes
+    max_form_memory_size: int  # Maximum form data in memory in bytes
+    max_form_parts: int  # Maximum number of form fields
+    secret_key_fallbacks: tuple[str, ...]  # Fallback secret keys for rotation
+
+
+@dataclass(frozen=True)
 class Settings:
     """Main settings container."""
 
@@ -87,7 +98,6 @@ class Settings:
     revids_api_url: str
     wikidata_domain: str
     is_localhost: Callable[[str], bool]
-    # has_db_config: callable
 
     # Nested configurations
     database_data: DbConfig
@@ -96,6 +106,7 @@ class Settings:
     sessions: SessionConfig
     oauth: Optional[OAuthConfig]
     cors: CorsConfig
+    security: SecurityConfig
     users: UsersConfig
 
 
