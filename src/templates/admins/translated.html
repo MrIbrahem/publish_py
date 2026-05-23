@@ -1,0 +1,105 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}Translated Pages{% endblock %}
+
+{% block contents %}
+<div class="card">
+    <div class="card-header">
+        <form method="GET" action="{{ url_for(endpoint) }}" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <h4 class="mb-0">Translated Pages ({{ table_label }} - {{ total_count }}):</h4>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text">Lang:</span>
+                    <select class="form-select" name="lang">
+                        <option value="All" {% if lang == 'All' %}selected{% endif %}>All</option>
+                        {% for l in languages %}
+                        <option value="{{ l.code }}" {% if lang == l.code %}selected{% endif %}>
+                            ({{ l.code }}) {{ l.autonym }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <input type="number" min="10" max="2000" class="form-control" name="limit" value="{{ limit }}" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100" type="submit">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Lang.</th>
+                    <th>Title</th>
+                    <th>Translated</th>
+                    <th>Published</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ loop.index + (page - 1) * limit }}</td>
+                    <td>{{ row.user }}</td>
+                    <td>{{ row.lang }}</td>
+                    <td>
+                        <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}"
+                            target="_blank">{{ row.title }}</a>
+                    </td>
+                    <td>
+                        {% if row.target %}
+                        <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}"
+                           target="_blank">{{ row.target }}</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ row.pupdate }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           href="{{ url_for(edit_endpoint, id=row.id) }}">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center text-muted">No translated pages found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if total_count > limit %}
+        {% set total_pages = (total_count // limit) + (1 if total_count % limit else 0) %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for(endpoint, lang=lang, page=1, limit=limit) }}">&laquo;</a>
+                </li>
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for(endpoint, lang=lang, page=page-1, limit=limit) }}">&lt;</a>
+                </li>
+                {% for p in range([1, page - 3]|max, [total_pages, page + 3]|min + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for(endpoint, lang=lang, page=p, limit=limit) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for(endpoint, lang=lang, page=page+1, limit=limit) }}">&gt;</a>
+                </li>
+                <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for(endpoint, lang=lang, page=total_pages, limit=limit) }}">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+        <p class="text-center text-muted">
+            Page {{ page }} of {{ total_pages }} (total {{ total_count }})
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

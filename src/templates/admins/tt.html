@@ -1,0 +1,98 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}Translate Type{% endblock %}
+
+{% block contents %}
+<div class="card">
+    <div class="card-header">
+        <form method="GET" action="{{ url_for('admin.tt.tt_index') }}" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <h4 class="mb-0">Translate Type ({{ translate_types|length }}):</h4>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text">Category:</span>
+                    <select class="form-select" name="cat">
+                        <option value="All" {% if cat == 'All' %}selected{% endif %}>All</option>
+                        {% for c in categories %}
+                        <option value="{{ c.category }}" {% if cat == c.category %}selected{% endif %}>
+                            {{ c.campaign or c.category }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100" type="submit">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped compact">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>id</th>
+                    <th>Title</th>
+                    <th>Lead</th>
+                    <th>Full</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tt in translate_types %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ tt.tt_id }}</td>
+                    <td>
+                        <a href="https://mdwiki.org/wiki/{{ tt.tt_title | replace(' ', '_') | urlencode }}"
+                            target="_blank">{{ tt.tt_title }}</a>
+                    </td>
+                    <td>
+                        <input class="form-check-input" type="checkbox" disabled
+                            {% if tt.tt_lead == 1 %}checked{% endif %}>
+                    </td>
+                    <td>
+                        <input class="form-check-input" type="checkbox" disabled
+                            {% if tt.tt_full == 1 %}checked{% endif %}>
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           href="{{ url_for('admin.tt.tt_edit', id=tt.tt_id, title=tt.tt_title, lead=tt.tt_lead, full=tt.tt_full) }}">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted">No translate types found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if new_titles %}
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="mb-0">New titles in qids not yet in translate_type ({{ new_titles|length }})</h5>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for title in new_titles %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ title }}</span>
+                <a class="btn btn-sm btn-outline-primary"
+                   href="{{ url_for('admin.tt.tt_edit', title=title, lead=1, full=0) }}">Add</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<div class="card mt-3">
+    <div class="card-body">
+        <a class="btn btn-outline-primary" href="{{ url_for('admin.tt.tt_edit') }}">Add one!</a>
+    </div>
+</div>
+{% endblock %}

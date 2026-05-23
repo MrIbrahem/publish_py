@@ -17,6 +17,31 @@ from ..analytics.word_service import get_word_counts_for_title
 logger = logging.getLogger(__name__)
 
 
+def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> List[PageRecord]:
+    """Return translated pages (target not empty) optionally filtered by language."""
+    query = db.session.query(PageRecord).filter(
+        PageRecord.target.isnot(None), PageRecord.target != ""
+    )
+    if lang and lang != "All":
+        query = query.filter(PageRecord.lang == lang)
+    return query.order_by(PageRecord.id.desc()).limit(limit).offset(offset).all()
+
+
+def count_translated(lang: str = "All") -> int:
+    """Return total count of translated pages, optionally filtered by language."""
+    query = db.session.query(func.count(PageRecord.id)).filter(
+        PageRecord.target.isnot(None), PageRecord.target != ""
+    )
+    if lang and lang != "All":
+        query = query.filter(PageRecord.lang == lang)
+    return int(query.scalar() or 0)
+
+
+def get_by_id(page_id: int) -> PageRecord | None:
+    """Return a single page row by id, or None when missing."""
+    return db.session.get(PageRecord, page_id)
+
+
 def list_pages() -> List[PageRecord]:
     """Return all pages."""
     orm_objs = db.session.query(PageRecord).order_by(PageRecord.id.asc()).all()

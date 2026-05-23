@@ -27,8 +27,15 @@ from .full_translators import fulltranslators_module
 from .language_settings import languagesettings_module
 from .last import last_translations_dashboard
 from .add_translate import add_bp
+from .pages_users_to_main import pages_users_to_main_bp
 from .projects import projects_module
+from .qids import qids_bp
+from .qids_others import qids_others_bp
 from .settings import settings_module
+from .stat import stat_bp
+from .translated import translated_bp
+from .translated_users import translated_users_bp
+from .tt import tt_bp
 from .users_emails import users_emails_module
 from .users_no_inprocess import usersnoinprocess_module
 
@@ -91,6 +98,13 @@ def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(usersnoinprocess_module.bp)
     bp_admin.register_blueprint(languagesettings_module.bp)
     bp_admin.register_blueprint(add_bp)
+    bp_admin.register_blueprint(tt_bp)
+    bp_admin.register_blueprint(translated_bp)
+    bp_admin.register_blueprint(translated_users_bp)
+    bp_admin.register_blueprint(qids_bp)
+    bp_admin.register_blueprint(qids_others_bp)
+    bp_admin.register_blueprint(pages_users_to_main_bp)
+    bp_admin.register_blueprint(stat_bp)
     # Templates(bp_admin)
     bp_admin.register_blueprint(settings_module.bp)
     bp_admin.register_blueprint(projects_module.bp)

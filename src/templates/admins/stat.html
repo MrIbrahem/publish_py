@@ -1,0 +1,31 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}Statistics{% endblock %}
+
+{% block contents %}
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">Statistics</h4>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Translated Pages (Main)</h5>
+                        <p class="display-6 mb-0">{{ "{:,}".format(pages_count) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Translated Pages (User)</h5>
+                        <p class="display-6 mb-0">{{ "{:,}".format(user_pages_count) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

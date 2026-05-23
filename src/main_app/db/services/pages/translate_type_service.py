@@ -10,15 +10,76 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
-from ...models import TranslateTypeRecord
+from ...models import PageRecord, QidRecord, TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
 
 
-def list_translate_types() -> List[TranslateTypeRecord]:
-    """Return all translate_type records."""
-    orm_objs = db.session.query(TranslateTypeRecord).order_by(TranslateTypeRecord.tt_id.asc()).all()
-    return orm_objs
+def list_translate_types(cat: str = "All") -> List[TranslateTypeRecord]:
+    """Return translate_type records, optionally filtered by category membership.
+
+    When ``cat != "All"``, only records whose ``tt_title`` matches a page in the
+    given category are returned.
+    """
+    query = db.session.query(TranslateTypeRecord)
+    if cat and cat != "All":
+        titles_in_cat = db.session.query(PageRecord.title).filter(PageRecord.cat == cat).distinct().subquery()
+        query = query.filter(TranslateTypeRecord.tt_title.in_(db.session.query(titles_in_cat.c.title)))
+    return query.order_by(TranslateTypeRecord.tt_id.asc()).all()
+
+
+def list_new_titles() -> List[str]:
+    """Return titles in the qids table that are not yet in translate_type."""
+    existing_titles = db.session.query(TranslateTypeRecord.tt_title).subquery()
+    rows = (
+        db.session.query(QidRecord.title)
+        .filter(QidRecord.title.notin_(db.session.query(existing_titles.c.tt_title)))
+        .distinct()
+        .order_by(QidRecord.title.asc())
+        .all()
+    )
+    return [row[0] for row in rows if row[0]]
+
+
+def upsert(tt_id: int | None, title: str, lead: int, full: int) -> bool:
+    """Insert a new translate_type row or update an existing one by tt_id.
+
+    - When ``tt_id`` is falsy: INSERT if no row with that ``tt_title`` exists.
+    - When ``tt_id`` is truthy: UPDATE the row matching that id.
+
+    Returns True on success, False on failure.
+    """
+    title = (title or "").strip()
+    if not title:
+        return False
+
+    try:
+        if tt_id:
+            orm_obj = db.session.get(TranslateTypeRecord, tt_id)
+            if not orm_obj:
+                return False
+            orm_obj.tt_title = title
+            orm_obj.tt_lead = int(lead) if lead else 0
+            orm_obj.tt_full = int(full) if full else 0
+        else:
+            existing = (
+                db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_title == title).first()
+            )
+            if existing:
+                # Match PHP "INSERT ... WHERE NOT EXISTS" semantic - silently skip
+                return True
+            orm_obj = TranslateTypeRecord(
+                tt_title=title,
+                tt_lead=int(lead) if lead else 0,
+                tt_full=int(full) if full else 0,
+            )
+            db.session.add(orm_obj)
+        db.session.commit()
+        return True
+    except Exception:
+        logger.exception("Failed to upsert translate_type id=%r title=%r", tt_id, title)
+        db.session.rollback()
+        return False
 
 
 def list_lead_enabled_types() -> List[TranslateTypeRecord]:
@@ -166,6 +227,7 @@ def can_translate_full(title: str) -> bool:
 
 __all__ = [
     "list_translate_types",
+    "list_new_titles",
     "list_lead_enabled_types",
     "list_full_enabled_types",
     "get_translate_type",
@@ -174,6 +236,7 @@ __all__ = [
     "add_or_update_translate_type",
     "update_translate_type",
     "delete_translate_type",
+    "upsert",
     "can_translate_lead",
     "can_translate_full",
 ]
