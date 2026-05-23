@@ -226,3 +226,161 @@ class TestCanTranslateFull:
     def test_returns_false_when_no_record(self, monkeypatch):
         """Test that function returns False when no record found (default behavior)."""
         assert can_translate_full("Unknown Title") is False
+
+
+
+# ---------------------------------------------------------------------------
+# Tests for new service functions added with the admin blueprint work:
+#   - list_translate_types(cat=)
+#   - list_new_titles()
+#   - upsert(tt_id, title, lead, full)
+# ---------------------------------------------------------------------------
+
+from src.main_app.db.models import PageRecord, QidRecord
+from src.main_app.db.services.pages.translate_type_service import list_new_titles, upsert
+from src.main_app.shared.core.extensions import db as _db
+
+
+class TestListTranslateTypesByCategory:
+    """Tests for the ``cat`` filter on list_translate_types."""
+
+    def test_returns_all_when_cat_is_default(self, monkeypatch):
+        add_translate_type("RTT_only_type")
+        add_translate_type("Other_only_type")
+        result = list_translate_types()
+        titles = {tt.tt_title for tt in result}
+        assert "RTT_only_type" in titles
+        assert "Other_only_type" in titles
+
+    def test_filters_by_category_membership(self, monkeypatch):
+        # Pages link a (title, cat) pair; translate_type rows are filtered
+        # to those whose tt_title matches a page in the requested cat.
+        add_translate_type("In_RTT")
+        add_translate_type("Not_In_RTT")
+        _db.session.add(
+            PageRecord(
+                title="In_RTT",
+                translate_type="lead",
+                cat="RTT",
+                lang="en",
+                user="u",
+                target="t",
+            )
+        )
+        _db.session.add(
+            PageRecord(
+                title="Not_In_RTT",
+                translate_type="lead",
+                cat="OTHER",
+                lang="en",
+                user="u",
+                target="t",
+            )
+        )
+        _db.session.commit()
+
+        result = list_translate_types(cat="RTT")
+        titles = {tt.tt_title for tt in result}
+        assert "In_RTT" in titles
+        assert "Not_In_RTT" not in titles
+
+    def test_returns_empty_for_unknown_category(self, monkeypatch):
+        add_translate_type("Some_type")
+        result = list_translate_types(cat="NoSuchCat")
+        assert result == []
+
+
+class TestListNewTitles:
+    """Tests for list_new_titles."""
+
+    def test_returns_qids_titles_not_in_translate_type(self, monkeypatch):
+        # In qids: Foo, Bar; In translate_type: Bar -> only Foo is "new".
+        _db.session.add(QidRecord(title="Foo", qid="Q1"))
+        _db.session.add(QidRecord(title="Bar", qid="Q2"))
+        _db.session.commit()
+        add_translate_type("Bar")
+
+        result = list_new_titles()
+        assert "Foo" in result
+        assert "Bar" not in result
+
+    def test_returns_empty_when_all_titles_already_in_translate_type(self, monkeypatch):
+        _db.session.add(QidRecord(title="Already_There", qid="Q3"))
+        _db.session.commit()
+        add_translate_type("Already_There")
+
+        assert list_new_titles() == []
+
+    def test_returns_empty_when_qids_table_empty(self, monkeypatch):
+        assert list_new_titles() == []
+
+    def test_returns_distinct_titles(self, monkeypatch):
+        # Two qids share the same title (allowed only across qids vs qids_others;
+        # within qids the title is unique). Use a single row but verify DISTINCT
+        # behaviour on the SELECT side by ensuring we do not return duplicates.
+        _db.session.add(QidRecord(title="Distinct_one", qid="Q4"))
+        _db.session.commit()
+        result = list_new_titles()
+        assert result.count("Distinct_one") == 1
+
+
+class TestUpsert:
+    """Tests for the upsert helper used by the tt admin POST handler."""
+
+    def test_inserts_when_no_id_and_title_is_new(self, monkeypatch):
+        ok = upsert(None, "Brand_new_type", lead=1, full=0)
+        assert ok is True
+        record = get_translate_type_by_title("Brand_new_type")
+        assert record is not None
+        assert record.tt_lead == 1
+        assert record.tt_full == 0
+
+    def test_silently_skips_insert_when_title_already_exists(self, monkeypatch):
+        # PHP "INSERT ... WHERE NOT EXISTS" semantics: don't fail, don't update.
+        existing = add_translate_type("Existing", tt_lead=1, tt_full=0)
+        ok = upsert(None, "Existing", lead=0, full=1)
+        assert ok is True
+        unchanged = get_translate_type(existing.tt_id)
+        assert unchanged.tt_lead == 1
+        assert unchanged.tt_full == 0
+
+    def test_updates_when_id_is_given(self, monkeypatch):
+        record = add_translate_type("To_update", tt_lead=1, tt_full=0)
+        ok = upsert(record.tt_id, "Renamed", lead=0, full=1)
+        assert ok is True
+        refreshed = get_translate_type(record.tt_id)
+        assert refreshed.tt_title == "Renamed"
+        assert refreshed.tt_lead == 0
+        assert refreshed.tt_full == 1
+
+    def test_returns_false_when_id_does_not_exist(self, monkeypatch):
+        assert upsert(99999, "x", lead=1, full=0) is False
+
+    def test_returns_false_when_title_is_empty(self, monkeypatch):
+        assert upsert(None, "   ", lead=1, full=0) is False
+        assert upsert(None, "", lead=1, full=0) is False
+
+    def test_strips_whitespace_from_title(self, monkeypatch):
+        ok = upsert(None, "  Trimmed  ", lead=1, full=0)
+        assert ok is True
+        assert get_translate_type_by_title("Trimmed") is not None
+
+    def test_coerces_lead_and_full_to_int(self, monkeypatch):
+        # Routes pass "1" / 0 / "" for these toggles.
+        ok = upsert(None, "Coerce_check", lead="1", full="")
+        assert ok is True
+        record = get_translate_type_by_title("Coerce_check")
+        assert record.tt_lead == 1
+        assert record.tt_full == 0
+
+    def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
+        with patch(
+            "src.main_app.db.services.pages.translate_type_service.db.session"
+        ) as mock_session:
+            # No row matches the title -> code path falls through to the
+            # INSERT branch where commit() raises.
+            mock_session.query.return_value.filter.return_value.first.return_value = None
+            mock_session.commit.side_effect = Exception("boom")
+            ok = upsert(None, "Fail", lead=1, full=0)
+            assert ok is False
+            mock_session.rollback.assert_called_once()

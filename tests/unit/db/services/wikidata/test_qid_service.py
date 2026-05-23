@@ -130,3 +130,163 @@ class TestGetTitleToQid:
     def test_handles_empty_qid(self, monkeypatch):
         """Test that get_title_to_qid handles empty QID values."""
         pass
+
+
+
+# ---------------------------------------------------------------------------
+# Tests for new service functions added with admin/qids work:
+#   - list_qids(dis=)  (empty / duplicate filters)
+#   - get_by_qid(qid)
+#   - get_by_title(title)
+#   - insert(title, qid)
+#   - update(qid_id, title, qid)
+# ---------------------------------------------------------------------------
+
+from src.main_app.db.services.wikidata.qid_service import (
+    get_by_qid,
+    get_by_title,
+    insert,
+    update,
+)
+from src.main_app.shared.core.extensions import db as _db
+
+
+def _add_with_empty_qid(title: str) -> QidRecord:
+    """Insert a row with an empty qid column (model __init__ rejects ``""``)."""
+    record = add_qid(title, "Q999")
+    record.qid = ""
+    _db.session.commit()
+    return record
+
+
+class TestListQidsByDis:
+    """Tests for the ``dis`` filter on list_qids."""
+
+    def test_dis_all_returns_every_row(self, monkeypatch):
+        add_qid("A", "Q1")
+        add_qid("B", "Q2")
+        rows = list_qids(dis="all")
+        titles = {r.title for r in rows}
+        assert {"A", "B"}.issubset(titles)
+
+    def test_dis_empty_returns_only_rows_with_empty_or_null_qid(self, monkeypatch):
+        add_qid("Has_qid", "Q1")
+        _add_with_empty_qid("Missing_qid")
+        rows = list_qids(dis="empty")
+        titles = {r.title for r in rows}
+        assert titles == {"Missing_qid"}
+
+    def test_dis_duplicate_returns_rows_sharing_qid(self, monkeypatch):
+        # ``qids.title`` is UNIQUE, but ``qid`` is not -> two rows can share
+        # the same Q-id and that's exactly what the duplicate filter surfaces.
+        add_qid("First_title", "Q42")
+        add_qid("Second_title", "Q42")
+        add_qid("Solo_title", "Q43")
+        rows = list_qids(dis="duplicate")
+        titles = {r.title for r in rows}
+        assert "First_title" in titles
+        assert "Second_title" in titles
+        assert "Solo_title" not in titles
+
+    def test_dis_default_is_all(self, monkeypatch):
+        add_qid("Anything", "Q1")
+        assert len(list_qids()) == 1
+
+
+class TestGetByQid:
+    """Tests for get_by_qid."""
+
+    def test_returns_record_when_qid_exists(self, monkeypatch):
+        add_qid("Some_title", "Q100")
+        record = get_by_qid("Q100")
+        assert record is not None
+        assert record.title == "Some_title"
+
+    def test_returns_none_when_qid_missing(self, monkeypatch):
+        assert get_by_qid("Q9999") is None
+
+    def test_returns_none_when_qid_is_empty_string(self, monkeypatch):
+        assert get_by_qid("") is None
+
+
+class TestGetByTitle:
+    """Tests for get_by_title."""
+
+    def test_returns_record_when_title_exists(self, monkeypatch):
+        add_qid("Findable", "Q200")
+        record = get_by_title("Findable")
+        assert record is not None
+        assert record.qid == "Q200"
+
+    def test_returns_none_when_title_missing(self, monkeypatch):
+        assert get_by_title("Ghost") is None
+
+    def test_returns_none_when_title_is_empty_string(self, monkeypatch):
+        assert get_by_title("") is None
+
+
+class TestInsert:
+    """Tests for the insert helper used by the admin/qids POST handler."""
+
+    def test_inserts_new_row(self, monkeypatch):
+        ok = insert("Brand_new", "Q300")
+        assert ok is True
+        rows = list_qids()
+        assert any(r.title == "Brand_new" and r.qid == "Q300" for r in rows)
+
+    def test_fills_empty_qid_for_existing_title(self, monkeypatch):
+        # Mirrors PHP "fill empty qid" follow-up after the INSERT-WHERE-NOT-EXISTS.
+        record = _add_with_empty_qid("Will_be_filled")
+        ok = insert("Will_be_filled", "Q301")
+        assert ok is True
+        _db.session.refresh(record)
+        assert record.qid == "Q301"
+
+    def test_does_not_overwrite_existing_non_empty_qid(self, monkeypatch):
+        record = add_qid("Already_set", "Q302")
+        ok = insert("Already_set", "Q303")
+        assert ok is True  # PHP returns success even when no-op.
+        _db.session.refresh(record)
+        assert record.qid == "Q302"  # not overwritten
+
+    def test_returns_false_when_title_or_qid_blank(self, monkeypatch):
+        assert insert("", "Q1") is False
+        assert insert("X", "") is False
+        assert insert("   ", "Q1") is False
+
+    def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
+        with patch("src.main_app.db.services.wikidata.qid_service.db.session") as mock_session:
+            mock_session.query.return_value.filter.return_value.first.return_value = None
+            mock_session.commit.side_effect = Exception("boom")
+            ok = insert("Will_fail", "Q1")
+            assert ok is False
+            mock_session.rollback.assert_called_once()
+
+
+class TestUpdate:
+    """Tests for the update helper used by the admin/qids POST handler."""
+
+    def test_updates_existing_row(self, monkeypatch):
+        record = add_qid("Old_title", "Q400")
+        ok = update(record.id, "New_title", "Q401")
+        assert ok is True
+        _db.session.refresh(record)
+        assert record.title == "New_title"
+        assert record.qid == "Q401"
+
+    def test_returns_false_when_id_missing(self, monkeypatch):
+        assert update(0, "T", "Q1") is False
+        assert update(99999, "T", "Q1") is False
+
+    def test_returns_false_when_title_or_qid_blank(self, monkeypatch):
+        record = add_qid("Solid", "Q500")
+        assert update(record.id, "", "Q1") is False
+        assert update(record.id, "T", "") is False
+
+    def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
+        with patch("src.main_app.db.services.wikidata.qid_service.db.session") as mock_session:
+            mock_session.commit.side_effect = Exception("boom")
+            mock_session.get.return_value = MagicMock()
+            ok = update(1, "T", "Q1")
+            assert ok is False
+            mock_session.rollback.assert_called_once()

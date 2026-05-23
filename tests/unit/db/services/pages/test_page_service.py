@@ -191,3 +191,114 @@ class TestInsertPageTarget:
 
             success = insert_page_target("Error", "t", "c", "l", "u", "t")
             assert success is False
+
+
+
+# ---------------------------------------------------------------------------
+# Tests for new service functions added with the admin/translated work:
+#   - list_translated(lang, limit, offset)
+#   - count_translated(lang)
+#   - get_by_id(page_id)
+# ---------------------------------------------------------------------------
+
+from src.main_app.db.services.pages.page_service import (
+    count_translated,
+    get_by_id,
+    list_translated,
+)
+
+
+def _make_page(title: str, lang: str, target: str, user: str = "u") -> PageRecord:
+    return add_page(
+        sourcetitle=title,
+        translate_type="lead",
+        cat="RTT",
+        lang=lang,
+        user=user,
+        target=target,
+    )
+
+
+class TestListTranslated:
+    """Tests for list_translated."""
+
+    def test_excludes_rows_with_empty_or_null_target(self, monkeypatch):
+        _make_page("Has_target", "en", "T1.html")
+        # Empty target row
+        empty = _make_page("Empty_target", "en", "x")
+        empty.target = ""
+        # NULL target row
+        null = _make_page("Null_target", "en", "x")
+        null.target = None
+        db.session.commit()
+
+        rows = list_translated(lang="All")
+        titles = {p.title for p in rows}
+        assert "Has_target" in titles
+        assert "Empty_target" not in titles
+        assert "Null_target" not in titles
+
+    def test_filters_by_lang(self, monkeypatch):
+        _make_page("English_page", "en", "E.html")
+        _make_page("French_page", "fr", "F.html")
+        rows = list_translated(lang="fr")
+        titles = {p.title for p in rows}
+        assert titles == {"French_page"}
+
+    def test_lang_all_returns_every_language(self, monkeypatch):
+        _make_page("English_page", "en", "E.html")
+        _make_page("French_page", "fr", "F.html")
+        rows = list_translated(lang="All")
+        titles = {p.title for p in rows}
+        assert titles == {"English_page", "French_page"}
+
+    def test_respects_limit_and_offset(self, monkeypatch):
+        for i in range(5):
+            _make_page(f"Page_{i}", "en", f"T_{i}.html")
+        rows = list_translated(lang="en", limit=2, offset=0)
+        assert len(rows) == 2
+        rows_offset = list_translated(lang="en", limit=2, offset=2)
+        assert len(rows_offset) == 2
+        # Offset should yield a different set.
+        first_ids = {p.id for p in rows}
+        offset_ids = {p.id for p in rows_offset}
+        assert first_ids.isdisjoint(offset_ids)
+
+    def test_returns_empty_when_no_translated_rows(self, monkeypatch):
+        assert list_translated(lang="All") == []
+
+
+class TestCountTranslated:
+    """Tests for count_translated."""
+
+    def test_counts_only_rows_with_target(self, monkeypatch):
+        _make_page("With_target", "en", "X.html")
+        empty = _make_page("Empty", "en", "x")
+        empty.target = ""
+        db.session.commit()
+
+        assert count_translated(lang="All") == 1
+
+    def test_counts_filtered_by_lang(self, monkeypatch):
+        _make_page("En1", "en", "E1.html")
+        _make_page("En2", "en", "E2.html")
+        _make_page("Fr1", "fr", "F1.html")
+        assert count_translated(lang="en") == 2
+        assert count_translated(lang="fr") == 1
+        assert count_translated(lang="All") == 3
+
+    def test_returns_zero_when_no_rows(self, monkeypatch):
+        assert count_translated(lang="All") == 0
+
+
+class TestGetById:
+    """Tests for get_by_id."""
+
+    def test_returns_record_when_found(self, monkeypatch):
+        p = _make_page("Findable", "en", "F.html")
+        result = get_by_id(p.id)
+        assert result is not None
+        assert result.title == "Findable"
+
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_by_id(99999) is None
