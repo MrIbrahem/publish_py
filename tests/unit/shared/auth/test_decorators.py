@@ -26,7 +26,6 @@ class TestOAuthRequired:
             consumer_key="test_key",
             consumer_secret="test_secret",
             encryption_key="test_encryption_key",
-            enabled=True,
         )
         # Patch the entire settings object, not just oauth
         monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
@@ -57,31 +56,6 @@ class TestOAuthRequired:
             consumer_key="test_key",
             consumer_secret="test_secret",
             encryption_key="test_encryption_key",
-            enabled=True,
-        )
-        monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
-
-        @oauth_required
-        def protected_view():
-            return "success"
-
-        with app.test_request_context():
-            result = protected_view()
-
-            assert result == "success"
-
-    def test_allows_access_when_oauth_disabled(self, app, monkeypatch):
-        """Test that decorator allows access when OAuth is disabled."""
-        from src.main_app.config import OAuthConfig
-
-        # Create a mock Settings object with OAuth disabled
-        mock_settings = MagicMock()
-        mock_settings.oauth = OAuthConfig(
-            mw_uri="https://test.com",
-            consumer_key="test_key",
-            consumer_secret="test_secret",
-            encryption_key="test_encryption_key",
-            enabled=False,
         )
         monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
 

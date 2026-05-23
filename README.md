@@ -42,10 +42,7 @@ Environment variables (see `src/example.env` for template):
 | `OAUTH_CONSUMER_KEY`    | Yes\*    | OAuth consumer key               |
 | `OAUTH_CONSUMER_SECRET` | Yes\*    | OAuth consumer secret            |
 | `OAUTH_ENCRYPTION_KEY`  | Yes\*    | Fernet encryption key for tokens |
-| `USE_MW_OAUTH`          | No       | Enable OAuth (default: true)     |
 | `CORS_ALLOWED_DOMAINS`  | No       | Comma-separated allowed domains  |
-
-\*Required when `USE_MW_OAUTH` is enabled
 
 ## REST API
 
