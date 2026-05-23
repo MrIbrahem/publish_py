@@ -51,13 +51,10 @@ def results_loader_2026(
     cat: str,
     tra_type: str,
     code_lang_name: str,
-    global_username: str,
     user_coord: bool,
     show_exists: bool,
     translation_button: str,
     full_tr_user: bool,
-    test: bool,
-    login_url: str,
 ) -> dict[str, Any]:
     """Build the results bundle for the index page.
 
@@ -93,10 +90,8 @@ def results_loader_2026(
         camp=camp,
         tra_type=tra_type,
         full_tr_user=full_tr_user,
-        global_username=global_username,
         nolead_titles=nolead_titles,
         full_titles=full_titles,
-        login_url=login_url,
     )
 
     inprocess_rows = _build_inprocess_rows(
@@ -106,7 +101,6 @@ def results_loader_2026(
         camp=camp,
         tra_btn=inprocess_button,
         full_tr_user=full_tr_user,
-        global_username=global_username,
         titles_infos=titles_infos,
         endpoint=endpoint,
     )
@@ -116,15 +110,11 @@ def results_loader_2026(
         langcode=code,
         cat=cat,
         camp=camp,
-        global_username=global_username,
         user_coord=user_coord,
         endpoint=endpoint,
     )
 
     debug = ""
-    if test:
-        debug = f"code:{code}<br>code_lang_name:{code_lang_name}<br>"
-
     return {
         "ix": bucket["ix"],
         "summary_count": len(bucket["missing"]),
@@ -137,14 +127,12 @@ def results_loader_2026(
         "exists_translated_before_count": exists_translated_before_count,
         "show_exists": show_exists,
         "translation_button": inprocess_button,
-        "test": test,
         "debug": debug,
         "code": code,
         "camp": camp,
         "cat": cat,
         "tra_type": tra_type or "lead",
         "code_lang_name": code_lang_name,
-        "global_username": global_username,
         "full_tr_user": full_tr_user,
     }
 
@@ -265,12 +253,6 @@ def _load_translate_type_sets() -> tuple[set[str], set[str]]:
 # Row builders
 # ---------------------------------------------------------------------------
 
-_LOGIN_BUTTON_TEMPLATE = (
-    "<a role='button' class='btn btn-outline-primary' href=\"{login_url}\">"
-    "<i class='fas fa-sign-in-alt fa-sm fa-fw mr-1'></i>"
-    "<span class='navtitles'>Login</span></a>"
-)
-
 
 def _is_video(title: str) -> bool:
     return title.lower().startswith("video:")
@@ -300,14 +282,10 @@ def _missing_translate_html(
     tra_type: str,
     words: int,
     full_tr_user: bool,
-    global_username: str,
     is_video_title: bool,
-    login_url: str,
 ) -> str:
     """Mirror PHP ``_make_one_row_results`` — translate column HTML."""
     # logic from results_table.php — anonymous user
-    if not global_username:
-        return _LOGIN_BUTTON_TEMPLATE.format(login_url=login_url)
 
     full_url = tr_link_medwiki(title, langcode, cat, camp, "all", words)
     lead_url = tr_link_medwiki(title, langcode, cat, camp, tra_type, words)
@@ -334,8 +312,6 @@ def _make_missing_row_dict(
     cat: str,
     camp: str,
     full_tr_user: bool,
-    global_username: str,
-    login_url: str,
 ) -> dict[str, Any]:
     """Build one row dict for the Results table (PHP _make_one_row_results)."""
     is_video_title = _is_video(title)
@@ -350,9 +326,7 @@ def _make_missing_row_dict(
         tra_type=effective_tra_type,
         words=words,
         full_tr_user=full_tr_user,
-        global_username=global_username,
         is_video_title=is_video_title,
-        login_url=login_url,
     )
 
     # PHP "$cnt2 = $full && (substr != 'video:') ? '$cnt.Full' : $cnt"
@@ -380,10 +354,8 @@ def _build_missing_rows(
     camp: str,
     tra_type: str,
     full_tr_user: bool,
-    global_username: str,
     nolead_titles: set[str],
     full_titles: set[str],
-    login_url: str,
 ) -> list[dict[str, Any]]:
     """Mirror of PHP ``make_results_table_2026``."""
     do_full = (tra_type or "lead") != "all"
@@ -417,8 +389,6 @@ def _build_missing_rows(
             cat=cat,
             camp=camp,
             full_tr_user=full_tr_user,
-            global_username=global_username,
-            login_url=login_url,
         )
 
         # PHP: "if (!$do_full || $full_tr_user) { emit and continue; }"
@@ -449,8 +419,6 @@ def _build_missing_rows(
                     cat=cat,
                     camp=camp,
                     full_tr_user=full_tr_user,
-                    global_username=global_username,
-                    login_url=login_url,
                 )
             )
 
@@ -473,9 +441,7 @@ def _inprocess_translate_html(
     camp: str,
     words: int,
     tra_btn: str,
-    global_username: str,
     full_tr_user: bool,
-    user_no_as_global: bool,
     is_video_title: bool,
     endpoint: str,
 ) -> str:
@@ -486,8 +452,6 @@ def _inprocess_translate_html(
     renders blank).
     """
     if tra_btn != "1":
-        return ""
-    if not global_username:
         return ""
 
     effective_type = "all" if is_video_title else (tra_type or "lead")
@@ -502,10 +466,6 @@ def _inprocess_translate_html(
             f"<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
             "</div>"
         )
-
-    # PHP: if inprocess and tra_btn != 1 and user_no_as_global → tab=''. tra_btn=='1' here, so this is a no-op.
-    # The variable is referenced only to preserve the PHP signature for future parity.
-    _ = user_no_as_global
     return tab
 
 
@@ -531,7 +491,6 @@ def _build_inprocess_rows(
     camp: str,
     tra_btn: str,
     full_tr_user: bool,
-    global_username: str,
     titles_infos: dict[str, dict],
     endpoint: str,
 ) -> list[dict[str, Any]]:
@@ -554,7 +513,6 @@ def _build_inprocess_rows(
         words, refs, importance, en_views, qid = _row_metrics(title_data, tra_type or "lead")
 
         user = title_tab.get("user") or ""
-        user_no_as_global = user != global_username
 
         translate_html = _inprocess_translate_html(
             title=display_title,
@@ -564,9 +522,7 @@ def _build_inprocess_rows(
             camp=camp,
             words=words,
             tra_btn=tra_btn,
-            global_username=global_username,
             full_tr_user=full_tr_user,
-            user_no_as_global=user_no_as_global,
             is_video_title=is_video_title,
             endpoint=endpoint,
         )
@@ -604,7 +560,6 @@ def _build_exists_rows(
     langcode: str,
     cat: str,
     camp: str,
-    global_username: str,
     user_coord: bool,
     endpoint: str,
 ) -> tuple[list[dict[str, Any]], int, int]:
@@ -633,8 +588,8 @@ def _build_exists_rows(
         translated_html = wikipedia_link(target, langcode) if (target and via == "td") else ""
         translated_before_html = wikipedia_link(target, langcode) if (target and via != "td") else ""
 
-        # PHP: $tab is shown only when (!empty(global_username) && user_coord)
-        if global_username and user_coord:
+        # PHP: $tab is shown only when user_coord
+        if user_coord:
             translate_url = content_translation_url(display_title, langcode, cat, camp, "lead", endpoint)
             translate_html = (
                 "<div class='inline'>"
