@@ -1,51 +1,85 @@
 """Application configuration helpers."""
 
 from __future__ import annotations
+from sqlalchemy import URL
 
+from .classes import DbConfig
 import os
-from .config.main_settings import settings
+from .main_settings import settings
 
 
-def has_db_config() -> bool:
-    """Return True when database connection details are configured."""
-    return bool(settings.database_data.db_host)
+def build_sqlalchemy_uri(db_config: DbConfig) -> str:
+    """Build a SQLAlchemy database URI from a DbConfig dataclass.
+
+    Used by Flask-SQLAlchemy configuration in create_app().
+    Compatible with the existing build_db_url() in engine.py.
+    """
+    url = URL.create(
+        "mysql+pymysql",
+        username=db_config.db_user,
+        password=db_config.db_password,
+        host=db_config.db_host,
+        database=db_config.db_name,
+    ).render_as_string(hide_password=False)
+    return url
+
+
+def _resolve_db_uri() -> str:
+    """Return MySQL URI when DB is configured, sqlite in-memory otherwise."""
+    if settings.database_data.db_host or settings.database_data.db_user:
+        return build_sqlalchemy_uri(settings.database_data)
+    return "sqlite:///:memory:"
 
 
 class Config:
     """Base configuration class for Flask applications.
 
-    This class provides Flask-standard configuration attributes that can be
-    used with app.config.from_object(). It wraps the dataclass-based settings.
+    All attributes are class-level so ``app.config.from_object()`` can read them.
+    Values are pulled from the environment-based ``settings`` singleton at
+    module import time.
     """
 
     # Flask core settings
     DEBUG: bool = False
     TESTING: bool = False
-    SECRET_KEY: str | None = None
-    SECRET_KEY_FALLBACKS: list[str] | None = None
+    SECRET_KEY: str = settings.security.secret_key
+    SECRET_KEY_FALLBACKS: list[str] = list(settings.security.secret_key_fallbacks or [])
 
-    # Session cookie settings (populated from settings by default)
-    SESSION_COOKIE_HTTPONLY: bool = True
-    SESSION_COOKIE_SECURE: bool = True
-    SESSION_COOKIE_SAMESITE: str = "Lax"
+    # Session cookie settings
+    SESSION_COOKIE_HTTPONLY: bool = settings.cookie.httponly
+    SESSION_COOKIE_SECURE: bool = settings.cookie.secure
+    SESSION_COOKIE_SAMESITE: str = settings.cookie.samesite
 
     # CSRF protection settings
     WTF_CSRF_ENABLED: bool = True
-    WTF_CSRF_TIME_LIMIT: int | None = None  # None = tokens don't expire
-    WTF_CSRF_SSL_STRICT: bool = True
-    WTF_CSRF_CHECK_DEFAULT: bool = True  # default value
-    WTF_CSRF_FIELD_NAME: str = "csrf_token"  # default value
-    WTF_CSRF_HEADERS: list[str] = ["X-CSRFToken", "X-CSRF-Token"]  # default value
-    WTF_CSRF_METHODS: list[str] = ["POST", "PUT", "PATCH", "DELETE"]  # default value
-    # WTF_CSRF_SECRET_KEY: str = settings.secret_key # default value
+    # CSRF token lifetime (in seconds). Default 3600 (1 hour).
+    # None = tokens don't expire
+    WTF_CSRF_TIME_LIMIT: int | None = settings.csrf_time_limit
 
-    # Flask-SQLAlchemy settings
+    WTF_CSRF_SSL_STRICT: bool = True
+    WTF_CSRF_CHECK_DEFAULT: bool = True
+    WTF_CSRF_FIELD_NAME: str = "csrf_token"
+    WTF_CSRF_HEADERS: list[str] = ["X-CSRFToken", "X-CSRF-Token"]
+    WTF_CSRF_METHODS: list[str] = ["POST", "PUT", "PATCH", "DELETE"]
+    # WTF_CSRF_SECRET_KEY: str = settings.security.secret_key
+
+    # Flask 3.1+ security configurations
+
+    # Maximum form data in memory (default 16MB)
+    MAX_CONTENT_LENGTH: int | None = settings.security.max_content_length
+
+    # Maximum form data in memory in bytes (default 16MB)
+    MAX_FORM_MEMORY_SIZE: int = settings.security.max_form_memory_size
+
+    # Maximum number of form fields (default 1000)
+    MAX_FORM_PARTS: int = settings.security.max_form_parts
+
+    # Flask-SQLAlchemy
     SQLALCHEMY_DATABASE_URI: str | None = None
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ENGINE_OPTIONS: dict = {}
 
-    # Request handling
-    MAX_CONTENT_LENGTH: int | None = 16 * 1024 * 1024  # 16MB default
+    SQLALCHEMY_ECHO: bool = False
 
     def __init__(self) -> None:
         """Initialize configuration with values from environment-based settings."""
@@ -99,8 +133,8 @@ class DevelopmentConfig(Config):
 
     DEBUG: bool = True
     TESTING: bool = True
-    WTF_CSRF_ENABLED: bool = True
-    WTF_CSRF_SSL_STRICT: bool = True
+    SQLALCHEMY_ECHO: bool = True  # Log SQL in development
+
 
     # Production should always use secure cookies
     SESSION_COOKIE_SECURE: bool = True
@@ -111,11 +145,21 @@ class DevelopmentConfig(Config):
     CORS_DISABLED: bool = True
 
 
+class ProductionConfig(Config):
+    """Production configuration with strict security settings."""
+
+    # Production should always use secure cookies
+    SESSION_COOKIE_SECURE: bool = True
+    SESSION_COOKIE_HTTPONLY: bool = True
+    SESSION_COOKIE_SAMESITE: str = "Lax"
+
+    CORS_DISABLED: bool = False
+
+
 class TestingConfig(Config):
     """Testing configuration with CSRF disabled for easier form testing."""
 
-    # Prevent pytest from collecting this as a test class
-    __test__ = False
+    __test__ = False  # prevent pytest collection
 
     DEBUG: bool = False
     TESTING: bool = True
@@ -125,25 +169,9 @@ class TestingConfig(Config):
     # Use a fixed test secret key
     SECRET_KEY: str = "test-secret-key-not-for-production"
 
-    # Use SQLite in-memory for tests (no MySQL dependency)
-    SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
-    SQLALCHEMY_ENGINE_OPTIONS: dict = {}  # SQLite doesn't need MySQL options
-
     # Disable CORS for testing
     CORS_DISABLED: bool = True
 
-
-class ProductionConfig(Config):
-    """Production configuration with strict security settings."""
-
-    DEBUG: bool = False
-    TESTING: bool = False
-    WTF_CSRF_ENABLED: bool = True
-    WTF_CSRF_SSL_STRICT: bool = True
-
-    # Production should always use secure cookies
-    SESSION_COOKIE_SECURE: bool = True
-    SESSION_COOKIE_HTTPONLY: bool = True
-    SESSION_COOKIE_SAMESITE: str = "Lax"
-
-    CORS_DISABLED: bool = False
+    # Use SQLite in-memory for tests (no MySQL dependency)
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {}  # SQLite doesn't need MySQL options
