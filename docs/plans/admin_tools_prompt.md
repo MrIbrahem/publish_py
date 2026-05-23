@@ -39,14 +39,15 @@ Flask forms use flat names: `mdtitle`, `cat`, `type`, … parsed with `request.f
 
 ## Route Overview Table
 
-| Route                       | PHP source dir                                | Blueprint name           | Service(s)                          | DB table(s) touched                                                 | Has POST?                 |
-| --------------------------- | --------------------------------------------- | ------------------------ | ----------------------------------- | ------------------------------------------------------------------- | ------------------------- |
-| `admin/tt`                  | `coordinator/admin/tt/*.php`                  | `tt_bp`                  | `translate_type_service`            | `translate_type`, `qids` (read-only for new-title detection)        | **Yes** (insert/update)   |
-| `admin/translated`          | `coordinator/admin/translated/*.php`          | `translated_bp`          | `page_service`, `user_page_service` | `pages`, `pages_users`                                              | **Yes** (update + delete) |
-| `admin/qids`                | `coordinator/admin/qids/*.php`                | `qids_bp`                | `qid_service`                       | `qids`                                                              | **Yes** (insert/update)   |
-| `admin/qids_others`         | same `coordinator/admin/qids/*.php`           | `qids_others_bp`         | `qid_others_service`                | `qids_others`                                                       | **Yes** (insert/update)   |
-| `admin/pages_users_to_main` | `coordinator/admin/pages_users_to_main/*.php` | `pages_users_to_main_bp` | `pages_users_to_main_service`       | `pages_users`, `pages_users_to_main`, `pages` (write via add logic) | **Yes** (fix-it action)   |
-| `admin/stat`                | `coordinator/admin/stat/*.php`                | `stat_bp`                | _(none — direct DB reads)_          | `pages`, `pages_users` (read-only aggregates)                       | **No**                    |
+| Route                       | PHP source dir                                | Blueprint name           | Service(s)                    | DB table(s) touched                                                 | Has POST?                 |
+| --------------------------- | --------------------------------------------- | ------------------------ | ----------------------------- | ------------------------------------------------------------------- | ------------------------- |
+| `admin/tt`                  | `coordinator/admin/tt/*.php`                  | `tt_bp`                  | `translate_type_service`      | `translate_type`, `qids` (read-only for new-title detection)        | **Yes** (insert/update)   |
+| `admin/translated`          | `coordinator/admin/translated/*.php`          | `translated_bp`          | `page_service`                | `pages`                                                             | **Yes** (update + delete) |
+| `admin/translated_users`    | `coordinator/admin/translated/*.php`          | `translated_users_bp`    | `user_page_service`           | `pages_users`                                                       | **Yes** (update + delete) |
+| `admin/qids`                | `coordinator/admin/qids/*.php`                | `qids_bp`                | `qid_service`                 | `qids`                                                              | **Yes** (insert/update)   |
+| `admin/qids_others`         | same `coordinator/admin/qids/*.php`           | `qids_others_bp`         | `qid_others_service`          | `qids_others`                                                       | **Yes** (insert/update)   |
+| `admin/pages_users_to_main` | `coordinator/admin/pages_users_to_main/*.php` | `pages_users_to_main_bp` | `pages_users_to_main_service` | `pages_users`, `pages_users_to_main`, `pages` (write via add logic) | **Yes** (fix-it action)   |
+| `admin/stat`                | `coordinator/admin/stat/*.php`                | `stat_bp`                | _(none — direct DB reads)_    | `pages`, `pages_users` (read-only aggregates)                       | **No**                    |
 
 ---
 
@@ -107,60 +108,85 @@ Flask forms use flat names: `mdtitle`, `cat`, `type`, … parsed with `request.f
 
 ---
 
-### 2. `admin/translated` — Translated Pages
+### 2a. `admin/translated` — Translated Main Pages (`pages`)
 
 **File:** `src/main_app/admin/routes/translated.py`
 **Blueprint:** `translated_bp = Blueprint("translated", __name__, url_prefix="/translated")`
-**Services:** `page_service` (for `pages` table), `user_page_service` (for `pages_users` table)
+**Service:** `page_service`
+**DB table:** `pages`
 
 #### GET `/`
 
--   Query params: `lang` (default `"All"`), `table` (default `"pages"`; values: `"pages"` or `"pages_users"`), `page` (int, default 1), `limit` (int, default 500)
--   Select service based on `table`:
-    -   `table == "pages"` → `page_service.list_translated(lang, limit, offset)`
-    -   `table == "pages_users"` → `user_page_service.list_translated(lang, limit, offset)`
--   Also call the corresponding `count_translated(lang)` for pagination.
--   Render `admins/translated.html` with `rows`, `total_count`, `lang`, `table`, `page`, `limit`.
+-   Query params: `lang` (default `"All"`), `page` (int, default 1), `limit` (int, default 500)
+-   Call `page_service.list_translated(lang, limit, offset) → list[dict]`
+-   Call `page_service.count_translated(lang) → int` for pagination.
+-   Render `admins/translated.html` with `rows`, `total_count`, `lang`, `page`, `limit`.
 
 #### GET `/edit`
 
--   Query params: `id` (required), `table` (required: `"pages"` or `"pages_users"`)
--   Fetch single row from the appropriate service:
-    -   `page_service.get_by_id(id)` or `user_page_service.get_by_id(id)`
--   Render `admins/translated_edit.html` with `row`, `table`.
-    Fields: `title`, `target`, `lang`, `user`, `pupdate`, and a `delete` toggle.
+-   Query params: `id` (required)
+-   Call `page_service.get_by_id(id) → dict`
+-   Render `admins/translated_edit.html` with `row`.
+    Fields: `title`, `target`, `lang`, `user`, `pupdate`, and a `delete` toggle checkbox.
 
-#### POST `/edit` (equivalent of `translated/edit_page.php` POST)
+#### POST `/edit` (equivalent of `translated/edit_page.php` POST against `pages`)
 
 -   Form fields:
     -   `id` (required)
-    -   `table` (required: `"pages"` or `"pages_users"`)
     -   `delete` (optional checkbox, value = `id` — signals delete instead of update)
     -   `title`, `target`, `lang`, `user`, `pupdate` (required for update)
 -   Logic:
     ```
     if "delete" in request.form:
-        service.delete(id)
+        page_service.delete(id)
         flash("Page deleted.", "success")
     else:
-        service.update(id, title, target, lang, user, pupdate)
+        page_service.update(id, title, target, lang, user, pupdate)
         flash("Page updated.", "success")
-    redirect to url_for("admin.translated.translated_index", table=table)
+    redirect to url_for("admin.translated.translated_index")
     ```
--   PHP SQL (update): `UPDATE {table} SET title=?, target=?, lang=?, user=?, pupdate=? WHERE id=?`
--   PHP SQL (delete): `DELETE FROM {table} WHERE id=?`
+-   PHP SQL (update): `UPDATE pages SET title=?, target=?, lang=?, user=?, pupdate=? WHERE id=?`
+-   PHP SQL (delete): `DELETE FROM pages WHERE id=?`
 
-**Service methods needed:**
+**Service methods needed in `page_service`:**
 
-`page_service`:
-
--   `list_translated(lang, limit, offset) → list[dict]` — queries `pages` table
+-   `list_translated(lang, limit, offset) → list[dict]`
 -   `count_translated(lang) → int`
 -   `get_by_id(id) → dict`
 -   `update(id, title, target, lang, user, pupdate) → None`
 -   `delete(id) → None`
 
-`user_page_service` — identical interface, queries `pages_users` table.
+---
+
+### 2b. `admin/translated_users` — Translated User Pages (`pages_users`)
+
+**File:** `src/main_app/admin/routes/translated_users.py`
+**Blueprint:** `translated_users_bp = Blueprint("translated_users", __name__, url_prefix="/translated_users")`
+**Service:** `user_page_service`
+**DB table:** `pages_users`
+
+**Identical structure to `admin/translated`** — same three endpoints, same logic, same form fields —
+but all queries target `pages_users` instead of `pages`.
+
+Routes:
+
+-   `GET /` → `translated_users_index`
+-   `GET /edit` → `translated_users_edit`
+-   `POST /edit` → `translated_users_edit_post`
+
+Render templates: `admins/translated_users.html`, `admins/translated_users_edit.html`
+(can reuse the `translated` templates with a passed context variable if preferred).
+
+Redirect after POST → `url_for("admin.translated_users.translated_users_index")`.
+
+**Service methods needed in `user_page_service`:** identical interface to `page_service` above,
+querying `pages_users`:
+
+-   `list_translated(lang, limit, offset) → list[dict]`
+-   `count_translated(lang) → int`
+-   `get_by_id(id) → dict`
+-   `update(id, title, target, lang, user, pupdate) → None`
+-   `delete(id) → None`
 
 ---
 
@@ -342,10 +368,11 @@ Render templates: `admins/qids_others.html`, `admins/qids_others_edit.html`
 7. **`qids` vs `qids_others` split** — even though PHP used a single `?qid_table=` param,
    Flask has **two separate blueprints** at two separate URL prefixes. Do not merge them.
 
-8. **`translated` table split** — PHP used `?table=pages` / `?table=pages_users` on the
-   same PHP file. Flask keeps them on the **same blueprint** (`translated_bp`) but selects
-   the service dynamically based on the `table` query param / form field, since they share
-   identical behaviour and templates.
+8. **`translated` split** — PHP used `?table=pages` / `?table=pages_users` on the same PHP file.
+   Flask uses **two separate blueprints**: `translated_bp` (url_prefix `/translated`, queries `pages`)
+   and `translated_users_bp` (url_prefix `/translated_users`, queries `pages_users`).
+   Same pattern as the `qids` / `qids_others` split. Do **not** use a `table` query param to switch
+   between them in Flask.
 
 9. **Logging:** add `logger = logging.getLogger(__name__)` at the top of every route file.
 
@@ -355,10 +382,11 @@ Render templates: `admins/qids_others.html`, `admins/qids_others_edit.html`
 
 -   [ ] `tt.py` — GET `/`, GET `/edit`, POST `/`
 -   [ ] `translated.py` — GET `/`, GET `/edit`, POST `/edit`
+-   [ ] `translated_users.py` — GET `/`, GET `/edit`, POST `/edit`
 -   [ ] `qids.py` — GET `/`, GET `/edit`, POST `/`
 -   [ ] `qids_others.py` — GET `/`, GET `/edit`, POST `/`
 -   [ ] `pages_users_to_main.py` — GET `/`, GET `/fix_it`, POST `/fix_it`
 -   [ ] `stat.py` — GET `/` (stub)
 -   [ ] Service stubs: `translate_type_service`, `qid_service`, `qid_others_service`, `pages_users_to_main_service` (+ new methods on existing `page_service` / `user_page_service`)
 -   [ ] Templates for each route (index + edit/fix_it where applicable)
--   [ ] Blueprint registration in admin `__init__.py`
+-   [ ] Blueprint registration in admin `__init__.py` for all 7 blueprints
