@@ -18,13 +18,11 @@ class TestQidRecord:
             id=1,
             title="TestArticle",
             qid="Q12345",
-            add_date="2024-01-01 12:00:00",
         )
 
         assert record.id == 1
         assert record.title == "TestArticle"
         assert record.qid == "Q12345"
-        assert record.add_date == "2024-01-01 12:00:00"
 
     def test_to_dict_returns_correct_dict(self):
         """Test that to_dict returns the correct dictionary representation."""
@@ -32,7 +30,6 @@ class TestQidRecord:
             id=1,
             title="TestArticle",
             qid="Q12345",
-            add_date="2024-01-01 12:00:00",
         )
 
         result = record.to_dict()
@@ -41,7 +38,6 @@ class TestQidRecord:
             "id": 1,
             "title": "TestArticle",
             "qid": "Q12345",
-            "add_date": "2024-01-01 12:00:00",
         }
 
     def test_raises_error_when_title_is_empty(self):
@@ -51,7 +47,6 @@ class TestQidRecord:
                 id=1,
                 title="",
                 qid="Q12345",
-                add_date="2024-01-01 12:00:00",
             )
 
     def test_raises_error_when_qid_is_empty(self):
@@ -61,7 +56,6 @@ class TestQidRecord:
                 id=1,
                 title="TestArticle",
                 qid="",
-                add_date="2024-01-01 12:00:00",
             )
 
     def test_raises_error_when_qid_does_not_start_with_q(self):
@@ -71,7 +65,6 @@ class TestQidRecord:
                 id=1,
                 title="TestArticle",
                 qid="12345",
-                add_date="2024-01-01 12:00:00",
             )
 
     def test_raises_error_when_qid_has_no_digits(self):
@@ -81,7 +74,6 @@ class TestQidRecord:
                 id=1,
                 title="TestArticle",
                 qid="QABC",
-                add_date="2024-01-01 12:00:00",
             )
 
     def test_raises_error_when_qid_is_just_q(self):
@@ -91,7 +83,6 @@ class TestQidRecord:
                 id=1,
                 title="TestArticle",
                 qid="Q",
-                add_date="2024-01-01 12:00:00",
             )
 
     def test_accepts_valid_qid_with_large_number(self):
@@ -100,7 +91,6 @@ class TestQidRecord:
             id=1,
             title="TestArticle",
             qid="Q123456789",
-            add_date="2024-01-01 12:00:00",
         )
 
         assert record.qid == "Q123456789"
@@ -111,7 +101,6 @@ class TestQidRecord:
             id=1,
             title="TestArticle",
             qid="Q1",
-            add_date="2024-01-01 12:00:00",
         )
 
         assert record.qid == "Q1"

@@ -7,11 +7,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from sqlalchemy import func, text
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import text
 
 from ....shared.core.extensions import db
-from ...models import QidRecord
 
 logger = logging.getLogger(__name__)
 

@@ -13,7 +13,6 @@ class QidRecord(db.Model):
         id int unsigned NOT NULL AUTO_INCREMENT,
         qid varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        add_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE KEY title (title),
         KEY qid (qid)
@@ -25,7 +24,39 @@ class QidRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     qid = db.Column(db.String(20), nullable=False)
     title = db.Column(db.String(255), unique=True, nullable=False)
-    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Validate that required fields are not empty
+        if not self.title:
+            raise ValueError("Title cannot be empty")
+
+        if not self.qid:
+            raise ValueError("QID cannot be empty")
+
+        # Validate QID format (should start with Q followed by digits)
+        if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
+            raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
+
+
+class QidOthersRecord(db.Model):
+    """
+    CREATE TABLE IF NOT EXISTS qids_others (
+        id int unsigned NOT NULL AUTO_INCREMENT,
+        qid varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+        title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY title (title),
+        KEY qid (qid)
+    )
+    """
+
+    __tablename__ = "qids_others"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    qid = db.Column(db.String(20), nullable=False)
+    title = db.Column(db.String(255), unique=True, nullable=False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
