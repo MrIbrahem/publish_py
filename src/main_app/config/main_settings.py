@@ -13,12 +13,12 @@ from .classes import (
     Paths,
     CookieConfig,
     SessionConfig,
+    SecurityConfig,
     OAuthConfig,
     CorsConfig,
     UsersConfig,
     Settings,
 )
-
 
 # --- Helper Functions ---
 
@@ -51,6 +51,34 @@ def resolve_path(_path) -> Path:
 
 # --- Configuration Loaders ---
 
+def _load_security_config() -> SecurityConfig:
+    """
+    Load security configuration (Flask 3.1+ features)
+    """
+    # MAX_CONTENT_LENGTH: Maximum request size (default 16MB)
+    max_content_length = _env_int("MAX_CONTENT_LENGTH", 16 * 1024 * 1024)
+
+    # MAX_FORM_MEMORY_SIZE: Maximum form data in memory (default 16MB)
+    max_form_memory_size = _env_int("MAX_FORM_MEMORY_SIZE", 16 * 1024 * 1024)
+
+    # MAX_FORM_PARTS: Maximum number of form fields (default 1000)
+    max_form_parts = _env_int("MAX_FORM_PARTS", 1000)
+
+    # SECRET_KEY_FALLBACKS: Comma-separated list of fallback secret keys for rotation
+    secret_key_fallbacks_str = os.getenv("SECRET_KEY_FALLBACKS", "")
+    secret_key_fallbacks = tuple(key.strip() for key in secret_key_fallbacks_str.split(",") if key.strip())
+
+    secret_key = os.getenv("FLASK_SECRET_KEY", "")
+
+    security_config = SecurityConfig(
+        secret_key=secret_key,
+        max_content_length=max_content_length,
+        max_form_memory_size=max_form_memory_size,
+        max_form_parts=max_form_parts,
+        secret_key_fallbacks=secret_key_fallbacks,
+    )
+    return security_config
+
 
 def _load_database_config() -> DbConfig:
     """
@@ -72,15 +100,10 @@ def _load_database_config() -> DbConfig:
     )
 
 
-def _load_oauth_config() -> Optional[OAuthConfig]:
+def _load_oauth_config() -> OAuthConfig:
     """
     Loads OAuth settings and validates them if enabled.
-    Returns None if USE_MW_OAUTH is disabled.
     """
-    mw_oauth_enabled = _env_bool("USE_MW_OAUTH", default=True)
-    if not mw_oauth_enabled:
-        return None
-
     mw_uri = os.getenv("OAUTH_MWURI", "")
     consumer_key = os.getenv("OAUTH_CONSUMER_KEY", "")
     consumer_secret = os.getenv("OAUTH_CONSUMER_SECRET", "")
@@ -93,14 +116,14 @@ def _load_oauth_config() -> Optional[OAuthConfig]:
         )
 
     if not encryption_key:
-        raise RuntimeError("OAUTH_ENCRYPTION_KEY is required when USE_MW_OAUTH is enabled")
+        raise RuntimeError("OAUTH_ENCRYPTION_KEY environment variable is required")
 
     return OAuthConfig(
         mw_uri=mw_uri,
         consumer_key=consumer_key,
         consumer_secret=consumer_secret,
         encryption_key=encryption_key,
-        enabled=mw_oauth_enabled,
+        enabled=True,
     )
 
 
@@ -176,13 +199,29 @@ def get_settings() -> Settings:
     if not secret_key:
         raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
 
-    # Load and organize sub-configs
-    cookie = load_cookie_config()
-
     sessions = SessionConfig(
         state_key=os.getenv("STATE_SESSION_KEY", "oauth_state_nonce"),
         request_token_key=os.getenv("REQUEST_TOKEN_SESSION_KEY", "state"),
     )
+    security_config = _load_security_config()
+
+    if not security_config.secret_key:
+        raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
+
+    oauth_config = _load_oauth_config()
+
+    if oauth_config is None:
+        raise RuntimeError(
+            "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
+        )
+
+    cookie_config = load_cookie_config()
+
+    # CSRF token lifetime (in seconds). Default 3600 (1 hour).
+    # Set to 0 or None to disable expiration (not recommended for production).
+    csrf_time_limit = _env_int("WTF_CSRF_TIME_LIMIT", 3600)
+    if not csrf_time_limit or csrf_time_limit <= 0:
+        csrf_time_limit = 3600
 
     # Load User Mappings
     special_users = load_special_users()
@@ -206,7 +245,12 @@ def get_settings() -> Settings:
     revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
     wikidata_domain = os.getenv("WIKIDATA_DOMAIN") or "www.wikidata.org"
 
-    user_agent = os.getenv("USER_AGENT", "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)")
+    database_data = _load_database_config()
+
+    user_agent = os.getenv(
+        "USER_AGENT",
+        "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)",
+    )
     publish_secret_code = os.getenv("PUBLISH_SECRET_CODE", "")
 
     return Settings(
@@ -216,11 +260,13 @@ def get_settings() -> Settings:
         revids_api_url=revids_api_url,
         wikidata_domain=wikidata_domain,
         is_localhost=is_localhost,
-        database_data=_load_database_config(),
         paths=_get_paths(),
-        cookie=cookie,
+        database_data=database_data,
+        cookie=cookie_config,
+        oauth=oauth_config,
+        security=security_config,
         sessions=sessions,
-        oauth=_load_oauth_config(),
+        csrf_time_limit=csrf_time_limit,
         cors=cors_config,
         users=users_config,
     )
