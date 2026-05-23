@@ -30,7 +30,7 @@ def prepare_log_file(log_file: str | None, project_logger: logging.Logger) -> Pa
 
 def setup_logging(
     level: str = "WARNING",
-    name: str = "svg_translate_web",
+    name: str = "",
     log_file: str | None = None,
     error_log_file: str | None = None,
 ) -> None:
@@ -39,10 +39,11 @@ def setup_logging(
     """
     project_logger = logging.getLogger(name)
 
+    numeric_level = getattr(logging, level.upper(), logging.INFO) if isinstance(level, str) else level
+
     if project_logger.handlers:
         return
 
-    numeric_level = getattr(logging, level.upper(), logging.INFO) if isinstance(level, str) else level
     project_logger.setLevel(numeric_level)
     project_logger.propagate = False
 
