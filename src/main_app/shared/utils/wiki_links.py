@@ -28,8 +28,8 @@ from urllib.parse import quote, urlencode
 
 # Mirrors PHP make_ContentTranslation_url's default. The setting key
 # `use_mdwikicx` (read by `_get_endpoint`) flips this to mdwikicx.
-_DEFAULT_ENDPOINT = "https://medwiki.toolforge.org/index.php"
-_MDWIKICX_ENDPOINT = "https://mdwikicx.toolforge.org/index.php"
+_DEFAULT_ENDPOINT = "https://medwiki.toolforge.org/w/index.php"
+_MDWIKICX_ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
 
 
 def _php_rawurlencode(value: str) -> str:
@@ -161,7 +161,7 @@ def get_endpoint() -> str:
         return _DEFAULT_ENDPOINT
 
     raw = (record.value or "").strip().lower()
-    truthy = raw in ("1", "true", "yes", "on")
+    truthy = raw == "1"
     return _MDWIKICX_ENDPOINT if truthy else _DEFAULT_ENDPOINT
 
 

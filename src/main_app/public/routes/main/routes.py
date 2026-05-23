@@ -63,7 +63,7 @@ def _setting_value(key: str, default: str = "") -> str:
         return default
     if record is None or record.value is None:
         return default
-    return str(record.value)
+    return record.value
 
 
 def _normalize_arg(name: str) -> str:

@@ -19,7 +19,7 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
         tuple of (parsed_value, success)
     """
     if v_type == "boolean":
-        return raw_val == "on", True
+        return 1 if raw_val == "on" else 0, True
     elif v_type == "integer":
         try:
             return int(raw_val), True
@@ -67,7 +67,7 @@ class SettingsRoutes:
                 return redirect(url_for("admin.settings.dashboard"))
 
             if value_type == "boolean":
-                value = False
+                value = 0  # equal to False
             elif value_type == "integer":
                 value = 0
             elif value_type == "json":
