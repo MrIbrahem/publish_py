@@ -13,6 +13,7 @@ from flask.typing import ResponseReturnValue
 from ...db.services.content.lang_service import list_langs
 from ...db.services.pages import pages_users_to_main_service
 from ...db.services.pages.page_service import add_translate_row_to_db
+from ...shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -123,6 +124,19 @@ def pages_users_to_main_fix_it_post() -> ResponseReturnValue:
 
     if not added:
         flash("Failed to add translations.", "danger")
+        return redirect_to
+
+    # ``add_translate_row_to_db`` only commits on the INSERT branch; when it
+    # updates an existing row the change stays pending in the session. If the
+    # later ``delete_user_page`` call rolls the session back, that pending
+    # update would silently disappear even though we just flashed success.
+    # Force the commit here so the flash matches what is actually persisted.
+    try:
+        db.session.commit()
+    except Exception:
+        logger.exception("Failed to commit add_translate_row_to_db for id=%r", page_id)
+        db.session.rollback()
+        flash("Failed to persist translations.", "danger")
         return redirect_to
 
     flash("Translations added successfully.", "success")
