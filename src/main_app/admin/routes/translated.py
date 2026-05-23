@@ -15,6 +15,7 @@ from flask.typing import ResponseReturnValue
 
 from ...db.services.content.lang_service import list_langs
 from ...db.services.pages import page_service
+from ...shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ def translated_edit_post() -> ResponseReturnValue:
         return redirect(url_for("admin.translated.translated_index"))
 
     try:
-        page_service.update_page(
+        row = page_service.update_page(
             page_id=page_id,
             title=title,
             target=target,
@@ -113,11 +114,8 @@ def translated_edit_post() -> ResponseReturnValue:
             user=user,
         )
         # pupdate is a separate column not handled by update_page's positional args
-        row = page_service.get_by_id(page_id)
         if row is not None:
             row.pupdate = pupdate
-            from ...shared.core.extensions import db
-
             db.session.commit()
         flash(f"Page id {page_id} updated.", "success")
     except Exception:
