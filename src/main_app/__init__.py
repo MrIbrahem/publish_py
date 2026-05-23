@@ -32,6 +32,7 @@ from .db import init_db
 
 logger = logging.getLogger(__name__)
 
+
 def context_data() -> dict[str, Any]:
     """
     used in @app.context_processor
@@ -42,7 +43,6 @@ def context_data() -> dict[str, Any]:
         "is_authenticated": user is not None,
         "is_admin": bool(user and user.username in active_coordinators()),
         "username": user.username if user else None,
-        "oauth_enabled": bool(settings.oauth),
     }
 
 
@@ -101,9 +101,6 @@ def create_app(config_class: Type | None = None) -> Flask:
             SESSION_COOKIE_SAMESITE=settings.cookie.samesite,
         )
 
-    oauth_enabled = settings.oauth and settings.oauth.enabled
-    app.config["USE_MW_OAUTH"] = oauth_enabled
-
     # Initialize CSRF protection
     csrf_init_app(app)
 
@@ -115,7 +112,7 @@ def create_app(config_class: Type | None = None) -> Flask:
         # Create database tables and views if they don't exist
         init_db(app, _db)
 
-    # if oauth_enabled and settings.database_data.db_host:
+    # if settings.database_data.db_host:
         # db_url = build_db_url(settings.database_data.to_dict())
 
     app.register_blueprint(bp_main)
@@ -133,7 +130,6 @@ def create_app(config_class: Type | None = None) -> Flask:
     def _inject_data():  # pragma: no cover - trivial wrapper
         return context_data()
 
-    app.jinja_env.globals.setdefault("USE_MW_OAUTH", oauth_enabled)
     app.jinja_env.filters["format_stage_timestamp"] = format_stage_timestamp
 
     # @app.teardown_appcontext
