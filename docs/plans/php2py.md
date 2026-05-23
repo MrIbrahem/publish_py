@@ -1071,7 +1071,7 @@ class OAuthConfig:
     allowed_cors_domains: list[str]  # For CORS validation
 
 # Update _load_oauth_config
-def _load_oauth_config() -> Optional[OAuthConfig]:
+def _load_oauth_config() -> OAuthConfig:
     mw_uri = os.getenv("OAUTH_MWURI")
     consumer_key = os.getenv("OAUTH_CONSUMER_KEY")
     consumer_secret = os.getenv("OAUTH_CONSUMER_SECRET")
