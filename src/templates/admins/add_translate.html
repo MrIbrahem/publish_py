@@ -34,32 +34,32 @@
                         <tr id="row_1">
                             <td data-order="1" data-content="#">1</td>
                             <td data-content="Mdwiki Title">
-                                <input class="form-control mdtitles" size="15" name="rows[1][mdtitle]" required />
+                                <input class="form-control mdtitles" size="15" name="mdtitle" required />
                             </td>
                             <td data-content="Campaign">
-                                <select class="form-select catsoptions" name="rows[1][cat]" data-bs-theme="auto">
+                                <select class="form-select catsoptions" name="cat" data-bs-theme="auto">
                                     {% for cat in categories %}
                                     <option value="{{ cat.category }}">{{ cat.campaign }}</option>
                                     {% endfor %}
                                 </select>
                             </td>
                             <td data-content="Type">
-                                <select name="rows[1][type]" class="form-select w-100" data-bs-theme="auto">
+                                <select name="type" class="form-select w-100" data-bs-theme="auto">
                                     <option value="lead">Lead</option>
                                     <option value="all">All</option>
                                 </select>
                             </td>
                             <td data-content="User">
-                                <input class="form-control td_user_input" size="10" name="rows[1][user]" required />
+                                <input class="form-control td_user_input" size="10" name="user" required />
                             </td>
                             <td data-content="Lang.">
-                                <input class="form-control lang_input" size="2" name="rows[1][lang]" required />
+                                <input class="form-control lang_input" size="2" name="lang" required />
                             </td>
                             <td data-content="Target">
-                                <input class="form-control" size="20" name="rows[1][target]" />
+                                <input class="form-control" size="20" name="target" />
                             </td>
                             <td data-content="Published">
-                                <input class="form-control" size="10" name="rows[1][pupdate]" placeholder="YYYY-MM-DD" />
+                                <input class="form-control" size="10" name="pupdate" placeholder="YYYY-MM-DD" />
                             </td>
                             <td data-content="Delete">
                                 <div class="">

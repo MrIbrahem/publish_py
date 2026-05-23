@@ -26,43 +26,31 @@ def add_translate() -> str:
 @add_bp.route("/", methods=["POST"])
 def add_translate_post() -> ResponseReturnValue:
     """Process the add_translate form submission."""
-    form_data = request.form.to_dict(flat=False)
-    rows = form_data.get("rows", {})
+    titles = request.form.getlist("mdtitle")
+    cats = request.form.getlist("cat")
+    types = request.form.getlist("type")
+    users = request.form.getlist("user")
+    langs = request.form.getlist("lang")
+    targets = request.form.getlist("target")
+    pupdates = request.form.getlist("pupdate")
 
-    if not rows:
+    if not titles:
         flash("No translation data submitted.", "danger")
-        logger.warning("form_data")
-        logger.warning(form_data)
         return redirect(url_for("admin.add.add_translate"))
 
     texts: list[str] = []
     errors: list[str] = []
 
-    for _idx, row in rows.items():
-        mdtitle = (row.get("mdtitle") or "").strip()
-        if isinstance(mdtitle, list):
-            mdtitle = mdtitle[0] if mdtitle else ""
-        cat = (row.get("cat") or "").strip()
-        if isinstance(cat, list):
-            cat = cat[0] if cat else ""
-        translate_type = (row.get("type") or "").strip()
-        if isinstance(translate_type, list):
-            translate_type = translate_type[0] if translate_type else ""
-        user = (row.get("user") or "").strip()
-        if isinstance(user, list):
-            user = user[0] if user else ""
-        lang = (row.get("lang") or "").strip()
-        if isinstance(lang, list):
-            lang = lang[0] if lang else ""
-        target = (row.get("target") or "").strip()
-        if isinstance(target, list):
-            target = target[0] if target else ""
-        pupdate = (row.get("pupdate") or "").strip()
-        if isinstance(pupdate, list):
-            pupdate = pupdate[0] if pupdate else ""
+    for i in range(len(titles)):
+        mdtitle = titles[i].strip()
+        cat = cats[i].strip() if i < len(cats) else ""
+        translate_type = types[i].strip() if i < len(types) else ""
+        user = users[i].strip() if i < len(users) else ""
+        lang = langs[i].strip() if i < len(langs) else ""
+        target = targets[i].strip() if i < len(targets) else ""
+        pupdate = pupdates[i].strip() if i < len(pupdates) else ""
 
         if not mdtitle or not lang or not user:
-            errors.append("Failed to add translations. Missing required fields.")
             continue
 
         try:

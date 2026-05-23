@@ -1,42 +1,42 @@
 let UrlDone = [];
 
 function add_data(ix, value, code) {
-    $(`input[name="rows[${ix}][${code}]"]`).val(value);
+    $(`#row_${ix} [name="${code}"]`).val(value);
 }
 function delete_row($row_id) {
     $(`#row_${$row_id}`).remove();
 }
 
 async function add_new_row() {
-    const options = $('.catsoptions').html();
+    const options = $('.catsoptions').first().html();
     const ii = $('#tab_data > tr').length + 1;
 
     const row = `
         <tr id="row_${ii}">
             <td data-order='${ii}' data-content='#'>${ii}</td>
             <td data-content="mdwiki title">
-                <input class="form-control mdtitles" size="15" name="rows[${ii}][mdtitle]" required />
+                <input class="form-control mdtitles" size="15" name="mdtitle" required />
             </td>
             <td data-content="Campaign">
-                <select class="form-select" name="rows[${ii}][cat]">${options}</select>
+                <select class="form-select" name="cat">${options}</select>
             </td>
             <td data-content="Type">
-                <select name="rows[${ii}][type]" class="form-select">
+                <select name="type" class="form-select">
                     <option value="lead">Lead</option>
                     <option value="all">All</option>
                 </select>
             </td>
             <td data-content="User">
-                <input class="form-control td_user_input" size="10" name="rows[${ii}][user]" required />
+                <input class="form-control td_user_input" size="10" name="user" required />
             </td>
             <td data-content="Language">
-                <input class="form-control lang_input" size="2" name="rows[${ii}][lang]" required />
+                <input class="form-control lang_input" size="2" name="lang" required />
             </td>
             <td data-content="Wiki title">
-                <input class="form-control" size="20" name="rows[${ii}][target]" required />
+                <input class="form-control" size="20" name="target" required />
             </td>
             <td data-content="Published">
-                <input class="form-control" size="10" name="rows[${ii}][pupdate]" placeholder='YYYY-MM-DD' required />
+                <input class="form-control" size="10" name="pupdate" placeholder='YYYY-MM-DD' required />
             </td>
             <td data-content="Delete">
                 <div id="delete_${ii}">
