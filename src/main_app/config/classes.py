@@ -59,7 +59,7 @@ class OAuthConfig:
     mw_uri: str
     consumer_key: str
     consumer_secret: str
-    encryption_key: Optional[str]
+    encryption_key: str | None
     enabled: bool = True
 
 
@@ -93,7 +93,6 @@ class Settings:
     """Main settings container."""
 
     publish_secret_code: str
-    secret_key: str
     user_agent: str
     revids_api_url: str
     wikidata_domain: str
@@ -104,10 +103,12 @@ class Settings:
     paths: Paths
     cookie: CookieConfig
     sessions: SessionConfig
-    oauth: Optional[OAuthConfig]
+    oauth: OAuthConfig
     cors: CorsConfig
     security: SecurityConfig
     users: UsersConfig
+
+    csrf_time_limit: int | None  # None means never expire
 
 
 __all__ = [
@@ -117,6 +118,6 @@ __all__ = [
     "SessionConfig",
     "OAuthConfig",
     "CorsConfig",
-    "UsersConfig",
     "Settings",
+    "UsersConfig",
 ]
