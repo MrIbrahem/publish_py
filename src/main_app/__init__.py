@@ -15,6 +15,7 @@ from .admin.routes.admin import (
     bp_admin,
 )
 from .config import settings
+from .db import init_db
 from .db.services.users.coordinator_service import active_coordinators
 from .public.routes import (
     bp_api,
@@ -27,8 +28,9 @@ from .public.routes import (
 )
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
-from .shared.core.extensions import csrf_exempt, csrf_init_app, db as _db, migrate
-from .db import init_db
+from .shared.core.extensions import csrf_exempt, csrf_init_app
+from .shared.core.extensions import db as _db
+from .shared.core.extensions import migrate
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +115,7 @@ def create_app(config_class: Type | None = None) -> Flask:
         init_db(app, _db)
 
     # if settings.database_data.db_host:
-        # db_url = build_db_url(settings.database_data.to_dict())
+    # db_url = build_db_url(settings.database_data.to_dict())
 
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_leaderboard)

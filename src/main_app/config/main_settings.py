@@ -9,15 +9,15 @@ from pathlib import Path
 from typing import Optional
 
 from .classes import (
-    DbConfig,
-    Paths,
     CookieConfig,
-    SessionConfig,
-    SecurityConfig,
-    OAuthConfig,
     CorsConfig,
-    UsersConfig,
+    DbConfig,
+    OAuthConfig,
+    Paths,
+    SecurityConfig,
+    SessionConfig,
     Settings,
+    UsersConfig,
 )
 
 # --- Helper Functions ---
@@ -50,6 +50,7 @@ def resolve_path(_path) -> Path:
 
 
 # --- Configuration Loaders ---
+
 
 def _load_security_config() -> SecurityConfig:
     """
