@@ -60,7 +60,6 @@ class OAuthConfig:
     consumer_key: str
     consumer_secret: str
     encryption_key: str | None
-    enabled: bool = True
 
 
 @dataclass(frozen=True)

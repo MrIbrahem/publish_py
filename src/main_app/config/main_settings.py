@@ -124,7 +124,6 @@ def _load_oauth_config() -> OAuthConfig:
         consumer_key=consumer_key,
         consumer_secret=consumer_secret,
         encryption_key=encryption_key,
-        enabled=True,
     )
 
 
