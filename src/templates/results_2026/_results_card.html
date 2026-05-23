@@ -1,0 +1,59 @@
+{# Orchestrator partial — port of src/backend/results_2026/index.php (Results_tables_2026 + card_result). #}
+{# `results` is the bundle returned by results_loader_2026(). #}
+
+{% if results.debug %}
+<div class="text-muted small">{{ results.debug|safe }}</div>
+{% endif %}
+
+{# logic from results_2026/index.php — Results card (always rendered when bundle is present). #}
+<br>
+<div class="card">
+    <div class="card-header">
+        <span class="card-title h5">Results: ({{ results.summary_count }}{% if results.test %}test:{% endif %})</span>
+        <span>{{ results.ix|safe }}</span>
+        <div class="card-tools">
+            <button type="button" class="btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body1 card2">
+        {% include "results_2026/_results_table.html" %}
+    </div>
+</div>
+
+{# logic from results_2026/index.php — In-process card (rendered when count > 0). #}
+{% if results.inprocess_count > 0 %}
+<br>
+<div class="card">
+    <div class="card-header">
+        <span class="card-title h5">In process: ({{ results.inprocess_count }})</span>
+        <div class="card-tools">
+            <button type="button" class="btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body1 card2">
+        {% include "results_2026/_inprocess_table.html" %}
+    </div>
+</div>
+{% endif %}
+
+{# logic from results_2026/index.php — Exists card (count > 1 AND show_exists, matching PHP). #}
+{% if results.show_exists and results.exists_count > 1 %}
+<br>
+<div class="card">
+    <div class="card-header">
+        <span class="card-title h5">Exists: ({{ results.exists_count }})</span>
+        <div class="card-tools">
+            <button type="button" class="btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body1 card2">
+        {% include "results_2026/_exists_table.html" %}
+    </div>
+</div>
+{% endif %}

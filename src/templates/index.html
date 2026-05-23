@@ -88,6 +88,13 @@
         </div>
     </div>
 </div>
+
+{# Results section — populated when results_loader_2026() returned a bundle. #}
+{% if results %}
+<div class="container-fluid">
+    {% include "results_2026/_results_card.html" %}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}

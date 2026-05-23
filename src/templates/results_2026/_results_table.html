@@ -1,0 +1,45 @@
+{# Missing-titles table — port of src/backend/results_2026/results_table.php #}
+{# Header markup mirrors src/frontend/results_rows/results_table_html.php (make_table_start with inprocess=false). #}
+<table class="table compact table-striped table_100 table_text_left display table_responsive_main">
+    <thead>
+        <tr>
+            <th class="num">#</th>
+            <th class="spannowrap" style="text-align: center">Title</th>
+            <th><span>Translate</span></th>
+            <th class="spannowrap" style="text-align: center">
+                <span data-bs-toggle="tooltip"
+                    data-bs-title="Page views in last month in English Wikipedia">Views</span>
+            </th>
+            <th class="spannowrap" style="text-align: center">
+                <span data-bs-toggle="tooltip"
+                    data-bs-title="Page importance from medicine project in English Wikipedia">Importance</span>
+            </th>
+            <th class="spannowrap" style="text-align: center">
+                <span data-bs-toggle="tooltip" data-bs-title="Number of words of the article in mdwiki.org">Words</span>
+            </th>
+            <th class="spannowrap" style="text-align: center">
+                <span data-bs-toggle="tooltip"
+                    data-bs-title="Number of references of the article in mdwiki.org">Refs.</span>
+            </th>
+            <th class="spannowrap" style="text-align: center">
+                <span data-bs-toggle="tooltip" data-bs-title="Wikidata identifier">Qid</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in results.missing_rows %}
+        <tr>
+            <th class="num" scope="row">{{ row.n }}</th>
+            <td class="link_container">
+                <a target="_blank" href="{{ row.mdwiki_url }}">{{ row.title }}</a>
+            </td>
+            <th>{{ row.translate_html|safe }}</th>
+            <td class="num" style="text-align: left">{{ row.en_views }}</td>
+            <td class="num" style="text-align: left">{{ row.importance }}</td>
+            <td class="num" style="text-align: left">{{ row.words }}</td>
+            <td class="num" style="text-align: left">{{ row.refs }}</td>
+            <td>{{ row.qid_html|safe }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
