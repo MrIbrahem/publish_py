@@ -7,8 +7,6 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from sqlalchemy import func
-
 from ....shared.core.extensions import db
 from ...models import QidOthersRecord
 
@@ -21,7 +19,7 @@ def add_qid_other(title: str, qid: str) -> QidOthersRecord:
     if orm_obj:
         orm_obj.qid = qid
     else:
-        orm_obj = QidOthersRecord(title=title, qid=qid, add_date=func.now())
+        orm_obj = QidOthersRecord(title=title, qid=qid)
         db.session.add(orm_obj)
 
     try:
