@@ -113,7 +113,7 @@ def create_side(active_route):
                 href="add",
                 title="Add translations",
                 icon="bi-plus-square",
-                ready=False,
+                ready=True,
             ),
             SidebarItem(
                 id="qidsload",
