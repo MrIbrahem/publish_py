@@ -94,7 +94,7 @@ def create_app(config_class: Type | None = None) -> Flask:
         app.config.from_object(config_class())
     else:
         # Use environment-based settings (legacy behavior)
-        app.secret_key = settings.secret_key
+        app.secret_key = settings.security.secret_key
         app.config.update(
             SESSION_COOKIE_HTTPONLY=settings.cookie.httponly,
             SESSION_COOKIE_SECURE=settings.cookie.secure,

@@ -84,7 +84,7 @@ class Config:
     def __init__(self) -> None:
         """Initialize configuration with values from environment-based settings."""
         # Sync with the dataclass-based settings for backward compatibility
-        self.SECRET_KEY = settings.secret_key
+        self.SECRET_KEY = settings.security.secret_key
         self.SESSION_COOKIE_HTTPONLY = settings.cookie.httponly
         self.SESSION_COOKIE_SECURE = settings.cookie.secure
         self.SESSION_COOKIE_SAMESITE = settings.cookie.samesite
