@@ -34,7 +34,7 @@ def last_translations_dashboard() -> str:
     languages = list_langs()
 
     return render_template(
-        "admins/last.html",
+        "admins/last/index.html",
         rows=rows,
         languages=languages,
         current_lang=lang,

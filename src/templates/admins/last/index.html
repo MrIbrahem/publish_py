@@ -10,7 +10,7 @@
             <div class="col-md-4">
                 <h4 class="mb-0">Recent translations ({{ count }}):</h4>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text">Namespace:</span>
                     <div class="form-control d-flex gap-3">
@@ -29,16 +29,21 @@
             </div>
             <div class="col-md-3">
                 <div class="input-group">
-                    <select class="form-select" id="lang" name="lang" aria-label="Language code">
-                        <option value="All" {% if current_lang == 'All' %}selected{% endif %}>All</option>
-                        {% for lang in languages %}
-                        <option value="{{ lang.code }}" {% if current_lang == lang.code %}selected{% endif %}>
-                            ({{ lang.code }}) {{ lang.autonym }}</option>
+                    <select aria-label="Language code" placeholder='Language code' class="selectpicker" id='lang'
+                        name='lang' placeholder='two letter code' data-live-search="true" data-container="body"
+                        data-live-search-style="begins" data-bs-theme="auto" data-style='btn active' data-width="100%">
+                        <option value="All">All</option>
+                        {# Loop through language tables #}
+                        {% for lang in languages if lang.code %}
+                        <option data-tokens="{{ lang.code }}" value="{{ lang.code }}"
+                            {{ 'selected' if lang.code == current_lang else '' }}>
+                            ({{ lang.code }}) {{ lang.autonym }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
             </div>
         </form>
