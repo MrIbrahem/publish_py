@@ -7,11 +7,12 @@ from __future__ import annotations
 import logging
 from typing import Any, List
 
-from sqlalchemy import func, text
+from sqlalchemy import func, or_, text
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
 from ...models import PageRecord
+from ..analytics.word_service import get_word_counts_for_title
 
 logger = logging.getLogger(__name__)
 
@@ -228,6 +229,89 @@ def list_of_users_by_translations_count() -> dict[str, int]:
     return result
 
 
+def add_translate_row_to_db(
+    title: str,
+    translate_type: str,
+    cat: str,
+    lang: str,
+    user: str,
+    target: str,
+    pupdate: str,
+    word: int = 0,
+) -> bool:
+    """Mirror of PHP add_pages_to_db + insert_to_pages.
+
+    Replaces ``_`` with `` `` in string values, UPDATEs rows where target is
+    empty, then INSERTs a new row if no matching title+lang+user exists.
+    """
+    translate_type = translate_type or "lead"
+    cat = cat or "RTT"
+
+    if word == 0:
+        lead_words, all_words = get_word_counts_for_title(title)
+        if translate_type == "all":
+            word = all_words or 0
+        else:
+            word = lead_words or 0
+
+    title = title.replace("_", " ")
+    user = user.replace("_", " ")
+    target = target.replace("_", " ")
+    cat = cat.replace("_", " ")
+    lang = lang.replace("_", " ")
+    pupdate = pupdate.replace("_", " ")
+
+    try:
+        db.session.query(PageRecord).filter(
+            PageRecord.user == user,
+            PageRecord.title == title,
+            PageRecord.lang == lang,
+            or_(PageRecord.target == "", PageRecord.target.is_(None)),
+        ).update(
+            {PageRecord.target: target, PageRecord.pupdate: pupdate, "word": word},
+            synchronize_session=False,
+        )
+    except Exception:
+        logger.exception("Failed to update existing page target")
+        db.session.rollback()
+        return False
+
+    existing = (
+        db.session.query(PageRecord)
+        .filter(PageRecord.title == title, PageRecord.lang == lang, PageRecord.user == user)
+        .first()
+    )
+
+    if not existing:
+        try:
+            new_page = PageRecord(
+                title=title,
+                word=word,
+                translate_type=translate_type,
+                cat=cat,
+                lang=lang,
+                user=user,
+                target=target,
+                pupdate=pupdate,
+                date=func.current_date(),
+            )
+            db.session.add(new_page)
+            db.session.commit()
+        except Exception:
+            logger.exception("Failed to insert new page")
+            db.session.rollback()
+            return False
+
+    found = (
+        db.session.query(PageRecord)
+        .filter(
+            PageRecord.title == title, PageRecord.lang == lang, PageRecord.user == user, PageRecord.target == target
+        )
+        .first()
+    )
+    return found is not None
+
+
 __all__ = [
     "list_pages",
     "list_pages_by_lang_cat",
@@ -237,4 +321,5 @@ __all__ = [
     "find_exists_or_update_page",
     "insert_page_target",
     "list_of_users_by_translations_count",
+    "add_translate_row_to_db",
 ]

@@ -63,7 +63,7 @@ def _setting_value(key: str, default: str = "") -> str:
         return default
     if record is None or record.value is None:
         return default
-    return str(record.value)
+    return record.value
 
 
 def _normalize_arg(name: str) -> str:
@@ -94,18 +94,16 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
     cat = _normalize_arg("cat")
     tra_type = _normalize_arg("type")
 
-    test = _as_bool(_normalize_arg("test")) or _as_bool((request.cookies.get("test") or ""))
     filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
 
     show_exists_param = "exists" in request.args
 
-    errors: list[str] = []
     code_lang_name = ""
 
     if code:
         lang_record = get_lang_by_code(code)
         if lang_record is None:
-            errors.append(f"code ({code}) not valid wiki.")
+            flash(f"code ({code}) not valid wiki.", "danger")
             code = ""
         else:
             code_lang_name = lang_record.name or lang_record.autonym or ""
@@ -118,7 +116,7 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
 
     # logic from load_request.php — validate camp against the input list.
     if camp and camp not in camps_data:
-        errors.append(f"camp ({camp}) not valid.")
+        flash(f"camp ({camp}) not valid.", "danger")
         camp = ""
 
     # logic from load_request.php — force "lead" when whole-article translate is disabled.
@@ -132,10 +130,8 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
         "camp": camp,
         "cat": cat,
         "tra_type": tra_type,
-        "test": test,
         "filter_sparql": filter_sparql,
         "show_exists_param": show_exists_param,
-        "errors": errors,
         "allow_whole_translate": allow_whole_translate,
     }
 
@@ -148,8 +144,8 @@ def _resolve_translation_button(user_coord: bool) -> str:
     return "1" if user_coord else "0"
 
 
-@bp_main.get("/")
-def index():
+@bp_main.get("/table")
+def table():
     # Form data — unchanged from the previous index() implementation.
     try:
         langs = [x.to_dict() for x in list_langs()]
@@ -167,16 +163,12 @@ def index():
 
     parsed = _parse_request_args(camps_data, cats_data)
 
-    for err in parsed["errors"]:
-        flash(err, "danger")
-
     # Identity / coordinator / full-translator flags — mirrors src/index.php.
     user = current_user()
-    global_username = user.username if user else ""
     user_coord = bool(user and user.username in active_coordinators())
     show_exists = user_coord or parsed["show_exists_param"]
     translation_button = _resolve_translation_button(user_coord)
-    full_tr_user = bool(global_username and is_full_translator(global_username))
+    full_tr_user = bool(user and is_full_translator(user.username))
 
     # PHP: only invoke results_loader_2026 when both code and camp are valid.
     results_bundle = None
@@ -188,13 +180,10 @@ def index():
                 cat=parsed["cat"],
                 tra_type=parsed["tra_type"],
                 code_lang_name=parsed["code_lang_name"],
-                global_username=global_username,
                 user_coord=user_coord,
                 show_exists=show_exists,
                 translation_button=translation_button,
                 full_tr_user=full_tr_user,
-                test=parsed["test"],
-                login_url=url_for("auth.login"),
             )
         except Exception:
             logger.exception(
@@ -218,6 +207,40 @@ def index():
             "type": parsed["tra_type"],
         },
         results=results_bundle,
+    )
+
+
+@bp_main.get("/")
+def index():
+    # Form data — unchanged from the previous index() implementation.
+    try:
+        langs = [x.to_dict() for x in list_langs()]
+        campaigns_records = list_categories()
+        campaigns = [x.to_dict() for x in campaigns_records]
+    except Exception:
+        logger.exception("Failed to load languages/campaigns for index page")
+        flash("Failed to load page data — please try again.", "danger")
+        langs = []
+        campaigns = []
+
+    # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
+    camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
+    cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
+
+    parsed = _parse_request_args(camps_data, cats_data)
+
+    return render_template(
+        "index.html",
+        settings={
+            "allow_whole_translate": parsed["allow_whole_translate"] != "0",
+        },
+        langs=langs,
+        campaigns=campaigns,
+        args={
+            "code": parsed["code"],
+            "camp": parsed["camp"],
+            "type": parsed["tra_type"],
+        },
     )
 
 

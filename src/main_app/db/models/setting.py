@@ -84,7 +84,7 @@ class SettingRecord(db.Model):
         if value is None:
             return None
         if value_type == "boolean":
-            return "true" if str(value).lower() in ("1", "true", "yes", "on") else "false"
+            return str(value)  # ("1", "0")
         elif value_type == "integer":
             try:
                 return int(value)
