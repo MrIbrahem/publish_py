@@ -168,7 +168,7 @@ def table():
     user_coord = bool(user and user.username in active_coordinators())
     show_exists = user_coord or parsed["show_exists_param"]
     translation_button = _resolve_translation_button(user_coord)
-    full_tr_user = is_full_translator(user.username)
+    full_tr_user = bool(user and is_full_translator(user.username))
 
     # PHP: only invoke results_loader_2026 when both code and camp are valid.
     results_bundle = None
