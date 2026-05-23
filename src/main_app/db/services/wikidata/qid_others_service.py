@@ -22,7 +22,7 @@ def add_qid_other(title: str, qid: str) -> QidOthersRecord:
     if orm_obj:
         orm_obj.qid = qid
     else:
-        orm_obj = QidOthersRecord(title=title, qid=qid, add_date=func.now())
+        orm_obj = QidOthersRecord(title=title, qid=qid)
         db.session.add(orm_obj)
 
     try:
