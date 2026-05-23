@@ -24,6 +24,7 @@ from .publish import ReportRecord
 from .qid import (
     AllQidsExistRecord,
     QidRecord,
+    QidOthersRecord,
 )
 from .setting import (
     LanguageSettingRecord,
@@ -59,6 +60,7 @@ __all__ = [
     "PagesUsersToMainRecord",
     "ProjectRecord",
     "QidRecord",
+    "QidOthersRecord",
     "RefsCountRecord",
     "ReportRecord",
     "SettingRecord",
