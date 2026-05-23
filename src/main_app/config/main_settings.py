@@ -6,7 +6,6 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
 
 from .classes import (
     CookieConfig,
@@ -104,6 +103,9 @@ def _load_database_config() -> DbConfig:
 def _load_oauth_config() -> OAuthConfig:
     """
     Loads OAuth settings and validates them if enabled.
+
+    Raises:
+        RuntimeError: If OAUTH_ENCRYPTION_KEY is missing.
     """
     mw_uri = os.getenv("OAUTH_MWURI", "")
     consumer_key = os.getenv("OAUTH_CONSUMER_KEY", "")
@@ -147,17 +149,7 @@ def _get_paths() -> Paths:
     )
 
 
-def is_localhost(host: str) -> bool:
-    """Check if the host refers to a local environment."""
-    local_hosts = [
-        "localhost",
-        "127.0.0.1",
-    ]
-
-    return any(x in host for x in local_hosts)
-
-
-def load_cookie_config():
+def load_cookie_config() -> CookieConfig:
     session_cookie_secure = _env_bool("SESSION_COOKIE_SECURE", default=True)
     session_cookie_httponly = _env_bool("SESSION_COOKIE_HTTPONLY", default=True)
     session_cookie_samesite = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
@@ -194,6 +186,14 @@ def get_settings() -> Settings:
     """
     Initialize and return a cached Settings object.
     Main entry point for application configuration.
+
+    Returns:
+        Settings: The populated application settings.
+
+    Raises:
+        RuntimeError: If FLASK_SECRET_KEY is not set.
+        RuntimeError: If OAUTH_ENCRYPTION_KEY is missing.
+        RuntimeError: If the OAuth configuration (OAUTH_MWURI, OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET) is incomplete.
     """
     sessions = SessionConfig(
         state_key=os.getenv("STATE_SESSION_KEY", "oauth_state_nonce"),
@@ -205,11 +205,6 @@ def get_settings() -> Settings:
         raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
 
     oauth_config = _load_oauth_config()
-
-    if oauth_config is None:
-        raise RuntimeError(
-            "MediaWiki OAuth configuration is incomplete. Set OAUTH_MWURI, OAUTH_CONSUMER_KEY, and OAUTH_CONSUMER_SECRET."
-        )
 
     cookie_config = load_cookie_config()
 
@@ -250,20 +245,19 @@ def get_settings() -> Settings:
     publish_secret_code = os.getenv("PUBLISH_SECRET_CODE", "")
 
     return Settings(
-        publish_secret_code=publish_secret_code,
         user_agent=user_agent,
-        revids_api_url=revids_api_url,
-        wikidata_domain=wikidata_domain,
-        is_localhost=is_localhost,
         paths=_get_paths(),
         database_data=database_data,
         cookie=cookie_config,
         oauth=oauth_config,
         security=security_config,
         sessions=sessions,
+        users=users_config,
         csrf_time_limit=csrf_time_limit,
         cors=cors_config,
-        users=users_config,
+        publish_secret_code=publish_secret_code,
+        revids_api_url=revids_api_url,
+        wikidata_domain=wikidata_domain,
     )
 
 

@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # --- Data Classes for Configuration Sections ---
 
@@ -95,7 +94,6 @@ class Settings:
     user_agent: str
     revids_api_url: str
     wikidata_domain: str
-    is_localhost: Callable[[str], bool]
 
     # Nested configurations
     database_data: DbConfig
