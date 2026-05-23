@@ -189,7 +189,7 @@ def create_side(active_route):
                 href="categories",
                 title="Categories",
                 icon="bi-tags",
-                ready=False,
+                ready=True,
             ),
         ],
         "Tools": [

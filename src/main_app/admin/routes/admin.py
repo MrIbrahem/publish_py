@@ -21,6 +21,7 @@ from flask import (
 from ..decorators import admin_required
 from ..sidebar import create_side
 from .campaigns import campaigns_module
+from .categories import categories_dashboard
 from .coordinators import coordinators_module
 from .full_translators import fulltranslators_module
 from .language_settings import languagesettings_module
@@ -75,6 +76,12 @@ def in_process_total_dashboard():
     return render_template(
         "admins/in_process_total.html",
     )
+
+
+@bp_admin.get("/categories")
+@admin_required
+def categories_dashboard_route():
+    return categories_dashboard()
 
 
 def register_blueprints(bp_admin: Blueprint) -> None:
