@@ -89,6 +89,7 @@ def create_side(active_route):
                 href="tt",
                 title="Translate Type",
                 icon="bi-translate",
+                ready=False,
             ),
             SidebarItem(
                 id="translated",
@@ -96,6 +97,7 @@ def create_side(active_route):
                 href="translated",
                 title="Translated Pages",
                 icon="bi-check2-square",
+                ready=False,
             ),
             SidebarItem(
                 id="pages_users_to_main",
@@ -103,6 +105,7 @@ def create_side(active_route):
                 href="pages_users_to_main",
                 title="Pages to check",
                 icon="bi-check",
+                ready=False,
             ),
             SidebarItem(
                 id="add",
@@ -110,6 +113,7 @@ def create_side(active_route):
                 href="add",
                 title="Add translations",
                 icon="bi-plus-square",
+                ready=False,
             ),
             SidebarItem(
                 id="qidsload",
@@ -117,6 +121,7 @@ def create_side(active_route):
                 href="qids",
                 title="Qids",
                 icon="bi-list-ul",
+                ready=False,
             ),
         ],
         "Users": [
@@ -184,6 +189,7 @@ def create_side(active_route):
                 href="categories",
                 title="Categories",
                 icon="bi-tags",
+                ready=False,
             ),
         ],
         "Tools": [
@@ -193,6 +199,7 @@ def create_side(active_route):
                 href="stat",
                 title="Status",
                 icon="bi-graph-up",
+                ready=False,
             ),
             SidebarItem(
                 id="language_settings",
