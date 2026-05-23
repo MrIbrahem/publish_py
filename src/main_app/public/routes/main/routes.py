@@ -78,6 +78,10 @@ def _normalize_arg(name: str) -> str:
     return raw
 
 
+def _as_bool(raw: str) -> bool:
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) -> dict[str, Any]:
     """Mirror of src/backend/loaders/load_request.php — load_request().
 
@@ -89,8 +93,10 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
     camp = _normalize_arg("camp")
     cat = _normalize_arg("cat")
     tra_type = _normalize_arg("type")
-    test = bool(request.args.get("test")) or bool(request.cookies.get("test"))
-    filter_sparql = bool(_normalize_arg("filter_sparql"))
+
+    test = _as_bool(_normalize_arg("test")) or _as_bool((request.cookies.get("test") or ""))
+    filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
+
     show_exists_param = "exists" in request.args
 
     errors: list[str] = []
@@ -145,9 +151,15 @@ def _resolve_translation_button(user_coord: bool) -> str:
 @bp_main.get("/")
 def index():
     # Form data — unchanged from the previous index() implementation.
-    langs = [x.to_dict() for x in list_langs()]
-    campaigns_records = list_categories()
-    campaigns = [x.to_dict() for x in campaigns_records]
+    try:
+        langs = [x.to_dict() for x in list_langs()]
+        campaigns_records = list_categories()
+        campaigns = [x.to_dict() for x in campaigns_records]
+    except Exception:
+        logger.exception("Failed to load languages/campaigns for index page")
+        flash("Failed to load page data — please try again.", "danger")
+        langs = []
+        campaigns = []
 
     # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
     camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}

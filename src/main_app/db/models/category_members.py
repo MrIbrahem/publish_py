@@ -32,7 +32,11 @@ class CategoryMemberRecord(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    category = db.Column(db.String(120), nullable=False)
+    category = db.Column(
+        db.String(120),
+        db.ForeignKey("categories.category"),
+        nullable=False,
+    )
     article_id = db.Column(db.String(255), nullable=False)
 
     def to_dict(self) -> dict:

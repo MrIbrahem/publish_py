@@ -124,7 +124,12 @@ def content_translation_url(
 ) -> str:
     """Special:ContentTranslation URL (PHP make_ContentTranslation_url)."""
     # PHP: $title = str_replace('%20', '_', $title);
-    title = title.replace("%20", "_")
+    # title = title.replace("%20", "_")
+
+    # Callers may pass either raw titles (`Foo Bar`) or pre-encoded titles (`Foo%20Bar`).
+    # Normalize both forms before query encoding so the output matches the PHP `_` form.
+    title = title.replace("%20", "_").replace(" ", "_")
+
     params = {
         "title": "Special:ContentTranslation",
         "tr_type": tra_type,

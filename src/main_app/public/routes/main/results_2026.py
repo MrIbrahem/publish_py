@@ -167,6 +167,7 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
     exists_via_td = {p.title: p for p in exists_via_td_rows}
 
     items_missing = missing_by_lang_and_category(code, cat)
+    missing_by_title = {row["title"]: row for row in items_missing if row.get("title")}
     items_exists_list = exists_by_lang_and_category(code, cat)
     items_exists: dict[str, dict] = {row["title"]: row for row in items_exists_list}
 
@@ -199,6 +200,7 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
         "inprocess": inprocess,
         "exists": items_exists,
         "missing": items_missing,
+        "missing_by_title": missing_by_title,
     }
 
 
@@ -282,6 +284,7 @@ def _row_metrics(title_data: dict, tra_type: str) -> tuple[int, int, str, Any, s
     else:
         words = title_data.get("w_lead_words") or 0
         refs = title_data.get("r_lead_refs") or 0
+
     importance = title_data.get("importance") or "Unknown"
     en_views = title_data.get("en_views") if title_data.get("en_views") is not None else ""
     qid = title_data.get("qid") or ""
