@@ -89,7 +89,7 @@ def create_side(active_route):
                 href="tt",
                 title="Translate Type",
                 icon="bi-translate",
-                ready=False,
+                ready=True,
             ),
             SidebarItem(
                 id="translated",
@@ -97,7 +97,15 @@ def create_side(active_route):
                 href="translated",
                 title="Translated Pages",
                 icon="bi-check2-square",
-                ready=False,
+                ready=True,
+            ),
+            SidebarItem(
+                id="translated_users",
+                admin=1,
+                href="translated_users",
+                title="Translated User Pages",
+                icon="bi-check2-circle",
+                ready=True,
             ),
             SidebarItem(
                 id="pages_users_to_main",
@@ -105,7 +113,7 @@ def create_side(active_route):
                 href="pages_users_to_main",
                 title="Pages to check",
                 icon="bi-check",
-                ready=False,
+                ready=True,
             ),
             SidebarItem(
                 id="add",
@@ -121,7 +129,15 @@ def create_side(active_route):
                 href="qids",
                 title="Qids",
                 icon="bi-list-ul",
-                ready=False,
+                ready=True,
+            ),
+            SidebarItem(
+                id="qids_others",
+                admin=1,
+                href="qids_others",
+                title="Qids Others",
+                icon="bi-list-check",
+                ready=True,
             ),
         ],
         "Users": [
@@ -199,7 +215,7 @@ def create_side(active_route):
                 href="stat",
                 title="Status",
                 icon="bi-graph-up",
-                ready=False,
+                ready=True,
             ),
             SidebarItem(
                 id="language_settings",

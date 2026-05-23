@@ -1,0 +1,43 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}{% if id %}Edit Qid{% else %}Add New Qid{% endif %}{% endblock %}
+
+{% block contents %}
+<div class="card">
+    <div class="card-header">
+        <h4>{% if id %}Edit Qid{% else %}Add New Qid{% endif %} ({{ qid_table }})</h4>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for(post_endpoint) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row g-3 align-items-end">
+                {% if id %}
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Id</span>
+                        <input class="form-control" type="text" name="id" value="{{ id }}" readonly />
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Title</span>
+                        <input class="form-control" type="text" name="title"
+                               value="{{ title|e }}" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Qid</span>
+                        <input class="form-control" type="text" name="qid"
+                               value="{{ qid|e }}" placeholder="Q12345" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

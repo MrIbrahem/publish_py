@@ -144,3 +144,92 @@ class TestInsertUserPageTarget:
 
             success = insert_user_page_target("Error_Page", "t", "c", "l", "u", "t")
             assert success is False
+
+
+
+# ---------------------------------------------------------------------------
+# Tests for new service functions added with admin/translated_users work:
+#   - list_translated(lang, limit, offset)
+#   - count_translated(lang)
+#   - get_by_id(page_id)
+# ---------------------------------------------------------------------------
+
+from src.main_app.db.services.pages.user_page_service import (
+    count_translated,
+    get_by_id,
+    list_translated,
+)
+
+
+def _make_user_page(title: str, lang: str, target: str, user: str = "u") -> UserPageRecord:
+    return add_user_page(
+        sourcetitle=title,
+        translate_type="lead",
+        cat="RTT",
+        lang=lang,
+        user=user,
+        target=target,
+    )
+
+
+class TestListTranslatedUserPages:
+    """Tests for list_translated on pages_users."""
+
+    def test_excludes_rows_with_empty_or_null_target(self, monkeypatch):
+        _make_user_page("Has_target", "en", "T.html")
+        empty = _make_user_page("Empty_target", "en", "x")
+        empty.target = ""
+        null = _make_user_page("Null_target", "en", "x")
+        null.target = None
+        db.session.commit()
+
+        titles = {p.title for p in list_translated(lang="All")}
+        assert "Has_target" in titles
+        assert "Empty_target" not in titles
+        assert "Null_target" not in titles
+
+    def test_filters_by_lang(self, monkeypatch):
+        _make_user_page("En_user_page", "en", "E.html")
+        _make_user_page("De_user_page", "de", "D.html")
+        rows = list_translated(lang="de")
+        assert {p.title for p in rows} == {"De_user_page"}
+
+    def test_respects_limit_and_offset(self, monkeypatch):
+        for i in range(4):
+            _make_user_page(f"UP_{i}", "en", f"U_{i}.html")
+        first = list_translated(lang="en", limit=2, offset=0)
+        second = list_translated(lang="en", limit=2, offset=2)
+        assert len(first) == 2 and len(second) == 2
+        assert {p.id for p in first}.isdisjoint({p.id for p in second})
+
+
+class TestCountTranslatedUserPages:
+    """Tests for count_translated on pages_users."""
+
+    def test_counts_only_rows_with_target(self, monkeypatch):
+        _make_user_page("With_target", "en", "X.html")
+        empty = _make_user_page("Empty", "en", "x")
+        empty.target = ""
+        db.session.commit()
+        assert count_translated(lang="All") == 1
+
+    def test_counts_filtered_by_lang(self, monkeypatch):
+        _make_user_page("U_en1", "en", "U1.html")
+        _make_user_page("U_en2", "en", "U2.html")
+        _make_user_page("U_de", "de", "D.html")
+        assert count_translated(lang="en") == 2
+        assert count_translated(lang="de") == 1
+        assert count_translated(lang="All") == 3
+
+
+class TestGetByIdUserPage:
+    """Tests for get_by_id on pages_users."""
+
+    def test_returns_record_when_found(self, monkeypatch):
+        p = _make_user_page("Findable_user", "en", "F.html")
+        result = get_by_id(p.id)
+        assert result is not None
+        assert result.title == "Findable_user"
+
+    def test_returns_none_when_not_found(self, monkeypatch):
+        assert get_by_id(99999) is None

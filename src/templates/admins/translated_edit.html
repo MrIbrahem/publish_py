@@ -1,0 +1,65 @@
+{% extends "admins/base1.html" %}
+
+{% block title %}Edit Page{% endblock %}
+
+{% block contents %}
+<div class="card">
+    <div class="card-header">
+        <h4>Edit Page (id: {{ row.id }})</h4>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for(post_endpoint) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="id" value="{{ row.id }}" />
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Title</span>
+                        <input class="form-control" type="text" name="title"
+                               value="{{ row.title|e }}" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">lang</span>
+                        <input class="form-control" type="text" name="lang"
+                               value="{{ row.lang|e }}" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">target</span>
+                        <input class="form-control" type="text" name="target"
+                               value="{{ row.target|e }}" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">user</span>
+                        <input class="form-control" type="text" name="user"
+                               value="{{ row.user|e }}" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Published</span>
+                        <input class="form-control" type="text" name="pupdate"
+                               value="{{ row.pupdate|e }}" placeholder="YYYY-MM-DD" required />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning d-flex align-items-center mb-0 p-2">
+                        <span class="me-2">Delete?</span>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" name="delete" value="{{ row.id }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-outline-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
