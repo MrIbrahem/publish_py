@@ -11,10 +11,7 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, jsonify, render_template, request  # , g
 
-from .admin.routes.admin import (
-    bp_admin,
-)
-from .config import settings
+from .admin.routes.admin import bp_admin
 from .db import init_db
 from .db.services.users.coordinator_service import active_coordinators
 from .public.routes import (
@@ -66,12 +63,11 @@ def format_stage_timestamp(value: str) -> str:
     return f"{month} {dt.day}, {dt.year}, {hour12}:{minute} {ampm}"
 
 
-def create_app(config_class: Type | None = None) -> Flask:
+def create_app(config_class: Type) -> Flask:
     """Instantiate and configure the Flask application.
 
     Args:
-        config_class: Optional configuration class to use. If not provided,
-                     uses environment-based settings.
+        config_class: configuration class to use.
 
     Returns:
         Configured Flask application instance.
@@ -91,17 +87,8 @@ def create_app(config_class: Type | None = None) -> Flask:
     app.test_client_class = CookieHeaderClient
 
     # Load configuration
-    if config_class is not None:
-        # Use provided config class (Flask-style)
-        app.config.from_object(config_class())
-    else:
-        # Use environment-based settings (legacy behavior)
-        app.secret_key = settings.security.secret_key
-        app.config.update(
-            SESSION_COOKIE_HTTPONLY=settings.cookie.httponly,
-            SESSION_COOKIE_SECURE=settings.cookie.secure,
-            SESSION_COOKIE_SAMESITE=settings.cookie.samesite,
-        )
+    # Use provided config class (Flask-style)
+    app.config.from_object(config_class())
 
     # Initialize CSRF protection
     csrf_init_app(app)

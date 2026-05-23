@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from urllib.parse import quote_plus
 
 from sqlalchemy import URL
 
@@ -15,11 +16,17 @@ def build_sqlalchemy_uri(db_config: DbConfig) -> str:
 
     Used by Flask-SQLAlchemy configuration in create_app().
     Compatible with the existing build_db_url() in engine.py.
+    return (
+        f"mysql+pymysql://{db_cfg.db_user}:{password}"
+        f"@{db_cfg.db_host}/{db_cfg.db_name}"
+        f"?charset=utf8mb4"
+    )
     """
+    password = quote_plus(db_config.db_password or "")
     url = URL.create(
         "mysql+pymysql",
         username=db_config.db_user,
-        password=db_config.db_password,
+        password=password,
         host=db_config.db_host,
         database=db_config.db_name,
     ).render_as_string(hide_password=False)
@@ -104,14 +111,7 @@ class Config:
             # Build SQLAlchemy database URI from environment config
             db_cfg = settings.database_data
             if db_cfg.db_host:
-                from urllib.parse import quote_plus
-
-                password = quote_plus(db_cfg.db_password or "")
-                self.SQLALCHEMY_DATABASE_URI = (
-                    f"mysql+pymysql://{db_cfg.db_user}:{password}"
-                    f"@{db_cfg.db_host}/{db_cfg.db_name}"
-                    f"?charset=utf8mb4"
-                )
+                self.SQLALCHEMY_DATABASE_URI = build_sqlalchemy_uri(db_cfg)
 
         # Only set MySQL-specific engine options if URI is MySQL (not SQLite)
         uri = self.SQLALCHEMY_DATABASE_URI or ""
