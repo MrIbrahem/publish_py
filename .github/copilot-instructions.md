@@ -191,7 +191,6 @@ Required environment variables (see `src/example.env`):
 
 Optional environment variables:
 
--   `USE_MW_OAUTH`: Enable/disable MediaWiki OAuth (default: true)
 -   `CORS_ALLOWED_DOMAINS`: Comma-separated list of allowed CORS domains
 -   `SPECIAL_USERS`: User mapping for alternate usernames
 -   `FALLBACK_USER`: Default user for retry operations

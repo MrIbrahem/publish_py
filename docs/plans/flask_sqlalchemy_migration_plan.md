@@ -103,7 +103,7 @@ def get_coordinator(coordinator_id: int) -> CoordinatorRecord | None:
 # create_app() - Current DB initialization
 def create_app(config_class=None):
     app = Flask(__name__, ...)
-    if oauth_enabled and settings.database_data.db_host:
+    if settings.database_data.db_host:
         db_url = build_db_url(settings.database_data.to_dict())
         init_db(db_url, True)
     return app
@@ -1052,7 +1052,6 @@ def _register_context(app: Flask) -> None:
             "is_authenticated": user is not None,
             "is_admin": bool(user and user.username in active_coordinators()),
             "username": user.username if user else None,
-            "oauth_enabled": bool(settings.oauth),
         }
 ```
 
@@ -1297,7 +1296,6 @@ jobs:
         runs-on: ubuntu-latest
         env:
             FLASK_SECRET_KEY: "ci-test-key"
-            USE_MW_OAUTH: "false"
             SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
 
         steps:
