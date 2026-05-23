@@ -32,7 +32,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>id</th>
+                    <!-- <th>id</th> -->
                     <th>Title</th>
                     <th>Lead</th>
                     <th>Full</th>
@@ -43,7 +43,7 @@
                 {% for tt in translate_types %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ tt.tt_id }}</td>
+                    <!-- <td>{{ tt.tt_id }}</td> -->
                     <td>
                         <a href="https://mdwiki.org/wiki/{{ tt.tt_title | replace(' ', '_') | urlencode }}"
                             target="_blank">{{ tt.tt_title }}</a>
@@ -57,14 +57,17 @@
                             {% if tt.tt_full == 1 %}checked{% endif %}>
                     </td>
                     <td>
-                        <a class="btn btn-sm btn-outline-secondary"
-                           href="{{ url_for('admin.tt.tt_edit', id=tt.tt_id, title=tt.tt_title, lead=tt.tt_lead, full=tt.tt_full) }}">
-                            <i class="bi bi-pencil"></i>
+                        <a class="btn btn-outline-primary btn-sm"
+                            pup-target="{{ url_for('admin.tt.tt_edit', id=tt.tt_id, title=tt.tt_title, lead=tt.tt_lead, full=tt.tt_full) }}"
+                            onclick="pup_window_new(this)">
+                            Edit
                         </a>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="6" class="text-center text-muted">No translate types found.</td></tr>
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No translate types found.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -82,7 +85,7 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ title }}</span>
                 <a class="btn btn-sm btn-outline-primary"
-                   href="{{ url_for('admin.tt.tt_edit', title=title, lead=1, full=0) }}">Add</a>
+                    href="{{ url_for('admin.tt.tt_edit', title=title, lead=1, full=0) }}">Add</a>
             </li>
             {% endfor %}
         </ul>

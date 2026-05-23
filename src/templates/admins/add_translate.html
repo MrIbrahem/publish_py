@@ -16,7 +16,8 @@
         <form action="{{ url_for('admin.add.add_translate') }}" method="POST">
             <input name="csrf_token" value="{{ csrf_token() }}" type="hidden" />
             <div class="form-group">
-                <table class="table table-striped compact table-mobile-responsive table-mobile-sided" style="font-size:95%;">
+                <table class="table table-striped compact table-mobile-responsive table-mobile-sided"
+                    style="font-size:95%;">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -63,7 +64,8 @@
                             </td>
                             <td data-content="Delete">
                                 <div class="">
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="delete_row(1)">Delete</button>
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                        onclick="delete_row(1)">Delete</button>
                                 </div>
                             </td>
                         </tr>
@@ -72,7 +74,8 @@
             </div>
             <div class="form-group d-flex justify-content-between">
                 <button type="submit" class="btn btn-outline-primary mb-10">Save</button>
-                <span role="button" id="add_new_row" class="btn btn-outline-primary" onclick="add_new_row()">New row</span>
+                <span role="button" id="add_new_row" class="btn btn-outline-primary" onclick="add_new_row()">New
+                    row</span>
             </div>
         </form>
     </div>
@@ -85,7 +88,7 @@
         </div>
     </div>
     <div class="input-group">
-        <span class="input-group-text">URL</span>
+        <span class="input-group-text">Wikipedia URL</span>
         <input class="form-control mdtitles url" size="15" id="url" name="url" value="" />
         <button class="btn btn-outline-primary mb-10" onclick="start_one_url(this)">Search</button>
     </div>

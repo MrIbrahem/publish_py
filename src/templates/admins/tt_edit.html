@@ -1,4 +1,4 @@
-{% extends "admins/base1.html" %}
+{% extends "admins/base1_no_navbar.html" %}
 
 {% block title %}{% if id %}Edit Translate type{% else %}Add Translate type{% endif %}{% endblock %}
 
@@ -22,20 +22,19 @@
                 <div class="col-md-3">
                     <div class="input-group">
                         <span class="input-group-text">Title</span>
-                        <input class="form-control" type="text" name="title"
-                               value="{{ title|e }}" required />
+                        <input class="form-control" type="text" name="title" value="{{ title|e }}" required />
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="d-flex gap-3">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="lead"
-                                   name="lead" value="1" {% if lead == '1' or lead == 1 %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" id="lead" name="lead" value="1"
+                                {% if lead == '1' or lead == 1 %}checked{% endif %}>
                             <label class="form-check-label" for="lead">Lead</label>
                         </div>
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="full"
-                                   name="full" value="1" {% if full == '1' or full == 1 %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" id="full" name="full" value="1"
+                                {% if full == '1' or full == 1 %}checked{% endif %}>
                             <label class="form-check-label" for="full">Full</label>
                         </div>
                     </div>

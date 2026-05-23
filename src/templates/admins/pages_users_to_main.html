@@ -80,8 +80,9 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a class="btn btn-sm btn-outline-secondary"
-                           href="{{ url_for('admin.pages_users_to_main.pages_users_to_main_fix_it', id=row.id, new_user=row.new_user, new_target=row.new_target) }}">
+                        <a class="btn btn-outline-primary btn-sm"
+                            pup-target="{{ url_for('admin.pages_users_to_main.pages_users_to_main_fix_it', id=row.id, new_user=row.new_user, new_target=row.new_target) }}"
+                            onclick="pup_window_new(this)">
                             <i class="bi bi-wrench"></i>
                         </a>
                     </td>

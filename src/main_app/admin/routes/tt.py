@@ -38,7 +38,7 @@ def tt_index() -> str:
     return render_template(
         "admins/tt.html",
         translate_types=translate_types,
-        new_titles=new_titles,
+        # new_titles=new_titles,
         categories=categories,
         cat=cat,
     )

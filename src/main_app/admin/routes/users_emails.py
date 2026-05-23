@@ -69,7 +69,7 @@ def _dashboard():
     users_data = sorted(users_data, key=lambda x: x["live"], reverse=True)
 
     return render_template(
-        "admins/users_emails.html",
+        "admins/users_emails/index.html",
         users=users_data,
         projects=projects,
         project_selected=project_name,
@@ -181,6 +181,11 @@ class UsersEmails:
         @admin_required
         def update(record_id: int) -> ResponseReturnValue:
             return _update_record(record_id)
+
+        @self.bp.get("/<int:record_id>/edit")
+        @admin_required
+        def edit(record_id: int) -> ResponseReturnValue:
+            return render_template("admins/users_emails/edit.html")
 
 
 users_emails_module = UsersEmails()

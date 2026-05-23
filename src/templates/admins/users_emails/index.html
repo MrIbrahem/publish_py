@@ -23,10 +23,12 @@
                                     <option data-tokens="all" value="All"
                                         {% if project_selected == 'All' %}selected{% endif %}>All</option>
                                     {% for p in projects %}
-                                    <option data-tokens="{{ p.g_title }}" value="{{ p.g_title }}" {% if project_selected == p.g_title %}selected{% endif %}>{{ p.g_title }}
+                                    <option data-tokens="{{ p.g_title }}" value="{{ p.g_title }}"
+                                        {% if project_selected == p.g_title %}selected{% endif %}>{{ p.g_title }}
                                     </option>
                                     {% endfor %}
-                                    <option data-tokens="empty" value="empty" {% if project_selected == 'empty' %}selected{% endif %}>empty</option>
+                                    <option data-tokens="empty" value="empty"
+                                        {% if project_selected == 'empty' %}selected{% endif %}>empty</option>
                                 </select>
                             </div>
                         </div>
@@ -93,8 +95,11 @@
                                     {{ s.live }}
                                 </td>
                                 <td>
-                                    <a class="btn btn-outline-primary btn-sm" pup-target=""
-                                        onclick="pup_window_new(this)">Edit</a>
+                                    <a class="btn btn-outline-primary btn-sm"
+                                        pup-target="{{ url_for('admin.users_emails.edit', record_id = s.user_id) }}"
+                                        onclick="pup_window_new(this)">
+                                        Edit
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}

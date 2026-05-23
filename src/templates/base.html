@@ -40,7 +40,9 @@
 </head>
 
 <body>
+    {% block _navbar %}
     {% include "_navbar.html" %}
+    {% endblock %}
 
     {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
@@ -83,6 +85,34 @@
                 pageLength: 100,
             });
         });
+        /**
+         * Open email popup window
+         *
+         * @param {HTMLElement} element - Element with pup-target attribute
+         * @returns {void}
+         */
+        function pup_window_email(element) {
+            var target = $(element).attr("pup-target");
+            if (!target) {
+                console.error("Missing pup-target attribute");
+                return;
+            }
+            window.open(target, 'popupWindow', 'width=850,height=550,scrollbars=yes');
+        }
+        /**
+         * Open generic popup window
+         *
+         * @param {HTMLElement} element - Element with pup-target attribute
+         * @returns {void}
+         */
+        function pup_window_new(element) {
+            var target = $(element).attr("pup-target");
+            if (!target) {
+                console.error("Missing pup-target attribute");
+                return;
+            }
+            window.open(target, '', 'width=600,height=500,left=100,top=100,location=no');
+        }
     </script>
 </body>
 

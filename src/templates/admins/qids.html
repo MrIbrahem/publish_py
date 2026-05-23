@@ -13,8 +13,8 @@
                 <div class="d-flex gap-3">
                     {% for opt, label in [('all', 'All'), ('empty', 'Empty'), ('duplicate', 'Duplicate')] %}
                     <div class="form-check form-check-inline mb-0">
-                        <input class="form-check-input" type="radio" name="dis" id="dis_{{ opt }}"
-                               value="{{ opt }}" {% if dis == opt %}checked{% endif %}>
+                        <input class="form-check-input" type="radio" name="dis" id="dis_{{ opt }}" value="{{ opt }}"
+                            {% if dis == opt %}checked{% endif %}>
                         <label class="form-check-label" for="dis_{{ opt }}">{{ label }}</label>
                     </div>
                     {% endfor %}
@@ -51,14 +51,17 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a class="btn btn-sm btn-outline-secondary"
-                           href="{{ url_for(edit_endpoint, id=row.id, title=row.title, qid=row.qid) }}">
-                            <i class="bi bi-pencil"></i>
+                        <a class="btn btn-outline-primary btn-sm"
+                            pup-target="{{ url_for(edit_endpoint, id=row.id, title=row.title, qid=row.qid) }}"
+                            onclick="pup_window_new(this)">
+                            Edit
                         </a>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="5" class="text-center text-muted">No rows found.</td></tr>
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No rows found.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
