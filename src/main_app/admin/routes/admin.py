@@ -26,6 +26,7 @@ from .coordinators import coordinators_module
 from .full_translators import fulltranslators_module
 from .language_settings import languagesettings_module
 from .last import last_translations_dashboard
+from .add_translate import add_bp
 from .projects import projects_module
 from .settings import settings_module
 from .users_emails import users_emails_module
@@ -89,6 +90,7 @@ def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(fulltranslators_module.bp)
     bp_admin.register_blueprint(usersnoinprocess_module.bp)
     bp_admin.register_blueprint(languagesettings_module.bp)
+    bp_admin.register_blueprint(add_bp)
     # Templates(bp_admin)
     bp_admin.register_blueprint(settings_module.bp)
     bp_admin.register_blueprint(projects_module.bp)
