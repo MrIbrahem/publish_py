@@ -27,7 +27,8 @@ from .public.routes import (
 )
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
-from .shared.core.extensions import csrf_exempt, csrf_init_app, db, migrate
+from .shared.core.extensions import csrf_exempt, csrf_init_app, db as _db, migrate
+from .db import init_db
 
 logger = logging.getLogger(__name__)
 
@@ -124,8 +125,11 @@ def create_app(config_class: Type | None = None) -> Flask:
 
     # Initialize Flask-SQLAlchemy (new)
     if app.config.get("SQLALCHEMY_DATABASE_URI"):
-        db.init_app(app)
-        migrate.init_app(app, db)
+        _db.init_app(app)
+        migrate.init_app(app, _db)
+
+        # Create database tables and views if they don't exist
+        init_db(app, _db)
 
     # Legacy DB initialization (kept for backward compatibility during migration)
     if oauth_enabled and settings.database_data.db_host:
