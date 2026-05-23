@@ -196,10 +196,6 @@ def get_settings() -> Settings:
     Initialize and return a cached Settings object.
     Main entry point for application configuration.
     """
-    secret_key = os.getenv("FLASK_SECRET_KEY", "")
-    if not secret_key:
-        raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
-
     sessions = SessionConfig(
         state_key=os.getenv("STATE_SESSION_KEY", "oauth_state_nonce"),
         request_token_key=os.getenv("REQUEST_TOKEN_SESSION_KEY", "state"),
@@ -256,7 +252,6 @@ def get_settings() -> Settings:
 
     return Settings(
         publish_secret_code=publish_secret_code,
-        secret_key=secret_key,
         user_agent=user_agent,
         revids_api_url=revids_api_url,
         wikidata_domain=wikidata_domain,
