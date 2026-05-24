@@ -1,0 +1,68 @@
+{% extends "admins/base1_no_navbar.html" %}
+
+{% block title %}{% if new %}Add Translate type{% else %}Edit Translate type{% endif %}{% endblock %}
+
+{% block contents %}
+<div class="card">
+    <div class="card-header">
+        <h4>{% if new %}Add Translate type{% else %}Edit Translate type{% endif %}</h4>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for(post_endpoint) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="row g-3 align-items-end">
+                {% if not new %}
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Id</span>
+                        <input class="form-control" type="text" name="id" value="{{ id }}" readonly />
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">Title</span>
+                        <input class="form-control" type="text" name="title" value="{{ title|e }}" required />
+                    </div>
+                </div>
+                <div class='col-md-3'>
+                    <div class='row'>
+                        <div class='col'>
+                            <div class='input-group form-control mb-3'>
+                                <div class='input-group-prepend'>
+                                    <span class='me-3'>Lead:</span>
+                                </div>
+                                <div class="form-check form-switch form-inline">
+                                    <input class="form-check-input" type="checkbox" id="lead" name="lead" value="1"
+                                        {% if lead == '1' or lead == 1 %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col'>
+                            <div class='input-group form-control mb-3'>
+                                <div class='input-group-prepend'>
+                                    <span class='me-3'>Full:</span>
+                                </div>
+                                <div class="form-check form-switch form-inline">
+                                    <input class="form-check-input" type="checkbox" id="full" name="full" value="1"
+                                        {% if full == '1' or full == 1 %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class='row'>
+                        <div class='col'>
+                            <button type="submit" class="btn btn-outline-primary">Save</button>
+                        </div>
+                        <div class='col'>
+                            <a class="btn btn-outline-secondary" onclick="window.close()">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

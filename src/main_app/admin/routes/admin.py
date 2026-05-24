@@ -86,6 +86,12 @@ def in_process_total_dashboard():
     )
 
 
+@bp_admin.get("/edit_done")
+@admin_required
+def edit_done() -> str:
+    return render_template("admins/close_btn.html")
+
+
 @bp_admin.get("/categories")
 @admin_required
 def categories_dashboard_route():

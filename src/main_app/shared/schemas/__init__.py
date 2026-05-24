@@ -45,12 +45,12 @@ class PublishReportsQuerySchema(Schema):
     user = fields.Str(validate=validate.Length(max=120))
     lang = fields.Str(validate=validate.Length(min=2, max=10))
     sourcetitle = fields.Str(validate=validate.Length(max=255))
-    result = fields.Str(validate=validate.OneOf(sorted(ALLOWED_SPECIAL_VALUES)))
+
+    result = fields.Str(validate=validate.Length(max=50))
+    # result = fields.Str(validate=validate.OneOf(sorted(ALLOWED_SPECIAL_VALUES)))
+
     select = fields.Str(validate=validate.Length(max=500))
     limit = fields.Int(validate=validate.Range(min=1, max=1000))
-
-    # Special filter values
-    ALLOWED_SPECIAL_VALUES = {"not_empty", "not_mt", "empty", "mt", ">0", "all"}
 
 
 class CXTokenRequestSchema(Schema):

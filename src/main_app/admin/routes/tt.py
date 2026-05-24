@@ -26,17 +26,17 @@ tt_bp = Blueprint("tt", __name__, url_prefix="/tt")
 def tt_index() -> str:
     """Render the Translate Type listing."""
     cat = request.args.get("cat", "All")
+    translate_types = []
+    new_titles = []
     try:
         translate_types = translate_type_service.list_translate_types(cat=cat)
-        new_titles = translate_type_service.list_new_titles() if cat == "All" else []
+        # new_titles = translate_type_service.list_new_titles() if cat == "All" else []
     except Exception:
         logger.exception("Failed to load translate_type rows for cat=%r", cat)
-        translate_types = []
-        new_titles = []
 
     categories = list_categories()
     return render_template(
-        "admins/tt.html",
+        "admins/tt/index.html",
         translate_types=translate_types,
         # new_titles=new_titles,
         categories=categories,
@@ -47,17 +47,31 @@ def tt_index() -> str:
 @tt_bp.route("/edit", methods=["GET"])
 def tt_edit() -> str:
     """Render the add/edit popup form for a single translate_type row."""
+    tt_id = request.args.get("id", "")
+    if not tt_id:
+        flash("Invalid id.", "danger")
+        return redirect(url_for("admin.edit_done"))
+    try:
+        translate_types = translate_type_service.get_translate_type(tt_id)
+    except Exception:
+        logger.exception("Failed to load translate_type rows for id=%r", tt_id)
+
+    if not translate_types:
+        flash(f"Failed to load translate_type id={tt_id}", "danger")
+        return redirect(url_for("admin.edit_done"))
+
     return render_template(
-        "admins/tt_edit.html",
-        id=request.args.get("id", ""),
-        title=request.args.get("title", ""),
-        lead=request.args.get("lead", ""),
-        full=request.args.get("full", ""),
+        "admins/tt/edit.html",
+        post_endpoint="admin.tt.tt_edit_post",
+        id=translate_types.tt_id,
+        title=translate_types.tt_title,
+        lead=translate_types.tt_lead,
+        full=translate_types.tt_full,
     )
 
 
 @tt_bp.route("/", methods=["POST"])
-def tt_post() -> ResponseReturnValue:
+def tt_edit_post() -> ResponseReturnValue:
     """Insert or update a translate_type row from the popup form."""
     tt_id_raw = (request.form.get("id") or "").strip()
     title = (request.form.get("title") or "").strip()
@@ -66,7 +80,7 @@ def tt_post() -> ResponseReturnValue:
 
     if not title:
         flash("Title is required.", "danger")
-        return redirect(url_for("admin.tt.tt_index"))
+        return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
 
     tt_id: int | None = None
     if tt_id_raw:
@@ -74,7 +88,7 @@ def tt_post() -> ResponseReturnValue:
             tt_id = int(tt_id_raw)
         except ValueError:
             flash(f"Invalid id: {tt_id_raw}", "danger")
-            return redirect(url_for("admin.tt.tt_index"))
+            return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
 
     try:
         result = translate_type_service.upsert(tt_id, title, lead, full)
@@ -84,7 +98,54 @@ def tt_post() -> ResponseReturnValue:
 
     if result:
         flash(f"Translate type saved successfully, title: {title}.", "success")
-    else:
-        flash(f"Failed to save translate type, title: {title}.", "danger")
+        return redirect(url_for("admin.edit_done"))
 
-    return redirect(url_for("admin.tt.tt_index"))
+    flash(f"Failed to save translate type, title: {title}.", "danger")
+    return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
+
+
+@tt_bp.route("/add", methods=["GET"])
+def add() -> str:
+    return render_template(
+        "admins/tt/edit.html",
+        post_endpoint="admin.tt.tt_add_post",
+        id="",
+        title="",
+        lead=1,
+        full=0,
+        new=1,
+    )
+
+
+@tt_bp.route("/add", methods=["POST"])
+def tt_add_post() -> ResponseReturnValue:
+    """Insert a translate_type row from the popup form."""
+    title = (request.form.get("title") or "").strip()
+    lead = 1 if request.form.get("lead") == "1" else 0
+    full = 1 if request.form.get("full") == "1" else 0
+
+    if not title:
+        flash("Title is required.", "danger")
+        return redirect(url_for("admin.tt.add"))
+
+    try:
+        exist_record = translate_type_service.get_translate_type_by_title(title)
+    except Exception:
+        exist_record = False
+
+    if exist_record:
+        flash(f"Translate type already exists, title: {title}.", "danger")
+        return redirect(url_for("admin.tt.edit", id=exist_record.tt_id))
+
+    try:
+        result = translate_type_service.upsert(tt_id, title, lead, full)
+    except Exception:
+        logger.exception("Failed to upsert translate_type title=%r", title)
+        result = False
+
+    if result:
+        flash(f"Translate type saved successfully, title: {title}.", "success")
+        return redirect(url_for("admin.edit_done"))
+
+    flash(f"Failed to save translate type, title: {title}.", "danger")
+    return redirect(url_for("admin.tt.add"))
