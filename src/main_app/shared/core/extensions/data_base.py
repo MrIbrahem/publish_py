@@ -1,14 +1,5 @@
 """
-Flask extensions initialization.
-
-This module centralizes Flask extensions to prevent circular imports
-and enable proper initialization order with the application factory pattern.
-
-IMPORT RULE: Always import extensions from this module.
-Never instantiate extensions elsewhere.
-
-Usage:
-    from main_app.shared.core.extensions import db, migrate, csrf
+Flask data base initialization.
 """
 
 from __future__ import annotations
@@ -16,14 +7,26 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from flask import Blueprint, Flask
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import MetaData, Text, event, inspect, text
+from sqlalchemy import MetaData, event, inspect, text
+
+from sqlalchemy import Text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 from sqlalchemy.engine import Connection, Dialect
 from sqlalchemy.types import TypeDecorator, TypeEngine
+
+
+class LONGTEXT(TypeDecorator):
+    """LONGTEXT for MySQL, Text for everything else."""
+
+    impl = Text
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine:
+        if dialect.name == "mysql":
+            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
+        return dialect.type_descriptor(Text())
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,23 +70,6 @@ metadata = MetaData(naming_convention=convention)
 # models continue to work unchanged.
 db = SQLAlchemy(metadata=metadata, model_class=Base)
 
-# Flask-Migrate instance (Alembic integration)
-migrate = Migrate()
-
-# CSRF Protection
-csrf = CSRFProtect()
-
-
-def csrf_init_app(app: Flask) -> None:
-    """Initialize CSRF protection."""
-    csrf.init_app(app)
-
-
-def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
-    """Exempt a blueprint from CSRF protection."""
-    if app.config.get("WTF_CSRF_ENABLED"):
-        csrf.exempt(bp_publish)
-
 
 @event.listens_for(db.metadata, "after_create")
 def create_views_new_all_view(target: MetaData, connection: Connection, **kw: Any) -> None:
@@ -107,22 +93,9 @@ def create_views_new_all_view(target: MetaData, connection: Connection, **kw: An
             logger.info(f"View '{name}' already exists, skipping.")
 
 
-class LONGTEXT(TypeDecorator):
-    """LONGTEXT for MySQL, Text for everything else."""
-
-    impl = Text
-    cache_ok = True
-
-    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine:
-        if dialect.name == "mysql":
-            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
-        return dialect.type_descriptor(Text())
-
-
 __all__ = [
+    "Base",
     "db",
-    "migrate",
-    "csrf",
-    "csrf_init_app",
-    "csrf_exempt",
+    "metadata",
+    "LONGTEXT",
 ]
