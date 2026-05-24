@@ -112,7 +112,7 @@ def _delete_category(record_id: int) -> None:
         logger.exception("Unable to delete category.")
         flash("Unable to delete category. Please try again.", "danger")
     else:
-        flash(f"category for '{record.category}' removed.", "success")
+        flash(f"category for '{record_id}' removed.", "success")
 
 
 class CampaignsDashboard:

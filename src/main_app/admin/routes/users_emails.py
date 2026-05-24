@@ -151,7 +151,7 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
         logger.exception("Unable to delete user.")
         flash("Unable to delete user. Please try again.", "danger")
     else:
-        flash(f"User '{record.username}' deleted", "success")
+        flash(f"User '{record_id}' deleted", "success")
 
     return redirect(url_for("admin.users_emails.dashboard"))
 

@@ -68,7 +68,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
     action = "activate" if is_active else "deactivate"
     past_tense = "activated" if is_active else "deactivated"
     try:
-        record = update_full_translator(record_id, is_active)
+        record = update_full_translator(record_id, is_active=is_active)
     except LookupError as exc:
         logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
@@ -76,7 +76,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
         logger.exception(f"Unable to {action} record.")
         flash(f"Unable to {action} record. Please try again.", "danger")
     else:
-        flash(f"Record '{record.username}' {past_tense}.", "success")
+        flash(f"Record '{record.user}' {past_tense}.", "success")
 
     return redirect(url_for("admin.full_translators.dashboard"))
 
@@ -103,7 +103,7 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
         logger.exception("Unable to delete full translator.")
         flash("Unable to delete full translator. Please try again.", "danger")
     else:
-        flash(f"Full translator '{record.user}' removed.", "success")
+        flash(f"Full translator '{translator_id}' removed.", "success")
 
     return redirect(url_for("admin.full_translators.dashboard"))
 

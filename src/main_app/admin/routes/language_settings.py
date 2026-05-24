@@ -107,7 +107,7 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
         logger.exception("Unable to delete language setting.")
         flash("Unable to delete language setting. Please try again.", "danger")
     else:
-        flash(f"Language setting for '{record.lang_code}' removed.", "success")
+        flash(f"Language setting for '{setting_id}' removed.", "success")
 
     return redirect(url_for("admin.language_settings.dashboard"))
 
