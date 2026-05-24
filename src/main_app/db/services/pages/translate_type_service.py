@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db
+from ....shared.core.extensions import db, UniqueError
 from ...models import PageRecord, QidRecord, TranslateTypeRecord
 
 logger = logging.getLogger(__name__)
@@ -98,7 +98,7 @@ def add_translate_type(
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        raise ValueError(f"Translate type '{tt_title}' already exists") from None
+        raise UniqueError(title=tt_title) from None
 
     db.session.refresh(orm_obj)
     return orm_obj
@@ -129,6 +129,9 @@ def update_translate_type(
     try:
         db.session.commit()
         db.session.refresh(orm_obj)
+    except IntegrityError:
+        db.session.rollback()
+        raise UniqueError(title=tt_title) from None
     except Exception:
         db.session.rollback()
         raise

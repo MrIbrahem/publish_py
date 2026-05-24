@@ -13,6 +13,8 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
+from ...shared.core.extensions import UniqueError
+
 from ...db.services.content.category_service import list_categories
 from ...db.services.pages import translate_type_service
 
@@ -102,6 +104,11 @@ def tt_edit_post() -> ResponseReturnValue:
 
     try:
         result = translate_type_service.update_translate_type(tt_id, title, lead, full)
+    except UniqueError:
+        logger.warning("Failed to update translate_type, duplicate item with title=%r", title)
+        flash(f"Failed, title: {title} is used in other item.", "danger")
+        return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
+
     except Exception:
         logger.exception("Failed to upsert translate_type id=%r title=%r", tt_id, title)
         result = False
@@ -139,16 +146,11 @@ def tt_add_post() -> ResponseReturnValue:
         return redirect(url_for("admin.tt.add"))
 
     try:
-        exist_record = translate_type_service.get_translate_type_by_title(title)
-    except Exception:
-        exist_record = False
-
-    if exist_record:
-        flash(f"Translate type already exists, title: {title}.", "danger")
-        return redirect(url_for("admin.tt.edit", id=exist_record.tt_id))
-
-    try:
         result = translate_type_service.add_translate_type(tt_title=title, tt_lead=lead, tt_full=full)
+    except UniqueError:
+        logger.warning("Failed to insert translate_type, duplicate item with title=%r", title)
+        flash(f"Failed, title: {title} is used in other item.", "danger")
+        return redirect(url_for("admin.tt.add"))
     except Exception:
         logger.exception("Failed to insert translate_type title=%r", title)
         result = False
