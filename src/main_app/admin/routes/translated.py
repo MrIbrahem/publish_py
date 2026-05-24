@@ -46,7 +46,7 @@ def translated_index() -> str:
         rows, total_count = [], 0
 
     return render_template(
-        "admins/translated.html",
+        "admins/translated/index.html",
         rows=rows,
         total_count=total_count,
         lang=lang,
@@ -72,7 +72,7 @@ def translated_edit() -> str:
         abort(404)
 
     return render_template(
-        "admins/translated_edit.html",
+        "admins/translated/edit.html",
         row=row,
         post_endpoint="admin.translated.translated_edit_post",
     )
