@@ -1,11 +1,11 @@
 {% extends "admins/base1_no_navbar.html" %}
 
-{% block title %}{% if id %}Edit Qid{% else %}Add New Qid{% endif %}{% endblock %}
+{% block title %}{% if new %}Add New Qid{% else %}Edit Qid{% endif %}{% endblock %}
 
 {% block contents %}
 <div class="card">
     <div class="card-header">
-        <h4>{% if id %}Edit Qid{% else %}Add New Qid{% endif %} ({{ qid_table }})</h4>
+        <h4>{% if new %}Add New Qid{% else %}Edit Qid{% endif %} ({{ qid_table }})</h4>
     </div>
     <div class="card-body">
         <form action="{{ url_for(post_endpoint) }}" method="POST">
@@ -22,15 +22,14 @@
                 <div class="col-md-3">
                     <div class="input-group">
                         <span class="input-group-text">Title</span>
-                        <input class="form-control" type="text" name="title"
-                               value="{{ title|e }}" required />
+                        <input class="form-control" type="text" name="title" value="{{ title|e }}" required />
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="input-group">
                         <span class="input-group-text">Qid</span>
-                        <input class="form-control" type="text" name="qid"
-                               value="{{ qid|e }}" placeholder="Q12345" required />
+                        <input class="form-control" type="text" name="qid" value="{{ qid|e }}" placeholder="Q12345"
+                            required />
                     </div>
                 </div>
                 <div class="col-md-3">

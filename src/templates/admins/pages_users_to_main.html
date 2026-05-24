@@ -6,7 +6,7 @@
 <div class="card">
     <div class="card-header">
         <form method="GET" action="{{ url_for('admin.pages_users_to_main.pages_users_to_main_index') }}"
-              class="row g-3 align-items-end">
+            class="row g-3 align-items-end">
             <div class="col-md-7">
                 <h4 class="mb-0">Userpages need to be moved to main pages: ({{ rows|length }})</h4>
             </div>
@@ -29,7 +29,7 @@
         </form>
     </div>
     <div class="card-body">
-        <table class="table table-sm table-striped">
+        <table class="table table-sm table-striped table_responsive">
             <thead>
                 <tr>
                     <th>#</th>
@@ -65,13 +65,13 @@
                     <td>
                         {% if row.target %}
                         <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}"
-                           target="_blank">{{ row.target }}</a>
+                            target="_blank">{{ row.target }}</a>
                         {% endif %}
                     </td>
                     <td>
                         {% if row.new_target %}
                         <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.new_target | replace(' ', '_') | urlencode }}"
-                           target="_blank">{{ row.new_target }}</a>
+                            target="_blank">{{ row.new_target }}</a>
                         {% endif %}
                     </td>
                     <td>
@@ -88,7 +88,9 @@
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="11" class="text-center text-muted">No pages waiting.</td></tr>
+                <tr>
+                    <td colspan="11" class="text-center text-muted">No pages waiting.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
