@@ -102,7 +102,14 @@ class QidsModel:
         @self.bp.route("/edit", methods=["GET"])
         def edit() -> str:
             """Render the add/edit popup for a single row."""
-            qid_id = request.args.get("id", "")
+            qid_id = None
+            qid_id_raw = request.args.get("id", "")
+            try:
+                qid_id = int(qid_id_raw)
+            except (ValueError, TypeError):
+                flash(f"Invalid ID: {qid_id_raw}", "danger")
+                return redirect(url_for("admin.edit_done"))
+
             record: QidRecord | QidOthersRecord = self.service.get_by_id(qid_id)
             if not record:
                 flash(f"Record not found. id={qid_id}", "danger")

@@ -7,8 +7,8 @@ class UniqueError(DatabaseError):
     message = "Unique constraint failed"
 
     def __init__(self, title):
-        super().__init__(None, None, None)
         self.title = title
+        super().__init__(f"Unique constraint failed for title: {title}")
 
 
 __all__ = [

@@ -48,15 +48,16 @@ def tt_index() -> str:
 @tt_bp.route("/edit", methods=["GET"])
 def tt_edit() -> str:
     """Render the add/edit popup form for a single translate_type row."""
-    tt_id = request.args.get("id", "")
-    if not tt_id:
+    tt_id_raw = request.args.get("id", "")
+    if not tt_id_raw:
         flash("Invalid id.", "danger")
         return redirect(url_for("admin.edit_done"))
-
     try:
+        tt_id = int(tt_id_raw)
         translate_types = translate_type_service.get_translate_type(tt_id)
-    except Exception:
-        logger.exception("Failed to load translate_type rows for id=%r", tt_id)
+    except (ValueError, TypeError):
+        logger.exception("Invalid translate_type id=%r", tt_id_raw)
+        translate_types = None
 
     if not translate_types:
         flash(f"Failed to load translate_type id={tt_id}", "danger")

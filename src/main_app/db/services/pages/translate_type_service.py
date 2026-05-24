@@ -107,8 +107,8 @@ def add_translate_type(
 def update_translate_type(
     tt_id: int,
     tt_title: str | None = None,
-    tt_lead: int = 1,
-    tt_full: int = 0,
+    tt_lead: int | None = None,
+    tt_full: int | None = None,
 ) -> TranslateTypeRecord:
     """Update a translate_type record."""
     # tt_id is the primary key for TranslateTypeRecord
@@ -120,10 +120,10 @@ def update_translate_type(
         tt_title = tt_title.strip()
         orm_obj.tt_title = tt_title
 
-    if tt_lead:
+    if tt_lead is not None:
         orm_obj.tt_lead = int(tt_lead)
 
-    if tt_full:
+    if tt_full is not None:
         orm_obj.tt_full = int(tt_full)
 
     try:

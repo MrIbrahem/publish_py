@@ -126,8 +126,8 @@ def get_by_qid(qid: str) -> QidOthersRecord | None:
     return db.session.query(QidOthersRecord).filter(QidOthersRecord.qid == qid).first()
 
 
-def get_by_id(qid_id: str) -> QidOthersRecord | None:
-    """Get the first QID record matching the given qid string."""
+def get_by_id(qid_id: int) -> QidOthersRecord | None:
+    """Get a QID record by its primary key ID."""
     return db.session.get(QidOthersRecord, qid_id)
 
 
