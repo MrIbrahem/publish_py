@@ -34,7 +34,7 @@ def qids_others_index() -> str:
         rows = []
 
     return render_template(
-        "admins/qids.html",
+        "admins/qids/index.html",
         rows=rows,
         dis=dis,
         qid_table="qids_others",
@@ -49,7 +49,7 @@ def qids_others_index() -> str:
 def qids_others_edit() -> str:
     """Render the add/edit popup for a single qids_others row."""
     return render_template(
-        "admins/qids_edit.html",
+        "admins/qids/edit.html",
         id=request.args.get("id", ""),
         title=request.args.get("title", ""),
         qid=request.args.get("qid", ""),
