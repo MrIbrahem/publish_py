@@ -17,6 +17,7 @@ from src.main_app.db.services.pages.translate_type_service import (
     list_new_titles,
 )
 from src.main_app.shared.core.extensions import db as _db
+from src.main_app.shared.core.extensions.exc import UniqueError
 
 
 def test_translate_type_workflow():
@@ -131,7 +132,7 @@ class TestAddTranslateType:
 
     def test_raises_error_if_exists(self, monkeypatch):
         add_translate_type("Duplicate")
-        with pytest.raises(ValueError, match="already exists"):
+        with pytest.raises(UniqueError):
             add_translate_type("Duplicate")
 
     def test_raises_error_if_no_title(self, monkeypatch):
