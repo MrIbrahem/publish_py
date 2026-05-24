@@ -7,6 +7,8 @@ import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from ....db.models import QidOthersRecord, QidRecord
+
 
 logger = logging.getLogger(__name__)
 
@@ -100,11 +102,17 @@ class QidsModel:
         @self.bp.route("/edit", methods=["GET"])
         def edit() -> str:
             """Render the add/edit popup for a single row."""
+            qid_id = request.args.get("id", "")
+            record: QidRecord | QidOthersRecord = self.service.get_by_id(qid_id)
+            if not record:
+                flash(f"Record not found. id={qid_id}", "danger")
+                return redirect(url_for("admin.edit_done"))
+
             return render_template(
                 "admins/qids/edit.html",
-                id=request.args.get("id", ""),
-                title=request.args.get("title", ""),
-                qid=request.args.get("qid", ""),
+                id=qid_id,
+                title=record.title,
+                qid=record.qid,
                 qid_table=self.endpoint,
                 post_endpoint=f"admin.{self.endpoint}.edit_post",
             )

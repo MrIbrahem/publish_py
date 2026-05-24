@@ -51,8 +51,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a class="btn btn-outline-primary btn-sm"
-                            pup-target="{{ url_for(edit_endpoint, id=row.id, title=row.title, qid=row.qid) }}"
+                        <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for(edit_endpoint, id=row.id) }}"
                             onclick="pup_window_new(this)">
                             Edit
                         </a>
