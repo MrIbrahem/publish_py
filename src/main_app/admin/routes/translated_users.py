@@ -28,7 +28,7 @@ def _safe_int(value: str | None, default: int) -> int:
 
 
 @translated_users_bp.route("/", methods=["GET"])
-def translated_users_index() -> str:
+def index() -> str:
     """List translated user pages with pagination."""
     lang = request.args.get("lang", "All")
     page = max(_safe_int(request.args.get("page"), 1), 1)
@@ -51,14 +51,14 @@ def translated_users_index() -> str:
         limit=limit,
         languages=list_langs(),
         table_label="User",
-        endpoint="admin.translated_users.translated_users_index",
-        edit_endpoint="admin.translated_users.translated_users_edit",
-        edit_post_endpoint="admin.translated_users.translated_users_edit_post",
+        endpoint="admin.translated_users.index",
+        edit_endpoint="admin.translated_users.edit",
+        edit_post_endpoint="admin.translated_users.edit_post",
     )
 
 
 @translated_users_bp.route("/edit", methods=["GET"])
-def translated_users_edit() -> str:
+def edit() -> str:
     """Render the edit popup for a single ``pages_users`` row."""
     page_id = _safe_int(request.args.get("id"), 0)
     if page_id <= 0:
@@ -71,17 +71,17 @@ def translated_users_edit() -> str:
     return render_template(
         "admins/translated/edit.html",
         row=row,
-        post_endpoint="admin.translated_users.translated_users_edit_post",
+        post_endpoint="admin.translated_users.edit_post",
     )
 
 
 @translated_users_bp.route("/edit", methods=["POST"])
-def translated_users_edit_post() -> ResponseReturnValue:
+def edit_post() -> ResponseReturnValue:
     """Update or delete a single ``pages_users`` row."""
     page_id = _safe_int(request.form.get("id"), 0)
     if page_id <= 0:
         flash("Invalid id supplied.", "danger")
-        return redirect(url_for("admin.translated_users.translated_users_index"))
+        return redirect(url_for("admin.translated_users.index"))
 
     if "delete" in request.form:
         try:
@@ -90,7 +90,7 @@ def translated_users_edit_post() -> ResponseReturnValue:
         except Exception:
             logger.exception("Failed to delete user page id=%r", page_id)
             flash(f"Failed to delete user page id {page_id}.", "danger")
-        return redirect(url_for("admin.translated_users.translated_users_index"))
+        return redirect(url_for("admin.translated_users.index"))
 
     title = (request.form.get("title") or "").strip()
     target = (request.form.get("target") or "").strip()
@@ -100,7 +100,7 @@ def translated_users_edit_post() -> ResponseReturnValue:
 
     if not title or not target or not lang or not user or not pupdate:
         flash("All fields (title, target, lang, user, pupdate) are required.", "danger")
-        return redirect(url_for("admin.translated_users.translated_users_index"))
+        return redirect(url_for("admin.translated_users.index"))
 
     try:
         row = user_page_service.update_user_page(
@@ -119,4 +119,4 @@ def translated_users_edit_post() -> ResponseReturnValue:
         logger.exception("Failed to update user page id=%r", page_id)
         flash(f"Failed to update user page id {page_id}.", "danger")
 
-    return redirect(url_for("admin.translated_users.translated_users_index"))
+    return redirect(url_for("admin.translated_users.index"))
