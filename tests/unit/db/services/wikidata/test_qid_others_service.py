@@ -1,7 +1,7 @@
 """Unit tests for the ``qid_others_service`` admin helpers.
 
 Covers the new functions exposed for the admin/qids_others blueprint:
-- ``list_qids_others(dis=)``  -> all / empty / duplicate filters
+- ``list_records(dis=)``  -> all / empty / duplicate filters
 - ``get_by_qid``
 - ``get_by_title``
 - ``insert``
@@ -18,7 +18,7 @@ from src.main_app.db.services.wikidata.qid_others_service import (
     get_by_qid,
     get_by_title,
     insert,
-    list_qids_others,
+    list_records,
     update,
 )
 from src.main_app.shared.core.extensions import db as _db
@@ -35,18 +35,18 @@ def _add_with_empty_qid(title: str) -> QidOthersRecord:
 
 
 class TestListQidsOthersByDis:
-    """Tests for the ``dis`` filter on list_qids_others."""
+    """Tests for the ``dis`` filter on list_records."""
 
     def test_dis_all_returns_every_row(self, monkeypatch):
         add_qid_other("A", "Q1")
         add_qid_other("B", "Q2")
-        rows = list_qids_others(dis="all")
+        rows = list_records(dis="all")
         assert {r.title for r in rows} >= {"A", "B"}
 
     def test_dis_empty_returns_only_rows_with_empty_or_null_qid(self, monkeypatch):
         add_qid_other("Has_qid", "Q1")
         _add_with_empty_qid("Missing_qid")
-        rows = list_qids_others(dis="empty")
+        rows = list_records(dis="empty")
         assert {r.title for r in rows} == {"Missing_qid"}
 
     def test_dis_duplicate_returns_rows_sharing_qid(self, monkeypatch):
@@ -55,14 +55,14 @@ class TestListQidsOthersByDis:
         add_qid_other("First", "Q42")
         add_qid_other("Second", "Q42")
         add_qid_other("Solo", "Q43")
-        titles = {r.title for r in list_qids_others(dis="duplicate")}
+        titles = {r.title for r in list_records(dis="duplicate")}
         assert "First" in titles
         assert "Second" in titles
         assert "Solo" not in titles
 
     def test_dis_default_is_all(self, monkeypatch):
         add_qid_other("Anything", "Q1")
-        assert len(list_qids_others()) == 1
+        assert len(list_records()) == 1
 
 
 class TestGetByQid:
@@ -97,7 +97,7 @@ class TestInsert:
     def test_inserts_new_row(self, monkeypatch):
         ok = insert("Brand_new", "Q300")
         assert ok is True
-        rows = list_qids_others()
+        rows = list_records()
         assert any(r.title == "Brand_new" and r.qid == "Q300" for r in rows)
 
     def test_fills_empty_qid_for_existing_title(self, monkeypatch):

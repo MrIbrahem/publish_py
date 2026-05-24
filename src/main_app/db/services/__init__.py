@@ -64,7 +64,7 @@ from .users.user_token_service import (
     upsert_user_token,
 )
 from .wikidata.allqid_service import list_targets_by_lang
-from .wikidata.qid_service import list_qids
+from .wikidata.qid_service import list_records
 
 __all__ = [
     "list_in_process",
@@ -95,7 +95,7 @@ __all__ = [
     "list_of_users_by_translations_count",
     # qid_service
     "list_targets_by_lang",
-    "list_qids",
+    "list_records",
     # user_token_service
     "upsert_user_token",
     "get_user_token",

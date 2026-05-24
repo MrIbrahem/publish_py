@@ -77,7 +77,7 @@ def get_page_qid(title: str) -> QidRecord | None:
     return orm_obj
 
 
-def list_qids(dis: str = "all") -> List[QidRecord]:
+def list_records(dis: str = "all") -> List[QidRecord]:
     """Return QID records, optionally filtered by ``dis``.
 
     - ``"all"``: every row in qids.
@@ -188,7 +188,7 @@ __all__ = [
     "update_qid",
     "delete_qid",
     "get_page_qid",
-    "list_qids",
+    "list_records",
     "list_qid_records",
     "get_title_to_qid",
     "get_by_qid",

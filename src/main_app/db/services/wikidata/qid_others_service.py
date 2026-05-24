@@ -77,7 +77,7 @@ def get_page_qid_other(title: str) -> QidOthersRecord | None:
     return orm_obj
 
 
-def list_qids_others(dis: str = "all") -> List[QidOthersRecord]:
+def list_records(dis: str = "all") -> List[QidOthersRecord]:
     """Return qids_others records, optionally filtered by ``dis``.
 
     - ``"all"``: every row.
@@ -175,7 +175,7 @@ __all__ = [
     "update_qid_other",
     "delete_qid_other",
     "get_page_qid_other",
-    "list_qids_others",
+    "list_records",
     "get_by_qid",
     "get_by_title",
     "insert",
