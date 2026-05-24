@@ -18,7 +18,6 @@ from ...db.services.pages import translate_type_service
 
 logger = logging.getLogger(__name__)
 
-
 tt_bp = Blueprint("tt", __name__, url_prefix="/tt")
 
 
@@ -51,6 +50,7 @@ def tt_edit() -> str:
     if not tt_id:
         flash("Invalid id.", "danger")
         return redirect(url_for("admin.edit_done"))
+
     try:
         translate_types = translate_type_service.get_translate_type(tt_id)
     except Exception:
@@ -91,7 +91,17 @@ def tt_edit_post() -> ResponseReturnValue:
             return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
 
     try:
-        result = translate_type_service.upsert(tt_id, title, lead, full)
+        translate_types = translate_type_service.get_translate_type(tt_id)
+    except Exception:
+        logger.exception("Failed to load translate_type rows for id=%r", tt_id)
+        translate_types = None
+
+    if not translate_types:
+        flash(f"Failed to load translate_type id={tt_id}", "danger")
+        return redirect(url_for("admin.edit_done"))
+
+    try:
+        result = translate_type_service.update_translate_type(tt_id, title, lead, full)
     except Exception:
         logger.exception("Failed to upsert translate_type id=%r title=%r", tt_id, title)
         result = False
@@ -138,9 +148,9 @@ def tt_add_post() -> ResponseReturnValue:
         return redirect(url_for("admin.tt.edit", id=exist_record.tt_id))
 
     try:
-        result = translate_type_service.upsert(tt_id, title, lead, full)
+        result = translate_type_service.add_translate_type(tt_title=title, tt_lead=lead, tt_full=full)
     except Exception:
-        logger.exception("Failed to upsert translate_type title=%r", title)
+        logger.exception("Failed to insert translate_type title=%r", title)
         result = False
 
     if result:

@@ -2,9 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.db.models import TranslateTypeRecord
+from src.main_app.db.models import TranslateTypeRecord, PageRecord, QidRecord
 from src.main_app.db.services.pages.translate_type_service import (
-    add_or_update_translate_type,
     add_translate_type,
     can_translate_full,
     can_translate_lead,
@@ -15,7 +14,9 @@ from src.main_app.db.services.pages.translate_type_service import (
     list_lead_enabled_types,
     list_translate_types,
     update_translate_type,
+    list_new_titles,
 )
+from src.main_app.shared.core.extensions import db as _db
 
 
 def test_translate_type_workflow():
@@ -50,10 +51,6 @@ def test_translate_type_workflow():
     updated = update_translate_type(tt.tt_id, tt_full=1)
     assert updated.tt_full == 1
     assert can_translate_full("Medical history") is True
-
-    # Test add_or_update
-    tt4 = add_or_update_translate_type("Medical history", 0, 1)
-    assert tt4.tt_lead == 0
 
     # Test delete
     deleted = delete_translate_type(tt.tt_id)
@@ -142,22 +139,6 @@ class TestAddTranslateType:
             add_translate_type("")
 
 
-class TestAddOrUpdateTranslateType:
-    """Tests for add_or_update_translate_type function."""
-
-    def test_delegates_to_store(self, monkeypatch):
-        """Test that function upserts record."""
-        add_translate_type("Public health", 1, 0)
-        record = add_or_update_translate_type("Public health", 0, 1)
-        assert record.tt_lead == 0
-        assert record.tt_full == 1
-        assert len(list_translate_types()) == 1
-
-    def test_raises_error_if_no_title(self, monkeypatch):
-        with pytest.raises(ValueError, match="Title is required"):
-            add_or_update_translate_type(" ")
-
-
 class TestUpdateTranslateType:
     """Tests for update_translate_type function."""
 
@@ -228,18 +209,11 @@ class TestCanTranslateFull:
         assert can_translate_full("Unknown Title") is False
 
 
-
 # ---------------------------------------------------------------------------
 # Tests for new service functions added with the admin blueprint work:
 #   - list_translate_types(cat=)
 #   - list_new_titles()
-#   - upsert(tt_id, title, lead, full)
 # ---------------------------------------------------------------------------
-
-from src.main_app.db.models import PageRecord, QidRecord
-from src.main_app.db.services.pages.translate_type_service import list_new_titles, upsert
-from src.main_app.shared.core.extensions import db as _db
-
 
 class TestListTranslateTypesByCategory:
     """Tests for the ``cat`` filter on list_translate_types."""
@@ -322,65 +296,3 @@ class TestListNewTitles:
         _db.session.commit()
         result = list_new_titles()
         assert result.count("Distinct_one") == 1
-
-
-class TestUpsert:
-    """Tests for the upsert helper used by the tt admin POST handler."""
-
-    def test_inserts_when_no_id_and_title_is_new(self, monkeypatch):
-        ok = upsert(None, "Brand_new_type", lead=1, full=0)
-        assert ok is True
-        record = get_translate_type_by_title("Brand_new_type")
-        assert record is not None
-        assert record.tt_lead == 1
-        assert record.tt_full == 0
-
-    def test_silently_skips_insert_when_title_already_exists(self, monkeypatch):
-        # PHP "INSERT ... WHERE NOT EXISTS" semantics: don't fail, don't update.
-        existing = add_translate_type("Existing", tt_lead=1, tt_full=0)
-        ok = upsert(None, "Existing", lead=0, full=1)
-        assert ok is True
-        unchanged = get_translate_type(existing.tt_id)
-        assert unchanged.tt_lead == 1
-        assert unchanged.tt_full == 0
-
-    def test_updates_when_id_is_given(self, monkeypatch):
-        record = add_translate_type("To_update", tt_lead=1, tt_full=0)
-        ok = upsert(record.tt_id, "Renamed", lead=0, full=1)
-        assert ok is True
-        refreshed = get_translate_type(record.tt_id)
-        assert refreshed.tt_title == "Renamed"
-        assert refreshed.tt_lead == 0
-        assert refreshed.tt_full == 1
-
-    def test_returns_false_when_id_does_not_exist(self, monkeypatch):
-        assert upsert(99999, "x", lead=1, full=0) is False
-
-    def test_returns_false_when_title_is_empty(self, monkeypatch):
-        assert upsert(None, "   ", lead=1, full=0) is False
-        assert upsert(None, "", lead=1, full=0) is False
-
-    def test_strips_whitespace_from_title(self, monkeypatch):
-        ok = upsert(None, "  Trimmed  ", lead=1, full=0)
-        assert ok is True
-        assert get_translate_type_by_title("Trimmed") is not None
-
-    def test_coerces_lead_and_full_to_int(self, monkeypatch):
-        # Routes pass "1" / 0 / "" for these toggles.
-        ok = upsert(None, "Coerce_check", lead="1", full="")
-        assert ok is True
-        record = get_translate_type_by_title("Coerce_check")
-        assert record.tt_lead == 1
-        assert record.tt_full == 0
-
-    def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
-        with patch(
-            "src.main_app.db.services.pages.translate_type_service.db.session"
-        ) as mock_session:
-            # No row matches the title -> code path falls through to the
-            # INSERT branch where commit() raises.
-            mock_session.query.return_value.filter.return_value.first.return_value = None
-            mock_session.commit.side_effect = Exception("boom")
-            ok = upsert(None, "Fail", lead=1, full=0)
-            assert ok is False
-            mock_session.rollback.assert_called_once()
