@@ -23,14 +23,14 @@
                 <tbody>
                     {% for row in rows %}
                     <tr>
-                        <th data-content="#">{{ loop.index }}</th>
-                        <td data-content="Language name">
+                        <th>{{ loop.index }}</th>
+                        <td>
                             <a target="_blank" href="https://{{ row.langcode }}.wikipedia.org">{{ row.langname }}</a>
                         </td>
-                        <td data-content="Language code">{{ row.langcode }}</td>
-                        <td data-content="Autonym">{{ row.autonym }}</td>
-                        <td data-content="Exists Articles">{{ "{:,}".format(row.exists) }}</td>
-                        <td data-content="Missing Articles" data-search="{{ row.missing }}">
+                        <td>{{ row.langcode }}</td>
+                        <td>{{ row.autonym }}</td>
+                        <td>{{ "{:,}".format(row.exists) }}</td>
+                        <td data-search="{{ row.missing }}">
                             <a
                                 href="{{ url_for('main.index', cat=category, depth=1, doit='Do+it', code=row.langcode, type='lead') }}">{{ "{:,}".format(row.missing) }}</a>
                         </td>

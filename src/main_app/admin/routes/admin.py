@@ -29,8 +29,10 @@ from .last import last_translations_dashboard
 from .add_translate import add_bp
 from .pages_users_to_main import pages_users_to_main_bp
 from .projects import projects_module
-from .qids import qids_bp
-from .qids_others import qids_others_bp
+
+from .qids.qids import qids_module  # qids_bp
+from .qids.qids_others import qids_others_module  # qids_others_bp
+
 from .settings import settings_module
 from .stat import stat_bp
 from .translated import translated_bp
@@ -86,6 +88,12 @@ def in_process_total_dashboard():
     )
 
 
+@bp_admin.get("/edit_done")
+@admin_required
+def edit_done() -> str:
+    return render_template("admins/close_btn.html")
+
+
 @bp_admin.get("/categories")
 @admin_required
 def categories_dashboard_route():
@@ -101,8 +109,13 @@ def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(tt_bp)
     bp_admin.register_blueprint(translated_bp)
     bp_admin.register_blueprint(translated_users_bp)
-    bp_admin.register_blueprint(qids_bp)
-    bp_admin.register_blueprint(qids_others_bp)
+
+    bp_admin.register_blueprint(qids_module.bp)
+    bp_admin.register_blueprint(qids_others_module.bp)
+
+    # bp_admin.register_blueprint(qids_bp)
+    # bp_admin.register_blueprint(qids_others_bp)
+
     bp_admin.register_blueprint(pages_users_to_main_bp)
     bp_admin.register_blueprint(stat_bp)
     # Templates(bp_admin)

@@ -88,7 +88,7 @@ def _delete_project(record_id: int) -> None:
         logger.exception("Unable to delete project.")
         flash("Unable to delete project. Please try again.", "danger")
     else:
-        flash(f"project for '{record.g_title}' removed.", "success")
+        flash(f"project for '{record_id}' removed.", "success")
 
 
 class ProjectsDashboard:

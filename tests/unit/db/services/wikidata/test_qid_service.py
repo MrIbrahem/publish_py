@@ -8,7 +8,7 @@ from src.main_app.db.services.wikidata.qid_service import (
     delete_qid,
     get_page_qid,
     get_title_to_qid,
-    list_qids,
+    list_records,
     update_qid,
 )
 
@@ -24,7 +24,7 @@ def test_qid_workflow():
     assert q2.qid == "Q2"
 
     # Test list
-    all_q = list_qids()
+    all_q = list_records()
     assert any(x.title == "Earth" for x in all_q)
 
     # Test mapping
@@ -93,7 +93,7 @@ class TestDeleteQid:
         """Test that delete_qid calls store delete."""
         q = add_qid("Uranus", "Q324")
         delete_qid(q.id)
-        assert not any(x.id == q.id for x in list_qids())
+        assert not any(x.id == q.id for x in list_records())
 
     def test_raises_error_if_not_found(self, monkeypatch):
         with pytest.raises(ValueError, match="not found"):
@@ -101,18 +101,18 @@ class TestDeleteQid:
 
 
 class TestListQids:
-    """Tests for list_qids function."""
+    """Tests for list_records function."""
 
     def test_returns_list_of_records(self, monkeypatch):
-        """Test that list_qids returns all records."""
+        """Test that list_records returns all records."""
         add_qid("Neptune", "Q332")
         add_qid("Pluto", "Q339")
-        result = list_qids()
+        result = list_records()
         assert len(result) >= 2
 
     def test_returns_empty_list_when_no_records(self, monkeypatch):
-        """Test that list_qids returns empty list when no records exist."""
-        result = list_qids()
+        """Test that list_records returns empty list when no records exist."""
+        result = list_records()
         assert result == []
 
 
@@ -135,7 +135,7 @@ class TestGetTitleToQid:
 
 # ---------------------------------------------------------------------------
 # Tests for new service functions added with admin/qids work:
-#   - list_qids(dis=)  (empty / duplicate filters)
+#   - list_records(dis=)  (empty / duplicate filters)
 #   - get_by_qid(qid)
 #   - get_by_title(title)
 #   - insert(title, qid)
@@ -160,19 +160,19 @@ def _add_with_empty_qid(title: str) -> QidRecord:
 
 
 class TestListQidsByDis:
-    """Tests for the ``dis`` filter on list_qids."""
+    """Tests for the ``dis`` filter on list_records."""
 
     def test_dis_all_returns_every_row(self, monkeypatch):
         add_qid("A", "Q1")
         add_qid("B", "Q2")
-        rows = list_qids(dis="all")
+        rows = list_records(dis="all")
         titles = {r.title for r in rows}
         assert {"A", "B"}.issubset(titles)
 
     def test_dis_empty_returns_only_rows_with_empty_or_null_qid(self, monkeypatch):
         add_qid("Has_qid", "Q1")
         _add_with_empty_qid("Missing_qid")
-        rows = list_qids(dis="empty")
+        rows = list_records(dis="empty")
         titles = {r.title for r in rows}
         assert titles == {"Missing_qid"}
 
@@ -182,7 +182,7 @@ class TestListQidsByDis:
         add_qid("First_title", "Q42")
         add_qid("Second_title", "Q42")
         add_qid("Solo_title", "Q43")
-        rows = list_qids(dis="duplicate")
+        rows = list_records(dis="duplicate")
         titles = {r.title for r in rows}
         assert "First_title" in titles
         assert "Second_title" in titles
@@ -190,7 +190,7 @@ class TestListQidsByDis:
 
     def test_dis_default_is_all(self, monkeypatch):
         add_qid("Anything", "Q1")
-        assert len(list_qids()) == 1
+        assert len(list_records()) == 1
 
 
 class TestGetByQid:
@@ -231,7 +231,7 @@ class TestInsert:
     def test_inserts_new_row(self, monkeypatch):
         ok = insert("Brand_new", "Q300")
         assert ok is True
-        rows = list_qids()
+        rows = list_records()
         assert any(r.title == "Brand_new" and r.qid == "Q300" for r in rows)
 
     def test_fills_empty_qid_for_existing_title(self, monkeypatch):

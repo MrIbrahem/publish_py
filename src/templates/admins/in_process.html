@@ -6,36 +6,23 @@
 
 <div class="card">
     <div class="card-header">
-        <h3 class="headline">Translations in Process</h3>
+        <h4>Translations in Process:</h4>
     </div>
     <div class="card-body">
-        <!-- <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h2 class="h6 text-uppercase text-muted">Total Records</h2>
-                        <p class="display-6 mb-0" id="totalRecords">0</p>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-        <div class="table-responsive shadow-sm">
-            <table class="table table-striped compact table-sm table-smtable-hover align-middle mb-0"
-                id="inProcessTable">
-                <thead>
-                    <tr>
-                        <th scope="col" style="width: 5%">#</th>
-                        <th scope="col">User</th>
-                        <th scope="col" style="width: 15%">Lang.</th>
-                        <th scope="col">Title</th>
-                        <th scope="col" style="width: 10%">Campaign</th>
-                        <th scope="col" style="width: 12%">Draft</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <table id="process_table" class="table table-sm table-striped table_text_left" style="font-size:90%;">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 5%">#</th>
+                    <th scope="col">User</th>
+                    <th scope="col" style="width: 15%">Lang.</th>
+                    <th scope="col">Title</th>
+                    <th scope="col" style="width: 10%">Campaign</th>
+                    <th scope="col" style="width: 12%">Draft</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
 
     </div>
 </div>
@@ -45,15 +32,29 @@
 {% block extra_js %}
 <script>
     $(document).ready(function () {
-        let table = $('#inProcessTable').DataTable({
+        let table = $("#process_table").DataTable({
+            // stateSave: false,
+            // paging: false,
+            // info: false,
+            // searching: false,
+            responsive: {
+                details: true
+                // display: $.fn.dataTable.Responsive.display.modal()
+            },
             ajax: {
-                url: '/api/in_process',
+                url: "/api/in_process",
                 dataSrc: function (json) {
                     // Update total records count
-                    $('#totalRecords').text(json.count);
+                    $("#totalRecords").text(json.count);
                     return json.results;
                 }
             },
+            lengthMenu: [
+                [25, 50, 100, 200],
+                [25, 50, 100, 200]
+            ],
+            order: [[0, "asc"]],
+            pageLength: 25,
             columns: [
                 {
                     data: null,
@@ -62,42 +63,53 @@
                     }
                 },
                 {
-                    data: 'user',
+                    data: "user",
                     render: function (data, type, row) {
-                        const escapedUser = $('<div>').text(data || '').html();
-                        const encodedUser = encodeURIComponent(data || '');
-                        return `<a href="https://mdwiki.org/wiki/User:${encodedUser}" target="_blank" rel="noopener noreferrer">${escapedUser}</a> (<a href="https://mdwiki.org/wiki/User_talk:${encodedUser}" target="_blank" rel="noopener noreferrer">talk</a>)`;
+                        const escapedUser = $("<div>").text(data || "").html();
+                        const encodedUser = encodeURIComponent(data || "");
+
+                        const base_url = "{{ url_for('leaderboard.users', username='USERNAME_PLACEHOLDER') }}";
+                        const leadboard_url = base_url.replace('USERNAME_PLACEHOLDER', data);
+
+                        let talkUrl = `//${row.lang}.wikipedia.org/w/index.php?title=User_talk:${encodedUser}&action=edit&section=new`;
+                        return `<a href="${leadboard_url}" target="_blank" rel="noopener noreferrer">${escapedUser}</a> (<a href="${talkUrl}" target="_blank" rel="noopener noreferrer">talk</a>)`;
                     }
                 },
                 {
-                    data: null,
+                    data: "lang",
                     render: function (data, type, row) {
-                        const lang = $('<div>').text(row.lang || '').html();
-                        const autonym = $('<div>').text(row.autonym || '').html();
-                        return `(${lang}) ${autonym}`;
+                        const lang = $("<div>").text(row.lang || "").html();
+                        const autonym = $("<div>").text(row.autonym || "").html();
+                        const base_url = "{{ url_for('leaderboard.langs', lang_code='_PLACEHOLDER_') }}";
+
+                        const leadboard_url = base_url.replace('_PLACEHOLDER_', data);
+
+                        return `
+                            <a href="${leadboard_url}" target="_blank" rel="noopener noreferrer">
+                            (${lang}) ${autonym}
+                            </a>`;
                     }
                 },
                 {
-                    data: 'title',
-                    render: $.fn.dataTable.render.text()
+                    data: "title",
+                    render: function (data, type, row) {
+                        let encoded = encodeURIComponent(data);
+                        return `<a href="//mdwiki.org/wiki/${encoded}" target="_blank">${data}</a>`;
+                    }
                 },
                 {
-                    data: 'campaign',
-                    render: $.fn.dataTable.render.text()
+                    data: "campaign"
                 },
                 {
-                    data: 'add_date',
-                    render: function (data, type) {
-                        if (type === 'display' && data) {
-                            return data.split('T')[0];
-                        }
-                        return data;
+                    data: "add_date",
+                    render: function (data, type, row) {
+                        // Extract YYYY-MM-DD from the timestamp
+                        let dateOnly = data.includes("T") ? data.split("T")[0] : data;
+                        let encodedTitle = encodeURIComponent(row.title);
+                        return `<a href="//mdwikicx.toolforge.org/wiki/${row.lang}/${encodedTitle}" target="_blank">${dateOnly}</a>`;
                     }
                 }
-            ],
-            order: [[0, 'asc']],
-            pageLength: 25,
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]]
+            ]
         });
     });
 </script>

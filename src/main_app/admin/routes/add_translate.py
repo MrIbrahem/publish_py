@@ -77,4 +77,5 @@ def add_translate_post() -> ResponseReturnValue:
     for e in errors:
         flash(e, "danger")
 
-    return redirect(url_for("admin.add.add_translate"))
+    # return redirect(url_for("admin.add.add_translate"))
+    return redirect(url_for("admin.edit_done"))

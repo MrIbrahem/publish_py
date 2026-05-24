@@ -80,6 +80,22 @@
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
     <script>
         $(document).ready(function () {
+
+            // $('[data-toggle="tooltip"]').tooltip();
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+            // $('.card').CardWidget('toggle')
+            $('.table_responsive').DataTable({
+                stateSave: false,
+                paging: false,
+                info: false,
+                searching: false,
+                responsive: {
+                    details: true
+                    // display: $.fn.dataTable.Responsive.display.modal()
+                }
+            });
             $('.DataTable').DataTable({
                 responsive: true,
                 pageLength: 100,
@@ -113,6 +129,8 @@
             }
             window.open(target, '', 'width=600,height=500,left=100,top=100,location=no');
         }
+
+
     </script>
 </body>
 

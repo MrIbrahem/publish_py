@@ -68,7 +68,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
     action = "activate" if is_active else "deactivate"
     past_tense = "activated" if is_active else "deactivated"
     try:
-        record = update_users_no_inprocess(record_id, is_active)
+        record = update_users_no_inprocess(record_id, is_active=is_active)
     except LookupError as exc:
         logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
@@ -76,7 +76,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
         logger.exception(f"Unable to {action} record.")
         flash(f"Unable to {action} record. Please try again.", "danger")
     else:
-        flash(f"Record '{record.username}' {past_tense}.", "success")
+        flash(f"Record '{record.user}' {past_tense}.", "success")
 
     return redirect(url_for("admin.users_no_inprocess.dashboard"))
 
@@ -103,7 +103,7 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
         logger.exception("Unable to delete user.")
         flash("Unable to delete user. Please try again.", "danger")
     else:
-        flash(f"User '{record.user}' removed from 'not in process' list.", "success")
+        flash(f"User '{record_id}' removed from 'not in process' list.", "success")
 
     return redirect(url_for("admin.users_no_inprocess.dashboard"))
 

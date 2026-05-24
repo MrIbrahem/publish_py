@@ -151,7 +151,7 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
         logger.exception("Unable to delete user.")
         flash("Unable to delete user. Please try again.", "danger")
     else:
-        flash(f"User '{record.username}' deleted", "success")
+        flash(f"User '{record_id}' deleted", "success")
 
     return redirect(url_for("admin.users_emails.dashboard"))
 
@@ -185,7 +185,11 @@ class UsersEmails:
         @self.bp.get("/<int:record_id>/edit")
         @admin_required
         def edit(record_id: int) -> ResponseReturnValue:
-            return render_template("admins/users_emails/edit.html")
+            user = get_user(record_id)
+            if not user:
+                flash(f"User with ID {record_id} not found.", "danger")
+                return redirect(url_for("admin.users_emails.dashboard"))
+            return render_template("admins/users_emails/edit.html", row=user)
 
 
 users_emails_module = UsersEmails()

@@ -27,7 +27,9 @@ class QidRecord(db.Model):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.validate()
 
+    def validate(self):
         # Validate that required fields are not empty
         if not self.title:
             raise ValueError("Title cannot be empty")
@@ -61,6 +63,9 @@ class QidOthersRecord(db.Model):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.validate()
+
+    def validate(self):
         # Validate that required fields are not empty
         if not self.title:
             raise ValueError("Title cannot be empty")

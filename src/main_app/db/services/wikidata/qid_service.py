@@ -23,9 +23,11 @@ def add_qid(title: str, qid: str) -> QidRecord:
         orm_obj.qid = qid
     else:
         orm_obj = QidRecord(title=title, qid=qid)
-        db.session.add(orm_obj)
+
+    orm_obj.validate()
 
     try:
+        db.session.add(orm_obj)
         db.session.commit()
         db.session.refresh(orm_obj)
     except Exception:
@@ -42,6 +44,9 @@ def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
 
     orm_obj.title = title
     orm_obj.qid = qid
+
+    orm_obj.validate()
+
     try:
         db.session.commit()
         db.session.refresh(orm_obj)
@@ -77,7 +82,7 @@ def get_page_qid(title: str) -> QidRecord | None:
     return orm_obj
 
 
-def list_qids(dis: str = "all") -> List[QidRecord]:
+def list_records(dis: str = "all") -> List[QidRecord]:
     """Return QID records, optionally filtered by ``dis``.
 
     - ``"all"``: every row in qids.
@@ -118,6 +123,11 @@ def get_by_qid(qid: str) -> QidRecord | None:
     return db.session.query(QidRecord).filter(QidRecord.qid == qid).first()
 
 
+def get_by_id(qid_id: int) -> QidRecord | None:
+    """Get a QID record by its primary key ID."""
+    return db.session.get(QidRecord, qid_id)
+
+
 def get_by_title(title: str) -> QidRecord | None:
     """Get the QID record matching the given title."""
     if not title:
@@ -142,6 +152,7 @@ def insert(title: str, qid: str) -> bool:
                 existing.qid = qid
                 db.session.commit()
             return True
+
         orm_obj = QidRecord(title=title, qid=qid)
         db.session.add(orm_obj)
         db.session.commit()
@@ -156,14 +167,31 @@ def update(qid_id: int, title: str, qid: str) -> bool:
     """Update an existing qids row by primary key."""
     title = (title or "").strip()
     qid = (qid or "").strip()
+
     if not qid_id or not title or not qid:
         return False
+
+    orm_obj = None
+
     try:
         orm_obj = db.session.get(QidRecord, qid_id)
-        if not orm_obj:
-            return False
-        orm_obj.title = title
-        orm_obj.qid = qid
+    except Exception:
+        logger.exception("Failed to update qid id=%r", qid_id)
+        return False
+
+    if not orm_obj:
+        return False
+
+    orm_obj.title = title
+    orm_obj.qid = qid
+
+    try:
+        orm_obj.validate()
+    except Exception:
+        logger.exception("Failed to validate")
+        return False
+
+    try:
         db.session.commit()
         return True
     except Exception:
@@ -188,11 +216,12 @@ __all__ = [
     "update_qid",
     "delete_qid",
     "get_page_qid",
-    "list_qids",
+    "list_records",
     "list_qid_records",
     "get_title_to_qid",
     "get_by_qid",
     "get_by_title",
     "insert",
     "update",
+    "get_by_id",
 ]

@@ -16,7 +16,7 @@
         <form action="{{ url_for('admin.add.add_translate') }}" method="POST">
             <input name="csrf_token" value="{{ csrf_token() }}" type="hidden" />
             <div class="form-group">
-                <table class="table table-striped compact table-mobile-responsive table-mobile-sided"
+                <table class="table table-striped compact table_responsive"
                     style="font-size:95%;">
                     <thead>
                         <tr>
@@ -33,36 +33,36 @@
                     </thead>
                     <tbody id="tab_data">
                         <tr id="row_1">
-                            <td data-order="1" data-content="#">1</td>
-                            <td data-content="Mdwiki Title">
+                            <td data-order="1">1</td>
+                            <td>
                                 <input class="form-control mdtitles" size="15" name="mdtitle" required />
                             </td>
-                            <td data-content="Campaign">
+                            <td>
                                 <select class="form-select catsoptions" name="cat" data-bs-theme="auto">
                                     {% for cat in categories %}
                                     <option value="{{ cat.category }}">{{ cat.campaign }}</option>
                                     {% endfor %}
                                 </select>
                             </td>
-                            <td data-content="Type">
+                            <td>
                                 <select name="type" class="form-select w-100" data-bs-theme="auto">
                                     <option value="lead">Lead</option>
                                     <option value="all">All</option>
                                 </select>
                             </td>
-                            <td data-content="User">
+                            <td>
                                 <input class="form-control td_user_input" size="10" name="user" required />
                             </td>
-                            <td data-content="Lang.">
+                            <td>
                                 <input class="form-control lang_input" size="2" name="lang" required />
                             </td>
-                            <td data-content="Target">
+                            <td>
                                 <input class="form-control" size="20" name="target" />
                             </td>
-                            <td data-content="Published">
+                            <td>
                                 <input class="form-control" size="10" name="pupdate" placeholder="YYYY-MM-DD" />
                             </td>
-                            <td data-content="Delete">
+                            <td>
                                 <div class="">
                                     <button type="button" class="btn btn-danger btn-sm"
                                         onclick="delete_row(1)">Delete</button>

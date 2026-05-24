@@ -23,9 +23,11 @@ def add_qid_other(title: str, qid: str) -> QidOthersRecord:
         orm_obj.qid = qid
     else:
         orm_obj = QidOthersRecord(title=title, qid=qid)
-        db.session.add(orm_obj)
+
+    orm_obj.validate()
 
     try:
+        db.session.add(orm_obj)
         db.session.commit()
         db.session.refresh(orm_obj)
     except Exception:
@@ -42,6 +44,9 @@ def update_qid_other(qid_id: int, title: str, qid: str) -> QidOthersRecord:
 
     orm_obj.title = title
     orm_obj.qid = qid
+
+    orm_obj.validate()
+
     try:
         db.session.commit()
         db.session.refresh(orm_obj)
@@ -77,7 +82,7 @@ def get_page_qid_other(title: str) -> QidOthersRecord | None:
     return orm_obj
 
 
-def list_qids_others(dis: str = "all") -> List[QidOthersRecord]:
+def list_records(dis: str = "all") -> List[QidOthersRecord]:
     """Return qids_others records, optionally filtered by ``dis``.
 
     - ``"all"``: every row.
@@ -86,14 +91,15 @@ def list_qids_others(dis: str = "all") -> List[QidOthersRecord]:
     """
     base = db.session.query(QidOthersRecord)
     if dis == "empty":
-        return (
+        rows = (
             base.filter(or_(QidOthersRecord.qid.is_(None), QidOthersRecord.qid == ""))
             .order_by(QidOthersRecord.id.asc())
             .all()
         )
+        return rows
     if dis == "duplicate":
         other = aliased(QidOthersRecord)
-        return (
+        rows = (
             base.join(
                 other,
                 and_(
@@ -108,6 +114,8 @@ def list_qids_others(dis: str = "all") -> List[QidOthersRecord]:
             .distinct()
             .all()
         )
+        return rows
+    # default: all
     return base.order_by(QidOthersRecord.id.asc()).all()
 
 
@@ -116,6 +124,11 @@ def get_by_qid(qid: str) -> QidOthersRecord | None:
     if not qid:
         return None
     return db.session.query(QidOthersRecord).filter(QidOthersRecord.qid == qid).first()
+
+
+def get_by_id(qid_id: int) -> QidOthersRecord | None:
+    """Get a QID record by its primary key ID."""
+    return db.session.get(QidOthersRecord, qid_id)
 
 
 def get_by_title(title: str) -> QidOthersRecord | None:
@@ -140,6 +153,7 @@ def insert(title: str, qid: str) -> bool:
                 existing.qid = qid
                 db.session.commit()
             return True
+
         orm_obj = QidOthersRecord(title=title, qid=qid)
         db.session.add(orm_obj)
         db.session.commit()
@@ -154,14 +168,31 @@ def update(qid_id: int, title: str, qid: str) -> bool:
     """Update an existing qids_others row by primary key."""
     title = (title or "").strip()
     qid = (qid or "").strip()
+
     if not qid_id or not title or not qid:
         return False
+
+    orm_obj = None
+
     try:
         orm_obj = db.session.get(QidOthersRecord, qid_id)
-        if not orm_obj:
-            return False
-        orm_obj.title = title
-        orm_obj.qid = qid
+    except Exception:
+        logger.exception("Failed to update qid id=%r", qid_id)
+        return False
+
+    if not orm_obj:
+        return False
+
+    orm_obj.title = title
+    orm_obj.qid = qid
+
+    try:
+        orm_obj.validate()
+    except Exception:
+        logger.exception("Failed to validate")
+        return False
+
+    try:
         db.session.commit()
         return True
     except Exception:
@@ -170,14 +201,28 @@ def update(qid_id: int, title: str, qid: str) -> bool:
         return False
 
 
+def list_qid_records() -> List[QidOthersRecord]:
+    """Return all QID records (legacy alias kept for compatibility)."""
+    return db.session.query(QidOthersRecord).order_by(QidOthersRecord.id.asc()).all()
+
+
+def get_title_to_qid() -> dict[str, str]:
+    """Retrieve title to QID mapping from database."""
+    qids = list_qid_records()
+    return {record.title: record.qid or "" for record in qids}
+
+
 __all__ = [
     "add_qid_other",
     "update_qid_other",
     "delete_qid_other",
     "get_page_qid_other",
-    "list_qids_others",
+    "list_records",
+    "list_qid_records",
+    "get_title_to_qid",
     "get_by_qid",
     "get_by_title",
     "insert",
     "update",
+    "get_by_id",
 ]

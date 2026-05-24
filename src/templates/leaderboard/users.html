@@ -7,7 +7,7 @@
             <div class='col-lg-4 col-md-12 border_debug border rounded'>
                 <div class="d-flex align-items-center justify-content-center" style="height: 100%">
                     <div class="list-group">
-                        <h4 class='text-center'>User: oʻzbekcha / ўзбекча (uz) <br><a target="_blank"
+                        <h4 class='text-center'>User: {{ username }} <br><a target="_blank"
                                 href="http://uz.wikipedia.org/wiki/Category:Translated_from_MDWiki">(cat)</a>
                         </h4>
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
@@ -70,24 +70,24 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <th data-content="#">
+                        <th>
 
                         </th>
-                        <td data-content="Lang">
+                        <td>
                         </td>
-                        <td data-content="Title">
+                        <td>
                         </td>
-                        <td data-content="Campaign">
+                        <td>
                         </td>
-                        <td data-content="Words">
+                        <td>
 
                         </td>
-                        <td data-content="Translated">
+                        <td>
 
                         </td>
-                        <td data-content="Date" class='spannowrap'>
+                        <td class='spannowrap'>
                         </td>
-                        <td data-content='Views'>
+                        <td>
 
                         </td>
 
@@ -137,25 +137,6 @@
 {% block extra_js %}
 
 <script>
-    $(document).ready(function () {
-        // get_views();
 
-        // $('[data-toggle="tooltip"]').tooltip();
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-        // $('.card').CardWidget('toggle')
-        $('.table_responsive').DataTable({
-            stateSave: false,
-            paging: false,
-            info: false,
-            searching: false,
-            responsive: {
-                details: true
-                // display: $.fn.dataTable.Responsive.display.modal()
-            }
-        });
-
-    });
 </script>
 {% endblock %}
