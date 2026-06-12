@@ -109,11 +109,11 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
 
 
 class FullTranslators:
-    def __init__(self):
+    def __init__(self) -> None:
         self.bp = Blueprint("full_translators", __name__, url_prefix="/full_translators")
         self._setup_routes()
 
-    def _setup_routes(self):
+    def _setup_routes(self) -> None:
         @self.bp.get("/")
         @admin_required
         def dashboard():

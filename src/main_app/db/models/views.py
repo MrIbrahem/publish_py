@@ -24,7 +24,7 @@ class EnwikiPageviewRecord(db.Model):
     title = db.Column(db.String(120), unique=True, nullable=False)
     en_views = db.Column(db.Integer, default=0, server_default=db.text("0"))
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "en_views" not in kwargs:
             kwargs["en_views"] = 0
@@ -55,7 +55,7 @@ class ViewsNewRecord(db.Model):
 
     __table_args__ = (db.UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "views" not in kwargs:
             kwargs["views"] = 0

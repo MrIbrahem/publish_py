@@ -45,7 +45,7 @@ class PageRecord(db.Model):
     deleted = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
     mdwiki_revid = db.Column(db.Integer, nullable=True)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "deleted" not in kwargs:
             kwargs["deleted"] = 0
@@ -90,7 +90,7 @@ class UserPageRecord(db.Model):
     deleted = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
     mdwiki_revid = db.Column(db.Integer, nullable=True)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "deleted" not in kwargs:
             kwargs["deleted"] = 0
@@ -116,7 +116,7 @@ class PagesUsersToMainRecord(db.Model):
     new_user = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
     new_qid = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "new_target" not in kwargs:
             kwargs["new_target"] = ""
@@ -154,7 +154,7 @@ class InProcessRecord(db.Model):
     word = db.Column(db.Integer, default=0, server_default=db.text("0"))
     add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "cat" not in kwargs:
             kwargs["cat"] = "RTT"

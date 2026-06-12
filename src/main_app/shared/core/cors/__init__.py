@@ -17,7 +17,7 @@ def is_domain(text: str):
     return validators.domain(text)
 
 
-def _validate_url(text) -> str:
+def _validate_url(text: str) -> str:
     if not text or not isinstance(text, str):
         return ""
 

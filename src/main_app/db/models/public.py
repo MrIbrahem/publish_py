@@ -68,7 +68,7 @@ class TranslateTypeRecord(db.Model):
     tt_lead = db.Column(db.Integer, nullable=False, default=1)
     tt_full = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "tt_lead" not in kwargs:
             kwargs["tt_lead"] = 1
