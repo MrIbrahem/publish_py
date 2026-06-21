@@ -13,14 +13,13 @@ from flask import (
     send_from_directory,
 )
 
-from ....db.services import (
-    get_camp_to_cats,
-    list_projects,
-    get_pages_years,
-    get_months_of_pages_years,
-    top_lang_of_users,
-    get_pages,
+from ....db.services import get_camp_to_cats, list_projects
+from ....db.services.pages.leaderboard_service import (
     get_leaderboard_chart_data,
+    get_months_of_pages_years,
+    get_pages,
+    get_pages_years,
+    top_lang_of_users,
 )
 
 bp_leaderboard = Blueprint("leaderboard", __name__, url_prefix="/leaderboard")

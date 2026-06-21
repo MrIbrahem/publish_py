@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from __future__ import annotations
 
@@ -7,8 +6,8 @@ import logging
 
 from flask import Response, jsonify, request
 
-from ....db.services import get_leaderboard_chart_data
-from .form_utils import get_form, FormData
+from ....db.services.pages.leaderboard_service import get_leaderboard_chart_data
+from .form_utils import FormData, get_form
 
 logger = logging.getLogger(__name__)
 

@@ -3,9 +3,6 @@ Shared db services, used in both admin and public blueprints
 
 """
 
-from .content.project_service import (
-    list_projects,
-)
 from .content.category_service import (
     add_category,
     delete_category,
@@ -22,6 +19,9 @@ from .content.lang_service import (
     get_lang_by_code,
     list_langs,
 )
+from .content.project_service import (
+    list_projects,
+)
 from .pages.in_process_service import (
     add_in_process,
     delete_in_process,
@@ -35,20 +35,22 @@ from .pages.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
+from .pages.leaderboard_service import (
+    get_leaderboard_chart_data,
+    get_months_of_pages_years,
+    get_pages,
+    get_pages_years,
+    list_of_users_by_translations_count,
+    top_lang_of_users,
+)
 from .pages.page_service import (
     add_page,
     delete_page,
     find_exists_or_update_page,
     insert_page_target,
-    list_of_users_by_translations_count,
     list_pages,
     list_pages_by_lang_cat,
     update_page,
-    get_pages_years,
-    get_months_of_pages_years,
-    get_pages,
-    top_lang_of_users,
-    get_leaderboard_chart_data,
 )
 from .pages.user_page_service import (
     add_user_page,
@@ -76,7 +78,6 @@ from .wikidata.qid_service import list_records
 
 __all__ = [
     "list_projects",
-
     "list_in_process",
     "list_in_process_by_user",
     "list_in_process_by_lang",
