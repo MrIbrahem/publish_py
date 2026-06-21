@@ -19,7 +19,12 @@ def get_pages_years(
     """
     SELECT DISTINCT YEAR(pupdate) AS year FROM pages WHERE pupdate <> ''
     """
-    query = db.session.query(func.year(PageRecord.pupdate).label("year")).filter(PageRecord.pupdate != "")
+    if db.engine.name == "sqlite":
+        year_expr = func.strftime("%Y", PageRecord.pupdate)
+    else:
+        year_expr = func.year(PageRecord.pupdate)
+
+    query = db.session.query(year_expr.label("year")).filter(PageRecord.pupdate != "")
     if user is not None:
         query = query.filter(PageRecord.user == user)
 
@@ -27,7 +32,7 @@ def get_pages_years(
         query = query.filter(PageRecord.lang == lang)
 
     rows = query.distinct().all()
-    years: list[int] = [row.year for row in rows if row.year is not None]
+    years: list[int] = [int(row.year) for row in rows if row.year is not None]
     years.sort(reverse=True)
     return years
 
@@ -38,16 +43,23 @@ def get_months_of_pages_years(year: int) -> list[int]:
     WHERE pupdate <> ''
     AND YEAR(pupdate) = :year
     """
+    if db.engine.name == "sqlite":
+        month_expr = func.strftime("%m", PageRecord.pupdate)
+        year_expr = func.strftime("%Y", PageRecord.pupdate)
+    else:
+        month_expr = func.month(PageRecord.pupdate)
+        year_expr = func.year(PageRecord.pupdate)
+
     rows = (
         db.session.query(
-            func.month(PageRecord.pupdate).label("month"),
+            month_expr.label("month"),
         )
         .filter(PageRecord.pupdate != "")
-        .filter(func.year(PageRecord.pupdate) == year)
+        .filter(year_expr == str(year) if db.engine.name == "sqlite" else year_expr == year)
         .distinct()
         .all()
     )
-    months: list[int] = [row.month for row in rows if row.month is not None]
+    months: list[int] = [int(row.month) for row in rows if row.month is not None]
     months.sort(reverse=True)
     return months
 
@@ -80,7 +92,7 @@ def get_pages(
     year: int | None = None,
     user: str | None = None,
     lang: str | None = None,
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """
     Return pages with views, optionally filtered by year, user, and language.
 
@@ -102,8 +114,14 @@ def get_pages(
         conditions.append("p.user = :user")
         params["user"] = user
     if year is not None:
-        conditions.append(":year IN (YEAR(p.date), YEAR(p.pupdate), YEAR(p.add_date))")
-        params["year"] = year
+        if db.engine.name == "sqlite":
+            conditions.append(
+                ":year IN (strftime('%Y', p.date), strftime('%Y', p.pupdate), strftime('%Y', p.add_date))"
+            )
+            params["year"] = str(year)
+        else:
+            conditions.append(":year IN (YEAR(p.date), YEAR(p.pupdate), YEAR(p.add_date))")
+            params["year"] = year
 
     where_clause = " AND ".join(conditions) if conditions else "1=1"
 
