@@ -16,7 +16,7 @@ from flask.typing import ResponseReturnValue
 from ..db.services.users import active_coordinators
 from ..shared.auth.identity import current_user
 
-F = TypeVar("F", bound=Callable[..., ResponseReturnValue])
+FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
 
 
 def _get_cached_active_coordinators() -> List[str]:
@@ -29,7 +29,7 @@ def _get_cached_active_coordinators() -> List[str]:
     return coordinators
 
 
-def admin_required(view: F) -> F:  # noqa: UP047
+def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
     """Decorator enforcing that the current user is an administrator."""
 
     @wraps(view)
@@ -41,4 +41,9 @@ def admin_required(view: F) -> F:  # noqa: UP047
             abort(403)
         return view(*args, **kwargs)
 
-    return cast(F, wrapped)
+    return cast(FuncType, wrapped)
+
+
+__all__ = [
+    "admin_required",
+]
