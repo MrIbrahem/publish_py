@@ -383,37 +383,50 @@ def get_pages(
     year: int | None = None,
     user: str | None = None,
     lang: str | None = None,
-) -> list[int]:
+) -> list[dict]:
     """
-        SELECT DISTINCT
-            p.title,
-            p.word,
-            p.translate_type,
-            p.cat,
-            p.lang,
-            p.user,
-            p.target,
-            p.date,
-            p.pupdate,
-            p.add_date,
-            p.deleted,
-            v.views
-        FROM
-            pages p
-            LEFT JOIN views_new_all v ON p.target = v.target
-            AND p.lang = v.lang
-        WHERE
-            p.lang = :lang
-            AND p.user = :user
-            AND :year IN (
-                YEAR (p.date),
-                YEAR (p.pupdate),
-                YEAR (p.add_date)
-            )
-    """
-    data = []
+    Return pages with views, optionally filtered by year, user, and language.
 
-    return data
+    SELECT DISTINCT
+        p.title, p.word, p.translate_type, p.cat, p.lang,
+        p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
+        v.views
+    FROM pages p
+    LEFT JOIN views_new_all v ON p.target = v.target AND p.lang = v.lang
+    [WHERE conditions by year/user/lang]
+    """
+    conditions: list[str] = []
+    params: dict[str, object] = {}
+
+    if lang is not None:
+        conditions.append("p.lang = :lang")
+        params["lang"] = lang
+    if user is not None:
+        conditions.append("p.user = :user")
+        params["user"] = user
+    if year is not None:
+        conditions.append(
+            ":year IN (YEAR(p.date), YEAR(p.pupdate), YEAR(p.add_date))"
+        )
+        params["year"] = year
+
+    where_clause = " AND ".join(conditions) if conditions else "1=1"
+
+    sql = text(f"""
+        SELECT DISTINCT
+            p.title, p.word, p.translate_type, p.cat, p.lang,
+            p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
+            v.views, ca.campaign
+        FROM pages p
+        LEFT JOIN views_new_all v
+            ON p.target = v.target AND p.lang = v.lang
+        LEFT JOIN categories ca
+            ON ca.category = p.cat
+        WHERE {where_clause}
+    """)
+
+    rows = db.session.execute(sql, params).fetchall()
+    return [dict(row._mapping) for row in rows]
 
 def top_lang_of_users(username: str):
     """
@@ -461,4 +474,5 @@ __all__ = [
     "get_months_of_pages_years",
     "list_of_users_by_translations_count",
     "add_translate_row_to_db",
+    "get_pages",
 ]

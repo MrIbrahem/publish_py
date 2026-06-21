@@ -19,8 +19,8 @@
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
                             <div class="text-muted">
                                 Articles: <strong>{{ pages | length }}</strong> &nbsp;
-                                Words: <strong>170</strong> &nbsp;
-                                Pageviews: <strong><span id="hrefjsontoadd">0</span></strong>
+                                Words: <strong>{{ words_total }}</strong> &nbsp;
+                                Pageviews: <strong><span id="hrefjsontoadd">{{ pageviews_total }}</span></strong>
                             </div>
                         </div>
                     </div>
@@ -88,22 +88,23 @@
                             <a href="{{ url_for('leaderboard.users', username=page.user) }}">{{ page.user }}</a>
                         </td>
                         <td>
-                            <a href="{{ page.url }}" target="_blank">{{ page.title }}</a>
+                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">{{ page.title }}</a>
                         </td>
                         <td>
-
+                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">{{ page.campaign }}</a>
                         </td>
                         <td>
-
+                            {{ page.word }}
                         </td>
                         <td>
-
+                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}"
+                                target="_blank">{{ page.target }}</a>
                         </td>
                         <td>
-
+                            {{ page.pupdate }}
                         </td>
                         <td>
-
+                            {{ page.views }}
                         </td>
                     </tr>
                     {% endfor %}

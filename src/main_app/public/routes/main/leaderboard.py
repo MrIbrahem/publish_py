@@ -55,12 +55,18 @@ def langs(lang_code: str) -> str:
         year=selected_year,
         lang=lang_code,
     )
+
+    words_total = sum(page["word"] for page in lang_pages if page.get("word"))
+    pageviews_total = sum(page["views"] for page in lang_pages if page.get("views"))
+
     return render_template(
         "leaderboard/langs.html",
         lang_code=lang_code,
         pages=lang_pages,
         selected_year=selected_year,
         years=lang_years,
+        words_total=words_total,
+        pageviews_total=pageviews_total,
     )
 
 
@@ -77,6 +83,9 @@ def users(username: str) -> str:
         year=selected_year,
         lang=selected_lang,
     )
+    words_total = sum(page["word"] for page in user_pages if page.get("word"))
+    pageviews_total = sum(page["views"] for page in user_pages if page.get("views"))
+
     return render_template(
         "leaderboard/users.html",
         username=username,
@@ -85,6 +94,8 @@ def users(username: str) -> str:
         langs=user_langs,
         selected_lang=selected_lang,
         selected_year=selected_year,
+        words_total=words_total,
+        pageviews_total=pageviews_total,
     )
 
 
