@@ -483,7 +483,7 @@ def get_leaderboard_chart_data(
         date_expr = func.left(PageRecord.pupdate, 7)
 
     query = db.session.query(date_expr.label("date"), func.count().label("count")).filter(
-        PageRecord.target != ""
+        PageRecord.target.isnot(None), PageRecord.target != ""
     )
 
     if cat:
