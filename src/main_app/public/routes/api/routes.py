@@ -26,6 +26,7 @@ from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.utils.web_utils import parse_select_fields
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
+from .leaderboard import leaderboard_status
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
@@ -418,6 +419,7 @@ def get_langs() -> Response:
 
     return jsonify(response_data)
 
+bp_api.route("/status", methods=["GET"])(leaderboard_status)
 
 # Register top_stats routes
 bp_api.route("/top_langs", methods=["GET"])(get_top_langs)

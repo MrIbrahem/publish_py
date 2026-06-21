@@ -143,6 +143,8 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/g.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graph_api.js') }}"></script>
 <script>
     // when page ready
     $(document).ready(async function () {
