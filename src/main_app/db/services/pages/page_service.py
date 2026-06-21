@@ -230,12 +230,48 @@ def find_exists_or_update_page(
     return True
 
 
-def get_pages_with_pupdate() -> list[int]:
+def get_pages_years(
+    user: str | None = None,
+    lang: str | None = None,
+) -> list[int]:
     """
     SELECT DISTINCT YEAR(pupdate) AS year FROM pages WHERE pupdate <> ''
     """
-    years : list[int] = []
+    query = (
+        db.session.query(
+            func.year(PageRecord.pupdate).label("year")
+        )
+        .filter(PageRecord.pupdate != "")
+    )
+    if user is not None:
+        query = query.filter(PageRecord.user == user)
+
+    if lang is not None:
+        query = query.filter(PageRecord.lang == lang)
+
+    rows = query.distinct()
+    years : list[int] = [ row.year for row in rows ]
+    years.sort(reverse=True)
     return years
+
+
+def get_months_of_pages_years(year: int) -> list[int]:
+    """
+    SELECT DISTINCT MONTH(pupdate) AS month FROM pages
+    WHERE pupdate <> ''
+    AND YEAR(pupdate) = :year
+    """
+    rows = (
+        db.session.query(
+            func.month(PageRecord.pupdate).label("month"),
+        )
+        .filter(PageRecord.pupdate != "")
+        .filter(func.year(PageRecord.pupdate) == year)
+        .distinct()
+    )
+    months : list[int] = [ row.month for row in rows ]
+    months.sort(reverse=True)
+    return months
 
 def list_of_users_by_translations_count() -> dict[str, int]:
     """
@@ -343,6 +379,76 @@ def add_translate_row_to_db(
     )
     return found is not None
 
+def get_pages(
+    year: int | None = None,
+    user: str | None = None,
+    lang: str | None = None,
+) -> list[int]:
+    """
+        SELECT DISTINCT
+            p.title,
+            p.word,
+            p.translate_type,
+            p.cat,
+            p.lang,
+            p.user,
+            p.target,
+            p.date,
+            p.pupdate,
+            p.add_date,
+            p.deleted,
+            v.views
+        FROM
+            pages p
+            LEFT JOIN views_new_all v ON p.target = v.target
+            AND p.lang = v.lang
+        WHERE
+            p.lang = :lang
+            AND p.user = :user
+            AND :year IN (
+                YEAR (p.date),
+                YEAR (p.pupdate),
+                YEAR (p.add_date)
+            )
+    """
+    data = []
+
+    return data
+
+def top_lang_of_users(username: str):
+    """
+    SELECT
+        p.user,
+        p.lang,
+        COUNT(p.target) AS cnt
+    FROM
+        pages p
+    WHERE
+        p.target != ''
+        AND p.target IS NOT NULL
+        AND p.user IN ('DaSupremo')
+    GROUP BY
+        p.user,
+        p.lang
+    result_example: { "user": "DaSupremo", "lang": "gpe", "cnt": 451 }
+    """
+    data = (
+        db.session.query(
+            PageRecord.user,
+            PageRecord.lang,
+            func.count(PageRecord.target).label("cnt"),
+        )
+        .filter(PageRecord.target != "", PageRecord.target.isnot(None))
+        .filter(PageRecord.user == username)
+        .group_by(PageRecord.user, PageRecord.lang)
+        .order_by(db.func.count(PageRecord.target).desc())
+        .all()
+    )
+    result = {
+        row.lang: row.cnt
+        for row in data
+    }
+    return result
 
 __all__ = [
     "list_pages",
@@ -352,6 +458,7 @@ __all__ = [
     "delete_page",
     "find_exists_or_update_page",
     "insert_page_target",
+    "get_months_of_pages_years",
     "list_of_users_by_translations_count",
     "add_translate_row_to_db",
 ]

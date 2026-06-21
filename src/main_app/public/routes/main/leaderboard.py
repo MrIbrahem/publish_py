@@ -13,7 +13,14 @@ from flask import (
     send_from_directory,
 )
 
-from ....db.services import get_camp_to_cats, list_projects, get_pages_with_pupdate
+from ....db.services import (
+    get_camp_to_cats,
+    list_projects,
+    get_pages_years,
+    get_months_of_pages_years,
+    top_lang_of_users,
+    get_pages,
+)
 
 bp_leaderboard = Blueprint("leaderboard", __name__, url_prefix="/leaderboard")
 logger = logging.getLogger(__name__)
@@ -21,9 +28,11 @@ logger = logging.getLogger(__name__)
 
 @bp_leaderboard.get("/")
 def index() -> str:
+    year = request.args.get("year", type=int)
+
     campagins = get_camp_to_cats().keys()
-    years = get_pages_with_pupdate()
-    months = {}
+    years: list[int] = get_pages_years()
+    months: list[int] = get_months_of_pages_years(year) if year else []
     user_groups = [x.g_title for x in list_projects()]
 
     form_data = request.args
@@ -38,18 +47,44 @@ def index() -> str:
 
 
 @bp_leaderboard.get("/langs/<string:lang_code>")
-def langs(lang_code: str):
+def langs(lang_code: str) -> str:
+    selected_year = request.args.get("year", type=int)
+    lang_years: list[int] = get_pages_years(lang=lang_code)
+
+    lang_pages = get_pages(
+        year=selected_year,
+        lang=lang_code,
+    )
     return render_template(
         "leaderboard/langs.html",
         lang_code=lang_code,
+        pages=lang_pages,
+        selected_year=selected_year,
+        years=lang_years,
     )
 
 
 @bp_leaderboard.get("/users/<string:username>")
-def users(username: str):
+def users(username: str) -> str:
+    selected_year = request.args.get("year", type=int)
+    selected_lang = request.args.get("lang", type=str)
+
+    user_years: list[int] = get_pages_years(user=username)
+    user_langs = top_lang_of_users(username)
+
+    user_pages = get_pages(
+        user=username,
+        year=selected_year,
+        lang=selected_lang,
+    )
     return render_template(
         "leaderboard/users.html",
         username=username,
+        pages=user_pages,
+        years=user_years,
+        langs=user_langs,
+        selected_lang=selected_lang,
+        selected_year=selected_year,
     )
 
 

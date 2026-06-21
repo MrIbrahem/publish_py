@@ -44,7 +44,10 @@ from .pages.page_service import (
     list_pages,
     list_pages_by_lang_cat,
     update_page,
-    get_pages_with_pupdate,
+    get_pages_years,
+    get_months_of_pages_years,
+    get_pages,
+    top_lang_of_users,
 )
 from .pages.user_page_service import (
     add_user_page,
@@ -94,7 +97,10 @@ __all__ = [
     "list_pages",
     "list_pages_by_lang_cat",
     "add_page",
-    "get_pages_with_pupdate",
+    "get_pages_years",
+    "get_months_of_pages_years",
+    "get_pages",
+    "top_lang_of_users",
     "update_page",
     "delete_page",
     "find_exists_or_update_page",

@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% macro select_options(data, selectd) %}
+{% for item in data %}
+<option value="{{ item }}" {% if item | string == selectd | string %} selected {% endif %}>{{ item }}</option>
+{% endfor %}
+{% endmacro %}
+
 {% block content %}
 <div class="container-fluid">
     <div class=''>
@@ -12,7 +18,7 @@
                         </h4>
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
                             <div class="text-muted">
-                                Articles: <strong>1</strong> &nbsp;
+                                Articles: <strong>{{ pages | length }}</strong> &nbsp;
                                 Words: <strong>170</strong> &nbsp;
                                 Pageviews: <strong><span id="hrefjsontoadd">0</span></strong>
                             </div>
@@ -33,15 +39,17 @@
                 </div>
             </div>
             <div class='col-lg-3 col-md-6 border_debug'>
-                <form method="get" action="leaderboard.php" class="border rounded">
+                <form method="get" action="{{ url_for('leaderboard.langs', lang_code=lang_code) }}"
+                    class="border rounded">
 
-                    <input type='hidden' name='get' value='langs' /><input type='hidden' name='langcode' value='uz' />
                     <div class='container mt-3'>
                         <div class='row g-1'>
                             <div class="col-12">
                                 <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
                                     <option value='all'>Year: All</option>
-                                    <option value='2023'>2023</option>
+                                    {% if years %}
+                                    {{ select_options(years, selected_year) }}
+                                    {% endif %}
                                 </select>
                             </div>
                             <div class="col-12 mt-1">

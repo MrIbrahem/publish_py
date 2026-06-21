@@ -2,7 +2,7 @@
 
 {% macro select_options(data, selectd) %}
 {% for item in data %}
-<option value="{{ item }}" {% if item == selectd %} selected {% endif %}>{{ item }}</option>
+<option value="{{ item }}" {% if item | string == selectd | string %} selected {% endif %}>{{ item }}</option>
 {% endfor %}
 {% endmacro %}
 
@@ -52,6 +52,7 @@
                                         {% endif %}
                                     </select>
                                 </div>
+                                {% if form.year %}
                                 <div class="input-group w-50">
                                     <select dir="ltr" id="month" name="month" class="form-select" data-bs-theme="auto">
                                         <option value="All">All</option>
@@ -60,6 +61,7 @@
                                         {% endif %}
                                     </select>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
