@@ -81,7 +81,7 @@ class UserRecord(db.Model):
     )
     reg_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "email" not in kwargs:
             kwargs["email"] = ""
@@ -110,7 +110,7 @@ class UsersNoInprocessRecord(db.Model):
     user = db.Column(db.String(120), unique=True, nullable=False)
     is_active = db.Column(db.Integer, nullable=False, default=1)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
@@ -135,7 +135,7 @@ class CoordinatorRecord(db.Model):
     username: str = db.Column(db.String(120), unique=True, nullable=False)
     is_active: int = db.Column(db.Integer, nullable=False, default=1)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
@@ -162,7 +162,7 @@ class FullTranslatorRecord(db.Model):
     user = db.Column(db.String(120), unique=True, nullable=False)
     is_active = db.Column(db.Integer, nullable=False, default=1)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1

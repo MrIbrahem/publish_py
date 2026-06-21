@@ -36,7 +36,7 @@ class CategoryRecord(db.Model):
     depth = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
     is_default = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Convert depth and is_default to int if provided as strings
         for key in ("depth", "is_default"):
             kwargs[key] = int(kwargs.get(key, 0))

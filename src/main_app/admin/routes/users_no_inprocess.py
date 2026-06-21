@@ -109,11 +109,11 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
 
 
 class UsersNoInprocess:
-    def __init__(self):
+    def __init__(self) -> None:
         self.bp = Blueprint("users_no_inprocess", __name__, url_prefix="/users_no_inprocess")
         self._setup_routes()
 
-    def _setup_routes(self):
+    def _setup_routes(self) -> None:
         @self.bp.get("/")
         @admin_required
         def dashboard():

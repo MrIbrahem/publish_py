@@ -56,7 +56,7 @@ def _get_revid(sourcetitle) -> str:
     return revid
 
 
-def shouldAddedToWikidata(lang, title):
+def shouldAddedToWikidata(lang, title) -> bool:
     """ """
     page_information = get_title_info(title, lang)
     if not page_information:
@@ -274,9 +274,9 @@ def insert_to_db(
     sourcetitle,
     mdwiki_revid,
     cat,
-    word,
+    word: str,
     to_users_table,
-    translate_type="lead",
+    translate_type: str="lead",
 ):
     # Normalize inputs
     sourcetitle = sourcetitle.replace("_", " ")

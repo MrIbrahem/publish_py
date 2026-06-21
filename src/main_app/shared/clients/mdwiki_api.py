@@ -32,7 +32,7 @@ class CategoryFetcher:
         self,
         options: dict[str, Any] | None = None,
         endpoint: str = "",
-    ):
+    ) -> None:
         self.options = options or {}
         self.endpoint = endpoint or "https://mdwiki.org/w/api.php"
         self.debug = bool(self.options.get("debug", False))

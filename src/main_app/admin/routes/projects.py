@@ -92,11 +92,11 @@ def _delete_project(record_id: int) -> None:
 
 
 class ProjectsDashboard:
-    def __init__(self):
+    def __init__(self) -> None:
         self.bp = Blueprint("projects", __name__, url_prefix="/projects")
         self._setup_routes()
 
-    def _setup_routes(self):
+    def _setup_routes(self) -> None:
         @self.bp.get("/")
         @admin_required
         def dashboard():

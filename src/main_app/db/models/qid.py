@@ -25,7 +25,7 @@ class QidRecord(db.Model):
     qid = db.Column(db.String(20), nullable=False)
     title = db.Column(db.String(255), unique=True, nullable=False)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.validate()
 
@@ -60,7 +60,7 @@ class QidOthersRecord(db.Model):
     qid = db.Column(db.String(20), nullable=False)
     title = db.Column(db.String(255), unique=True, nullable=False)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
         self.validate()

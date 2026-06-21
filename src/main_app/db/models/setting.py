@@ -33,7 +33,7 @@ class LanguageSettingRecord(db.Model):
     expend = db.Column(db.Integer, default=0, server_default=db.text("0"))
     add_en_lang = db.Column(db.Integer, default=0, server_default=db.text("0"))
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "move_dots" not in kwargs:
             kwargs["move_dots"] = 0
@@ -72,7 +72,7 @@ class SettingRecord(db.Model):
         default="boolean",
     )
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
         if "value_type" not in kwargs:
             kwargs["value_type"] = "boolean"

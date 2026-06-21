@@ -35,11 +35,11 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
 
 
 class SettingsRoutes:
-    def __init__(self):
+    def __init__(self) -> None:
         self.bp = Blueprint("settings", __name__, url_prefix="/settings")
         self._setup_routes()
 
-    def _setup_routes(self):
+    def _setup_routes(self) -> None:
         @self.bp.get("/")
         @admin_required
         def dashboard():

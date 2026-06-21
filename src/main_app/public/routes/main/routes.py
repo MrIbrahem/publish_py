@@ -306,7 +306,6 @@ def missing():
         category=category,
         total=total,
         rows=rows,
-        generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
     )
 
 

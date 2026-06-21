@@ -42,7 +42,7 @@ def add_setting(
     key: str,
     title: str,
     value_type: str = "boolean",
-    value: Any = None,
+    value: Any | None = None,
 ) -> SettingRecord:
     """Add a new setting record."""
     key = key.strip()

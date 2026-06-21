@@ -113,11 +113,11 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
 
 
 class LanguageSettings:
-    def __init__(self):
+    def __init__(self) -> None:
         self.bp = Blueprint("language_settings", __name__, url_prefix="/language_settings")
         self._setup_routes()
 
-    def _setup_routes(self):
+    def _setup_routes(self) -> None:
         @self.bp.get("/")
         @admin_required
         def dashboard():

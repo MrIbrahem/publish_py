@@ -60,7 +60,7 @@ class QidsModel:
         url_prefix: str,
         title_label: str,
         service,
-    ):
+    ) -> None:
         self.bp = Blueprint(endpoint, __name__, url_prefix=url_prefix)
         self.endpoint = endpoint
         self.title_label = title_label
@@ -72,7 +72,7 @@ class QidsModel:
         existing_by_title = self.service.get_by_title(title)
         return is_valid(qid_id, qid, title, existing_by_qid, existing_by_title)
 
-    def _setup_routes(self):
+    def _setup_routes(self) -> None:
         @self.bp.route("/", methods=["GET"])
         def index() -> str:
             """List of rows with optional filter (all / empty / duplicate)."""
