@@ -1,10 +1,5 @@
 {% extends "base.html" %}
-
-{% macro select_options(data, selectd) %}
-{% for item in data %}
-<option value="{{ item }}" {% if item | string == selectd | string %} selected {% endif %}>{{ item }}</option>
-{% endfor %}
-{% endmacro %}
+{% from "leaderboard/_macros.html" import select_options %}
 
 {% block content %}
 <div class="container-fluid">
