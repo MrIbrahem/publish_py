@@ -8,6 +8,7 @@ import sys
 import logging
 import pymysql
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -22,13 +23,12 @@ except Exception:
     logging.warning(f"Failed to load .env file from {str(_env_file_path)}")
 
 # import app here
-from main_app import create_app  # noqa: E402
+from logger_config import configure_logging  # noqa: E402
+
+configure_logging(logging.DEBUG, use_colorlog=True)
+
 from main_app.config import DevelopmentConfig  # noqa: E402
-
-from logger_config import configure_logging, setup_logging  # noqa: E402
-
-configure_logging(logging.DEBUG)
-setup_logging(level=logging.WARNING, name="sqlalchemy")
+from main_app import create_app  # noqa: E402
 
 app = create_app(DevelopmentConfig)
 
