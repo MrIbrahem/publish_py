@@ -6,7 +6,7 @@ import logging
 
 from flask import Response, jsonify, request
 
-from ....db.services.pages.leaderboard_service import get_leaderboard_chart_data
+from ....db.services.pages import get_leaderboard_chart_data
 from .form_utils import FormData, get_form
 
 logger = logging.getLogger(__name__)

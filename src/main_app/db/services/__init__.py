@@ -22,6 +22,14 @@ from .content.lang_service import (
 from .content.project_service import (
     list_projects,
 )
+from .pages import (
+    get_leaderboard_chart_data,
+    get_months_of_pages_years,
+    get_pages,
+    get_pages_years,
+    list_of_users_by_translations_count,
+    top_lang_of_users,
+)
 from .pages.in_process_service import (
     add_in_process,
     delete_in_process,
@@ -34,14 +42,6 @@ from .pages.in_process_service import (
     list_in_process_by_lang,
     list_in_process_by_user,
     update_in_process,
-)
-from .pages.leaderboard_service import (
-    get_leaderboard_chart_data,
-    get_months_of_pages_years,
-    get_pages,
-    get_pages_years,
-    list_of_users_by_translations_count,
-    top_lang_of_users,
 )
 from .pages.page_service import (
     add_page,

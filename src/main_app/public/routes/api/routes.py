@@ -19,7 +19,7 @@ from ....db.services import (
     list_langs,
     query_reports_with_filters,
 )
-from ....db.services.pages.leaderboard_service import list_of_users_by_translations_count
+from ....db.services.pages import list_of_users_by_translations_count
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema

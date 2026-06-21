@@ -14,7 +14,7 @@ from flask import (
 )
 
 from ....db.services import get_camp_to_cats, list_projects
-from ....db.services.pages.leaderboard_service import (
+from ....db.services.pages import (
     get_leaderboard_chart_data,
     get_months_of_pages_years,
     get_pages,

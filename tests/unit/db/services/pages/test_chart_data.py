@@ -1,5 +1,5 @@
 from src.main_app.db.models import CategoryRecord, PageRecord, UserRecord
-from src.main_app.db.services.pages.leaderboard_service import get_leaderboard_chart_data
+from src.main_app.db.services.pages import get_leaderboard_chart_data
 from src.main_app.shared.core.extensions import db
 
 
