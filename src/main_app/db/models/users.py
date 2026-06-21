@@ -117,7 +117,7 @@ class UsersNoInprocessRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class CoordinatorRecord(db.Model):
+class AdminUserRecord(db.Model):
     """
     ORM model for the coordinators table.
     CREATE TABLE IF NOT EXISTS coordinators (
@@ -170,7 +170,7 @@ class FullTranslatorRecord(db.Model):
 
 
 __all__ = [
-    "CoordinatorRecord",
+    "AdminUserRecord",
     "FullTranslatorRecord",
     "UsersNoInprocessRecord",
     "UserTokenRecord",

@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.db.models import CoordinatorRecord
+from src.main_app.db.models import AdminUserRecord
 from src.main_app.db.services.users.admin_service import (
     active_coordinators,
     add_coordinator,
@@ -92,10 +92,10 @@ class TestGetCoordinator:
     """Tests for get_coordinator function."""
 
     def test_returns_coordinator_record(self, monkeypatch):
-        """Test that function returns a CoordinatorRecord."""
+        """Test that function returns a AdminUserRecord."""
         c = add_coordinator("Medic_Expert")
         result = get_coordinator(c.id)
-        assert isinstance(result, CoordinatorRecord)
+        assert isinstance(result, AdminUserRecord)
         assert result.username == "Medic_Expert"
 
     def test_returns_none_when_not_found(self, monkeypatch):
