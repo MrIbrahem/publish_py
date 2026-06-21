@@ -14,6 +14,8 @@ class FormData:
     cat: str | None
     camp: str | None
     year: int | None
+    lang: int | None
+    user: int | None
     month: int | None
 
 def get_form(request_args) -> FormData:
@@ -36,6 +38,13 @@ def get_form(request_args) -> FormData:
     if camp.lower() == "all":
         camp = None
 
+    user = request_args.get("user", default="all", type=str)
+    if user.lower() == "all":
+        user = None
+
+    lang = request_args.get("lang", default="all", type=str)
+    if lang.lower() == "all":
+        lang = None
     return FormData(
         limit=limit,
         user_group=user_group,
@@ -43,4 +52,6 @@ def get_form(request_args) -> FormData:
         camp=camp,
         year=year,
         month=month,
+        lang=lang,
+        user=user,
     )

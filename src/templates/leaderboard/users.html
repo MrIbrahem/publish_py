@@ -24,18 +24,11 @@
             <div class='col-lg-5 col-md-6'>
                 <div class="position-relative py-1 border rounded">
                     <canvas id="chart_69e6e6d5e7ab7" height="100" width="200" class="invert-on-dark"></canvas>
-                    <script>
-                        graph_js(
-                            ['', '2023-08'],
-                            [0, 1],
-                            "chart_69e6e6d5e7ab7"
-                        )
-                    </script>
                 </div>
             </div>
             <div class='col-lg-3 col-md-6 border_debug'>
-                <form method="get" action="{{ url_for('leaderboard.users', username=username) }}"
-                    class="border rounded">
+                <form method="get" action="{{ url_for('leaderboard.users', username=username) }}" class="border rounded"
+                    id="form_board">
                     <div class='container mt-3'>
                         <div class='row g-1'>
                             <div class="col-6">
@@ -98,7 +91,8 @@
                             {{ page.word }}
                         </td>
                         <td>
-                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}" target="_blank">{{ page.target }}</a>
+                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}"
+                                target="_blank">{{ page.target }}</a>
                         </td>
                         <td>
                             {{ page.pupdate }}
@@ -152,8 +146,19 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/g.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graph_api.js') }}"></script>
 
 <script>
-
+    function getFormData(d) {
+        const formData = $('#form_board').serializeArray();
+        formData.forEach(field => {
+            if (field.value.trim()) {
+                d[field.name] = field.value;
+            }
+        });
+        return d;
+    }
+    graph_js_params('chart_69e6e6d5e7ab7', getFormData({user: '{{ username }}' }))
 </script>
 {% endblock %}

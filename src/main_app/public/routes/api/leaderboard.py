@@ -62,6 +62,12 @@ def leaderboard_status() -> Response:
             str_like = f"{form.year}-{form.month:02d}%"
         query = query.filter(PageRecord.pupdate.like(str_like))
 
+    if form.lang:
+        query = query.filter(PageRecord.lang == form.lang)
+
+    if form.user:
+        query = query.filter(PageRecord.user == form.user)
+
     query = query.group_by(date_expr).order_by(date_expr)
 
 
