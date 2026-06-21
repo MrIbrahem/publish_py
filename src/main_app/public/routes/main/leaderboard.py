@@ -56,8 +56,8 @@ def langs(lang_code: str) -> str:
         lang=lang_code,
     )
 
-    words_total = sum(page["word"] for page in lang_pages if page.get("word"))
-    pageviews_total = sum(page["views"] for page in lang_pages if page.get("views"))
+    words_total = sum(int(page["word"]) for page in lang_pages if page.get("word"))
+    pageviews_total = sum(int(page["views"]) for page in lang_pages if page.get("views"))
 
     return render_template(
         "leaderboard/langs.html",
