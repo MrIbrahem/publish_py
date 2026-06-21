@@ -249,8 +249,8 @@ def get_pages_years(
     if lang is not None:
         query = query.filter(PageRecord.lang == lang)
 
-    rows = query.distinct()
-    years : list[int] = [ row.year for row in rows ]
+    rows = query.distinct().all()
+    years : list[int] = [ row.year for row in rows if row.year is not None ]
     years.sort(reverse=True)
     return years
 
@@ -268,8 +268,9 @@ def get_months_of_pages_years(year: int) -> list[int]:
         .filter(PageRecord.pupdate != "")
         .filter(func.year(PageRecord.pupdate) == year)
         .distinct()
+        .all()
     )
-    months : list[int] = [ row.month for row in rows ]
+    months : list[int] = [ row.month for row in rows if row.month is not None ]
     months.sort(reverse=True)
     return months
 
