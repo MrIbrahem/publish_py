@@ -46,16 +46,18 @@ def get_months_of_pages_years(year: int) -> list[int]:
     if db.engine.name == "sqlite":
         month_expr = func.strftime("%m", PageRecord.pupdate)
         year_expr = func.strftime("%Y", PageRecord.pupdate)
+        year_val = str(year)
     else:
         month_expr = func.month(PageRecord.pupdate)
         year_expr = func.year(PageRecord.pupdate)
+        year_val = year
 
     rows = (
         db.session.query(
             month_expr.label("month"),
         )
         .filter(PageRecord.pupdate != "")
-        .filter(year_expr == str(year) if db.engine.name == "sqlite" else year_expr == year)
+        .filter(year_expr == year_val)
         .distinct()
         .all()
     )
