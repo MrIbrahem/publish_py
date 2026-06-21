@@ -20,19 +20,17 @@ from flask import (
 # )
 from ..decorators import admin_required
 from ..sidebar import create_side
+from .add_translate import add_bp
 from .campaigns import campaigns_module
 from .categories import categories_dashboard
 from .coordinators import coordinators_module
 from .full_translators import fulltranslators_module
 from .language_settings import languagesettings_module
 from .last import last_translations_dashboard
-from .add_translate import add_bp
 from .pages_users_to_main import pages_users_to_main_bp
 from .projects import projects_module
-
 from .qids.qids import qids_module  # qids_bp
 from .qids.qids_others import qids_others_module  # qids_others_bp
-
 from .settings import settings_module
 from .stat import stat_bp
 from .translated import translated_bp

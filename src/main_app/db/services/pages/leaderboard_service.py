@@ -107,7 +107,8 @@ def get_pages(
 
     where_clause = " AND ".join(conditions) if conditions else "1=1"
 
-    sql = text(f"""
+    sql = text(
+        f"""
         SELECT DISTINCT
             p.title, p.word, p.translate_type, p.cat, p.lang,
             p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
@@ -118,7 +119,8 @@ def get_pages(
         LEFT JOIN categories ca
             ON ca.category = p.cat
         WHERE {where_clause}
-    """)
+    """
+    )
 
     rows = db.session.execute(sql, params).fetchall()
     return [dict(row._mapping) for row in rows]

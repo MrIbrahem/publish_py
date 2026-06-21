@@ -7,8 +7,8 @@ Endpoints:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 from typing import Any, Dict, List
 
 from flask import Response, jsonify, request
@@ -16,11 +16,16 @@ from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
 
 from ....db.models import (
-    LangRecord, PageRecord, ViewsNewAllRecord, WordRecord, CategoryRecord, UserRecord,
+    CategoryRecord,
+    LangRecord,
+    PageRecord,
+    UserRecord,
+    ViewsNewAllRecord,
+    WordRecord,
 )
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
-from .form_utils import get_form, FormData
+from .form_utils import FormData, get_form
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +55,7 @@ def apply_filters(
         query = query.filter(PageRecord.pupdate.like(str_like))
 
     return query
+
 
 @check_cors
 def get_top_langs() -> Response:
@@ -150,11 +156,7 @@ def get_top_langs() -> Response:
         )
 
         query = apply_filters(form, query)
-        query = (
-            query
-            .group_by(PageRecord.lang, LangRecord.name)
-            .order_by(db.func.count(PageRecord.target).desc())
-        )
+        query = query.group_by(PageRecord.lang, LangRecord.name).order_by(db.func.count(PageRecord.target).desc())
         if form.limit:
             query = query.limit(int(form.limit))
 
@@ -174,7 +176,7 @@ def get_top_langs() -> Response:
 
     except Exception:
         logger.exception("Error fetching top_langs data")
-        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500 # type: ignore
+        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500  # type: ignore
 
     response_data = {
         "results": data,
@@ -279,11 +281,7 @@ def get_top_users() -> Response:
 
         query = apply_filters(form, query)
 
-        query = (
-            query
-            .group_by(PageRecord.user)
-            .order_by(db.func.count(PageRecord.target).desc())
-        )
+        query = query.group_by(PageRecord.user).order_by(db.func.count(PageRecord.target).desc())
         if form.limit:
             query = query.limit(int(form.limit))
         results = query.all()
@@ -301,7 +299,7 @@ def get_top_users() -> Response:
 
     except Exception:
         logger.exception("Error fetching top_users data")
-        return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500 # type: ignore
+        return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500  # type: ignore
 
     response_data = {
         "results": data,

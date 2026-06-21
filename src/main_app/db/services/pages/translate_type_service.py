@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db, UniqueError
+from ....shared.core.extensions import UniqueError, db
 from ...models import PageRecord, QidRecord, TranslateTypeRecord
 
 logger = logging.getLogger(__name__)

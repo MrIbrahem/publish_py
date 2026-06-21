@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.db.models import TranslateTypeRecord, PageRecord, QidRecord
+from src.main_app.db.models import PageRecord, QidRecord, TranslateTypeRecord
 from src.main_app.db.services.pages.translate_type_service import (
     add_translate_type,
     can_translate_full,
@@ -12,9 +12,9 @@ from src.main_app.db.services.pages.translate_type_service import (
     get_translate_type_by_title,
     list_full_enabled_types,
     list_lead_enabled_types,
+    list_new_titles,
     list_translate_types,
     update_translate_type,
-    list_new_titles,
 )
 from src.main_app.shared.core.extensions import db as _db
 from src.main_app.shared.core.extensions.exc import UniqueError
@@ -215,6 +215,7 @@ class TestCanTranslateFull:
 #   - list_translate_types(cat=)
 #   - list_new_titles()
 # ---------------------------------------------------------------------------
+
 
 class TestListTranslateTypesByCategory:
     """Tests for the ``cat`` filter on list_translate_types."""

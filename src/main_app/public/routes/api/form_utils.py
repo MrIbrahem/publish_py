@@ -1,11 +1,12 @@
-"""
-"""
+""" """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
+
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class FormData:
@@ -17,6 +18,7 @@ class FormData:
     lang: int | None
     user: int | None
     month: int | None
+
 
 def get_form(request_args) -> FormData:
     # limit

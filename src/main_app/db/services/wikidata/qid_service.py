@@ -91,11 +91,7 @@ def list_records(dis: str = "all") -> List[QidRecord]:
     """
     base = db.session.query(QidRecord)
     if dis == "empty":
-        rows = (
-            base.filter(or_(QidRecord.qid.is_(None), QidRecord.qid == ""))
-            .order_by(QidRecord.id.asc())
-            .all()
-        )
+        rows = base.filter(or_(QidRecord.qid.is_(None), QidRecord.qid == "")).order_by(QidRecord.id.asc()).all()
         return rows
     if dis == "duplicate":
         other = aliased(QidRecord)
