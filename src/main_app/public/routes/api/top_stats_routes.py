@@ -32,13 +32,13 @@ def apply_filters(
     if form.cat:
         query = query.filter(PageRecord.cat == form.cat)
     elif form.camp:
-        query = query.outerjoin(
+        query = query.join(
             CategoryRecord,
             (PageRecord.cat == CategoryRecord.category) & (CategoryRecord.campaign == form.camp),
         )
 
     if form.user_group:
-        query = query.outerjoin(
+        query = query.join(
             UserRecord,
             (PageRecord.user == UserRecord.username) & (UserRecord.user_group == form.user_group),
         )

@@ -18,10 +18,7 @@ class FormData:
 
 def get_form(request_args) -> FormData:
     # limit
-    limit = request_args.get("limit", default=50, type=int)
-    if limit is None or limit <= 0:
-        limit = 50
-    limit = min(limit, 1000)
+    limit = request_args.get("limit", type=int)
 
     # /api/top_langs?camp=Video&user_group=all&year=all&month=All&cat=RTTVideo
     user_group = request_args.get("user_group", default="all", type=str)

@@ -34,9 +34,14 @@ def leaderboard_status() -> Response:
         ORDER BY
             1 ASC;
     """
-    query = db.session.query()
-
     form: FormData = get_form(request.args)
+
+    date_expr = db.func.left(PageRecord.pupdate, 7)
+
+    query = db.session.query(date_expr.label("date"), db.func.count().label("count")).filter(
+        PageRecord.target != ""
+    )
+
     if form.cat:
         query = query.filter(PageRecord.cat == form.cat)
     elif form.camp:
@@ -57,23 +62,19 @@ def leaderboard_status() -> Response:
             str_like = f"{form.year}-{form.month:02d}%"
         query = query.filter(PageRecord.pupdate.like(str_like))
 
-    query = (
-        query
-        # .group_by()
-        # .order_by()
-    )
-    results = query.all()
-    # data example: [ { "date": "2025-02", "count": 1 }, { "date": "2025-04", "count": 3 } ]
-    data = {}
+    query = query.group_by(date_expr).order_by(date_expr)
+
+
+    rows = query.all()
+    data = [{"date": row.date, "count": row.count} for row in rows]
 
     response_data = {
         "results": data,
         "count": len(data),
     }
 
-    response = jsonify(response_data)
+    return jsonify(response_data)
 
-    return response
 
 __all__ = [
     "leaderboard_status",

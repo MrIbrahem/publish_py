@@ -13,11 +13,7 @@ from flask import (
     send_from_directory,
 )
 
-from ....db.models import ProjectRecord
-
-from ....db.services import get_camp_to_cats, list_projects
-
-from ....shared.auth.identity import current_user
+from ....db.services import get_camp_to_cats, list_projects, get_pages_with_pupdate
 
 bp_leaderboard = Blueprint("leaderboard", __name__, url_prefix="/leaderboard")
 logger = logging.getLogger(__name__)
@@ -26,8 +22,8 @@ logger = logging.getLogger(__name__)
 @bp_leaderboard.get("/")
 def index() -> str:
     campagins = get_camp_to_cats().keys()
-    years={}
-    months={}
+    years = get_pages_with_pupdate()
+    months = {}
     user_groups = [x.g_title for x in list_projects()]
 
     form_data = request.args

@@ -230,6 +230,13 @@ def find_exists_or_update_page(
     return True
 
 
+def get_pages_with_pupdate() -> list[int]:
+    """
+    SELECT DISTINCT YEAR(pupdate) AS year FROM pages WHERE pupdate <> ''
+    """
+    years : list[int] = []
+    return years
+
 def list_of_users_by_translations_count() -> dict[str, int]:
     """
     Get a dictionary of users and their translation counts.
