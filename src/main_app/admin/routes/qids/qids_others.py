@@ -14,5 +14,5 @@ from .qids_model import QidsModel
 logger = logging.getLogger(__name__)
 
 qids_others_module = QidsModel(
-    endpoint="qids_others", url_prefix="/qids_others", title_label="Qids Others", service=qid_others_service
+    endpoint="qids_others", url_prefix="/qids_others", title_label="Qids Others", service=qid_others_service,
 )
