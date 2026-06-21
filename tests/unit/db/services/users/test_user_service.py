@@ -10,6 +10,7 @@ from src.main_app.db.services.users.user_service import (
     get_user_by_username,
     list_users,
     list_users_by_group,
+    update_user,
     update_user_data,
     user_exists,
 )
@@ -130,10 +131,65 @@ class TestUpdateUser:
             update_user_data(9999, email="T")
 
 
+class TestUpdateUserFull:
+    """Tests for the update_user function (full field replacement, added to __all__ in this PR)."""
+
+    def test_updates_all_fields(self, monkeypatch):
+        """update_user replaces all user fields and returns the updated record."""
+        u = add_user("Original_Name", email="old@example.com", wiki="enwiki", user_group="Editor")
+        updated = update_user(u.user_id, username="New_Name", email="new@example.com", wiki="frwiki", user_group="Admin")
+
+        assert updated.username == "New_Name"
+        assert updated.email == "new@example.com"
+        assert updated.wiki == "frwiki"
+        assert updated.user_group == "Admin"
+
+    def test_update_persists_to_db(self, monkeypatch):
+        """Changes made by update_user are persisted and retrievable."""
+        u = add_user("Persist_Test", email="before@example.com")
+        update_user(u.user_id, username="Persist_Test", email="after@example.com")
+
+        fetched = get_user(u.user_id)
+        assert fetched.email == "after@example.com"
+
+    def test_raises_on_nonexistent_user(self, monkeypatch):
+        """Raises ValueError when user_id does not exist."""
+        with pytest.raises(ValueError, match="not found"):
+            update_user(99999, username="Ghost")
+
+    def test_raises_on_empty_username(self, monkeypatch):
+        """Raises ValueError when new username is empty or whitespace."""
+        u = add_user("Valid_User")
+        with pytest.raises(ValueError, match="Username is required"):
+            update_user(u.user_id, username="   ")
+
+    def test_strips_whitespace_from_username(self, monkeypatch):
+        """Strips leading/trailing whitespace from username."""
+        u = add_user("Whitespace_User")
+        updated = update_user(u.user_id, username="  Trimmed  ")
+        assert updated.username == "Trimmed"
+
+    def test_returns_user_record_instance(self, monkeypatch):
+        """update_user returns a UserRecord instance."""
+        u = add_user("Return_Type_Check")
+        result = update_user(u.user_id, username="Return_Type_Check")
+        assert isinstance(result, UserRecord)
+
+    def test_update_user_in_users_package(self, monkeypatch):
+        """update_user is accessible via the users package __init__.py."""
+        from src.main_app.db.services.users import update_user as pkg_update_user
+        assert callable(pkg_update_user)
+
+    def test_update_user_in_user_service_all(self):
+        """update_user is listed in user_service.__all__."""
+        from src.main_app.db.services.users import user_service
+        assert "update_user" in user_service.__all__
+
+
 class TestDeleteUser:
     """Tests for delete_user function."""
 
-    def test_delegates_to_store(self, monkeypatch):
+
         """Test that function deletes the record."""
         u = add_user("Temporary_Account")
         deleted = delete_user(u.user_id)
