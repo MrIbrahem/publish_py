@@ -124,7 +124,7 @@ def get_pages(
     return [dict(row._mapping) for row in rows]
 
 
-def top_lang_of_users(username: str):
+def top_lang_of_users(username: str) -> dict[str, int]:
     """
     SELECT
         p.user,
