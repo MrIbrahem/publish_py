@@ -132,7 +132,6 @@ class TestGetTitleToQid:
         pass
 
 
-
 # ---------------------------------------------------------------------------
 # Tests for new service functions added with admin/qids work:
 #   - list_records(dis=)  (empty / duplicate filters)

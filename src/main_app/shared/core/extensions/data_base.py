@@ -8,9 +8,7 @@ import logging
 from typing import Any
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData, event, inspect, text
-
-from sqlalchemy import Text
+from sqlalchemy import MetaData, Text, event, inspect, text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 from sqlalchemy.engine import Connection, Dialect
 from sqlalchemy.types import TypeDecorator, TypeEngine

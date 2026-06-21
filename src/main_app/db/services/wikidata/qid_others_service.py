@@ -145,9 +145,7 @@ def insert(title: str, qid: str) -> bool:
     if not title or not qid:
         return False
     try:
-        existing = (
-            db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
-        )
+        existing = db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
         if existing:
             if not existing.qid:
                 existing.qid = qid

@@ -17,5 +17,5 @@ qids_others_module = QidsModel(
     endpoint="qids_others",
     url_prefix="/qids_others",
     title_label="Qids Others",
-    service=qid_others_service
+    service=qid_others_service,
 )

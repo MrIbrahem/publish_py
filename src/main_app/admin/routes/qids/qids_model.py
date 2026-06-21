@@ -1,5 +1,4 @@
-"""s
-"""
+"""s"""
 
 from __future__ import annotations
 
@@ -7,8 +6,8 @@ import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
-from ....db.models import QidOthersRecord, QidRecord
 
+from ....db.models import QidOthersRecord, QidRecord
 
 logger = logging.getLogger(__name__)
 
@@ -37,15 +36,13 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
     if existing_by_title:
         if qid_id and existing_by_title.id != qid_id:
             flash(
-                f"Title:({title}) already used in database with qid:"
-                f"({existing_by_title.qid}), new qid:({qid})",
+                f"Title:({title}) already used in database with qid:" f"({existing_by_title.qid}), new qid:({qid})",
                 "danger",
             )
             return False
         if not qid_id and existing_by_title.qid and existing_by_title.qid != qid:
             flash(
-                f"Title:({title}) already used in database with qid:"
-                f"({existing_by_title.qid}), new qid:({qid})",
+                f"Title:({title}) already used in database with qid:" f"({existing_by_title.qid}), new qid:({qid})",
                 "danger",
             )
             return False
@@ -95,7 +92,6 @@ class QidsModel:
                 index_endpoint=f"admin.{self.endpoint}.index",
                 edit_endpoint=f"admin.{self.endpoint}.edit",
                 post_endpoint=f"admin.{self.endpoint}.edit_post",
-
                 add_endpoint=f"admin.{self.endpoint}.add",
             )
 

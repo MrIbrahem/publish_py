@@ -12,18 +12,19 @@ Usage:
 """
 
 from __future__ import annotations
+
 from flask_migrate import Migrate
 
 from ._csrf import (
     csrf,
-    csrf_init_app,
     csrf_exempt,
+    csrf_init_app,
 )
 from .data_base import (
-    db,
-    metadata,
     LONGTEXT,
     Base,
+    db,
+    metadata,
 )
 from .exc import UniqueError
 
@@ -36,13 +37,9 @@ __all__ = [
     "metadata",
     "LONGTEXT",
     "Base",
-
     "migrate",
-
     "csrf",
     "csrf_init_app",
     "csrf_exempt",
-
     "UniqueError",
-
 ]

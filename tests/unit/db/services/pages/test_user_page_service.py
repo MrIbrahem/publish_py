@@ -146,7 +146,6 @@ class TestInsertUserPageTarget:
             assert success is False
 
 
-
 # ---------------------------------------------------------------------------
 # Tests for new service functions added with admin/translated_users work:
 #   - list_translated(lang, limit, offset)

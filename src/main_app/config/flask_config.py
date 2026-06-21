@@ -115,7 +115,6 @@ class DevelopmentConfig(Config):
 
     DEBUG: bool = True
     TESTING: bool = True
-    SQLALCHEMY_ECHO: bool = True  # Log SQL in development
 
     # Production should always use secure cookies
     SESSION_COOKIE_SECURE: bool = True

@@ -98,8 +98,9 @@ def create_app(config_class: Type) -> Flask:
         _db.init_app(app)
         migrate.init_app(app, _db)
 
-        # Create database tables and views if they don't exist
-        init_db(app, _db)
+        with app.app_context():
+            # Create database tables and views if they don't exist
+            init_db(_db)
 
     # if settings.database_data.db_host:
     # db_url = build_db_url(settings.database_data.to_dict())

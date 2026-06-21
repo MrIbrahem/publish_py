@@ -120,9 +120,7 @@ class TestInsert:
         assert insert("   ", "Q1") is False
 
     def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
-        with patch(
-            "src.main_app.db.services.wikidata.qid_others_service.db.session"
-        ) as mock_session:
+        with patch("src.main_app.db.services.wikidata.qid_others_service.db.session") as mock_session:
             mock_session.query.return_value.filter.return_value.first.return_value = None
             mock_session.commit.side_effect = Exception("boom")
             ok = insert("Will_fail", "Q1")
@@ -149,9 +147,7 @@ class TestUpdate:
         assert update(record.id, "T", "") is False
 
     def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
-        with patch(
-            "src.main_app.db.services.wikidata.qid_others_service.db.session"
-        ) as mock_session:
+        with patch("src.main_app.db.services.wikidata.qid_others_service.db.session") as mock_session:
             mock_session.commit.side_effect = Exception("boom")
             mock_session.get.return_value = MagicMock()
             ok = update(1, "T", "Q1")

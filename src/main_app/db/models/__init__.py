@@ -23,8 +23,8 @@ from .public import (
 from .publish import ReportRecord
 from .qid import (
     AllQidsExistRecord,
-    QidRecord,
     QidOthersRecord,
+    QidRecord,
 )
 from .setting import (
     LanguageSettingRecord,

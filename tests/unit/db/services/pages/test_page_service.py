@@ -193,7 +193,6 @@ class TestInsertPageTarget:
             assert success is False
 
 
-
 # ---------------------------------------------------------------------------
 # Tests for new service functions added with the admin/translated work:
 #   - list_translated(lang, limit, offset)

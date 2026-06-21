@@ -104,12 +104,10 @@ def delete_user_page(page_id: int) -> bool:
         return False
 
     try:
-        db.session.query(PagesUsersToMainRecord).filter(
-            PagesUsersToMainRecord.id == page_id
-        ).delete(synchronize_session=False)
-        db.session.query(UserPageRecord).filter(UserPageRecord.id == page_id).delete(
+        db.session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == page_id).delete(
             synchronize_session=False
         )
+        db.session.query(UserPageRecord).filter(UserPageRecord.id == page_id).delete(synchronize_session=False)
         db.session.commit()
     except Exception:
         logger.exception("Failed to delete pages_users(_to_main) id=%r", page_id)

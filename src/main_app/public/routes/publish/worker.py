@@ -275,7 +275,7 @@ def insert_to_db(
     sourcetitle,
     mdwiki_revid,
     cat,
-    word: str,
+    word: str | int,
     to_users_table,
     translate_type: str = "lead",
 ):
@@ -314,7 +314,7 @@ def insert_to_db_2(
     target: str,
     to_users_table: bool = False,
     mdwiki_revid: int | None = None,
-    word: int = 0,
+    word: int | str = 0,
 ) -> dict[str, Any]:
     """Insert a page target record.
 
@@ -359,6 +359,9 @@ def insert_to_db_2(
         return result
 
     table_sql = "pages_users" if use_user_sql else "pages"
+
+    if isinstance(word, str):
+        word = int(word)
 
     if table_sql == "pages":
         # Insert new record
