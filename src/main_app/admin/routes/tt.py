@@ -13,10 +13,9 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...shared.core.extensions import UniqueError
-
-from ...db.services.content.category_service import list_categories
+from ...db.services.content import list_categories
 from ...db.services.pages import translate_type_service
+from ...shared.core.extensions import UniqueError
 
 logger = logging.getLogger(__name__)
 

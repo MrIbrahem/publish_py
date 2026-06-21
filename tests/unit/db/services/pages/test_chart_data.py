@@ -1,6 +1,7 @@
-from src.main_app.db.services.pages.page_service import get_leaderboard_chart_data
-from src.main_app.db.models import PageRecord, CategoryRecord, UserRecord
+from src.main_app.db.models import CategoryRecord, PageRecord, UserRecord
+from src.main_app.db.services.pages import get_leaderboard_chart_data
 from src.main_app.shared.core.extensions import db
+
 
 def test_get_leaderboard_chart_data(app, setup_db):
     with app.app_context():

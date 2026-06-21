@@ -3,80 +3,64 @@ Shared db services, used in both admin and public blueprints
 
 """
 
-from .content.project_service import (
-    list_projects,
-)
-from .content.category_service import (
+from .content import (
     add_category,
-    delete_category,
-    get_camp_to_cats,
-    get_campaign_category,
-    list_categories,
-    update_category,
-)
-from .content.lang_service import (
     add_lang,
     add_or_update_lang,
+    delete_category,
     delete_lang,
+    get_camp_to_cats,
+    get_campaign_category,
     get_lang,
     get_lang_by_code,
+    list_categories,
     list_langs,
+    list_projects,
+    update_category,
 )
-from .pages.in_process_service import (
-    add_in_process,
+from .pages import (
+    add_page,
+    add_user_page,
     delete_in_process,
     delete_in_process_by_title_user_lang,
+    delete_page,
+    delete_user_page,
+    find_exists_or_update_page,
+    find_exists_or_update_user_page,
     get_in_process,
     get_in_process_by_title_user_lang,
     get_in_process_counts_by_user,
+    get_leaderboard_chart_data,
+    get_months_of_pages_years,
+    get_pages,
+    get_pages_years,
+    insert_page_target,
+    insert_user_page_target,
     is_in_process,
     list_in_process,
     list_in_process_by_lang,
     list_in_process_by_user,
-    update_in_process,
-)
-from .pages.page_service import (
-    add_page,
-    delete_page,
-    find_exists_or_update_page,
-    insert_page_target,
     list_of_users_by_translations_count,
     list_pages,
     list_pages_by_lang_cat,
-    update_page,
-    get_pages_years,
-    get_months_of_pages_years,
-    get_pages,
-    top_lang_of_users,
-    get_leaderboard_chart_data,
-)
-from .pages.user_page_service import (
-    add_user_page,
-    delete_user_page,
-    find_exists_or_update_user_page,
-    insert_user_page_target,
     list_user_pages,
+    top_lang_of_users,
+    update_in_process,
+    update_page,
     update_user_page,
 )
-from .reports.report_service import (
-    add_report,
-    delete_report,
-    list_reports,
-    query_reports_with_filters,
-)
-from .users.user_token_service import (
+from .reports import add_report, delete_report, list_reports, query_reports_with_filters
+from .users import (
     delete_user_token,
     delete_user_token_by_username,
     get_user_token,
     get_user_token_by_username,
     upsert_user_token,
 )
-from .wikidata.allqid_service import list_targets_by_lang
-from .wikidata.qid_service import list_records
+from .wikidata import list_records, list_targets_by_lang
 
 __all__ = [
     "list_projects",
-
     "list_in_process",
     "list_in_process_by_user",
     "list_in_process_by_lang",

@@ -13,20 +13,16 @@ from marshmallow import ValidationError
 from sqlalchemy import func
 
 from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
-from ....db.services import (
-    get_in_process_counts_by_user,
-    list_categories,
-    list_langs,
-    list_of_users_by_translations_count,
-    query_reports_with_filters,
-)
+from ....db.services.content import list_categories, list_langs
+from ....db.services.pages import get_in_process_counts_by_user, list_of_users_by_translations_count
+from ....db.services.reports import query_reports_with_filters
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.utils.web_utils import parse_select_fields
+from .leaderboard import leaderboard_status
 from .pages_query_service import list_pages_users, list_pages_with_views
 from .top_stats_routes import get_top_langs, get_top_users
-from .leaderboard import leaderboard_status
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
@@ -418,6 +414,7 @@ def get_langs() -> Response:
     }
 
     return jsonify(response_data)
+
 
 bp_api.route("/status", methods=["GET"])(leaderboard_status)
 

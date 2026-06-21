@@ -10,17 +10,14 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content.lang_service import list_langs
-from ...db.services.pages import pages_users_to_main_service
-from ...db.services.pages.page_service import add_translate_row_to_db
+from ...db.services.content import list_langs
+from ...db.services.pages import add_translate_row_to_db, pages_users_to_main_service
 from ...shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
 
-pages_users_to_main_bp = Blueprint(
-    "pages_users_to_main", __name__, url_prefix="/pages_users_to_main"
-)
+pages_users_to_main_bp = Blueprint("pages_users_to_main", __name__, url_prefix="/pages_users_to_main")
 
 
 def _safe_int(value: str | None, default: int) -> int:

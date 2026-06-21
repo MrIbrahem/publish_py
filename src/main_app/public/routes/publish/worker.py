@@ -7,16 +7,17 @@ import logging
 from typing import Any
 
 from ....config import settings
-from ....db.services import (
-    add_report,
+from ....db.models import LanguageSettingRecord
+from ....db.services.config import get_language_setting_by_code
+from ....db.services.content import get_campaign_category
+from ....db.services.pages import (
     find_exists_or_update_page,
     find_exists_or_update_user_page,
-    get_user_token_by_username,
     insert_page_target,
     insert_user_page_target,
 )
-from ....db.services.config.language_setting_service import LanguageSettingRecord, get_language_setting_by_code
-from ....db.services.content.category_service import get_campaign_category
+from ....db.services.reports import add_report
+from ....db.services.users import get_user_token_by_username
 from ....shared.clients import (
     get_revid,
     get_revid_db,
@@ -276,7 +277,7 @@ def insert_to_db(
     cat,
     word: str,
     to_users_table,
-    translate_type: str="lead",
+    translate_type: str = "lead",
 ):
     # Normalize inputs
     sourcetitle = sourcetitle.replace("_", " ")

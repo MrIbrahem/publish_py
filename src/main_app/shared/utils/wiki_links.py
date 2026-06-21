@@ -151,7 +151,7 @@ def get_endpoint() -> str:
     """
     # Imported lazily to avoid pulling Flask-SQLAlchemy at import time.
     try:
-        from ...db.services.config.setting_service import get_setting_by_key
+        from ...db.services.config import get_setting_by_key
 
         record = get_setting_by_key("use_mdwikicx")
     except Exception:

@@ -13,7 +13,7 @@ import logging
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content.lang_service import list_langs
+from ...db.services.content import list_langs
 from ...db.services.pages import page_service
 from ...shared.core.extensions import db
 

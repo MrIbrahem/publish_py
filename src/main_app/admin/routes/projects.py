@@ -16,7 +16,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content.project_service import (
+from ...db.services.content import (
     add_project,
     delete_project,
     list_projects,

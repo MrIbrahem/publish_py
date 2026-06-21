@@ -13,7 +13,7 @@ from flask import Flask, flash, jsonify, render_template, request  # , g
 
 from .admin.routes.admin import bp_admin
 from .db import init_db
-from .db.services.users.coordinator_service import active_coordinators
+from .db.services.users import active_coordinators
 from .public.routes import (
     bp_api,
     bp_auth,
