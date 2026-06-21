@@ -365,7 +365,7 @@
             ]
         });
         // ---
-        graph_js_params('chart09', getFormData({}))
+        graph_js({{ chart_labels|tojson }}, {{ chart_counts|tojson }}, 'chart09')
         // ---
     })
 </script>

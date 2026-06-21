@@ -48,6 +48,7 @@ from .pages.page_service import (
     get_months_of_pages_years,
     get_pages,
     top_lang_of_users,
+    get_leaderboard_chart_data,
 )
 from .pages.user_page_service import (
     add_user_page,
@@ -101,6 +102,7 @@ __all__ = [
     "get_months_of_pages_years",
     "get_pages",
     "top_lang_of_users",
+    "get_leaderboard_chart_data",
     "update_page",
     "delete_page",
     "find_exists_or_update_page",

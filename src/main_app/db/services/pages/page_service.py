@@ -11,7 +11,7 @@ from sqlalchemy import func, or_, text
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
-from ...models import PageRecord
+from ...models import CategoryRecord, PageRecord, UserRecord
 from ..analytics.word_service import get_word_counts_for_title
 
 logger = logging.getLogger(__name__)
@@ -464,6 +464,60 @@ def top_lang_of_users(username: str):
     }
     return result
 
+
+def get_leaderboard_chart_data(
+    camp: str | None = None,
+    cat: str | None = None,
+    user_group: str | None = None,
+    year: int | None = None,
+    month: int | None = None,
+    lang: str | None = None,
+    user: str | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Fetch aggregated counts of translations by month for the leaderboard chart.
+    """
+    if db.engine.name == "sqlite":
+        date_expr = func.strftime("%Y-%m", PageRecord.pupdate)
+    else:
+        date_expr = func.left(PageRecord.pupdate, 7)
+
+    query = db.session.query(date_expr.label("date"), func.count().label("count")).filter(
+        PageRecord.target != ""
+    )
+
+    if cat:
+        query = query.filter(PageRecord.cat == cat)
+    elif camp:
+        query = query.join(
+            CategoryRecord,
+            (PageRecord.cat == CategoryRecord.category) & (CategoryRecord.campaign == camp),
+        )
+
+    if user_group:
+        query = query.join(
+            UserRecord,
+            (PageRecord.user == UserRecord.username) & (UserRecord.user_group == user_group),
+        )
+
+    if year:
+        str_like = f"{year}-%"
+        if month:
+            str_like = f"{year}-{month:02d}%"
+        query = query.filter(PageRecord.pupdate.like(str_like))
+
+    if lang:
+        query = query.filter(PageRecord.lang == lang)
+
+    if user:
+        query = query.filter(PageRecord.user == user)
+
+    query = query.group_by(date_expr).order_by(date_expr)
+
+    rows = query.all()
+    return [{"date": row.date, "count": row.count} for row in rows]
+
+
 __all__ = [
     "list_pages",
     "list_pages_by_lang_cat",
@@ -476,4 +530,5 @@ __all__ = [
     "list_of_users_by_translations_count",
     "add_translate_row_to_db",
     "get_pages",
+    "get_leaderboard_chart_data",
 ]

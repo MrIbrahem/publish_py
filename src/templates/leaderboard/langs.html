@@ -144,6 +144,6 @@
         });
         return d;
     }
-    graph_js_params('chart_69e6e6d5e7ab7', getFormData({lang: '{{ lang_code }}' }))
+    graph_js({{ chart_labels|tojson }}, {{ chart_counts|tojson }}, 'chart_69e6e6d5e7ab7')
 </script>
 {% endblock %}
