@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "leaderboard/_macros.html" import select_options %}
 
 {% block content %}
 <div class="container-fluid">
@@ -12,9 +13,9 @@
                         </h4>
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
                             <div class="text-muted">
-                                Articles: <strong>1</strong> &nbsp;
-                                Words: <strong>170</strong> &nbsp;
-                                Pageviews: <strong><span id="hrefjsontoadd">0</span></strong>
+                                Articles: <strong>{{ pages | length }}</strong> &nbsp;
+                                Words: <strong>{{ words_total }}</strong> &nbsp;
+                                Pageviews: <strong><span id="hrefjsontoadd">{{ pageviews_total }}</span></strong>
                             </div>
                         </div>
                     </div>
@@ -23,25 +24,27 @@
             <div class='col-lg-5 col-md-6'>
                 <div class="position-relative py-1 border rounded">
                     <canvas id="chart_69e6e6d5e7ab7" height="100" width="200" class="invert-on-dark"></canvas>
-                    <script>
-                        graph_js(
-                            ['', '2023-08'],
-                            [0, 1],
-                            "chart_69e6e6d5e7ab7"
-                        )
-                    </script>
                 </div>
             </div>
             <div class='col-lg-3 col-md-6 border_debug'>
-                <form method="get" action="leaderboard.php" class="border rounded">
-
-                    <input type='hidden' name='get' value='langs' /><input type='hidden' name='langcode' value='uz' />
+                <form method="get" action="{{ url_for('leaderboard.users', username=username) }}" class="border rounded"
+                    id="form_board">
                     <div class='container mt-3'>
                         <div class='row g-1'>
-                            <div class="col-12">
+                            <div class="col-6">
+                                <select dir="ltr" id="lang" name="lang" class="form-select" data-bs-theme="auto">
+                                    <option value='all'>Lang: All</option>
+                                    {% if langs %}
+                                    {{ select_options(langs, selected_lang) }}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="col-6">
                                 <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
                                     <option value='all'>Year: All</option>
-                                    <option value='2023'>2023</option>
+                                    {% if years %}
+                                    {{ select_options(years, selected_year) }}
+                                    {% endif %}
                                 </select>
                             </div>
                             <div class="col-12 mt-1">
@@ -69,29 +72,37 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% if pages %}
+                    {% for page in pages %}
                     <tr>
                         <th>
-
+                            {{ loop.index }}
                         </th>
                         <td>
+                            <a href="{{ url_for('leaderboard.langs', lang_code=page.lang) }}">{{ page.lang }}</a>
                         </td>
                         <td>
+                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">{{ page.title }}</a>
                         </td>
                         <td>
+                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">{{ page.campaign }}</a>
                         </td>
                         <td>
-
+                            {{ page.word }}
                         </td>
                         <td>
-
-                        </td>
-                        <td class='spannowrap'>
+                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}"
+                                target="_blank">{{ page.target }}</a>
                         </td>
                         <td>
-
+                            {{ page.pupdate }}
                         </td>
-
+                        <td>
+                            {{ page.views }}
+                        </td>
                     </tr>
+                    {% endfor %}
+                    {% endif %}
                 </tbody>
                 <tfoot>
                 </tfoot>
@@ -135,8 +146,19 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/g.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graph_api.js') }}"></script>
 
 <script>
-
+    function getFormData(d) {
+        const formData = $('#form_board').serializeArray();
+        formData.forEach(field => {
+            if (field.value.trim()) {
+                d[field.name] = field.value;
+            }
+        });
+        return d;
+    }
+    graph_js_params('chart_69e6e6d5e7ab7', getFormData({user: '{{ username }}' }))
 </script>
 {% endblock %}

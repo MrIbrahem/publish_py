@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def list_projects() -> List[ProjectRecord]:
     """Return all project records."""
-    orm_objs = db.session.query(ProjectRecord).order_by(ProjectRecord.g_id.asc()).all()
+    orm_objs = db.session.query(ProjectRecord).order_by(ProjectRecord.g_title.asc()).all()
     return orm_objs
 
 

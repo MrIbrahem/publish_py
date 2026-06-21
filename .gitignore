@@ -43,3 +43,4 @@ src/main_app/db/services/_main_service.py
 /php_admin
 /_work_files/php_publish
 /src/results_api_php_code
+/.commandcode

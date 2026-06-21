@@ -3,6 +3,9 @@ Shared db services, used in both admin and public blueprints
 
 """
 
+from .content.project_service import (
+    list_projects,
+)
 from .content.category_service import (
     add_category,
     delete_category,
@@ -41,6 +44,10 @@ from .pages.page_service import (
     list_pages,
     list_pages_by_lang_cat,
     update_page,
+    get_pages_years,
+    get_months_of_pages_years,
+    get_pages,
+    top_lang_of_users,
 )
 from .pages.user_page_service import (
     add_user_page,
@@ -67,6 +74,8 @@ from .wikidata.allqid_service import list_targets_by_lang
 from .wikidata.qid_service import list_records
 
 __all__ = [
+    "list_projects",
+
     "list_in_process",
     "list_in_process_by_user",
     "list_in_process_by_lang",
@@ -88,6 +97,10 @@ __all__ = [
     "list_pages",
     "list_pages_by_lang_cat",
     "add_page",
+    "get_pages_years",
+    "get_months_of_pages_years",
+    "get_pages",
+    "top_lang_of_users",
     "update_page",
     "delete_page",
     "find_exists_or_update_page",

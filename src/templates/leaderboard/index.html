@@ -1,141 +1,204 @@
 {% extends "base.html" %}
+{% from "leaderboard/_macros.html" import select_options %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="container-fluid">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <div class="card card2 mb-3">
-                    <div class="card-header">
-                        <span class="card-title" style="font-weight:bold;">
-                            Numbers
-                        </span>
-                        <div style='float: right'>
-
+    <div class="row g-3">
+        <form method="get" action="{{ url_for('leaderboard.index') }}" id="leaderboard_filter">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <span align="center">
+                        <h3>Leaderboard</h3>
+                    </span>
+                </div>
+                <div class="col-md-7">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">Campaign</span>
+                                <select dir="ltr" id="camp" name="camp" class="form-select" data-bs-theme="auto">
+                                    <option value="all">All</option>
+                                    {% if campaigns %}
+                                    {{ select_options(campaigns, form.camp) }}
+                                    {% endif %}
+                                </select>
+                            </div>
                         </div>
-                        <div class="card-tools">
-                            <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                    class="fas fa-minus"></i></button>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text">Translators</span>
+                                <select dir="ltr" id="user_group" name="user_group" class="form-select"
+                                    data-bs-theme="auto">
+                                    <option value="all">All</option>
+                                    {% if user_groups %}
+                                    {{ select_options(user_groups, form.user_group) }}
+                                    {% endif %}
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-body1 card2">
-                        <table class='table compact table-striped table_text_left leaderboard_tables'>
-                            <thead>
-                                <tr>
-                                    <th class="spannowrap">Type</th>
-                                    <th>Number</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><b>Users</b></td>
-                                    <td><span id="c_user">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td><b>Articles</b></td>
-                                    <td><span id="c_articles">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td><b>Words</b></td>
-                                    <td><span id="c_words">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td><b>Languages</b></td>
-                                    <td><span id="c_lang">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td><b>Pageviews</b></td>
-                                    <td><span id="c_pv">0</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                <div class="input-group">
+                                    <span class="input-group-text">Year</span>
+                                    <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
+                                        <option value="all">All</option>
+                                        {% if years %}
+                                        {{ select_options(years, form.year) }}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                {% if form.year %}
+                                <div class="input-group w-50">
+                                    <select dir="ltr" id="month" name="month" class="form-select" data-bs-theme="auto">
+                                        <option value="All">All</option>
+                                        {% if months %}
+                                        {{ select_options(months, form.month) }}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header aligncenter" style="font-weight:bold;">
-                        Translation by month
-                        <div class="card-tools">
-                            <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                    class="fas fa-minus"></i></button>
-                        </div>
+                <div class="aligncenter col-md-1 col-sm-3">
+                    <input class="btn btn-outline-primary" type="submit" value="Filter">
+                </div>
+            </div>
+        </form>
+
+        <hr />
+        <div class="col-md-3">
+            <div class="card card2 mb-3">
+                <div class="card-header">
+                    <span class="card-title" style="font-weight:bold;">
+                        Numbers
+                    </span>
+                    <div style='float: right'>
+
                     </div>
-                    <div class="card-body1 card5px">
-                        <div class="position-relative">
-                            <canvas id="chart09" height="200" class="invert-on-dark"></canvas>
-                        </div>
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
+                                class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body1 card2">
+                    <table class='table compact table-striped table_text_left leaderboard_tables'>
+                        <thead>
+                            <tr>
+                                <th class="spannowrap">Type</th>
+                                <th>Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>Users</b></td>
+                                <td><span id="c_user">0</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Articles</b></td>
+                                <td><span id="c_articles">0</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Words</b></td>
+                                <td><span id="c_words">0</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Languages</b></td>
+                                <td><span id="c_lang">0</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Pageviews</b></td>
+                                <td><span id="c_pv">0</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header aligncenter" style="font-weight:bold;">
+                    Translation by month
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
+                                class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body1 card5px">
+                    <div class="position-relative">
+                        <canvas id="chart09" height="200" class="invert-on-dark"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="col-md-5">
-                <div class="card card2 mb-3">
-                    <div class="card-header">
-                        <span class="card-title" style="font-weight:bold;">
-                            Top users by number of translation
-                        </span>
-                        <div style='float: right'>
-                            <button type="button" class="btn-tool" href="#" data-bs-toggle="modal"
-                                data-bs-target="#targets">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="card-tools">
-                            <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                    class="fas fa-minus"></i></button>
-                        </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card card2 mb-3">
+                <div class="card-header">
+                    <span class="card-title" style="font-weight:bold;">
+                        Top users by number of translation
+                    </span>
+                    <div style='float: right'>
+                        <button type="button" class="btn-tool" href="#" data-bs-toggle="modal"
+                            data-bs-target="#targets">
+                            <i class="fas fa-copy"></i>
+                        </button>
                     </div>
-                    <div class="card-body1 card2">
-                        <table class='table compact table-striped table_text_left leaderboard_tables' id='Topusers'
-                            style='margin-top: 0px !important;margin-bottom: 0px !important'>
-                            <thead>
-                                <tr>
-                                    <th class="spannowrap">#</th>
-                                    <th class="spannowrap">User</th>
-                                    <th>Number</th>
-                                    <th>Words</th>
-                                    <th>Pageviews</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                            <tfoot>
-                            </tfoot>
-                        </table>
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
+                                class="fas fa-minus"></i></button>
                     </div>
                 </div>
+                <div class="card-body1 card2">
+                    <table class='table compact table-striped table_text_left leaderboard_tables' id='Topusers'
+                        style='margin-top: 0px !important;margin-bottom: 0px !important'>
+                        <thead>
+                            <tr>
+                                <th class="spannowrap">#</th>
+                                <th class="spannowrap">User</th>
+                                <th>Number</th>
+                                <th>Words</th>
+                                <th>Pageviews</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
-            <div class="col-md-4">
-                <div class="card card2 mb-3">
-                    <div class="card-header">
-                        <span class="card-title" style="font-weight:bold;">
-                            Top languages by number of Articles
-                        </span>
-                        <div style='float: right'>
+        </div>
+        <div class="col-md-4">
+            <div class="card card2 mb-3">
+                <div class="card-header">
+                    <span class="card-title" style="font-weight:bold;">
+                        Top languages by number of Articles
+                    </span>
+                    <div style='float: right'>
 
-                        </div>
-                        <div class="card-tools">
-                            <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                    class="fas fa-minus"></i></button>
-                        </div>
                     </div>
-                    <div class="card-body1 card2">
-                        <table class='table compact table-striped table_text_left leaderboard_tables' id='Toplangs'
-                            style='margin-top: 0px !important;margin-bottom: 0px !important'>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th class='spannowrap'>Language</th>
-                                    <th>Count</th>
-                                    <!-- <th>Words</th> -->
-                                    <th>Pageviews</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
+                                class="fas fa-minus"></i></button>
                     </div>
                 </div>
-
+                <div class="card-body1 card2">
+                    <table class='table compact table-striped table_text_left leaderboard_tables' id='Toplangs'
+                        style='margin-top: 0px !important;margin-bottom: 0px !important'>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class='spannowrap'>Language</th>
+                                <th>Count</th>
+                                <!-- <th>Words</th> -->
+                                <th>Pageviews</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
