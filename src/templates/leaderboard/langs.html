@@ -78,15 +78,20 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% if pages %}
+                    {% for page in pages %}
                     <tr>
                         <th>
-
+                            {{ loop.index }}
                         </th>
                         <td>
+                            <a href="{{ url_for('leaderboard.users', username=page.user) }}">{{ page.user }}</a>
                         </td>
                         <td>
+                            <a href="{{ page.url }}" target="_blank">{{ page.title }}</a>
                         </td>
                         <td>
+
                         </td>
                         <td>
 
@@ -94,13 +99,15 @@
                         <td>
 
                         </td>
-                        <td class='spannowrap'>
+                        <td>
+
                         </td>
                         <td>
 
                         </td>
-
                     </tr>
+                    {% endfor %}
+                    {% endif %}
                 </tbody>
                 <tfoot>
                 </tfoot>
