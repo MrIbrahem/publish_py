@@ -1,6 +1,6 @@
 """Users db services."""
 
-from .coordinator_service import (
+from .admin_service import (
     active_coordinators,
     add_coordinator,
     add_or_update_coordinator,
