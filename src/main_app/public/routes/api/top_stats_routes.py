@@ -80,6 +80,7 @@ def get_top_langs() -> Response:
             ) AS views
         FROM
             pages p
+            LEFT JOIN users u ON p.user = u.username
             LEFT JOIN words w ON w.w_title = p.title
             LEFT JOIN views_new_all v ON p.target = v.target
             AND p.lang = v.lang
@@ -91,10 +92,14 @@ def get_top_langs() -> Response:
             AND p.user IS NOT NULL
             AND p.lang != ''
             AND p.lang IS NOT NULL
+            AND YEAR (p.pupdate) = '2025'
+            AND MONTH (p.pupdate) = '02'
+            AND u.user_group = 'WIKI'
+            AND p.cat = 'RTT'
         GROUP BY
             p.lang
         ORDER BY
-            targets DESC
+            2 DESC
 
     Returns:
         JSON response with language statistics
@@ -207,9 +212,11 @@ def get_top_users() -> Response:
             ) AS views
         FROM
             pages p
+            LEFT JOIN users u ON p.user = u.username
             LEFT JOIN words w ON w.w_title = p.title
             LEFT JOIN views_new_all v ON p.target = v.target
             AND p.lang = v.lang
+            LEFT JOIN langs la ON p.lang = la.code
         WHERE
             p.target != ''
             AND p.target IS NOT NULL
@@ -217,10 +224,14 @@ def get_top_users() -> Response:
             AND p.user IS NOT NULL
             AND p.lang != ''
             AND p.lang IS NOT NULL
+            AND YEAR (p.pupdate) = '2025'
+            AND MONTH (p.pupdate) = '02'
+            AND u.user_group = 'WIKI'
+            AND p.cat = 'RTT'
         GROUP BY
             p.user
         ORDER BY
-            targets DESC
+            2 DESC
 
     Returns:
         JSON response with user statistics
