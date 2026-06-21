@@ -9,8 +9,13 @@ import logging
 from flask import (
     Blueprint,
     render_template,
+    request,
     send_from_directory,
 )
+
+from ....db.models import ProjectRecord
+
+from ....db.services import get_camp_to_cats, list_projects
 
 from ....shared.auth.identity import current_user
 
@@ -19,9 +24,20 @@ logger = logging.getLogger(__name__)
 
 
 @bp_leaderboard.get("/")
-def index():
+def index() -> str:
+    campagins = get_camp_to_cats().keys()
+    years={}
+    months={}
+    user_groups = [x.g_title for x in list_projects()]
+
+    form_data = request.args
     return render_template(
         "leaderboard/index.html",
+        campaigns=campagins,
+        years=years,
+        months=months,
+        user_groups=user_groups,
+        form=form_data,
     )
 
 

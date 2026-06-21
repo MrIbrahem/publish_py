@@ -7,18 +7,49 @@ Endpoints:
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 import logging
 from typing import Any, Dict, List
 
 from flask import Response, jsonify, request
 from sqlalchemy import case, cast
+from sqlalchemy.orm.query import Query
 
-from ....db.models import LangRecord, PageRecord, ViewsNewAllRecord, WordRecord
+from ....db.models import (
+    LangRecord, PageRecord, ViewsNewAllRecord, WordRecord, CategoryRecord, UserRecord,
+)
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
+from .form_utils import get_form, FormData
 
 logger = logging.getLogger(__name__)
 
+
+def apply_filters(
+    form: FormData,
+    query: Query,
+) -> Query:
+    if form.cat:
+        query = query.filter(PageRecord.cat == form.cat)
+    elif form.camp:
+        query = query.outerjoin(
+            CategoryRecord,
+            (PageRecord.cat == CategoryRecord.category) & (CategoryRecord.campaign == form.camp),
+        )
+
+    if form.user_group:
+        query = query.outerjoin(
+            UserRecord,
+            (PageRecord.user == UserRecord.username) & (UserRecord.user_group == form.user_group),
+        )
+
+    if form.year:
+        str_like = f"{form.year}-%"
+        if form.month:
+            str_like = f"{form.year}-{form.month:02d}%"
+        query = query.filter(PageRecord.pupdate.like(str_like))
+
+    return query
 
 @check_cors
 def get_top_langs() -> Response:
@@ -69,10 +100,9 @@ def get_top_langs() -> Response:
         JSON response with language statistics
     """
 
-    limit = request.args.get("limit", default=50, type=int)
-    if limit is None or limit <= 0:
-        limit = 50
-    limit = min(limit, 1000)
+    # /api/top_langs?camp=Video&user_group=all&year=all&month=All&cat=RTTVideo
+
+    form = get_form(request.args)
 
     try:
         # Build the word count expression
@@ -112,12 +142,16 @@ def get_top_langs() -> Response:
             .filter(PageRecord.user.is_not(None))
             .filter(PageRecord.lang != "")
             .filter(PageRecord.lang.is_not(None))
+        )
+
+        query = apply_filters(form, query)
+        query = (
+            query
             .group_by(PageRecord.lang, LangRecord.name)
             .order_by(db.func.count(PageRecord.target).desc())
         )
-
-        if limit:
-            query = query.limit(int(limit))
+        if form.limit:
+            query = query.limit(int(form.limit))
 
         results = query.all()
 
@@ -135,7 +169,7 @@ def get_top_langs() -> Response:
 
     except Exception:
         logger.exception("Error fetching top_langs data")
-        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500
+        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500 # type: ignore
 
     response_data = {
         "results": data,
@@ -192,10 +226,8 @@ def get_top_users() -> Response:
         JSON response with user statistics
     """
 
-    limit = request.args.get("limit", default=50, type=int)
-    if limit is None or limit <= 0:
-        limit = 50
-    limit = min(limit, 1000)
+    form = get_form(request.args)
+
     try:
         # Build the word count expression
         word_expr = case(
@@ -232,13 +264,17 @@ def get_top_users() -> Response:
             .filter(PageRecord.user.is_not(None))
             .filter(PageRecord.lang != "")
             .filter(PageRecord.lang.is_not(None))
+        )
+
+        query = apply_filters(form, query)
+
+        query = (
+            query
             .group_by(PageRecord.user)
             .order_by(db.func.count(PageRecord.target).desc())
         )
-
-        if limit:
-            query = query.limit(int(limit))
-
+        if form.limit:
+            query = query.limit(int(form.limit))
         results = query.all()
 
         # Convert results to list of dicts
@@ -254,7 +290,7 @@ def get_top_users() -> Response:
 
     except Exception:
         logger.exception("Error fetching top_users data")
-        return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500
+        return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500 # type: ignore
 
     response_data = {
         "results": data,

@@ -18,9 +18,14 @@
 
 
 <header>
-    <nav class="navbar navbar-expand-lg mb-4 border-bottom bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg mb-3 border-bottom bg-body-tertiary shadow">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">WikiProjectMed Translation Dashboard</a>
+            <a class="navbar-brand mb-0 h1" href="{{ url_for('main.index') }}" style="color:#0d6efd;">
+                <img class='med-logo' width="40px" height="40px" src='{{ url_for('static', filename='favicon.svg')}}' decoding='async'
+                    alt='Wiki Project Med Foundation logo'>
+                <span class='d-none d-sm-inline tool_title' title=''>WikiProjectMed Translation Dashboard</span>
+                <span class='d-inline d-sm-none tool_title'>WikiProjectMed TD</span>
+            </a>
             <div class="d-flex align-items-center order-lg-last">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
