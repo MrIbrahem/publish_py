@@ -7,8 +7,8 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content.category_service import list_categories
-from ...db.services.pages.page_service import add_translate_row_to_db
+from ...db.services.content import list_categories
+from ...db.services.pages import add_translate_row_to_db
 
 logger = logging.getLogger(__name__)
 

@@ -157,6 +157,7 @@ __all__ = [
     "get_user",
     "get_user_by_username",
     "add_user",
+    "update_user",
     "update_user_data",
     "delete_user",
     "user_exists",

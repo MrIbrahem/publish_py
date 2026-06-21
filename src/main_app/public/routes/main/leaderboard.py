@@ -13,7 +13,7 @@ from flask import (
     send_from_directory,
 )
 
-from ....db.services import get_camp_to_cats, list_projects
+from ....db.services.content import get_camp_to_cats, list_projects
 from ....db.services.pages import (
     get_leaderboard_chart_data,
     get_months_of_pages_years,

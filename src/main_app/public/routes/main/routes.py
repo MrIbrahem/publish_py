@@ -19,15 +19,13 @@ from flask import (
     url_for,
 )
 
-from ....db.services.config.setting_service import get_setting_by_key
-from ....db.services.content.category_service import list_categories
-from ....db.services.content.lang_service import get_lang_by_code, list_langs
-from ....db.services.pages.missing_stats_service import (
+from ....db.services.config import get_setting_by_key
+from ....db.services.content import get_lang_by_code, list_categories, list_langs
+from ....db.services.pages import (
     count_category_members,
     statics_by_category,
 )
-from ....db.services.users.coordinator_service import active_coordinators
-from ....db.services.users.full_translator_service import is_full_translator
+from ....db.services.users import active_coordinators, is_full_translator
 from ....shared.auth.identity import current_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result

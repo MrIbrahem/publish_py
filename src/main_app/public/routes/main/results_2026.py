@@ -18,13 +18,13 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....db.services.pages.in_process_service import list_in_process_by_lang
-from ....db.services.pages.page_service import list_pages_by_lang_cat
-from ....db.services.pages.results_2026_service import (
+from ....db.services.pages import (
     exists_by_lang_and_category,
+    list_in_process_by_lang,
+    list_pages_by_lang_cat,
+    list_translate_types,
     missing_by_lang_and_category,
 )
-from ....db.services.pages.translate_type_service import list_translate_types
 from ....shared.utils.wiki_links import (
     content_translation_url,
     get_endpoint,

@@ -16,9 +16,9 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ...db.models import ProjectRecord, UserRecord
-from ...db.services.content.project_service import list_projects
+from ...db.services.content import list_projects
 from ...db.services.pages import list_of_users_by_translations_count
-from ...db.services.users.user_service import (
+from ...db.services.users import (
     add_user,
     delete_user,
     get_user,

@@ -13,13 +13,9 @@ from marshmallow import ValidationError
 from sqlalchemy import func
 
 from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
-from ....db.services import (
-    get_in_process_counts_by_user,
-    list_categories,
-    list_langs,
-    query_reports_with_filters,
-)
-from ....db.services.pages import list_of_users_by_translations_count
+from ....db.services.content import list_categories, list_langs
+from ....db.services.pages import get_in_process_counts_by_user, list_of_users_by_translations_count
+from ....db.services.reports import query_reports_with_filters
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
