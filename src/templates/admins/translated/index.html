@@ -83,7 +83,9 @@
             <tbody>
                 {% for row in rows %}
                 <tr>
-                    <td>{{ loop.index + (page - 1) * limit }}</td>
+                    <td>
+                        {{ loop.index + (page - 1) * limit }}
+                    </td>
                     <td>
                         <a href="{{ url_for("leaderboard.users", username=row.user) }}" target="_blank">{{ row.user }}
                         </a>
@@ -105,7 +107,9 @@
                         </a>
                         {% endif %}
                     </td>
-                    <td>{{ row.pupdate }}</td>
+                    <td>
+                        {{ row.pupdate }}
+                    </td>
                     <td>
                         <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for(edit_endpoint, id=row.id) }}"
                             onclick="pup_window_new(this)">

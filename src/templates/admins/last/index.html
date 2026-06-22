@@ -73,7 +73,9 @@
                 <tbody>
                     {% for row in rows %}
                     <tr>
-                        <td>{{ loop.index }}</td>
+                        <td>
+                            {{ loop.index }}
+                        </td>
                         <td>
                             {% set display_user = row.user[:15] if row.user and row.user|length > 15 else row.user %}
                             <a href="/leaderboard/users/{{ row.user }}" data-bs-toggle="tooltip" title="{{ row.user }}">
@@ -86,7 +88,9 @@
                                 {{ row.title }}
                             </a>
                         </td>
-                        <td>{{ row.campaign or row.cat }}</td>
+                        <td>
+                            {{ row.campaign or row.cat }}
+                        </td>
                         <td>
                             <a href="/leaderboard/langs/{{ row.lang }}">
                                 {{ row.lang }}
@@ -96,7 +100,9 @@
                                 {{ row.target }}
                             </a>
                         </td>
-                        <td>{{ row.pupdate }}</td>
+                        <td>
+                            {{ row.pupdate }}
+                        </td>
                         <td>
                             {% if last_table == 'pages' and row.views %}
                             {{ pageviews_link(row.views, row.lang, row.target, row.pupdate) }}

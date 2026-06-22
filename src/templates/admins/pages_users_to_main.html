@@ -48,8 +48,12 @@
             <tbody>
                 {% for row in rows %}
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ row.lang }}</td>
+                    <td>
+                        {{ loop.index }}
+                    </td>
+                    <td>
+                        {{ row.lang }}
+                    </td>
                     <td>
                         <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}"
                             target="_blank">
@@ -63,9 +67,15 @@
                         </a>
                         {% endif %}
                     </td>
-                    <td>{{ row.pupdate }}</td>
-                    <td>{{ row.user }}</td>
-                    <td>{{ row.new_user }}</td>
+                    <td>
+                        {{ row.pupdate }}
+                    </td>
+                    <td>
+                        {{ row.user }}
+                    </td>
+                    <td>
+                        {{ row.new_user }}
+                    </td>
                     <td>
                         {% if row.target %}
                         <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}"

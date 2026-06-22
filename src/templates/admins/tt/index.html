@@ -42,8 +42,10 @@
             <tbody>
                 {% for tt in translate_types %}
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <!-- <td>{{ tt.tt_id }}</td> -->
+                    <td>
+                        {{ loop.index }}
+                    </td>
+                    <!-- <td> {{ tt.tt_id }} </td> -->
                     <td>
                         <a href="https://mdwiki.org/wiki/{{ tt.tt_title | replace(' ', '_') | urlencode }}"
                             target="_blank">

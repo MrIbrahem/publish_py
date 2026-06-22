@@ -39,8 +39,12 @@
             <tbody>
                 {% for row in rows %}
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ row.id }}</td>
+                    <td>
+                        {{ loop.index }}
+                    </td>
+                    <td>
+                        {{ row.id }}
+                    </td>
                     <td>
                         <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}"
                             target="_blank">
