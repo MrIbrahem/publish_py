@@ -23,7 +23,6 @@ from ._csrf import (
 )
 from .data_base import (
     LONGTEXT,
-    BaseModel,
     db,
     metadata,
 )
@@ -36,7 +35,6 @@ __all__ = [
     "db",
     "metadata",
     "LONGTEXT",
-    "BaseModel",
     "migrate",
     "csrf",
     "csrf_init_app",
