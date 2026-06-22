@@ -95,6 +95,7 @@ def _set_record_active_status(coordinator_id: int, is_active: bool) -> ResponseR
 
     return redirect(url_for("admin.coordinators.dashboard"))
 
+
 def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
     """Remove a coordinator entirely."""
 

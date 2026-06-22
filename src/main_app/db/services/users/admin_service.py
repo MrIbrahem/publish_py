@@ -36,7 +36,6 @@ def active_coordinators() -> List[str]:
     return [r.username for r in records]
 
 
-
 def is_active_coordinator(username: str) -> bool:
     """Check whether a single username is an active coordinator."""
     try:
@@ -58,6 +57,7 @@ def list_coordinators() -> List[AdminUserRecord]:
     Returns a list of records, or an empty list on failure.
     """
     return db.session.query(AdminUserRecord).all()
+
 
 def get_coordinator_by_id(coordinator_id: int) -> AdminUserRecord | None:
     """
@@ -98,6 +98,7 @@ def add_coordinator(username: str) -> AdminUserRecord:
     active_coordinators.cache_clear()
     return record
 
+
 @db_guard_rollback
 def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRecord | None:
     """Toggle coordinator activity."""
@@ -110,6 +111,7 @@ def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRec
     db.session.commit()
     db.session.refresh(record)
     return record
+
 
 def delete_coordinator(coordinator_id: int) -> bool:
     deleted = delete_record_by_pk(AdminUserRecord, coordinator_id)

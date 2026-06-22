@@ -129,4 +129,3 @@ class TestIsCoordinator:
     def test_returns_false_when_user_not_coordinator(self, monkeypatch):
         """Test that is_active_coordinator returns False when username not found."""
         assert is_active_coordinator("Random_User") is False
-

@@ -80,6 +80,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
 
     return redirect(url_for("admin.users_no_inprocess.dashboard"))
 
+
 def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
     """Remove a user not in process record entirely."""
 

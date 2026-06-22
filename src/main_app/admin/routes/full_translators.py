@@ -80,6 +80,7 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
 
     return redirect(url_for("admin.full_translators.dashboard"))
 
+
 def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
     """Remove a full translator entirely."""
 
