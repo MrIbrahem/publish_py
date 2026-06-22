@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.public.routes.auth.oauth import (
+from src.main_app.shared.auth.mwoauth_handshake import (
     IDENTITY_ERROR_MESSAGE,
     OAuthIdentityError,
     complete_login,
@@ -46,13 +46,13 @@ class TestGetHandshaker:
 
     def test_raises_when_oauth_config_none(self):
         """Test that RuntimeError is raised when OAuth config is None."""
-        with patch("src.main_app.public.routes.auth.oauth.settings") as mock_settings:
+        with patch("src.main_app.shared.auth.mwoauth_handshake.settings") as mock_settings:
             mock_settings.oauth = None
 
             with pytest.raises(RuntimeError, match="MediaWiki OAuth configuration is incomplete"):
                 get_handshaker()
 
-    @patch("src.main_app.public.routes.auth.oauth.mwoauth")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.mwoauth")
     def test_creates_handshaker_with_correct_params(self, mock_mwoauth):
         """Test that handshaker is created with correct parameters."""
         mock_consumer_token = MagicMock()
@@ -60,7 +60,7 @@ class TestGetHandshaker:
         mock_handshaker_instance = MagicMock()
         mock_mwoauth.Handshaker.return_value = mock_handshaker_instance
 
-        with patch("src.main_app.public.routes.auth.oauth.settings") as mock_settings:
+        with patch("src.main_app.shared.auth.mwoauth_handshake.settings") as mock_settings:
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
             mock_settings.oauth.mw_uri = "https://test.wiki/w/index.php"
@@ -80,8 +80,8 @@ class TestGetHandshaker:
 class TestStartLogin:
     """Tests for start_login function."""
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
-    @patch("src.main_app.public.routes.auth.oauth.url_for")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.url_for")
     def test_returns_redirect_url_and_request_token(self, mock_url_for, mock_get_handshaker):
         """Test that function returns redirect URL and request token."""
         mock_url_for.return_value = "https://example.com/callback"
@@ -96,8 +96,8 @@ class TestStartLogin:
         assert redirect_url == "https://oauth.provider.com/authorize"
         assert request_token == "request_token_123"
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
-    @patch("src.main_app.public.routes.auth.oauth.url_for")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.url_for")
     def test_uses_provided_state_token(self, mock_url_for, mock_get_handshaker):
         """Test that the provided state token is used in the callback URL."""
         mock_url_for.return_value = "https://example.com/callback?state=abc123"
@@ -113,7 +113,7 @@ class TestStartLogin:
 class TestCompleteLogin:
     """Tests for complete_login function."""
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
     def test_returns_access_token_and_identity(self, mock_get_handshaker):
         """Test that function returns access token and user identity."""
         mock_handshaker = MagicMock()
@@ -133,7 +133,7 @@ class TestCompleteLogin:
         assert access_token is mock_access_token
         assert identity is mock_identity
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
     def test_raises_identity_error_when_identify_fails(self, mock_get_handshaker):
         """Test that OAuthIdentityError is raised when identity verification fails."""
         mock_handshaker = MagicMock()
@@ -150,7 +150,7 @@ class TestCompleteLogin:
         assert str(exc_info.value) == IDENTITY_ERROR_MESSAGE
         assert exc_info.value.original_exception is not None
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
     def test_identity_error_message_constant(self, mock_get_handshaker):
         """Test that the correct error message constant is used."""
         mock_handshaker = MagicMock()
@@ -161,7 +161,7 @@ class TestCompleteLogin:
         with pytest.raises(OAuthIdentityError, match=IDENTITY_ERROR_MESSAGE):
             complete_login("token", "query")
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
     def test_handles_identity_with_username(self, mock_get_handshaker):
         """Test handling identity response with username field."""
         mock_handshaker = MagicMock()
@@ -173,7 +173,7 @@ class TestCompleteLogin:
 
         assert identity["username"] == "TestUser"
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
     def test_handles_identity_with_name_field(self, mock_get_handshaker):
         """Test handling identity response with name field (fallback)."""
         mock_handshaker = MagicMock()
@@ -205,8 +205,8 @@ class TestIdentityErrorMessage:
 class TestOAuthIntegration:
     """Integration-style tests for OAuth flow."""
 
-    @patch("src.main_app.public.routes.auth.oauth.get_handshaker")
-    @patch("src.main_app.public.routes.auth.oauth.url_for")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.get_handshaker")
+    @patch("src.main_app.shared.auth.mwoauth_handshake.url_for")
     def test_full_oauth_flow(self, mock_url_for, mock_get_handshaker):
         """Test complete OAuth flow from start to completion."""
         # Setup mocks
