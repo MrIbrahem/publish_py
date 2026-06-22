@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Any
 from urllib.parse import quote_plus
 
 from sqlalchemy import URL
@@ -50,7 +51,7 @@ class Config:
     WTF_CSRF_ENABLED: bool = True
     # CSRF token lifetime (in seconds). Default 3600 (1 hour).
     # None = tokens don't expire
-    WTF_CSRF_TIME_LIMIT: int | None = settings.csrf_time_limit
+    WTF_CSRF_TIME_LIMIT: int | None = settings.other.csrf_time_limit
 
     WTF_CSRF_SSL_STRICT: bool = True
     WTF_CSRF_CHECK_DEFAULT: bool = True
@@ -73,7 +74,7 @@ class Config:
     # Flask-SQLAlchemy
     SQLALCHEMY_DATABASE_URI: str | None = None
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
-    SQLALCHEMY_ENGINE_OPTIONS: dict = {}
+    SQLALCHEMY_ENGINE_OPTIONS: dict[str, Any] = {}
 
     SQLALCHEMY_ECHO: bool = False
 
@@ -115,6 +116,7 @@ class DevelopmentConfig(Config):
 
     DEBUG: bool = True
     TESTING: bool = True
+    SQLALCHEMY_ECHO: bool = False  # Log SQL in development
 
     # Production should always use secure cookies
     SESSION_COOKIE_SECURE: bool = True
@@ -154,4 +156,12 @@ class TestingConfig(Config):
 
     # Use SQLite in-memory for tests (no MySQL dependency)
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
-    SQLALCHEMY_ENGINE_OPTIONS: dict = {}  # SQLite doesn't need MySQL options
+    SQLALCHEMY_ENGINE_OPTIONS: dict[str, Any] = {}  # SQLite doesn't need MySQL options
+
+
+__all__ = [
+    "Config",
+    "DevelopmentConfig",
+    "ProductionConfig",
+    "TestingConfig",
+]

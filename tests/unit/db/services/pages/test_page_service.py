@@ -3,9 +3,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import PageRecord
+from src.main_app.db.services.delete_service import (
+    delete_page,
+)
 from src.main_app.db.services.pages.page_service import (
     add_page,
-    delete_page,
     find_exists_or_update_page,
     insert_page_target,
     list_pages,
@@ -117,8 +119,7 @@ class TestDeletePage:
         assert not any(x.id == p.id for x in list_pages())
 
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        with pytest.raises(LookupError, match="not found"):
-            delete_page(9999)
+        assert delete_page(9999) is False
 
 
 class TestFindExistsOrUpdate:

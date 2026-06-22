@@ -95,33 +95,8 @@ def check_main_page_exists(title: str, lang: str) -> Optional[PageRecord]:
     )
 
 
-def delete_user_page(page_id: int) -> bool:
-    """Delete the row from both ``pages_users_to_main`` and ``pages_users``.
-
-    Returns True only when both rows are gone after the operation.
-    """
-    if not page_id:
-        return False
-
-    try:
-        db.session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == page_id).delete(
-            synchronize_session=False
-        )
-        db.session.query(UserPageRecord).filter(UserPageRecord.id == page_id).delete(synchronize_session=False)
-        db.session.commit()
-    except Exception:
-        logger.exception("Failed to delete pages_users(_to_main) id=%r", page_id)
-        db.session.rollback()
-        return False
-
-    in_users = db.session.get(UserPageRecord, page_id)
-    in_to_main = db.session.get(PagesUsersToMainRecord, page_id)
-    return in_users is None and in_to_main is None
-
-
 __all__ = [
     "list_pending",
     "get_user_page",
     "check_main_page_exists",
-    "delete_user_page",
 ]

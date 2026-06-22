@@ -123,24 +123,6 @@ def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
     return orm_obj
 
 
-def delete_in_process(process_id: int) -> bool:
-    """Delete an in_process record by ID."""
-    # orm_obj = db.session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
-    orm_obj = db.session.get(InProcessRecord, process_id)
-    if not orm_obj:
-        raise ValueError(f"In-process record with ID {process_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(InProcessRecord, process_id)
-    return deleted is None
-
-
 def delete_in_process_by_title_user_lang(title: str, user: str, lang: str) -> bool:
     """Delete an in_process record by title, user, and language."""
     result = (
@@ -186,7 +168,6 @@ __all__ = [
     "get_in_process_by_title_user_lang",
     "add_in_process",
     "update_in_process",
-    "delete_in_process",
     "delete_in_process_by_title_user_lang",
     "is_in_process",
     "get_in_process_counts_by_user",

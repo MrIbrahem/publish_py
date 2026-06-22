@@ -31,7 +31,7 @@ from .setting import (
     SettingRecord,
 )
 from .users import (
-    CoordinatorRecord,
+    AdminUserRecord,
     FullTranslatorRecord,
     UserRecord,
     UsersNoInprocessRecord,
@@ -49,7 +49,7 @@ __all__ = [
     "AssessmentRecord",
     "CategoryMemberRecord",
     "CategoryRecord",
-    "CoordinatorRecord",
+    "AdminUserRecord",
     "EnwikiPageviewRecord",
     "FullTranslatorRecord",
     "InProcessRecord",

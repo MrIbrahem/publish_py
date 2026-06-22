@@ -12,6 +12,7 @@ from .classes import (
     CorsConfig,
     DbConfig,
     OAuthConfig,
+    OtherConfig,
     Paths,
     SecurityConfig,
     SessionConfig,
@@ -30,7 +31,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _env_int(name: str, default: int) -> int:
+def _env_int(name: str, default: int | None, safe: bool = False) -> int | None:
     """Convert environment variable to integer."""
     value = os.getenv(name)
     if value is None:
@@ -38,7 +39,10 @@ def _env_int(name: str, default: int) -> int:
     try:
         return int(value)
     except ValueError as exc:  # pragma: no cover - defensive guard
-        raise ValueError(f"Environment variable {name} must be an integer") from exc
+        if not safe:
+            raise ValueError(f"Environment variable {name} must be an integer") from exc
+        else:
+            return default
 
 
 def resolve_path(_path) -> Path:
@@ -70,6 +74,8 @@ def _load_security_config() -> SecurityConfig:
 
     secret_key = os.getenv("FLASK_SECRET_KEY", "")
 
+    publish_secret_code = os.getenv("PUBLISH_SECRET_CODE", "")
+
     security_config = SecurityConfig(
         salt="mdwikipy",
         secret_key=secret_key,
@@ -77,6 +83,7 @@ def _load_security_config() -> SecurityConfig:
         max_form_memory_size=max_form_memory_size,
         max_form_parts=max_form_parts,
         secret_key_fallbacks=secret_key_fallbacks,
+        publish_secret_code=publish_secret_code,
     )
     return security_config
 
@@ -86,6 +93,7 @@ def _load_database_config() -> DbConfig:
     Construct a DbConfig populated from environment variables.
 
     Reads TOOL_TOOLSDB_DBNAME and TOOL_TOOLSDB_HOST (defaulting to empty string) and TOOL_TOOLSDB_USER and TOOL_TOOLSDB_PASSWORD (defaulting to None) and returns a DbConfig with those values.
+
     Returns:
         DbConfig: Configuration with fields:
             - db_name: from TOOL_TOOLSDB_DBNAME (default "").
@@ -150,6 +158,35 @@ def _get_paths() -> Paths:
     )
 
 
+def load_other_config() -> OtherConfig:
+    # CSRF token lifetime (in seconds). Default 3600 (1 hour).
+    # Set to 0 or None to disable expiration (not recommended for production).
+    csrf_time_limit = _env_int("WTF_CSRF_TIME_LIMIT", 3600)
+    if not csrf_time_limit or csrf_time_limit <= 0:
+        csrf_time_limit = 3600
+
+    wiki_domain = os.getenv("WIKI_DOMAIN") or "commons.wikimedia.org"
+    static_server = os.getenv("STATIC_SERVER") or "https://tools-static.wmflabs.org/cdnjs"
+
+    user_agent = os.getenv(
+        "USER_AGENT",
+        "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)",
+    )
+    revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
+    wikidata_domain = os.getenv("WIKIDATA_DOMAIN") or "www.wikidata.org"
+
+    _config = OtherConfig(
+        csrf_time_limit=csrf_time_limit,
+        user_agent=user_agent,
+        wiki_domain=wiki_domain,
+        static_server=static_server,
+        revids_api_url=revids_api_url,
+        wikidata_domain=wikidata_domain,
+    )
+
+    return _config
+
+
 def load_cookie_config() -> CookieConfig:
     session_cookie_secure = _env_bool("SESSION_COOKIE_SECURE", default=True)
     session_cookie_httponly = _env_bool("SESSION_COOKIE_HTTPONLY", default=True)
@@ -182,6 +219,33 @@ def load_special_users() -> dict:
     return special_users
 
 
+def load_cors_config() -> UsersConfig:
+    # Load CORS configuration
+    cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
+    cors_domains = [d.strip() for d in cors_domains_str.split(",") if d.strip()]
+
+    return CorsConfig(
+        allowed_domains=cors_domains,
+    )
+
+
+def load_user_config() -> UsersConfig:
+    # Load User Mappings
+    special_users = load_special_users()
+    fallback_user = os.getenv("FALLBACK_USER", "Mr. Ibrahem")
+
+    users_without_hashtag_str = os.getenv("USERS_WITHOUT_HASHTAG") or "Mr. Ibrahem"
+    users_without_hashtag = tuple(u.strip() for u in users_without_hashtag_str.split(",") if u.strip())
+
+    users_config = UsersConfig(
+        special_users=special_users,
+        fallback_user=fallback_user,
+        users_without_hashtag=users_without_hashtag,
+    )
+
+    return users_config
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     """
@@ -209,62 +273,47 @@ def get_settings() -> Settings:
 
     cookie_config = load_cookie_config()
 
-    # CSRF token lifetime (in seconds). Default 3600 (1 hour).
-    # Set to 0 or None to disable expiration (not recommended for production).
-    csrf_time_limit = _env_int("WTF_CSRF_TIME_LIMIT", 3600)
-    if not csrf_time_limit or csrf_time_limit <= 0:
-        csrf_time_limit = 3600
+    other_config = load_other_config()
 
-    # Load User Mappings
-    special_users = load_special_users()
-    fallback_user = os.getenv("FALLBACK_USER", "Mr. Ibrahem")
+    users_config = load_user_config()
 
-    users_without_hashtag_str = os.getenv("USERS_WITHOUT_HASHTAG") or "Mr. Ibrahem"
-    users_without_hashtag = tuple(u.strip() for u in users_without_hashtag_str.split(",") if u.strip())
-
-    users_config = UsersConfig(
-        special_users=special_users,
-        fallback_user=fallback_user,
-        users_without_hashtag=users_without_hashtag,
-    )
-
-    # Load CORS configuration
-    cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
-    cors_domains = [d.strip() for d in cors_domains_str.split(",") if d.strip()]
-
-    cors_config = CorsConfig(allowed_domains=cors_domains)
-
-    revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
-    wikidata_domain = os.getenv("WIKIDATA_DOMAIN") or "www.wikidata.org"
+    cors_config = load_cors_config()
 
     database_data = _load_database_config()
 
-    user_agent = os.getenv(
-        "USER_AGENT",
-        "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)",
-    )
-    publish_secret_code = os.getenv("PUBLISH_SECRET_CODE", "")
-
     return Settings(
-        user_agent=user_agent,
         paths=_get_paths(),
         database_data=database_data,
         cookie=cookie_config,
         oauth=oauth_config,
         security=security_config,
         sessions=sessions,
+        other=other_config,
         users=users_config,
-        csrf_time_limit=csrf_time_limit,
         cors=cors_config,
-        publish_secret_code=publish_secret_code,
-        revids_api_url=revids_api_url,
-        wikidata_domain=wikidata_domain,
     )
 
 
 # Singleton settings instance
 settings = get_settings()
 
+
+def ensure_directories() -> None:
+    """Create application directories if they don't exist.
+
+    Call this once at app startup (in the factory), not at import time.
+    """
+    for dir_name in [
+        settings.paths.flask_data_dir,
+        settings.paths.log_dir,
+        settings.paths.publish_reports_dir,
+        settings.paths.words_json_path,
+        settings.paths.revids_file_path,
+    ]:
+        Path(dir_name).mkdir(parents=True, exist_ok=True)
+
+
 __all__ = [
+    "ensure_directories",
     "settings",
 ]

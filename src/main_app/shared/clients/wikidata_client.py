@@ -51,7 +51,7 @@ def _link_it(
     Returns:
         API response dictionary
     """
-    https_domain = f"https://{settings.wikidata_domain}"
+    https_domain = f"https://{settings.other.wikidata_domain}"
     api_params = {
         "action": "wbsetsitelink",
         "linktitle": targettitle,

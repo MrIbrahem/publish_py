@@ -1,21 +1,23 @@
 """Users db services."""
 
-from .coordinator_service import (
+from ..delete_service import (
+    delete_full_translator,
+    delete_user,
+    delete_user_token,
+    delete_users_no_inprocess,
+)
+from .admin_service import (
     active_coordinators,
     add_coordinator,
-    add_or_update_coordinator,
     delete_coordinator,
-    get_coordinator,
-    get_coordinator_by_user,
-    is_coordinator,
+    get_coordinator_by_id,
+    is_active_coordinator,
     list_coordinators,
     set_coordinator_active,
-    update_coordinator,
 )
 from .full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,
-    delete_full_translator,
     get_full_translator,
     get_full_translator_by_user,
     is_full_translator,
@@ -25,7 +27,6 @@ from .full_translator_service import (
 )
 from .user_service import (
     add_user,
-    delete_user,
     get_user,
     get_user_by_username,
     list_users,
@@ -35,7 +36,6 @@ from .user_service import (
     user_exists,
 )
 from .user_token_service import (
-    delete_user_token,
     delete_user_token_by_username,
     get_user_token,
     get_user_token_by_username,
@@ -44,7 +44,6 @@ from .user_token_service import (
 from .users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,
-    delete_users_no_inprocess,
     get_users_no_inprocess,
     get_users_no_inprocess_by_user,
     list_active_users_no_inprocess,
@@ -56,13 +55,10 @@ from .users_no_inprocess_service import (
 __all__ = [
     "list_coordinators",
     "active_coordinators",
-    "get_coordinator",
-    "get_coordinator_by_user",
+    "get_coordinator_by_id",
     "add_coordinator",
-    "add_or_update_coordinator",
-    "update_coordinator",
     "delete_coordinator",
-    "is_coordinator",
+    "is_active_coordinator",
     "set_coordinator_active",
     "list_full_translators",
     "list_active_full_translators",

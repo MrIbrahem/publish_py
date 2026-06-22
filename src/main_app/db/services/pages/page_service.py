@@ -163,24 +163,6 @@ def update_page(
     return orm_obj
 
 
-def delete_page(page_id: int) -> bool:
-    """Delete a page."""
-    orm_obj = db.session.get(PageRecord, page_id)
-    if not orm_obj:
-        raise LookupError(f"Page id {page_id} was not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        logger.exception("Failed to delete page")
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(PageRecord, page_id)
-    return deleted is None
-
-
 def find_exists_or_update_page(
     title: str,
     lang: str,
@@ -314,7 +296,6 @@ __all__ = [
     "list_pages_by_lang_cat",
     "add_page",
     "update_page",
-    "delete_page",
     "find_exists_or_update_page",
     "insert_page_target",
     "add_translate_row_to_db",

@@ -271,7 +271,7 @@ def missing():
     langs_lookup: dict[str, dict] = {}
     try:
         for lang in list_langs():
-            data = lang.to_dict() if hasattr(lang, "to_dict") else dict(lang)
+            data = lang.to_dict()
             code = data.get("code")
             if code:
                 langs_lookup[code] = data

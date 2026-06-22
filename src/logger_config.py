@@ -52,14 +52,14 @@ def setup_logging(
             # Standard format: Time - Name - Level - [File:Line] - Message
             fmt="%(asctime)s - %(name)s - %(log_color)s%(levelname)-s %(reset)s- [%(filename)s:%(lineno)d] - %(message)s",
             datefmt="%H:%M:%S",
-        log_colors={
-            "DEBUG": "cyan",
-            "INFO": "green",
-            "WARNING": "yellow",
-            "ERROR": "red",
-            "CRITICAL": "red,bg_white",
-        },
-    )
+            log_colors={
+                "DEBUG": "cyan",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "red,bg_white",
+            },
+        )
     else:
         console_formatter = logging.Formatter(
             # Standard format: Time - Name - Level - [File:Line] - Message
@@ -116,11 +116,11 @@ def configure_logging(
         try:
             log_dir.mkdir(parents=True, exist_ok=True)
         except OSError as exc:
-                setup_logging(level=level, name="main_app", use_colorlog=use_colorlog)
-                logging.getLogger("main_app").warning(
-                    "Falling back to console logging; could not create log directory %s: %s", log_dir, exc
-                )
-                return
+            setup_logging(level=level, name="main_app", use_colorlog=use_colorlog)
+            logging.getLogger("main_app").warning(
+                "Falling back to console logging; could not create log directory %s: %s", log_dir, exc
+            )
+            return
 
     # Define paths
     all_log_path = str(log_dir / "app.log")

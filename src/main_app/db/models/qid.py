@@ -4,10 +4,10 @@ QID domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 
-class QidRecord(db.Model):
+class QidRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS qids (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ class QidRecord(db.Model):
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
 
-class QidOthersRecord(db.Model):
+class QidOthersRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS qids_others (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -78,7 +78,7 @@ class QidOthersRecord(db.Model):
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
 
-class AllQidsExistRecord(db.Model):
+class AllQidsExistRecord(db.Model, BaseModel):
     """
     CREATE TABLE all_qids_exists (
         id int NOT NULL AUTO_INCREMENT,

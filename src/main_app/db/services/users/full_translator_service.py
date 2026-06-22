@@ -103,20 +103,6 @@ def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord
     return orm_obj
 
 
-def delete_full_translator(translator_id: int) -> bool:
-    """Delete a full translator record by ID."""
-    # orm_obj = db.session.query(FullTranslatorRecord).filter(FullTranslatorRecord.id == translator_id).first()
-    orm_obj = db.session.get(FullTranslatorRecord, translator_id)
-    if not orm_obj:
-        raise ValueError(f"Full translator record with ID {translator_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(FullTranslatorRecord, translator_id)
-    return deleted is None
-
-
 def is_full_translator(user: str) -> bool:
     """Check if a user is a full translator."""
     record = get_full_translator_by_user(user)
@@ -131,6 +117,5 @@ __all__ = [
     "add_full_translator",
     "add_or_update_full_translator",
     "update_full_translator",
-    "delete_full_translator",
     "is_full_translator",
 ]

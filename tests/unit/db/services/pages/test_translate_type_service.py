@@ -2,12 +2,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.exceptions import UniqueError
 from src.main_app.db.models import PageRecord, QidRecord, TranslateTypeRecord
+from src.main_app.db.services.delete_service import (
+    delete_translate_type,
+)
 from src.main_app.db.services.pages.translate_type_service import (
     add_translate_type,
     can_translate_full,
     can_translate_lead,
-    delete_translate_type,
     get_translate_type,
     get_translate_type_by_title,
     list_full_enabled_types,
@@ -17,7 +20,6 @@ from src.main_app.db.services.pages.translate_type_service import (
     update_translate_type,
 )
 from src.main_app.shared.core.extensions import db as _db
-from src.main_app.shared.core.extensions.exc import UniqueError
 
 
 def test_translate_type_workflow():
@@ -170,8 +172,7 @@ class TestDeleteTranslateType:
         assert get_translate_type(tt.tt_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_translate_type(9999)
+        assert delete_translate_type(9999) is False
 
 
 class TestCanTranslateLead:

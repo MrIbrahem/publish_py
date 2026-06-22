@@ -5,11 +5,13 @@ import pytest
 from src.main_app.db.models import ProjectRecord
 from src.main_app.db.services.content.project_service import (
     add_project,
-    delete_project,
     get_project,
     get_project_by_title,
     list_projects,
     update_project,
+)
+from src.main_app.db.services.delete_service import (
+    delete_project,
 )
 
 
@@ -126,5 +128,4 @@ class TestDeleteProject:
         assert get_project(p.g_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_project(9999)
+        assert delete_project(9999) is False

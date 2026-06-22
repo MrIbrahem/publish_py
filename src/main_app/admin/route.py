@@ -12,32 +12,26 @@ from flask import (
     url_for,
 )
 
-# from ..admin_routes import (
-#     Coordinators,
-#     Jobs,
-#     OwidCharts,
-#     Templates,
-# )
-from ..decorators import admin_required
-from ..sidebar import create_side
-from .add_translate import add_bp
-from .campaigns import campaigns_module
-from .categories import categories_dashboard
-from .coordinators import coordinators_module
-from .full_translators import fulltranslators_module
-from .language_settings import languagesettings_module
-from .last import last_translations_dashboard
-from .pages_users_to_main import pages_users_to_main_bp
-from .projects import projects_module
-from .qids.qids import qids_module
-from .qids.qids_others import qids_others_module
-from .settings import settings_module
-from .stat import stat_bp
-from .translated import translated_bp
-from .translated_users import translated_users_bp
-from .tt import tt_bp
-from .users_emails import users_emails_module
-from .users_no_inprocess import usersnoinprocess_module
+from .decorators import admin_required
+from .routes.add_translate import add_bp
+from .routes.campaigns import campaigns_module
+from .routes.categories import categories_dashboard
+from .routes.coordinators import coordinators_module
+from .routes.full_translators import fulltranslators_module
+from .routes.language_settings import languagesettings_module
+from .routes.last import last_translations_dashboard
+from .routes.pages_users_to_main import pages_users_to_main_bp
+from .routes.projects import projects_module
+from .routes.qids.qids import qids_module
+from .routes.qids.qids_others import qids_others_module
+from .routes.settings import settings_module
+from .routes.stat import stat_bp
+from .routes.translated import translated_bp
+from .routes.translated_users import translated_users_bp
+from .routes.tt import tt_bp
+from .routes.users_emails import users_emails_module
+from .routes.users_no_inprocess import usersnoinprocess_module
+from .sidebar import create_side
 
 logger = logging.getLogger(__name__)
 

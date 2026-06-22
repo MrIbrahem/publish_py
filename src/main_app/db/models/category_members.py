@@ -9,10 +9,10 @@ belong to category X" — used by the results_2026 and missing-stats flows.
 
 from __future__ import annotations
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 
-class CategoryMemberRecord(db.Model):
+class CategoryMemberRecord(db.Model, BaseModel):
     """
     CREATE TABLE category_members (
         id int NOT NULL AUTO_INCREMENT,

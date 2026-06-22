@@ -7,12 +7,12 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from ...shared.core.extensions import LONGTEXT, db
+from ...shared.core.extensions import LONGTEXT, BaseModel, db
 
 logger = logging.getLogger(__name__)
 
 
-class LanguageSettingRecord(db.Model):
+class LanguageSettingRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS language_settings (
         id int NOT NULL AUTO_INCREMENT,
@@ -44,7 +44,7 @@ class LanguageSettingRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class SettingRecord(db.Model):
+class SettingRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS new_settings (
         `id` INT NOT NULL AUTO_INCREMENT,

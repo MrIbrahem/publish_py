@@ -1,9 +1,16 @@
 """Analytics db services."""
 
+from ..delete_service import (
+    delete_assessment,
+    delete_enwiki_pageview,
+    delete_mdwiki_revid,
+    delete_refs_count,
+    delete_views_new,
+    delete_word,
+)
 from .assessment_service import (
     add_assessment,
     add_or_update_assessment,
-    delete_assessment,
     get_assessment,
     get_assessment_by_title,
     list_assessments,
@@ -12,7 +19,6 @@ from .assessment_service import (
 from .enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
-    delete_enwiki_pageview,
     get_enwiki_pageview,
     get_enwiki_pageview_by_title,
     get_top_enwiki_pageviews,
@@ -22,7 +28,6 @@ from .enwiki_pageview_service import (
 from .mdwiki_revid_service import (
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
-    delete_mdwiki_revid,
     get_mdwiki_revid_by_title,
     get_revid_for_title,
     list_mdwiki_revids,
@@ -31,7 +36,6 @@ from .mdwiki_revid_service import (
 from .refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,
-    delete_refs_count,
     get_ref_counts_for_title,
     get_refs_count,
     get_refs_count_by_title,
@@ -41,7 +45,6 @@ from .refs_count_service import (
 from .views_new_service import (
     add_or_update_views_new,
     add_views_new,
-    delete_views_new,
     get_total_views_for_target,
     get_views_by_target_lang_year,
     get_views_new,
@@ -53,7 +56,6 @@ from .views_new_service import (
 from .word_service import (
     add_or_update_word,
     add_word,
-    delete_word,
     get_word,
     get_word_by_title,
     get_word_counts_for_title,

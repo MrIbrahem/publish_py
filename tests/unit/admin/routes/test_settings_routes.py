@@ -58,14 +58,14 @@ class TestParseSettingValue:
         """Test that invalid integer string returns 0 and success=True."""
         # Note: The implementation returns 0 with success=True for invalid integers
         result, success = _parse_setting_value("integer", "not_a_number")
-        assert result == 0
-        assert success == 1
+        assert result is None
+        assert success is False
 
     def test_parse_integer_empty_returns_zero(self):
         """Test that empty string returns 0 for integer type."""
         result, success = _parse_setting_value("integer", "")
-        assert result == 0
-        assert success == 1
+        assert result is None
+        assert success is False
 
     def test_parse_json_valid_object(self):
         """Test that json type parses valid JSON object."""

@@ -26,12 +26,12 @@ from werkzeug.wrappers import Response as WerkzeugResponse
 from ....config import settings
 from ....db.services.users import delete_user_token, upsert_user_token
 from ....shared.auth.identity import CurrentUser
-from ....shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
-from .oauth import (
+from ....shared.auth.mwoauth_handshake import (
     OAuthIdentityError,
     complete_login,
     start_login,
 )
+from ....shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
 from .rate_limit import callback_rate_limiter, login_rate_limiter
 
 logger = logging.getLogger(__name__)

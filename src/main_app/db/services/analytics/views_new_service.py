@@ -141,19 +141,6 @@ def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
     return orm_obj
 
 
-def delete_views_new(view_id: int) -> bool:
-    """Delete a views_new record by ID."""
-    orm_obj = db.session.get(ViewsNewRecord, view_id)
-    if not orm_obj:
-        raise ValueError(f"ViewsNew record with ID {view_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(ViewsNewRecord, view_id)
-    return deleted is None
-
-
 def get_total_views_for_target(target: str) -> int:
     """Get total views across all years for a target."""
     records = list_views_by_target(target)
@@ -169,6 +156,5 @@ __all__ = [
     "add_views_new",
     "add_or_update_views_new",
     "update_views_new",
-    "delete_views_new",
     "get_total_views_for_target",
 ]

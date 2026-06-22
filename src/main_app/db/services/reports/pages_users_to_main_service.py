@@ -71,27 +71,9 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
     return orm_obj
 
 
-def delete_pages_users_to_main(record_id: int) -> bool:
-    """Delete a pages_users_to_main record by ID."""
-    orm_obj = db.session.get(PagesUsersToMainRecord, record_id)
-    if not orm_obj:
-        raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(PagesUsersToMainRecord, record_id)
-    return deleted is None
-
-
 __all__ = [
     "list_pages_users_to_main",
     "get_pages_users_to_main",
     "add_pages_users_to_main",
     "update_pages_users_to_main",
-    "delete_pages_users_to_main",
 ]

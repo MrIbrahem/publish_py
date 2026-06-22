@@ -3,9 +3,11 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import InProcessRecord
+from src.main_app.db.services.delete_service import (
+    delete_in_process,
+)
 from src.main_app.db.services.pages.in_process_service import (
     add_in_process,
-    delete_in_process,
     delete_in_process_by_title_user_lang,
     get_in_process,
     get_in_process_by_title_user_lang,
@@ -180,8 +182,7 @@ class TestDeleteInProcess:
         assert get_in_process(ip.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_in_process(9999)
+        assert delete_in_process(9999) is False
 
 
 class TestDeleteInProcessByTitleUserLang:

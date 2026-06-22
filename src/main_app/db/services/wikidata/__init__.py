@@ -1,17 +1,19 @@
 """Wikidata db services."""
 
+from ..delete_service import (
+    delete_qid,
+    delete_qid_other,
+)
 from .allqid_service import (
     list_targets_by_lang,
 )
 from .qid_others_service import (
     add_qid_other,
-    delete_qid_other,
     get_page_qid_other,
     update_qid_other,
 )
 from .qid_service import (
     add_qid,
-    delete_qid,
     get_by_id,
     get_by_qid,
     get_by_title,

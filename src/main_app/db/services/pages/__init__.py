@@ -1,8 +1,13 @@
 """Pages db services."""
 
+from ..delete_service import (
+    delete_in_process,
+    delete_page,
+    delete_translate_type,
+    delete_user_page,
+)
 from .in_process_service import (
     add_in_process,
-    delete_in_process,
     delete_in_process_by_title_user_lang,
     get_in_process,
     get_in_process_by_title_user_lang,
@@ -28,7 +33,6 @@ from .missing_stats_service import (
 from .page_service import (
     add_page,
     add_translate_row_to_db,
-    delete_page,
     find_exists_or_update_page,
     insert_page_target,
     list_pages,
@@ -48,7 +52,6 @@ from .translate_type_service import (
     add_translate_type,
     can_translate_full,
     can_translate_lead,
-    delete_translate_type,
     get_translate_type,
     get_translate_type_by_title,
     list_full_enabled_types,
@@ -60,7 +63,6 @@ from .translate_type_service import (
 from .user_page_service import (
     add_user_page,
     count_translated,
-    delete_user_page,
     find_exists_or_update_user_page,
     get_by_id,
     insert_user_page_target,

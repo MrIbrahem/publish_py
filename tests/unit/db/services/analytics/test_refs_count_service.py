@@ -6,12 +6,14 @@ from src.main_app.db.models import RefsCountRecord
 from src.main_app.db.services.analytics.refs_count_service import (
     add_or_update_refs_count,
     add_refs_count,
-    delete_refs_count,
     get_ref_counts_for_title,
     get_refs_count,
     get_refs_count_by_title,
     list_refs_counts,
     update_refs_count,
+)
+from src.main_app.db.services.delete_service import (
+    delete_refs_count,
 )
 
 
@@ -156,8 +158,7 @@ class TestDeleteRefsCount:
         assert get_refs_count(r.r_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_refs_count(9999)
+        assert delete_refs_count(9999) is False
 
 
 class TestGetRefsCountsForTitle:

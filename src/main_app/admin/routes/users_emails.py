@@ -162,7 +162,7 @@ class UsersEmails:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.get("/")
+        @self.bp.route("/", methods=["GET"])
         @admin_required
         def dashboard():
             return _dashboard()

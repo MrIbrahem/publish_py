@@ -7,7 +7,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from cachetools import TTLCache, cached
+from cachetools import TTLCache
 
 logger = logging.getLogger(__name__)
 

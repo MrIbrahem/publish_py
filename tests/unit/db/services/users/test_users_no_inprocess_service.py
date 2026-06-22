@@ -3,10 +3,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import UsersNoInprocessRecord
+from src.main_app.db.services.delete_service import (
+    delete_users_no_inprocess,
+)
 from src.main_app.db.services.users.users_no_inprocess_service import (
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,
-    delete_users_no_inprocess,
     get_users_no_inprocess,
     get_users_no_inprocess_by_user,
     list_active_users_no_inprocess,
@@ -167,8 +169,7 @@ class TestDeleteUsersNoInprocess:
         assert get_users_no_inprocess(rec.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_users_no_inprocess(9999)
+        assert delete_users_no_inprocess(9999) is False
 
 
 class TestShouldHideFromInprocess:

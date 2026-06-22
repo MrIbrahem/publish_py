@@ -56,23 +56,6 @@ def update_qid_other(qid_id: int, title: str, qid: str) -> QidOthersRecord:
     return orm_obj
 
 
-def delete_qid_other(qid_id: int) -> bool:
-    """Delete a QID record."""
-    orm_obj = db.session.get(QidOthersRecord, qid_id)
-    if not orm_obj:
-        raise ValueError(f"QID record with ID {qid_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(QidOthersRecord, qid_id)
-    return deleted is None
-
-
 def get_page_qid_other(title: str) -> QidOthersRecord | None:
     """Get the QID for a page title."""
     orm_obj = db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
@@ -213,7 +196,6 @@ def get_title_to_qid() -> dict[str, str]:
 __all__ = [
     "add_qid_other",
     "update_qid_other",
-    "delete_qid_other",
     "get_page_qid_other",
     "list_records",
     "list_qid_records",

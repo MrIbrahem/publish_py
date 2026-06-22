@@ -34,7 +34,7 @@ def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
     }
     url = f"https://{lang}.wikipedia.org/w/api.php"
 
-    headers = {"User-Agent": settings.user_agent}
+    headers = {"User-Agent": settings.other.user_agent}
 
     try:
         response = requests.get(url, headers=headers, params=params, timeout=30)

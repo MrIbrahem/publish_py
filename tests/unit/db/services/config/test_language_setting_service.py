@@ -7,11 +7,13 @@ from src.main_app.db.models import LanguageSettingRecord
 from src.main_app.db.services.config.language_setting_service import (
     add_language_setting,
     add_or_update_language_setting,
-    delete_language_setting,
     get_language_setting,
     get_language_setting_by_code,
     list_language_settings,
     update_language_setting,
+)
+from src.main_app.db.services.delete_service import (
+    delete_language_setting,
 )
 
 
@@ -149,5 +151,4 @@ class TestDeleteLanguageSetting:
         assert get_language_setting(ls.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_language_setting(9999)
+        assert delete_language_setting(9999) is False

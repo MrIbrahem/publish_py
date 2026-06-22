@@ -56,7 +56,7 @@ def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dic
         "meta": "tokens",
         "format": "json",
     }
-    headers = {"User-Agent": settings.user_agent}
+    headers = {"User-Agent": settings.other.user_agent}
     client = get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
 
     try:
@@ -120,7 +120,7 @@ def post_params(
     logger.debug(f"post_params: apiParams: {api_params}")
 
     client = get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
-    headers = {"User-Agent": settings.user_agent}  # , headers=headers
+    headers = {"User-Agent": settings.other.user_agent}  # , headers=headers
     response = requests.post(api_url, headers=headers, data=api_params, auth=client, timeout=60)
     return response.text
 

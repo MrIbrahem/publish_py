@@ -4,10 +4,10 @@ Views domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 
-class EnwikiPageviewRecord(db.Model):
+class EnwikiPageviewRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS enwiki_pageviews (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -31,7 +31,7 @@ class EnwikiPageviewRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class ViewsNewRecord(db.Model):
+class ViewsNewRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS views_new (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -62,7 +62,7 @@ class ViewsNewRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class ViewsNewAllRecord(db.Model):
+class ViewsNewAllRecord(db.Model, BaseModel):
     """
     CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `views_new_all` AS
         SELECT `v`.`target` AS `target`,

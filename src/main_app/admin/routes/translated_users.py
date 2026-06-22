@@ -11,7 +11,13 @@ from flask import Blueprint, abort, flash, redirect, render_template, request, u
 from flask.typing import ResponseReturnValue
 
 from ...db.services.content import list_langs
-from ...db.services.pages import user_page_service
+from ...db.services.pages import (
+    delete_user_page,
+    count_translated,
+    get_by_id,
+    list_translated,
+    update_user_page,
+)
 from ...shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
@@ -36,8 +42,8 @@ def index() -> str:
     offset = (page - 1) * limit
 
     try:
-        rows = user_page_service.list_translated(lang=lang, limit=limit, offset=offset)
-        total_count = user_page_service.count_translated(lang=lang)
+        rows = list_translated(lang=lang, limit=limit, offset=offset)
+        total_count = count_translated(lang=lang)
     except Exception:
         logger.exception("Failed to list translated user pages lang=%r", lang)
         rows, total_count = [], 0
@@ -64,7 +70,7 @@ def edit() -> str:
     if page_id <= 0:
         abort(400, description="id is required")
 
-    row = user_page_service.get_by_id(page_id)
+    row = get_by_id(page_id)
     if not row:
         abort(404)
 
@@ -86,7 +92,7 @@ def edit_post() -> ResponseReturnValue:
 
     if "delete" in request.form:
         try:
-            user_page_service.delete_user_page(page_id)
+            delete_user_page(page_id)
             flash(f"User page id {page_id} deleted.", "success")
         except Exception:
             logger.exception("Failed to delete user page id=%r", page_id)
@@ -104,7 +110,7 @@ def edit_post() -> ResponseReturnValue:
         return redirect(url_for("admin.translated_users.edit", id=page_id))
 
     try:
-        row = user_page_service.update_user_page(
+        row = update_user_page(
             page_id=page_id,
             title=title,
             target=target,

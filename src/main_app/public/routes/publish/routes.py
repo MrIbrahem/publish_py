@@ -36,6 +36,11 @@ def handle_form(request_data) -> Response:
         response.status_code = 400
         return response
 
+    if validated_data is None:
+        response = jsonify({"error": {"code": "validation_error", "info": ""}})
+        response.status_code = 400
+        return response
+
     # Format inputs
     user = format_user(validated_data.get("user", ""))
     title = format_title(validated_data.get("title", ""))

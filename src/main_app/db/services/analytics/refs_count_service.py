@@ -101,20 +101,6 @@ def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
     return orm_obj
 
 
-def delete_refs_count(refs_id: int) -> bool:
-    """Delete a refs_count record by ID."""
-    # orm_obj = db.session.get(RefsCountRecord, refs_id)
-    orm_obj = db.session.get(RefsCountRecord, refs_id)
-    if not orm_obj:
-        raise ValueError(f"RefsCount record with ID {refs_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(RefsCountRecord, refs_id)
-    return deleted is None
-
-
 def get_ref_counts_for_title(title: str) -> tuple[int | None, int | None]:
     """Get lead and all reference counts for a title."""
     record = get_refs_count_by_title(title)
@@ -130,6 +116,5 @@ __all__ = [
     "add_refs_count",
     "add_or_update_refs_count",
     "update_refs_count",
-    "delete_refs_count",
     "get_ref_counts_for_title",
 ]

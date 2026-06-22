@@ -4,10 +4,10 @@ Pages domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 
-class PageRecord(db.Model):
+class PageRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -52,7 +52,7 @@ class PageRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class UserPageRecord(db.Model):
+class UserPageRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -97,7 +97,7 @@ class UserPageRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class PagesUsersToMainRecord(db.Model):
+class PagesUsersToMainRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS pages_users_to_main (
         id int unsigned NOT NULL,
@@ -127,7 +127,7 @@ class PagesUsersToMainRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class InProcessRecord(db.Model):
+class InProcessRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS in_process (
         id int unsigned NOT NULL AUTO_INCREMENT,

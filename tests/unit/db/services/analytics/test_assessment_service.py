@@ -6,11 +6,13 @@ from src.main_app.db.models import AssessmentRecord
 from src.main_app.db.services.analytics.assessment_service import (
     add_assessment,
     add_or_update_assessment,
-    delete_assessment,
     get_assessment,
     get_assessment_by_title,
     list_assessments,
     update_assessment,
+)
+from src.main_app.db.services.delete_service import (
+    delete_assessment,
 )
 
 
@@ -148,5 +150,4 @@ class TestDeleteAssessment:
         assert get_assessment(a.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_assessment(9999)
+        assert delete_assessment(9999) is False

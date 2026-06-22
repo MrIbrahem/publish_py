@@ -138,24 +138,6 @@ def update_translate_type(
     return orm_obj
 
 
-def delete_translate_type(tt_id: int) -> bool:
-    """Delete a translate_type record by ID."""
-    # tt_id is the primary key for TranslateTypeRecord
-    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
-    if not orm_obj:
-        raise ValueError(f"TranslateType record with ID {tt_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(TranslateTypeRecord, tt_id)
-    return deleted is None
-
-
 def can_translate_lead(title: str) -> bool:
     """Check if a title can be translated as lead."""
     record = get_translate_type_by_title(title)
@@ -177,7 +159,6 @@ __all__ = [
     "get_translate_type_by_title",
     "add_translate_type",
     "update_translate_type",
-    "delete_translate_type",
     "can_translate_lead",
     "can_translate_full",
 ]

@@ -6,12 +6,14 @@ from src.main_app.db.models import EnwikiPageviewRecord
 from src.main_app.db.services.analytics.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
-    delete_enwiki_pageview,
     get_enwiki_pageview,
     get_enwiki_pageview_by_title,
     get_top_enwiki_pageviews,
     list_enwiki_pageviews,
     update_enwiki_pageview,
+)
+from src.main_app.db.services.delete_service import (
+    delete_enwiki_pageview,
 )
 
 
@@ -169,5 +171,4 @@ class TestDeleteEnwikiPageview:
         assert get_enwiki_pageview(p.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_enwiki_pageview(9999)
+        assert delete_enwiki_pageview(9999) is False

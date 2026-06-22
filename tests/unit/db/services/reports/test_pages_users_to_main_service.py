@@ -3,9 +3,11 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import PagesUsersToMainRecord
+from src.main_app.db.services.delete_service import (
+    delete_pages_users_to_main,
+)
 from src.main_app.db.services.reports.pages_users_to_main_service import (
     add_pages_users_to_main,
-    delete_pages_users_to_main,
     get_pages_users_to_main,
     list_pages_users_to_main,
     update_pages_users_to_main,
@@ -145,5 +147,4 @@ class TestDeletePagesUsersToMain:
         assert get_pages_users_to_main(60) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_pages_users_to_main(9999)
+        assert delete_pages_users_to_main(9999) is False

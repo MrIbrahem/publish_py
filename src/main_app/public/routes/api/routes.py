@@ -10,7 +10,6 @@ from typing import Any, Dict, List
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy import func
 
 from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
 from ....db.services.content import list_categories, list_langs

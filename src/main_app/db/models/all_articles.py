@@ -4,10 +4,10 @@ All Articles domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 
-class AllArticlesRecord(db.Model):
+class AllArticlesRecord(db.Model, BaseModel):
     """
     CREATE TABLE all_articles (
         id int NOT NULL AUTO_INCREMENT,

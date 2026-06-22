@@ -11,7 +11,7 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, jsonify, render_template, request  # , g
 
-from .admin.routes.admin import bp_admin
+from .admin.route import bp_admin
 from .db import init_db
 from .db.services.users import active_coordinators
 from .public.routes import (

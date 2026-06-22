@@ -3,9 +3,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import QidRecord
+from src.main_app.db.services.delete_service import (
+    delete_qid,
+)
 from src.main_app.db.services.wikidata.qid_service import (
     add_qid,
-    delete_qid,
     get_page_qid,
     get_title_to_qid,
     list_records,
@@ -96,8 +98,7 @@ class TestDeleteQid:
         assert not any(x.id == q.id for x in list_records())
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_qid(9999)
+        assert delete_qid(9999) is False
 
 
 class TestListQids:

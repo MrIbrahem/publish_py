@@ -472,7 +472,7 @@ class CategoryFetcher:
    - `_fetch_cats_members_api(cat)` — `requests.post()` with pagination (`cmcontinue`)
    - `_titles_filter(titles)` — strip `File:`, `Template:`, `User:`, `(disambiguation)`
    - File cache reader (`_open_tables_file`) — reads from `JSON_TABLES_PATH` env var
-   - User-Agent from `settings.user_agent`
+   - User-Agent from `settings.other.user_agent`
 9. Write `get_mdwiki_cat_members(cat, depth, use_cache)` standalone function
 
 ## Phase 3: Orchestrator Logic
@@ -836,7 +836,7 @@ from ..config import settings
 
 logger = logging.getLogger(__name__)
 
-USER_AGENT = settings.user_agent
+USER_AGENT = settings.other.user_agent
 DEFAULT_ENDPOINT = "https://mdwiki.org/w/api.php"
 NS_MAIN = 0
 NS_CATEGORY = 14

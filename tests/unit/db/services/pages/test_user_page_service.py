@@ -3,9 +3,11 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserPageRecord
+from src.main_app.db.services.delete_service import (
+    delete_user_page,
+)
 from src.main_app.db.services.pages.user_page_service import (
     add_user_page,
-    delete_user_page,
     find_exists_or_update_user_page,
     insert_user_page_target,
     list_user_pages,
@@ -111,8 +113,7 @@ class TestDeleteUserPage:
         assert not any(x.id == p.id for x in list_user_pages())
 
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        with pytest.raises(LookupError):
-            delete_user_page(999)
+        assert delete_user_page(9999) is False
 
 
 class TestFindExistsOrUpdateUserPage:

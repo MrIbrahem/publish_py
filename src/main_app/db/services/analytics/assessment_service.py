@@ -93,19 +93,6 @@ def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
     return orm_obj
 
 
-def delete_assessment(assessment_id: int) -> bool:
-    """Delete an assessment record by ID."""
-    orm_obj = db.session.get(AssessmentRecord, assessment_id)
-    if not orm_obj:
-        raise ValueError(f"Assessment record with ID {assessment_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(AssessmentRecord, assessment_id)
-    return deleted is None
-
-
 __all__ = [
     "list_assessments",
     "get_assessment",
@@ -113,5 +100,4 @@ __all__ = [
     "add_assessment",
     "add_or_update_assessment",
     "update_assessment",
-    "delete_assessment",
 ]

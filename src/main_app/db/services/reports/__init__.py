@@ -1,15 +1,17 @@
 """Reports db services."""
 
+from ..delete_service import (
+    delete_pages_users_to_main,
+    delete_report,
+)
 from .pages_users_to_main_service import (
     add_pages_users_to_main,
-    delete_pages_users_to_main,
     get_pages_users_to_main,
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
 from .report_service import (
     add_report,
-    delete_report,
     list_reports,
     query_reports_with_filters,
 )

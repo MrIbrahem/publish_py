@@ -66,7 +66,6 @@ def _add_full_translator() -> ResponseReturnValue:
 def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
     """Shared helper to update record active status."""
     action = "activate" if is_active else "deactivate"
-    past_tense = "activated" if is_active else "deactivated"
     try:
         record = update_full_translator(record_id, is_active=is_active)
     except LookupError as exc:
@@ -76,19 +75,10 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
         logger.exception(f"Unable to {action} record.")
         flash(f"Unable to {action} record. Please try again.", "danger")
     else:
-        flash(f"Record '{record.user}' {past_tense}.", "success")
+        state = "activated" if record.is_active else "deactivated"
+        flash(f"Record '{record.user}' {state}.", "success")
 
     return redirect(url_for("admin.full_translators.dashboard"))
-
-
-def _activate_record(record_id: int) -> ResponseReturnValue:
-    """Activate a record."""
-    return _set_record_active_status(record_id, True)
-
-
-def _deactivate_record(record_id: int) -> ResponseReturnValue:
-    """Deactivate a record."""
-    return _set_record_active_status(record_id, False)
 
 
 def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
@@ -114,7 +104,7 @@ class FullTranslators:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.get("/")
+        @self.bp.route("/", methods=["GET"])
         @admin_required
         def dashboard():
             # Call the internal function _full_translators_dashboard to return the full dashboard
@@ -133,12 +123,12 @@ class FullTranslators:
         @self.bp.post("/<int:record_id>/activate")
         @admin_required
         def activate(record_id: int) -> ResponseReturnValue:
-            return _activate_record(record_id)
+            return _set_record_active_status(record_id, True)
 
         @self.bp.post("/<int:record_id>/deactivate")
         @admin_required
         def deactivate(record_id: int) -> ResponseReturnValue:
-            return _deactivate_record(record_id)
+            return _set_record_active_status(record_id, False)
 
 
 fulltranslators_module = FullTranslators()
