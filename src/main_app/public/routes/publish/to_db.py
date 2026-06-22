@@ -17,6 +17,14 @@ from ....db.services.pages import (
 )
 logger = logging.getLogger(__name__)
 
+def find_exists_or_update_page(sourcetitle, lang, user, target):
+    orm_obj: PageRecord | None = find_page_record(sourcetitle, lang, user)
+    if orm_obj:
+        exists = True
+        exists = set_page_target(orm_obj, target)
+    return exists
+
+
 def _add_to_db(
     target: str,
     lang: str,
@@ -146,10 +154,7 @@ def insert_to_db_2(
     if use_user_sql:
         exists = find_exists_or_update_user_page(sourcetitle, lang, user, target)
     else:
-        orm_obj: PageRecord | None = find_page_record(sourcetitle, lang, user)
-        if orm_obj:
-            exists = True
-            exists = set_page_target(orm_obj, target)
+        exists = find_exists_or_update_page(sourcetitle, lang, user, target)
 
     if exists:
         result["exists"] = "already_in"
@@ -188,7 +193,6 @@ def insert_to_db_2(
     result["execute_query"] = add_done is True
 
     return result
-
 
 __all__ = [
     "_add_to_db",

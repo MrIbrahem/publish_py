@@ -109,9 +109,9 @@ class TestPostEndpoint:
             patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
             patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
             patch("src.main_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.main_app.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
-            patch("src.main_app.public.routes.publish.worker.insert_page_target") as mock_insert_page,
-            patch("src.main_app.public.routes.publish.worker.get_campaign_category") as mock_get_campaign_category,
+            patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
+            patch("src.main_app.public.routes.publish.to_db.insert_page_target") as mock_insert_page,
+            patch("src.main_app.public.routes.publish.to_db.get_campaign_category") as mock_get_campaign_category,
         ):
             # Mock user token
             mock_token = MagicMock()
