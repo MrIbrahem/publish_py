@@ -110,6 +110,7 @@ def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRec
     record.is_active = is_active
     db.session.commit()
     db.session.refresh(record)
+    active_coordinators.cache_clear()
     return record
 
 

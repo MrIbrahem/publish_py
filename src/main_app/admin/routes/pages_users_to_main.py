@@ -11,7 +11,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
 from ...db.services.content import list_langs
-from ...db.services.delete_service import delete_user_page
+from ...db.services.delete_service import delete_user_page_to_main
 from ...db.services.pages import add_translate_row_to_db, pages_users_to_main_service
 from ...shared.core.extensions import db
 
@@ -140,7 +140,7 @@ def pages_users_to_main_fix_it_post() -> ResponseReturnValue:
     flash("Translations added successfully.", "success")
 
     try:
-        deleted = delete_user_page(page_id)
+        deleted = delete_user_page_to_main(page_id)
     except Exception:
         logger.exception("delete_user_page failed for id=%r", page_id)
         deleted = False
