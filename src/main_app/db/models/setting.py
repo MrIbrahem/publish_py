@@ -7,6 +7,9 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
+from sqlalchemy import Enum, String, text
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import LONGTEXT, BaseModel, db
 
 logger = logging.getLogger(__name__)
@@ -27,11 +30,11 @@ class LanguageSettingRecord(db.Model, BaseModel):
 
     __tablename__ = "language_settings"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    lang_code = db.Column(db.String(20), unique=True, nullable=True)
-    move_dots = db.Column(db.Integer, default=0, server_default=db.text("0"))
-    expend = db.Column(db.Integer, default=0, server_default=db.text("0"))
-    add_en_lang = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    lang_code: Mapped[str | None] = mapped_column(String(20), unique=True)
+    move_dots: Mapped[int] = mapped_column(default=0, server_default=text("0"))
+    expend: Mapped[int] = mapped_column(default=0, server_default=text("0"))
+    add_en_lang: Mapped[int] = mapped_column(default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -59,15 +62,15 @@ class SettingRecord(db.Model, BaseModel):
 
     __tablename__ = "new_settings"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    key = db.Column(db.String(190), unique=True, nullable=False)
-    title = db.Column(db.String(500), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    key: Mapped[str] = mapped_column(String(190), unique=True, nullable=False)
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    value = db.Column(LONGTEXT, nullable=True)
+    value: Mapped[str | None] = mapped_column(LONGTEXT)
 
-    value_type = db.Column(
-        db.Enum("boolean", "string", "integer", name="setting_value_type"),
+    value_type: Mapped[str] = mapped_column(
+        Enum("boolean", "string", "integer", name="setting_value_type"),
         nullable=False,
         default="boolean",
     )

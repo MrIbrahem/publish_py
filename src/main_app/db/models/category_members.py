@@ -9,6 +9,9 @@ belong to category X" — used by the results_2026 and missing-stats flows.
 
 from __future__ import annotations
 
+from sqlalchemy import Index, String, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 
@@ -27,17 +30,13 @@ class CategoryMemberRecord(db.Model, BaseModel):
 
     __tablename__ = "category_members"
     __table_args__ = (
-        db.UniqueConstraint("category", "article_id", name="category_article_id"),
-        db.Index("article_id", "article_id"),
+        UniqueConstraint("category", "article_id", name="category_article_id"),
+        Index("article_id", "article_id"),
     )
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    category = db.Column(
-        db.String(120),
-        # db.ForeignKey("categories.category"),
-        nullable=False,
-    )
-    article_id = db.Column(db.String(255), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    category: Mapped[str] = mapped_column(String(120), nullable=False)
+    article_id: Mapped[str] = mapped_column(String(255), nullable=False)
 
     def to_dict(self) -> dict:
         return {

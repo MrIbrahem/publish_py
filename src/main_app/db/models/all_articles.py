@@ -4,6 +4,9 @@ All Articles domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 
@@ -20,9 +23,9 @@ class AllArticlesRecord(db.Model, BaseModel):
 
     __tablename__ = "all_articles"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    article_id = db.Column(db.String(255), unique=True, nullable=False)
-    category = db.Column(db.String(255), nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    article_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    category: Mapped[str | None] = mapped_column(String(255))
 
 
 __all__ = [

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 
-from sqlalchemy.orm import validates
+from sqlalchemy import DateTime, LargeBinary, String, text
+from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from ...shared.core.crypto import decrypt_value
 from ...shared.core.extensions import BaseModel, db
@@ -30,21 +32,19 @@ class UserTokenRecord(db.Model, BaseModel):
 
     __tablename__ = "user_tokens"
 
-    user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True, nullable=False)
-    access_token = db.Column(db.LargeBinary(1024), nullable=False)
-    access_secret = db.Column(db.LargeBinary(1024), nullable=False)
+    user_id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    access_token: Mapped[bytes] = mapped_column(LargeBinary(1024), nullable=False)
+    access_secret: Mapped[bytes] = mapped_column(LargeBinary(1024), nullable=False)
 
-    created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
-    updated_at = db.Column(
-        db.DateTime,
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
+    updated_at: Mapped[datetime] = mapped_column(
         nullable=False,
         server_default=db.func.current_timestamp(),
         server_onupdate=db.func.current_timestamp(),
-        # server_default=db.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
     )
-    last_used_at = db.Column(db.DateTime, nullable=True, server_default=db.func.current_timestamp())
-    rotated_at = db.Column(db.DateTime, nullable=True)
+    last_used_at: Mapped[datetime | None] = mapped_column(server_default=db.func.current_timestamp())
+    rotated_at: Mapped[datetime | None] = mapped_column()
 
     @validates("access_token", "access_secret")
     def validate_bytes(self, key, value):
@@ -73,14 +73,14 @@ class UserRecord(db.Model, BaseModel):
 
     __tablename__ = "users"
 
-    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255), nullable=False, default="")
-    wiki = db.Column(db.String(255), nullable=False, default="")
-    user_group = db.Column(
-        db.String(120), nullable=False, default="Uncategorized", server_default=db.text("'Uncategorized'")
+    user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    wiki: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    user_group: Mapped[str] = mapped_column(
+        String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'")
     )
-    reg_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    reg_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -107,9 +107,9 @@ class UsersNoInprocessRecord(db.Model, BaseModel):
 
     __tablename__ = "users_no_inprocess"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user = db.Column(db.String(120), unique=True, nullable=False)
-    is_active = db.Column(db.Integer, nullable=False, default=1)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    is_active: Mapped[int] = mapped_column(nullable=False, default=1)
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -132,11 +132,11 @@ class AdminUserRecord(db.Model, BaseModel):
 
     __tablename__ = "coordinators"
 
-    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username: str = db.Column(db.String(120), unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
 
     # Python application default and database-level server default configuration
-    is_active: int = db.Column(db.Integer, nullable=False, default=True, server_default=db.text("1"))
+    is_active: Mapped[int] = mapped_column(nullable=False, default=True, server_default=text("1"))
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         for key, value in kwargs.items():
@@ -160,9 +160,9 @@ class FullTranslatorRecord(db.Model, BaseModel):
 
     __tablename__ = "full_translators"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user = db.Column(db.String(120), unique=True, nullable=False)
-    is_active = db.Column(db.Integer, nullable=False, default=1)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    is_active: Mapped[int] = mapped_column(nullable=False, default=1)
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided

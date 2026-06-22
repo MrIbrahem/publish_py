@@ -4,6 +4,9 @@ Metrics domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 
@@ -20,9 +23,9 @@ class AssessmentRecord(db.Model, BaseModel):
 
     __tablename__ = "assessments"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(120), unique=True, nullable=False)
-    importance = db.Column(db.String(120), nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    importance: Mapped[str | None] = mapped_column(String(120))
 
 
 class RefsCountRecord(db.Model, BaseModel):
@@ -39,10 +42,10 @@ class RefsCountRecord(db.Model, BaseModel):
 
     __tablename__ = "refs_counts"
 
-    r_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    r_title = db.Column(db.String(120), unique=True, nullable=False)
-    r_lead_refs = db.Column(db.Integer, nullable=True)
-    r_all_refs = db.Column(db.Integer, nullable=True)
+    r_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    r_title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    r_lead_refs: Mapped[int | None] = mapped_column()
+    r_all_refs: Mapped[int | None] = mapped_column()
 
 
 class WordRecord(db.Model, BaseModel):
@@ -59,10 +62,10 @@ class WordRecord(db.Model, BaseModel):
 
     __tablename__ = "words"
 
-    w_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    w_title = db.Column(db.String(120), unique=True, nullable=False)
-    w_lead_words = db.Column(db.Integer, nullable=True)
-    w_all_words = db.Column(db.Integer, nullable=True)
+    w_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    w_title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    w_lead_words: Mapped[int | None] = mapped_column()
+    w_all_words: Mapped[int | None] = mapped_column()
 
 
 __all__ = [

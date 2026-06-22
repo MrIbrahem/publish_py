@@ -10,6 +10,9 @@ Note: Several models have been moved to specialized modules:
 
 from __future__ import annotations
 
+from sqlalchemy import JSON, String, text
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 
@@ -27,11 +30,11 @@ class LangRecord(db.Model, BaseModel):
 
     __tablename__ = "langs"
 
-    lang_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    code = db.Column(db.String(20), nullable=False)
-    autonym = db.Column(db.String(70), nullable=False)
-    name = db.Column(db.String(70), nullable=False)
-    redirects = db.Column(db.JSON, nullable=True, server_default=db.text("NULL"))
+    lang_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    code: Mapped[str] = mapped_column(String(20), nullable=False)
+    autonym: Mapped[str] = mapped_column(String(70), nullable=False)
+    name: Mapped[str] = mapped_column(String(70), nullable=False)
+    redirects: Mapped[dict | list | None] = mapped_column(JSON, server_default=text("NULL"))
 
 
 class MdwikiRevidRecord(db.Model, BaseModel):
@@ -45,8 +48,8 @@ class MdwikiRevidRecord(db.Model, BaseModel):
 
     __tablename__ = "mdwiki_revids"
 
-    title = db.Column(db.String(255), primary_key=True)
-    revid = db.Column(db.Integer, nullable=False)
+    title: Mapped[str] = mapped_column(String(255), primary_key=True)
+    revid: Mapped[int] = mapped_column(nullable=False)
 
 
 class TranslateTypeRecord(db.Model, BaseModel):
@@ -63,10 +66,10 @@ class TranslateTypeRecord(db.Model, BaseModel):
 
     __tablename__ = "translate_type"
 
-    tt_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    tt_title = db.Column(db.String(120), unique=True, nullable=False)
-    tt_lead = db.Column(db.Integer, nullable=False, default=1)
-    tt_full = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
+    tt_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    tt_title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    tt_lead: Mapped[int] = mapped_column(nullable=False, default=1)
+    tt_full: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
