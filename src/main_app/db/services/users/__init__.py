@@ -9,14 +9,11 @@ from ..delete_service import (
 from .admin_service import (
     active_coordinators,
     add_coordinator,
-    add_or_update_coordinator,
     delete_coordinator,
-    get_coordinator,
-    get_coordinator_by_user,
-    is_coordinator,
+    get_coordinator_by_id,
+    is_active_coordinator,
     list_coordinators,
     set_coordinator_active,
-    update_coordinator,
 )
 from .full_translator_service import (
     add_full_translator,
@@ -58,13 +55,10 @@ from .users_no_inprocess_service import (
 __all__ = [
     "list_coordinators",
     "active_coordinators",
-    "get_coordinator",
-    "get_coordinator_by_user",
+    "get_coordinator_by_id",
     "add_coordinator",
-    "add_or_update_coordinator",
-    "update_coordinator",
     "delete_coordinator",
-    "is_coordinator",
+    "is_active_coordinator",
     "set_coordinator_active",
     "list_full_translators",
     "list_active_full_translators",

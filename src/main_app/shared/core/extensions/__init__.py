@@ -22,11 +22,11 @@ from ._csrf import (
 )
 from .data_base import (
     LONGTEXT,
-    Base,
+    BaseModel,
     db,
     metadata,
 )
-from .exc import UniqueError
+from ....db.exceptions import UniqueError
 
 # Flask-Migrate instance (Alembic integration)
 migrate = Migrate()
@@ -36,7 +36,7 @@ __all__ = [
     "db",
     "metadata",
     "LONGTEXT",
-    "Base",
+    "BaseModel",
     "migrate",
     "csrf",
     "csrf_init_app",

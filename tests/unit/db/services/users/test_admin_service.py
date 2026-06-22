@@ -6,31 +6,24 @@ from src.main_app.db.models import AdminUserRecord
 from src.main_app.db.services.users.admin_service import (
     active_coordinators,
     add_coordinator,
-    add_or_update_coordinator,
     delete_coordinator,
-    get_coordinator,
-    get_coordinator_by_user,
-    is_coordinator,
+    get_coordinator_by_id,
+    is_active_coordinator,
     list_coordinators,
     set_coordinator_active,
-    update_coordinator,
 )
 
 
 def test_coordinator_workflow():
     # Test add
-    c = add_coordinator("Wiki_User", 1)
+    c = add_coordinator("Wiki_User")
     assert c.username == "Wiki_User"
     assert c.is_active == 1
     assert c.id is not None
 
     # Test get
-    c2 = get_coordinator(c.id)
+    c2 = get_coordinator_by_id(c.id)
     assert c2.username == "Wiki_User"
-
-    # Test get by user
-    c3 = get_coordinator_by_user("Wiki_User")
-    assert c3.id == c.id
 
     # Test list
     all_c = list_coordinators()
@@ -42,26 +35,18 @@ def test_coordinator_workflow():
     active = active_coordinators()
     assert "Wiki_User" in active
 
-    # Test update
-    updated = update_coordinator(c.id, is_active=0)
-    assert updated.is_active == 0
-
     active_coordinators.cache_clear()
     assert "Wiki_User" not in active_coordinators()
 
-    # Test is_coordinator
-    assert is_coordinator("Wiki_User") is False
+    # Test is_active_coordinator
+    assert is_active_coordinator("Wiki_User") is False
     set_coordinator_active(c.id, True)
-    assert is_coordinator("Wiki_User") is True
-
-    # Test add_or_update
-    c4 = add_or_update_coordinator("Wiki_User", 0)
-    assert c4.is_active == 0
+    assert is_active_coordinator("Wiki_User") is True
 
     # Test delete
     deleted = delete_coordinator(c.id)
     assert deleted is True
-    assert get_coordinator(c.id) is None
+    assert get_coordinator_by_id(c.id) is None
 
 
 class TestListCoordinators:
@@ -81,39 +66,24 @@ class TestListActiveCoordinators:
     def test_returns_active_usernames(self, monkeypatch):
         """Test that active_coordinators returns active coordinator usernames."""
         active_coordinators.cache_clear()
-        add_coordinator("Active_Editor", is_active=1)
-        add_coordinator("Inactive_Editor", is_active=0)
+        add_coordinator("Active_Editor")
         active = active_coordinators()
         assert "Active_Editor" in active
-        assert "Inactive_Editor" not in active
 
 
 class TestGetCoordinator:
-    """Tests for get_coordinator function."""
+    """Tests for get_coordinator_by_id function."""
 
     def test_returns_coordinator_record(self, monkeypatch):
         """Test that function returns a AdminUserRecord."""
         c = add_coordinator("Medic_Expert")
-        result = get_coordinator(c.id)
+        result = get_coordinator_by_id(c.id)
         assert isinstance(result, AdminUserRecord)
         assert result.username == "Medic_Expert"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that function returns None when coordinator not found."""
-        assert get_coordinator(8888) is None
-
-
-class TestGetCoordinatorByUser:
-    """Tests for get_coordinator_by_user function."""
-
-    def test_returns_coordinator_by_user(self, monkeypatch):
-        """Test that function returns coordinator by username."""
-        add_coordinator("Wiki_Lead")
-        result = get_coordinator_by_user("Wiki_Lead")
-        assert result.username == "Wiki_Lead"
-
-    def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_coordinator_by_user("Ghost") is None
+        assert get_coordinator_by_id(8888) is None
 
 
 class TestAddCoordinator:
@@ -134,40 +104,6 @@ class TestAddCoordinator:
             add_coordinator("")
 
 
-class TestAddOrUpdateCoordinator:
-    """Tests for add_or_update_coordinator function."""
-
-    def test_upserts_coordinator(self, monkeypatch):
-        """Test that add_or_update_coordinator upserts the record."""
-        add_coordinator("Sync_User", is_active=1)
-        record = add_or_update_coordinator("Sync_User", is_active=0)
-        assert record.is_active == 0
-        assert len(list_coordinators()) == 1
-
-    def test_raises_error_if_no_username(self, monkeypatch):
-        with pytest.raises(ValueError, match="username is required"):
-            add_or_update_coordinator(" ")
-
-
-class TestUpdateCoordinator:
-    """Tests for update_coordinator function."""
-
-    def test_updates_coordinator_and_returns_record(self, monkeypatch):
-        """Test that update_coordinator updates and returns the record."""
-        c = add_coordinator("Update_Me", is_active=1)
-        updated = update_coordinator(c.id, is_active=0)
-        assert updated.is_active == 0
-
-    def test_returns_record_if_no_kwargs(self, monkeypatch):
-        c = add_coordinator("No_Change")
-        result = update_coordinator(c.id)
-        assert result.username == "No_Change"
-
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            update_coordinator(9999, is_active=0)
-
-
 class TestDeleteCoordinator:
     """Tests for delete_coordinator function."""
 
@@ -176,25 +112,21 @@ class TestDeleteCoordinator:
         c = add_coordinator("Delete_Me")
         deleted = delete_coordinator(c.id)
         assert deleted is True
-        assert get_coordinator(c.id) is None
+        assert get_coordinator_by_id(c.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
         assert delete_coordinator(9999) is False
 
 
 class TestIsCoordinator:
-    """Tests for is_coordinator function."""
+    """Tests for is_active_coordinator function."""
 
     def test_returns_true_when_user_is_active_coordinator(self, monkeypatch):
-        """Test that is_coordinator returns True for active coordinator."""
-        add_coordinator("Active_Coord", is_active=1)
-        assert is_coordinator("Active_Coord") is True
+        """Test that is_active_coordinator returns True for active coordinator."""
+        add_coordinator("Active_Coord")
+        assert is_active_coordinator("Active_Coord") is True
 
     def test_returns_false_when_user_not_coordinator(self, monkeypatch):
-        """Test that is_coordinator returns False when username not found."""
-        assert is_coordinator("Random_User") is False
+        """Test that is_active_coordinator returns False when username not found."""
+        assert is_active_coordinator("Random_User") is False
 
-    def test_returns_false_when_coordinator_inactive(self, monkeypatch):
-        """Test that is_coordinator returns False for inactive coordinator."""
-        add_coordinator("Inactive_Coord", is_active=0)
-        assert is_coordinator("Inactive_Coord") is False

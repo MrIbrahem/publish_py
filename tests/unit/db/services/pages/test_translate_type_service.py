@@ -19,7 +19,7 @@ from src.main_app.db.services.pages.translate_type_service import (
     update_translate_type,
 )
 from src.main_app.shared.core.extensions import db as _db
-from src.main_app.shared.core.extensions.exc import UniqueError
+from src.main_app.db.exceptions import UniqueError
 
 
 def test_translate_type_workflow():

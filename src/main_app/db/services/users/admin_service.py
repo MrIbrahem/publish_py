@@ -1,5 +1,7 @@
 """
+
 SQLAlchemy-based service for managing coordinators.
+
 """
 
 from __future__ import annotations
@@ -11,16 +13,14 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
+from ...exceptions import DuplicateUserError, UserNotFoundError
 from ...models import AdminUserRecord
 from ..delete_service import delete_record_by_pk
+from ..utils import db_guard_rollback
 
 logger = logging.getLogger(__name__)
 
-
-def list_coordinators() -> List[AdminUserRecord]:
-    """Return all coordinator records."""
-    orm_objs = db.session.query(AdminUserRecord).order_by(AdminUserRecord.id).all()
-    return orm_objs
+# ── SELECT ───────────────────────────────────────────────
 
 
 @functools.lru_cache(maxsize=1)
@@ -36,8 +36,33 @@ def active_coordinators() -> List[str]:
     return [r.username for r in records]
 
 
-def get_coordinator(coordinator_id: int) -> AdminUserRecord | None:
-    """Get a coordinator record by ID."""
+
+def is_active_coordinator(username: str) -> bool:
+    """Check whether a single username is an active coordinator."""
+    try:
+        record = (
+            db.session.query(AdminUserRecord)
+            .filter(AdminUserRecord.username == username, AdminUserRecord.is_active)
+            .first()
+        )
+        return record is not None
+    except Exception:
+        logger.exception("Failed to check coordinator status")
+    return False
+
+
+def list_coordinators() -> List[AdminUserRecord]:
+    """
+    Return all coordinators from the database.
+
+    Returns a list of records, or an empty list on failure.
+    """
+    return db.session.query(AdminUserRecord).all()
+
+def get_coordinator_by_id(coordinator_id: int) -> AdminUserRecord | None:
+    """
+    Get a coordinator by ID.
+    """
     # record = db.session.query(AdminUserRecord).filter(AdminUserRecord.id == coordinator_id).first()
     record = db.session.get(AdminUserRecord, coordinator_id)
     if not record:
@@ -46,91 +71,45 @@ def get_coordinator(coordinator_id: int) -> AdminUserRecord | None:
     return record
 
 
-def get_coordinator_by_user(username: str) -> AdminUserRecord | None:
-    """Get a coordinator record by username."""
-    # record = db.session.query(AdminUserRecord).filter(AdminUserRecord.username == username).first()
-    record = db.session.query(AdminUserRecord).filter_by(username=username).first()
-    if not record:
-        return None
-    return record
+# ── INSERT, UPDATE, SET ──────────────────────────────────
 
 
-def add_coordinator(username: str, is_active: int = 1) -> AdminUserRecord:
-    """Add a new coordinator. Raises ValueError if username already exists."""
+def add_coordinator(username: str) -> AdminUserRecord:
+    """Add a coordinator."""
     username = username.strip()
     if not username:
-        raise ValueError("username is required")
-
-    record = AdminUserRecord(username=username, is_active=is_active)
-    db.session.add(record)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        raise ValueError(f"Coordinator '{username}' already exists") from None
-
-    # Refresh to get the ID and other defaults
-    db.session.refresh(record)
-    active_coordinators.cache_clear()
-    return record
-
-
-def add_or_update_coordinator(username: str, is_active: int = 1) -> AdminUserRecord:
-    """Add a coordinator or update is_active if already exists (UPSERT)."""
-    username = username.strip()
-    if not username:
-        raise ValueError("username is required")
+        raise ValueError("Username is required")
 
     record = db.session.query(AdminUserRecord).filter(AdminUserRecord.username == username).first()
     if record:
-        record.is_active = is_active
-    else:
-        record = AdminUserRecord(username=username, is_active=is_active)
-        db.session.add(record)
+        # This assumes a UNIQUE constraint on the username column
+        raise DuplicateUserError(f"Coordinator '{username}' already exists") from None
+
+    record = AdminUserRecord(username=username, is_active=True)
+    db.session.add(record)
     try:
         db.session.commit()
-    except Exception:
+    except IntegrityError as exc:
         db.session.rollback()
+        if "a foreign key constraint fails" in str(exc):
+            raise UserNotFoundError(f"User '{username}' does not exist") from exc
         raise
     db.session.refresh(record)
     active_coordinators.cache_clear()
     return record
 
-
-def update_coordinator(coordinator_id: int, **kwargs) -> AdminUserRecord:
-    """Update fields on a coordinator record. Raises ValueError if not found."""
-    # record = db.session.query(AdminUserRecord).filter(AdminUserRecord.id == coordinator_id).first()
-    record = db.session.get(AdminUserRecord, coordinator_id)
+@db_guard_rollback
+def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRecord | None:
+    """Toggle coordinator activity."""
+    # record = get_coordinator_by_id(coordinator_id)
+    record = db.session.query(AdminUserRecord).filter(AdminUserRecord.id == coordinator_id).first()
     if not record:
-        raise ValueError(f"Coordinator with ID {coordinator_id} not found")
+        return None
 
-    if not kwargs:
-        return record
-
-    for key, value in kwargs.items():
-        if hasattr(record, key):
-            setattr(record, key, value)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
+    record.is_active = is_active
+    db.session.commit()
     db.session.refresh(record)
-    active_coordinators.cache_clear()
-
     return record
-
-
-def is_coordinator(username: str) -> bool:
-    """Check if a username is an active coordinator."""
-    record = get_coordinator_by_user(username)
-    return record is not None and record.is_active == 1
-
-
-def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRecord:
-    """Toggle coordinator activity and refresh settings."""
-    return update_coordinator(coordinator_id, is_active=1 if is_active else 0)
-
 
 def delete_coordinator(coordinator_id: int) -> bool:
     deleted = delete_record_by_pk(AdminUserRecord, coordinator_id)
@@ -141,11 +120,8 @@ def delete_coordinator(coordinator_id: int) -> bool:
 __all__ = [
     "list_coordinators",
     "active_coordinators",
-    "get_coordinator",
-    "get_coordinator_by_user",
+    "get_coordinator_by_id",
     "add_coordinator",
-    "add_or_update_coordinator",
-    "update_coordinator",
-    "is_coordinator",
+    "is_active_coordinator",
     "set_coordinator_active",
 ]

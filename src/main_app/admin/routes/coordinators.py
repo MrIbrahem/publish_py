@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from flask import (
     Blueprint,
@@ -14,9 +15,11 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
+from ...db.exceptions import DuplicateUserError, UserNotFoundError
 from ...db.services.users import (
     add_coordinator,
     delete_coordinator,
+    get_coordinator_by_id,
     list_coordinators,
     set_coordinator_active,
 )
@@ -25,19 +28,24 @@ from ..decorators import admin_required
 logger = logging.getLogger(__name__)
 
 
-def _coordinators_dashboard():
+def _coordinators_dashboard() -> str:
     """Render the coordinator management dashboard."""
+    try:
+        coordinators = list_coordinators()
+    except Exception as e:  # pragma: no cover - defensive guard
+        logger.error(f"Unable to list coordinators: {e}")
+        flash("Unable to list coordinators.", "danger")
+        coordinators: list[Any] = []
 
-    coordinators = list_coordinators()
     total = len(coordinators)
-    is_active = sum(1 for coord in coordinators if coord.is_active)
+    total_active = sum(1 for coord in coordinators if coord.is_active)
 
     return render_template(
         "admins/coordinators.html",
         coordinators=coordinators,
         total_coordinators=total,
-        active_coordinators=is_active,
-        inactive_coordinators=total - is_active,
+        total_active_coordinators=total_active,
+        inactive_coordinators=total - total_active,
     )
 
 
@@ -51,64 +59,64 @@ def _add_coordinator() -> ResponseReturnValue:
 
     try:
         record = add_coordinator(username)
-    except (LookupError, ValueError) as exc:
+    except UserNotFoundError as exc:
+        logger.error("UserNotFoundError: %s", exc)
+        flash(f"User '{username}' does not exist", "warning")
+    except DuplicateUserError:
+        logger.error(f"Coordinator '{username}' already exists")
+        flash(f"Coordinator '{username}' already exists", "warning")
+    except (LookupError, ValueError):
         logger.exception("Unable to Add coordinator.")
-        flash(str(exc), "warning")
+        flash(f"Unable to add '{username}' as coordinator", "warning")
     except Exception:  # pragma: no cover - defensive guard
         logger.exception("Unable to add coordinator.")
-        flash("Unable to add coordinator. Please try again.", "danger")
+        flash("Unable to add coordinator.", "danger")
     else:
         flash(f"Coordinator '{record.username}' added.", "success")
 
     return redirect(url_for("admin.coordinators.dashboard"))
 
 
-def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturnValue:
+def _set_record_active_status(coordinator_id: int, is_active: bool) -> ResponseReturnValue:
     """Shared helper to update coordinator is_active status."""
-    action = "activate" if is_active else "deactivate"
-    past_tense = "activated" if is_active else "deactivated"
     try:
-        record = set_coordinator_active(record_id, is_active)
-    except LookupError as exc:
-        logger.exception(f"Unable to {action} coordinator.")
-        flash(str(exc), "warning")
+        record = set_coordinator_active(coordinator_id, is_active)
+        if record is None:
+            raise LookupError(f"Coordinator with id {coordinator_id} not found")
+    except LookupError:
+        logger.exception("Unable to update coordinator.")
+        flash("Unable to update coordinator", "warning")
     except Exception:  # pragma: no cover - defensive guard
-        logger.exception(f"Unable to {action} coordinator.")
-        flash(f"Unable to {action} coordinator. Please try again.", "danger")
+        logger.exception("Unable to update coordinator.")
+        flash("Unable to update coordinator status. Please try again.", "danger")
     else:
-        flash(f"Coordinator '{record.username}' {past_tense}.", "success")
+        state = "activated" if record.is_active else "deactivated"
+        flash(f"Coordinator '{record.username}' {state}.", "success")
 
     return redirect(url_for("admin.coordinators.dashboard"))
-
-
-def _activate_record(record_id: int) -> ResponseReturnValue:
-    """Activate a coordinator."""
-    return _set_record_active_status(record_id, True)
-
-
-def _deactivate_record(record_id: int) -> ResponseReturnValue:
-    """Deactivate a coordinator."""
-    return _set_record_active_status(record_id, False)
-
 
 def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
     """Remove a coordinator entirely."""
 
     try:
-        record = delete_coordinator(coordinator_id)
-    except LookupError as exc:
+        record = get_coordinator_by_id(coordinator_id)
+        username = record.username
+        delete_coordinator(coordinator_id)
+    except LookupError:
         logger.exception("Unable to delete coordinator.")
-        flash(str(exc), "warning")
+        flash(f"Coordinator id {coordinator_id} was not found", "warning")
     except Exception:  # pragma: no cover - defensive guard
         logger.exception("Unable to delete coordinator.")
         flash("Unable to delete coordinator. Please try again.", "danger")
     else:
-        flash(f"Coordinator '{coordinator_id}' removed.", "success")
+        flash(f"Coordinator '{username}' removed.", "success")
 
     return redirect(url_for("admin.coordinators.dashboard"))
 
 
-class Coordinators:
+class CoordinatorsRoutes:
+    """Jobs management routes."""
+
     def __init__(self) -> None:
         self.bp = Blueprint("coordinators", __name__, url_prefix="/coordinators")
         self._setup_routes()
@@ -124,20 +132,30 @@ class Coordinators:
         def add() -> ResponseReturnValue:
             return _add_coordinator()
 
+        @self.bp.post("/<int:coordinator_id>/activate")
+        @admin_required
+        def activate(coordinator_id: int) -> ResponseReturnValue:
+            return _set_record_active_status(coordinator_id, True)
+
+        @self.bp.post("/<int:coordinator_id>/deactivate")
+        @admin_required
+        def deactivate(coordinator_id: int) -> ResponseReturnValue:
+            return _set_record_active_status(coordinator_id, False)
+
+        @self.bp.post("/<int:coordinator_id>/active")
+        @admin_required
+        def update_active(coordinator_id: int) -> ResponseReturnValue:
+            desired = request.form.get("active", "0") == "1"
+            return _set_record_active_status(coordinator_id, desired)
+
         @self.bp.post("/<int:coordinator_id>/delete")
         @admin_required
         def delete(coordinator_id: int) -> ResponseReturnValue:
             return _delete_coordinator(coordinator_id)
 
-        @self.bp.post("/<int:record_id>/activate")
-        @admin_required
-        def activate(record_id: int) -> ResponseReturnValue:
-            return _activate_record(record_id)
 
-        @self.bp.post("/<int:record_id>/deactivate")
-        @admin_required
-        def deactivate(record_id: int) -> ResponseReturnValue:
-            return _deactivate_record(record_id)
+coordinators_module = CoordinatorsRoutes()
 
-
-coordinators_module = Coordinators()
+__all__ = [
+    "coordinators_module",
+]

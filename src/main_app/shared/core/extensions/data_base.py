@@ -8,6 +8,7 @@ import logging
 from typing import Any
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy.model import Model
 from sqlalchemy import MetaData, Text, event, inspect, text
 from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
 from sqlalchemy.engine import Connection, Dialect
@@ -29,27 +30,22 @@ class LONGTEXT(TypeDecorator):
 logger = logging.getLogger(__name__)
 
 
-class Base:
-    """
-    Base class for database models.
-    Provides common functionality like to_dict.
-    """
+class BaseModel(Model):
+    """Base model providing a generic to_dict() for all records."""
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert ORM object to dictionary."""
-        data = {column.name: getattr(self, column.name) for column in self.__table__.columns}
-
-        if "add_date" in data and self.add_date:
-            data["add_date"] = self.add_date.isoformat() if hasattr(self.add_date, "isoformat") else str(self.add_date)
-
-        if "date" in data and self.date:
-            data["date"] = self.date.isoformat() if hasattr(self.date, "isoformat") else str(self.date)
-
-        for column in self.__table__.columns:
-            if column.nullable is False and data[column.name] is None:
-                data[column.name] = column.default
-
+        data: dict[str, Any] = {}
+        for column in self.__table__.columns:  # type: ignore
+            value = getattr(self, column.name)  # type: ignore
+            if hasattr(value, "isoformat"):
+                value = value.isoformat()
+            data[column.name] = value  # type: ignore
         return data
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
 
 # Naming convention for constraints (required for reliable Alembic migrations)
@@ -66,7 +62,10 @@ metadata = MetaData(naming_convention=convention)
 # Flask-SQLAlchemy instance
 # Uses existing BaseDb (DeclarativeBase) as model_class so all existing
 # models continue to work unchanged.
-db = SQLAlchemy(metadata=metadata, model_class=Base)
+db = SQLAlchemy(
+    model_class=BaseModel,
+    metadata=metadata,
+)
 
 
 @event.listens_for(db.metadata, "after_create")
@@ -92,7 +91,7 @@ def create_views_new_all_view(target: MetaData, connection: Connection, **kw: An
 
 
 __all__ = [
-    "Base",
+    "BaseModel",
     "db",
     "metadata",
     "LONGTEXT",

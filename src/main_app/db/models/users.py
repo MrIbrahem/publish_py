@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy.orm import validates
 
@@ -135,11 +136,10 @@ class AdminUserRecord(db.Model):
     username: str = db.Column(db.String(120), unique=True, nullable=False)
     is_active: int = db.Column(db.Integer, nullable=False, default=1)
 
-    def __init__(self, **kwargs) -> None:
-        # Apply Python-level defaults for fields not provided
-        if "is_active" not in kwargs:
-            kwargs["is_active"] = 1
-        super().__init__(**kwargs)
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def __repr__(self) -> str:
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"

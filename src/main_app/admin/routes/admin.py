@@ -12,12 +12,6 @@ from flask import (
     url_for,
 )
 
-# from ..admin_routes import (
-#     Coordinators,
-#     Jobs,
-#     OwidCharts,
-#     Templates,
-# )
 from ..decorators import admin_required
 from ..sidebar import create_side
 from .add_translate import add_bp

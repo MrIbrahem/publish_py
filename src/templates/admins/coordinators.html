@@ -2,6 +2,29 @@
 
 {% block title %}Coordinators{% endblock %}
 
+{%- macro update_active_form(coordinator) -%}
+{% set endpoint_target = 'admin.coordinators.deactivate' if coordinator.is_active else 'admin.coordinators.activate' %}
+<form method="post" action="{{ url_for(endpoint_target, coordinator_id=coordinator.id) }}" class="d-inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="form-check form-switch d-inline-flex align-items-center">
+        <input class="form-check-input" type="checkbox" role="switch" id="coordinator-active-{{ coordinator.id }}"
+            {% if coordinator.is_active %}checked{% endif %} onchange="this.form.submit();">
+        <label class="visually-hidden" for="coordinator-active-{{ coordinator.id }}">Toggle
+            coordinator active state</label>
+    </div>
+</form>
+{%- endmacro -%}
+
+{%- macro delete_coordinator_form(coordinator) -%}
+<form method="post" action="{{ url_for('admin.coordinators.delete', coordinator_id=coordinator.id) }}" class="d-inline"
+    onsubmit="return confirm('Remove {{ coordinator.username }} from coordinators?');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <button type="submit" class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-trash"></i> Delete
+    </button>
+</form>
+{%- endmacro -%}
+
 {% block contents %}
 
 <div class="card">
@@ -23,7 +46,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
                         <h2 class="h6 text-uppercase text-muted">Active</h2>
-                        <p class="display-6 mb-0">{{ active_coordinators }}</p>
+                        <p class="display-6 mb-0">{{ total_active_coordinators }}</p>
                     </div>
                 </div>
             </div>
@@ -40,7 +63,7 @@
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
                 <form method="post" action="{{ url_for('admin.coordinators.add') }}" class="row g-2 align-items-end">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="col-sm-8 col-md-6 col-lg-4">
                         <label class="form-label" for="new-coordinator-username">Add coordinator</label>
                         <input type="text" name="username" class="form-control" id="new-coordinator-username"
@@ -71,31 +94,10 @@
                         <td>{{ coordinator.id }}</td>
                         <td>{{ coordinator.username }}</td>
                         <td class="text-center">
-                            {% set endpoint_target = 'admin.coordinators.deactivate' if coordinator.is_active else 'admin.coordinators.activate' %}
-                            <form method="post"
-                                action="{{ url_for(endpoint_target, record_id=coordinator.id) }}"
-                                class="d-inline">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                <div class="form-check form-switch d-inline-flex align-items-center">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="coordinator-active-{{ coordinator.id }}"
-                                        {% if coordinator.is_active %}checked{% endif %}
-                                        onchange="this.form.submit();">
-                                    <label class="visually-hidden" for="coordinator-active-{{ coordinator.id }}">Toggle
-                                        coordinator active state</label>
-                                </div>
-                            </form>
+                            {{ update_active_form(coordinator) }}
                         </td>
                         <td class="text-center">
-                            <form method="post"
-                                action="{{ url_for('admin.coordinators.delete', coordinator_id=coordinator.id) }}"
-                                class="d-inline"
-                                onsubmit="return confirm('Remove {{ coordinator.username }} from coordinators?');">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
-                            </form>
+                            {{ delete_coordinator_form(coordinator) }}
                         </td>
                     </tr>
                     {% endfor %}
