@@ -3,6 +3,7 @@ All Articles domain models - SQLAlchemy ORM.
 """
 
 from __future__ import annotations
+from typing import Any
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -26,6 +27,18 @@ class AllArticlesRecord(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     article_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     category: Mapped[str | None] = mapped_column(String(255))
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "article_id": self.article_id,
+            "category": self.category,
+        }
 
 
 __all__ = [

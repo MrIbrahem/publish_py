@@ -5,6 +5,7 @@ SQLAlchemy ORM models
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy import String, text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -75,6 +76,16 @@ class ProjectRecord(db.Model):
     g_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     g_title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "g_id": self.g_id,
+            "g_title": self.g_title,
+        }
 
 __all__ = [
     "CategoryRecord",

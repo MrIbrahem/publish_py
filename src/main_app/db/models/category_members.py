@@ -8,6 +8,7 @@ belong to category X" — used by the results_2026 and missing-stats flows.
 """
 
 from __future__ import annotations
+from typing import Any
 
 from sqlalchemy import Index, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
@@ -37,6 +38,11 @@ class CategoryMemberRecord(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     category: Mapped[str] = mapped_column(String(120), nullable=False)
     article_id: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def to_dict(self) -> dict:
         return {
