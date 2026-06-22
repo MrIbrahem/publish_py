@@ -4,6 +4,8 @@ QID domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -44,6 +46,13 @@ class QidRecord(db.Model):
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "title": self.title,
+        }
+
 
 class QidOthersRecord(db.Model):
     """
@@ -80,6 +89,13 @@ class QidOthersRecord(db.Model):
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "title": self.title,
+        }
+
 
 class AllQidsExistRecord(db.Model):
     """
@@ -100,6 +116,19 @@ class AllQidsExistRecord(db.Model):
     qid: Mapped[str] = mapped_column(String(255), nullable=False)
     code: Mapped[str] = mapped_column(String(25), nullable=False)
     target: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "code": self.code,
+            "target": self.target,
+        }
 
 
 __all__ = [

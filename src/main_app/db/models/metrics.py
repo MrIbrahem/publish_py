@@ -4,6 +4,8 @@ Metrics domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -27,6 +29,18 @@ class AssessmentRecord(db.Model):
     title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     importance: Mapped[str | None] = mapped_column(String(120))
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "importance": self.importance,
+        }
+
 
 class RefsCountRecord(db.Model):
     """
@@ -47,6 +61,19 @@ class RefsCountRecord(db.Model):
     r_lead_refs: Mapped[int | None] = mapped_column()
     r_all_refs: Mapped[int | None] = mapped_column()
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "r_id": self.r_id,
+            "r_title": self.r_title,
+            "r_lead_refs": self.r_lead_refs,
+            "r_all_refs": self.r_all_refs,
+        }
+
 
 class WordRecord(db.Model):
     """
@@ -66,6 +93,19 @@ class WordRecord(db.Model):
     w_title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     w_lead_words: Mapped[int | None] = mapped_column()
     w_all_words: Mapped[int | None] = mapped_column()
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "w_id": self.w_id,
+            "w_title": self.w_title,
+            "w_lead_words": self.w_lead_words,
+            "w_all_words": self.w_all_words,
+        }
 
 
 __all__ = [

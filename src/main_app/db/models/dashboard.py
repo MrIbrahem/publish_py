@@ -36,7 +36,7 @@ class CategoryRecord(db.Model):
     category: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     campaign: Mapped[str] = mapped_column(String(120), nullable=False, default="", server_default=text("''"))
     display: Mapped[str] = mapped_column(String(120), nullable=False, default="", server_default=text("''"))
-    category2: Mapped[str] = mapped_column(String(120), nullable=False, default="", server_default=text("''"))
+    category2: Mapped[str | None] = mapped_column(String(120), default="", server_default=text("''"))
     depth: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
     is_default: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
 

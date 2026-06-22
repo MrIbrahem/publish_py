@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -44,6 +45,23 @@ class ReportRecord(db.Model):
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
     data: Mapped[str] = mapped_column(LONGTEXT, nullable=False)
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "date": self.date,
+            "title": self.title,
+            "user": self.user,
+            "lang": self.lang,
+            "sourcetitle": self.sourcetitle,
+            "result": self.result,
+            "data": self.data,
+        }
 
 
 __all__ = [
