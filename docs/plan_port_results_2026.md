@@ -45,7 +45,7 @@
 | `src/main_app/db/services/pages/{page_service,in_process_service,translate_type_service}.py` | Existing service helpers we will reuse                                    |
 | `src/main_app/db/services/users/{coordinator_service,full_translator_service}.py`            | `active_coordinators()`, `is_full_translator()`                           |
 | `src/main_app/db/services/content/{lang_service,category_service}.py`                        | `list_langs`, `list_categories`, `get_camp_to_cats`                       |
-| `src/main_app/db/services/config/setting_service.py`                                         | `get_setting_by_key()` for `use_mdwikicx` lookup                          |
+| `src/main_app/db/services/config/settings_service.py`                                         | `get_setting_by_key()` for `use_mdwikicx` lookup                          |
 | `src/main_app/db/services/wikidata/allqid_service.py`                                        | Existing `list_targets_by_lang()` — pattern reference for raw-SQL queries |
 | `src/main_app/db/models/*.py`                                                                | All model definitions referenced by the new queries                       |
 | `src/main_app/shared/auth/identity.py`                                                       | `current_user()`                                                          |

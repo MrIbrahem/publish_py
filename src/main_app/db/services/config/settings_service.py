@@ -11,9 +11,21 @@ from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
 from ...models import SettingRecord
-from ..delete_service import delete_setting
+from ..utils import db_guard
 
 logger = logging.getLogger(__name__)
+
+def _serialize_value(value: Any, value_type: str) -> str | None:
+    if value is None:
+        return None
+    if value_type == "boolean":
+        return "true" if value else "false"
+    elif value_type == "integer":
+        try:
+            return str(int(value))
+        except (ValueError, TypeError):
+            return "0"
+    return str(value)
 
 
 def list_settings() -> list[SettingRecord]:
@@ -68,13 +80,39 @@ def get_setting_by_id(setting_id: int) -> SettingRecord | None:
     return orm_obj
 
 
+@db_guard(default_return=False)
+def update_setting(
+    key: str,
+    value: Any,
+    value_type: str = "string",
+    title: str | None = None,
+) -> SettingRecord:
+    """
+    Update an existing setting.
+    """
+    setting = db.session.query(SettingRecord).filter(SettingRecord.key == key).first()
+    if not setting:
+        return False
+
+    if not value_type:
+        value_type = setting.value_type
+
+    setting.value = _serialize_value(value, value_type)
+    if title:
+        setting.title = title
+    db.session.commit()
+    return setting
+
+
 def create_setting(
     key: str,
     title: str,
     value_type: str = "boolean",
     value: Any | None = None,
-) -> SettingRecord:
-    """Add a new setting record."""
+) -> bool:
+    """
+    Create new setting.
+    """
     key = key.strip()
     title = title.strip()
     if not key:
@@ -82,15 +120,12 @@ def create_setting(
     if not title:
         raise ValueError("Title is required")
 
-    if not value:
-        if value_type == "boolean":
-            value = 0  # equal to False
-        elif value_type == "integer":
-            value = 0
-        elif value_type == "json":
-            value = {}
-        else:
-            value = ""
+    default_value_types = {
+        "boolean": "false",
+        "integer": "0",
+    }
+
+    value = value or default_value_types.get(value_type, "")
 
     orm_obj = SettingRecord(
         key=key,
@@ -101,39 +136,21 @@ def create_setting(
     db.session.add(orm_obj)
     try:
         db.session.commit()
+        return True
     except IntegrityError:
         db.session.rollback()
-        raise ValueError(f"Setting with key '{key}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
-
-
-def update_value(setting_id: int, value: Any) -> SettingRecord:
-    """Update a setting record value.
-
-    Normalizes the input identically to ``create_setting`` so the persisted
-    type stays consistent across creation and updates: non-``None`` values
-    are coerced to ``str``; ``None`` is stored as ``None``.
-    """
-    orm_obj: SettingRecord = db.session.get(SettingRecord, setting_id)
-    if not orm_obj:
-        raise ValueError(f"Setting record with ID {setting_id} not found")
-
-    orm_obj.value = str(value) if value is not None else None
-    try:
-        db.session.commit()
+        return False
     except Exception:
         db.session.rollback()
-        raise
-    db.session.refresh(orm_obj)
-    return orm_obj
-
+        return False
 
 __all__ = [
     "list_settings",
     "get_setting_by_id",
     "get_setting_by_key",
+    "get_all_settings_raw",
+    "update_setting",
     "create_setting",
-    "update_value",
+    "list_settings",
+    "get_all_settings_ready",
 ]

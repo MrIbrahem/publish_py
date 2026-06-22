@@ -8,25 +8,48 @@ from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from ...db.services.config import setting_service as service
+from ...db.services.config import (
+    create_setting,
+    get_all_settings_raw,
+    delete_setting_by_key,
+    update_setting,
+)
 from ..decorators import admin_required
 
 
+def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
+    """Returns (value, success)"""
+    if v_type == "boolean":
+        return raw_val == "on", True
+    elif v_type == "integer":
+        try:
+            return int(raw_val), True
+        except (TypeError, ValueError):
+            return 0, True
+    elif v_type == "json":
+        try:
+            return json.loads(raw_val), True
+        except Exception:
+            return None, False
+    else:
+        return raw_val, True
+
+
 def settings_update_form(request_form) -> tuple[list[str], list[str]]:
-    all_settings = service.list_settings()
+    all_settings = get_all_settings_raw()
     failed_keys: list[str] = []
     deleted_keys: list[str] = []
 
     for setting in all_settings:
-        key = setting.key
-        v_type = setting.value_type
+        key = setting["key"]
+        v_type = setting["value_type"]
         form_key = f"setting_{key}"
         delete_key = f"delete_{key}"
 
         # Check if marked for deletion
         if request_form.get(delete_key) == "on":
             try:
-                service.delete_setting(setting.id)
+                delete_setting_by_key(key)
                 deleted_keys.append(key)
             except Exception:
                 failed_keys.append(key)
@@ -45,44 +68,11 @@ def settings_update_form(request_form) -> tuple[list[str], list[str]]:
             continue
 
         try:
-            service.update_value(setting.id, value=value)
+            update_setting(key, value, v_type)
         except Exception:
             failed_keys.append(key)
 
     return failed_keys, deleted_keys
-
-
-def get_settings_raw() -> list[dict[str, Any]]:
-    all_settings = service.list_settings()
-    # Convert records to dicts for template compatibility
-    settings_list = [s.to_dict() for s in all_settings]
-    # Add key and value_type to dict for template
-    for i, s in enumerate(all_settings):
-        settings_list[i]["key"] = s.key
-        settings_list[i]["value_type"] = s.value_type
-    return settings_list
-
-
-def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
-    """Parse a setting value from form input.
-
-    Returns:
-        tuple of (parsed_value, success)
-    """
-    if v_type == "boolean":
-        return 1 if raw_val == "on" else 0, True
-    elif v_type == "integer":
-        try:
-            return int(raw_val), True
-        except ValueError:
-            return 0, True
-    elif v_type == "json":
-        try:
-            return json.loads(raw_val), True
-        except Exception:
-            return None, False
-    else:
-        return raw_val, True
 
 
 class SettingsRoutes:
@@ -94,7 +84,7 @@ class SettingsRoutes:
         @self.bp.route("/", methods=["GET"])
         @admin_required
         def dashboard():
-            settings_list = get_settings_raw()
+            settings_list = get_all_settings_raw()
             return render_template(
                 "admins/settings.html",
                 settings_list=settings_list,
@@ -115,11 +105,11 @@ class SettingsRoutes:
                 return redirect(url_for("admin.settings.dashboard"))
 
             if key and title:
-                try:
-                    service.create_setting(key, title, value_type)
+                success = create_setting(key, title, value_type)
+                if success:
                     flash("Setting created successfully.", "success")
-                except ValueError as e:
-                    flash(f"Setting could not be created: {e}", "danger")
+                else:
+                    flash("Setting could not be created or already exists.", "danger")
             else:
                 flash("Key and Title are required.", "danger")
 

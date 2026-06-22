@@ -19,7 +19,7 @@ from flask import (
     url_for,
 )
 
-from ....app_routes.auth.identity import current_user
+from ....shared.auth.identity import current_user
 from ....db.services.config import get_setting_by_key
 from ....db.services.content import get_lang_by_code, list_categories, list_langs
 from ....db.services.pages import (

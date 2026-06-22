@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.main_app.app_routes.auth.identity import (
+from src.main_app.shared.auth.identity import (
     CurrentUser,
     _resolve_user_id,
     current_user,
@@ -99,7 +99,7 @@ class TestCurrentUserFunction:
                 return mock_user
             return None
 
-        monkeypatch.setattr("src.main_app.app_routes.auth.identity.get_user_token", mock_get_user_token)
+        monkeypatch.setattr("src.main_app.shared.auth.identity.get_user_token", mock_get_user_token)
 
         with app.test_request_context():
             from flask import session
@@ -115,7 +115,7 @@ class TestCurrentUserFunction:
         mock_user = MagicMock()
         mock_user.username = "UpdatedName"
 
-        monkeypatch.setattr("src.main_app.app_routes.auth.identity.get_user_token", lambda uid: mock_user)
+        monkeypatch.setattr("src.main_app.shared.auth.identity.get_user_token", lambda uid: mock_user)
 
         with app.test_request_context():
             from flask import session

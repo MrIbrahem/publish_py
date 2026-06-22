@@ -23,7 +23,7 @@ from flask import (
 )
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from ....app_routes.auth.identity import CurrentUser
+from ....shared.auth.identity import CurrentUser
 from ....config import settings
 from ....db.services.users import delete_user_token, upsert_user_token
 from ....shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token

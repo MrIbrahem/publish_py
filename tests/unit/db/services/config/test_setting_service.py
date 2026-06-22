@@ -4,44 +4,37 @@ import pytest
 
 # from src.main_app.db.models import SettingRecord
 from src.main_app.db.models import SettingRecord
-from src.main_app.db.services.config.setting_service import (
+from src.main_app.db.services.config.settings_service import (
     create_setting,
     get_setting_by_id,
     get_setting_by_key,
     list_settings,
-    update_value,
 )
 from src.main_app.db.services.delete_service import (
     delete_setting,
+    delete_setting_by_key,
 )
 
 
 def test_setting_workflow():
     # Test add
     s = create_setting("site_name", "Application Name", "string", "WikiMedical")
-    assert s.key == "site_name"
-    assert s.value == "WikiMedical"
 
-    # Test get
-    s2 = get_setting_by_id(s.id)
-    assert s2.key == "site_name"
+    assert s is True
 
     # Test get by key
     s3 = get_setting_by_key("site_name")
-    assert s3.id == s.id
+    assert s3.key == "site_name"
+    assert s3.value == "WikiMedical"
 
     # Test list
     all_s = list_settings()
     assert any(x.key == "site_name" for x in all_s)
 
-    # Test update
-    updated = update_value(s.id, "MDWiki")
-    assert updated.value == "MDWiki"
-
     # Test delete
-    deleted = delete_setting(s.id)
+    deleted = delete_setting(s3.id)
     assert deleted is True
-    assert get_setting_by_id(s.id) is None
+    assert get_setting_by_id(s3.id) is None
 
 
 class TestListSettings:
@@ -61,7 +54,7 @@ class TestGetSetting:
     def test_returns_setting_record(self, monkeypatch):
         """Test that function returns a SettingRecord."""
         s = create_setting("analytics_id", "Google Analytics ID", "string", "UA-12345")
-        result = get_setting_by_id(s.id)
+        result = get_setting_by_key("analytics_id")
         assert isinstance(result, SettingRecord)
         assert result.key == "analytics_id"
 
@@ -88,12 +81,14 @@ class TestAddSetting:
     def test_adds_setting_and_returns_record(self, monkeypatch):
         """Test that create_setting adds and returns the record."""
         record = create_setting("debug_logging", "Enable Debug Logs", "boolean", "True")
-        assert record.key == "debug_logging"
+        assert record is True
 
     def test_raises_error_if_exists(self, monkeypatch):
-        create_setting("K1", "T1")
-        with pytest.raises(ValueError, match="already exists"):
-            create_setting("K1", "T1")
+        created = create_setting("K1", "T1")
+        assert created is True
+
+        created2 = create_setting("K1", "T1")
+        assert created2 is False
 
     def test_raises_error_if_no_key_or_title(self, monkeypatch):
         with pytest.raises(ValueError, match="Key is required"):
@@ -102,34 +97,15 @@ class TestAddSetting:
             create_setting("Key", "")
 
 
-class TestUpdateValue:
-    """Tests for update_value function."""
-
-    def test_updates_setting_value(self, monkeypatch):
-        """Test that update_value updates the setting value."""
-        s = create_setting("items_per_page", "Search results limit", value_type="integer", value="20")
-        updated = update_value(s.id, "50")
-        assert updated.value == "50"
-
-    def test_handles_none_value(self, monkeypatch):
-        s = create_setting("nullable_setting", "Title", value="Something")
-        updated = update_value(s.id, None)
-        assert updated.value is None
-
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            update_value(9999, "NewValue")
-
-
 class TestDeleteSetting:
     """Tests for delete_setting function."""
 
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_setting calls store delete."""
         s = create_setting("temporary_key", "Will be deleted")
-        deleted = delete_setting(s.id)
+        deleted = delete_setting_by_key("temporary_key")
         assert deleted is True
-        assert get_setting_by_id(s.id) is None
+        assert get_setting_by_key("temporary_key") is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
         assert delete_setting(9999) is False

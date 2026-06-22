@@ -70,6 +70,13 @@ def delete_setting(setting_id: int) -> bool:
     return delete_record_by_pk(SettingRecord, setting_id)
 
 
+def delete_setting_by_key(key: str) -> bool:
+    setting = SettingRecord.query.filter_by(key=key).first()
+    if setting:
+        return delete_record_by_pk(SettingRecord, setting.id)
+    return False
+
+
 def delete_coordinator(coordinator_id: int) -> bool:
     return delete_record_by_pk(AdminUserRecord, coordinator_id)
 
@@ -203,7 +210,7 @@ __all__ = [
     "delete_record_by_pk",
     "delete_refs_count",
     "delete_report",
-    "delete_setting",
+    "delete_setting_by_key",
     "delete_setting",
     "delete_translate_type",
     "delete_user",
