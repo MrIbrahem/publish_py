@@ -15,6 +15,7 @@ from ..utils import db_guard
 
 logger = logging.getLogger(__name__)
 
+
 def _serialize_value(value: Any, value_type: str) -> str | None:
     if value is None:
         return None
@@ -143,6 +144,7 @@ def create_setting(
     except Exception:
         db.session.rollback()
         return False
+
 
 __all__ = [
     "list_settings",

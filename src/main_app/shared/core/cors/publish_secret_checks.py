@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def _get_publish_secret_code() -> str:
-    return settings.publish_secret_code
+    return settings.security.publish_secret_code
 
 
 def check_publish_secret_code() -> str | None:

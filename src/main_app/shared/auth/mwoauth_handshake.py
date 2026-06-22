@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import logging
-from typing import Tuple
+from typing import Any, Tuple
 
 import mwoauth
 from flask import url_for
+from mwoauth.handshaker import Handshaker
 
 from ...config import settings
 
 logger = logging.getLogger(__name__)
 
-IDENTITY_ERROR_MESSAGE = "We couldn’t verify your MediaWiki identity. Please try again."
+IDENTITY_ERROR_MESSAGE = "We couldn't verify your MediaWiki identity. Please try again."
 
 
 class OAuthIdentityError(Exception):
@@ -23,15 +24,15 @@ class OAuthIdentityError(Exception):
         self.original_exception = original_exception
 
 
-def get_handshaker():
-    if settings.oauth is None:
+def get_handshaker() -> Handshaker:
+    if not settings.oauth:
         raise RuntimeError("MediaWiki OAuth configuration is incomplete")
 
     consumer_token = mwoauth.ConsumerToken(settings.oauth.consumer_key, settings.oauth.consumer_secret)
     return mwoauth.Handshaker(
         settings.oauth.mw_uri,
         consumer_token=consumer_token,
-        user_agent=settings.user_agent,
+        user_agent=settings.other.user_agent,
     )
 
 
@@ -46,16 +47,24 @@ def start_login(state_token: str) -> Tuple[str, object]:
     return redirect_url, request_token
 
 
-def complete_login(request_token, query_string: str):
+def complete_login(request_token: object, query_string: str) -> Tuple[str, dict[str, Any]]:
     """Complete the OAuth login flow and return the access token and user identity."""
     logger.debug("Completing OAuth login with query_string")
     handshaker = get_handshaker()
-    access_token = handshaker.complete(request_token, query_string)
+    access_token: mwoauth.AccessToken = handshaker.complete(request_token, query_string)
     logger.info("OAuth access token obtained")
     try:
-        identity = handshaker.identify(access_token)
+        identity: dict[str, Any] = handshaker.identify(access_token)
         logger.info("OAuth identity verified: %s", identity.get("username") or identity.get("name"))
     except Exception as exc:
         logger.exception("OAuth identity verification failed")
         raise OAuthIdentityError(IDENTITY_ERROR_MESSAGE, original_exception=exc) from exc
     return access_token, identity
+
+
+__all__ = [
+    "OAuthIdentityError",
+    "get_handshaker",
+    "start_login",
+    "complete_login",
+]

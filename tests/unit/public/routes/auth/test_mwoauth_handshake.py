@@ -64,7 +64,7 @@ class TestGetHandshaker:
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
             mock_settings.oauth.mw_uri = "https://test.wiki/w/index.php"
-            mock_settings.user_agent = "TestAgent/1.0"
+            mock_settings.other.user_agent = "TestAgent/1.0"
 
             result = get_handshaker()
 

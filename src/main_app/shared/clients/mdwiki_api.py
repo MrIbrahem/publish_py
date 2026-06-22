@@ -162,7 +162,7 @@ class CategoryFetcher:
         resp = requests.post(
             self.endpoint,
             data=params,
-            headers={"User-Agent": settings.user_agent},
+            headers={"User-Agent": settings.other.user_agent},
             timeout=(self.connect_timeout, self.timeout),
         )
         resp.raise_for_status()

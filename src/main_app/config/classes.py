@@ -4,9 +4,21 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 # --- Data Classes for Configuration Sections ---
+
+
+@dataclass(frozen=True)
+class OtherConfig:
+    """configs not in specific sections"""
+
+    csrf_time_limit: Optional[int]  # None means never expire
+    user_agent: str
+    wiki_domain: str
+    static_server: str
+    revids_api_url: str
+    wikidata_domain: str
 
 
 @dataclass(frozen=True)
@@ -85,16 +97,12 @@ class SecurityConfig:
     max_form_memory_size: int  # Maximum form data in memory in bytes
     max_form_parts: int  # Maximum number of form fields
     secret_key_fallbacks: tuple[str, ...]  # Fallback secret keys for rotation
+    publish_secret_code: str
 
 
 @dataclass(frozen=True)
 class Settings:
     """Main settings container."""
-
-    publish_secret_code: str
-    user_agent: str
-    revids_api_url: str
-    wikidata_domain: str
 
     # Nested configurations
     database_data: DbConfig
@@ -102,11 +110,10 @@ class Settings:
     cookie: CookieConfig
     sessions: SessionConfig
     oauth: OAuthConfig
-    cors: CorsConfig
     security: SecurityConfig
+    other: OtherConfig
     users: UsersConfig
-
-    csrf_time_limit: int | None  # None means never expire
+    cors: CorsConfig
 
 
 __all__ = [
@@ -115,7 +122,9 @@ __all__ = [
     "CookieConfig",
     "SessionConfig",
     "OAuthConfig",
-    "CorsConfig",
     "Settings",
+    "OtherConfig",
+    "SecurityConfig",
+    "CorsConfig",
     "UsersConfig",
 ]

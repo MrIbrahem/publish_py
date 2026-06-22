@@ -54,13 +54,13 @@ def get_revid_db(sourcetitle: str) -> str:
         "title": sourcetitle,
     }
 
-    if not settings.revids_api_url:
-        logger.warning("revids_api_url not set in config")
+    if not settings.other.revids_api_url:
+        logger.warning("other.revids_api_url not set in config")
         return ""
 
-    headers = {"User-Agent": settings.user_agent}
+    headers = {"User-Agent": settings.other.user_agent}
     try:
-        response = requests.get(settings.revids_api_url, headers=headers, params=params, timeout=30)
+        response = requests.get(settings.other.revids_api_url, headers=headers, params=params, timeout=30)
         data = response.json()
         results = {r["title"]: str(r["revid"]) for r in data.get("results", [])}
         return results.get(sourcetitle, "")

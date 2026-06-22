@@ -10,8 +10,8 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from ...db.services.config import (
     create_setting,
-    get_all_settings_raw,
     delete_setting_by_key,
+    get_all_settings_raw,
     update_setting,
 )
 from ..decorators import admin_required

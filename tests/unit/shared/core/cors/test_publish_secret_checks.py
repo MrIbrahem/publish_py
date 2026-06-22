@@ -21,7 +21,7 @@ class TestGetPublishSecretCode:
     def test_returns_secret_from_settings(self, monkeypatch):
         """Test that secret is retrieved from settings."""
         mock_settings = MagicMock()
-        mock_settings.publish_secret_code = "my_secret_code"
+        mock_settings.security.publish_secret_code = "my_secret_code"
 
         monkeypatch.setattr("src.main_app.shared.core.cors.publish_secret_checks.settings", mock_settings)
 
@@ -32,7 +32,7 @@ class TestGetPublishSecretCode:
     def test_returns_empty_string_when_not_set(self, monkeypatch):
         """Test that empty string is returned when not set."""
         mock_settings = MagicMock()
-        mock_settings.publish_secret_code = ""
+        mock_settings.security.publish_secret_code = ""
 
         monkeypatch.setattr("src.main_app.shared.core.cors.publish_secret_checks.settings", mock_settings)
 
