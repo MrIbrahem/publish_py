@@ -75,150 +75,40 @@ def delete_coordinator(coordinator_id: int) -> bool:
 
 
 def delete_qid(qid_id: int) -> bool:
-    """Delete a QID record."""
-    orm_obj = db.session.get(QidRecord, qid_id)
-    if not orm_obj:
-        raise ValueError(f"QID record with ID {qid_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(QidRecord, qid_id)
-    return deleted is None
+    return delete_record_by_pk(QidRecord, qid_id)
 
 
 def delete_qid_other(qid_id: int) -> bool:
     """Delete a QID record."""
-    orm_obj = db.session.get(QidOthersRecord, qid_id)
-    if not orm_obj:
-        raise ValueError(f"QID record with ID {qid_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(QidOthersRecord, qid_id)
-    return deleted is None
+    return delete_record_by_pk(QidOthersRecord, qid_id)
 
 
 def delete_users_no_inprocess(record_id: int) -> bool:
-    """Delete a users_no_inprocess record by ID."""
-    # orm_obj = db.session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.id == record_id).first()
-    orm_obj = db.session.get(UsersNoInprocessRecord, record_id)
-    if not orm_obj:
-        raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(UsersNoInprocessRecord, record_id)
-    return deleted is None
+    return delete_record_by_pk(UsersNoInprocessRecord, record_id)
 
 
 def delete_user(user_id: int) -> bool:
-    """Delete a user record by ID."""
-    orm_obj = db.session.get(UserRecord, user_id)
-    if not orm_obj:
-        raise ValueError(f"User record with ID {user_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(UserRecord, user_id)
-    return deleted is None
+    return delete_record_by_pk(UserRecord, user_id)
 
 
 def delete_full_translator(translator_id: int) -> bool:
-    """Delete a full translator record by ID."""
-    # orm_obj = db.session.query(FullTranslatorRecord).filter(FullTranslatorRecord.id == translator_id).first()
-    orm_obj = db.session.get(FullTranslatorRecord, translator_id)
-    if not orm_obj:
-        raise ValueError(f"Full translator record with ID {translator_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(FullTranslatorRecord, translator_id)
-    return deleted is None
+    return delete_record_by_pk(FullTranslatorRecord, translator_id)
 
 
 def delete_report(report_id: int) -> bool:
-    """Delete a report record by ID."""
-    # orm_obj = db.session.query(ReportRecord).filter(ReportRecord.id == report_id).first()
-    orm_obj = db.session.get(ReportRecord, report_id)
-    if not orm_obj:
-        raise LookupError(f"Report id {report_id} was not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(ReportRecord, report_id)
-    return deleted is None
+    return delete_record_by_pk(ReportRecord, report_id)
 
 
 def delete_pages_users_to_main(record_id: int) -> bool:
-    """Delete a pages_users_to_main record by ID."""
-    orm_obj = db.session.get(PagesUsersToMainRecord, record_id)
-    if not orm_obj:
-        raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(PagesUsersToMainRecord, record_id)
-    return deleted is None
+    return delete_record_by_pk(PagesUsersToMainRecord, record_id)
 
 
 def delete_user_page(page_id: int) -> bool:
-    """Delete a page."""
-    # orm_obj = db.session.query(UserPageRecord).filter(UserPageRecord.id == page_id).first()
-    orm_obj = db.session.get(UserPageRecord, page_id)
-    if not orm_obj:
-        raise LookupError(f"Page id {page_id} was not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        logger.exception("Failed to delete user page")
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(UserPageRecord, page_id)
-    return deleted is None
+    return delete_record_by_pk(UserPageRecord, page_id)
 
 
 def delete_translate_type(tt_id: int) -> bool:
-    """Delete a translate_type record by ID."""
-    # tt_id is the primary key for TranslateTypeRecord
-    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
-    if not orm_obj:
-        raise ValueError(f"TranslateType record with ID {tt_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(TranslateTypeRecord, tt_id)
-    return deleted is None
+    return delete_record_by_pk(TranslateTypeRecord, tt_id)
 
 
 def delete_user_page_to_main(page_id: int) -> bool:
@@ -246,174 +136,51 @@ def delete_user_page_to_main(page_id: int) -> bool:
 
 
 def delete_page(page_id: int) -> bool:
-    """Delete a page."""
-    orm_obj = db.session.get(PageRecord, page_id)
-    if not orm_obj:
-        raise LookupError(f"Page id {page_id} was not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        logger.exception("Failed to delete page")
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(PageRecord, page_id)
-    return deleted is None
+    return delete_record_by_pk(PageRecord, page_id)
 
 
 def delete_in_process(process_id: int) -> bool:
-    """Delete an in_process record by ID."""
-    # orm_obj = db.session.query(InProcessRecord).filter(InProcessRecord.id == process_id).first()
-    orm_obj = db.session.get(InProcessRecord, process_id)
-    if not orm_obj:
-        raise ValueError(f"In-process record with ID {process_id} not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(InProcessRecord, process_id)
-    return deleted is None
+    return delete_record_by_pk(InProcessRecord, process_id)
 
 
 def delete_project(project_id: int) -> bool:
-    """Delete a project record by ID."""
-    orm_obj = db.session.get(ProjectRecord, project_id)
-    if not orm_obj:
-        raise ValueError(f"Project record with ID {project_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(ProjectRecord, project_id)
-    return deleted is None
+    return delete_record_by_pk(ProjectRecord, project_id)
 
 
 def delete_lang(lang_id: int) -> bool:
-    """Delete a language record by ID."""
-    # orm_obj = db.session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
-    # lang_id is the primary key for LangRecord
-    orm_obj = db.session.get(LangRecord, lang_id)
-    if not orm_obj:
-        raise ValueError(f"Language record with ID {lang_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(LangRecord, lang_id)
-    return deleted is None
+    return delete_record_by_pk(LangRecord, lang_id)
 
 
 def delete_category(category_id: int) -> bool:
-    """Delete a category."""
-    orm_obj = db.session.get(CategoryRecord, category_id)
-    if not orm_obj:
-        raise ValueError(f"Category with ID {category_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(CategoryRecord, category_id)
-    return deleted is None
+    return delete_record_by_pk(CategoryRecord, category_id)
 
 
 def delete_language_setting(setting_id: int) -> bool:
-    """Delete a language setting record by ID."""
-    # orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.id == setting_id).first()
-    orm_obj = db.session.get(LanguageSettingRecord, setting_id)
-    if not orm_obj:
-        raise ValueError(f"Language setting record with ID {setting_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(LanguageSettingRecord, setting_id)
-    return deleted is None
+    return delete_record_by_pk(LanguageSettingRecord, setting_id)
 
 
 def delete_word(word_id: int) -> bool:
-    """Delete a word record by ID."""
-    # orm_obj = db.session.query(WordRecord).filter(WordRecord.w_id == word_id).first()
-    orm_obj = db.session.get(WordRecord, word_id)
-    if not orm_obj:
-        raise ValueError(f"Word record with ID {word_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(WordRecord, word_id)
-    return deleted is None
+    return delete_record_by_pk(WordRecord, word_id)
 
 
 def delete_views_new(view_id: int) -> bool:
-    """Delete a views_new record by ID."""
-    orm_obj = db.session.get(ViewsNewRecord, view_id)
-    if not orm_obj:
-        raise ValueError(f"ViewsNew record with ID {view_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(ViewsNewRecord, view_id)
-    return deleted is None
+    return delete_record_by_pk(ViewsNewRecord, view_id)
 
 
 def delete_refs_count(refs_id: int) -> bool:
-    """Delete a refs_count record by ID."""
-    # orm_obj = db.session.get(RefsCountRecord, refs_id)
-    orm_obj = db.session.get(RefsCountRecord, refs_id)
-    if not orm_obj:
-        raise ValueError(f"RefsCount record with ID {refs_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(RefsCountRecord, refs_id)
-    return deleted is None
+    return delete_record_by_pk(RefsCountRecord, refs_id)
 
 
 def delete_mdwiki_revid(title: str) -> bool:
-    """Delete an mdwiki_revid record by title."""
-    orm_obj = db.session.get(MdwikiRevidRecord, title)
-    if not orm_obj:
-        raise ValueError(f"MDWiki revid record for '{title}' not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(MdwikiRevidRecord, title)
-    return deleted is None
+    return delete_record_by_pk(MdwikiRevidRecord, title)
 
 
 def delete_enwiki_pageview(pageview_id: int) -> bool:
-    """Delete an enwiki pageview record by ID."""
-    orm_obj = db.session.get(EnwikiPageviewRecord, pageview_id)
-    if not orm_obj:
-        raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(EnwikiPageviewRecord, pageview_id)
-    return deleted is None
+    return delete_record_by_pk(EnwikiPageviewRecord, pageview_id)
 
 
 def delete_assessment(assessment_id: int) -> bool:
-    """Delete an assessment record by ID."""
-    orm_obj = db.session.get(AssessmentRecord, assessment_id)
-    if not orm_obj:
-        raise ValueError(f"Assessment record with ID {assessment_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(AssessmentRecord, assessment_id)
-    return deleted is None
+    return delete_record_by_pk(AssessmentRecord, assessment_id)
 
 
 __all__ = [
