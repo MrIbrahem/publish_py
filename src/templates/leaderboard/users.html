@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "leaderboard/_macros.html" import select_options %}
+{% from "_macros.html" import select_options, pageviews_link %}
 
 {% block content %}
 <div class="container-fluid">
@@ -98,7 +98,7 @@
                             {{ page.pupdate }}
                         </td>
                         <td>
-                            {{ page.views }}
+                            {{ pageviews_link(page.views, page.lang, page.target, page.pupdate) }}
                         </td>
                     </tr>
                     {% endfor %}

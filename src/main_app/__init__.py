@@ -6,11 +6,12 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from typing import Any, Tuple, Type
 
 from flask import Flask, flash, jsonify, render_template, request  # , g
 
+from .shared.core.jinja_filters import filters
 from .admin.route import bp_admin
 from .db import init_db
 from .db.services.users import active_coordinators
@@ -42,26 +43,8 @@ def context_data() -> dict[str, Any]:
         "is_authenticated": user is not None,
         "is_admin": bool(user and user.username in active_coordinators()),
         "username": user.username if user else None,
+        "yesterday": (date.today() - timedelta(days=1)).isoformat(),
     }
-
-
-def format_stage_timestamp(value: str) -> str:
-    """Format ISO8601 like '2025-10-27T04:41:07' to 'Oct 27, 2025, 4:41 AM'."""
-    if not value:
-        return ""
-    try:
-        dt = datetime.fromisoformat(value)
-    except (ValueError, TypeError):
-        logger.exception("Failed to parse timestamp: %s", value)
-        return ""
-    # convert 24h → 12h with AM/PM
-    hour24 = dt.hour
-    ampm = "AM" if hour24 < 12 else "PM"
-    hour12 = hour24 % 12 or 12
-    minute = f"{dt.minute:02d}"
-    month = dt.strftime("%b")  # Oct
-    return f"{month} {dt.day}, {dt.year}, {hour12}:{minute} {ampm}"
-
 
 def create_app(config_class: Type) -> Flask:
     """Instantiate and configure the Flask application.
@@ -120,7 +103,7 @@ def create_app(config_class: Type) -> Flask:
     def _inject_data():  # pragma: no cover - trivial wrapper
         return context_data()
 
-    app.jinja_env.filters["format_stage_timestamp"] = format_stage_timestamp
+    app.jinja_env.filters.update(filters)
 
     # @app.teardown_appcontext
     # def _cleanup_connections(exception: Exception | None) -> None:  # pragma: no cover - teardown

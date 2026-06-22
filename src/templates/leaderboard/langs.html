@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "leaderboard/_macros.html" import select_options %}
+{% from "_macros.html" import select_options, pageviews_link %}
 
 {% block content %}
 <div class="container-fluid">
@@ -85,14 +85,15 @@
                             {{ page.word }}
                         </td>
                         <td>
-                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}"
-                                target="_blank">{{ page.target }}</a>
+                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}" target="_blank">
+                                {{ page.target }}
+                            </a>
                         </td>
                         <td>
                             {{ page.pupdate }}
                         </td>
                         <td>
-                            {{ page.views }}
+                            {{ pageviews_link(page.views, page.lang, page.target, page.pupdate) }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -144,6 +145,6 @@
         });
         return d;
     }
-    graph_js({{ chart_labels|tojson }}, {{ chart_counts|tojson }}, 'chart_69e6e6d5e7ab7')
+    graph_js({{ chart_labels| tojson }}, {{ chart_counts| tojson }}, 'chart_69e6e6d5e7ab7')
 </script>
 {% endblock %}

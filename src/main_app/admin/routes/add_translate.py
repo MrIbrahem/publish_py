@@ -20,7 +20,10 @@ add_bp = Blueprint("add", __name__, url_prefix="/add")
 def add_translate() -> str:
     """Render the translations add_translate dashboard."""
     categories = list_categories()
-    return render_template("admins/add_translate.html", categories=categories)
+    return render_template(
+        "admins/add_translate.html",
+        categories=categories,
+    )
 
 
 @add_bp.route("/", methods=["POST"])
@@ -77,5 +80,5 @@ def add_translate_post() -> ResponseReturnValue:
     for e in errors:
         flash(e, "danger")
 
-    # return redirect(url_for("admin.add.add_translate"))
-    return redirect(url_for("admin.edit_done"))
+    return redirect(url_for("admin.add.add_translate"))
+    # return redirect(url_for("admin.edit_done"))

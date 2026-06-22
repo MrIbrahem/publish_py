@@ -40,5 +40,4 @@ def last_translations_dashboard() -> str:
         current_lang=lang,
         last_table=last_table,
         count=len(rows),
-        yesterday=(date.today() - timedelta(days=1)).isoformat(),
     )

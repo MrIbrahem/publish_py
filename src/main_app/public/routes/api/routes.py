@@ -76,8 +76,6 @@ def get_publish_reports() -> Response:
     raw = {k: v for k, v in request.args.items() if v != "" and str(v).lower() != "all"}
     try:
         validated = PublishReportsQuerySchema().load(raw, unknown="exclude")
-        if not validated:
-            raise ValidationError("No valid filters provided")
     except ValidationError as err:
         return jsonify({"error": "Validation failed", "info": err.messages}), 400
 

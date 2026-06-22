@@ -1,0 +1,14 @@
+{% macro select_options(data, selectd) %}
+{% for item in data %}
+<option value="{{ item }}" {% if item | string == selectd | string %} selected {% endif %}>{{ item }}</option>
+{% endfor %}
+{% endmacro %}
+
+
+{% macro pageviews_link(views, lang, target, pupdate) %}
+
+<a href="https://pageviews.wmcloud.org/?project={{ lang }}.wikipedia.org&platform=all-access&agent=all-agents&start={{ pupdate or '2019-01-01' }}&end={{ yesterday }}&redirects=0&pages={{ target | replace(' ', '_') | urlencode }}"
+    target="_blank">
+    {{ "{:,}".format(views) if views else 0 }}
+</a>
+{% endmacro %}

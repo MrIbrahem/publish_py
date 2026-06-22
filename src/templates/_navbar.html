@@ -21,8 +21,8 @@
     <nav class="navbar navbar-expand-lg mb-3 border-bottom bg-body-tertiary shadow">
         <div class="container-fluid">
             <a class="navbar-brand mb-0 h1" href="{{ url_for('main.index') }}" style="color:#0d6efd;">
-                <img class='med-logo' width="40px" height="40px" src='{{ url_for('static', filename='favicon.svg')}}' decoding='async'
-                    alt='Wiki Project Med Foundation logo'>
+                <img class='med-logo' width="40px" height="40px" src='{{ url_for('static', filename='favicon.svg')}}'
+                    decoding='async' alt='Wiki Project Med Foundation logo'>
                 <span class='d-none d-sm-inline tool_title' title=''>WikiProjectMed Translation Dashboard</span>
                 <span class='d-inline d-sm-none tool_title'>WikiProjectMed TD</span>
             </a>
@@ -89,7 +89,8 @@
                     <!-- <div class="d-flex align-items-center"> <span class="navbar-text"> -->
                     {% if current_user %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
-                        <a href="/profile" class="nav-link py-2 px-0 px-lg-2">
+                        <a href="{{ url_for('leaderboard.users', username=current_user.username) }}"
+                            class="nav-link py-2 px-0 px-lg-2">
                             <i class="fas fa-user fa-sm fa-fw mr-2"></i> <span
                                 class="navtitles">{{ current_user.username }}</span>
                         </a>
