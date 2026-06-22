@@ -43,11 +43,15 @@
                     <td>{{ row.id }}</td>
                     <td>
                         <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}"
-                            target="_blank">{{ row.title }}</a>
+                            target="_blank">
+                            {{ row.title }}
+                        </a>
                     </td>
                     <td>
                         {% if row.qid %}
-                        <a href="https://wikidata.org/wiki/{{ row.qid }}" target="_blank">{{ row.qid }}</a>
+                        <a href="https://wikidata.org/wiki/{{ row.qid }}" target="_blank">
+                            {{ row.qid }}
+                        </a>
                         {% endif %}
                     </td>
                     <td>

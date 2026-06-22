@@ -76,18 +76,25 @@
                         <td>{{ loop.index }}</td>
                         <td>
                             {% set display_user = row.user[:15] if row.user and row.user|length > 15 else row.user %}
-                            <a href="/leaderboard/users/{{ row.user }}" data-bs-toggle="tooltip"
-                                title="{{ row.user }}">{{ display_user }}</a>
+                            <a href="/leaderboard/users/{{ row.user }}" data-bs-toggle="tooltip" title="{{ row.user }}">
+                                {{ display_user }}
+                            </a>
                         </td>
                         <td>
                             <a href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}"
-                                target="_blank">{{ row.title }}</a>
+                                target="_blank">
+                                {{ row.title }}
+                            </a>
                         </td>
                         <td>{{ row.campaign or row.cat }}</td>
                         <td>
-                            <a href="/leaderboard/langs/{{ row.lang }}">{{ row.lang }}</a>:
+                            <a href="/leaderboard/langs/{{ row.lang }}">
+                                {{ row.lang }}
+                            </a>:
                             <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}"
-                                target="_blank">{{ row.target }}</a>
+                                target="_blank">
+                                {{ row.target }}
+                            </a>
                         </td>
                         <td>{{ row.pupdate }}</td>
                         <td>

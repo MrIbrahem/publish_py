@@ -79,20 +79,27 @@
                             {{ loop.index }}
                         </th>
                         <td>
-                            <a href="{{ url_for('leaderboard.langs', lang_code=page.lang) }}">{{ page.lang }}</a>
+                            <a href="{{ url_for('leaderboard.langs', lang_code=page.lang) }}">
+                                {{ page.lang }}
+                            </a>
                         </td>
                         <td>
-                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">{{ page.title }}</a>
+                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">
+                                {{ page.title }}
+                            </a>
                         </td>
                         <td>
-                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">{{ page.campaign }}</a>
+                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
+                                {{ page.campaign }}
+                            </a>
                         </td>
                         <td>
                             {{ page.word }}
                         </td>
                         <td>
-                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}"
-                                target="_blank">{{ page.target }}</a>
+                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}" target="_blank">
+                                {{ page.target }}
+                            </a>
                         </td>
                         <td>
                             {{ page.pupdate }}
@@ -159,6 +166,6 @@
         });
         return d;
     }
-    graph_js({{ chart_labels|tojson }}, {{ chart_counts|tojson }}, 'chart_69e6e6d5e7ab7')
+    graph_js({{ chart_labels| tojson }}, {{ chart_counts| tojson }}, 'chart_69e6e6d5e7ab7')
 </script>
 {% endblock %}

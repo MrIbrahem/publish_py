@@ -73,13 +73,19 @@
                             {{ loop.index }}
                         </th>
                         <td>
-                            <a href="{{ url_for('leaderboard.users', username=page.user) }}">{{ page.user }}</a>
+                            <a href="{{ url_for('leaderboard.users', username=page.user) }}">
+                                {{ page.user }}
+                            </a>
                         </td>
                         <td>
-                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">{{ page.title }}</a>
+                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">
+                                {{ page.title }}
+                            </a>
                         </td>
                         <td>
-                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">{{ page.campaign }}</a>
+                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
+                                {{ page.campaign }}
+                            </a>
                         </td>
                         <td>
                             {{ page.word }}
