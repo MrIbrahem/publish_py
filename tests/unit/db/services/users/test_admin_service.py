@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.main_app.db.exceptions import DuplicateUserError
 from src.main_app.db.models import AdminUserRecord
 from src.main_app.db.services.users.admin_service import (
     active_coordinators,
@@ -34,6 +35,10 @@ def test_coordinator_workflow():
     active_coordinators.cache_clear()
     active = active_coordinators()
     assert "Wiki_User" in active
+
+    # Test update
+    updated = set_coordinator_active(c.id, False)
+    assert updated.is_active == 0
 
     active_coordinators.cache_clear()
     assert "Wiki_User" not in active_coordinators()
@@ -96,11 +101,11 @@ class TestAddCoordinator:
 
     def test_raises_error_if_exists(self, monkeypatch):
         add_coordinator("Duplicate")
-        with pytest.raises(ValueError, match="already exists"):
+        with pytest.raises(DuplicateUserError, match="Coordinator 'Duplicate' already exists"):
             add_coordinator("Duplicate")
 
     def test_raises_error_if_no_username(self, monkeypatch):
-        with pytest.raises(ValueError, match="username is required"):
+        with pytest.raises(ValueError, match="Username is required"):
             add_coordinator("")
 
 

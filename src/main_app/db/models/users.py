@@ -6,13 +6,13 @@ from typing import Any
 from sqlalchemy.orm import validates
 
 from ...shared.core.crypto import decrypt_value
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 from ...shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 
 
-class UserTokenRecord(db.Model):
+class UserTokenRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS user_tokens (
         user_id int NOT NULL,
@@ -58,7 +58,7 @@ class UserTokenRecord(db.Model):
         return access_key, access_secret
 
 
-class UserRecord(db.Model):
+class UserRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS users (
         user_id int NOT NULL AUTO_INCREMENT,
@@ -93,7 +93,7 @@ class UserRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class UsersNoInprocessRecord(db.Model):
+class UsersNoInprocessRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS users_no_inprocess (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -118,7 +118,7 @@ class UsersNoInprocessRecord(db.Model):
         super().__init__(**kwargs)
 
 
-class AdminUserRecord(db.Model):
+class AdminUserRecord(db.Model, BaseModel):
     """
     ORM model for the coordinators table.
     CREATE TABLE IF NOT EXISTS coordinators (
@@ -134,7 +134,9 @@ class AdminUserRecord(db.Model):
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username: str = db.Column(db.String(120), unique=True, nullable=False)
-    is_active: int = db.Column(db.Integer, nullable=False, default=1)
+
+    # Python application default and database-level server default configuration
+    is_active: int = db.Column(db.Integer, nullable=False, default=True, server_default=db.text("1"))
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         for key, value in kwargs.items():
@@ -145,7 +147,7 @@ class AdminUserRecord(db.Model):
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
-class FullTranslatorRecord(db.Model):
+class FullTranslatorRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS full_translators (
         id int unsigned NOT NULL AUTO_INCREMENT,

@@ -12,6 +12,7 @@ from typing import Any, Tuple, Type
 from flask import Flask, flash, jsonify, render_template, request  # , g
 
 from .admin.routes.admin import bp_admin
+from .app_routes.auth.identity import current_user
 from .db import init_db
 from .db.services.users import active_coordinators
 from .public.routes import (
@@ -23,7 +24,6 @@ from .public.routes import (
     bp_main,
     bp_publish,
 )
-from .app_routes.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
 from .shared.core.extensions import db as _db

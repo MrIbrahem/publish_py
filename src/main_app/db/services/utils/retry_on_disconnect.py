@@ -5,7 +5,7 @@ import logging
 
 from sqlalchemy.exc import OperationalError
 
-from ....extensions import db
+from ....shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 

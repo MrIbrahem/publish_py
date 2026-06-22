@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import logging
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 logger = logging.getLogger(__name__)
 
 
-class CategoryRecord(db.Model):
+class CategoryRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS categories (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -57,7 +57,7 @@ class CategoryRecord(db.Model):
             raise ValueError("Campaign name cannot be empty")
 
 
-class ProjectRecord(db.Model):
+class ProjectRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS projects (
         g_id int unsigned NOT NULL AUTO_INCREMENT,

@@ -4,10 +4,10 @@ Metrics domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 
-class AssessmentRecord(db.Model):
+class AssessmentRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS assessments (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -25,7 +25,7 @@ class AssessmentRecord(db.Model):
     importance = db.Column(db.String(120), nullable=True)
 
 
-class RefsCountRecord(db.Model):
+class RefsCountRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS refs_counts (
         r_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -45,7 +45,7 @@ class RefsCountRecord(db.Model):
     r_all_refs = db.Column(db.Integer, nullable=True)
 
 
-class WordRecord(db.Model):
+class WordRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS words (
         w_id int unsigned NOT NULL AUTO_INCREMENT,

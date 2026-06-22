@@ -10,10 +10,10 @@ Note: Several models have been moved to specialized modules:
 
 from __future__ import annotations
 
-from ...shared.core.extensions import db
+from ...shared.core.extensions import BaseModel, db
 
 
-class LangRecord(db.Model):
+class LangRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS langs (
         lang_id int NOT NULL AUTO_INCREMENT,
@@ -34,7 +34,7 @@ class LangRecord(db.Model):
     redirects = db.Column(db.JSON, nullable=True, server_default=db.text("NULL"))
 
 
-class MdwikiRevidRecord(db.Model):
+class MdwikiRevidRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS mdwiki_revids (
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -49,7 +49,7 @@ class MdwikiRevidRecord(db.Model):
     revid = db.Column(db.Integer, nullable=False)
 
 
-class TranslateTypeRecord(db.Model):
+class TranslateTypeRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS translate_type (
         tt_id int unsigned NOT NULL AUTO_INCREMENT,

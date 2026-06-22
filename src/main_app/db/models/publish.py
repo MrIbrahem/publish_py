@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import logging
 
-from ...shared.core.extensions import LONGTEXT, db
+from ...shared.core.extensions import LONGTEXT, db, BaseModel
 
 logger = logging.getLogger(__name__)
 
 
-class ReportRecord(db.Model):
+class ReportRecord(db.Model, BaseModel):
     """
     CREATE TABLE IF NOT EXISTS publish_reports (
         id int NOT NULL AUTO_INCREMENT,

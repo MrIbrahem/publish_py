@@ -19,6 +19,7 @@ from flask import (
     url_for,
 )
 
+from ....app_routes.auth.identity import current_user
 from ....db.services.config import get_setting_by_key
 from ....db.services.content import get_lang_by_code, list_categories, list_langs
 from ....db.services.pages import (
@@ -26,7 +27,6 @@ from ....db.services.pages import (
     statics_by_category,
 )
 from ....db.services.users import active_coordinators, is_full_translator
-from ....app_routes.auth.identity import current_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result
 
