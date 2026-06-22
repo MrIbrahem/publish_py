@@ -17,9 +17,11 @@ from src.main_app.db.models import (
     QidRecord,
     UserPageRecord,
 )
+from src.main_app.db.services.delete_service import (
+    delete_user_page,
+)
 from src.main_app.db.services.pages.pages_users_to_main_service import (
     check_main_page_exists,
-    delete_user_page,
     get_user_page,
     list_pending,
 )

@@ -6,12 +6,14 @@ from src.main_app.db.models import EnwikiPageviewRecord
 from src.main_app.db.services.analytics.enwiki_pageview_service import (
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
-    delete_enwiki_pageview,
     get_enwiki_pageview,
     get_enwiki_pageview_by_title,
     get_top_enwiki_pageviews,
     list_enwiki_pageviews,
     update_enwiki_pageview,
+)
+from src.main_app.db.services.delete_service import (
+    delete_enwiki_pageview,
 )
 
 

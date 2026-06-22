@@ -6,12 +6,14 @@ from src.main_app.db.models import WordRecord
 from src.main_app.db.services.analytics.word_service import (
     add_or_update_word,
     add_word,
-    delete_word,
     get_word,
     get_word_by_title,
     get_word_counts_for_title,
     list_words,
     update_word,
+)
+from src.main_app.db.services.delete_service import (
+    delete_word,
 )
 
 

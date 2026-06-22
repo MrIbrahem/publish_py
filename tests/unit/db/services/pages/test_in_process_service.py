@@ -3,9 +3,11 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import InProcessRecord
+from src.main_app.db.services.delete_service import (
+    delete_in_process,
+)
 from src.main_app.db.services.pages.in_process_service import (
     add_in_process,
-    delete_in_process,
     delete_in_process_by_title_user_lang,
     get_in_process,
     get_in_process_by_title_user_lang,

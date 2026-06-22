@@ -98,19 +98,6 @@ def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
     return orm_obj
 
 
-def delete_enwiki_pageview(pageview_id: int) -> bool:
-    """Delete an enwiki pageview record by ID."""
-    orm_obj = db.session.get(EnwikiPageviewRecord, pageview_id)
-    if not orm_obj:
-        raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(EnwikiPageviewRecord, pageview_id)
-    return deleted is None
-
-
 __all__ = [
     "list_enwiki_pageviews",
     "get_top_enwiki_pageviews",
@@ -119,5 +106,4 @@ __all__ = [
     "add_enwiki_pageview",
     "add_or_update_enwiki_pageview",
     "update_enwiki_pageview",
-    "delete_enwiki_pageview",
 ]

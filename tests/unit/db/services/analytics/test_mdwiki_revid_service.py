@@ -6,11 +6,13 @@ from src.main_app.db.models import MdwikiRevidRecord
 from src.main_app.db.services.analytics.mdwiki_revid_service import (
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
-    delete_mdwiki_revid,
     get_mdwiki_revid_by_title,
     get_revid_for_title,
     list_mdwiki_revids,
     update_mdwiki_revid,
+)
+from src.main_app.db.services.delete_service import (
+    delete_mdwiki_revid,
 )
 
 

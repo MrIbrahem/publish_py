@@ -3,9 +3,11 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserPageRecord
+from src.main_app.db.services.delete_service import (
+    delete_user_page,
+)
 from src.main_app.db.services.pages.user_page_service import (
     add_user_page,
-    delete_user_page,
     find_exists_or_update_user_page,
     insert_user_page_target,
     list_user_pages,

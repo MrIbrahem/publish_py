@@ -3,9 +3,11 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserRecord
+from src.main_app.db.services.delete_service import (
+    delete_user,
+)
 from src.main_app.db.services.users.user_service import (
     add_user,
-    delete_user,
     get_user,
     get_user_by_username,
     list_users,

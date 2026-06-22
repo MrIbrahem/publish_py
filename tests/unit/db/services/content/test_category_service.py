@@ -5,11 +5,13 @@ import pytest
 from src.main_app.db.models import CategoryRecord
 from src.main_app.db.services.content.category_service import (
     add_category,
-    delete_category,
     get_camp_to_cats,
     get_campaign_category,
     list_categories,
     update_category,
+)
+from src.main_app.db.services.delete_service import (
+    delete_category,
 )
 
 

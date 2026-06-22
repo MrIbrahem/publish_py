@@ -71,31 +71,6 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
     return orm_obj
 
 
-def delete_user_token(user_id: int) -> bool:
-    """Remove the stored OAuth credentials for the given user id.
-
-    Returns ``True`` if a row was deleted, ``False`` if no row existed
-    for ``user_id`` (mirroring :func:`delete_user_token_by_username`).
-    """
-    if not user_id:
-        return False
-
-    # # user_id is the primary key for UserTokenRecord
-    orm_obj = db.session.get(UserTokenRecord, user_id)
-    if not orm_obj:
-        return False
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(UserTokenRecord, user_id)
-    return deleted is None
-
-
 def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
     """Fetch the encrypted OAuth credentials for a user by username."""
     username = username.strip()
@@ -130,7 +105,6 @@ def delete_user_token_by_username(username: str) -> bool:
 __all__ = [
     "upsert_user_token",
     "get_user_token",
-    "delete_user_token",
     "get_user_token_by_username",
     "delete_user_token_by_username",
 ]

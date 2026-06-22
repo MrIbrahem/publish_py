@@ -6,11 +6,13 @@ import pytest
 from src.main_app.db.models import SettingRecord
 from src.main_app.db.services.config.setting_service import (
     add_setting,
-    delete_setting,
     get_setting,
     get_setting_by_key,
     list_settings,
     update_value,
+)
+from src.main_app.db.services.delete_service import (
+    delete_setting,
 )
 
 

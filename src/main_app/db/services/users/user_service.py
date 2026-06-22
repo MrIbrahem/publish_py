@@ -132,19 +132,6 @@ def update_user_data(
     return orm_obj
 
 
-def delete_user(user_id: int) -> bool:
-    """Delete a user record by ID."""
-    orm_obj = db.session.get(UserRecord, user_id)
-    if not orm_obj:
-        raise ValueError(f"User record with ID {user_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(UserRecord, user_id)
-    return deleted is None
-
-
 def user_exists(username: str) -> bool:
     """Check if a user exists."""
     record = get_user_by_username(username)
@@ -159,6 +146,5 @@ __all__ = [
     "add_user",
     "update_user",
     "update_user_data",
-    "delete_user",
     "user_exists",
 ]

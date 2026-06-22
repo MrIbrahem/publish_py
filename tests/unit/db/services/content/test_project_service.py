@@ -5,11 +5,13 @@ import pytest
 from src.main_app.db.models import ProjectRecord
 from src.main_app.db.services.content.project_service import (
     add_project,
-    delete_project,
     get_project,
     get_project_by_title,
     list_projects,
     update_project,
+)
+from src.main_app.db.services.delete_service import (
+    delete_project,
 )
 
 

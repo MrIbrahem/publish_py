@@ -3,10 +3,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import FullTranslatorRecord
+from src.main_app.db.services.delete_service import (
+    delete_full_translator,
+)
 from src.main_app.db.services.users.full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,
-    delete_full_translator,
     get_full_translator,
     get_full_translator_by_user,
     is_full_translator,

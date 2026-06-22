@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
 from ...models import AdminUserRecord
+from ..delete_service import delete_record_by_pk
 
 logger = logging.getLogger(__name__)
 
@@ -120,27 +121,6 @@ def update_coordinator(coordinator_id: int, **kwargs) -> AdminUserRecord:
     return record
 
 
-def delete_coordinator(coordinator_id: int) -> bool:
-    """Delete a coordinator record by ID.
-
-    Returns True when the record was deleted successfully, False otherwise.
-    """
-    # record = db.session.query(AdminUserRecord).filter(AdminUserRecord.id == coordinator_id).first()
-    record = db.session.get(AdminUserRecord, coordinator_id)
-    if not record:
-        raise ValueError(f"Coordinator with ID {coordinator_id} not found")
-    db.session.delete(record)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-    active_coordinators.cache_clear()
-
-    deleted = db.session.get(AdminUserRecord, coordinator_id)
-    return deleted is None
-
-
 def is_coordinator(username: str) -> bool:
     """Check if a username is an active coordinator."""
     record = get_coordinator_by_user(username)
@@ -152,6 +132,12 @@ def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRec
     return update_coordinator(coordinator_id, is_active=1 if is_active else 0)
 
 
+def delete_coordinator(coordinator_id: int) -> bool:
+    deleted = delete_record_by_pk(AdminUserRecord, coordinator_id)
+    active_coordinators.cache_clear()
+    return deleted
+
+
 __all__ = [
     "list_coordinators",
     "active_coordinators",
@@ -160,7 +146,6 @@ __all__ = [
     "add_coordinator",
     "add_or_update_coordinator",
     "update_coordinator",
-    "delete_coordinator",
     "is_coordinator",
     "set_coordinator_active",
 ]

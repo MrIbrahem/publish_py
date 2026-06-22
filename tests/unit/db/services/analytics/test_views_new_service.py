@@ -6,7 +6,6 @@ from src.main_app.db.models import ViewsNewRecord
 from src.main_app.db.services.analytics.views_new_service import (
     add_or_update_views_new,
     add_views_new,
-    delete_views_new,
     get_total_views_for_target,
     get_views_by_target_lang_year,
     get_views_new,
@@ -14,6 +13,9 @@ from src.main_app.db.services.analytics.views_new_service import (
     list_views_by_target,
     list_views_new,
     update_views_new,
+)
+from src.main_app.db.services.delete_service import (
+    delete_views_new,
 )
 
 

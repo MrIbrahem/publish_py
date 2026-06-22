@@ -159,25 +159,6 @@ def update_user_page(
     return orm_obj
 
 
-def delete_user_page(page_id: int) -> bool:
-    """Delete a page."""
-    # orm_obj = db.session.query(UserPageRecord).filter(UserPageRecord.id == page_id).first()
-    orm_obj = db.session.get(UserPageRecord, page_id)
-    if not orm_obj:
-        raise LookupError(f"Page id {page_id} was not found")
-
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        logger.exception("Failed to delete user page")
-        db.session.rollback()
-        raise
-
-    deleted = db.session.get(UserPageRecord, page_id)
-    return deleted is None
-
-
 def find_exists_or_update_user_page(
     title: str,
     lang: str,
@@ -230,7 +211,6 @@ __all__ = [
     "get_by_id",
     "add_user_page",
     "update_user_page",
-    "delete_user_page",
     "find_exists_or_update_user_page",
     "insert_user_page_target",
 ]

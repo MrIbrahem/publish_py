@@ -97,19 +97,6 @@ def update_category(
     return orm_obj
 
 
-def delete_category(category_id: int) -> bool:
-    """Delete a category."""
-    orm_obj = db.session.get(CategoryRecord, category_id)
-    if not orm_obj:
-        raise ValueError(f"Category with ID {category_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(CategoryRecord, category_id)
-    return deleted is None
-
-
 def get_campaign_category(campaign: str) -> CategoryRecord | None:
     """Get the category for a campaign."""
     orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.campaign == campaign).first()
@@ -135,7 +122,6 @@ def get_camp_to_cats() -> dict[str, str]:
 __all__ = [
     "add_category",
     "update_category",
-    "delete_category",
     "get_campaign_category",
     "list_categories",
     "get_camp_to_cats",

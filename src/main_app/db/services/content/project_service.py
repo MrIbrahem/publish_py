@@ -101,19 +101,6 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
     return orm_obj
 
 
-def delete_project(project_id: int) -> bool:
-    """Delete a project record by ID."""
-    orm_obj = db.session.get(ProjectRecord, project_id)
-    if not orm_obj:
-        raise ValueError(f"Project record with ID {project_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(ProjectRecord, project_id)
-    return deleted is None
-
-
 __all__ = [
     "list_projects",
     "get_project",
@@ -121,5 +108,4 @@ __all__ = [
     "add_project",
     "update_project",
     "update_project_title",
-    "delete_project",
 ]

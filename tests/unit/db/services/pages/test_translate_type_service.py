@@ -3,11 +3,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import PageRecord, QidRecord, TranslateTypeRecord
+from src.main_app.db.services.delete_service import (
+    delete_translate_type,
+)
 from src.main_app.db.services.pages.translate_type_service import (
     add_translate_type,
     can_translate_full,
     can_translate_lead,
-    delete_translate_type,
     get_translate_type,
     get_translate_type_by_title,
     list_full_enabled_types,

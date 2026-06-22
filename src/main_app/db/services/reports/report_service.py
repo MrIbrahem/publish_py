@@ -48,20 +48,6 @@ def add_report(
     return orm_obj
 
 
-def delete_report(report_id: int) -> bool:
-    """Delete a report record by ID."""
-    # orm_obj = db.session.query(ReportRecord).filter(ReportRecord.id == report_id).first()
-    orm_obj = db.session.get(ReportRecord, report_id)
-    if not orm_obj:
-        raise LookupError(f"Report id {report_id} was not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(ReportRecord, report_id)
-    return deleted is None
-
-
 def query_reports_with_filters(
     filters: Dict[str, Any],
     select_fields: Optional[List[str]] = None,
@@ -131,6 +117,5 @@ def query_reports_with_filters(
 __all__ = [
     "list_reports",
     "add_report",
-    "delete_report",
     "query_reports_with_filters",
 ]

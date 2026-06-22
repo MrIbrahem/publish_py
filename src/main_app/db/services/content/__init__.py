@@ -1,8 +1,12 @@
 """Content db services."""
 
+from ..delete_service import (
+    delete_category,
+    delete_lang,
+    delete_project,
+)
 from .category_service import (
     add_category,
-    delete_category,
     get_camp_to_cats,
     get_campaign_category,
     list_categories,
@@ -11,14 +15,12 @@ from .category_service import (
 from .lang_service import (
     add_lang,
     add_or_update_lang,
-    delete_lang,
     get_lang,
     get_lang_by_code,
     list_langs,
 )
 from .project_service import (
     add_project,
-    delete_project,
     get_project,
     get_project_by_title,
     list_projects,

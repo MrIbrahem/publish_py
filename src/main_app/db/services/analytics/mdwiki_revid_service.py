@@ -77,19 +77,6 @@ def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
     return orm_obj
 
 
-def delete_mdwiki_revid(title: str) -> bool:
-    """Delete an mdwiki_revid record by title."""
-    orm_obj = db.session.get(MdwikiRevidRecord, title)
-    if not orm_obj:
-        raise ValueError(f"MDWiki revid record for '{title}' not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(MdwikiRevidRecord, title)
-    return deleted is None
-
-
 def get_revid_for_title(title: str) -> int | None:
     """Get the revision ID for a title."""
     record = get_mdwiki_revid_by_title(title)
@@ -102,6 +89,5 @@ __all__ = [
     "add_mdwiki_revid",
     "add_or_update_mdwiki_revid",
     "update_mdwiki_revid",
-    "delete_mdwiki_revid",
     "get_revid_for_title",
 ]

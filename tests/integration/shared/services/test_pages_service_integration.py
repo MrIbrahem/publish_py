@@ -18,9 +18,11 @@ These tests complement the unit tests by verifying the service-to-DB integration
 
 from unittest.mock import MagicMock, patch
 
+from src.main_app.db.services.delete_service import (
+    delete_page,
+)
 from src.main_app.db.services.pages.page_service import (
     add_page,
-    delete_page,
     find_exists_or_update_page,
     insert_page_target,
     list_pages,

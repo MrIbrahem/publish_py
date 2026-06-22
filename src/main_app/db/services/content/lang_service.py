@@ -88,26 +88,10 @@ def add_or_update_lang(
     return orm_obj
 
 
-def delete_lang(lang_id: int) -> bool:
-    """Delete a language record by ID."""
-    # orm_obj = db.session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
-    # lang_id is the primary key for LangRecord
-    orm_obj = db.session.get(LangRecord, lang_id)
-    if not orm_obj:
-        raise ValueError(f"Language record with ID {lang_id} not found")
-
-    db.session.delete(orm_obj)
-    db.session.commit()
-
-    deleted = db.session.get(LangRecord, lang_id)
-    return deleted is None
-
-
 __all__ = [
     "list_langs",
     "get_lang",
     "get_lang_by_code",
     "add_lang",
     "add_or_update_lang",
-    "delete_lang",
 ]

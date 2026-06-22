@@ -6,10 +6,12 @@ from src.main_app.db.models import LangRecord
 from src.main_app.db.services.content.lang_service import (
     add_lang,
     add_or_update_lang,
-    delete_lang,
     get_lang,
     get_lang_by_code,
     list_langs,
+)
+from src.main_app.db.services.delete_service import (
+    delete_lang,
 )
 from src.main_app.shared.core.extensions import db
 

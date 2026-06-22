@@ -3,9 +3,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.main_app.db.models import ReportRecord
+from src.main_app.db.services.delete_service import (
+    delete_report,
+)
 from src.main_app.db.services.reports.report_service import (
     add_report,
-    delete_report,
     list_reports,
     query_reports_with_filters,
 )

@@ -1,9 +1,12 @@
 """Config db services."""
 
+from ..delete_service import (
+    delete_language_setting,
+    delete_setting,
+)
 from .language_setting_service import (
     add_language_setting,
     add_or_update_language_setting,
-    delete_language_setting,
     get_language_setting,
     get_language_setting_by_code,
     list_language_settings,
@@ -11,7 +14,6 @@ from .language_setting_service import (
 )
 from .setting_service import (
     add_setting,
-    delete_setting,
     get_setting,
     get_setting_by_key,
     list_settings,
