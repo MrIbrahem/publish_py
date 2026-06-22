@@ -21,8 +21,8 @@ class PublishRequestSchema(Schema):
     campaign = fields.Str(validate=validate.Length(max=100))
     # translate_type = fields.Str(validate=validate.Length(max=50))
     translate_type = fields.Str(validate=validate.OneOf(["lead", "all"]))
-    wpCaptchaId = fields.Str(validate=validate.Length(max=100)) # noqa: N815
-    wpCaptchaWord = fields.Str(validate=validate.Length(max=50)) ## noqa: N815
+    wpCaptchaId = fields.Str(validate=validate.Length(max=100))  # noqa: N815
+    wpCaptchaWord = fields.Str(validate=validate.Length(max=50))  ## noqa: N815
 
     @post_load
     def process_fields(self, data, **kwargs):
@@ -87,7 +87,7 @@ def validate_json(schema_class):
                 return response
 
             # Add validated data to request context
-            request.validated_data = schema.load(data) # type: ignore
+            request.validated_data = schema.load(data)  # type: ignore
             return func(*args, **kwargs)
 
         wrapper.__name__ = func.__name__

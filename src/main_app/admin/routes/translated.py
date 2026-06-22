@@ -15,11 +15,11 @@ from flask.typing import ResponseReturnValue
 
 from ...db.services.content import list_langs
 from ...db.services.pages import (
-    delete_page,
-    update_page,
-    list_translated,
-    get_by_id,
     count_translated,
+    delete_page,
+    get_by_id,
+    list_translated,
+    update_page,
 )
 from ...shared.core.extensions import db
 

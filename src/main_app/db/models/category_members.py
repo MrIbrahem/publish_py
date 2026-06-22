@@ -8,6 +8,7 @@ belong to category X" — used by the results_2026 and missing-stats flows.
 """
 
 from __future__ import annotations
+
 from typing import Any
 
 from sqlalchemy import Index, String, UniqueConstraint

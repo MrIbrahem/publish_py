@@ -12,8 +12,8 @@ from flask.typing import ResponseReturnValue
 
 from ...db.services.content import list_langs
 from ...db.services.pages import (
-    delete_user_page,
     count_translated,
+    delete_user_page,
     get_by_id,
     list_translated,
     update_user_page,

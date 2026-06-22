@@ -202,7 +202,9 @@ class InProcessRecord(db.Model):
     user: Mapped[str] = mapped_column(String(255), nullable=False)
     lang: Mapped[str] = mapped_column(String(30), nullable=False)
     cat: Mapped[str | None] = mapped_column(String(255), default="RTT", server_default=text("'RTT'"))
-    translate_type: Mapped[str] = mapped_column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
+    translate_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="lead", server_default=text("'lead'")
+    )
     word: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
     add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
 

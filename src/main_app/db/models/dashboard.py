@@ -51,8 +51,6 @@ class CategoryRecord(db.Model):
         if "category2" not in kwargs:
             kwargs["category2"] = ""
 
-        super().__init__(**kwargs)
-
         # Validate that required fields are not empty
         if not self.category:
             raise ValueError("Category name cannot be empty")
@@ -97,6 +95,7 @@ class ProjectRecord(db.Model):
             "g_id": self.g_id,
             "g_title": self.g_title,
         }
+
 
 __all__ = [
     "CategoryRecord",
