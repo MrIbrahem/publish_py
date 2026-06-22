@@ -82,14 +82,15 @@ def create_setting(
     if not title:
         raise ValueError("Title is required")
 
-    if value_type == "boolean":
-        value = 0  # equal to False
-    elif value_type == "integer":
-        value = 0
-    elif value_type == "json":
-        value = {}
-    else:
-        value = ""
+    if not value:
+        if value_type == "boolean":
+            value = 0  # equal to False
+        elif value_type == "integer":
+            value = 0
+        elif value_type == "json":
+            value = {}
+        else:
+            value = ""
 
     orm_obj = SettingRecord(
         key=key,
