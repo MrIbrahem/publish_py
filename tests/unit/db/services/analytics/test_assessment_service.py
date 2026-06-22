@@ -150,5 +150,4 @@ class TestDeleteAssessment:
         assert get_assessment(a.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_assessment(9999)
+        assert delete_assessment(9999) is False

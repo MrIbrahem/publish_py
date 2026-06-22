@@ -112,7 +112,7 @@ class TestGetUserTokenByUsername:
         assert get_user_token_by_username("GhostEditor") is None
 
 
-class TestDeleteUserTokenByUsername:
+class TestUserDeleteTokenByUsername:
     """Tests for delete_user_token_by_username function."""
 
     def test_returns_none_for_empty_username(self, monkeypatch):
