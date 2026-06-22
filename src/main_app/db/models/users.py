@@ -136,7 +136,7 @@ class AdminUserRecord(db.Model, BaseModel):
     username: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
 
     # Python application default and database-level server default configuration
-    is_active: Mapped[int] = mapped_column(nullable=False, default=True, server_default=text("1"))
+    is_active: Mapped[int] = mapped_column(nullable=False, default=1, server_default=text("1"))
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         for key, value in kwargs.items():

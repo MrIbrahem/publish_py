@@ -32,9 +32,9 @@ class LanguageSettingRecord(db.Model, BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     lang_code: Mapped[str | None] = mapped_column(String(20), unique=True)
-    move_dots: Mapped[int] = mapped_column(default=0, server_default=text("0"))
-    expend: Mapped[int] = mapped_column(default=0, server_default=text("0"))
-    add_en_lang: Mapped[int] = mapped_column(default=0, server_default=text("0"))
+    move_dots: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
+    expend: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
+    add_en_lang: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided

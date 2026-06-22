@@ -25,7 +25,7 @@ class EnwikiPageviewRecord(db.Model, BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    en_views: Mapped[int] = mapped_column(default=0, server_default=text("0"))
+    en_views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -55,7 +55,7 @@ class ViewsNewRecord(db.Model, BaseModel):
     target: Mapped[str] = mapped_column(String(120), nullable=False)
     lang: Mapped[str] = mapped_column(String(30), nullable=False)
     year: Mapped[int] = mapped_column(nullable=False)
-    views: Mapped[int] = mapped_column(default=0, server_default=text("0"))
+    views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -78,7 +78,7 @@ class ViewsNewAllRecord(db.Model, BaseModel):
 
     target: Mapped[str] = mapped_column(String(120), primary_key=True, nullable=False)
     lang: Mapped[str] = mapped_column(String(30), primary_key=True, nullable=False)
-    views: Mapped[int] = mapped_column(default=0, server_default=text("0"))
+    views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
     __table_args__ = (
         # Prevent SQLAlchemy from trying to create this as a table
