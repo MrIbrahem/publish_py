@@ -4,6 +4,7 @@ SQLAlchemy-based service for managing pages_users and page targets.
 
 from __future__ import annotations
 
+from datetime import datetime
 import logging
 from typing import Any, List
 
@@ -191,7 +192,7 @@ def find_exists_or_update_user_page(
         # Update target if it's empty or NULL
         if not obj.target:
             obj.target = target
-            obj.pupdate = func.current_date()
+            obj.pupdate = datetime.now().strftime("%Y-%m-%d")
             changed = True
     if changed:
         try:

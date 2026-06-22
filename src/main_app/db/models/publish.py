@@ -51,18 +51,6 @@ class ReportRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "date": self.date,
-            "title": self.title,
-            "user": self.user,
-            "lang": self.lang,
-            "sourcetitle": self.sourcetitle,
-            "result": self.result,
-            "data": self.data,
-        }
-
 
 __all__ = [
     "ReportRecord",

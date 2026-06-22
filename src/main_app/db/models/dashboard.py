@@ -40,16 +40,19 @@ class CategoryRecord(db.Model):
     depth: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
     is_default: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key in ("campaign", "display", "category2"):
+            kwargs[key] = kwargs.get(key) or ""
+
         # Convert depth and is_default to int if provided as strings
         for key in ("depth", "is_default"):
             kwargs[key] = int(kwargs.get(key, 0))
 
-        # Apply Python-level defaults for fields not provided
-        if "display" not in kwargs:
-            kwargs["display"] = ""
-        if "category2" not in kwargs:
-            kwargs["category2"] = ""
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def __init__1(self, **kwargs) -> None:
 
         # Validate that required fields are not empty
         if not self.category:

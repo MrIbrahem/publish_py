@@ -37,8 +37,8 @@ def add_category(
 
     orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.category == category).first()
     if orm_obj:
-        orm_obj.campaign = campaign
-        orm_obj.display = display
+        orm_obj.campaign = campaign or ""
+        orm_obj.display = display or ""
         orm_obj.category2 = category2
         orm_obj.depth = depth
     else:

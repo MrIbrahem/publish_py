@@ -31,6 +31,8 @@ from .missing_stats_service import (
     statics_by_category,
 )
 from .page_service import (
+    set_page_target,
+    find_page_record,
     add_page,
     add_translate_row_to_db,
     find_exists_or_update_page,
@@ -93,6 +95,8 @@ __all__ = [
     "statics_by_category",
     "list_pages",
     "list_pages_by_lang_cat",
+    "set_page_target",
+    "find_page_record",
     "add_page",
     "update_page",
     "delete_page",
