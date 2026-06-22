@@ -8,14 +8,13 @@ from src.main_app.db.services.delete_service import (
 )
 from src.main_app.db.services.pages.user_page_service import (
     add_user_page,
-    insert_user_page_target,
-    list_user_pages,
-    update_user_page,
     count_translated,
     get_by_id,
+    insert_user_page_target,
     list_translated,
+    list_user_pages,
+    update_user_page,
 )
-
 from src.main_app.shared.core.extensions import db
 
 pytestmark = pytest.mark.unit
@@ -116,6 +115,7 @@ class TestDeleteUserPage:
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
         assert delete_user_page(9999) is False
 
+
 class TestInsertUserPageTarget:
     """Tests for insert_user_page_target function."""
 
@@ -137,6 +137,7 @@ class TestInsertUserPageTarget:
 #   - count_translated(lang)
 #   - get_by_id(page_id)
 # ---------------------------------------------------------------------------
+
 
 def _make_user_page(title: str, lang: str, target: str, user: str = "u") -> UserPageRecord:
     return add_user_page(

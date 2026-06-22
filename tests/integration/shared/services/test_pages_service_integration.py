@@ -16,7 +16,6 @@ The actual DB operations are mocked to avoid requiring a real database.
 These tests complement the unit tests by verifying the service-to-DB integration.
 """
 
-
 from src.main_app.db.services.delete_service import (
     delete_page,
 )

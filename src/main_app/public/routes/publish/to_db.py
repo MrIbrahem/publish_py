@@ -1,6 +1,4 @@
-"""
-
-"""
+""" """
 
 import json
 import logging
@@ -10,15 +8,22 @@ from ....db.models import PageRecord, UserPageRecord
 from ....db.services.content import get_campaign_category
 from ....db.services.pages import (
     find_page_record,
+    find_user_page_record,
     insert_page_target,
     insert_user_page_target,
     set_page_target,
     set_user_page_target,
-    find_user_page_record,
 )
+
 logger = logging.getLogger(__name__)
 
-def find_exists_or_update_page(sourcetitle, lang, user, target):
+
+def find_exists_or_update_page(
+    sourcetitle: str,
+    lang: str,
+    user: str,
+    target: str,
+) -> bool:
     orm_obj: PageRecord | None = find_page_record(sourcetitle, lang, user)
     if orm_obj:
         exists = True
@@ -26,7 +31,12 @@ def find_exists_or_update_page(sourcetitle, lang, user, target):
     return exists
 
 
-def find_exists_or_update_user_page(sourcetitle, lang, user, target):
+def find_exists_or_update_user_page(
+    sourcetitle: str,
+    lang: str,
+    user: str,
+    target: str,
+) -> bool:
     orm_obj: UserPageRecord | None = find_user_page_record(sourcetitle, lang, user)
     if orm_obj:
         exists = True
@@ -79,6 +89,9 @@ def _add_to_db(
     target = target.replace("_", " ")
     user = user.replace("_", " ")
 
+    if isinstance(words, str):
+        words = int(words)
+
     # Validate required fields
     if not user or not sourcetitle or not lang:
         return {
@@ -87,80 +100,13 @@ def _add_to_db(
             "one_empty": {"title": sourcetitle, "lang": lang, "user": user},
         }
 
-    return insert_to_db(
-        target,
-        lang,
-        user,
-        sourcetitle,
-        mdwiki_revid,
-        cat,
-        words,
-        to_users_table,
-        translate_type=translate_type,
-    )
-
-
-def insert_to_db(
-    target,
-    lang,
-    user,
-    sourcetitle,
-    mdwiki_revid,
-    cat,
-    word: str | int,
-    to_users_table,
-    translate_type: str = "lead",
-) -> dict[str, Any]:
-    return insert_to_db_2(
-        sourcetitle=sourcetitle,
-        translate_type=translate_type,
-        cat=cat,
-        lang=lang,
-        user=user,
-        target=target,
-        use_user_sql=to_users_table,
-        mdwiki_revid=int(mdwiki_revid) if mdwiki_revid else None,
-        word=word,
-    )
-
-
-def insert_to_db_2(
-    sourcetitle: str,
-    lang: str,
-    user: str,
-    translate_type: str,
-    cat: str,
-    target: str,
-    use_user_sql: bool = False,
-    mdwiki_revid: int | None = None,
-    word: int | str = 0,
-) -> dict[str, Any]:
-    """
-    Insert a page target record.
-
-    Mirrors: php_src/bots/sql/db_pages.php InsertPageTarget()
-
-    Args:
-        sourcetitle: Page title
-        translate_type: Translation type
-        cat: Category
-        lang: Target language
-        user: Username
-        target: Target page title
-        use_user_sql: Whether to insert to pages_users table
-        mdwiki_revid: MDWiki revision ID
-        word: Word count
-
-    Returns:
-        Dictionary with operation result
-    """
     result: dict[str, Any] = {
-        "use_user_sql": use_user_sql,
-        "to_users_table": use_user_sql,
+        "use_user_sql": to_users_table,
+        "to_users_table": to_users_table,
     }
 
     # Check if exists and update if needed
-    if use_user_sql:
+    if to_users_table:
         exists = find_exists_or_update_user_page(sourcetitle, lang, user, target)
     else:
         exists = find_exists_or_update_page(sourcetitle, lang, user, target)
@@ -169,24 +115,9 @@ def insert_to_db_2(
         result["exists"] = "already_in"
         return result
 
-    table_sql = "pages_users" if use_user_sql else "pages"
+    md_revid = int(mdwiki_revid) if mdwiki_revid else None
 
-    if isinstance(word, str):
-        word = int(word)
-
-    if table_sql == "pages":
-        # Insert new record
-        add_done = insert_page_target(
-            sourcetitle=sourcetitle,
-            translate_type=translate_type,
-            cat=cat,
-            lang=lang,
-            user=user,
-            target=target,
-            mdwiki_revid=mdwiki_revid,
-            word=word,
-        )
-    else:
+    if to_users_table:
         # Insert new record
         add_done = insert_user_page_target(
             sourcetitle=sourcetitle,
@@ -195,13 +126,25 @@ def insert_to_db_2(
             lang=lang,
             user=user,
             target=target,
-            mdwiki_revid=mdwiki_revid,
-            word=word,
+            mdwiki_revid=md_revid,
+            word=words,
+        )
+    else:
+        # Insert new record
+        add_done = insert_page_target(
+            sourcetitle=sourcetitle,
+            translate_type=translate_type,
+            cat=cat,
+            lang=lang,
+            user=user,
+            target=target,
+            mdwiki_revid=md_revid,
+            word=words,
         )
 
     result["execute_query"] = add_done is True
-
     return result
+
 
 __all__ = [
     "_add_to_db",

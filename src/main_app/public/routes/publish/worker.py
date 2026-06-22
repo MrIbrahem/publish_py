@@ -213,6 +213,7 @@ def _handle_successful_edit(
 
     return link_result
 
+
 def load_to_do_file(editit) -> str:
     if editit.get("edit", {}).get("result", "") == "Success":
         to_do_file = "success"

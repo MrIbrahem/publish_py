@@ -31,13 +31,13 @@ from .missing_stats_service import (
     statics_by_category,
 )
 from .page_service import (
-    set_page_target,
-    find_page_record,
     add_page,
     add_translate_row_to_db,
+    find_page_record,
     insert_page_target,
     list_pages,
     list_pages_by_lang_cat,
+    set_page_target,
     update_page,
 )
 from .pages_users_to_main_service import (
@@ -64,13 +64,13 @@ from .translate_type_service import (
 from .user_page_service import (
     add_user_page,
     count_translated,
+    find_user_page_record,
     get_by_id,
     insert_user_page_target,
     list_translated,
     list_user_pages,
-    update_user_page,
     set_user_page_target,
-    find_user_page_record,
+    update_user_page,
 )
 
 __all__ = [

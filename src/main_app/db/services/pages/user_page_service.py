@@ -4,8 +4,8 @@ SQLAlchemy-based service for managing pages_users and page targets.
 
 from __future__ import annotations
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import Any, List
 
 from sqlalchemy import func, text
@@ -140,12 +140,12 @@ def update_user_page(
         raise
     return orm_obj
 
+
 def set_user_page_target(
     record: UserPageRecord,
     target: str,
 ) -> bool:
-    """
-    """
+    """ """
     record.target = target
     record.pupdate = datetime.now().strftime("%Y-%m-%d")
 
@@ -157,7 +157,6 @@ def set_user_page_target(
         return False
 
     return True
-
 
 
 def find_user_page_record(
@@ -180,7 +179,6 @@ def find_user_page_record(
         .first()
     )
     return orm_obj
-
 
 
 __all__ = [
