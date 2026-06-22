@@ -5,6 +5,7 @@ Pages domain models - SQLAlchemy ORM.
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -57,6 +58,23 @@ class PageRecord(db.Model):
         if "deleted" not in kwargs:
             kwargs["deleted"] = 0
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "word": self.word,
+            "translate_type": self.translate_type,
+            "cat": self.cat,
+            "lang": self.lang,
+            "user": self.user,
+            "target": self.target,
+            "date": self.date,
+            "pupdate": self.pupdate,
+            "add_date": self.add_date,
+            "deleted": self.deleted,
+            "mdwiki_revid": self.mdwiki_revid,
+        }
 
 
 class UserPageRecord(db.Model):

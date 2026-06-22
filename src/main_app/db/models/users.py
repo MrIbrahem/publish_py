@@ -46,6 +46,23 @@ class UserTokenRecord(db.Model):
     last_used_at: Mapped[datetime | None] = mapped_column(server_default=db.func.current_timestamp())
     rotated_at: Mapped[datetime | None] = mapped_column()
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "access_token": self.access_token,
+            "access_secret": self.access_secret,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "last_used_at": self.last_used_at,
+            "rotated_at": self.rotated_at,
+        }
+
     @validates("access_token", "access_secret")
     def validate_bytes(self, key, value):
         return coerce_bytes(value)
@@ -92,6 +109,16 @@ class UserRecord(db.Model):
             kwargs["user_group"] = "Uncategorized"
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "email": self.email,
+            "wiki": self.wiki,
+            "user_group": self.user_group,
+            "reg_date": self.reg_date,
+        }
+
 
 class UsersNoInprocessRecord(db.Model):
     """
@@ -116,6 +143,13 @@ class UsersNoInprocessRecord(db.Model):
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "user": self.user,
+            "is_active": self.is_active,
+        }
 
 
 class AdminUserRecord(db.Model):
@@ -169,6 +203,13 @@ class FullTranslatorRecord(db.Model):
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "user": self.user,
+            "is_active": self.is_active,
+        }
 
 
 __all__ = [

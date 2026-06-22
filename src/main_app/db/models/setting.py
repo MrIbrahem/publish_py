@@ -105,6 +105,15 @@ class SettingRecord(db.Model):
 
         return str(value)  # string
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "key": self.key,
+            "title": self.title,
+            "value": self.value,
+            "value_type": self.value_type,
+        }
+
 
 __all__ = [
     "LanguageSettingRecord",
