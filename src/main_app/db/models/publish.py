@@ -5,6 +5,10 @@ SQLAlchemy ORM models
 from __future__ import annotations
 
 import logging
+from datetime import datetime
+
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ...shared.core.extensions import LONGTEXT, BaseModel, db
 
@@ -30,16 +34,16 @@ class ReportRecord(db.Model, BaseModel):
 
     __tablename__ = "publish_reports"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
-    title = db.Column(db.String(255), nullable=False)
-    user = db.Column(db.String(255), nullable=False)
-    lang = db.Column(db.String(255), nullable=False)
-    sourcetitle = db.Column(db.String(255), nullable=False)
-    result = db.Column(db.String(255), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    user: Mapped[str] = mapped_column(String(255), nullable=False)
+    lang: Mapped[str] = mapped_column(String(255), nullable=False)
+    sourcetitle: Mapped[str] = mapped_column(String(255), nullable=False)
+    result: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
-    data = db.Column(LONGTEXT, nullable=False)
+    data: Mapped[str] = mapped_column(LONGTEXT, nullable=False)
 
 
 __all__ = [

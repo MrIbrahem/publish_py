@@ -4,6 +4,9 @@ Views domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from sqlalchemy import String, UniqueConstraint, text
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 
@@ -20,9 +23,9 @@ class EnwikiPageviewRecord(db.Model, BaseModel):
 
     __tablename__ = "enwiki_pageviews"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(120), unique=True, nullable=False)
-    en_views = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    en_views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -46,14 +49,13 @@ class ViewsNewRecord(db.Model, BaseModel):
     """
 
     __tablename__ = "views_new"
+    __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    target = db.Column(db.String(120), nullable=False)
-    lang = db.Column(db.String(30), nullable=False)
-    year = db.Column(db.Integer, nullable=False)
-    views = db.Column(db.Integer, default=0, server_default=db.text("0"))
-
-    __table_args__ = (db.UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    target: Mapped[str] = mapped_column(String(120), nullable=False)
+    lang: Mapped[str] = mapped_column(String(30), nullable=False)
+    year: Mapped[int] = mapped_column(nullable=False)
+    views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -74,9 +76,9 @@ class ViewsNewAllRecord(db.Model, BaseModel):
 
     __tablename__ = "views_new_all"
 
-    target = db.Column(db.String(120), primary_key=True, nullable=False)
-    lang = db.Column(db.String(30), primary_key=True, nullable=False)
-    views = db.Column(db.Integer, default=0, server_default=db.text("0"))
+    target: Mapped[str] = mapped_column(String(120), primary_key=True, nullable=False)
+    lang: Mapped[str] = mapped_column(String(30), primary_key=True, nullable=False)
+    views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
     __table_args__ = (
         # Prevent SQLAlchemy from trying to create this as a table

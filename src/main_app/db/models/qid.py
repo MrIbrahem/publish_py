@@ -4,6 +4,9 @@ QID domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from sqlalchemy import String, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 
@@ -21,9 +24,9 @@ class QidRecord(db.Model, BaseModel):
 
     __tablename__ = "qids"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    qid = db.Column(db.String(20), nullable=False)
-    title = db.Column(db.String(255), unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    qid: Mapped[str] = mapped_column(String(20), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -56,9 +59,9 @@ class QidOthersRecord(db.Model, BaseModel):
 
     __tablename__ = "qids_others"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    qid = db.Column(db.String(20), nullable=False)
-    title = db.Column(db.String(255), unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    qid: Mapped[str] = mapped_column(String(20), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -91,12 +94,12 @@ class AllQidsExistRecord(db.Model, BaseModel):
     """
 
     __tablename__ = "all_qids_exists"
-    __table_args__ = (db.UniqueConstraint("qid", "code", name="qid_code"),)
+    __table_args__ = (UniqueConstraint("qid", "code", name="qid_code"),)
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    qid = db.Column(db.String(255), nullable=False)
-    code = db.Column(db.String(25), nullable=False)
-    target = db.Column(db.String(255), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    qid: Mapped[str] = mapped_column(String(255), nullable=False)
+    code: Mapped[str] = mapped_column(String(25), nullable=False)
+    target: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
 __all__ = [

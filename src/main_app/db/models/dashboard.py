@@ -6,6 +6,9 @@ from __future__ import annotations
 
 import logging
 
+from sqlalchemy import String, text
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 logger = logging.getLogger(__name__)
@@ -28,13 +31,13 @@ class CategoryRecord(db.Model, BaseModel):
 
     __tablename__ = "categories"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    category = db.Column(db.String(120), unique=True, nullable=False)
-    campaign = db.Column(db.String(120), nullable=False, default="", server_default=db.text("''"))
-    display = db.Column(db.String(120), nullable=False, default="", server_default=db.text("''"))
-    category2 = db.Column(db.String(120), nullable=False, default="", server_default=db.text("''"))
-    depth = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
-    is_default = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    category: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    campaign: Mapped[str] = mapped_column(String(120), nullable=False, default="", server_default=text("''"))
+    display: Mapped[str] = mapped_column(String(120), nullable=False, default="", server_default=text("''"))
+    category2: Mapped[str] = mapped_column(String(120), nullable=False, default="", server_default=text("''"))
+    depth: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
+    is_default: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
 
     def __init__(self, **kwargs) -> None:
         # Convert depth and is_default to int if provided as strings
@@ -69,8 +72,8 @@ class ProjectRecord(db.Model, BaseModel):
 
     __tablename__ = "projects"
 
-    g_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    g_title = db.Column(db.String(120), unique=True, nullable=False)
+    g_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    g_title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
 
 
 __all__ = [

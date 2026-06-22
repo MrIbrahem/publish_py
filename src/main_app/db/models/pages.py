@@ -4,6 +4,11 @@ Pages domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from datetime import date, datetime
+
+from sqlalchemy import Date, ForeignKey, String, text
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...shared.core.extensions import BaseModel, db
 
 
@@ -31,19 +36,21 @@ class PageRecord(db.Model, BaseModel):
 
     __tablename__ = "pages"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(120), nullable=False)
-    word = db.Column(db.Integer, nullable=True)
-    translate_type = db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
-    cat = db.Column(db.String(120), nullable=True)
-    lang = db.Column(db.String(30), nullable=True)
-    user = db.Column(db.String(120), nullable=True)
-    target = db.Column(db.String(120), nullable=True)
-    date = db.Column(db.Date, nullable=True)
-    pupdate = db.Column(db.String(120), nullable=True)
-    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
-    deleted = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
-    mdwiki_revid = db.Column(db.Integer, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    word: Mapped[int | None] = mapped_column()
+    translate_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="lead", server_default=text("'lead'")
+    )
+    cat: Mapped[str | None] = mapped_column(String(120))
+    lang: Mapped[str | None] = mapped_column(String(30))
+    user: Mapped[str | None] = mapped_column(String(120))
+    target: Mapped[str | None] = mapped_column(String(120))
+    date: Mapped[date | None] = mapped_column()
+    pupdate: Mapped[str | None] = mapped_column(String(120))
+    add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
+    deleted: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
+    mdwiki_revid: Mapped[int | None] = mapped_column()
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -76,19 +83,21 @@ class UserPageRecord(db.Model, BaseModel):
 
     __tablename__ = "pages_users"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(120), nullable=False)
-    word = db.Column(db.Integer, nullable=True)
-    translate_type = db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
-    cat = db.Column(db.String(120), nullable=True)
-    lang = db.Column(db.String(30), nullable=True)
-    user = db.Column(db.String(120), nullable=True)
-    target = db.Column(db.String(120), nullable=True)
-    date = db.Column(db.Date, nullable=True)
-    pupdate = db.Column(db.String(120), nullable=True)
-    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
-    deleted = db.Column(db.Integer, nullable=False, default=0, server_default=db.text("0"))
-    mdwiki_revid = db.Column(db.Integer, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    word: Mapped[int | None] = mapped_column()
+    translate_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="lead", server_default=text("'lead'")
+    )
+    cat: Mapped[str | None] = mapped_column(String(120))
+    lang: Mapped[str | None] = mapped_column(String(30))
+    user: Mapped[str | None] = mapped_column(String(120))
+    target: Mapped[str | None] = mapped_column(String(120))
+    date: Mapped[date | None] = mapped_column()
+    pupdate: Mapped[str | None] = mapped_column(String(120))
+    add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
+    deleted: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
+    mdwiki_revid: Mapped[int | None] = mapped_column()
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -111,10 +120,10 @@ class PagesUsersToMainRecord(db.Model, BaseModel):
 
     __tablename__ = "pages_users_to_main"
 
-    id = db.Column(db.Integer, db.ForeignKey("pages_users.id"), primary_key=True)
-    new_target = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
-    new_user = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
-    new_qid = db.Column(db.String(255), nullable=False, default="", server_default=db.text("''"))
+    id: Mapped[int] = mapped_column(ForeignKey("pages_users.id"), primary_key=True)
+    new_target: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
+    new_user: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
+    new_qid: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -145,14 +154,14 @@ class InProcessRecord(db.Model, BaseModel):
 
     __tablename__ = "in_process"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(255), nullable=False)
-    user = db.Column(db.String(255), nullable=False)
-    lang = db.Column(db.String(30), nullable=False)
-    cat = db.Column(db.String(255), default="RTT", server_default=db.text("'RTT'"))
-    translate_type = db.Column(db.String(20), nullable=False, default="lead", server_default=db.text("'lead'"))
-    word = db.Column(db.Integer, default=0, server_default=db.text("0"))
-    add_date = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    user: Mapped[str] = mapped_column(String(255), nullable=False)
+    lang: Mapped[str] = mapped_column(String(30), nullable=False)
+    cat: Mapped[str | None] = mapped_column(String(255), default="RTT", server_default=text("'RTT'"))
+    translate_type: Mapped[str] = mapped_column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
+    word: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
+    add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
