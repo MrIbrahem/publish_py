@@ -46,6 +46,15 @@ class LanguageSettingRecord(db.Model):
             kwargs["add_en_lang"] = 0
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "lang_code": self.lang_code,
+            "move_dots": self.move_dots,
+            "expend": self.expend,
+            "add_en_lang": self.add_en_lang,
+        }
+
 
 class SettingRecord(db.Model):
     """
