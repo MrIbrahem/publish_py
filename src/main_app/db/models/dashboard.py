@@ -60,6 +60,17 @@ class CategoryRecord(db.Model):
         if not self.campaign:
             raise ValueError("Campaign name cannot be empty")
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "category": self.category,
+            "campaign": self.campaign,
+            "display": self.display,
+            "category2": self.category2,
+            "depth": self.depth,
+            "is_default": self.is_default,
+        }
+
 
 class ProjectRecord(db.Model):
     """

@@ -123,6 +123,23 @@ class UserPageRecord(db.Model):
             kwargs["deleted"] = 0
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "word": self.word,
+            "translate_type": self.translate_type,
+            "cat": self.cat,
+            "lang": self.lang,
+            "user": self.user,
+            "target": self.target,
+            "date": self.date,
+            "pupdate": self.pupdate,
+            "add_date": self.add_date,
+            "deleted": self.deleted,
+            "mdwiki_revid": self.mdwiki_revid,
+        }
+
 
 class PagesUsersToMainRecord(db.Model):
     """
@@ -152,6 +169,14 @@ class PagesUsersToMainRecord(db.Model):
         if "new_qid" not in kwargs:
             kwargs["new_qid"] = ""
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "new_target": self.new_target,
+            "new_user": self.new_user,
+            "new_qid": self.new_qid,
+        }
 
 
 class InProcessRecord(db.Model):
@@ -190,6 +215,18 @@ class InProcessRecord(db.Model):
         if "word" not in kwargs:
             kwargs["word"] = 0
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "user": self.user,
+            "lang": self.lang,
+            "cat": self.cat,
+            "translate_type": self.translate_type,
+            "word": self.word,
+            "add_date": self.add_date,
+        }
 
 
 __all__ = [

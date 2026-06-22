@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, LargeBinary, String, text
+from sqlalchemy import LargeBinary, String, text
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from ...shared.core.crypto import decrypt_value

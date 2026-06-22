@@ -4,6 +4,8 @@ Views domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import String, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -32,6 +34,13 @@ class EnwikiPageviewRecord(db.Model):
         if "en_views" not in kwargs:
             kwargs["en_views"] = 0
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "en_views": self.en_views,
+        }
 
 
 class ViewsNewRecord(db.Model):
@@ -63,6 +72,15 @@ class ViewsNewRecord(db.Model):
             kwargs["views"] = 0
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "target": self.target,
+            "lang": self.lang,
+            "year": self.year,
+            "views": self.views,
+        }
+
 
 class ViewsNewAllRecord(db.Model):
     """
@@ -79,6 +97,18 @@ class ViewsNewAllRecord(db.Model):
     target: Mapped[str] = mapped_column(String(120), primary_key=True, nullable=False)
     lang: Mapped[str] = mapped_column(String(30), primary_key=True, nullable=False)
     views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "target": self.target,
+            "lang": self.lang,
+            "views": self.views,
+        }
 
     __table_args__ = (
         # Prevent SQLAlchemy from trying to create this as a table
