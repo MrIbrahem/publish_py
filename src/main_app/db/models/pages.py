@@ -9,10 +9,10 @@ from datetime import date, datetime
 from sqlalchemy import Date, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class PageRecord(db.Model, BaseModel):
+class PageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -59,7 +59,7 @@ class PageRecord(db.Model, BaseModel):
         super().__init__(**kwargs)
 
 
-class UserPageRecord(db.Model, BaseModel):
+class UserPageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -106,7 +106,7 @@ class UserPageRecord(db.Model, BaseModel):
         super().__init__(**kwargs)
 
 
-class PagesUsersToMainRecord(db.Model, BaseModel):
+class PagesUsersToMainRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users_to_main (
         id int unsigned NOT NULL,
@@ -136,7 +136,7 @@ class PagesUsersToMainRecord(db.Model, BaseModel):
         super().__init__(**kwargs)
 
 
-class InProcessRecord(db.Model, BaseModel):
+class InProcessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS in_process (
         id int unsigned NOT NULL AUTO_INCREMENT,

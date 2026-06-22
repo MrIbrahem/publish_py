@@ -8,13 +8,13 @@ from sqlalchemy import DateTime, LargeBinary, String, text
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from ...shared.core.crypto import decrypt_value
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 from ...shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 
 
-class UserTokenRecord(db.Model, BaseModel):
+class UserTokenRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS user_tokens (
         user_id int NOT NULL,
@@ -58,7 +58,7 @@ class UserTokenRecord(db.Model, BaseModel):
         return access_key, access_secret
 
 
-class UserRecord(db.Model, BaseModel):
+class UserRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS users (
         user_id int NOT NULL AUTO_INCREMENT,
@@ -93,7 +93,7 @@ class UserRecord(db.Model, BaseModel):
         super().__init__(**kwargs)
 
 
-class UsersNoInprocessRecord(db.Model, BaseModel):
+class UsersNoInprocessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS users_no_inprocess (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -118,7 +118,7 @@ class UsersNoInprocessRecord(db.Model, BaseModel):
         super().__init__(**kwargs)
 
 
-class AdminUserRecord(db.Model, BaseModel):
+class AdminUserRecord(db.Model):
     """
     ORM model for the coordinators table.
     CREATE TABLE IF NOT EXISTS coordinators (
@@ -147,7 +147,7 @@ class AdminUserRecord(db.Model, BaseModel):
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
-class FullTranslatorRecord(db.Model, BaseModel):
+class FullTranslatorRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS full_translators (
         id int unsigned NOT NULL AUTO_INCREMENT,

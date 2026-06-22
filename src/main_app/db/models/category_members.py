@@ -12,10 +12,10 @@ from __future__ import annotations
 from sqlalchemy import Index, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class CategoryMemberRecord(db.Model, BaseModel):
+class CategoryMemberRecord(db.Model):
     """
     CREATE TABLE category_members (
         id int NOT NULL AUTO_INCREMENT,

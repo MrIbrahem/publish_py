@@ -7,10 +7,10 @@ from __future__ import annotations
 from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class QidRecord(db.Model, BaseModel):
+class QidRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS qids (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -45,7 +45,7 @@ class QidRecord(db.Model, BaseModel):
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
 
-class QidOthersRecord(db.Model, BaseModel):
+class QidOthersRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS qids_others (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -81,7 +81,7 @@ class QidOthersRecord(db.Model, BaseModel):
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
 
-class AllQidsExistRecord(db.Model, BaseModel):
+class AllQidsExistRecord(db.Model):
     """
     CREATE TABLE all_qids_exists (
         id int NOT NULL AUTO_INCREMENT,

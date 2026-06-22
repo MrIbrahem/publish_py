@@ -7,10 +7,10 @@ from __future__ import annotations
 from sqlalchemy import String, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class EnwikiPageviewRecord(db.Model, BaseModel):
+class EnwikiPageviewRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS enwiki_pageviews (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -34,7 +34,7 @@ class EnwikiPageviewRecord(db.Model, BaseModel):
         super().__init__(**kwargs)
 
 
-class ViewsNewRecord(db.Model, BaseModel):
+class ViewsNewRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS views_new (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -49,13 +49,13 @@ class ViewsNewRecord(db.Model, BaseModel):
     """
 
     __tablename__ = "views_new"
-    __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
-
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     target: Mapped[str] = mapped_column(String(120), nullable=False)
     lang: Mapped[str] = mapped_column(String(30), nullable=False)
     year: Mapped[int] = mapped_column(nullable=False)
     views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
+
+    __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 
     def __init__(self, **kwargs) -> None:
         # Apply Python-level defaults for fields not provided
@@ -64,7 +64,7 @@ class ViewsNewRecord(db.Model, BaseModel):
         super().__init__(**kwargs)
 
 
-class ViewsNewAllRecord(db.Model, BaseModel):
+class ViewsNewAllRecord(db.Model):
     """
     CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `views_new_all` AS
         SELECT `v`.`target` AS `target`,

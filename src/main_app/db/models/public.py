@@ -13,10 +13,10 @@ from __future__ import annotations
 from sqlalchemy import JSON, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class LangRecord(db.Model, BaseModel):
+class LangRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS langs (
         lang_id int NOT NULL AUTO_INCREMENT,
@@ -37,7 +37,7 @@ class LangRecord(db.Model, BaseModel):
     redirects: Mapped[dict | list | None] = mapped_column(JSON, server_default=text("NULL"))
 
 
-class MdwikiRevidRecord(db.Model, BaseModel):
+class MdwikiRevidRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS mdwiki_revids (
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -52,7 +52,7 @@ class MdwikiRevidRecord(db.Model, BaseModel):
     revid: Mapped[int] = mapped_column(nullable=False)
 
 
-class TranslateTypeRecord(db.Model, BaseModel):
+class TranslateTypeRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS translate_type (
         tt_id int unsigned NOT NULL AUTO_INCREMENT,

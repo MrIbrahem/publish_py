@@ -7,10 +7,10 @@ from __future__ import annotations
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class AssessmentRecord(db.Model, BaseModel):
+class AssessmentRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS assessments (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -28,7 +28,7 @@ class AssessmentRecord(db.Model, BaseModel):
     importance: Mapped[str | None] = mapped_column(String(120))
 
 
-class RefsCountRecord(db.Model, BaseModel):
+class RefsCountRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS refs_counts (
         r_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -48,7 +48,7 @@ class RefsCountRecord(db.Model, BaseModel):
     r_all_refs: Mapped[int | None] = mapped_column()
 
 
-class WordRecord(db.Model, BaseModel):
+class WordRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS words (
         w_id int unsigned NOT NULL AUTO_INCREMENT,

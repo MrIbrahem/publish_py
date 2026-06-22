@@ -10,12 +10,12 @@ from datetime import datetime
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import LONGTEXT, BaseModel, db
+from ...shared.core.extensions import LONGTEXT, db
 
 logger = logging.getLogger(__name__)
 
 
-class ReportRecord(db.Model, BaseModel):
+class ReportRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS publish_reports (
         id int NOT NULL AUTO_INCREMENT,

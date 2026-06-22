@@ -7,10 +7,10 @@ from __future__ import annotations
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class AllArticlesRecord(db.Model, BaseModel):
+class AllArticlesRecord(db.Model):
     """
     CREATE TABLE all_articles (
         id int NOT NULL AUTO_INCREMENT,
