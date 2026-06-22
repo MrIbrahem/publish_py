@@ -113,8 +113,7 @@ class TestDeleteCategory:
         assert not any(c.id == cat.id for c in list_categories())
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_category(9999)
+        assert delete_category(9999) is False
 
 
 class TestUpdateCategory:

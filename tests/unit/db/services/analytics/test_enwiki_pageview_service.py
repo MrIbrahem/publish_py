@@ -171,5 +171,4 @@ class TestDeleteEnwikiPageview:
         assert get_enwiki_pageview(p.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_enwiki_pageview(9999)
+        assert delete_enwiki_pageview(9999) is False

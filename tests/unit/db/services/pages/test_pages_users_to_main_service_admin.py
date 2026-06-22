@@ -4,7 +4,7 @@ Mirrors the PHP ``coordinator/admin/pages_users_to_main/*.php`` flow:
 - ``list_pending(lang)`` -> joined view of pages_users + pages_users_to_main
 - ``get_user_page(id)``
 - ``check_main_page_exists(title, lang)``
-- ``delete_user_page(id)`` -> removes from BOTH pages_users_to_main and pages_users
+- ``delete_user_page_to_main(id)`` -> removes from BOTH pages_users_to_main and pages_users
 """
 
 from unittest.mock import patch
@@ -18,7 +18,7 @@ from src.main_app.db.models import (
     UserPageRecord,
 )
 from src.main_app.db.services.delete_service import (
-    delete_user_page,
+    delete_user_page_to_main,
 )
 from src.main_app.db.services.pages.pages_users_to_main_service import (
     check_main_page_exists,
@@ -202,13 +202,13 @@ class TestCheckMainPageExists:
 
 
 class TestDeleteUserPage:
-    """Tests for delete_user_page."""
+    """Tests for delete_user_page_to_main."""
 
     def test_removes_both_rows(self):
         page = _seed_pending("Foo", "en")
         page_id = page.id
 
-        ok = delete_user_page(page_id)
+        ok = delete_user_page_to_main(page_id)
         assert ok is True
         assert db.session.get(UserPageRecord, page_id) is None
         assert db.session.get(PagesUsersToMainRecord, page_id) is None
@@ -228,16 +228,16 @@ class TestDeleteUserPage:
         db.session.commit()
         page_id = page.id  # capture before delete; ORM proxy raises after.
 
-        ok = delete_user_page(page_id)
+        ok = delete_user_page_to_main(page_id)
         assert ok is True
         assert db.session.get(UserPageRecord, page_id) is None
 
     def test_returns_false_when_id_is_falsy(self):
-        assert delete_user_page(0) is False
+        assert delete_user_page_to_main(0) is False
 
     def test_returns_false_and_rolls_back_on_db_error(self):
-        with patch("src.main_app.db.services.pages.pages_users_to_main_service.db.session") as mock_session:
+        with patch("src.main_app.db.services.delete_service.db.session") as mock_session:
             mock_session.query.return_value.filter.return_value.delete.side_effect = Exception("boom")
-            ok = delete_user_page(1)
+            ok = delete_user_page_to_main(1)
             assert ok is False
             mock_session.rollback.assert_called_once()

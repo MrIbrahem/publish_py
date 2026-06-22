@@ -169,8 +169,7 @@ class TestDeleteFullTranslator:
         assert get_full_translator(ft.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_full_translator(9999)
+        assert delete_full_translator(9999) is False
 
 
 class TestIsFullTranslator:

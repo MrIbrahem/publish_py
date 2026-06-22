@@ -129,8 +129,7 @@ class TestDeleteMdwikiRevid:
         assert get_mdwiki_revid_by_title("Ibuprofen") is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_mdwiki_revid("Ghost")
+        assert delete_mdwiki_revid("Ghost") is False
 
 
 class TestGetRevidForTitle:

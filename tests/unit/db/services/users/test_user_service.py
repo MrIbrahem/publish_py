@@ -143,8 +143,7 @@ class TestDeleteUser:
         assert get_user(u.user_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_user(9999)
+        assert delete_user(9999) is False
 
 
 class TestUserExists:

@@ -172,8 +172,7 @@ class TestDeleteTranslateType:
         assert get_translate_type(tt.tt_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_translate_type(9999)
+        assert delete_translate_type(9999) is False
 
 
 class TestCanTranslateLead:

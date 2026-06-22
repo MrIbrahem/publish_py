@@ -176,5 +176,4 @@ class TestDeleteLang:
         assert get_lang(added.lang_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_lang(9999)
+        assert delete_lang(9999) is False

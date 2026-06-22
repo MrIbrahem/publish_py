@@ -98,8 +98,7 @@ class TestDeleteQid:
         assert not any(x.id == q.id for x in list_records())
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_qid(9999)
+        assert delete_qid(9999) is False
 
 
 class TestListQids:

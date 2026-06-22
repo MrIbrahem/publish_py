@@ -193,8 +193,7 @@ class TestDeleteViewsNew:
         assert get_views_new(v.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_views_new(9999)
+        assert delete_views_new(9999) is False
 
 
 class TestGetTotalViewsForTarget:

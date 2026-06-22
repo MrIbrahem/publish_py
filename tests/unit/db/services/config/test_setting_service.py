@@ -132,5 +132,4 @@ class TestDeleteSetting:
         assert get_setting(s.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_setting(9999)
+        assert delete_setting(9999) is False

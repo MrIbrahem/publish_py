@@ -182,8 +182,7 @@ class TestDeleteInProcess:
         assert get_in_process(ip.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_in_process(9999)
+        assert delete_in_process(9999) is False
 
 
 class TestDeleteInProcessByTitleUserLang:

@@ -169,8 +169,7 @@ class TestDeleteUsersNoInprocess:
         assert get_users_no_inprocess(rec.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_users_no_inprocess(9999)
+        assert delete_users_no_inprocess(9999) is False
 
 
 class TestShouldHideFromInprocess:

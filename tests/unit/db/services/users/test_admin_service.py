@@ -179,8 +179,7 @@ class TestDeleteCoordinator:
         assert get_coordinator(c.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            delete_coordinator(9999)
+        assert delete_coordinator(9999) is False
 
 
 class TestIsCoordinator:

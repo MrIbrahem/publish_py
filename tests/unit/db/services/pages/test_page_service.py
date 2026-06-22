@@ -119,8 +119,7 @@ class TestDeletePage:
         assert not any(x.id == p.id for x in list_pages())
 
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        with pytest.raises(LookupError, match="not found"):
-            delete_page(9999)
+        assert delete_page(9999) is False
 
 
 class TestFindExistsOrUpdate:

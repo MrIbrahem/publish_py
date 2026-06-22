@@ -54,8 +54,7 @@ class TestDeleteReport:
         assert not any(x.id == r.id for x in list_reports())
 
     def test_raises_lookup_error_when_not_found(self):
-        with pytest.raises(LookupError, match="not found"):
-            delete_report(99999)
+        assert delete_report(99999) is False
 
 
 class TestQueryReportsWithFilters:
