@@ -117,14 +117,7 @@ def update_user_page(
     page_id: int,
     title: str,
     target: str,
-    translate_type: str | None = None,
-    cat: str | None = None,
-    lang: str | None = None,
-    user: str | None = None,
-    mdwiki_revid: int | None = None,
-    word: int | None = None,
-    add_date: str | None = None,
-    deleted: int | None = None,
+    **kwargs: dict[str, Any],
 ) -> UserPageRecord:
     """Update page."""
     orm_obj = db.session.get(UserPageRecord, page_id)
@@ -133,22 +126,10 @@ def update_user_page(
 
     orm_obj.title = title
     orm_obj.target = target
-    if translate_type is not None:
-        orm_obj.translate_type = translate_type
-    if cat is not None:
-        orm_obj.cat = cat
-    if lang is not None:
-        orm_obj.lang = lang
-    if user is not None:
-        orm_obj.user = user
-    if mdwiki_revid is not None:
-        orm_obj.mdwiki_revid = mdwiki_revid
-    if word is not None:
-        orm_obj.word = word
-    if add_date is not None:
-        orm_obj.add_date = add_date
-    if deleted is not None:
-        orm_obj.deleted = deleted
+
+    for key, value in kwargs.items():
+        if hasattr(orm_obj, key):
+            setattr(orm_obj, key, value)
 
     try:
         db.session.commit()
@@ -159,59 +140,57 @@ def update_user_page(
         raise
     return orm_obj
 
+def set_user_page_target(
+    record: UserPageRecord,
+    target: str,
+) -> bool:
+    """
+    """
+    record.target = target
+    record.pupdate = datetime.now().strftime("%Y-%m-%d")
 
-def find_exists_or_update_user_page(
+    try:
+        db.session.commit()
+    except Exception:
+        logger.exception("Failed to update page target")
+        db.session.rollback()
+        return False
+
+    return True
+
+
+
+def find_user_page_record(
     title: str,
     lang: str,
     user: str,
-    target: str,
-) -> bool:
-    """Check if record exists and update target if empty.
-
-    Returns True only when matching records exist *and* any necessary
-    update committed successfully (or no update was needed). Returns
-    False when the commit fails after a rollback.
+) -> UserPageRecord | None:
+    """
+    Check if record exists
     """
 
     # Check existence
-    orm_objs = (
+    orm_obj = (
         db.session.query(UserPageRecord)
         .filter(
             UserPageRecord.title == title,
             UserPageRecord.lang == lang,
             UserPageRecord.user == user,
         )
-        .all()
+        .first()
     )
+    return orm_obj
 
-    if not orm_objs:
-        return False
-
-    changed = False
-    for obj in orm_objs:
-        # Update target if it's empty or NULL
-        if not obj.target:
-            obj.target = target
-            obj.pupdate = datetime.now().strftime("%Y-%m-%d")
-            changed = True
-    if changed:
-        try:
-            db.session.commit()
-        except Exception:
-            logger.exception("Failed to update user page target")
-            db.session.rollback()
-            return False
-
-    return True
 
 
 __all__ = [
+    "set_user_page_target",
+    "find_user_page_record",
     "list_user_pages",
     "list_translated",
     "count_translated",
     "get_by_id",
     "add_user_page",
     "update_user_page",
-    "find_exists_or_update_user_page",
     "insert_user_page_target",
 ]

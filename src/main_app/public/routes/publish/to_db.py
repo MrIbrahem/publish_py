@@ -6,14 +6,15 @@ import json
 import logging
 from typing import Any
 
-from ....db.models import PageRecord
+from ....db.models import PageRecord, UserPageRecord
 from ....db.services.content import get_campaign_category
 from ....db.services.pages import (
-    find_exists_or_update_user_page,
     find_page_record,
     insert_page_target,
     insert_user_page_target,
     set_page_target,
+    set_user_page_target,
+    find_user_page_record,
 )
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,14 @@ def find_exists_or_update_page(sourcetitle, lang, user, target):
     if orm_obj:
         exists = True
         exists = set_page_target(orm_obj, target)
+    return exists
+
+
+def find_exists_or_update_user_page(sourcetitle, lang, user, target):
+    orm_obj: UserPageRecord | None = find_user_page_record(sourcetitle, lang, user)
+    if orm_obj:
+        exists = True
+        exists = set_user_page_target(orm_obj, target)
     return exists
 
 

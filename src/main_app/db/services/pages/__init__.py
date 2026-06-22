@@ -35,7 +35,6 @@ from .page_service import (
     find_page_record,
     add_page,
     add_translate_row_to_db,
-    find_exists_or_update_page,
     insert_page_target,
     list_pages,
     list_pages_by_lang_cat,
@@ -65,12 +64,13 @@ from .translate_type_service import (
 from .user_page_service import (
     add_user_page,
     count_translated,
-    find_exists_or_update_user_page,
     get_by_id,
     insert_user_page_target,
     list_translated,
     list_user_pages,
     update_user_page,
+    set_user_page_target,
+    find_user_page_record,
 )
 
 __all__ = [
@@ -100,7 +100,6 @@ __all__ = [
     "add_page",
     "update_page",
     "delete_page",
-    "find_exists_or_update_page",
     "insert_page_target",
     "add_translate_row_to_db",
     "list_pending",
@@ -126,6 +125,7 @@ __all__ = [
     "get_by_id",
     "add_user_page",
     "update_user_page",
-    "find_exists_or_update_user_page",
     "insert_user_page_target",
+    "set_user_page_target",
+    "find_user_page_record",
 ]

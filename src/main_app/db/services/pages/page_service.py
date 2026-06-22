@@ -144,52 +144,6 @@ def update_page(
         raise
     return orm_obj
 
-
-def find_exists_or_update_page(
-    title: str,
-    lang: str,
-    user: str,
-    target: str,
-) -> bool:
-    """Check if record exists and update target if empty.
-
-    Returns True only when matching records exist *and* any necessary
-    update committed successfully (or no update was needed). Returns
-    False when the commit fails after a rollback.
-    """
-
-    # Check existence
-    orm_objs = (
-        db.session.query(PageRecord)
-        .filter(
-            PageRecord.title == title,
-            PageRecord.lang == lang,
-            PageRecord.user == user,
-        )
-        .all()
-    )
-
-    if not orm_objs:
-        return False
-
-    changed = False
-    for obj in orm_objs:
-        # Update target if it's empty or NULL
-        if not obj.target:
-            obj.target = target
-            obj.pupdate = datetime.now().strftime("%Y-%m-%d")
-            changed = True
-    if changed:
-        try:
-            db.session.commit()
-        except Exception:
-            logger.exception("Failed to update page target")
-            db.session.rollback()
-            return False
-
-    return True
-
-
 def set_page_target(
     record: PageRecord,
     target: str,
@@ -322,7 +276,6 @@ __all__ = [
     "list_pages_by_lang_cat",
     "add_page",
     "update_page",
-    "find_exists_or_update_page",
     "insert_page_target",
     "add_translate_row_to_db",
 ]
