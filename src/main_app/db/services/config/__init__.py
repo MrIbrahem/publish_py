@@ -13,8 +13,8 @@ from .language_setting_service import (
     update_language_setting,
 )
 from .setting_service import (
-    add_setting,
-    get_setting,
+    create_setting,
+    get_setting_by_id,
     get_setting_by_key,
     list_settings,
     update_value,
@@ -29,9 +29,9 @@ __all__ = [
     "update_language_setting",
     "delete_language_setting",
     "list_settings",
-    "get_setting",
+    "get_setting_by_id",
     "get_setting_by_key",
-    "add_setting",
+    "create_setting",
     "update_value",
     "delete_setting",
 ]

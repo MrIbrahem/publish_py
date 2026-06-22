@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 
-from ...shared.core.extensions import LONGTEXT, db, BaseModel
+from ...shared.core.extensions import LONGTEXT, BaseModel, db
 
 logger = logging.getLogger(__name__)
 

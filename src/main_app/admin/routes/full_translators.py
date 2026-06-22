@@ -104,7 +104,7 @@ class FullTranslators:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.get("/")
+        @self.bp.route("/", methods=["GET"])
         @admin_required
         def dashboard():
             # Call the internal function _full_translators_dashboard to return the full dashboard

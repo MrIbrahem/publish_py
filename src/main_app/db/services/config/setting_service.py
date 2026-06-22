@@ -5,23 +5,61 @@ SQLAlchemy-based service for managing settings.
 from __future__ import annotations
 
 import logging
-from typing import Any, List
+from typing import Any
 
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.extensions import db
 from ...models import SettingRecord
+from ..delete_service import delete_setting
 
 logger = logging.getLogger(__name__)
 
 
-def list_settings() -> List[SettingRecord]:
+def list_settings() -> list[SettingRecord]:
     """Return all setting records."""
-    orm_objs = db.session.query(SettingRecord).order_by(SettingRecord.id.asc()).all()
+    orm_objs = db.session.query(SettingRecord).all()
     return orm_objs
 
 
-def get_setting(setting_id: int) -> SettingRecord | None:
+def get_all_settings_raw() -> list[dict[str, Any]]:
+    """Fetch a setting by key."""
+    return [x.to_dict() for x in list_settings()]
+
+
+def get_all_settings_ready() -> dict[str, Any]:
+    """Fetch all settings parsed into their respective Python types."""
+    records: dict[str, Any] = {}
+
+    for x in list_settings():
+        val = None
+        if x.value_type == "boolean":
+            val = x.value == "true"
+        elif x.value_type == "integer":
+            if isinstance(x.value, int):
+                val = x.value
+            else:
+                try:
+                    val = int(x.value)  # type: ignore
+                except (ValueError, TypeError):
+                    val = None
+        elif x.value_type == "string":
+            val = str(x.value)
+
+        if val is None:
+            logger.warning("Could not parse setting %s with value %s", x.key, x.value)
+
+        records[x.key] = val
+
+    return records
+
+
+def get_setting_by_key(key: str) -> SettingRecord:
+    """Fetch a setting by key."""
+    return db.session.query(SettingRecord).filter(SettingRecord.key == key).first()
+
+
+def get_setting_by_id(setting_id: int) -> SettingRecord | None:
     """Get a setting record by ID."""
     orm_obj = db.session.get(SettingRecord, setting_id)
     if not orm_obj:
@@ -30,15 +68,7 @@ def get_setting(setting_id: int) -> SettingRecord | None:
     return orm_obj
 
 
-def get_setting_by_key(key: str) -> SettingRecord | None:
-    """Get a setting record by key."""
-    orm_obj = db.session.query(SettingRecord).filter(SettingRecord.key == key).first()
-    if not orm_obj:
-        return None
-    return orm_obj
-
-
-def add_setting(
+def create_setting(
     key: str,
     title: str,
     value_type: str = "boolean",
@@ -51,6 +81,15 @@ def add_setting(
         raise ValueError("Key is required")
     if not title:
         raise ValueError("Title is required")
+
+    if value_type == "boolean":
+        value = 0  # equal to False
+    elif value_type == "integer":
+        value = 0
+    elif value_type == "json":
+        value = {}
+    else:
+        value = ""
 
     orm_obj = SettingRecord(
         key=key,
@@ -72,7 +111,7 @@ def add_setting(
 def update_value(setting_id: int, value: Any) -> SettingRecord:
     """Update a setting record value.
 
-    Normalizes the input identically to ``add_setting`` so the persisted
+    Normalizes the input identically to ``create_setting`` so the persisted
     type stays consistent across creation and updates: non-``None`` values
     are coerced to ``str``; ``None`` is stored as ``None``.
     """
@@ -92,8 +131,8 @@ def update_value(setting_id: int, value: Any) -> SettingRecord:
 
 __all__ = [
     "list_settings",
-    "get_setting",
+    "get_setting_by_id",
     "get_setting_by_key",
-    "add_setting",
+    "create_setting",
     "update_value",
 ]

@@ -123,7 +123,7 @@ class CoordinatorsRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.get("/")
+        @self.bp.route("/", methods=["GET"])
         @admin_required
         def dashboard():
             return _coordinators_dashboard()
@@ -142,12 +142,6 @@ class CoordinatorsRoutes:
         @admin_required
         def deactivate(coordinator_id: int) -> ResponseReturnValue:
             return _set_record_active_status(coordinator_id, False)
-
-        @self.bp.post("/<int:coordinator_id>/active")
-        @admin_required
-        def update_active(coordinator_id: int) -> ResponseReturnValue:
-            desired = request.form.get("active", "0") == "1"
-            return _set_record_active_status(coordinator_id, desired)
 
         @self.bp.post("/<int:coordinator_id>/delete")
         @admin_required

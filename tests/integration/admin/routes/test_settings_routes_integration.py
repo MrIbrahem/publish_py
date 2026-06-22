@@ -57,7 +57,7 @@ class TestCreateSetting:
     def test_create_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test creating setting with valid data."""
 
-        with patch("src.main_app.db.services.config.setting_service.add_setting") as mock_add:
+        with patch("src.main_app.db.services.config.setting_service.create_setting") as mock_add:
             mock_add.return_value = MagicMock(key="new_setting")
 
             response = auth_client.post(
