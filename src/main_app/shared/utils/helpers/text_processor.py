@@ -6,6 +6,7 @@ Mirrors: php_src/text_change.php
 """
 
 import os
+import sys
 
 DoChangesToText1 = None
 fix_one_page = None
@@ -15,7 +16,7 @@ try:
 except ImportError:
     fix_refs_path = os.getenv("FIX_REFS_PY_PATH", "")
     if fix_refs_path and os.path.isdir(fix_refs_path):
-        os.sys.path.insert(0, fix_refs_path)
+        sys.path.insert(0, fix_refs_path)
         from fix_refs import DoChangesToText1  # type: ignore
         from fix_refs import fix_one_page  # type: ignore
 

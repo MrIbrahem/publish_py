@@ -46,6 +46,7 @@ from .pages import (
     list_user_pages,
     top_lang_of_users,
     update_in_process,
+    add_in_process,
     update_page,
     update_user_page,
 )
