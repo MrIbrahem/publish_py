@@ -44,7 +44,7 @@ def find_exists_or_update_user_page(
     return exists
 
 
-def _add_to_db(
+def add_to_db(
     target: str,
     lang: str,
     user: str,
@@ -147,5 +147,5 @@ def _add_to_db(
 
 
 __all__ = [
-    "_add_to_db",
+    "add_to_db",
 ]

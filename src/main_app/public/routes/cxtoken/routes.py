@@ -99,8 +99,8 @@ def index() -> Response:
         return response
 
     # Get request parameters
-    wiki = validated_data.get("wiki", "")
-    user = validated_data.get("user", "")
+    wiki = validated_data.get("wiki", "")  # type: ignore
+    user = validated_data.get("user", "")  # type: ignore
 
     # Format user (apply special user mappings)
     user = _format_user(user)

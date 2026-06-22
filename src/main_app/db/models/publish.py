@@ -51,6 +51,15 @@ class ReportRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
+    def to_dict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {}
+        for column in self.__table__.columns:  # type: ignore
+            value = getattr(self, column.name)  # type: ignore
+            if hasattr(value, "isoformat"):
+                value = value.isoformat()
+            data[column.name] = value  # type: ignore
+        return data
+
 
 __all__ = [
     "ReportRecord",

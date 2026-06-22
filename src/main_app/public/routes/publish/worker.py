@@ -25,7 +25,7 @@ from ....shared.utils.helpers import (
     make_summary,
     to_do,
 )
-from .to_db import _add_to_db
+from .to_db import add_to_db
 
 logger = logging.getLogger(__name__)
 
@@ -316,7 +316,7 @@ def _process_edit(
             access_secret,
         )
 
-        sql_result = _add_to_db(
+        sql_result = add_to_db(
             title,
             lang,
             user,

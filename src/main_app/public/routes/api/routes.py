@@ -76,16 +76,20 @@ def get_publish_reports() -> Response:
     raw = {k: v for k, v in request.args.items() if v != "" and str(v).lower() != "all"}
     try:
         validated = PublishReportsQuerySchema().load(raw, unknown="exclude")
+        if not validated:
+            raise ValidationError("No valid filters provided")
     except ValidationError as err:
         return jsonify({"error": "Validation failed", "info": err.messages}), 400
 
-    limit = validated.pop("limit", None)
-    select_fields = parse_select_fields(validated.pop("select", None))
-    filters: Dict[str, Any] = validated
+    limit = validated.pop("limit", None)  # type: ignore
+    select = validated.pop("select", None)  # type: ignore
+
+    select_fields = parse_select_fields(select)
+    filters: Dict[str, Any] = validated  # type: ignore
 
     try:
         # Query database
-        records = query_reports_with_filters(filters, select_fields, limit)
+        records: List[ReportRecord] = query_reports_with_filters(filters, select_fields, limit)
 
     except Exception:
         logger.exception("Error fetching publish_reports")
@@ -93,7 +97,7 @@ def get_publish_reports() -> Response:
         return jsonify({"error": "An internal error occurred while fetching reports"}), 500
 
     # Build response
-    data = [r.to_dict() for r in records]
+    data = [r.to_dict() for r in records] if records else []
 
     response_data = {
         "results": data,

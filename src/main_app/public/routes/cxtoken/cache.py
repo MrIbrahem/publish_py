@@ -45,7 +45,7 @@ def store_jwt(cxtoken: dict, user: str, wiki: str) -> None:
 
 
 def get_from_store(user: str, wiki: str) -> dict | None:
-    in_cache: CxToken = cache.get((user, wiki))
+    in_cache: CxToken = cache.get((user, wiki))  # type: ignore
 
     if in_cache:
         return in_cache.to_dict()
