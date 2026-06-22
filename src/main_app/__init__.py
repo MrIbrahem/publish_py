@@ -23,7 +23,7 @@ from .public.routes import (
     bp_main,
     bp_publish,
 )
-from .shared.auth.identity import current_user
+from .app_routes.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
 from .shared.core.extensions import db as _db

@@ -14,7 +14,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ..db.services.users import active_coordinators
-from ..shared.auth.identity import current_user
+from ..app_routes.auth.identity import current_user
 
 FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
 
