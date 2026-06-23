@@ -153,7 +153,7 @@ def _make_mdwiki_cat_url(category: str, name: str | None = None) -> str:
     from urllib.parse import quote
 
     encoded = quote(clean.replace(" ", "_"), safe="")
-    return f"<a target='_blank' " f"href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
+    return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
 
 
 def _make_summary(code: str, cat: str, inprocess_count: int, missing_count: int, exists_count: int) -> str:

@@ -34,17 +34,14 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
     # with a non-empty different qid when inserting)
     # existing_by_title = _service.get_by_title(title)
     if existing_by_title:
+        msg = f"Title:({title}) already used in database with qid:({existing_by_title.qid}), new qid:({qid})"
+
         if qid_id and existing_by_title.id != qid_id:
-            flash(
-                f"Title:({title}) already used in database with qid:" f"({existing_by_title.qid}), new qid:({qid})",
-                "danger",
-            )
+            flash( msg, "danger" )
             return False
+
         if not qid_id and existing_by_title.qid and existing_by_title.qid != qid:
-            flash(
-                f"Title:({title}) already used in database with qid:" f"({existing_by_title.qid}), new qid:({qid})",
-                "danger",
-            )
+            flash( msg, "danger" )
             return False
 
     return True

@@ -7,8 +7,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
-from ....db.models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
-from ....shared.core.extensions import db
+from ..models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
+from ...shared.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,6 @@ def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, An
         }
         for row in results
     ]
-
 
 __all__ = [
     "list_pages_users",

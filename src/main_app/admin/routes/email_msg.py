@@ -12,6 +12,10 @@ from flask import (
     request,
 )
 
+from ...db.services.analytics import get_total_views_for_target
+
+from ...public.routes.main.results_api import results_api_result
+
 from ...db.services.pages import get_page_by_id, get_user_page_by_id
 from ...db.services.users import get_user_by_username
 from ...shared.auth.identity import current_user
@@ -32,8 +36,11 @@ def make_translate_link(sugust: str, langcode: str) -> str:
     here_url = "https://mdwiki.toolforge.org/Translation_Dashboard/translate_med/index.php?" + urlencode(params)
     return here_url
 
-def make_sugustion(langcode: str) -> str | None:
-    return "test"
+def make_sugustion(langcode: str, title: str) -> str | None:
+    data = results_api_result(langcode, "Main", 0)
+
+    missing = [ x for x in data.get("missing", []) if x != title]
+    return missing[0] if missing else None
 
 def get_user_email(username: str) -> str | None:
     user_record = get_user_by_username(username)
@@ -57,6 +64,12 @@ def get_page_data(last_table: str, id: int) -> dict[str, Any]:
         page_record = get_user_page_by_id(id)
     # user=row.user, lang=row.lang, target=row.target, date=row.pupdate, title=row.title
     page_data = page_record.to_dict() if page_record else {}
+    target = page_data.get("target")
+    lang = page_data.get("lang")
+
+    if page_data and not page_data.get("views"):
+        page_data["views"] = get_total_views_for_target(target, lang)
+
     return page_data
 
 
@@ -82,7 +95,7 @@ def create_email_msg(page_data: dict[str, Any], sugust: str) -> str:
         " Since this translation has gone live on"
         f" <font color='#311873'>{date}</font>"
         f" it has been read by <font color='#0000ff'>{views} people</font>.<br>"
-        f" Would you be interested in translating '{sugust_link}'?"
+        f" Would you be interested in translating \"{sugust_link}\"?"
         f" If so, simply click {translate_link}.<br>"
         " Once again thank you for improving access to knowledge.<br>"
     )
@@ -105,7 +118,7 @@ def msg_dashboard(
     user_email = get_user_email(username)
     currect_user_email = get_currect_user_email()
 
-    sugust = make_sugustion(page_data.get("lang"))
+    sugust = make_sugustion(page_data.get("lang"), page_data.get("title"))
 
     # Create email message
     msg = create_email_msg(page_data, sugust)
