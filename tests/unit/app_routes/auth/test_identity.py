@@ -20,17 +20,19 @@ class TestCurrentUser:
 
     def test_create_with_fields(self):
         """Test creating CurrentUser with fields."""
-        user = CurrentUser(user_id="12345", username="TestUser")
+        user = CurrentUser(user_id=12345, username="TestUser", access_token=b"token", access_secret=b"secret")
 
-        assert user.user_id == "12345"
+        assert user.user_id == 12345
         assert user.username == "TestUser"
+        assert user.access_token == b"token"
+        assert user.access_secret == b"secret"
 
     def test_is_frozen(self):
         """Test that CurrentUser is immutable."""
-        user = CurrentUser(user_id="12345", username="TestUser")
+        user = CurrentUser(user_id=12345, username="TestUser", access_token=b"token", access_secret=b"secret")
 
         with pytest.raises(AttributeError):
-            user.user_id = "99999"
+            user.user_id = 99999
 
 
 class TestResolveUserId:
@@ -91,15 +93,19 @@ class TestCurrentUserFunction:
 
     def test_returns_user_from_session(self, app, monkeypatch):
         """Test that user is returned from session."""
-        mock_user = MagicMock()
-        mock_user.username = "TestUser"
+        mock_record = MagicMock()
+        mock_record.user_id = 12345
+        mock_record.username = "TestUser"
+        mock_record.access_token = b"token"
+        mock_record.access_secret = b"secret"
 
         def mock_get_user_token(uid):
             if uid == 12345:
-                return mock_user
+                return mock_record
             return None
 
         monkeypatch.setattr("src.main_app.shared.auth.identity.get_user_token", mock_get_user_token)
+        monkeypatch.setattr("src.main_app.shared.auth.identity.is_active_coordinator", lambda u: False)
 
         with app.test_request_context():
             from flask import session
@@ -108,7 +114,9 @@ class TestCurrentUserFunction:
 
             result = current_user()
 
-            assert result is mock_user
+            assert result is not None
+            assert result.user_id == 12345
+            assert result.username == "TestUser"
 
     def test_updates_session_username(self, app, monkeypatch):
         """Test that session username is updated from user record."""

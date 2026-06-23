@@ -7,26 +7,14 @@ from typing import Callable, List, TypeVar, cast
 
 from flask import (
     abort,
-    g,
     redirect,
     url_for,
 )
 from flask.typing import ResponseReturnValue
 
-from ..db.services.users import active_coordinators
 from ..shared.auth.identity import current_user
 
 FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
-
-
-def _get_cached_active_coordinators() -> List[str]:
-    """Get active coordinators, cached for the duration of the request."""
-    if hasattr(g, "_active_coordinators"):
-        return g._active_coordinators  # type: ignore[attr-defined]
-
-    coordinators = active_coordinators()
-    g._active_coordinators = coordinators  # type: ignore[attr-defined]
-    return coordinators
 
 
 def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
@@ -37,7 +25,7 @@ def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
         user = current_user()
         if not user:
             return redirect(url_for("auth.login"))
-        if user.username not in _get_cached_active_coordinators():
+        if not user.is_active_admin:
             abort(403)
         return view(*args, **kwargs)
 

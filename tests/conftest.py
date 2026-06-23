@@ -228,10 +228,5 @@ def mock_admin_required(mocker):
     # Mock current_user to return a valid user object
     mock_user = MagicMock()
     mock_user.username = "admin"
+    mock_user.is_active_admin = True
     mocker.patch("src.main_app.admin.decorators.current_user", return_value=mock_user)
-
-    # Mock _get_cached_active_coordinators to return list with "admin"
-    mocker.patch(
-        "src.main_app.admin.decorators._get_cached_active_coordinators",
-        return_value=["admin"],
-    )

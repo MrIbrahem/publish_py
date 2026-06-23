@@ -13,7 +13,7 @@ from flask import Flask, flash, jsonify, render_template, request  # , g
 
 from .admin.route import bp_admin
 from .db import init_db
-from .db.services.users import active_coordinators
+from .db.services.users import should_bypass_coordinator_check
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -41,7 +41,7 @@ def context_data() -> dict[str, Any]:
     return {
         "current_user": user,
         "is_authenticated": user is not None,
-        "is_admin": bool(user and user.username in active_coordinators()),
+        "is_admin": bool(user and user.is_active_admin),
         "username": user.username if user else None,
         "yesterday": (date.today() - timedelta(days=1)).isoformat(),
     }
