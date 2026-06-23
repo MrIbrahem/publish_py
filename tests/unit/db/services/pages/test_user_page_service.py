@@ -8,8 +8,10 @@ from src.main_app.db.services.delete_service import (
 )
 from src.main_app.db.services.pages.user_page_service import (
     add_user_page,
-    find_exists_or_update_user_page,
+    count_translated,
+    get_by_id,
     insert_user_page_target,
+    list_translated,
     list_user_pages,
     update_user_page,
 )
@@ -40,8 +42,6 @@ def test_user_page_workflow() -> None:
     orm_p.user = "Spanish_Editor"
     orm_p.target = ""
     db.session.commit()
-
-    assert find_exists_or_update_user_page("Flu", "es", "Spanish_Editor", "Gripe_target.html") is True
 
     success = insert_user_page_target(
         sourcetitle="Malaria",
@@ -116,22 +116,6 @@ class TestDeleteUserPage:
         assert delete_user_page(9999) is False
 
 
-class TestFindExistsOrUpdateUserPage:
-    """Tests for find_exists_or_update_user_page function."""
-
-    def test_updates_target_if_empty(self, monkeypatch):
-        db.session.add(UserPageRecord(title="Psychiatry", lang="en", user="Dr_Smith", target=""))
-        db.session.commit()
-
-        result = find_exists_or_update_user_page("Psychiatry", "en", "Dr_Smith", "Mental_Health.html")
-        assert result is True
-        p = next(p for p in list_user_pages() if p.title == "Psychiatry")
-        assert p.target == "Mental_Health.html"
-
-    def test_returns_false_if_not_found(self, monkeypatch):
-        assert find_exists_or_update_user_page("Ghost", "en", "User", "T") is False
-
-
 class TestInsertUserPageTarget:
     """Tests for insert_user_page_target function."""
 
@@ -153,12 +137,6 @@ class TestInsertUserPageTarget:
 #   - count_translated(lang)
 #   - get_by_id(page_id)
 # ---------------------------------------------------------------------------
-
-from src.main_app.db.services.pages.user_page_service import (
-    count_translated,
-    get_by_id,
-    list_translated,
-)
 
 
 def _make_user_page(title: str, lang: str, target: str, user: str = "u") -> UserPageRecord:

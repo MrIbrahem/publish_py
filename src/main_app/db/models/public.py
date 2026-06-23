@@ -10,13 +10,15 @@ Note: Several models have been moved to specialized modules:
 
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import JSON, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class LangRecord(db.Model, BaseModel):
+class LangRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS langs (
         lang_id int NOT NULL AUTO_INCREMENT,
@@ -36,8 +38,22 @@ class LangRecord(db.Model, BaseModel):
     name: Mapped[str] = mapped_column(String(70), nullable=False)
     redirects: Mapped[dict | list | None] = mapped_column(JSON, server_default=text("NULL"))
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
-class MdwikiRevidRecord(db.Model, BaseModel):
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "lang_id": self.lang_id,
+            "code": self.code,
+            "autonym": self.autonym,
+            "name": self.name,
+            "redirects": self.redirects,
+        }
+
+
+class MdwikiRevidRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS mdwiki_revids (
         title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -51,8 +67,19 @@ class MdwikiRevidRecord(db.Model, BaseModel):
     title: Mapped[str] = mapped_column(String(255), primary_key=True)
     revid: Mapped[int] = mapped_column(nullable=False)
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
-class TranslateTypeRecord(db.Model, BaseModel):
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "title": self.title,
+            "revid": self.revid,
+        }
+
+
+class TranslateTypeRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS translate_type (
         tt_id int unsigned NOT NULL AUTO_INCREMENT,
@@ -78,6 +105,14 @@ class TranslateTypeRecord(db.Model, BaseModel):
         if "tt_full" not in kwargs:
             kwargs["tt_full"] = 0
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "tt_id": self.tt_id,
+            "tt_title": self.tt_title,
+            "tt_lead": self.tt_lead,
+            "tt_full": self.tt_full,
+        }
 
 
 __all__ = [

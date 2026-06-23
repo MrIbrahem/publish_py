@@ -10,12 +10,12 @@ from typing import Any, Optional
 from sqlalchemy import Enum, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import LONGTEXT, BaseModel, db
+from ...shared.core.extensions import LONGTEXT, db
 
 logger = logging.getLogger(__name__)
 
 
-class LanguageSettingRecord(db.Model, BaseModel):
+class LanguageSettingRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS language_settings (
         id int NOT NULL AUTO_INCREMENT,
@@ -46,8 +46,17 @@ class LanguageSettingRecord(db.Model, BaseModel):
             kwargs["add_en_lang"] = 0
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "lang_code": self.lang_code,
+            "move_dots": self.move_dots,
+            "expend": self.expend,
+            "add_en_lang": self.add_en_lang,
+        }
 
-class SettingRecord(db.Model, BaseModel):
+
+class SettingRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS new_settings (
         `id` INT NOT NULL AUTO_INCREMENT,
@@ -95,6 +104,15 @@ class SettingRecord(db.Model, BaseModel):
                 return 0
 
         return str(value)  # string
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "key": self.key,
+            "title": self.title,
+            "value": self.value,
+            "value_type": self.value_type,
+        }
 
 
 __all__ = [

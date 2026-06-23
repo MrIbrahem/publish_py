@@ -48,7 +48,9 @@
                     </li>
                     {% for p in range([1, page - 3]|max, [total_pages, page + 3]|min + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for(endpoint, lang=lang, page=p, limit=limit) }}">{{ p }}</a>
+                        <a class="page-link" href="{{ url_for(endpoint, lang=lang, page=p, limit=limit) }}">
+                            {{ p }}
+                        </a>
                     </li>
                     {% endfor %}
                     <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
@@ -65,8 +67,8 @@
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-sm table-striped table_responsive table_text_left"
-            id="pages_table" style="font-size:90%;">
+        <table class="table table-sm table-striped table_responsive table_text_left" id="pages_table"
+            style="font-size:90%;">
             <thead>
                 <tr>
                     <th>#</th>
@@ -81,7 +83,9 @@
             <tbody>
                 {% for row in rows %}
                 <tr>
-                    <td>{{ loop.index + (page - 1) * limit }}</td>
+                    <td>
+                        {{ loop.index + (page - 1) * limit }}
+                    </td>
                     <td>
                         <a href="{{ url_for("leaderboard.users", username=row.user) }}" target="_blank">{{ row.user }}
                         </a>
@@ -98,10 +102,14 @@
                     <td>
                         {% if row.target %}
                         <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}"
-                            target="_blank">{{ row.target }}</a>
+                            target="_blank">
+                            {{ row.target }}
+                        </a>
                         {% endif %}
                     </td>
-                    <td>{{ row.pupdate }}</td>
+                    <td>
+                        {{ row.pupdate }}
+                    </td>
                     <td>
                         <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for(edit_endpoint, id=row.id) }}"
                             onclick="pup_window_new(this)">

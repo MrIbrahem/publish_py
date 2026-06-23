@@ -26,10 +26,10 @@ function add_it(item, data) {
 
 function get_views() {
 	// get the data from the data-json-url if the server not localhost
-	if (window.location.hostname === 'localhost') {
+	if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
 		// log to console
 		console.log('dont load get_views() in localhost');
-		// return;
+		return;
 	}
 	// ---
 	$("[data-json-url]").each(function () {

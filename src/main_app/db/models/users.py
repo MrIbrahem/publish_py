@@ -4,17 +4,17 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, LargeBinary, String, text
+from sqlalchemy import LargeBinary, String, text
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from ...shared.core.crypto import decrypt_value
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 from ...shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 
 
-class UserTokenRecord(db.Model, BaseModel):
+class UserTokenRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS user_tokens (
         user_id int NOT NULL,
@@ -46,6 +46,23 @@ class UserTokenRecord(db.Model, BaseModel):
     last_used_at: Mapped[datetime | None] = mapped_column(server_default=db.func.current_timestamp())
     rotated_at: Mapped[datetime | None] = mapped_column()
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "access_token": self.access_token,
+            "access_secret": self.access_secret,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "last_used_at": self.last_used_at,
+            "rotated_at": self.rotated_at,
+        }
+
     @validates("access_token", "access_secret")
     def validate_bytes(self, key, value):
         return coerce_bytes(value)
@@ -58,7 +75,7 @@ class UserTokenRecord(db.Model, BaseModel):
         return access_key, access_secret
 
 
-class UserRecord(db.Model, BaseModel):
+class UserRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS users (
         user_id int NOT NULL AUTO_INCREMENT,
@@ -92,8 +109,18 @@ class UserRecord(db.Model, BaseModel):
             kwargs["user_group"] = "Uncategorized"
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "email": self.email,
+            "wiki": self.wiki,
+            "user_group": self.user_group,
+            "reg_date": self.reg_date,
+        }
 
-class UsersNoInprocessRecord(db.Model, BaseModel):
+
+class UsersNoInprocessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS users_no_inprocess (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -117,8 +144,15 @@ class UsersNoInprocessRecord(db.Model, BaseModel):
             kwargs["is_active"] = 1
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "user": self.user,
+            "is_active": self.is_active,
+        }
 
-class AdminUserRecord(db.Model, BaseModel):
+
+class AdminUserRecord(db.Model):
     """
     ORM model for the coordinators table.
     CREATE TABLE IF NOT EXISTS coordinators (
@@ -147,7 +181,7 @@ class AdminUserRecord(db.Model, BaseModel):
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
-class FullTranslatorRecord(db.Model, BaseModel):
+class FullTranslatorRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS full_translators (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -169,6 +203,13 @@ class FullTranslatorRecord(db.Model, BaseModel):
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "user": self.user,
+            "is_active": self.is_active,
+        }
 
 
 __all__ = [

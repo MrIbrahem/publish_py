@@ -5,14 +5,15 @@ Pages domain models - SQLAlchemy ORM.
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Any
 
-from sqlalchemy import Date, ForeignKey, String, text
+from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class PageRecord(db.Model, BaseModel):
+class PageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -58,8 +59,25 @@ class PageRecord(db.Model, BaseModel):
             kwargs["deleted"] = 0
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "word": self.word,
+            "translate_type": self.translate_type,
+            "cat": self.cat,
+            "lang": self.lang,
+            "user": self.user,
+            "target": self.target,
+            "date": self.date,
+            "pupdate": self.pupdate,
+            "add_date": self.add_date,
+            "deleted": self.deleted,
+            "mdwiki_revid": self.mdwiki_revid,
+        }
 
-class UserPageRecord(db.Model, BaseModel):
+
+class UserPageRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -105,8 +123,25 @@ class UserPageRecord(db.Model, BaseModel):
             kwargs["deleted"] = 0
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "word": self.word,
+            "translate_type": self.translate_type,
+            "cat": self.cat,
+            "lang": self.lang,
+            "user": self.user,
+            "target": self.target,
+            "date": self.date,
+            "pupdate": self.pupdate,
+            "add_date": self.add_date,
+            "deleted": self.deleted,
+            "mdwiki_revid": self.mdwiki_revid,
+        }
 
-class PagesUsersToMainRecord(db.Model, BaseModel):
+
+class PagesUsersToMainRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users_to_main (
         id int unsigned NOT NULL,
@@ -135,8 +170,16 @@ class PagesUsersToMainRecord(db.Model, BaseModel):
             kwargs["new_qid"] = ""
         super().__init__(**kwargs)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "new_target": self.new_target,
+            "new_user": self.new_user,
+            "new_qid": self.new_qid,
+        }
 
-class InProcessRecord(db.Model, BaseModel):
+
+class InProcessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS in_process (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -159,7 +202,9 @@ class InProcessRecord(db.Model, BaseModel):
     user: Mapped[str] = mapped_column(String(255), nullable=False)
     lang: Mapped[str] = mapped_column(String(30), nullable=False)
     cat: Mapped[str | None] = mapped_column(String(255), default="RTT", server_default=text("'RTT'"))
-    translate_type: Mapped[str] = mapped_column(String(20), nullable=False, default="lead", server_default=text("'lead'"))
+    translate_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="lead", server_default=text("'lead'")
+    )
     word: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
     add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
 
@@ -172,6 +217,18 @@ class InProcessRecord(db.Model, BaseModel):
         if "word" not in kwargs:
             kwargs["word"] = 0
         super().__init__(**kwargs)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "user": self.user,
+            "lang": self.lang,
+            "cat": self.cat,
+            "translate_type": self.translate_type,
+            "word": self.word,
+            "add_date": self.add_date,
+        }
 
 
 __all__ = [

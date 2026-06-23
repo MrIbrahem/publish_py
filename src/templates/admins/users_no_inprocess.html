@@ -69,8 +69,12 @@
                 <tbody>
                     {% for user_rec in users %}
                     <tr>
-                        <td>{{ user_rec.id }}</td>
-                        <td>{{ user_rec.user }}</td>
+                        <td>
+                            {{ user_rec.id }}
+                        </td>
+                        <td>
+                            {{ user_rec.user }}
+                        </td>
                         <td class="text-center">
                             {% set endpoint_target = 'admin.users_no_inprocess.deactivate' if user_rec.is_active else 'admin.users_no_inprocess.activate' %}
                             <form method="post" action="{{ url_for(endpoint_target, record_id=user_rec.id) }}"

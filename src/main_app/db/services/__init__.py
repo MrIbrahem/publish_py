@@ -19,14 +19,13 @@ from .content import (
     update_category,
 )
 from .pages import (
+    add_in_process,
     add_page,
     add_user_page,
     delete_in_process,
     delete_in_process_by_title_user_lang,
     delete_page,
     delete_user_page,
-    find_exists_or_update_page,
-    find_exists_or_update_user_page,
     get_in_process,
     get_in_process_by_title_user_lang,
     get_in_process_counts_by_user,
@@ -46,7 +45,6 @@ from .pages import (
     list_user_pages,
     top_lang_of_users,
     update_in_process,
-    add_in_process,
     update_page,
     update_user_page,
 )
@@ -90,7 +88,6 @@ __all__ = [
     "get_leaderboard_chart_data",
     "update_page",
     "delete_page",
-    "find_exists_or_update_page",
     "insert_page_target",
     "list_of_users_by_translations_count",
     # qid_service
@@ -112,7 +109,6 @@ __all__ = [
     "add_user_page",
     "update_user_page",
     "delete_user_page",
-    "find_exists_or_update_user_page",
     "insert_user_page_target",
     "list_langs",
     "get_lang",

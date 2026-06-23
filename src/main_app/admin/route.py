@@ -12,6 +12,8 @@ from flask import (
     url_for,
 )
 
+from .routes.email_msg import bp_msg
+
 from .decorators import admin_required
 from .routes.add_translate import add_bp
 from .routes.campaigns import campaigns_module
@@ -64,7 +66,6 @@ def last_dashboard():
 def reports():
     return render_template("admins/reports.html")
 
-
 @bp_admin.get("/process")
 @admin_required
 def in_process_dashboard():
@@ -91,7 +92,6 @@ def edit_done() -> str:
 def categories_dashboard_route():
     return categories_dashboard()
 
-
 def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(coordinators_module.bp)
     bp_admin.register_blueprint(fulltranslators_module.bp)
@@ -102,6 +102,7 @@ def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(translated_bp)
     bp_admin.register_blueprint(translated_users_bp)
 
+    bp_admin.register_blueprint(bp_msg)
     bp_admin.register_blueprint(qids_module.bp)
     bp_admin.register_blueprint(qids_others_module.bp)
     bp_admin.register_blueprint(pages_users_to_main_bp)

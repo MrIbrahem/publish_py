@@ -13,11 +13,10 @@
         <h4>Add translations:</h4>
     </div>
     <div class="cardbody p-2">
-        <form action="{{ url_for('admin.add.add_translate') }}" method="POST">
+        <form action="{{ url_for('admin.add.add_translate_post') }}" method="POST">
             <input name="csrf_token" value="{{ csrf_token() }}" type="hidden" />
             <div class="form-group">
-                <table class="table table-striped compact table_responsive"
-                    style="font-size:95%;">
+                <table class="table table-striped compact table_responsive" style="font-size:95%;">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -74,8 +73,9 @@
             </div>
             <div class="form-group d-flex justify-content-between">
                 <button type="submit" class="btn btn-outline-primary mb-10">Save</button>
-                <span role="button" id="add_new_row" class="btn btn-outline-primary" onclick="add_new_row()">New
-                    row</span>
+                <span role="button" id="add_new_row" class="btn btn-outline-primary" onclick="add_new_row()">
+                    New row
+                </span>
             </div>
         </form>
     </div>

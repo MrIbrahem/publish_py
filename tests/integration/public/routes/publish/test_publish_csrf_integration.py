@@ -129,7 +129,7 @@ class BasePublishTest:
 
     @pytest.fixture(autouse=True)
     def mock_get_campaign_category(mocker):
-        with patch("src.main_app.public.routes.publish.worker.get_campaign_category") as mocked:
+        with patch("src.main_app.public.routes.publish.to_db.get_campaign_category") as mocked:
             mocked.return_value = None
             yield mocked
 
@@ -160,10 +160,10 @@ class BasePublishTest:
             patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
             patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
             patch("src.main_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
-            patch("src.main_app.public.routes.publish.worker.find_exists_or_update_page") as mock_find_exists,
-            patch("src.main_app.public.routes.publish.worker.find_exists_or_update_user_page") as mock_user_find_exists,
-            patch("src.main_app.public.routes.publish.worker.insert_page_target") as mock_insert_page,
-            patch("src.main_app.public.routes.publish.worker.insert_user_page_target") as mock_insert_user_page,
+            patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
+            patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page") as mock_user_find_exists,
+            patch("src.main_app.public.routes.publish.to_db.insert_page_target") as mock_insert_page,
+            patch("src.main_app.public.routes.publish.to_db.insert_user_page_target") as mock_insert_user_page,
         ):
             # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"

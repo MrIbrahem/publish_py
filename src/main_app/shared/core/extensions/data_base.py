@@ -91,7 +91,6 @@ def create_views_new_all_view(target: MetaData, connection: Connection, **kw: An
 
 
 __all__ = [
-    "BaseModel",
     "db",
     "metadata",
     "LONGTEXT",

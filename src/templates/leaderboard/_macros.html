@@ -1,5 +1,0 @@
-{% macro select_options(data, selectd) %}
-{% for item in data %}
-<option value="{{ item }}" {% if item | string == selectd | string %} selected {% endif %}>{{ item }}</option>
-{% endfor %}
-{% endmacro %}

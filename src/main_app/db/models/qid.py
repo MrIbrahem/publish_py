@@ -4,13 +4,15 @@ QID domain models - SQLAlchemy ORM.
 
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import BaseModel, db
+from ...shared.core.extensions import db
 
 
-class QidRecord(db.Model, BaseModel):
+class QidRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS qids (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -44,8 +46,15 @@ class QidRecord(db.Model, BaseModel):
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "title": self.title,
+        }
 
-class QidOthersRecord(db.Model, BaseModel):
+
+class QidOthersRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS qids_others (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -80,8 +89,15 @@ class QidOthersRecord(db.Model, BaseModel):
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "title": self.title,
+        }
 
-class AllQidsExistRecord(db.Model, BaseModel):
+
+class AllQidsExistRecord(db.Model):
     """
     CREATE TABLE all_qids_exists (
         id int NOT NULL AUTO_INCREMENT,
@@ -100,6 +116,19 @@ class AllQidsExistRecord(db.Model, BaseModel):
     qid: Mapped[str] = mapped_column(String(255), nullable=False)
     code: Mapped[str] = mapped_column(String(25), nullable=False)
     target: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "qid": self.qid,
+            "code": self.code,
+            "target": self.target,
+        }
 
 
 __all__ = [

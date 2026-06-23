@@ -42,11 +42,15 @@
             <tbody>
                 {% for tt in translate_types %}
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <!-- <td>{{ tt.tt_id }}</td> -->
+                    <td>
+                        {{ loop.index }}
+                    </td>
+                    <!-- <td> {{ tt.tt_id }} </td> -->
                     <td>
                         <a href="https://mdwiki.org/wiki/{{ tt.tt_title | replace(' ', '_') | urlencode }}"
-                            target="_blank">{{ tt.tt_title }}</a>
+                            target="_blank">
+                            {{ tt.tt_title }}
+                        </a>
                     </td>
                     <td>
                         <div class='form-check form-switch'>
@@ -87,8 +91,7 @@
             {% for title in new_titles %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ title }}</span>
-                <a class="btn btn-outline-primary btn-sm"
-                    pup-target="{{ url_for('admin.tt.add', title=title) }}"
+                <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for('admin.tt.add', title=title) }}"
                     onclick="pup_window_new(this)">
                     Add
                 </a>
@@ -101,8 +104,8 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <a class="btn btn-outline-primary btn-sm"
-            pup-target="{{ url_for('admin.tt.add') }}" onclick="pup_window_new(this)">
+        <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for('admin.tt.add') }}"
+            onclick="pup_window_new(this)">
             Add one!
         </a>
     </div>

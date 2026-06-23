@@ -31,12 +31,14 @@ from .missing_stats_service import (
     statics_by_category,
 )
 from .page_service import (
+    get_page_by_id,
     add_page,
     add_translate_row_to_db,
-    find_exists_or_update_page,
+    find_page_record,
     insert_page_target,
     list_pages,
     list_pages_by_lang_cat,
+    set_page_target,
     update_page,
 )
 from .pages_users_to_main_service import (
@@ -63,11 +65,12 @@ from .translate_type_service import (
 from .user_page_service import (
     add_user_page,
     count_translated,
-    find_exists_or_update_user_page,
-    get_by_id,
+    find_user_page_record,
+    get_user_page_by_id,
     insert_user_page_target,
     list_translated,
     list_user_pages,
+    set_user_page_target,
     update_user_page,
 )
 
@@ -93,10 +96,11 @@ __all__ = [
     "statics_by_category",
     "list_pages",
     "list_pages_by_lang_cat",
+    "set_page_target",
+    "find_page_record",
     "add_page",
     "update_page",
     "delete_page",
-    "find_exists_or_update_page",
     "insert_page_target",
     "add_translate_row_to_db",
     "list_pending",
@@ -119,9 +123,11 @@ __all__ = [
     "list_user_pages",
     "list_translated",
     "count_translated",
-    "get_by_id",
     "add_user_page",
     "update_user_page",
-    "find_exists_or_update_user_page",
     "insert_user_page_target",
+    "set_user_page_target",
+    "find_user_page_record",
+    "get_page_by_id",
+    "get_user_page_by_id",
 ]

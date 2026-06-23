@@ -16,14 +16,11 @@ The actual DB operations are mocked to avoid requiring a real database.
 These tests complement the unit tests by verifying the service-to-DB integration.
 """
 
-from unittest.mock import MagicMock, patch
-
 from src.main_app.db.services.delete_service import (
     delete_page,
 )
 from src.main_app.db.services.pages.page_service import (
     add_page,
-    find_exists_or_update_page,
     insert_page_target,
     list_pages,
     update_page,
@@ -47,11 +44,6 @@ class TestPagesServiceIntegration:
 
         deleted = delete_page(result.id)
         assert deleted is True
-
-    def test_find_exists_or_update_integration(self):
-        """Test find_exists_or_update_page through service layer."""
-        result = find_exists_or_update_page("TestTitle", "ar", "TestUser", "Target")
-        assert result is False
 
     def test_insert_page_target_integration(self):
         """Test insert_page_target through service layer."""

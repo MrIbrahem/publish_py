@@ -31,14 +31,26 @@
         <tr>
             <th class="num" scope="row">{{ row.n }}</th>
             <td class="link_container">
-                <a target="_blank" href="{{ row.mdwiki_url }}">{{ row.title }}</a>
+                <a target="_blank" href="{{ row.mdwiki_url }}">
+                    {{ row.title }}
+                </a>
             </td>
             <th>{{ row.translate_html|safe }}</th>
-            <td class="num" style="text-align: left">{{ row.en_views }}</td>
-            <td class="num" style="text-align: left">{{ row.importance }}</td>
-            <td class="num" style="text-align: left">{{ row.words }}</td>
-            <td class="num" style="text-align: left">{{ row.refs }}</td>
-            <td>{{ row.qid_html|safe }}</td>
+            <td class="num" style="text-align: left">
+                {{ row.en_views }}
+            </td>
+            <td class="num" style="text-align: left">
+                {{ row.importance }}
+            </td>
+            <td class="num" style="text-align: left">
+                {{ row.words }}
+            </td>
+            <td class="num" style="text-align: left">
+                {{ row.refs }}
+            </td>
+            <td>
+                {{ row.qid_html|safe }}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

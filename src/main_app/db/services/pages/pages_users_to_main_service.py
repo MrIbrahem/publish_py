@@ -49,7 +49,7 @@ def list_pending(lang: str = "All") -> List[Dict[str, Any]]:
         .join(PagesUsersToMainRecord, PagesUsersToMainRecord.id == UserPageRecord.id)
         .outerjoin(QidRecord, QidRecord.title == UserPageRecord.title)
     )
-    if lang and lang != "All":
+    if lang and lang.lower() != "all":
         query = query.filter(UserPageRecord.lang == lang)
 
     return [

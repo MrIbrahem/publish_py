@@ -22,7 +22,7 @@ def list_translate_types(cat: str = "All") -> List[TranslateTypeRecord]:
     given category are returned.
     """
     query = db.session.query(TranslateTypeRecord)
-    if cat and cat != "All":
+    if cat and cat.lower() != "all":
         titles_in_cat = db.session.query(PageRecord.title).filter(PageRecord.cat == cat).distinct()
         query = query.filter(TranslateTypeRecord.tt_title.in_(titles_in_cat))
     return query.order_by(TranslateTypeRecord.tt_id.asc()).all()

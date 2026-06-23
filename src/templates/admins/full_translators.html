@@ -38,7 +38,8 @@
 
         <div class="card mb-4 shadow-sm">
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.full_translators.add') }}" class="row g-2 align-items-end">
+                <form method="post" action="{{ url_for('admin.full_translators.add') }}"
+                    class="row g-2 align-items-end">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="col-sm-8 col-md-6 col-lg-4">
                         <label class="form-label" for="new-translator-username">Add full translator</label>
@@ -67,8 +68,12 @@
                 <tbody>
                     {% for translator in translators %}
                     <tr>
-                        <td>{{ translator.id }}</td>
-                        <td>{{ translator.user }}</td>
+                        <td>
+                            {{ translator.id }}
+                        </td>
+                        <td>
+                            {{ translator.user }}
+                        </td>
                         <td class="text-center">
                             {% set endpoint_target = 'admin.full_translators.deactivate' if translator.is_active else 'admin.full_translators.activate' %}
                             <form method="post" action="{{ url_for(endpoint_target, record_id=translator.id) }}"

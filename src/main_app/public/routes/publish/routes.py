@@ -41,23 +41,25 @@ def handle_form(request_data) -> Response:
         response.status_code = 400
         return response
 
+    validated_dict = {x: v for x, v in validated_data.items() if v is not None}  # type: ignore
+
     # Format inputs
-    user = format_user(validated_data.get("user", ""))
-    title = format_title(validated_data.get("title", ""))
-    text = validated_data.get("text", "")
+    user = format_user(validated_dict.get("user", ""))
+    title = format_title(validated_dict.get("title", ""))
+    text = validated_dict.get("text", "")
 
     # Build operation metadata
     tab = {
         "title": title,
         "summary": "",
-        "lang": validated_data.get("target", ""),
+        "lang": validated_dict.get("target", ""),
         "user": user,
-        "campaign": validated_data.get("campaign", ""),
+        "campaign": validated_dict.get("campaign", ""),
         "result": "",
         "edit": {},
-        "sourcetitle": validated_data.get("sourcetitle", ""),
-        "request_revid": validated_data.get("revid", "") or validated_data.get("revision", ""),
-        "translate_type": validated_data.get("translate_type", "lead"),
+        "sourcetitle": validated_dict.get("sourcetitle", ""),
+        "request_revid": validated_dict.get("revid", "") or validated_dict.get("revision", ""),
+        "translate_type": validated_dict.get("translate_type", "lead"),
         "words": 0,
     }
 
@@ -73,10 +75,10 @@ def handle_form(request_data) -> Response:
     access_key, access_secret = user_token.decrypted()
 
     # Add captcha parameters if present
-    if validated_data.get("wpCaptchaId") and validated_data.get("wpCaptchaWord"):
+    if validated_dict.get("wpCaptchaId") and validated_dict.get("wpCaptchaWord"):
         tab["wp_captcha_params"] = {
-            "wpCaptchaId": validated_data["wpCaptchaId"],
-            "wpCaptchaWord": validated_data["wpCaptchaWord"],
+            "wpCaptchaId": validated_dict["wpCaptchaId"],
+            "wpCaptchaWord": validated_dict["wpCaptchaWord"],
         }
 
     # Process the edit

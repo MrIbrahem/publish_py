@@ -8,7 +8,6 @@ from src.main_app.db.services.delete_service import (
 )
 from src.main_app.db.services.pages.page_service import (
     add_page,
-    find_exists_or_update_page,
     insert_page_target,
     list_pages,
     update_page,
@@ -41,8 +40,6 @@ def test_page_workflow():
     orm_p.user = "WikiUser"
     orm_p.target = ""
     db.session.commit()
-
-    assert find_exists_or_update_page("COVID-19", "en", "WikiUser", "Pandemic_target.html") is True
 
     success = insert_page_target(
         sourcetitle="Black Death",
@@ -120,42 +117,6 @@ class TestDeletePage:
 
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
         assert delete_page(9999) is False
-
-
-class TestFindExistsOrUpdate:
-    """Tests for find_exists_or_update_page function."""
-
-    def test_updates_target_if_empty(self, monkeypatch):
-        """Test that function updates target if empty."""
-        # Manual insert to set specific fields
-        db.session.add(PageRecord(title="Philosophy", lang="en", user="PhilAuthor", target=""))
-        db.session.commit()
-
-        result = find_exists_or_update_page("Philosophy", "en", "PhilAuthor", "Philosophy_article.html")
-        assert result is True
-
-        # Verify update
-        pages = list_pages()
-        p = next(p for p in pages if p.title == "Philosophy")
-        assert p.target == "Philosophy_article.html"
-
-    def test_returns_false_when_not_exists(self, monkeypatch):
-        """Test that function returns False when record not found."""
-        result = find_exists_or_update_page("Nonexistent Article", "en", "GhostUser", "none.html")
-        assert result is False
-
-    def test_handles_exception_on_commit(self, monkeypatch):
-        db.session.add(PageRecord(title="Error_Page", lang="en", user="U", target=""))
-        db.session.commit()
-        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
-            mock_session.query.return_value.filter.return_value.all.return_value = [MagicMock(target="")]
-            mock_session.commit.side_effect = Exception("DB Error")
-
-            # Commit fails after rollback, so we must return False
-            # (the previous behavior of returning True swallowed real failures).
-            result = find_exists_or_update_page("Error_Page", "en", "U", "T")
-            assert result is False
-            mock_session.rollback.assert_called_once()
 
 
 class TestInsertPageTarget:
