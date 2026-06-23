@@ -102,7 +102,15 @@ class CategoryFetcher:
             if cmcontinue != "x":
                 params["cmcontinue"] = cmcontinue
 
-            data = self._post_urls_mdwiki(params)
+            try:
+                data = self._post_urls_mdwiki(params)
+            except requests.RequestException as e:
+                logger.warning("fetch_cats_members_api: Failed to fetch '%s': %s", cat, e)
+                break
+            except Exception as e:
+                logger.warning("fetch_cats_members_api: Failed to fetch '%s': %s", cat, e)
+                break
+
             members = data.get("query", {}).get("categorymembers", [])
             if not members:
                 break
