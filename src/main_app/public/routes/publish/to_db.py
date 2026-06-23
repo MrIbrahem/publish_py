@@ -26,9 +26,8 @@ def find_exists_or_update_page(
 ) -> bool:
     orm_obj: PageRecord | None = find_page_record(sourcetitle, lang, user)
     if orm_obj:
-        exists = True
-        exists = set_page_target(orm_obj, target)
-    return exists
+        return set_page_target(orm_obj, target)
+    return False
 
 
 def find_exists_or_update_user_page(
@@ -39,9 +38,8 @@ def find_exists_or_update_user_page(
 ) -> bool:
     orm_obj: UserPageRecord | None = find_user_page_record(sourcetitle, lang, user)
     if orm_obj:
-        exists = True
-        exists = set_user_page_target(orm_obj, target)
-    return exists
+        return set_user_page_target(orm_obj, target)
+    return False
 
 
 def add_to_db(
