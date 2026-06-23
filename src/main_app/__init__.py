@@ -164,15 +164,22 @@ def create_app(config_class: Type) -> Flask:
         flash("Internal Server Error", "danger")
         return render_template("index.html", title="Internal Server Error"), 500
 
-    # Add cache control headers to prevent CSRF token caching issues
+    # Add security and cache control headers to all responses
     @app.after_request
-    def add_cache_headers(response):
-        """Prevent CSRF token caching on form-related routes."""
+    def add_security_headers(response):
+        """Inject security and cache control headers."""
+        # Security headers
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+        # Prevent CSRF token caching on form-related routes
         endpoints = ["auth.", "publish.", "fixrefs.", "cxtoken."]
         if request.endpoint and any(request.endpoint.startswith(bp) for bp in endpoints):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
+
         return response
 
     # g.settings = settings  # Make settings available in Flask's global context
