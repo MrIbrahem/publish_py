@@ -3,7 +3,7 @@ Python port of the PHP ``Results\\GetResults2026`` module.
 
 Reference PHP files:
   - src/backend/results_2026/index.php           (results_loader_2026, Results_tables_2026, load_translate_type)
-  - src/backend/results_2026/get_results_2026.php (get_results_2026, getinprocess_n, _create_summary)
+  - src/backend/results_2026/get_results_2026.php (get_results_2026, getinprocess_n)
   - src/backend/results_2026/results_table.php   (_make_one_row_results, make_results_table_2026)
   - src/backend/results_2026/results_table_exists.php (make_one_row_exists_2026, make_results_table_exists_2026)
   - src/backend/results_2026/results_table_inprocess.php (make_one_row_new_inprocess, make_results_table_inprocess)
@@ -54,24 +54,6 @@ def _get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str,
             "add_date": r.add_date,  # datetime or None
         }
     return result
-
-
-def _create_summary(
-    *,
-    code: str,
-    cat: str,
-    len_inprocess: int,
-    len_missing: int,
-    len_exists: int,
-    total: int,
-) -> str:
-    return (
-        f"Found {total} pages in <a target='_blank' href='https://mdwiki.org/wiki/Category:{cat}'>{cat}</a>, "
-        f"{len_exists} exists, and {len_missing} missing in "
-        f"(<a href='https://{code}.wikipedia.org' target='_blank'>{code}</a>), "
-        f"{len_inprocess} In process."
-    )
-
 
 # ---------------------------------------------------------------------------
 # load_translate_type — partition translate_type rows into the two sets
@@ -538,7 +520,6 @@ def results_loader_2026(
 
     debug = ""
     return {
-        "ix": bucket["ix"],
         "summary_data": bucket["summary_data"],
         "summary_count": len(bucket["missing"]),
         "missing_rows": missing_rows,
@@ -567,7 +548,7 @@ def results_loader_2026(
 def get_results_2026(cat: str, code: str) -> dict[str, Any]:
     """Mirror of PHP ``get_results_2026($cat, $code)``.
 
-    Returns ``{"ix", "inprocess", "exists", "missing"}`` where:
+    Returns ``{"summary_data", "inprocess", "exists", "missing"}`` where:
       - ``inprocess`` is a dict[title -> in_process row dict]
       - ``exists``    is a dict[title -> exists row dict] with ``via`` set
       - ``missing``   is a list[missing row dict] (in DB order)
@@ -602,20 +583,10 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
         "len_exists": len(items_exists),
         "total": len(items_exists) + len(items_missing) + len(inprocess),
     }
-    summary = _create_summary(
-        code=code,
-        cat=cat,
-        len_inprocess=len(inprocess),
-        len_missing=len(items_missing),
-        len_exists=len(items_exists),
-        total=len(items_exists) + len(items_missing) + len(inprocess),
-    )
-
     # Match PHP ksort($items_exists)
     items_exists = dict(sorted(items_exists.items()))
 
     return {
-        "ix": summary,
         "summary_data": summary_data,
         "inprocess": inprocess,
         "exists": items_exists,

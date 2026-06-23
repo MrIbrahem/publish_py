@@ -1,6 +1,18 @@
 {# Orchestrator partial — port of src/backend/results_2026/index.php (Results_tables_2026 + card_result). #}
 {# `results` is the bundle returned by results_loader_2026(). #}
 
+{% macro results_summary(data) %}
+{#
+   Generates a summary string with links based on the provided summary data.
+   Expects a dictionary with keys: total, cat, len_exists, len_missing, code, len_inprocess
+#}
+{% set cat_link = "<a target='_blank' href='https://mdwiki.org/wiki/Category:" ~ data.cat ~ "'>Category</a>" %}
+{% set wiki_link = "<a href='https://" ~ data.code ~ ".wikipedia.org' target='_blank'>" ~ data.code ~ "</a>" %}
+
+Found {{ data.total }} pages in {{ cat_link | safe }}, {{ data.len_exists }} exists, and {{ data.len_missing }} missing in
+({{ wiki_link | safe }}), {{ data.len_inprocess }} In process.
+{% endmacro %}
+
 {% if results.debug %}
 <div class="text-muted small">{{ results.debug|safe }}</div>
 {% endif %}
@@ -10,7 +22,9 @@
 <div class="card">
     <div class="card-header">
         <span class="card-title h5">Results: ({{ results.summary_count }}{% if results.test %}test:{% endif %})</span>
-        <span>{{ results.ix|safe }}</span>
+        <span>
+            {{ results_summary(results.summary_data) }}
+        </span>
         <div class="card-tools">
             <button type="button" class="btn-tool" data-card-widget="collapse">
                 <i class="fas fa-minus"></i>
@@ -40,8 +54,8 @@
 </div>
 {% endif %}
 
-{# logic from results_2026/index.php — Exists card (count > 1 AND show_exists, matching PHP). #}
-{% if results.show_exists and results.exists_count > 1 %}
+{# logic from results_2026/index.php — Exists card (count > 1 AND show_exists_table, matching PHP). #}
+{% if results.settings.show_exists_table and results.exists_count > 1 %}
 <br>
 <div class="card">
     <div class="card-header">

@@ -112,19 +112,6 @@ def _make_mdwiki_cat_url(category: str, name: str | None = None) -> str:
     encoded = quote(clean.replace(" ", "_"), safe="")
     return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
 
-
-def _make_summary(code: str, cat: str, inprocess_count: int, missing_count: int, exists_count: int) -> str:
-    total = exists_count + missing_count + inprocess_count
-    cat_url = _make_mdwiki_cat_url(cat, "Category")
-    return (
-        f"Found {total} pages in {cat_url}, "
-        f"{exists_count} exists, and {missing_count} missing in "
-        f"(<a href='https://{code}.wikipedia.org' "
-        f"target='_blank'>{code}</a>), "
-        f"{inprocess_count} In process."
-    )
-
-
 def results_api_result(
     code: str | None,
     camp: str | None,
@@ -158,8 +145,6 @@ def results_api_result(
     in_titles = set(inprocess)
     missing = [t for t in missing if t not in in_titles]
 
-    summary = _make_summary(code, cat, len(inprocess), len(missing), len(items_exists))
-
     summary_data = {
         "code": code,
         "cat": cat,
@@ -169,7 +154,6 @@ def results_api_result(
         "total": len(items_exists) + len(missing) + len(inprocess),
     }
     return {
-        "ix": summary,
         "summary_data": summary_data,
         "inprocess": inprocess,
         "exists": dict(sorted(items_exists.items())),
