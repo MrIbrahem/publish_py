@@ -76,6 +76,13 @@ def _load_security_config() -> SecurityConfig:
 
     publish_secret_code = os.getenv("PUBLISH_SECRET_CODE", "")
 
+    # UI_TEST_BYPASS_COORDINATOR_CHECK: dev/test-only bypass for the
+    # coordinator authorization check. Defaults to False/disabled.
+    # Actual enforcement also requires DevelopmentConfig to be active —
+    # see flask_config.py — so this can never take effect in production even
+    # if the env var is set there by mistake.
+    ui_test_bypass_coordinator_check = _env_bool("UI_TEST_BYPASS_COORDINATOR_CHECK", False)
+
     security_config = SecurityConfig(
         salt="mdwikipy",
         secret_key=secret_key,
@@ -84,6 +91,7 @@ def _load_security_config() -> SecurityConfig:
         max_form_parts=max_form_parts,
         secret_key_fallbacks=secret_key_fallbacks,
         publish_secret_code=publish_secret_code,
+        ui_test_bypass_coordinator_check=ui_test_bypass_coordinator_check,
     )
     return security_config
 

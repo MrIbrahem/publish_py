@@ -78,6 +78,24 @@ class Config:
 
     SQLALCHEMY_ECHO: bool = False
 
+    # --------------------------------------------------------------------
+    # UI Test Bypass (development-only)
+    # --------------------------------------------------------------------
+    # When True AND the active config class is DevelopmentConfig, the
+    # coordinator authorization check (is_active_coordinator) is bypassed
+    # so local/automated UI, Playwright, Selenium, and E2E tests don't
+    # need a real row in the coordinators table.
+    #
+    # SAFETY: Gated on IS_DEVELOPMENT_CONFIG, a concrete class attribute
+    # set only on DevelopmentConfig — never on ProductionConfig — so it
+    # cannot activate in production regardless of environment variables.
+    # DO NOT use this as a production authorization mechanism.
+    UI_TEST_BYPASS_COORDINATOR_CHECK: bool = settings.security.ui_test_bypass_coordinator_check
+
+    # Source of truth for "is this config local development". Only
+    # DevelopmentConfig overrides this to True.
+    IS_DEVELOPMENT_CONFIG: bool = False
+
     def __init__(self) -> None:
         """Initialize configuration with values from environment-based settings."""
         # Sync with the dataclass-based settings for backward compatibility
@@ -117,6 +135,12 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     SQLALCHEMY_ECHO: bool = False  # Log SQL in development
+
+    # Marks this config as local development — the only context in which
+    # UI_TEST_BYPASS_COORDINATOR_CHECK can take effect. The flag value
+    # itself still comes from the UI_TEST_BYPASS_COORDINATOR_CHECK env
+    # var (see SecurityConfig) and defaults to False.
+    IS_DEVELOPMENT_CONFIG: bool = True
 
     # Production should always use secure cookies
     SESSION_COOKIE_SECURE: bool = True
