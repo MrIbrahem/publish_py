@@ -1,6 +1,7 @@
 import pytest
 from src.main_app.config import DevelopmentConfig, ProductionConfig
 from src.main_app.db.services.users.admin_service import is_active_coordinator
+from src.main_app.db.services.users.bypass_service import should_bypass_coordinator_check
 
 
 def test_bypass_never_active_under_production(app):
@@ -11,6 +12,7 @@ def test_bypass_never_active_under_production(app):
     app.config["UI_TEST_BYPASS_COORDINATOR_CHECK"] = True  # simulated leaked env var
 
     with app.app_context():
+        assert should_bypass_coordinator_check("nonexistent-user") is False
         assert is_active_coordinator("nonexistent-user") is False
 
 
@@ -20,7 +22,7 @@ def test_bypass_active_under_development_when_enabled(app):
     app.config["UI_TEST_BYPASS_COORDINATOR_CHECK"] = True
 
     with app.app_context():
-        assert is_active_coordinator("nonexistent-user") is True
+        assert should_bypass_coordinator_check("nonexistent-user") is True
 
 
 def test_bypass_disabled_by_default_under_development(app):
@@ -29,4 +31,5 @@ def test_bypass_disabled_by_default_under_development(app):
     app.config["UI_TEST_BYPASS_COORDINATOR_CHECK"] = False
 
     with app.app_context():
+        assert should_bypass_coordinator_check("nonexistent-user") is False
         assert is_active_coordinator("nonexistent-user") is False

@@ -15,6 +15,7 @@ from .admin_service import (
     list_coordinators,
     set_coordinator_active,
 )
+from .bypass_service import should_bypass_coordinator_check
 from .full_translator_service import (
     add_full_translator,
     add_or_update_full_translator,
@@ -59,6 +60,7 @@ __all__ = [
     "add_coordinator",
     "delete_coordinator",
     "is_active_coordinator",
+    "should_bypass_coordinator_check",
     "set_coordinator_active",
     "list_full_translators",
     "list_active_full_translators",
