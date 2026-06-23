@@ -36,6 +36,10 @@ def make_translate_link(sugust: str, langcode: str) -> str:
 
 
 def make_sugustion(langcode: str, title: str) -> str | None:
+
+    if not langcode or not title:
+        return None
+
     data = results_api_result(langcode, "Main", 0)
 
     missing = [x for x in data.get("missing", []) if x != title]
@@ -67,7 +71,7 @@ def get_page_data(last_table: str, id: int) -> dict[str, Any]:
     target = page_data.get("target")
     lang = page_data.get("lang")
 
-    if page_data and not page_data.get("views"):
+    if page_data and target and not page_data.get("views"):
         page_data["views"] = get_total_views_for_target(target, lang)
 
     return page_data
@@ -78,6 +82,8 @@ def create_blank_link(url: str, title: str) -> str:
 
 
 def create_email_msg(page_data: dict[str, Any], sugust: str) -> str:
+    if not sugust:
+        return ""
     title = page_data.get("title", "")
     langcode = page_data.get("lang", "")
     langname = page_data.get("langname", "") or langcode
