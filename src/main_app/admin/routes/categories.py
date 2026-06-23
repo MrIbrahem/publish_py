@@ -12,3 +12,8 @@ logger = logging.getLogger(__name__)
 def categories_dashboard() -> str:
     """Render the translations categories dashboard."""
     return render_template("admins/categories.html")
+
+
+__all__ = [
+    "categories_dashboard",
+]

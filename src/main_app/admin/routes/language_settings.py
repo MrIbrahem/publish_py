@@ -140,3 +140,9 @@ class LanguageSettings:
 
 
 languagesettings_module = LanguageSettings()
+
+
+__all__ = [
+    "LanguageSettings",
+    "languagesettings_module",
+]

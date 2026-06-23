@@ -151,3 +151,8 @@ def pages_users_to_main_fix_it_post() -> ResponseReturnValue:
         flash(f"Failed to delete page with id:({page_id}).", "danger")
 
     return redirect_to
+
+
+__all__ = [
+    "pages_users_to_main_bp",
+]

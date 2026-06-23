@@ -130,3 +130,9 @@ class ProjectsDashboard:
 
 
 projects_module = ProjectsDashboard()
+
+
+__all__ = [
+    "ProjectsDashboard",
+    "projects_module",
+]

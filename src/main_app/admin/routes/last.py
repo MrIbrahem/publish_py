@@ -54,3 +54,8 @@ def last_translations_dashboard() -> str:
         last_table=last_table,
         count=len(last_rows),
     )
+
+
+__all__ = [
+    "last_translations_dashboard",
+]

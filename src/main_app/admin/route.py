@@ -118,3 +118,9 @@ def register_blueprints(bp_admin: Blueprint) -> None:
 
 
 register_blueprints(bp_admin)
+
+
+__all__ = [
+    "bp_admin",
+    "register_blueprints",
+]
