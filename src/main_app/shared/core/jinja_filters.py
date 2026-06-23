@@ -46,8 +46,7 @@ def format_long_date(value: str | datetime, default: str = "") -> str:
     )
 
 
-
-def format_date(value: str | datetime, format_str: str="%Y-%m-%d %H:%M:%S", default: str = "") -> str:
+def format_date(value: str | datetime, format_str: str = "%Y-%m-%d %H:%M:%S", default: str = "") -> str:
     """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
     return _format_timestamp(
         value=value,
@@ -119,6 +118,7 @@ def check_active_route(route_name: str) -> str:
 
 def is_job_running(job_status: str | None) -> bool:
     return job_status and job_status.lower() in ["running", "pending"]
+
 
 filters = {
     "format_long_date": format_long_date,

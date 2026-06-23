@@ -5,11 +5,10 @@ Admin-only routes for recent translations (last).
 from __future__ import annotations
 
 import logging
+
 from flask import render_template, request
 
-from ...db.services.content import get_camp_to_cats
-
-from ...db.services.content import list_langs
+from ...db.services.content import get_camp_to_cats, list_langs
 from ...public.routes.api.pages_query_service import list_pages_users, list_pages_with_views
 
 logger = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ def last_translations_dashboard() -> str:
         rows = list_pages_users(limit=100, lang=lang)
 
     camps = get_camp_to_cats()
-    cats_to_camp = { v:x for x, v in camps.items() if v}
+    cats_to_camp = {v: x for x, v in camps.items() if v}
 
     last_rows = []
     for row in rows:
