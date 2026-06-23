@@ -81,8 +81,9 @@ def update_category(
     orm_obj.category = category
     orm_obj.campaign = campaign
     orm_obj.display = display or ""
-    if category2:
-        orm_obj.category2 = category2
+
+    orm_obj.category2 = category2 or ""
+
     orm_obj.depth = depth
 
     if is_default:

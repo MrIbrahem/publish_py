@@ -94,7 +94,7 @@
                     data: "title",
                     render: function (data, type, row) {
                         let encoded = encodeURIComponent(data);
-                        return `<a href="//mdwiki.org/wiki/${encoded}" target="_blank">${data}</a>`;
+                        return `<a href="https://mdwiki.org/wiki/${encoded}" target="_blank">${data}</a>`;
                     }
                 },
                 {
@@ -106,7 +106,7 @@
                         // Extract YYYY-MM-DD from the timestamp
                         let dateOnly = data.includes("T") ? data.split("T")[0] : data;
                         let encodedTitle = encodeURIComponent(row.title);
-                        return `<a href="//mdwikicx.toolforge.org/wiki/${row.lang}/${encodedTitle}" target="_blank">${dateOnly}</a>`;
+                        return `<a href="https://mdwikicx.toolforge.org/wiki/${row.lang}/${encodedTitle}" target="_blank">${dateOnly}</a>`;
                     }
                 }
             ]

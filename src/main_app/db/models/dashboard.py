@@ -40,7 +40,7 @@ class CategoryRecord(db.Model):
     depth: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
     is_default: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key in ("campaign", "display", "category2"):
             kwargs[key] = kwargs.get(key) or ""
 
@@ -88,7 +88,7 @@ class ProjectRecord(db.Model):
     g_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     g_title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

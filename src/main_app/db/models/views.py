@@ -98,7 +98,7 @@ class ViewsNewAllRecord(db.Model):
     lang: Mapped[str] = mapped_column(String(30), primary_key=True, nullable=False)
     views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

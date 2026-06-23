@@ -122,7 +122,7 @@ def update_user_page(
     page_id: int,
     title: str,
     target: str,
-    **kwargs: dict[str, Any],
+    **kwargs: Any,
 ) -> UserPageRecord:
     """Update page."""
     orm_obj = db.session.get(UserPageRecord, page_id)

@@ -22,7 +22,7 @@ class PublishRequestSchema(Schema):
     # translate_type = fields.Str(validate=validate.Length(max=50))
     translate_type = fields.Str(validate=validate.OneOf(["lead", "all"]))
     wpCaptchaId = fields.Str(validate=validate.Length(max=100))  # noqa: N815
-    wpCaptchaWord = fields.Str(validate=validate.Length(max=50))  ## noqa: N815
+    wpCaptchaWord = fields.Str(validate=validate.Length(max=50))  # noqa: N815
 
     @post_load
     def process_fields(self, data, **kwargs):

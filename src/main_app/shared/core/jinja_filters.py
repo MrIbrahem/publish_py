@@ -34,7 +34,7 @@ def _format_timestamp(
             logger.error("type of value: %s", type(value))
             return default
 
-    return dt.strftime(format_str)
+    return dt.strftime(format_str) # type: ignore
 
 
 def format_long_date(value: str | datetime, default: str = "") -> str:
@@ -64,7 +64,7 @@ def format_short_date(value: str | datetime, default: str = "") -> str:
     )
 
 
-def get_status_class(status):
+def get_status_class(status: str) -> str:
     status_classes = {
         "running": "primary",
         "imported": "success",

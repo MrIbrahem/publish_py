@@ -126,7 +126,7 @@ def update_page(
     page_id: int,
     title: str,
     target: str,
-    **kwargs: dict[str, Any],
+    **kwargs: Any,
 ) -> PageRecord:
     """Update page."""
     orm_obj = db.session.get(PageRecord, page_id)

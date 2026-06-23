@@ -46,7 +46,7 @@ class UserTokenRecord(db.Model):
     last_used_at: Mapped[datetime | None] = mapped_column(server_default=db.func.current_timestamp())
     rotated_at: Mapped[datetime | None] = mapped_column()
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
@@ -172,7 +172,7 @@ class AdminUserRecord(db.Model):
     # Python application default and database-level server default configuration
     is_active: Mapped[int] = mapped_column(nullable=False, default=1, server_default=text("1"))
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

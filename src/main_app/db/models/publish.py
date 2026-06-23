@@ -46,7 +46,7 @@ class ReportRecord(db.Model):
     # Compiler <sqlalchemy.dialects.sqlite.base.SQLiteTypeCompiler object at ...> can't render element of type LONGTEXT
     data: Mapped[str] = mapped_column(LONGTEXT, nullable=False)
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

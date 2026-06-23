@@ -29,7 +29,7 @@ class AssessmentRecord(db.Model):
     title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     importance: Mapped[str | None] = mapped_column(String(120))
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
@@ -61,7 +61,7 @@ class RefsCountRecord(db.Model):
     r_lead_refs: Mapped[int | None] = mapped_column()
     r_all_refs: Mapped[int | None] = mapped_column()
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
@@ -94,7 +94,7 @@ class WordRecord(db.Model):
     w_lead_words: Mapped[int | None] = mapped_column()
     w_all_words: Mapped[int | None] = mapped_column()
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
