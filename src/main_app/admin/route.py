@@ -12,13 +12,12 @@ from flask import (
     url_for,
 )
 
-from .routes.email_msg import bp_msg
-
 from .decorators import admin_required
 from .routes.add_translate import add_bp
 from .routes.campaigns import campaigns_module
 from .routes.categories import categories_dashboard
 from .routes.coordinators import coordinators_module
+from .routes.email_msg import bp_msg
 from .routes.full_translators import fulltranslators_module
 from .routes.language_settings import languagesettings_module
 from .routes.last import last_translations_dashboard
@@ -66,6 +65,7 @@ def last_dashboard():
 def reports():
     return render_template("admins/reports.html")
 
+
 @bp_admin.get("/process")
 @admin_required
 def in_process_dashboard():
@@ -91,6 +91,7 @@ def edit_done() -> str:
 @admin_required
 def categories_dashboard_route():
     return categories_dashboard()
+
 
 def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(coordinators_module.bp)

@@ -40,7 +40,7 @@ class CategoryMemberRecord(db.Model):
     category: Mapped[str] = mapped_column(String(120), nullable=False)
     article_id: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

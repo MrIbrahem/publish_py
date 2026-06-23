@@ -5,7 +5,7 @@
 {% endmacro %}
 
 
-{% macro pageviews_link(views, lang, target, pupdate) %}
+{% macro pageviews_link(views, lang, target, pupdate, yesterday) %}
 {# Sets the target fallback URL #}
 {% set url = "https://pageviews.wmcloud.org/?project=" ~ lang ~ ".wikipedia.org&platform=all-access&agent=all-agents&start=" ~ (pupdate or '2019-01-01') ~ "&end=" ~ yesterday ~ "&redirects=0&pages=" ~ (target | replace(' ', '_') | urlencode) %}
 {% if views %}

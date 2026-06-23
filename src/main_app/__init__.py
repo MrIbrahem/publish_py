@@ -11,7 +11,6 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, jsonify, render_template, request  # , g
 
-from .shared.core.jinja_filters import filters
 from .admin.route import bp_admin
 from .db import init_db
 from .db.services.users import active_coordinators
@@ -29,6 +28,7 @@ from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
 from .shared.core.extensions import db as _db
 from .shared.core.extensions import migrate
+from .shared.core.jinja_filters import filters
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +45,7 @@ def context_data() -> dict[str, Any]:
         "username": user.username if user else None,
         "yesterday": (date.today() - timedelta(days=1)).isoformat(),
     }
+
 
 def create_app(config_class: Type) -> Flask:
     """Instantiate and configure the Flask application.

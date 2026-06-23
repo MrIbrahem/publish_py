@@ -45,6 +45,7 @@ def get_by_id(page_id: int) -> UserPageRecord | None:
     """Return a single user page row by id, or None when missing."""
     return db.session.get(UserPageRecord, page_id)
 
+
 def get_user_page_by_id(page_id: int) -> UserPageRecord | None:
     """Return a single user page row by id, or None when missing."""
     return db.session.get(UserPageRecord, page_id)
@@ -121,7 +122,7 @@ def update_user_page(
     page_id: int,
     title: str,
     target: str,
-    **kwargs: dict[str, Any],
+    **kwargs: Any,
 ) -> UserPageRecord:
     """Update page."""
     orm_obj = db.session.get(UserPageRecord, page_id)

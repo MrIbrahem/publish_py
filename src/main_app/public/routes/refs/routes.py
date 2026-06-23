@@ -67,14 +67,12 @@ def test() -> str:
     )
 
 
-@oauth_required
-@bp_fixrefs.route("/", methods=["POST"])
-def process_new() -> str:
-    source_title = request.form.get("source_title", "")
-    title = request.form.get("title", "")
-    text = request.form.get("text", "")
-    lang = request.form.get("lang", "")
-    mdwiki_revid_raw = request.form.get("mdwiki_revid", "").strip()
+def _process(data) -> str:
+    source_title = data.get("source_title", "")
+    title = data.get("title", "")
+    text = data.get("text", "")
+    lang = data.get("lang", "")
+    mdwiki_revid_raw = data.get("mdwiki_revid", "").strip()
 
     try:
         mdwiki_revid = int(mdwiki_revid_raw or 0)
@@ -82,11 +80,11 @@ def process_new() -> str:
         flash("Invalid MDWiki revision ID.", "warning")
         mdwiki_revid = 0
 
-    save = request.form.get("save", "").lower() in {"1", "true", "on", "yes"}
-    infobox = request.form.get("infobox", "").lower() in {"1", "true", "on", "yes"}
-    movedots = request.form.get("movedots", "").lower() in {"1", "true", "on", "yes"}
-    # add_en_lang = request.form.get("add_en_lang", "").lower() in {"1", "true", "on", "yes"}
-    # add_category = request.form.get("add_category", "").lower() in {"1", "true", "on", "yes"}
+    save = data.get("save", "").lower() in {"1", "true", "on", "yes"}
+    infobox = data.get("infobox", "").lower() in {"1", "true", "on", "yes"}
+    movedots = data.get("movedots", "").lower() in {"1", "true", "on", "yes"}
+    # add_en_lang = data.get("add_en_lang", "").lower() in {"1", "true", "on", "yes"}
+    # add_category = data.get("add_category", "").lower() in {"1", "true", "on", "yes"}
 
     if not text and lang and title:
         text = get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
@@ -128,6 +126,22 @@ def process_new() -> str:
             "movedots": movedots,
         },
     )
+
+
+@oauth_required
+@bp_fixrefs.route("/", methods=["POST"])
+def process_new() -> str:
+    data = request.form.to_dict()
+    logger.info("Processing text with settings: %s", data)
+    return _process(data)
+
+
+@oauth_required
+@bp_fixrefs.route("/process", methods=["GET"])
+def process() -> str:
+    data = request.args
+    logger.info("Processing text with settings: %s", data)
+    return _process(data)
 
 
 __all__ = ["bp_fixrefs"]

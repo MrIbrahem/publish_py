@@ -17,14 +17,14 @@ def _format_timestamp(
     format_str: str = "%Y-%m-%d %H:%M:%S",
     default: str = "",
 ) -> str:
-    """Format ISO8601 like '2025-10-27T04:41:07' to 'Oct 27, 2025, 4:41 AM'."""
+    """Format a timestamp string or datetime/date object using the specified format string."""
     if not value:
         return default
 
     if not format_str:
         format_str = "%Y-%m-%d %H:%M:%S"
 
-    if isinstance(value, datetime):
+    if hasattr(value, "strftime"):
         dt = value
     else:
         try:
@@ -34,7 +34,7 @@ def _format_timestamp(
             logger.error("type of value: %s", type(value))
             return default
 
-    return dt.strftime(format_str)
+    return dt.strftime(format_str)  # type: ignore
 
 
 def format_long_date(value: str | datetime, default: str = "") -> str:
@@ -46,8 +46,7 @@ def format_long_date(value: str | datetime, default: str = "") -> str:
     )
 
 
-
-def format_date(value: str | datetime, format_str: str="%Y-%m-%d %H:%M:%S", default: str = "") -> str:
+def format_date(value: str | datetime, format_str: str = "%Y-%m-%d %H:%M:%S", default: str = "") -> str:
     """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
     return _format_timestamp(
         value=value,
@@ -65,7 +64,7 @@ def format_short_date(value: str | datetime, default: str = "") -> str:
     )
 
 
-def get_status_class(status):
+def get_status_class(status: str) -> str:
     status_classes = {
         "running": "primary",
         "imported": "success",
@@ -119,6 +118,7 @@ def check_active_route(route_name: str) -> str:
 
 def is_job_running(job_status: str | None) -> bool:
     return job_status and job_status.lower() in ["running", "pending"]
+
 
 filters = {
     "format_long_date": format_long_date,

@@ -38,7 +38,7 @@ class LangRecord(db.Model):
     name: Mapped[str] = mapped_column(String(70), nullable=False)
     redirects: Mapped[dict | list | None] = mapped_column(JSON, server_default=text("NULL"))
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
@@ -67,7 +67,7 @@ class MdwikiRevidRecord(db.Model):
     title: Mapped[str] = mapped_column(String(255), primary_key=True)
     revid: Mapped[int] = mapped_column(nullable=False)
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

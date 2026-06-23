@@ -81,7 +81,8 @@
                         </td>
                         <td>
                             {% set display_user = row.user[:15] if row.user and row.user|length > 15 else row.user %}
-                            <a href="/leaderboard/users/{{ row.user }}" data-bs-toggle="tooltip" title="{{ row.user }}">
+                            <a href="{{ url_for('leaderboard.users', username=row.user) }}" data-bs-toggle="tooltip"
+                                title="{{ row.user }}">
                                 {{ display_user }}
                             </a>
                         </td>
@@ -102,7 +103,7 @@
                             {{ row.campaign or row.cat }}
                         </td>
                         <td>
-                            <a href="/leaderboard/langs/{{ row.lang }}">
+                            <a href="{{ url_for('leaderboard.langs', lang_code=row.lang) }}">
                                 {{ row.lang }}
                             </a>:
                             <a href="https://{{ row.lang }}.wikipedia.org/wiki/{{ row.target | replace(' ', '_') | urlencode }}"
@@ -115,17 +116,21 @@
                         </td>
                         <td>
                             {% if last_table == 'pages' %}
-                            {{ pageviews_link(row.views, row.lang, row.target, row.pupdate) }}
+                            {{ pageviews_link(row.views, row.lang, row.target, row.pupdate, yesterday) }}
                             {% else %}
                             <span class="text-muted">-</span>
                             {% endif %}
                         </td>
                         <td>
-
+                            <a target="_blank"
+                                href="{{ url_for('fixrefs.process', source_title=row.title, lang=row.lang, title=row.target) }}"
+                                class="spannowrap">
+                                Fix
+                            </a>
                         </td>
                         <td>
                             {% if row.add_date %}
-                            <a href="//mdwikicx.toolforge.org/wiki/{{ row.lang }}/{{ row.title | replace(' ', '_') | urlencode }}"
+                            <a href="https://mdwikicx.toolforge.org/wiki/{{ row.lang }}/{{ row.title | replace(' ', '_') | urlencode }}"
                                 target="_blank" class="spannowrap">
                                 {{ row.add_date | format_date(format_str='%Y-%m-%d') }}
                             </a>

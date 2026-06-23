@@ -21,14 +21,14 @@ def list_views_new() -> List[ViewsNewRecord]:
     return orm_objs
 
 
-def list_views_by_target(target: str) -> List[ViewsNewRecord]:
+def list_views_by_target(target: str, lang: str | None = None) -> List[ViewsNewRecord]:
     """Return views_new records for a specific target."""
-    orm_objs = (
-        db.session.query(ViewsNewRecord)
-        .filter(ViewsNewRecord.target == target)
-        .order_by(ViewsNewRecord.year.desc())
-        .all()
-    )
+    query = db.session.query(ViewsNewRecord).filter(ViewsNewRecord.target == target)
+    if lang:
+        query = query.filter(ViewsNewRecord.lang == lang)
+
+    orm_objs = query.order_by(ViewsNewRecord.year.desc()).all()
+
     return orm_objs
 
 
@@ -141,9 +141,12 @@ def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
     return orm_obj
 
 
-def get_total_views_for_target(target: str) -> int:
+def get_total_views_for_target(
+    target: str,
+    lang: str | None = None,
+) -> int:
     """Get total views across all years for a target."""
-    records = list_views_by_target(target)
+    records = list_views_by_target(target, lang)
     return sum(r.views or 0 for r in records)
 
 

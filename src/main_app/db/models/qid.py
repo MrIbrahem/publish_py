@@ -117,7 +117,7 @@ class AllQidsExistRecord(db.Model):
     code: Mapped[str] = mapped_column(String(25), nullable=False)
     target: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

@@ -31,10 +31,10 @@ from .missing_stats_service import (
     statics_by_category,
 )
 from .page_service import (
-    get_page_by_id,
     add_page,
     add_translate_row_to_db,
     find_page_record,
+    get_page_by_id,
     insert_page_target,
     list_pages,
     list_pages_by_lang_cat,
