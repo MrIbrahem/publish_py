@@ -39,6 +39,11 @@ def get_by_id(page_id: int) -> PageRecord | None:
     return db.session.get(PageRecord, page_id)
 
 
+def get_page_by_id(page_id: int) -> PageRecord | None:
+    """Return a single page row by id, or None when missing."""
+    return db.session.get(PageRecord, page_id)
+
+
 def list_pages() -> List[PageRecord]:
     """Return all pages."""
     orm_objs = db.session.query(PageRecord).order_by(PageRecord.id.asc()).all()
@@ -269,6 +274,7 @@ def add_translate_row_to_db(
 
 
 __all__ = [
+    "get_page_by_id",
     "set_page_target",
     "find_page_record",
     "list_pages",

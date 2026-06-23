@@ -1,0 +1,61 @@
+{% extends "admins/base1_no_navbar.html" %}
+
+{% block title %}Send Email msg{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <form action="{{ url_for('admin.email_msg.msg_post') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="id" value="{{ id }}" />
+        <div class="card">
+            <div class="card-header">
+                <h4></h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-2">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">To:</span>
+                            <input class="form-control" type="text" name="title" value="{{ user_email|e }}" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <input class='form-check-input me-2' type='checkbox' name='ccme'>
+                                Send me copy
+                            </span>
+                            <input class="form-control" type="text" name="lang" value="{{ cc_me_email|e }}" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class='col-sm-12 col-md-12'>
+                        <div class='input-group mb-2'>
+                            <div class='input-group-prepend'>
+                                <span class='input-group-text'>
+                                    <label class='mr-sm-2' for='msg_title'>Subject:</label>
+                                </span>
+                            </div>
+                            <input class='form-control' type='text' name='msg_title'
+                                value='Wiki Project Med Translation Dashboard' />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="mt-3 aligncenter">
+                    <div class='row'>
+                        <div class='col'>
+                            <button type="submit" class="btn btn-outline-primary">Send</button>
+                        </div>
+                        <div class='col'>
+                            <a class="btn btn-outline-secondary" onclick="window.close()">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

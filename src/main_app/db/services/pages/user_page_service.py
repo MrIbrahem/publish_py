@@ -45,6 +45,10 @@ def get_by_id(page_id: int) -> UserPageRecord | None:
     """Return a single user page row by id, or None when missing."""
     return db.session.get(UserPageRecord, page_id)
 
+def get_user_page_by_id(page_id: int) -> UserPageRecord | None:
+    """Return a single user page row by id, or None when missing."""
+    return db.session.get(UserPageRecord, page_id)
+
 
 def add_user_page(
     sourcetitle: str,
@@ -188,6 +192,7 @@ __all__ = [
     "list_translated",
     "count_translated",
     "get_by_id",
+    "get_user_page_by_id",
     "add_user_page",
     "update_user_page",
     "insert_user_page_target",

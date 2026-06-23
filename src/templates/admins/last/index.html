@@ -57,7 +57,7 @@
             <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="10" href="#">Flags</a>
         </div>
         <div class="table-responsive">
-            <table class="table table-striped compact table-sm" id="lastTable" style="font-size: 90%;">
+            <table class="table table-striped compact table-sm table_text_left" id="lastTable" style="font-size: 90%;">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -87,7 +87,7 @@
                         </td>
                         <td>
                             <a class="btn btn-outline-primary btn-sm"
-                                pup-target="{{ url_for('admin.email_msg', user=row.user, id=row.id, last_table=last_table) }}"
+                                pup-target="{{ url_for('admin.email_msg.dashboard', user=row.user, id=row.id, last_table=last_table) }}"
                                 onclick="pup_window_email(this)">
                                 @
                             </a>

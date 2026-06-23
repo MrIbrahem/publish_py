@@ -12,7 +12,7 @@ from flask import (
     url_for,
 )
 
-from .routes.email_msg import email_msg_dashboard
+from .routes.email_msg import bp_msg
 
 from .decorators import admin_required
 from .routes.add_translate import add_bp
@@ -92,13 +92,6 @@ def edit_done() -> str:
 def categories_dashboard_route():
     return categories_dashboard()
 
-
-@bp_admin.get("/email_msg")
-@admin_required
-def email_msg() -> str:
-    return email_msg_dashboard()
-
-
 def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(coordinators_module.bp)
     bp_admin.register_blueprint(fulltranslators_module.bp)
@@ -109,6 +102,7 @@ def register_blueprints(bp_admin: Blueprint) -> None:
     bp_admin.register_blueprint(translated_bp)
     bp_admin.register_blueprint(translated_users_bp)
 
+    bp_admin.register_blueprint(bp_msg)
     bp_admin.register_blueprint(qids_module.bp)
     bp_admin.register_blueprint(qids_others_module.bp)
     bp_admin.register_blueprint(pages_users_to_main_bp)
