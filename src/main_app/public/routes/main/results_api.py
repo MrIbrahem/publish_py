@@ -14,6 +14,7 @@ from ....shared.clients import get_mdwiki_cat_members
 
 logger = logging.getLogger(__name__)
 
+
 def _resolve_campaign_to_category(camp: str) -> str:
     cats = get_camp_to_cats()
     return cats.get(camp, camp)
@@ -124,7 +125,6 @@ def _make_summary(code: str, cat: str, inprocess_count: int, missing_count: int,
     )
 
 
-
 def results_api_result(
     code: str | None,
     camp: str | None,
@@ -160,11 +160,20 @@ def results_api_result(
 
     summary = _make_summary(code, cat, len(inprocess), len(missing), len(items_exists))
 
+    summary_data = {
+        "code": code,
+        "cat": cat,
+        "len_inprocess": len(inprocess),
+        "len_missing": len(missing),
+        "len_exists": len(items_exists),
+        "total": len(items_exists) + len(missing) + len(inprocess),
+    }
     return {
+        "ix": summary,
+        "summary_data": summary_data,
         "inprocess": inprocess,
         "exists": dict(sorted(items_exists.items())),
         "missing": missing,
-        "ix": summary,
     }
 
 
