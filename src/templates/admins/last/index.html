@@ -121,7 +121,9 @@
                             {% endif %}
                         </td>
                         <td>
-
+                            <a target="_blank" href="{{ url_for('fixrefs.process', source_title=row.title, lang=row.lang, title=row.target) }}" class="spannowrap">
+                                Fix
+                            </a>
                         </td>
                         <td>
                             {% if row.add_date %}
