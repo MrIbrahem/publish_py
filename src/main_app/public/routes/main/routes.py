@@ -25,7 +25,7 @@ from ....db.services.pages import (
     count_category_members,
     statics_by_category,
 )
-from ....db.services.users import active_coordinators, is_full_translator, should_bypass_coordinator_check
+from ....db.services.users import active_coordinators, is_full_translator
 from ....shared.auth.identity import current_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result
@@ -163,9 +163,7 @@ def table():
 
     # Identity / coordinator / full-translator flags — mirrors src/index.php.
     user = current_user()
-    user_coord = False
-    if user:
-        user_coord = should_bypass_coordinator_check(user.username) or user.username in active_coordinators()
+    user_coord = bool(user and user.username in active_coordinators())
     show_exists = user_coord or parsed["show_exists_param"]
     translation_button = _resolve_translation_button(user_coord)
     full_tr_user = bool(user and is_full_translator(user.username))

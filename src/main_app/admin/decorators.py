@@ -13,7 +13,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..db.services.users import active_coordinators, should_bypass_coordinator_check
+from ..db.services.users import active_coordinators
 from ..shared.auth.identity import current_user
 
 FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
@@ -37,8 +37,6 @@ def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
         user = current_user()
         if not user:
             return redirect(url_for("auth.login"))
-        if should_bypass_coordinator_check(user.username):
-            return view(*args, **kwargs)
         if user.username not in _get_cached_active_coordinators():
             abort(403)
         return view(*args, **kwargs)

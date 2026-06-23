@@ -11,6 +11,20 @@ from flask import current_app
 logger = logging.getLogger(__name__)
 
 
+def is_bypass_enabled() -> bool:
+    """Check if the UI test bypass is enabled in the current configuration.
+
+    The bypass is enabled ONLY if the active config is DevelopmentConfig (safety check)
+    AND the UI_TEST_BYPASS_COORDINATOR_CHECK setting is True.
+    """
+    try:
+        return current_app.config.get("IS_DEVELOPMENT_CONFIG", False) and current_app.config.get(
+            "UI_TEST_BYPASS_COORDINATOR_CHECK", False
+        )
+    except Exception:
+        return False
+
+
 def should_bypass_coordinator_check(username: str) -> bool:
     """Determine if the coordinator check should be bypassed for the given user.
 
@@ -25,19 +39,12 @@ def should_bypass_coordinator_check(username: str) -> bool:
     variables. Do NOT rely on this bypass when testing authorization or
     permission logic itself; keep it disabled for those tests.
     """
-    try:
-        bypass_enabled = current_app.config.get("IS_DEVELOPMENT_CONFIG", False) and current_app.config.get(
-            "UI_TEST_BYPASS_COORDINATOR_CHECK", False
+    if is_bypass_enabled():
+        current_app.logger.warning(
+            "UI_TEST_BYPASS_COORDINATOR_CHECK is active — coordinator "
+            "authorization check bypassed for username=%s.",
+            username,
         )
-        if bypass_enabled:
-            current_app.logger.warning(
-                "UI_TEST_BYPASS_COORDINATOR_CHECK is active — coordinator "
-                "authorization check bypassed for username=%s.",
-                username,
-            )
-            return True
-    except Exception:
-        # If current_app is not available or config is missing, do not bypass
-        pass
+        return True
 
     return False
