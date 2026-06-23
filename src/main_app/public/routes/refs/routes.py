@@ -136,7 +136,6 @@ def process_new() -> str:
     return _process(data)
 
 
-
 @oauth_required
 @bp_fixrefs.route("/process", methods=["GET"])
 def process() -> str:

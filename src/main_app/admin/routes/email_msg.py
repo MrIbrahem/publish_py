@@ -13,11 +13,9 @@ from flask import (
 )
 
 from ...db.services.analytics import get_total_views_for_target
-
-from ...public.routes.main.results_api import results_api_result
-
 from ...db.services.pages import get_page_by_id, get_user_page_by_id
 from ...db.services.users import get_user_by_username
+from ...public.routes.main.results_api import results_api_result
 from ...shared.auth.identity import current_user
 from ..decorators import admin_required
 
@@ -36,11 +34,13 @@ def make_translate_link(sugust: str, langcode: str) -> str:
     here_url = "https://mdwiki.toolforge.org/Translation_Dashboard/translate_med/index.php?" + urlencode(params)
     return here_url
 
+
 def make_sugustion(langcode: str, title: str) -> str | None:
     data = results_api_result(langcode, "Main", 0)
 
-    missing = [ x for x in data.get("missing", []) if x != title]
+    missing = [x for x in data.get("missing", []) if x != title]
     return missing[0] if missing else None
+
 
 def get_user_email(username: str) -> str | None:
     user_record = get_user_by_username(username)
@@ -76,6 +76,7 @@ def get_page_data(last_table: str, id: int) -> dict[str, Any]:
 def create_blank_link(url: str, title: str) -> str:
     return f"<a target='_blank' href='{url}'>{title}</a>"
 
+
 def create_email_msg(page_data: dict[str, Any], sugust: str) -> str:
     title = page_data.get("title", "")
     langcode = page_data.get("lang", "")
@@ -95,7 +96,7 @@ def create_email_msg(page_data: dict[str, Any], sugust: str) -> str:
         " Since this translation has gone live on"
         f" <font color='#311873'>{date}</font>"
         f" it has been read by <font color='#0000ff'>{views} people</font>.<br>"
-        f" Would you be interested in translating \"{sugust_link}\"?"
+        f' Would you be interested in translating "{sugust_link}"?'
         f" If so, simply click {translate_link}.<br>"
         " Once again thank you for improving access to knowledge.<br>"
     )

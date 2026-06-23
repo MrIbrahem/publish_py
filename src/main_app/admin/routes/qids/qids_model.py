@@ -37,11 +37,11 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
         msg = f"Title:({title}) already used in database with qid:({existing_by_title.qid}), new qid:({qid})"
 
         if qid_id and existing_by_title.id != qid_id:
-            flash( msg, "danger" )
+            flash(msg, "danger")
             return False
 
         if not qid_id and existing_by_title.qid and existing_by_title.qid != qid:
-            flash( msg, "danger" )
+            flash(msg, "danger")
             return False
 
     return True

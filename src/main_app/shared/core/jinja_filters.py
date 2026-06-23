@@ -34,7 +34,7 @@ def _format_timestamp(
             logger.error("type of value: %s", type(value))
             return default
 
-    return dt.strftime(format_str) # type: ignore
+    return dt.strftime(format_str)  # type: ignore
 
 
 def format_long_date(value: str | datetime, default: str = "") -> str:
