@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> List[PageRecord]:
     """Return translated pages (target not empty) optionally filtered by language."""
     query = db.session.query(PageRecord).filter(PageRecord.target.isnot(None), PageRecord.target != "")
-    if lang and lang != "All":
+    if lang and lang.lower() != "all":
         query = query.filter(PageRecord.lang == lang)
     return query.order_by(PageRecord.id.desc()).limit(limit).offset(offset).all()
 
@@ -29,7 +29,7 @@ def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> Lis
 def count_translated(lang: str = "All") -> int:
     """Return total count of translated pages, optionally filtered by language."""
     query = db.session.query(func.count(PageRecord.id)).filter(PageRecord.target.isnot(None), PageRecord.target != "")
-    if lang and lang != "All":
+    if lang and lang.lower() != "all":
         query = query.filter(PageRecord.lang == lang)
     return int(query.scalar() or 0)
 

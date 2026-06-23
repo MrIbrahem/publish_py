@@ -36,7 +36,7 @@ def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
         .filter(UserPageRecord.target.is_not(None))
     )
 
-    if lang and lang != "All":
+    if lang and lang.lower() != "all":
         query = query.filter(UserPageRecord.lang == lang)
 
     results = query.order_by(UserPageRecord.pupdate.desc()).limit(limit).all()
@@ -76,10 +76,10 @@ def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, An
         views_subquery.label("views"),
     ).filter(PageRecord.target != "")
 
-    if lang and lang != "All":
+    if lang and lang.lower() != "all":
         query = query.filter(PageRecord.lang == lang)
 
-    results = query.distinct().limit(limit).all()
+    results = query.distinct().order_by(PageRecord.pupdate.desc()).limit(limit).all()
 
     return [
         {

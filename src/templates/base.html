@@ -80,6 +80,7 @@
 
     {% block extra_js %}{% endblock %}
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/to.js') }}"></script>
     <script>
         $(document).ready(function () {
 
@@ -102,6 +103,8 @@
                 responsive: true,
                 pageLength: 100,
             });
+
+            get_views();
         });
         /**
          * Open email popup window

@@ -26,7 +26,7 @@ def list_user_pages() -> List[UserPageRecord]:
 def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> List[UserPageRecord]:
     """Return translated user pages (target not empty) optionally filtered by language."""
     query = db.session.query(UserPageRecord).filter(UserPageRecord.target.isnot(None), UserPageRecord.target != "")
-    if lang and lang != "All":
+    if lang and lang.lower() != "all":
         query = query.filter(UserPageRecord.lang == lang)
     return query.order_by(UserPageRecord.id.desc()).limit(limit).offset(offset).all()
 
@@ -36,7 +36,7 @@ def count_translated(lang: str = "All") -> int:
     query = db.session.query(func.count(UserPageRecord.id)).filter(
         UserPageRecord.target.isnot(None), UserPageRecord.target != ""
     )
-    if lang and lang != "All":
+    if lang and lang.lower() != "all":
         query = query.filter(UserPageRecord.lang == lang)
     return int(query.scalar() or 0)
 

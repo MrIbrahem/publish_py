@@ -194,7 +194,7 @@ def get_in_process() -> Response:
             .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
         )
 
-        if lang and lang != "All":
+        if lang and lang.lower() != "all":
             query = query.filter(InProcessRecord.lang == lang)
 
         results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()

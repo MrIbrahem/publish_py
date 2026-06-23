@@ -52,8 +52,9 @@
     <div class="card-body">
         <div class="d-none d-md-inline mb-3">
             <span class="me-2">Toggle columns:</span>
-            <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="3" href="#">Campaign</a>
-            <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="8" href="#">Flags</a>
+            <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="4" href="#">Campaign</a>
+            <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="8" type="#">Fixref</a>
+            <a class="toggle-vis btn btn-outline-primary btn-sm" data-column="10" href="#">Flags</a>
         </div>
         <div class="table-responsive">
             <table class="table table-striped compact table-sm" id="lastTable" style="font-size: 90%;">
@@ -61,11 +62,13 @@
                     <tr>
                         <th>#</th>
                         <th>User</th>
+                        <th><span title='Email'>@</span></th>
                         <th>Title</th>
                         <th>Campaign</th>
                         <th>Translated</th>
                         <th>Published</th>
                         <th>Views</th>
+                        <th>Fixref</th>
                         <th>Draft</th>
                         <th>Flags</th>
                     </tr>
@@ -80,6 +83,13 @@
                             {% set display_user = row.user[:15] if row.user and row.user|length > 15 else row.user %}
                             <a href="/leaderboard/users/{{ row.user }}" data-bs-toggle="tooltip" title="{{ row.user }}">
                                 {{ display_user }}
+                            </a>
+                        </td>
+                        <td>
+                            <a class="btn btn-outline-primary btn-sm"
+                                pup-target="{{ url_for('admin.email_msg', user=row.user, id=row.id, last_table=last_table) }}"
+                                onclick="pup_window_email(this)">
+                                @
                             </a>
                         </td>
                         <td>
@@ -104,11 +114,14 @@
                             {{ row.pupdate }}
                         </td>
                         <td>
-                            {% if last_table == 'pages' and row.views %}
+                            {% if last_table == 'pages' %}
                             {{ pageviews_link(row.views, row.lang, row.target, row.pupdate) }}
                             {% else %}
                             <span class="text-muted">-</span>
                             {% endif %}
+                        </td>
+                        <td>
+
                         </td>
                         <td>
                             {% if row.add_date %}
@@ -120,7 +133,8 @@
                             <span class="text-muted">-</span>
                             {% endif %}
                         </td>
-                        <td></td>
+                        <td>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
