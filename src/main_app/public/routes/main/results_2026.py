@@ -518,7 +518,6 @@ def results_loader_2026(
         endpoint=endpoint,
     )
 
-    debug = ""
     return {
         "summary_data": bucket["summary_data"],
         "summary_count": len(bucket["missing"]),
@@ -530,7 +529,6 @@ def results_loader_2026(
         "exists_translated_count": exists_translated_count,
         "exists_translated_before_count": exists_translated_before_count,
         "show_translation_button": inprocess_button,
-        "debug": debug,
         "code": code,
         "camp": camp,
         "cat": cat,

@@ -1,12 +1,12 @@
 {# In-process table — port of src/backend/results_2026/results_table_inprocess.php #}
 {# Header mirrors make_table_start with inprocess=true (extra user/date columns; Translate header collapses to empty when tra_btn != '1'). #}
-{% set show_translate_header = results.translation_button == '1' %}
+{% set show_translate_header = settings and settings.show_translation_button == True %}
 <table class="table compact table-striped table_100 table_text_left display table_responsive_main">
     <thead>
         <tr>
             <th class="num">#</th>
             <th class="spannowrap" style="text-align: center">Title</th>
-            {% if show_translate_header %}
+            {% if is_admin or show_translate_header %}
             <th><span>Translate</span></th>
             {% else %}
             <th></th>
@@ -38,7 +38,7 @@
         <tr>
             <th class="num" scope="row">{{ row.n }}</th>
             <td class="link_container">
-                <a target="_blank" href="{{ row.mdwiki_url }}">
+                <a target="_blank" href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}">
                     {{ row.title }}
                 </a>
             </td>

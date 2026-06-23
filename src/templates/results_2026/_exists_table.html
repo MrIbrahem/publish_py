@@ -17,7 +17,10 @@
         <tr>
             <th scope="row" style="text-align: center">{{ row.n }}</th>
             <td class="link_container spannowrap">
-                {{ row.mdwiki_link_html|safe }}
+                <a href="https://mdwiki.org/wiki/{{ row.display_title | replace(' ', '_') | urlencode }}"
+                    target="_blank">
+                    {{ row.display_title }}
+                </a>
             </td>
             <td>
                 {{ row.translate_html|safe }}

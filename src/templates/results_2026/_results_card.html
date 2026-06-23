@@ -7,15 +7,11 @@
    Expects a dictionary with keys: total, cat, len_exists, len_missing, code, len_inprocess
 #}
 {% set cat_link = "<a target='_blank' href='https://mdwiki.org/wiki/Category:" ~ data.cat ~ "'>Category</a>" %}
-{% set wiki_link = "<a href='https://" ~ data.code ~ ".wikipedia.org' target='_blank'>" ~ data.code ~ "</a>" %}
+{% set wiki_link = "<a href='https://" ~ data.code ~ ".wikipedia.org' target='_blank'>" ~ (data.code_lang_name or data.code) ~ "</a>" %}
 
 Found {{ data.total }} pages in {{ cat_link | safe }}, {{ data.len_exists }} exists, and {{ data.len_missing }} missing in
 ({{ wiki_link | safe }}), {{ data.len_inprocess }} In process.
 {% endmacro %}
-
-{% if results.debug %}
-<div class="text-muted small">{{ results.debug|safe }}</div>
-{% endif %}
 
 {# logic from results_2026/index.php — Results card (always rendered when bundle is present). #}
 <br>
@@ -55,7 +51,7 @@ Found {{ data.total }} pages in {{ cat_link | safe }}, {{ data.len_exists }} exi
 {% endif %}
 
 {# logic from results_2026/index.php — Exists card (count > 1 AND show_exists_table, matching PHP). #}
-{% if results.settings.show_exists_table and results.exists_count > 1 %}
+{% if settings and settings.show_exists_table == True and results.exists_count > 1 %}
 <br>
 <div class="card">
     <div class="card-header">

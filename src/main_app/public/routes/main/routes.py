@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import logging
 import time
-from datetime import datetime, timezone
 from typing import Any
 
 from flask import (
@@ -16,10 +15,9 @@ from flask import (
     render_template,
     request,
     send_from_directory,
-    url_for,
 )
 
-from ....db.services.config import get_setting_by_key
+from ....db.services.config import get_all_settings_ready
 from ....db.services.content import get_lang_by_code, list_categories, list_langs
 from ....db.services.pages import (
     count_category_members,
@@ -51,19 +49,6 @@ def results_api():
         }
     )
 
-
-def _setting_value(key: str, default: str = "") -> str:
-    """Fetch a settings row by key, returning the stringified value."""
-    try:
-        record = get_setting_by_key(key)
-    except Exception:
-        logger.exception("Setting lookup failed for key=%r", key)
-        return default
-    if record is None or record.value is None:
-        return default
-    return record.value
-
-
 def _normalize_arg(name: str) -> str:
     """Read a GET param, strip whitespace, treat 'undefined' as empty.
 
@@ -94,8 +79,6 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
 
     filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
 
-    show_exists_param = "exists" in request.args
-
     code_lang_name = ""
 
     if code:
@@ -118,8 +101,12 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
         camp = ""
 
     # logic from load_request.php — force "lead" when whole-article translate is disabled.
-    allow_whole_translate = _setting_value("allow_type_of_translate", "1")
-    if allow_whole_translate == "0":
+    all_settings = get_all_settings_ready()
+    show_translation_button = all_settings.get("translation_button_in_progress_table", False)
+    allow_type_of_translate = all_settings.get("allow_type_of_translate", False)
+    show_exists_table       = all_settings.get("show_exists_table", False)
+
+    if allow_type_of_translate is False:
         tra_type = "lead"
 
     return {
@@ -128,19 +115,13 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
         "camp": camp,
         "cat": cat,
         "tra_type": tra_type,
-        "filter_sparql": filter_sparql,
-        "show_exists_param": show_exists_param,
-        "allow_whole_translate": allow_whole_translate,
+        "settings": {
+            "filter_sparql": filter_sparql,
+            "show_exists_table": show_exists_table,
+            "allow_type_of_translate": allow_type_of_translate,
+            "show_translation_button": show_translation_button,
+        }
     }
-
-
-def _resolve_translation_button(user_coord: bool) -> str:
-    """Mirror of src/index.php translation_button gate."""
-    raw = _setting_value("translation_button_in_progress_table", "0")
-    if raw == "0":
-        return "0"
-    return "1" if user_coord else "0"
-
 
 @bp_main.get("/table")
 def table():
@@ -164,12 +145,12 @@ def table():
     # Identity / coordinator / full-translator flags — mirrors src/index.php.
     user = current_user()
     user_coord = bool(user and user.username in active_coordinators())
-    show_exists = user_coord or parsed["show_exists_param"]
-    translation_button = _resolve_translation_button(user_coord)
     full_tr_user = bool(user and is_full_translator(user.username))
 
+    parsed_settings = parsed["settings"]
+
     # PHP: only invoke results_loader_2026 when both code and camp are valid.
-    results_bundle = None
+    results_bundle = {}
     if parsed["code"] and parsed["camp"] and parsed["code_lang_name"]:
         try:
             results_bundle = results_loader_2026(
@@ -179,8 +160,7 @@ def table():
                 tra_type=parsed["tra_type"],
                 code_lang_name=parsed["code_lang_name"],
                 user_coord=user_coord,
-                show_exists=show_exists,
-                translation_button=translation_button,
+                settings=parsed_settings,
                 full_tr_user=full_tr_user,
             )
         except Exception:
@@ -192,11 +172,12 @@ def table():
             )
             flash("Failed to load results — please try again.", "danger")
 
+    if results_bundle.get("summary_data"):
+        results_bundle["summary_data"]["code_lang_name"] = parsed["code_lang_name"]
+
     return render_template(
-        "index.html",
-        settings={
-            "allow_whole_translate": parsed["allow_whole_translate"] != "0",
-        },
+        "td/index.html",
+        settings=parsed_settings,
         langs=langs,
         campaigns=campaigns,
         args={
@@ -228,10 +209,8 @@ def index():
     parsed = _parse_request_args(camps_data, cats_data)
 
     return render_template(
-        "index.html",
-        settings={
-            "allow_whole_translate": parsed["allow_whole_translate"] != "0",
-        },
+        "td/index.html",
+        settings=parsed["settings"],
         langs=langs,
         campaigns=campaigns,
         args={
@@ -300,7 +279,7 @@ def missing():
         )
 
     return render_template(
-        "missing.html",
+        "td/missing.html",
         category=category,
         total=total,
         rows=rows,
