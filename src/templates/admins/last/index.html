@@ -115,7 +115,7 @@
                         </td>
                         <td>
                             {% if last_table == 'pages' %}
-                            {{ pageviews_link(row.views, row.lang, row.target, row.pupdate) }}
+                            {{ pageviews_link(row.views, row.lang, row.target, row.pupdate, yesterday) }}
                             {% else %}
                             <span class="text-muted">-</span>
                             {% endif %}
