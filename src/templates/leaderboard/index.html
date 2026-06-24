@@ -18,8 +18,8 @@
                                 <span class="input-group-text">Campaign</span>
                                 <select dir="ltr" id="camp" name="camp" class="form-select" data-bs-theme="auto">
                                     <option value="all">All</option>
-                                    {% if campaigns %}
-                                    {{ select_options(campaigns, form.camp) }}
+                                    {% if form_data and form_data.campaigns %}
+                                    {{ select_options(form_data.campaigns, selected_data.camp) }}
                                     {% endif %}
                                 </select>
                             </div>
@@ -30,8 +30,8 @@
                                 <select dir="ltr" id="user_group" name="user_group" class="form-select"
                                     data-bs-theme="auto">
                                     <option value="all">All</option>
-                                    {% if user_groups %}
-                                    {{ select_options(user_groups, form.user_group) }}
+                                    {% if form_data and form_data.user_groups %}
+                                    {{ select_options(form_data.user_groups, selected_data.user_group) }}
                                     {% endif %}
                                 </select>
                             </div>
@@ -42,17 +42,17 @@
                                     <span class="input-group-text">Year</span>
                                     <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
                                         <option value="all">All</option>
-                                        {% if years %}
-                                        {{ select_options(years, form.year) }}
+                                        {% if form_data and form_data.years %}
+                                        {{ select_options(form_data.years, selected_data.year) }}
                                         {% endif %}
                                     </select>
                                 </div>
-                                {% if form.year %}
+                                {% if selected_data.year %}
                                 <div class="input-group w-50">
                                     <select dir="ltr" id="month" name="month" class="form-select" data-bs-theme="auto">
                                         <option value="All">All</option>
-                                        {% if months %}
-                                        {{ select_options(months, form.month) }}
+                                        {% if form_data and form_data.months %}
+                                        {{ select_options(form_data.months, selected_data.month) }}
                                         {% endif %}
                                     </select>
                                 </div>

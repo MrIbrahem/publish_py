@@ -1,7 +1,6 @@
-
 from .leaderboard import bp_leaderboard
-from .td_route import bp_td
 from .routes import bp_main
+from .td_route import bp_td
 
 __all__ = [
     "bp_main",

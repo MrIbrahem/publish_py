@@ -112,6 +112,7 @@ def _make_mdwiki_cat_url(category: str, name: str | None = None) -> str:
     encoded = quote(clean.replace(" ", "_"), safe="")
     return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
 
+
 def results_api_result(
     code: str | None,
     camp: str | None,

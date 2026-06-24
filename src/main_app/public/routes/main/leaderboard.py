@@ -10,12 +10,11 @@ from flask import (
     Blueprint,
     render_template,
     request,
-    send_from_directory,
 )
 
 from ....db.services.content import get_camp_to_cats, list_projects
 from ....db.services.pages import (
-    get_leaderboard_chart_data,
+    get_chart_data_formatted,
     get_months_of_pages_years,
     get_pages,
     get_pages_years,
@@ -41,28 +40,32 @@ def index() -> str:
 
     cat = campaign_to_cats.get(camp) if camp and camp != "all" else None
 
-    chart_data_raw = get_leaderboard_chart_data(
+    chart_data = get_chart_data_formatted(
         camp=camp if camp != "all" else None,
         cat=cat,
         user_group=user_group if user_group != "all" else None,
         year=year,
-        month=month,
+        # month=month, # dont filter chart by month
     )
-    chart_labels = [row["date"] for row in chart_data_raw]
-    chart_counts = [row["count"] for row in chart_data_raw]
 
-    form_data = request.args
+    form_selected_data = request.args
+    form_data = {
+        "campaigns": campaigns,
+        "years": years,
+        "months": months,
+        "user_groups": user_groups,
+    }
+
+    pages_rows = []
+
     return render_template(
         "leaderboard/index.html",
-        campaigns=campaigns,
-        years=years,
-        months=months,
-        user_groups=user_groups,
-        form=form_data,
-        chart_data={
-            "labels": chart_labels,
-            "counts": chart_counts,
-        },
+        # data to use in form
+        form_data=form_data,
+        selected_data=form_selected_data,
+        chart_data=chart_data,
+        # main data
+        pages=pages_rows,
     )
 
 
@@ -79,25 +82,26 @@ def langs(lang_code: str) -> str:
     words_total = sum(int(page["word"]) for page in lang_pages if page.get("word"))
     pageviews_total = sum(int(page["views"]) for page in lang_pages if page.get("views"))
 
-    chart_data_raw = get_leaderboard_chart_data(
+    chart_data = get_chart_data_formatted(
         lang=lang_code,
         year=selected_year,
     )
-    chart_labels = [row["date"] for row in chart_data_raw]
-    chart_counts = [row["count"] for row in chart_data_raw]
 
     return render_template(
         "leaderboard/langs.html",
         lang_code=lang_code,
-        pages=lang_pages,
-        selected_year=selected_year,
-        years=lang_years,
+        # data to use in form
+        form_data={
+            "years": lang_years,
+        },
+        selected_data={
+            "year": selected_year,
+        },
         words_total=words_total,
         pageviews_total=pageviews_total,
-        chart_data={
-            "labels": chart_labels,
-            "counts": chart_counts,
-        },
+        chart_data=chart_data,
+        # main data
+        pages=lang_pages,
     )
 
 
@@ -117,34 +121,32 @@ def users(username: str) -> str:
     words_total = sum(page["word"] for page in user_pages if page.get("word"))
     pageviews_total = sum(page["views"] for page in user_pages if page.get("views"))
 
-    chart_data_raw = get_leaderboard_chart_data(
+    chart_data = get_chart_data_formatted(
         user=username,
         year=selected_year,
         lang=selected_lang,
     )
-    chart_labels = [row["date"] for row in chart_data_raw]
-    chart_counts = [row["count"] for row in chart_data_raw]
+
+    form_data = {
+        "years": user_years,
+        "langs": user_langs,
+    }
 
     return render_template(
         "leaderboard/users.html",
         username=username,
-        pages=user_pages,
-        years=user_years,
-        langs=user_langs,
-        selected_lang=selected_lang,
-        selected_year=selected_year,
+        # data to use in form
+        form_data=form_data,
+        selected_data={
+            "year": selected_year,
+            "lang": selected_lang,
+        },
         words_total=words_total,
         pageviews_total=pageviews_total,
-        chart_data={
-            "labels": chart_labels,
-            "counts": chart_counts,
-        },
+        chart_data=chart_data,
+        # main data
+        pages=user_pages,
     )
-
-
-@bp_leaderboard.get("/favicon.ico")
-def favicon():
-    return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
 
 
 __all__ = ["bp_leaderboard"]

@@ -45,6 +45,7 @@ def results_api():
         }
     )
 
+
 def _normalize_arg(name: str) -> str:
     """Read a GET param, strip whitespace, treat 'undefined' as empty.
 
@@ -100,7 +101,7 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
     all_settings = get_all_settings_ready()
     show_translation_button = all_settings.get("translation_button_in_progress_table", False)
     allow_type_of_translate = all_settings.get("allow_type_of_translate", False)
-    show_exists_table       = all_settings.get("show_exists_table", False)
+    show_exists_table = all_settings.get("show_exists_table", False)
 
     if allow_type_of_translate is False:
         tra_type = "lead"
@@ -116,8 +117,9 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
             "show_exists_table": show_exists_table,
             "allow_type_of_translate": allow_type_of_translate,
             "show_translation_button": show_translation_button,
-        }
+        },
     }
+
 
 @bp_main.get("/table")
 def table():

@@ -35,8 +35,8 @@
                             <div class="col-12">
                                 <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
                                     <option value='all'>Year: All</option>
-                                    {% if years %}
-                                    {{ select_options(years, selected_year) }}
+                                    {% if form_data and form_data.years %}
+                                    {{ select_options(form_data.years, selected_data.year) }}
                                     {% endif %}
                                 </select>
                             </div>

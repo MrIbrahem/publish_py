@@ -1,4 +1,9 @@
 
+/**
+ * @param {string | any[]} _labels
+ * @param {null[]} _data
+ * @param {string} _id
+ */
 function graph_js(_labels, _data, _id) {
 
     var ticksStyle = {
@@ -65,8 +70,11 @@ function graph_js(_labels, _data, _id) {
             }
         },
     }
+    // @ts-ignore
     var visitorsChart = $("#" + _id);
-    // إنشاء الرسم البياني
+
+    // create Chart
+    // @ts-ignore
     var myChart = new Chart(visitorsChart, {
         data: {
             labels: _labels,
@@ -94,6 +102,10 @@ function graph_js(_labels, _data, _id) {
     })
 }
 
+/**
+ * @param {{ labels: string | any[]; counts: null[]; }} chart
+ * @param {string} _id
+ */
 function render_graph(chart, _id) {
     graph_js(chart.labels, chart.counts, _id)
 }

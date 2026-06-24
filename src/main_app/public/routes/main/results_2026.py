@@ -55,6 +55,7 @@ def _get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str,
         }
     return result
 
+
 # ---------------------------------------------------------------------------
 # load_translate_type — partition translate_type rows into the two sets
 # ---------------------------------------------------------------------------

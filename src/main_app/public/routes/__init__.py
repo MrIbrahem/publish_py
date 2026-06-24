@@ -3,6 +3,7 @@ Flask public routes
 """
 
 from flask import Blueprint
+
 from .api.routes import bp_api
 from .auth.routes import bp_auth
 from .cxtoken.routes import bp_cxtoken

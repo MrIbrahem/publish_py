@@ -34,16 +34,16 @@
                             <div class="col-6">
                                 <select dir="ltr" id="lang" name="lang" class="form-select" data-bs-theme="auto">
                                     <option value='all'>Lang: All</option>
-                                    {% if langs %}
-                                    {{ select_options(langs, selected_lang) }}
+                                    {% if form_data and form_data.langs %}
+                                    {{ select_options(form_data.langs, selected_data.lang) }}
                                     {% endif %}
                                 </select>
                             </div>
                             <div class="col-6">
                                 <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
                                     <option value='all'>Year: All</option>
-                                    {% if years %}
-                                    {{ select_options(years, selected_year) }}
+                                    {% if form_data and form_data.years %}
+                                    {{ select_options(form_data.years, selected_data.year) }}
                                     {% endif %}
                                 </select>
                             </div>

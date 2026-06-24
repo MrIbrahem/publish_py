@@ -19,9 +19,9 @@ from .public.routes import (
     bp_auth,
     bp_cxtoken,
     bp_fixrefs,
-    bp_td,
     bp_main,
     bp_publish,
+    bp_td,
 )
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
