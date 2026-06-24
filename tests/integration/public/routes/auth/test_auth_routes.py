@@ -138,6 +138,7 @@ class TestAuthLogout:
         # Cookie should have expired or be deleted
         assert "auth_cookie" in cookie_header.lower() or "Max-Age=0" in cookie_header or "Expires" in cookie_header
 
+
 class TestAuthRouteIntegration:
     """Integration tests for auth routes."""
 

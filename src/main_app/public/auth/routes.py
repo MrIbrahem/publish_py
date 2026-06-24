@@ -38,6 +38,7 @@ from ...shared.auth.mwoauth_handshake import (
 )
 from ...shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
 from .rate_limit import callback_rate_limiter, login_rate_limiter
+from .utils import load_logged_in_user
 
 logger = logging.getLogger(__name__)
 bp_auth = Blueprint("auth", __name__)
@@ -81,6 +82,18 @@ def _load_request_token(raw: Sequence[Any] | None) -> RequestToken:
 
 
 # ---------------------------------------------------------
+# Hooks
+# ---------------------------------------------------------
+
+
+# Register the hook right after defining the blueprint
+@bp_auth.before_app_request
+def before_request() -> None:
+    """Automatically load the user before any route is processed."""
+    load_logged_in_user()
+
+
+# ---------------------------------------------------------
 # Routes
 # ---------------------------------------------------------
 
@@ -88,12 +101,6 @@ def _load_request_token(raw: Sequence[Any] | None) -> RequestToken:
 @bp_auth.get("/login")
 def login() -> WerkzeugResponse:
     logger.info("OAuth login initiated, client: %s", _client_key())
-
-    if settings.oauth is None:
-        flash("OAuth not configured", "danger")
-        logger.warning("OAuth login failed: OAuth not configured")
-        return redirect(url_for("main.index", error="oauth-not-configured"))
-
     if not login_rate_limiter.allow(_client_key()):
         time_left = login_rate_limiter.try_after(_client_key()).total_seconds()
         time_left_str = str(time_left).split(".")[0]
@@ -126,13 +133,6 @@ def login() -> WerkzeugResponse:
 @bp_auth.get("/callback")
 def callback() -> WerkzeugResponse:
     logger.info("OAuth callback initiated, client: %s", _client_key())
-    # ------------------
-    # use oauth
-    if settings.oauth is None:
-        flash("OAuth not configured", "danger")
-        logger.warning("OAuth callback failed: OAuth not configured")
-        return redirect(url_for("main.index", error="oauth-not-configured"))
-
     # ------------------
     # callback rate limiter
     if not callback_rate_limiter.allow(_client_key()):
@@ -227,6 +227,7 @@ def callback() -> WerkzeugResponse:
         access_secret=str(token_secret),
     )
 
+    # Set sessions
     session["uid"] = user_id
     session["username"] = username
 
@@ -245,22 +246,10 @@ def callback() -> WerkzeugResponse:
         access_secret=str(token_secret).encode(),
         is_active_admin=is_active_coordinator(username),
     )
-    g.is_authenticated = True
-    g.authenticated_user_id = str(user_id)
     logger.info("OAuth login successful for user_id=%s username=%s", user_id, username)
 
-    oauth_config = settings.oauth  # Already validated as non-None above
-    if oauth_config:
-        g.oauth_credentials = {
-            "consumer_key": oauth_config.consumer_key,
-            "consumer_secret": oauth_config.consumer_secret,
-            "access_token": str(token_key),
-            "access_secret": str(token_secret),
-        }
-    else:
-        g.oauth_credentials = None
-
     return response
+
 
 @bp_auth.get("/logout")
 def logout() -> WerkzeugResponse:
@@ -294,11 +283,7 @@ def logout() -> WerkzeugResponse:
     response = make_response(redirect(url_for("main.index")))
     response.delete_cookie(settings.cookie.name, path="/")
 
-    g.current_user = None
-    g.is_authenticated = False
-    g.oauth_credentials = None
-    g.authenticated_user_id = None
-
+    g._current_user = None
     return response
 
 
