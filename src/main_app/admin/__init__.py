@@ -4,7 +4,7 @@ Admin Blueprints
 
 from flask import Blueprint
 
-from .route import admin_route_module
+from .admin_panel import admin_route_module
 from .routes.add_translate import add_bp
 from .routes.campaigns import campaigns_module
 from .routes.coordinators import coordinators_module
