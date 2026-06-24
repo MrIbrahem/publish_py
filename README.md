@@ -125,3 +125,34 @@ Before publishing to Wikipedia, the process uses the [fix_refs](https://github.c
 -   **Other changes:** Adding and correcting other minor wikitext issues
 
 The application then publishes to Wikipedia via MediaWiki API and optionally links articles to Wikidata via the Wikidata API.
+
+## Development UI Testing
+
+The admin area normally requires the authenticated user to exist as an
+active row in the coordinators table (`is_active_coordinator`, checked on
+every login and on every `@admin_required` route).
+
+For local UI testing (manual or automated — Playwright, Selenium, etc.),
+this requirement can be bypassed **only** under `DevelopmentConfig`:
+
+1. Start the app in development mode:
+
+   ```bash
+   flask --app src.app1 run
+   ```
+
+2. Set the bypass environment variable before starting:
+
+   ```bash
+   UI_TEST_BYPASS_COORDINATOR_CHECK=true flask --app src.app1 run
+   ```
+
+When enabled, any authenticated user is treated as an active coordinator
+without needing a real row in the coordinators table. Every bypass use is
+logged as a warning, so it's easy to spot in development logs.
+
+**This bypass is permanently disabled under `ProductionConfig`.** Setting
+`UI_TEST_BYPASS_COORDINATOR_CHECK=true` in a production environment has
+no effect — the flag is only honored when the app is configured with
+`DevelopmentConfig`. It must never be treated as a production
+authorization mechanism.

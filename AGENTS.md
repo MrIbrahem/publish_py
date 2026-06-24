@@ -96,3 +96,35 @@ See `src/example.env` for template.
 -   Tests use in-memory SQLite (`sqlite:///:memory:`) by default for unit tests.
 -   `pytest.ini` excludes network tests by default (`-m "not network"`).
 -   Coverage is enabled by default for `src/main_app`.
+
+## Local Development & UI Testing
+
+For local development, use:
+
+```bash
+flask --app src.app1 run
+```
+
+`src.app1` is the preferred Flask entry point for development work.
+
+### UI / Browser Automation Testing
+
+When performing UI, Playwright, Selenium, browser automation, or
+end-to-end testing, agents may enable the coordinator-check bypass:
+
+```bash
+UI_TEST_BYPASS_COORDINATOR_CHECK=true
+```
+
+This lets test runs proceed without needing a real row in the
+coordinators table.
+
+**Rules:**
+- This bypass is intended only for local development and automated UI
+  testing under `DevelopmentConfig`. It has no effect under
+  `ProductionConfig`.
+- Agents must **not** rely on this bypass when validating production
+  authorization behavior.
+- If testing authorization/permission logic itself, the bypass must
+  remain **disabled** (do not set `UI_TEST_BYPASS_COORDINATOR_CHECK`, or
+  explicitly set it to `false`).

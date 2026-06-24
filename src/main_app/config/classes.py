@@ -99,6 +99,12 @@ class SecurityConfig:
     secret_key_fallbacks: tuple[str, ...]  # Fallback secret keys for rotation
     publish_secret_code: str
 
+    # Development-only bypass for the coordinator authorization check.
+    # Honored ONLY when running under DevelopmentConfig — see
+    # config.py / db/services/admin_service.py for enforcement.
+    # NEVER a production authorization mechanism.
+    ui_test_bypass_coordinator_check: bool
+
 
 @dataclass(frozen=True)
 class Settings:
