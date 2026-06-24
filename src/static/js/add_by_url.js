@@ -1,8 +1,19 @@
+/**
+ * @type {any[]}
+ */
 let UrlDone = [];
 
+/**
+ * @param {any} ix
+ * @param {string} value
+ * @param {string} code
+ */
 function add_data(ix, value, code) {
     $(`#row_${ix} [name="${code}"]`).val(value);
 }
+/**
+ * @param {any} $row_id
+ */
 function delete_row($row_id) {
     $(`#row_${$row_id}`).remove();
 }
@@ -53,6 +64,10 @@ async function add_new_row() {
     return ii;
 }
 
+/**
+ * @param {any} articleTitle
+ * @param {any} language
+ */
 async function get_info(articleTitle, language) {
     const params = {
         "action": "query",
@@ -74,6 +89,10 @@ async function get_info(articleTitle, language) {
     return data;
 }
 
+/**
+ * @param {string} language
+ * @param {string} articleTitle
+ */
 async function get_page_info(language, articleTitle) {
     const data = await get_info(articleTitle, language);
 
@@ -101,6 +120,9 @@ async function get_page_info(language, articleTitle) {
     return page_data;
 }
 
+/**
+ * @param {string | string[] | URL} url
+ */
 async function workinurl(url) {
     try {
         if (!url.includes("wikipedia.org")) {
@@ -159,6 +181,9 @@ async function workinurl(url) {
     }
 }
 
+/**
+ * @param {{ closest: (arg0: string) => any; }} button
+ */
 async function start_one_url(button) {
     $("#alert_text").text("");
     $("#alert").hide();
@@ -170,7 +195,7 @@ async function start_one_url(button) {
     const paramInputs = endpointContent.querySelectorAll('.url');
 
     // عرض القيم في تنبيه
-    paramInputs.forEach(input => {
+    paramInputs.forEach((/** @type {{ value: any; }} */ input) => {
         let url = input.value;
         workinurl(url);
     });

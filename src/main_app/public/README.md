@@ -6,22 +6,22 @@ The `public` package contains all public-facing Flask blueprints for the MDWiki 
 
 ### Main Modules
 
-| Directory | Blueprint | Prefix | Purpose |
-|-----------|----------|--------|---------|
-| `routes/api/` | `bp_api` | `/api` | JSON API endpoints for reports, stats, pages, categories |
-| `routes/auth/` | `bp_auth` | `/auth` | OAuth login, callback, logout with rate limiting |
-| `routes/cxtoken/` | `bp_cxtoken` | `/cxtoken` | ContentTranslation JWT token proxy |
-| `routes/main/` | `bp_main` + `bp_leaderboard` | `""` + `/leaderboard` | Homepage, results tables, leaderboard |
-| `routes/publish/` | `bp_publish` | `/publish` | Article publishing to Wikipedia via MediaWiki API |
-| `routes/refs/` | `bp_fixrefs` | `/fixrefs` | Reference fixing tool |
+| Directory         | Blueprint                    | Prefix                | Purpose                                                  |
+| ----------------- | ---------------------------- | --------------------- | -------------------------------------------------------- |
+| `routes/api/`     | `bp_api`                     | `/api`                | JSON API endpoints for reports, stats, pages, categories |
+| `routes/auth/`    | `bp_auth`                    | `/auth`               | OAuth login, callback, logout with rate limiting         |
+| `routes/cxtoken/` | `bp_cxtoken`                 | `/cxtoken`            | ContentTranslation JWT token proxy                       |
+| `routes/main/`    | `bp_main` + `bp_leaderboard` | `""` + `/leaderboard` | Homepage, results tables, leaderboard                    |
+| `routes/publish/` | `bp_publish`                 | `/publish`            | Article publishing to Wikipedia via MediaWiki API        |
+| `routes/refs/`    | `bp_fixrefs`                 | `/fixrefs`            | Reference fixing tool                                    |
 
 ### Technologies & Dependencies
 
-- **Flask Blueprints** with CORS decorators
-- **Marshmallow** for request validation
-- **MediaWiki OAuth** via `mwoauth` library
-- **cachetools.TTLCache** for CX token caching
-- **requests** for external API calls
+-   **Flask Blueprints** with CORS decorators
+-   **Marshmallow** for request validation
+-   **MediaWiki OAuth** via `mwoauth` library
+-   **cachetools.TTLCache** for CX token caching
+-   **requests** for external API calls
 
 ## Architecture & Code Quality Review
 
@@ -29,26 +29,27 @@ The `public` package contains all public-facing Flask blueprints for the MDWiki 
 
 13 JSON endpoints with consistent `{"results": ..., "count": ...}` envelope:
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/publish_reports` | Filtered publish reports with Marshmallow validation |
-| `GET /api/publish_reports_stats` | Filter dropdown options |
-| `GET /api/in_process` | In-process translations with category/language data |
-| `GET /api/in_process_total` | Aggregated in-process counts per user |
-| `GET /api/pages_users` | User-space pages with campaign data |
-| `GET /api/pages_with_views` | Pages with Wikipedia pageview counts |
-| `GET /api/categories` | All category records |
-| `GET /api/distinct_langs` | Distinct language codes |
-| `GET /api/users_by_translations_count` | User translation counts |
-| `GET /api/langs` | All language records |
-| `GET /api/top_langs` | Aggregated stats per language |
-| `GET /api/top_users` | Aggregated stats per user |
+| Endpoint                               | Description                                          |
+| -------------------------------------- | ---------------------------------------------------- |
+| `GET /api/publish_reports`             | Filtered publish reports with Marshmallow validation |
+| `GET /api/publish_reports/stats`       | Filter dropdown options                              |
+| `GET /api/in_process`                  | In-process translations with category/language data  |
+| `GET /api/in_process_total`            | Aggregated in-process counts per user                |
+| `GET /api/pages_users`                 | User-space pages with campaign data                  |
+| `GET /api/pages_with_views`            | Pages with Wikipedia pageview counts                 |
+| `GET /api/categories`                  | All category records                                 |
+| `GET /api/distinct_langs`              | Distinct language codes                              |
+| `GET /api/users_by_translations_count` | User translation counts                              |
+| `GET /api/langs`                       | All language records                                 |
+| `GET /api/top_langs`                   | Aggregated stats per language                        |
+| `GET /api/top_users`                   | Aggregated stats per user                            |
 
 All endpoints decorated with `@check_cors`.
 
 ### Auth Blueprint (`routes/auth/`)
 
 OAuth flow:
+
 ```
 /auth/login  -> Generate state nonce -> mwoauth.Handshaker -> Redirect to MediaWiki
 /auth/callback -> Verify state -> Complete handshake -> Store encrypted tokens -> Set signed cookie
@@ -56,13 +57,15 @@ OAuth flow:
 ```
 
 Features:
-- **Rate limiting**: Sliding-window rate limiter (5/min login, 10/min callback)
-- **State token signing**: OAuth state nonce signed with `itsdangerous`
-- **Token encryption**: OAuth tokens encrypted with Fernet before DB storage
+
+-   **Rate limiting**: Sliding-window rate limiter (5/min login, 10/min callback)
+-   **State token signing**: OAuth state nonce signed with `itsdangerous`
+-   **Token encryption**: OAuth tokens encrypted with Fernet before DB storage
 
 ### Publish Blueprint (`routes/publish/`)
 
 The core publishing workflow:
+
 ```
 POST /publish/ -> Validate (CORS + secret key) -> Schema validation
   -> Look up user OAuth tokens
@@ -75,10 +78,11 @@ POST /publish/ -> Validate (CORS + secret key) -> Schema validation
 ```
 
 Features:
-- **CORS + secret key protection** (CSRF exempt)
-- **Fallback user support** for Wikidata linking
-- **Text processing** via `fix_refs` module
-- **File-based report logging** for debugging
+
+-   **CORS + secret key protection** (CSRF exempt)
+-   **Fallback user support** for Wikidata linking
+-   **Text processing** via `fix_refs` module
+-   **File-based report logging** for debugging
 
 ### Main Blueprint (`routes/main/`)
 
@@ -97,6 +101,7 @@ The results system (622 lines in `results_2026.py`) mirrors the PHP `Results/Get
 ### CXToken Blueprint (`routes/cxtoken/`)
 
 Proxy for ContentTranslation JWT tokens:
+
 ```
 GET /cxtoken/?wiki=...&user=...
   -> Validate schema
@@ -109,11 +114,11 @@ GET /cxtoken/?wiki=...&user=...
 
 ### Design Patterns
 
-- **Blueprint Pattern**: Clean separation with 7 blueprints
-- **Decorator Pattern**: CORS (`@check_cors`), auth (`@login_required`, `@oauth_required`), access (`@validate_access`)
-- **Schema Validation**: Marshmallow schemas for request validation
-- **Cache Pattern**: TTL cache for CX tokens
-- **PHP Port Pattern**: Extensive comments referencing original PHP functions being ported
+-   **Blueprint Pattern**: Clean separation with 7 blueprints
+-   **Decorator Pattern**: CORS (`@check_cors`), auth (`@login_required`, `@oauth_required`), access (`@validate_access`)
+-   **Schema Validation**: Marshmallow schemas for request validation
+-   **Cache Pattern**: TTL cache for CX tokens
+-   **PHP Port Pattern**: Extensive comments referencing original PHP functions being ported
 
 ## Strengths
 
@@ -164,41 +169,44 @@ GET /cxtoken/?wiki=...&user=...
 
 ## Areas That Need Attention
 
-| Area | Priority | Details |
-|------|----------|---------|
-| XSS in HTML builders | **High** | Add `html.escape` to all interpolated values |
-| Rate limit bypass | **Medium** | Use `request.remote_addr` or configure trusted proxies |
-| Code duplication | **Medium** | Merge `results_2026.py` and `results_api.py` shared logic |
-| File size | **Medium** | Split `results_2026.py` (622 lines) into smaller modules |
-| Error message typo | **Low** | Fix "fetching v data" in `users_by_translations_count` |
-| Dead imports | **Low** | Remove `random` from `refs/routes.py` |
+| Area                 | Priority   | Details                                                   |
+| -------------------- | ---------- | --------------------------------------------------------- |
+| XSS in HTML builders | **High**   | Add `html.escape` to all interpolated values              |
+| Rate limit bypass    | **Medium** | Use `request.remote_addr` or configure trusted proxies    |
+| Code duplication     | **Medium** | Merge `results_2026.py` and `results_api.py` shared logic |
+| File size            | **Medium** | Split `results_2026.py` (622 lines) into smaller modules  |
+| Error message typo   | **Low**    | Fix "fetching v data" in `users_by_translations_count`    |
+| Dead imports         | **Low**    | Remove `random` from `refs/routes.py`                     |
 
 ## Improvement Plan
 
 ### Quick Wins
-- [ ] Fix XSS by adding `html.escape()` to `_make_summary()` and `_make_mdwiki_cat_url()`
-- [ ] Fix "fetching v data" error message typo
-- [ ] Remove unused `random` import from `refs/routes.py`
-- [ ] Fix duplicate flash messages in logout
+
+-   [ ] Fix XSS by adding `html.escape()` to `_make_summary()` and `_make_mdwiki_cat_url()`
+-   [ ] Fix "fetching v data" error message typo
+-   [ ] Remove unused `random` import from `refs/routes.py`
+-   [ ] Fix duplicate flash messages in logout
 
 ### Medium-term Improvements
-- [ ] Extract shared language/campaign loading logic from `index()` and `table()` into a helper
-- [ ] Merge `_make_summary()` and `_create_summary()` into a single shared function
-- [ ] Split `results_2026.py` into `results_builder.py`, `results_data.py`, `results_html.py`
-- [ ] Fix rate limiting to use `request.remote_addr`
+
+-   [ ] Extract shared language/campaign loading logic from `index()` and `table()` into a helper
+-   [ ] Merge `_make_summary()` and `_create_summary()` into a single shared function
+-   [ ] Split `results_2026.py` into `results_builder.py`, `results_data.py`, `results_html.py`
+-   [ ] Fix rate limiting to use `request.remote_addr`
 
 ### Long-term Recommendations
-- [ ] Implement server-side caching for results (Redis or in-memory with TTL)
-- [ ] Add pagination to results API for large categories
-- [ ] Convert results system to async for parallel API calls
-- [ ] Add OpenAPI documentation for all `/api/` endpoints
+
+-   [ ] Implement server-side caching for results (Redis or in-memory with TTL)
+-   [ ] Add pagination to results API for large categories
+-   [ ] Convert results system to async for parallel API calls
+-   [ ] Add OpenAPI documentation for all `/api/` endpoints
 
 ## Comprehensive Review
 
-| Metric | Score | Notes |
-|--------|-------|-------|
-| **Overall Rating** | **7/10** | Functional with good patterns, but duplication and XSS concerns |
-| **Production Readiness** | Ready with caveats | XSS in HTML builders needs fixing |
-| **Technical Debt** | **Medium** | Code duplication, large files, PHP port artifacts |
-| **Risk Assessment** | **Medium** | XSS risk; rate limit bypass; slow results for large categories |
-| **Maintainability** | **Medium** | Good blueprint separation, but duplicated logic increases change risk |
+| Metric                   | Score              | Notes                                                                 |
+| ------------------------ | ------------------ | --------------------------------------------------------------------- |
+| **Overall Rating**       | **7/10**           | Functional with good patterns, but duplication and XSS concerns       |
+| **Production Readiness** | Ready with caveats | XSS in HTML builders needs fixing                                     |
+| **Technical Debt**       | **Medium**         | Code duplication, large files, PHP port artifacts                     |
+| **Risk Assessment**      | **Medium**         | XSS risk; rate limit bypass; slow results for large categories        |
+| **Maintainability**      | **Medium**         | Good blueprint separation, but duplicated logic increases change risk |

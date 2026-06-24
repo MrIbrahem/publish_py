@@ -18,7 +18,7 @@ from src.main_app.shared.schemas import PublishReportsQuerySchema
 class TestApiRoutes:
     """Integration tests for API routes."""
 
-    def test_publish_reports_preflight(self, client: FlaskClient):
+    def test_api_preflight(self, client: FlaskClient):
         """Test that publish_reports OPTIONS endpoint returns correct CORS headers."""
         response = client.options("/api/publish_reports")
 
@@ -83,7 +83,7 @@ class TestApiRoutes:
 
     def test_publish_reports_stats_success(self, client: FlaskClient):
         """Test that publish_reports_stats endpoint returns stats."""
-        response = client.get("/api/publish_reports_stats")
+        response = client.get("/api/publish_reports/stats")
 
         assert response.status_code == 200
         assert response.content_type == "application/json"

@@ -11,7 +11,7 @@ from typing import Any, Tuple, Type
 
 from flask import Flask, flash, jsonify, render_template, request  # , g
 
-from .admin.route import bp_admin
+from .admin.route import admin_route_module
 from .db import init_db
 from .db.services.users import active_coordinators
 from .public.routes import (
@@ -96,7 +96,7 @@ def create_app(config_class: Type) -> Flask:
     app.register_blueprint(bp_publish)
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
-    app.register_blueprint(bp_admin)
+    app.register_blueprint(admin_route_module.bp)
 
     csrf_exempt(app, bp_publish)
 

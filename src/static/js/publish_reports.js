@@ -57,7 +57,7 @@ async function load_form() {
 
     console.log("loading publish_reports_stats");
     try {
-        const response = await $.getJSON('/api/publish_reports_stats');
+        const response = await $.getJSON('/api/publish_reports/stats');
         if (response?.results) {
             populateFilterOptions(response.results);
         }
@@ -65,7 +65,7 @@ async function load_form() {
         console.error('Failed to load filter options:', error);
     }
     /*
-    $.getJSON('/api/publish_reports_stats')
+    $.getJSON('/api/publish_reports/stats')
         .done(await function (json) {
             if (json && json.results) {
                 populateFilterOptions(json.results);
