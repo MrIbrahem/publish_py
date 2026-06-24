@@ -29,12 +29,12 @@ class AdminPanelRoutes:
 
     def _setup_routes(self) -> None:
 
-        @self.bp.get("/")
+        @self.bp.route("/", methods=["GET"])
         @admin_required
         def index():
             return redirect(url_for("admin.last_dashboard"))
 
-        @self.bp.get("/last")
+        @self.bp.route("/last", methods=["GET"])
         @admin_required
         def last_dashboard():
             # Get query parameters
@@ -48,29 +48,29 @@ class AdminPanelRoutes:
 
             return last_translations_dashboard(last_table, lang)
 
-        @self.bp.get("/last/pages/<string:lang>")
-        @self.bp.get("/last/pages/")
+        @self.bp.route("/last/pages/<string:lang>", methods=["GET"])
+        @self.bp.route("/last/pages/", methods=["GET"])
         @admin_required
         def dashboard_pages(lang : str | None = None):
             return last_translations_dashboard("pages", lang)
 
-        @self.bp.get("/last/pages_users/<string:lang>")
-        @self.bp.get("/last/pages_users/")
+        @self.bp.route("/last/pages_users/<string:lang>", methods=["GET"])
+        @self.bp.route("/last/pages_users/", methods=["GET"])
         @admin_required
         def dashboard_pages_users(lang : str | None = None):
             return last_translations_dashboard("pages_users", lang)
 
-        @self.bp.get("/reports")
+        @self.bp.route("/reports", methods=["GET"])
         @admin_required
         def reports():
             return render_template("admins/reports.html")
 
-        @self.bp.get("/process")
+        @self.bp.route("/process", methods=["GET"])
         @admin_required
         def in_process_dashboard():
             return render_template("admins/in_process.html")
 
-        @self.bp.get("/process_total")
+        @self.bp.route("/process_total", methods=["GET"])
         @admin_required
         def in_process_total_dashboard():
             """
@@ -80,12 +80,12 @@ class AdminPanelRoutes:
             """
             return render_template("admins/in_process_total.html")
 
-        @self.bp.get("/edit_done")
+        @self.bp.route("/edit_done", methods=["GET"])
         @admin_required
         def edit_done() -> str:
             return render_template("admins/close_btn.html")
 
-        @self.bp.get("/categories")
+        @self.bp.route("/categories", methods=["GET"])
         @admin_required
         def categories_dashboard_route():
             return categories_dashboard()
