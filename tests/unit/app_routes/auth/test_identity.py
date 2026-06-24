@@ -44,45 +44,19 @@ class TestCurrentUser:
 class TestResolveUserId:
     """Tests for _resolve_user_id function."""
 
-    def test_returns_int_from_session(self, app):
-        """Test that int uid from session is returned."""
-        with app.test_request_context():
-            from flask import session
-
-            session["uid"] = 12345
-
-            result = _resolve_user_id()
-
-            assert result == 12345
-            assert isinstance(result, int)
-
     def test_converts_string_uid_to_int(self, app):
         """Test that string uid is converted to int."""
         with app.test_request_context():
-            from flask import session
-
-            session["uid"] = "12345"
-
-            result = _resolve_user_id()
+            result = _resolve_user_id("12345")
 
             assert result == 12345
             assert isinstance(result, int)
-
-    def test_returns_none_when_no_uid(self, app):
-        """Test that None is returned when no uid in session."""
-        with app.test_request_context():
-            result = _resolve_user_id()
-
-            assert result is None
 
     def test_returns_none_for_invalid_uid(self, app):
         """Test that None is returned for invalid uid."""
         with app.test_request_context():
-            from flask import session
 
-            session["uid"] = "not_a_number"
-
-            result = _resolve_user_id()
+            result = _resolve_user_id("not_a_number")
 
             assert result is None
 

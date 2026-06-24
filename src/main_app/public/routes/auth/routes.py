@@ -29,7 +29,7 @@ from ....db.services.users import (
     is_active_coordinator,
     upsert_user_token,
 )
-from ....shared.auth.identity import CurrentUser
+from ....shared.auth.current_user import CurrentUser
 from ....shared.auth.mwoauth_handshake import (
     OAuthIdentityError,
     complete_login,

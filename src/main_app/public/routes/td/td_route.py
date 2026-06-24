@@ -23,7 +23,7 @@ from ....db.services.pages import (
     statics_by_category,
 )
 from ....db.services.users import is_full_translator
-from ....shared.auth.identity import current_user
+from ....shared.auth.current_user import current_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result
 
