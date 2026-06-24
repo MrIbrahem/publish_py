@@ -72,11 +72,11 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped compact table-sm table_responsive table_text_left"
-                id="resultsTable" style="width:100%">
+            <table class="table table-striped compact table-sm table_text_left" id="resultsTable" style="width:100%">
                 <thead class="">
                     <tr>
                         <th style="display:none">ID</th>
+                        <th>#</th>
                         <th>Date</th>
                         <th>Language</th>
                         <th>Title</th>
@@ -109,18 +109,10 @@
 {% endblock %}
 
 {% block extra_js %}
-
 <script src="{{ url_for('static', filename='js/publish_reports.js') }}"></script>
 <script>
-    $(document).ready(async function () {
-        // Load filters once only
-        await load_form();
-
-        let table = await newDataTable();
-
-        $('#count_result').text(allResults.length);
-        setupEventHandlers(table);
-
+    $(document).ready(function () {
+        render_reports_table();
     });
 </script>
 {% endblock %}
