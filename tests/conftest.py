@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any, Generator
+from typing import Generator
 from unittest.mock import MagicMock
 
 import pytest
@@ -45,9 +45,10 @@ if sys:
 
 
 # Import after environment setup
-from src.main_app import create_app  # noqa: E402
-from src.main_app.config import TestingConfig  # noqa: E402
-from src.main_app.shared.core.extensions import db as _db  # noqa: E402
+from src.main_app import create_app
+from src.main_app.config import TestingConfig
+from src.main_app.shared.auth import CurrentUser
+from src.main_app.shared.core.extensions import db as _db
 
 
 @pytest.fixture(autouse=True)
@@ -60,7 +61,7 @@ def disable_network(request, mocker):
 
 
 @pytest.fixture
-def app() -> Generator[Flask, None, None]:
+def app() -> Generator[Flask]:
     """Create and configure a test Flask application.
 
     Yields:
@@ -225,13 +226,6 @@ def mock_admin_required(mocker):
     Inject this fixture into admin route tests to bypass authentication
     so tests can focus on route functionality rather than auth.
     """
-    # Mock current_user to return a valid user object
-    mock_user = MagicMock()
-    mock_user.username = "admin"
-    mocker.patch("src.main_app.admin.decorators.current_user", return_value=mock_user)
-
-    # Mock _get_cached_active_coordinators to return list with "admin"
-    mocker.patch(
-        "src.main_app.admin.decorators._get_cached_active_coordinators",
-        return_value=["admin"],
-    )
+    # Mock load_logged_in_user to return a valid user object
+    mock_user = CurrentUser(user_id=0, username="ADMIN_USER", access_token="", access_secret="", is_active_admin=True)
+    mocker.patch("src.main_app.admin.decorators.load_logged_in_user", return_value=mock_user)

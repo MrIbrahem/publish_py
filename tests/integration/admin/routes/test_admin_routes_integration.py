@@ -6,11 +6,12 @@ TODO: should mock admin_required decorator
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
+
+from src.main_app.shared.auth import CurrentUser
 
 
 @pytest.mark.integration
@@ -103,34 +104,23 @@ class TestAdminRouteAccess:
 
     def test_authenticated_non_admin_redirected(self, auth_client: FlaskClient):
         """Test that authenticated non-admin users are denied access."""
-        # Mock current_user to return a non-admin user
-        from src.main_app.db.services.users.user_token_service import UserTokenRecord
+        # Mock load_logged_in_user to return a non-admin user
 
-        mock_user = UserTokenRecord(user_id=12345, username="TestUser")
+        mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
 
-        with patch("src.main_app.admin.decorators.current_user", return_value=mock_user):
-            # Mock _get_cached_active_coordinators to return list without "TestUser"
-            with patch(
-                "src.main_app.admin.decorators._get_cached_active_coordinators",
-                return_value=["admin"],
-            ):
-                response = auth_client.get("/admin/", follow_redirects=False)
+        with patch("src.main_app.admin.decorators.load_logged_in_user", return_value=mock_user):
+            response = auth_client.get("/admin/", follow_redirects=False)
 
-                # Should return 403 Forbidden (not a redirect)
-                assert response.status_code == 403
+            # Should return 403 Forbidden (not a redirect)
+            assert response.status_code == 403
 
     def test_authenticated_non_admin_forbidden(self, auth_client: FlaskClient):
         """Test that authenticated non-admin users are denied access."""
-        # Mock current_user to return a non-admin user
-        from src.main_app.db.services.users.user_token_service import UserTokenRecord
+        # Mock load_logged_in_user to return a non-admin user
 
-        mock_user = UserTokenRecord(user_id=12345, username="TestUser")
-        with patch("src.main_app.admin.decorators.current_user", return_value=mock_user):
-            # Mock _get_cached_active_coordinators to return list without "TestUser"
-            with patch(
-                "src.main_app.admin.decorators._get_cached_active_coordinators",
-                return_value=["admin"],
-            ):
-                response = auth_client.get("/admin/", follow_redirects=False)
-                # Should return 403 Forbidden (not a redirect)
-                assert response.status_code == 403
+        mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
+        with patch("src.main_app.admin.decorators.load_logged_in_user", return_value=mock_user):
+
+            response = auth_client.get("/admin/", follow_redirects=False)
+            # Should return 403 Forbidden (not a redirect)
+            assert response.status_code == 403

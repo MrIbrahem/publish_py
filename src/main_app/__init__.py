@@ -13,7 +13,7 @@ from flask import Flask, Response, flash, jsonify, render_template, request  # ,
 
 from .admin.admin_panel import admin_route_module
 from .db import init_db
-from .db.services.users import active_coordinators
+from .public.auth.utils import load_logged_in_user
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -23,7 +23,6 @@ from .public.routes import (
     bp_publish,
     bp_td,
 )
-from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.extensions import csrf_exempt, csrf_init_app
 from .shared.core.extensions import db as _db
@@ -37,11 +36,11 @@ def context_data() -> dict[str, Any]:
     """
     used in @app.context_processor
     """
-    user = current_user()
+    user = load_logged_in_user()
     return {
         "current_user": user,
         "is_authenticated": user is not None,
-        "is_admin": bool(user and user.username in active_coordinators()),
+        "is_admin": bool(user and user.is_active_admin),
         "username": user.username if user else None,
         "yesterday": (date.today() - timedelta(days=1)).isoformat(),
     }
