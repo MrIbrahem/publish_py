@@ -101,6 +101,12 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
         camp = ""
 
     # logic from load_request.php — force "lead" when whole-article translate is disabled.
+
+    def to_bool(val: Any) -> bool:
+        if isinstance(val, str):
+            return val.lower() in ("1", "true", "yes", "on")
+        return bool(val)
+
     all_settings = get_all_settings_ready()
     show_translation_button = all_settings.get("translation_button_in_progress_table", False)
     allow_type_of_translate = all_settings.get("allow_type_of_translate", False)
