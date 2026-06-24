@@ -1,62 +1,67 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="container my-5">
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h4 class="card-title mb-4">Publish Reports Viewer (<span id="count_result">0</span>):</h4>
-            <form id="filterForm" class="row g-3">
-                <div class="row">
-                    <div class="col-md-9">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="input-group">
-                                    <label class="input-group-text" for="year">Year</label>
-                                    <select class="form-select" name="year" id="year"></select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="input-group">
-                                    <label class="input-group-text" for="month">Month</label>
-                                    <select class="form-select" name="month" id="month"></select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="input-group">
-                                    <label class="input-group-text" for="lang">Language</label>
-                                    <select class="form-select" name="lang" id="lang"></select>
-                                </div>
-                            </div>
-                        </div>
+
+{% macro render_form() %}
+<form id="filterForm" class="row g-3">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <label class="input-group-text" for="year">Year</label>
+                        <select class="form-select" name="year" id="year"></select>
                     </div>
-                    <!-- <div class="col-md-3">
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <label class="input-group-text" for="month">Month</label>
+                        <select class="form-select" name="month" id="month"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <label class="input-group-text" for="lang">Language</label>
+                        <select class="form-select" name="lang" id="lang"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="col-md-3">
                             <div class="input-group">
                                 <label class="input-group-text" for="sourcetitle">Source Title</label>
                                 <select class="form-select" name="sourcetitle" id="sourcetitle"></select>
                             </div>
                         </div> -->
-                    <div class="col-md-3">
-                        <div class="input-group">
-                            <label class="input-group-text" for="user">User</label>
-                            <select class="form-select" name="user" id="user"></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <label class="input-group-text" for="result">Result</label>
-                            <select class="form-select" name="result" id="result"></select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary w-100">Search</button>
-                    </div>
-                    <div class="col-md-4">
-                        <button type="button" class="btn btn-outline-secondary w-100" id="resetBtn">Reset</button>
-                    </div>
-                </div>
-            </form>
+        <div class="col-md-3">
+            <div class="input-group">
+                <label class="input-group-text" for="user">User</label>
+                <select class="form-select" name="user" id="user"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4">
+            <div class="input-group">
+                <label class="input-group-text" for="result">Result</label>
+                <select class="form-select" name="result" id="result"></select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-outline-secondary w-100" id="resetBtn">Reset</button>
+        </div>
+    </div>
+</form>
+{% endmacro %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Publish Reports Viewer (<span id="count_result">0</span>):</h4>
+            {{ render_form() }}
         </div>
     </div>
 

@@ -20,7 +20,7 @@ function populateFilterOptions(results) {
     for (const [id, values] of Object.entries(options)) {
         const select = document.getElementById(id);
         select.innerHTML = '<option value="">-- All --</option>' +
-            values.map(value => `<option value="${value}">${value}</option>`).join('');
+            values.map(value => `<option data-tokens="${value}" value="${value}">${value}</option>`).join('');
     }
 }
 
@@ -50,6 +50,7 @@ function render_reports_table() {
         .done(function (json) {
             if (json && json.results) {
                 populateFilterOptions(json.results);
+                $('.selectpicker').selectpicker('refresh');
             }
         })
         .fail(function (xhr, status, error) {
@@ -182,5 +183,6 @@ function render_reports_table() {
     $('#resetBtn').on('click', function () {
         $('#filterForm')[0].reset();
         table.ajax.reload();
+        $('.selectpicker').selectpicker('refresh');
     });
 }

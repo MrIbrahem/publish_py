@@ -11,6 +11,7 @@ from flask import (
     request,
     url_for,
 )
+from werkzeug.wrappers.response import Response
 
 from .decorators import admin_required
 from .routes.categories import categories_dashboard
@@ -36,28 +37,27 @@ class AdminPanelRoutes:
 
         @self.bp.route("/last", methods=["GET"])
         @admin_required
-        def last_dashboard():
+        def last_dashboard() -> Response:
             # Get query parameters
             lang = request.args.get("lang", "All", type=str)
-
             last_table = request.args.get("last_table", "pages", type=str)
 
             # Validate last_table
-            if last_table not in ["pages", "pages_users"]:
-                last_table = "pages"
-
-            return last_translations_dashboard(last_table, lang)
+            if last_table == "pages_users":
+                return redirect(url_for("admin.dashboard_pages_users", lang=lang))
+            else:
+                return redirect(url_for("admin.dashboard_pages", lang=lang))
 
         @self.bp.route("/last/pages/<string:lang>", methods=["GET"])
         @self.bp.route("/last/pages/", methods=["GET"])
         @admin_required
-        def dashboard_pages(lang : str | None = None):
+        def dashboard_pages(lang: str | None = None):
             return last_translations_dashboard("pages", lang)
 
         @self.bp.route("/last/pages_users/<string:lang>", methods=["GET"])
         @self.bp.route("/last/pages_users/", methods=["GET"])
         @admin_required
-        def dashboard_pages_users(lang : str | None = None):
+        def dashboard_pages_users(lang: str | None = None):
             return last_translations_dashboard("pages_users", lang)
 
         @self.bp.route("/reports", methods=["GET"])

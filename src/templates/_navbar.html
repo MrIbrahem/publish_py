@@ -30,59 +30,30 @@
                 <ul class="navbar-nav me-auto flex-row flex-wrap bd-navbar-nav">
                     {% set nav_item_class = "nav-item col-lg-auto col-md-4 col-sm-6 col-6" %}
                     <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-bar-chart-line',
-                            'Leaderboard',
-                            url_for('td.leaderboard.index'),
-                            '/Translation_Dashboard/leaderboard',
-                            )
-                        }}
-                    </li>
-                    <li class="{{ nav_item_class }}">
-                        <a class="nav-link py-2 px-0 px-lg-2" target="_blank" href="/prior">
-                            <span class="navtitles">
-                                <i class="bi bi-bar-chart me-1"></i> Prior
-                            </span>
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('td.index') }}" target="_blank">
+                            <span class="navtitles">Translation Dashboard</span>
                         </a>
                     </li>
                     <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-card-list',
-                            'Missing',
-                            url_for('td.missing'),
-                            '/missing',
-                            )
-                        }}
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('td.leaderboard.index') }}"
+                            target="_blank">
+                            <span class="navtitles">Leaderboard</span>
+                        </a>
                     </li>
                     <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-list-task',
-                            'Fix Refs',
-                            url_for('fixrefs.index'),
-                            '/fixrefs',
-                            )
-                        }}
+                        <a class="nav-link py-2 px-0 px-lg-2" href="/views">
+                            <span class="navtitles">PageViews</span>
+                        </a>
                     </li>
                     <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-list-task',
-                            'Publish Reports',
-                            url_for('main.reports'),
-                            '/reports',
-                            )
-                        }}
+                        <a class="nav-link py-2 px-0 px-lg-2" href="https://github.com/MrIbrahem/mdwiki.toolforge.org"
+                            target="_blank">
+                            <span class="navtitles">Github</span>
+                        </a>
                     </li>
-                    {% if is_admin %}
                     <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-people-fill',
-                            'Coordinator Tools',
-                            url_for('admin.index'),
-                            '/admin',
-                            )
-                        }}
+                        <span class="nav-link py-2 px-0 px-lg-2" id="load_time"></span>
                     </li>
-                    {% endif %}
                 </ul>
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
                     {% if current_user %}

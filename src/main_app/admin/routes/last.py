@@ -26,7 +26,10 @@ def add_campaign(rows, cats_to_camp):
     return last_rows
 
 
-def last_translations_dashboard(last_table: str, lang: str | None = None,) -> str:
+def last_translations_dashboard(
+    last_table: str,
+    lang: str | None = None,
+) -> str:
     """Render the recent translations dashboard."""
 
     # Fetch data based on table type
@@ -51,6 +54,7 @@ def last_translations_dashboard(last_table: str, lang: str | None = None,) -> st
         last_table=last_table,
         count=len(last_rows),
     )
+
 
 __all__ = [
     "last_translations_dashboard",

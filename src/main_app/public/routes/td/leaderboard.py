@@ -59,7 +59,7 @@ def index() -> str:
     pages_rows = []
 
     return render_template(
-        "leaderboard/index.html",
+        "td/leaderboard/index.html",
         # data to use in form
         form_data=form_data,
         selected_data=form_selected_data,
@@ -88,7 +88,7 @@ def langs(lang_code: str) -> str:
     )
 
     return render_template(
-        "leaderboard/langs.html",
+        "td/leaderboard/langs.html",
         lang_code=lang_code,
         # data to use in form
         form_data={
@@ -133,7 +133,7 @@ def users(username: str) -> str:
     }
 
     return render_template(
-        "leaderboard/users.html",
+        "td/leaderboard/users.html",
         username=username,
         # data to use in form
         form_data=form_data,

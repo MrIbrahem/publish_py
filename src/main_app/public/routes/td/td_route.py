@@ -221,14 +221,6 @@ def index():
         },
     )
 
-
-@bp_td.get("/reports")
-def reports():
-    return render_template(
-        "reports.html",
-    )
-
-
 @bp_td.get("/missing")
 def missing():
     # logic from src/missing.php — Top languages by missing articles in Category:RTT.
