@@ -15,6 +15,7 @@ from flask import (
 bp_main = Blueprint("main", __name__, url_prefix="")
 logger = logging.getLogger(__name__)
 
+
 @bp_main.get("/")
 def index():
     return render_template(

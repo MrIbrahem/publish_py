@@ -221,6 +221,7 @@ def index():
         },
     )
 
+
 @bp_td.get("/missing")
 def missing():
     # logic from src/missing.php — Top languages by missing articles in Category:RTT.
