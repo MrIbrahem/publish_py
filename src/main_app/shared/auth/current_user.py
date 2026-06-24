@@ -1,4 +1,6 @@
-"""Helpers for loading the current authenticated user."""
+"""
+Helpers for loading the current authenticated user.
+"""
 
 from __future__ import annotations
 
@@ -36,8 +38,7 @@ class CurrentUser:
         }
 
 
-def _resolve_user_id() -> Optional[int]:
-    uid = session.get("uid")
+def _resolve_user_id(uid) -> int | None:
     if isinstance(uid, int):
         return uid
     try:
@@ -50,7 +51,8 @@ def current_user() -> Optional[CurrentUser]:
     if hasattr(g, "_current_user"):
         return g._current_user  # type: ignore[attr-defined]
 
-    user_id = _resolve_user_id()
+    uid = session.get("uid")
+    user_id = _resolve_user_id(uid)
     if user_id is None:
         signed = request.cookies.get(settings.cookie.name)
         if signed:
