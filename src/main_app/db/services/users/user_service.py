@@ -22,8 +22,10 @@ def list_users() -> List[UserRecord]:
     return orm_objs
 
 
-def users_search(userlike: str) -> List[str]:
+def users_search(userlike: str | None) -> List[str]:
     """Return all user records where there username start with userlike."""
+    if not userlike:
+        return []
     query = db.session.query(UserRecord).filter(UserRecord.username.like(f"{userlike}%"))
     orm_objs = query.all()
     return [x.username for x in orm_objs]

@@ -9,8 +9,8 @@ function populateFilterOptions(results) {
     };
 
     const options = {
-        year: unique('date', d => d.split('-')[0]),
-        month: unique('date', d => d.split('-')[1]),
+        year: unique('date', d => typeof d === 'string' ? d.split('-')[0] : ''),
+        month: unique('date', d => typeof d === 'string' ? d.split('-')[1] : ''),
         // sourcetitle: unique('sourcetitle'),
         user: unique('user'),
         lang: unique('lang'),
@@ -77,8 +77,9 @@ function render_reports_table() {
                 // تجميع الصفوف حسب الحقول المطلوبة
                 const grouped = {};
                 originalResults.forEach(item => {
+                    const datePart = (typeof item.date === 'string') ? item.date.split(' ')[0] : '';
                     const key = [
-                        item.date.split(' ')[0], // فقط جزء التاريخ بدون الوقت
+                        datePart,
                         item.title,
                         item.user,
                         item.lang,
@@ -118,11 +119,11 @@ function render_reports_table() {
                 data: 'date',
                 title: "Date",
                 render: function (data, type) {
-                    if (type === 'display' || type === 'filter') {
+                    if ((type === 'display' || type === 'filter') && typeof data === 'string') {
                         return data.split(' ')[0];
                     }
                     return data;
-                }
+                },
             },
             {
                 data: 'lang',

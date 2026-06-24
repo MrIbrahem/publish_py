@@ -421,8 +421,8 @@ def get_users() -> Response:
     try:
         records = users_search(userlike)
     except Exception:
-        logger.exception("Error fetching langs data")
-        return jsonify({"error": "An internal error occurred while fetching langs data"}), 500
+        logger.exception("Error fetching users data")
+        return jsonify({"error": "An internal error occurred while fetching users data"}), 500
 
     records = [{"username": x} for x in records]
 

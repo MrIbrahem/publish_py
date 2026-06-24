@@ -31,6 +31,8 @@ def last_translations_dashboard(
     lang: str | None = None,
 ) -> str:
     """Render the recent translations dashboard."""
+    if lang is None:
+        lang = "All"
 
     # Fetch data based on table type
     if last_table == "pages":

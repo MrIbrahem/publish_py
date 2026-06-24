@@ -485,8 +485,10 @@ def results_loader_2026(
 
     endpoint = get_endpoint()
 
-    # PHP: in inprocess flow, the translation button is also gated by user_coord.
-    inprocess_button = settings["show_translation_button"] if user_coord else "0"
+    show_btn = settings["show_translation_button"]
+    if isinstance(show_btn, str):
+        show_btn = show_btn.lower() in ("1", "true", "yes", "on")
+    inprocess_button = "1" if (show_btn and user_coord) else "0"
 
     missing_rows = _build_missing_rows(
         missing=bucket["missing"],

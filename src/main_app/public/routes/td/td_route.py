@@ -108,11 +108,11 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
         return bool(val)
 
     all_settings = get_all_settings_ready()
-    show_translation_button = all_settings.get("translation_button_in_progress_table", False)
-    allow_type_of_translate = all_settings.get("allow_type_of_translate", False)
-    show_exists_table = all_settings.get("show_exists_table", False)
+    show_translation_button = to_bool(all_settings.get("translation_button_in_progress_table", False))
+    allow_type_of_translate = to_bool(all_settings.get("allow_type_of_translate", False))
+    show_exists_table = to_bool(all_settings.get("show_exists_table", False))
 
-    if allow_type_of_translate is False:
+    if not allow_type_of_translate:
         tra_type = "lead"
 
     return {
