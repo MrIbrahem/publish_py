@@ -45,9 +45,10 @@ if sys:
 
 
 # Import after environment setup
-from src.main_app import create_app  # noqa: E402
-from src.main_app.config import TestingConfig  # noqa: E402
-from src.main_app.shared.core.extensions import db as _db  # noqa: E402
+from src.main_app import create_app
+from src.main_app.config import TestingConfig
+from src.main_app.shared.core.extensions import db as _db
+from src.main_app.shared.auth.identity import CurrentUser
 
 
 @pytest.fixture(autouse=True)
@@ -226,12 +227,5 @@ def mock_admin_required(mocker):
     so tests can focus on route functionality rather than auth.
     """
     # Mock current_user to return a valid user object
-    mock_user = MagicMock()
-    mock_user.username = "admin"
+    mock_user = CurrentUser(user_id=0, username="ADMIN_USER", access_token="", access_secret="", is_active_admin=True)
     mocker.patch("src.main_app.admin.decorators.current_user", return_value=mock_user)
-
-    # Mock active_coordinators to return list with "admin"
-    mocker.patch(
-        "src.main_app.admin.decorators.active_coordinators",
-        return_value=["admin"],
-    )
