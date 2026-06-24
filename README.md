@@ -16,23 +16,56 @@ publishing Wikipedia articles translated via ContentTranslation tool. Takes wiki
 
 ```
 src/main_app/
-├── __init__.py           # Flask application factory (create_app)
-├── config.py             # Configuration dataclasses with @lru_cache settings
-├── admin/                # Admin routes and sidebar
-├── public/routes/        # Public blueprints
-│   ├── auth/            # OAuth authentication routes
-│   ├── main/            # Homepage, reports, missing pages
-│   ├── publish/         # Publishing endpoints
-│   ├── refs/            # Fix refs tool
-│   ├── cxtoken/         # CX Token handling
-│   └── api/             # REST API endpoints
-├── shared/
-│   ├── services/        # Business logic services
-│   ├── clients/         # External API clients (MediaWiki, Wikidata, OAuth)
-│   ├── auth/            # Authentication decorators and identity
-│   ├── core/            # CORS, cookies, crypto utilities
-│   └── models/  # SQLAlchemy ORM models
-└── models/   # Database models (pages, users, metrics, etc.)
+├── __init__.py
+├── config.py
+├── admin/
+├── public/routes/
+src/
+├── main_app/
+│   ├── __init__.py                 # Flask application factory (create_app)
+│   ├── config/                     # App Configuration
+│   ├── db/
+│   │   ├── models/                 # Database models (pages, users, metrics, etc.)
+│   │   ├── services/               # Business logic services
+│   │   ├── __init__.py
+│   │   ├── exceptions.py
+│   │   └── README.md
+│   │
+│   ├── admin/                      # Admin blueprints
+│   │   ├── routes/
+│   │   │   └── __init__.py
+│   │   └── __init__.py
+│   │
+│   ├── public/                     # Public blueprints
+│   │   │   ├── api/                # REST API endpoints
+│   │   │   ├── auth/               # OAuth authentication routes
+│   │   │   ├── cxtoken/            # CX Token handling
+│   │   │   ├── main/
+│   │   │   ├── publish/            # Publishing endpoints
+│   │   │   ├── refs/               # Fix refs tool
+│   │   │   └── td/
+│   │   ├── __init__.py
+│   │   └── README.md
+│   │
+│   ├── shared/
+│   │   ├── auth/                   # Authentication decorators and identity
+│   │   ├── clients/                # External API clients (MediaWiki, Wikidata, OAuth)
+│   │   ├── core/                   # CORS, cookies, crypto utilities
+│   │   ├── schemas/
+│   │   ├── utils/
+│   │   ├── __init__.py
+│   │   └── README.md
+│   └── README.md
+├── static/
+│   ├── css/
+│   ├── js/
+│   └── favicon.svg
+├── templates/
+├── __init__.py
+├── app.py
+├── logger_config.py
+└── README.md
+
 ```
 
 ## Configuration
