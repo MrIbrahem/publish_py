@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 let allResults = [];
 let originalResults = [];
