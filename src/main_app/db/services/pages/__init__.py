@@ -19,6 +19,7 @@ from .in_process_service import (
     update_in_process,
 )
 from .leaderboard_service import (
+    get_chart_data_formatted,
     get_leaderboard_chart_data,
     get_months_of_pages_years,
     get_pages,
@@ -91,6 +92,7 @@ __all__ = [
     "list_of_users_by_translations_count",
     "get_pages",
     "top_lang_of_users",
+    "get_chart_data_formatted",
     "get_leaderboard_chart_data",
     "count_category_members",
     "statics_by_category",

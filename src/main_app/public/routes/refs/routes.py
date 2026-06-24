@@ -144,4 +144,6 @@ def process() -> str:
     return _process(data)
 
 
-__all__ = ["bp_fixrefs"]
+__all__ = [
+    "bp_fixrefs",
+]

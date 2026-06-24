@@ -182,7 +182,7 @@ class UsersEmails:
         def update(record_id: int) -> ResponseReturnValue:
             return _update_record(record_id)
 
-        @self.bp.get("/<int:record_id>/edit")
+        @self.bp.route("/<int:record_id>/edit", methods=["GET"])
         @admin_required
         def edit(record_id: int) -> ResponseReturnValue:
             user = get_user(record_id)

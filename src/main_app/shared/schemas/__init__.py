@@ -4,7 +4,7 @@ Validation schemas using marshmallow.
 
 from typing import ClassVar
 
-from flask import request
+from flask import jsonify, request
 from marshmallow import Schema, fields, post_load, validate
 
 
@@ -72,7 +72,6 @@ def validate_json(schema_class):
                 data = request.form.to_dict()
 
             if not data:
-                from flask import jsonify
 
                 response = jsonify({"error": "No data provided"})
                 response.status_code = 400
@@ -80,7 +79,6 @@ def validate_json(schema_class):
 
             errors = schema.validate(data)
             if errors:
-                from flask import jsonify
 
                 response = jsonify({"error": errors})
                 response.status_code = 400

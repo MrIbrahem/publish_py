@@ -16,6 +16,7 @@ from .language_setting_service import (
 from .settings_service import (
     create_setting,
     get_all_settings_raw,
+    get_all_settings_ready,
     get_setting_by_id,
     get_setting_by_key,
     list_settings,
@@ -23,6 +24,7 @@ from .settings_service import (
 )
 
 __all__ = [
+    "get_all_settings_ready",
     "list_language_settings",
     "get_language_setting",
     "get_language_setting_by_code",

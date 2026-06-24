@@ -26,7 +26,7 @@ def do_changes_to_text_with_settings(
     title: str,
     lang: str,
     source_title: str = "",
-    mdwiki_revid: int = 0,
+    mdwiki_revid: int | str = 0,
     move_dots: bool = True,
     expend_infobox: bool = True,
     add_en_lang: bool = False,

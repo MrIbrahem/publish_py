@@ -1,4 +1,4 @@
-"""API endpoints for publish_reports.
+"""API endpoints for API.
 
 Mirrors: php_src/endpoints/index.php?get=publish_reports
 """
@@ -16,6 +16,7 @@ from ....db.services.content import list_categories, list_langs
 from ....db.services.pages import get_in_process_counts_by_user, list_of_users_by_translations_count
 from ....db.services.pages_query_service import list_pages_users, list_pages_with_views
 from ....db.services.reports import query_reports_with_filters
+from ....db.services.users import users_search
 from ....shared.core.cors import check_cors
 from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
@@ -27,21 +28,16 @@ bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
 
 
-@bp_api.route("/publish_reports", methods=["OPTIONS"])
-@check_cors
-def publish_reports_preflight() -> Response:
-    """
-    Handle preflight requests.
-
-    Returns:
-        Preflight response
-    """
-
-    response = Response("", status=200)
-    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    response.headers["Access-Control-Max-Age"] = "7200"
-    return response
+@bp_api.before_request
+def handle_options_preflight():
+    if request.method == "OPTIONS":
+        response = Response("", status=200)
+        requested_method = request.headers.get("Access-Control-Request-Method", "GET")
+        response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
+        # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Max-Age"] = "7200"
+        return response
 
 
 @bp_api.route("/publish_reports", methods=["GET"])
@@ -107,7 +103,7 @@ def get_publish_reports() -> Response:
     return response
 
 
-@bp_api.route("/publish_reports_stats", methods=["GET"])
+@bp_api.route("/publish_reports/stats", methods=["GET"])
 @check_cors
 def publish_reports_stats() -> Response:
     """
@@ -417,10 +413,38 @@ def get_langs() -> Response:
     return jsonify(response_data)
 
 
+@bp_api.route("/users", methods=["GET"])
+@check_cors
+def get_users() -> Response:
+    """
+    Handle users API requests. Returns all users names.
+    """
+    userlike = request.args.get("userlike", type=str)
+    if not userlike:
+        return jsonify({"error": "Query parameter 'userlike' is required"}), 400
+
+    try:
+        records = users_search(userlike)
+    except Exception:
+        logger.exception("Error fetching users data")
+        return jsonify({"error": "An internal error occurred while fetching users data"}), 500
+
+    records = [{"username": x} for x in records]
+
+    response_data = {
+        "results": records,
+        "count": len(records),
+    }
+
+    return jsonify(response_data)
+
+
 bp_api.route("/status", methods=["GET"])(leaderboard_status)
 
 # Register top_stats routes
 bp_api.route("/top_langs", methods=["GET"])(get_top_langs)
 bp_api.route("/top_users", methods=["GET"])(get_top_users)
 
-__all__ = ["bp_api"]
+__all__ = [
+    "bp_api",
+]

@@ -212,6 +212,35 @@ def get_leaderboard_chart_data(
     return [{"date": row.date, "count": row.count} for row in rows]
 
 
+def get_chart_data_formatted(
+    camp: str | None = None,
+    cat: str | None = None,
+    user_group: str | None = None,
+    year: int | None = None,
+    month: int | None = None,
+    lang: str | None = None,
+    user: str | None = None,
+) -> dict[str, list]:
+
+    chart_data_raw = get_leaderboard_chart_data(
+        camp=camp,
+        cat=cat,
+        user_group=user_group,
+        year=year,
+        month=month,
+        lang=lang,
+        user=user,
+    )
+
+    chart_labels = [row["date"] for row in chart_data_raw]
+    chart_counts = [row["count"] for row in chart_data_raw]
+    chart_data = {
+        "labels": chart_labels,
+        "counts": chart_counts,
+    }
+    return chart_data
+
+
 __all__ = [
     "get_pages_years",
     "get_months_of_pages_years",
@@ -219,4 +248,5 @@ __all__ = [
     "get_pages",
     "top_lang_of_users",
     "get_leaderboard_chart_data",
+    "get_chart_data_formatted",
 ]

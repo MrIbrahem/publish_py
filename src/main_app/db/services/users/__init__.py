@@ -34,6 +34,7 @@ from .user_service import (
     update_user,
     update_user_data,
     user_exists,
+    users_search,
 )
 from .user_token_service import (
     delete_user_token_by_username,
@@ -78,6 +79,7 @@ __all__ = [
     "update_user_data",
     "delete_user",
     "user_exists",
+    "users_search",
     "upsert_user_token",
     "get_user_token",
     "delete_user_token",

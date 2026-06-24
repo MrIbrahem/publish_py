@@ -26,9 +26,11 @@ from html import escape
 from typing import Optional
 from urllib.parse import quote, urlencode
 
+from ...db.services.config import get_setting_by_key
+
 # Mirrors PHP make_ContentTranslation_url's default. The setting key
 # `use_mdwikicx` (read by `_get_endpoint`) flips this to mdwikicx.
-_DEFAULT_ENDPOINT = "https://medwiki.toolforge.org/w/index.php"
+_DEFAULT_ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
 _MDWIKICX_ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
 
 
@@ -40,22 +42,6 @@ def _php_rawurlencode(value: str) -> str:
 def _wiki_path(title: str) -> str:
     """PHP-equivalent ``rawurlencode(str_replace(' ', '_', $title))``."""
     return _php_rawurlencode(title.replace(" ", "_"))
-
-
-def mdwiki_url(title: str) -> str:
-    """Plain URL to a mdwiki article (PHP make_mdwiki_href)."""
-    if not title:
-        return title or ""
-    return f"https://mdwiki.org/wiki/{_wiki_path(title)}"
-
-
-def mdwiki_article_link(title: str, name: Optional[str] = None) -> str:
-    """``<a target="_blank">`` for a mdwiki article (PHP make_mdwiki_article_url_blank)."""
-    if not title:
-        return title or ""
-    display = escape(name if name else title)
-    encoded = _wiki_path(title)
-    return f"<a target='_blank' href='https://mdwiki.org/wiki/{encoded}'>{display}</a>"
 
 
 def mdwiki_cat_link(category: str, name: Optional[str] = None) -> str:
@@ -117,7 +103,6 @@ def tr_link_medwiki(title: str, cod: str, cat: str, camp: str, tra_type: str, wo
 def content_translation_url(
     title: str,
     cod: str,
-    cat: str,  # noqa: ARG001 — kept for parity with the PHP signature
     campaign: str,
     tra_type: str,
     endpoint: str,
@@ -141,7 +126,7 @@ def content_translation_url(
     return endpoint + "?" + urlencode(params, quote_via=quote)
 
 
-def get_endpoint() -> str:
+def _get_endpoint_like_php() -> str:
     """Return the ContentTranslation endpoint based on the ``use_mdwikicx`` setting.
 
     The setting lookup is wrapped in a try/except so that a missing key,
@@ -151,7 +136,6 @@ def get_endpoint() -> str:
     """
     # Imported lazily to avoid pulling Flask-SQLAlchemy at import time.
     try:
-        from ...db.services.config import get_setting_by_key
 
         record = get_setting_by_key("use_mdwikicx")
     except Exception:
@@ -165,9 +149,12 @@ def get_endpoint() -> str:
     return _MDWIKICX_ENDPOINT if truthy else _DEFAULT_ENDPOINT
 
 
+def get_endpoint() -> str:
+    """ """
+    return _MDWIKICX_ENDPOINT
+
+
 __all__ = [
-    "mdwiki_url",
-    "mdwiki_article_link",
     "mdwiki_cat_link",
     "wikipedia_link",
     "wikidata_link",

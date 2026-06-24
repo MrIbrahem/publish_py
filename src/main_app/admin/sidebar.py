@@ -228,7 +228,7 @@ def create_side(active_route):
             SidebarItem(
                 id="fixwikirefs",
                 admin=0,
-                href="/fixwikirefs.php",
+                href="/fixrefs",
                 title="Fixwikirefs",
                 target="_blank",
                 icon="bi-wrench",

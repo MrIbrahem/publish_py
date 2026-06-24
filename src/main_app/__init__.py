@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from typing import Any, Tuple, Type
 
-from flask import Flask, flash, jsonify, render_template, request  # , g
+from flask import Flask, Response, flash, jsonify, render_template, request  # , g
 
-from .admin.route import bp_admin
+from .admin.admin_panel import admin_route_module
 from .db import init_db
 from .db.services.users import active_coordinators
 from .public.routes import (
@@ -19,9 +19,9 @@ from .public.routes import (
     bp_auth,
     bp_cxtoken,
     bp_fixrefs,
-    bp_leaderboard,
     bp_main,
     bp_publish,
+    bp_td,
 )
 from .shared.auth.identity import current_user
 from .shared.core.cookies import CookieHeaderClient
@@ -90,13 +90,13 @@ def create_app(config_class: Type) -> Flask:
     # db_url = build_db_url(settings.database_data.to_dict())
 
     app.register_blueprint(bp_main)
-    app.register_blueprint(bp_leaderboard)
+    app.register_blueprint(bp_td)
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_cxtoken)
     app.register_blueprint(bp_publish)
     app.register_blueprint(bp_fixrefs)
     app.register_blueprint(bp_api)
-    app.register_blueprint(bp_admin)
+    app.register_blueprint(admin_route_module.bp)
 
     csrf_exempt(app, bp_publish)
 
@@ -110,16 +110,17 @@ def create_app(config_class: Type) -> Flask:
     # def _cleanup_connections(exception: Exception | None) -> None:  # pragma: no cover - teardown
 
     @app.errorhandler(400)
-    def bad_request(e: Exception) -> Tuple[str, int]:
+    def bad_request(e: Exception) -> Tuple[str | Response, int]:
         """Handle 400 errors"""
         logger.warning("Bad request: %s", e)
         if request.is_json or request.path.startswith("/api/"):
             return jsonify({"error": "Bad request", "message": str(e)}), 400
+
         flash("Bad request", "warning")
         return render_template("index.html", title="Bad Request"), 400
 
     @app.errorhandler(401)
-    def unauthorized(e: Exception) -> Tuple[str, int]:
+    def unauthorized(e: Exception) -> Tuple[str | Response, int]:
         """Handle 401 errors"""
         logger.warning("Unauthorized: %s", e)
         if request.is_json or request.path.startswith("/api/"):
@@ -128,7 +129,7 @@ def create_app(config_class: Type) -> Flask:
         return render_template("index.html", title="Unauthorized"), 401
 
     @app.errorhandler(403)
-    def forbidden(e: Exception) -> Tuple[str, int]:
+    def forbidden(e: Exception) -> Tuple[str | Response, int]:
         """Handle 403 errors"""
         logger.warning("Forbidden: %s", e)
         if request.is_json or request.path.startswith("/api/"):
@@ -137,7 +138,7 @@ def create_app(config_class: Type) -> Flask:
         return render_template("index.html", title="Access Denied"), 403
 
     @app.errorhandler(404)
-    def page_not_found(e: Exception) -> Tuple[str, int]:
+    def page_not_found(e: Exception) -> Tuple[str | Response, int]:
         """Handle 404 errors"""
         logger.error("Page not found: %s", e)
         logger.error(f"Request url: {request.url}")
@@ -147,7 +148,7 @@ def create_app(config_class: Type) -> Flask:
         return render_template("index.html", title="Page Not Found"), 404
 
     @app.errorhandler(429)
-    def too_many_requests(e: Exception) -> Tuple[str, int]:
+    def too_many_requests(e: Exception) -> Tuple[str | Response, int]:
         """Handle 429 rate limit errors"""
         logger.warning("Rate limit exceeded: %s", e)
         if request.is_json or request.path.startswith("/api/"):
@@ -156,7 +157,7 @@ def create_app(config_class: Type) -> Flask:
         return render_template("index.html", title="Rate Limit Exceeded"), 429
 
     @app.errorhandler(500)
-    def internal_server_error(e: Exception) -> Tuple[str, int]:
+    def internal_server_error(e: Exception) -> Tuple[str | Response, int]:
         """Handle 500 errors"""
         logger.error("Internal Server Error: %s", e)
         if request.is_json or request.path.startswith("/api/"):
@@ -177,3 +178,9 @@ def create_app(config_class: Type) -> Flask:
 
     # g.settings = settings  # Make settings available in Flask's global context
     return app
+
+
+__all__ = [
+    "context_data",
+    "create_app",
+]

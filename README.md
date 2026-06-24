@@ -1,6 +1,14 @@
 # Overview
 
-Flask web application for publishing Wikipedia articles translated via ContentTranslation tool. Takes wikitext, refines it using the fix_refs repository, publishes to Wikipedia via MediaWiki API, and links articles to Wikidata.
+Flask web application for mdwiki tools.
+
+## Endpoints
+
+-   read [docs/merge.md](docs/merge.md) for more informations
+
+### Publish endpoint
+
+publishing Wikipedia articles translated via ContentTranslation tool. Takes wikitext, refines it using the fix_refs repository, publishes to Wikipedia via MediaWiki API, and links articles to Wikidata.
 
 **Stack**: Python 3.13, Flask, SQLAlchemy, MySQL/MariaDB, MediaWiki OAuth
 
@@ -8,23 +16,56 @@ Flask web application for publishing Wikipedia articles translated via ContentTr
 
 ```
 src/main_app/
-├── __init__.py           # Flask application factory (create_app)
-├── config.py             # Configuration dataclasses with @lru_cache settings
-├── admin/                # Admin routes and sidebar
-├── public/routes/        # Public blueprints
-│   ├── auth/            # OAuth authentication routes
-│   ├── main/            # Homepage, reports, missing pages
-│   ├── publish/         # Publishing endpoints
-│   ├── refs/            # Fix refs tool
-│   ├── cxtoken/         # CX Token handling
-│   └── api/             # REST API endpoints
-├── shared/
-│   ├── services/        # Business logic services
-│   ├── clients/         # External API clients (MediaWiki, Wikidata, OAuth)
-│   ├── auth/            # Authentication decorators and identity
-│   ├── core/            # CORS, cookies, crypto utilities
-│   └── models/  # SQLAlchemy ORM models
-└── models/   # Database models (pages, users, metrics, etc.)
+├── __init__.py
+├── config.py
+├── admin/
+├── public/routes/
+src/
+├── main_app/
+│   ├── __init__.py                 # Flask application factory (create_app)
+│   ├── config/                     # App Configuration
+│   ├── db/
+│   │   ├── models/                 # Database models (pages, users, metrics, etc.)
+│   │   ├── services/               # Business logic services
+│   │   ├── __init__.py
+│   │   ├── exceptions.py
+│   │   └── README.md
+│   │
+│   ├── admin/                      # Admin blueprints
+│   │   ├── routes/
+│   │   │   └── __init__.py
+│   │   └── __init__.py
+│   │
+│   ├── public/                     # Public blueprints
+│   │   │   ├── api/                # REST API endpoints
+│   │   │   ├── auth/               # OAuth authentication routes
+│   │   │   ├── cxtoken/            # CX Token handling
+│   │   │   ├── main/
+│   │   │   ├── publish/            # Publishing endpoints
+│   │   │   ├── refs/               # Fix refs tool
+│   │   │   └── td/
+│   │   ├── __init__.py
+│   │   └── README.md
+│   │
+│   ├── shared/
+│   │   ├── auth/                   # Authentication decorators and identity
+│   │   ├── clients/                # External API clients (MediaWiki, Wikidata, OAuth)
+│   │   ├── core/                   # CORS, cookies, crypto utilities
+│   │   ├── schemas/
+│   │   ├── utils/
+│   │   ├── __init__.py
+│   │   └── README.md
+│   └── README.md
+├── static/
+│   ├── css/
+│   ├── js/
+│   └── favicon.svg
+├── templates/
+├── __init__.py
+├── app.py
+├── logger_config.py
+└── README.md
+
 ```
 
 ## Configuration
@@ -43,54 +84,6 @@ Environment variables (see `src/example.env` for template):
 | `OAUTH_CONSUMER_SECRET` | Yes\*    | OAuth consumer secret            |
 | `OAUTH_ENCRYPTION_KEY`  | Yes\*    | Fernet encryption key for tokens |
 | `CORS_ALLOWED_DOMAINS`  | No       | Comma-separated allowed domains  |
-
-## REST API
-
-### GET `/api/publish_reports`
-
-Retrieves publish reports with optional filtering.
-
-**Query Parameters:**
-
-| Parameter     | Type   | Description                      |
-| ------------- | ------ | -------------------------------- |
-| `year`        | number | Filter by year (e.g., `2026`)    |
-| `month`       | number | Filter by month (1-12)           |
-| `title`       | string | Filter by page title             |
-| `user`        | string | Filter by username               |
-| `lang`        | string | Filter by language code          |
-| `sourcetitle` | string | Filter by source title           |
-| `result`      | string | Filter by result status          |
-| `select`      | string | Comma-separated fields to return |
-| `limit`       | number | Maximum results to return        |
-
-**Special Filter Values:** `not_empty`, `empty`, `>0`, `all`
-
-**Example:**
-
-```
-GET /api/publish_reports?year=2026&user=JohnDoe&limit=100
-```
-
-**Response:**
-
-```json
-{
-    "results": [
-        {
-            "id": 123,
-            "date": "2026-01-24T10:30:00",
-            "title": "Example_Page",
-            "user": "JohnDoe",
-            "lang": "en",
-            "sourcetitle": "Source_Example",
-            "result": "success",
-            "data": "{}"
-        }
-    ],
-    "count": 1
-}
-```
 
 ## Commands
 

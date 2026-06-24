@@ -271,9 +271,9 @@ def _process_edit(
         lang=lang,
         source_title=sourcetitle,
         mdwiki_revid=mdwiki_revid,
-        move_dots=language_setting.move_dots,
-        expend_infobox=language_setting.expend,
-        add_en_lang=language_setting.add_en_lang,
+        move_dots=bool(language_setting.move_dots),
+        expend_infobox=bool(language_setting.expend),
+        add_en_lang=bool(language_setting.add_en_lang),
         # add_category=add_category,
     )
 

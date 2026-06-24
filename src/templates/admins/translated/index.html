@@ -87,11 +87,11 @@
                         {{ loop.index + (page - 1) * limit }}
                     </td>
                     <td>
-                        <a href="{{ url_for("leaderboard.users", username=row.user) }}" target="_blank">{{ row.user }}
+                        <a href="{{ url_for('td.leaderboard.users', username=row.user) }}" target="_blank">{{ row.user }}
                         </a>
                     </td>
                     <td>
-                        <a href="{{ url_for("leaderboard.langs", lang_code=row.lang) }}" target="_blank">{{ row.lang }}
+                        <a href="{{ url_for('td.leaderboard.langs', lang_code=row.lang) }}" target="_blank">{{ row.lang }}
                         </a>
                     </td>
                     <td>

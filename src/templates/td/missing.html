@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "td/td_base.html" %}
 {% block content %}
 {# Port of src/missing.php — Top languages by missing articles in Category:RTT. #}
 <div class="container-fluid">
@@ -41,7 +41,7 @@
                         </td>
                         <td data-search="{{ row.missing }}">
                             <a
-                                href="{{ url_for('main.index', cat=category, depth=1, doit='Do+it', code=row.langcode, type='lead') }}">
+                                href="{{ url_for('td.index', cat=category, depth=1, doit='Do+it', code=row.langcode, type='lead') }}">
                                 {{ "{:,}".format(row.missing) }}
                             </a>
                         </td>

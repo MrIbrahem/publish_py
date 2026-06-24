@@ -15,49 +15,6 @@ from ....shared.clients import get_mdwiki_cat_members
 logger = logging.getLogger(__name__)
 
 
-def results_api_result(
-    code: str | None,
-    camp: str | None,
-    depth: str | None,
-    cat2: str | None = None,
-) -> dict[str, Any]:
-    code = code or "ar"
-    camp = camp or "Hearing"
-    try:
-        depth_int = max(0, int(depth)) if depth else 1
-    except (ValueError, TypeError):
-        depth_int = 1
-
-    cat = _resolve_campaign_to_category(camp)
-
-    pages = list_pages_by_lang_cat(code, cat)
-    pages_by_title = {p.title: p for p in pages}
-
-    items_exists, items_missing = _get_cat_exists_and_missing(pages_by_title, cat, depth_int, code)
-
-    targets = _get_exists_targets_by_lang(code)
-    extra_exists = _exists_expends(items_missing, targets)
-
-    if extra_exists:
-        items_exists.update(extra_exists)
-        items_missing = [t for t in items_missing if t not in extra_exists]
-
-    missing = _unique_ordered(items_missing)
-
-    inprocess = _get_inprocess_for_titles(missing, code)
-    in_titles = set(inprocess)
-    missing = [t for t in missing if t not in in_titles]
-
-    summary = _make_summary(code, cat, len(inprocess), len(missing), len(items_exists))
-
-    return {
-        "inprocess": inprocess,
-        "exists": dict(sorted(items_exists.items())),
-        "missing": missing,
-        "ix": summary,
-    }
-
-
 def _resolve_campaign_to_category(camp: str) -> str:
     cats = get_camp_to_cats()
     return cats.get(camp, camp)
@@ -156,16 +113,53 @@ def _make_mdwiki_cat_url(category: str, name: str | None = None) -> str:
     return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
 
 
-def _make_summary(code: str, cat: str, inprocess_count: int, missing_count: int, exists_count: int) -> str:
-    total = exists_count + missing_count + inprocess_count
-    cat_url = _make_mdwiki_cat_url(cat, "Category")
-    return (
-        f"Found {total} pages in {cat_url}, "
-        f"{exists_count} exists, and {missing_count} missing in "
-        f"(<a href='https://{code}.wikipedia.org' "
-        f"target='_blank'>{code}</a>), "
-        f"{inprocess_count} In process."
-    )
+def results_api_result(
+    code: str | None,
+    camp: str | None,
+    depth: str | None,
+    cat2: str | None = None,
+) -> dict[str, Any]:
+    code = code or "ar"
+    camp = camp or "Hearing"
+    try:
+        depth_int = max(0, int(depth)) if depth else 1
+    except (ValueError, TypeError):
+        depth_int = 1
+
+    cat = _resolve_campaign_to_category(camp)
+
+    pages = list_pages_by_lang_cat(code, cat)
+    pages_by_title = {p.title: p for p in pages}
+
+    items_exists, items_missing = _get_cat_exists_and_missing(pages_by_title, cat, depth_int, code)
+
+    targets = _get_exists_targets_by_lang(code)
+    extra_exists = _exists_expends(items_missing, targets)
+
+    if extra_exists:
+        items_exists.update(extra_exists)
+        items_missing = [t for t in items_missing if t not in extra_exists]
+
+    missing = _unique_ordered(items_missing)
+
+    inprocess = _get_inprocess_for_titles(missing, code)
+    in_titles = set(inprocess)
+    missing = [t for t in missing if t not in in_titles]
+
+    summary_data = {
+        "code": code,
+        "cat": cat,
+        "len_inprocess": len(inprocess),
+        "len_missing": len(missing),
+        "len_exists": len(items_exists),
+        "total": len(items_exists) + len(missing) + len(inprocess),
+    }
+    return {
+        "summary_data": summary_data,
+        "inprocess": inprocess,
+        "exists": dict(sorted(items_exists.items())),
+        "missing": missing,
+    }
 
 
 __all__ = [

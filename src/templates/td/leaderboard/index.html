@@ -1,10 +1,10 @@
-{% extends "base.html" %}
+{% extends "td/td_base.html" %}
 {% from "_macros.html" import select_options %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row g-3">
-        <form method="get" action="{{ url_for('leaderboard.index') }}" id="leaderboard_filter">
+        <form method="get" action="{{ url_for('td.leaderboard.index') }}" id="leaderboard_filter">
             <div class="row g-3">
                 <div class="col-md-3">
                     <span align="center">
@@ -18,8 +18,8 @@
                                 <span class="input-group-text">Campaign</span>
                                 <select dir="ltr" id="camp" name="camp" class="form-select" data-bs-theme="auto">
                                     <option value="all">All</option>
-                                    {% if campaigns %}
-                                    {{ select_options(campaigns, form.camp) }}
+                                    {% if form_data and form_data.campaigns %}
+                                    {{ select_options(form_data.campaigns, selected_data.camp) }}
                                     {% endif %}
                                 </select>
                             </div>
@@ -30,8 +30,8 @@
                                 <select dir="ltr" id="user_group" name="user_group" class="form-select"
                                     data-bs-theme="auto">
                                     <option value="all">All</option>
-                                    {% if user_groups %}
-                                    {{ select_options(user_groups, form.user_group) }}
+                                    {% if form_data and form_data.user_groups %}
+                                    {{ select_options(form_data.user_groups, selected_data.user_group) }}
                                     {% endif %}
                                 </select>
                             </div>
@@ -42,17 +42,17 @@
                                     <span class="input-group-text">Year</span>
                                     <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
                                         <option value="all">All</option>
-                                        {% if years %}
-                                        {{ select_options(years, form.year) }}
+                                        {% if form_data and form_data.years %}
+                                        {{ select_options(form_data.years, selected_data.year) }}
                                         {% endif %}
                                     </select>
                                 </div>
-                                {% if form.year %}
+                                {% if selected_data.year %}
                                 <div class="input-group w-50">
                                     <select dir="ltr" id="month" name="month" class="form-select" data-bs-theme="auto">
                                         <option value="All">All</option>
-                                        {% if months %}
-                                        {{ select_options(months, form.month) }}
+                                        {% if form_data and form_data.months %}
+                                        {{ select_options(form_data.months, selected_data.month) }}
                                         {% endif %}
                                     </select>
                                 </div>
@@ -206,8 +206,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/g.js') }}"></script>
-<script src="{{ url_for('static', filename='js/graph_api.js') }}"></script>
 <script>
     // when page ready
     $(document).ready(async function () {
@@ -230,10 +228,6 @@
         }
         // ---
         function getFormData(d) {
-            // d['get'] = 'top_users';
-            // ---
-            // '/api/top_users&year=&user_group=&cat=';
-            // ---
             const formData = $('#leaderboard_filter').serializeArray();
             formData.forEach(field => {
                 if (field.value.trim()) {
@@ -290,7 +284,11 @@
                 data: 'user',
                 title: 'User',
                 render: function (data, type) {
-                    return `<a href="/leaderboard/users/${data}">${data}</a>`;
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('td.leaderboard.users', username='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${data}</a>`;
                 }
             },
             {
@@ -344,7 +342,11 @@
                 data: 'lang',
                 title: 'Language',
                 render: function (data, type, row, meta) {
-                    return `<a href="/leaderboard/langs/${data}">${row.lang_name}</a>`;
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('td.leaderboard.langs', lang_code='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${row.lang_name}</a>`;
                 }
             },
             {
@@ -365,7 +367,7 @@
             ]
         });
         // ---
-        graph_js({{ chart_labels|tojson }}, {{ chart_counts|tojson }}, 'chart09')
+        render_graph(JSON.parse('{{ chart_data|tojson }}'), 'chart09');
         // ---
     })
 </script>

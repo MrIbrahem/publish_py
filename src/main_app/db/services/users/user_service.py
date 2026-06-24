@@ -22,6 +22,21 @@ def list_users() -> List[UserRecord]:
     return orm_objs
 
 
+def users_search(userlike: str | None) -> List[str]:
+    """Return all user records where there username start with userlike."""
+    if not userlike:
+        return []
+    safe_prefix = userlike.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    rows = (
+        db.session.query(UserRecord.username)
+        .filter(UserRecord.username.like(f"{safe_prefix}%", escape="\\"))
+        .order_by(UserRecord.username.asc())
+        .limit(20)
+        .all()
+    )
+    return [x.username for x in rows]
+
+
 def list_users_by_group(user_group: str) -> List[UserRecord]:
     """Return user records by group."""
     orm_objs = (
@@ -147,4 +162,5 @@ __all__ = [
     "update_user",
     "update_user_data",
     "user_exists",
+    "users_search",
 ]

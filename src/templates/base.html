@@ -72,15 +72,16 @@
     <script src='{{ cdn_base }}/datatables-responsive/3.0.4/dataTables.responsive.min.js'></script>
     <script src='{{ cdn_base }}/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js'></script>
     <!-- Autocomplete script -->
-    <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/td_autocomplete.js') }}"></script>
     <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
     <!-- Dark mode toggle script -->
     <script src="{{ url_for('static', filename='js/dark-mode.js') }}"></script>
     <script src="{{ url_for('static', filename='js/card-tools.js') }}"></script>
 
-    {% block extra_js %}{% endblock %}
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/to.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/views_api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/graph.js') }}"></script>
+    {% block extra_js %}{% endblock %}
     <script>
         $(document).ready(function () {
 

@@ -20,7 +20,7 @@ bp_publish = Blueprint("publish", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
 
 
-def handle_form(request_data) -> Response:
+def _handle_form(request_data) -> Response:
     # Validate using marshmallow schema
     raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
 
@@ -130,7 +130,9 @@ def index() -> Response:
             response.status_code = 400
             return response
 
-    return handle_form(request_data)
+    return _handle_form(request_data)
 
 
-__all__ = ["bp_publish"]
+__all__ = [
+    "bp_publish",
+]

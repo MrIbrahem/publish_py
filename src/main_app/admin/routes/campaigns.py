@@ -170,3 +170,9 @@ class CampaignsDashboard:
 
 
 campaigns_module = CampaignsDashboard()
+
+
+__all__ = [
+    "CampaignsDashboard",
+    "campaigns_module",
+]

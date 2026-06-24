@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "td/td_base.html" %}
 {% from "_macros.html" import select_options, pageviews_link %}
 
 {% block content %}
@@ -8,7 +8,7 @@
             <div class='col-lg-4 col-md-12 border_debug border rounded'>
                 <div class="d-flex align-items-center justify-content-center" style="height: 100%">
                     <div class="list-group">
-                        <h4 class='text-center'>User: {{ username }} <br><a target="_blank"
+                        <h4 class='text-center'>Language: lang_name ({{ lang_code }}) <br><a target="_blank"
                                 href="http://uz.wikipedia.org/wiki/Category:Translated_from_MDWiki">(cat)</a>
                         </h4>
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
@@ -27,23 +27,16 @@
                 </div>
             </div>
             <div class='col-lg-3 col-md-6 border_debug'>
-                <form method="get" action="{{ url_for('leaderboard.users', username=username) }}" class="border rounded"
-                    id="form_board">
+                <form method="get" action="{{ url_for('td.leaderboard.langs', lang_code=lang_code) }}" id="form_board"
+                    class="border rounded">
+
                     <div class='container mt-3'>
                         <div class='row g-1'>
-                            <div class="col-6">
-                                <select dir="ltr" id="lang" name="lang" class="form-select" data-bs-theme="auto">
-                                    <option value='all'>Lang: All</option>
-                                    {% if langs %}
-                                    {{ select_options(langs, selected_lang) }}
-                                    {% endif %}
-                                </select>
-                            </div>
-                            <div class="col-6">
+                            <div class="col-12">
                                 <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
                                     <option value='all'>Year: All</option>
-                                    {% if years %}
-                                    {{ select_options(years, selected_year) }}
+                                    {% if form_data and form_data.years %}
+                                    {{ select_options(form_data.years, selected_data.year) }}
                                     {% endif %}
                                 </select>
                             </div>
@@ -58,11 +51,12 @@
     </div>
     <div class='card mt-1'>
         <div class='card-body p-1'>
+            <!-- https://mdwiki.toolforge.org/api.php?get=pages_by_user_or_lang&lang=my -->
             <table class='table table-striped compact table_text_left table_responsive' id='leadtable'>
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th data-priority="1">Lang</th>
+                        <th data-priority="1">User</th>
                         <th data-priority="2">Title</th>
                         <th>Campaign</th>
                         <th>Words</th>
@@ -79,8 +73,8 @@
                             {{ loop.index }}
                         </th>
                         <td>
-                            <a href="{{ url_for('leaderboard.langs', lang_code=page.lang) }}">
-                                {{ page.lang }}
+                            <a href="{{ url_for('td.leaderboard.users', username=page.user) }}">
+                                {{ page.user }}
                             </a>
                         </td>
                         <td>
@@ -89,7 +83,7 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
+                            <a href="{{ url_for('td.leaderboard.index', camp=page.campaign) }}">
                                 {{ page.campaign }}
                             </a>
                         </td>
@@ -119,20 +113,12 @@
     <div class='card'>
         <div class='card-body' style='padding:5px 0px 5px 5px;'>
             <h2 class='text-center'>Translations in process</h2>
-            <!--
-                https://mdwiki.toolforge.org/api.php?get=top_lang_of_users&users%5B0%5D=SeaTub
-                https://mdwiki.toolforge.org/api.php?get=pages_by_user_or_lang&user=SeaTub
-                https://mdwiki.toolforge.org/api.php?get=in_process&user=SeaTub
-                https://mdwiki.toolforge.org/api.php?get=user_status&select=year&user=SeaTub
-                https://mdwiki.toolforge.org/api.php?get=user_status&select=lang&user=SeaTub
-                https://mdwiki.toolforge.org/api.php?get=user_status&select=campaign&user=SeaTub
-                /api/in_process?user=es
-             -->
+            <!-- /api/in_process?lang=es -->
             <table class='table table-striped compact table_text_left table_responsive' id='leadtable2'>
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th data-priority="1">Lang</th>
+                        <th data-priority="1">User</th>
                         <th data-priority="2">Title</th>
                         <th>Campaign</th>
                         <th>Words</th>
@@ -153,19 +139,9 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/g.js') }}"></script>
-<script src="{{ url_for('static', filename='js/graph_api.js') }}"></script>
-
+{% if chart_data %}
 <script>
-    function getFormData(d) {
-        const formData = $('#form_board').serializeArray();
-        formData.forEach(field => {
-            if (field.value.trim()) {
-                d[field.name] = field.value;
-            }
-        });
-        return d;
-    }
-    graph_js({{ chart_labels| tojson }}, {{ chart_counts| tojson }}, 'chart_69e6e6d5e7ab7')
+    render_graph(JSON.parse('{{ chart_data|tojson }}'), 'chart_69e6e6d5e7ab7');
 </script>
+{% endif %}
 {% endblock %}
