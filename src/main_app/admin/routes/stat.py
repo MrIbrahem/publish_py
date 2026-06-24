@@ -11,6 +11,7 @@ import logging
 
 from flask import Blueprint, render_template
 
+from ..decorators import admin_required
 from ...db.services.pages import page_service, user_page_service
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ stat_bp = Blueprint("stat", __name__, url_prefix="/stat")
 
 
 @stat_bp.route("/", methods=["GET"])
+@admin_required
 def stat_index() -> str:
     """Render a minimal statistics overview."""
     try:

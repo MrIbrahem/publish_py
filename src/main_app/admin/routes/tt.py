@@ -13,6 +13,7 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
+from ..decorators import admin_required
 from ...db.services.content import list_categories
 from ...db.services.pages import translate_type_service
 from ...shared.core.extensions import UniqueError
@@ -23,6 +24,7 @@ tt_bp = Blueprint("tt", __name__, url_prefix="/tt")
 
 
 @tt_bp.route("/", methods=["GET"])
+@admin_required
 def tt_index() -> str:
     """Render the Translate Type listing."""
     cat = request.args.get("cat", "All")
@@ -45,6 +47,7 @@ def tt_index() -> str:
 
 
 @tt_bp.route("/edit", methods=["GET"])
+@admin_required
 def tt_edit() -> str:
     """Render the add/edit popup form for a single translate_type row."""
     tt_id_raw = request.args.get("id", "")
@@ -73,6 +76,7 @@ def tt_edit() -> str:
 
 
 @tt_bp.route("/", methods=["POST"])
+@admin_required
 def tt_edit_post() -> ResponseReturnValue:
     """Insert or update a translate_type row from the popup form."""
     tt_id_raw = (request.form.get("id") or "").strip()
@@ -122,6 +126,7 @@ def tt_edit_post() -> ResponseReturnValue:
 
 
 @tt_bp.route("/add", methods=["GET"])
+@admin_required
 def add() -> str:
     return render_template(
         "admins/tt/edit.html",
@@ -135,6 +140,7 @@ def add() -> str:
 
 
 @tt_bp.route("/add", methods=["POST"])
+@admin_required
 def tt_add_post() -> ResponseReturnValue:
     """Insert a translate_type row from the popup form."""
     title = (request.form.get("title") or "").strip()

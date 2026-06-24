@@ -7,6 +7,7 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
+from ...decorators import admin_required
 from ....db.models import QidOthersRecord, QidRecord
 
 logger = logging.getLogger(__name__)
@@ -68,6 +69,7 @@ class QidsModel:
 
     def _setup_routes(self) -> None:
         @self.bp.route("/", methods=["GET"])
+        @admin_required
         def index() -> str:
             """List of rows with optional filter (all / empty / duplicate)."""
             dis = request.args.get("dis", "all")
@@ -93,6 +95,7 @@ class QidsModel:
             )
 
         @self.bp.route("/edit", methods=["GET"])
+        @admin_required
         def edit() -> str:
             """Render the add/edit popup for a single row."""
             qid_id = None
@@ -118,6 +121,7 @@ class QidsModel:
             )
 
         @self.bp.route("/add", methods=["GET"])
+        @admin_required
         def add() -> str:
             """Render the add popup for a single qids row."""
             return render_template(
@@ -130,6 +134,7 @@ class QidsModel:
             )
 
         @self.bp.route("/", methods=["POST"])
+        @admin_required
         def edit_post() -> ResponseReturnValue:
             """update a row."""
             qid_id_raw = (request.form.get("id") or "").strip()
@@ -179,6 +184,7 @@ class QidsModel:
             return edit_redirect_to
 
         @self.bp.route("/add", methods=["POST"])
+        @admin_required
         def add_post() -> ResponseReturnValue:
             """Insert a qid row"""
             title = (request.form.get("title") or "").strip()

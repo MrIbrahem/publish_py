@@ -7,6 +7,7 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
+from ..decorators import admin_required
 from ...db.services.content import list_categories
 from ...db.services.pages import add_translate_row_to_db
 
@@ -17,6 +18,7 @@ add_bp = Blueprint("add", __name__, url_prefix="/add")
 
 
 @add_bp.route("/", methods=["GET"])
+@admin_required
 def add_translate() -> str:
     """Render the translations add_translate dashboard."""
     categories = list_categories()
@@ -27,6 +29,7 @@ def add_translate() -> str:
 
 
 @add_bp.route("/", methods=["POST"])
+@admin_required
 def add_translate_post() -> ResponseReturnValue:
     """Process the add_translate form submission."""
     titles = request.form.getlist("mdtitle")

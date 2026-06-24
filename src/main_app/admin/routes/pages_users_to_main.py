@@ -10,6 +10,7 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
+from ..decorators import admin_required
 from ...db.services.content import list_langs
 from ...db.services.delete_service import delete_user_page_to_main
 from ...db.services.pages import add_translate_row_to_db, pages_users_to_main_service
@@ -29,6 +30,7 @@ def _safe_int(value: str | None, default: int) -> int:
 
 
 @pages_users_to_main_bp.route("/", methods=["GET"])
+@admin_required
 def pages_users_to_main_index() -> str:
     """List user pages flagged for promotion to main pages."""
     lang = request.args.get("lang", "All")
@@ -48,6 +50,7 @@ def pages_users_to_main_index() -> str:
 
 
 @pages_users_to_main_bp.route("/fix_it", methods=["GET"])
+@admin_required
 def pages_users_to_main_fix_it() -> str:
     """Render the fix_it form to promote a user page to main."""
     page_id = _safe_int(request.args.get("id"), 0)
@@ -78,6 +81,7 @@ def pages_users_to_main_fix_it() -> str:
 
 
 @pages_users_to_main_bp.route("/fix_it", methods=["POST"])
+@admin_required
 def pages_users_to_main_fix_it_post() -> ResponseReturnValue:
     """Promote a user page to main and delete the source rows."""
     page_id = _safe_int(request.form.get("id"), 0)

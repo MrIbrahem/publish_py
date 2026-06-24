@@ -13,6 +13,7 @@ import logging
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
+from ..decorators import admin_required
 from ...db.services.content import list_langs
 from ...db.services.pages import (
     count_translated,
@@ -37,6 +38,7 @@ def _safe_int(value: str | None, default: int) -> int:
 
 
 @translated_bp.route("/", methods=["GET"])
+@admin_required
 def index() -> str:
     """List translated main pages with pagination."""
     lang = request.args.get("lang", "All")
@@ -67,6 +69,7 @@ def index() -> str:
 
 
 @translated_bp.route("/edit", methods=["GET"])
+@admin_required
 def edit() -> str:
     """Render the edit popup for a single ``pages`` row."""
     page_id = _safe_int(request.args.get("id"), 0)
@@ -85,6 +88,7 @@ def edit() -> str:
 
 
 @translated_bp.route("/edit", methods=["POST"])
+@admin_required
 def edit_post() -> ResponseReturnValue:
     """Update or delete a single ``pages`` row from the popup form."""
     page_id = _safe_int(request.form.get("id"), 0)
