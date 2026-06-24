@@ -27,6 +27,7 @@ from .top_stats_routes import get_top_langs, get_top_users
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
 
+
 @bp_api.before_request
 def handle_options_preflight():
     if request.method == "OPTIONS":
@@ -35,6 +36,7 @@ def handle_options_preflight():
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
         response.headers["Access-Control-Max-Age"] = "7200"
         return response
+
 
 @bp_api.route("/publish_reports", methods=["GET"])
 @check_cors

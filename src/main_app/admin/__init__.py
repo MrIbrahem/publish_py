@@ -24,7 +24,7 @@ from .routes.users_emails import users_emails_module
 from .routes.users_no_inprocess import usersnoinprocess_module
 
 
-def register_blueprints(_bp: Blueprint) -> None:
+def register_bp_admin_blueprints(_bp: Blueprint) -> None:
     _bp.register_blueprint(coordinators_module.bp)
     _bp.register_blueprint(fulltranslators_module.bp)
     _bp.register_blueprint(usersnoinprocess_module.bp)
@@ -48,4 +48,4 @@ def register_blueprints(_bp: Blueprint) -> None:
     _bp.register_blueprint(users_emails_module.bp)
 
 
-register_blueprints(admin_route_module.bp)
+register_bp_admin_blueprints(admin_route_module.bp)

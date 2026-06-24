@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 @bp_leaderboard.get("/")
 def index() -> str:
     year = request.args.get("year", type=int)
-    month = request.args.get("month", type=int)
+    # month = request.args.get("month", type=int)
     camp = request.args.get("camp", type=str)
     user_group = request.args.get("user_group", type=str)
 

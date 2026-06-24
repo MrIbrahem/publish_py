@@ -11,7 +11,6 @@ import pytest
 from flask.testing import FlaskClient
 
 
-
 @pytest.mark.integration
 class TestApiRoutes:
     """Integration tests for API routes."""
