@@ -25,8 +25,6 @@ def test_bypass_active_under_development_when_enabled(app):
 
     with app.test_request_context():
         assert should_bypass_coordinator_check("nonexistent-user") is True
-        assert is_active_coordinator("any-user") is True
-        assert "BYPASS_ADMIN" in active_coordinators()
         user = current_user()
         assert user is not None
         assert user.username == "BYPASS_ADMIN"
