@@ -1,10 +1,8 @@
 """
-Unit tests for auth.identity module.
+Unit tests for auth module.
 
 Tests for current user helpers.
 """
-
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -40,4 +38,4 @@ class TestCurrentUser:
         )
 
         with pytest.raises(AttributeError):
-            user.user_id = 99999
+            user.user_id = 99999 # type: ignore

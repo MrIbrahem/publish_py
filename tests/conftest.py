@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any, Generator
+from typing import Generator
 from unittest.mock import MagicMock
 
 import pytest
@@ -47,7 +47,7 @@ if sys:
 # Import after environment setup
 from src.main_app import create_app
 from src.main_app.config import TestingConfig
-from src.main_app.shared.auth.identity import CurrentUser
+from src.main_app.shared.auth import CurrentUser
 from src.main_app.shared.core.extensions import db as _db
 
 
@@ -61,7 +61,7 @@ def disable_network(request, mocker):
 
 
 @pytest.fixture
-def app() -> Generator[Flask, None, None]:
+def app() -> Generator[Flask]:
     """Create and configure a test Flask application.
 
     Yields:
