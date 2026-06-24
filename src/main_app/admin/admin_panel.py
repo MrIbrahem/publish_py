@@ -37,7 +37,28 @@ class AdminPanelRoutes:
         @self.bp.get("/last")
         @admin_required
         def last_dashboard():
-            return last_translations_dashboard()
+            # Get query parameters
+            lang = request.args.get("lang", "All", type=str)
+
+            last_table = request.args.get("last_table", "pages", type=str)
+
+            # Validate last_table
+            if last_table not in ["pages", "pages_users"]:
+                last_table = "pages"
+
+            return last_translations_dashboard(last_table, lang)
+
+        @self.bp.get("/last/pages/<string:lang>")
+        @self.bp.get("/last/pages/")
+        @admin_required
+        def dashboard_pages(lang : str | None = None):
+            return last_translations_dashboard("pages", lang)
+
+        @self.bp.get("/last/pages_users/<string:lang>")
+        @self.bp.get("/last/pages_users/")
+        @admin_required
+        def dashboard_pages_users(lang : str | None = None):
+            return last_translations_dashboard("pages_users", lang)
 
         @self.bp.get("/reports")
         @admin_required
