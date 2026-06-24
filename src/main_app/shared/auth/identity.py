@@ -2,23 +2,38 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from flask import g, request, session
 
 from ...config import settings
-from ...db.models import UserTokenRecord
-from ...db.services.users import get_user_token
+from ...db.services.users import (
+    get_user_token,
+    is_active_coordinator,
+)
 from ..core.cookies.cookie import extract_user_id
 
 
 @dataclass(frozen=True)
 class CurrentUser:
-    """Lightweight representation of the authenticated user."""
+    """Bundles user identity and OAuth credentials
+    Stored in ``g._current_user`` during the request lifecycle.
+    """
 
-    user_id: str
+    user_id: int
     username: str
+    access_token: bytes = field(repr=False)
+    access_secret: bytes = field(repr=False)
+    is_active_admin: bool = False
+
+    def to_auth_payload(self) -> dict[str, int | str | bytes]:
+        return {
+            "id": self.user_id,
+            "username": self.username,
+            "access_token": self.access_token,
+            "access_secret": self.access_secret,
+        }
 
 
 def _resolve_user_id() -> Optional[int]:
@@ -31,7 +46,7 @@ def _resolve_user_id() -> Optional[int]:
         return None
 
 
-def current_user() -> Optional[UserTokenRecord]:
+def current_user() -> Optional[CurrentUser]:
     if hasattr(g, "_current_user"):
         return g._current_user  # type: ignore[attr-defined]
 
@@ -43,9 +58,20 @@ def current_user() -> Optional[UserTokenRecord]:
             if user_id is not None:
                 session["uid"] = user_id
 
-    user = get_user_token(user_id) if user_id is not None else None
-    if user and session.get("username") != user.username:
-        session["username"] = user.username
+    record = get_user_token(user_id) if user_id is not None else None
+    if record is None:
+        return None
+
+    if session.get("username") != record.username:
+        session["username"] = record.username
+
+    user = CurrentUser(
+        user_id=record.user_id,
+        username=record.username,
+        access_token=record.access_token,
+        access_secret=record.access_secret,
+        is_active_admin=is_active_coordinator(record.username),
+    )
 
     g._current_user = user  # type: ignore[attr-defined]
     return user

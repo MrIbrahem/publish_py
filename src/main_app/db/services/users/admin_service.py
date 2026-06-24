@@ -23,9 +23,8 @@ logger = logging.getLogger(__name__)
 # ── SELECT ───────────────────────────────────────────────
 
 
-@functools.lru_cache(maxsize=1)
 def active_coordinators() -> List[str]:
-    """Return usernames of all active coordinators (cached)."""
+    """Return usernames of all active coordinators."""
     records = (
         db.session.query(AdminUserRecord)
         # .filter(AdminUserRecord.is_active == 1)
@@ -95,7 +94,6 @@ def add_coordinator(username: str) -> AdminUserRecord:
             raise UserNotFoundError(f"User '{username}' does not exist") from exc
         raise
     db.session.refresh(record)
-    active_coordinators.cache_clear()
     return record
 
 
@@ -110,13 +108,11 @@ def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRec
     record.is_active = is_active
     db.session.commit()
     db.session.refresh(record)
-    active_coordinators.cache_clear()
     return record
 
 
 def delete_coordinator(coordinator_id: int) -> bool:
     deleted = delete_record_by_pk(AdminUserRecord, coordinator_id)
-    active_coordinators.cache_clear()
     return deleted
 
 

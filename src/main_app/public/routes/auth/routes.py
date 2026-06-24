@@ -24,7 +24,11 @@ from flask import (
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from ....config import settings
-from ....db.services.users import delete_user_token, upsert_user_token
+from ....db.services.users import (
+    delete_user_token,
+    is_active_coordinator,
+    upsert_user_token,
+)
 from ....shared.auth.identity import CurrentUser
 from ....shared.auth.mwoauth_handshake import (
     OAuthIdentityError,
@@ -234,7 +238,13 @@ def callback() -> WerkzeugResponse:
         path="/",
     )
 
-    g.current_user = CurrentUser(str(user_id), str(username))
+    g._current_user = CurrentUser(
+        user_id=user_id,
+        username=username,
+        access_token=str(token_key).encode(),
+        access_secret=str(token_secret).encode(),
+        is_active_admin=is_active_coordinator(username),
+    )
     g.is_authenticated = True
     g.authenticated_user_id = str(user_id)
     logger.info("OAuth login successful for user_id=%s username=%s", user_id, username)

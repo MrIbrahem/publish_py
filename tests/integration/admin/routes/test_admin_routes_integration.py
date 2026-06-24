@@ -109,9 +109,9 @@ class TestAdminRouteAccess:
         mock_user = UserTokenRecord(user_id=12345, username="TestUser")
 
         with patch("src.main_app.admin.decorators.current_user", return_value=mock_user):
-            # Mock _get_cached_active_coordinators to return list without "TestUser"
+            # Mock active_coordinators to return list without "TestUser"
             with patch(
-                "src.main_app.admin.decorators._get_cached_active_coordinators",
+                "src.main_app.admin.decorators.active_coordinators",
                 return_value=["admin"],
             ):
                 response = auth_client.get("/admin/", follow_redirects=False)
@@ -126,9 +126,9 @@ class TestAdminRouteAccess:
 
         mock_user = UserTokenRecord(user_id=12345, username="TestUser")
         with patch("src.main_app.admin.decorators.current_user", return_value=mock_user):
-            # Mock _get_cached_active_coordinators to return list without "TestUser"
+            # Mock active_coordinators to return list without "TestUser"
             with patch(
-                "src.main_app.admin.decorators._get_cached_active_coordinators",
+                "src.main_app.admin.decorators.active_coordinators",
                 return_value=["admin"],
             ):
                 response = auth_client.get("/admin/", follow_redirects=False)
