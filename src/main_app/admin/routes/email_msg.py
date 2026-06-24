@@ -16,7 +16,7 @@ from ...db.services.analytics import get_total_views_for_target
 from ...db.services.pages import get_page_by_id, get_user_page_by_id
 from ...db.services.users import get_user_by_username
 from ...public.routes.td.results_api import results_api_result
-from ...shared.auth.identity import current_user
+from ...shared.auth.current_user import current_user
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
