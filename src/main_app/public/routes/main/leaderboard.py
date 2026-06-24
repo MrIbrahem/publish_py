@@ -149,4 +149,6 @@ def users(username: str) -> str:
     )
 
 
-__all__ = ["bp_leaderboard"]
+__all__ = [
+    "bp_leaderboard",
+]

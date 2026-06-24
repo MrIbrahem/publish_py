@@ -120,4 +120,6 @@ def index() -> Response:
     return response
 
 
-__all__ = ["bp_cxtoken"]
+__all__ = [
+    "bp_cxtoken",
+]

@@ -5,13 +5,11 @@ Integration tests for src/main_app/public/routes/api/routes.py module.
 from __future__ import annotations
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
-from src.main_app.shared.schemas import PublishReportsQuerySchema
 
 
 @pytest.mark.integration
@@ -20,10 +18,12 @@ class TestApiRoutes:
 
     def test_api_preflight(self, client: FlaskClient):
         """Test that publish_reports OPTIONS endpoint returns correct CORS headers."""
+
         response = client.options("/api/publish_reports")
 
         # Should return 200 with CORS headers
         assert response.status_code == 200
+        # Headers([('Content-Type', 'text/html; charset=utf-8'), ('Allow', 'GET, OPTIONS, HEAD'), ('Content-Length', '0')])
         assert response.headers["Access-Control-Allow-Methods"] == "GET, OPTIONS"
         assert response.headers["Access-Control-Allow-Headers"] == "Content-Type"
         assert response.headers["Access-Control-Max-Age"] == "7200"

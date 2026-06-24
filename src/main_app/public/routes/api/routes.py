@@ -27,23 +27,14 @@ from .top_stats_routes import get_top_langs, get_top_users
 bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
 
-
-@bp_api.route("/<path:url>", methods=["OPTIONS"])
-@check_cors
-def api_preflight() -> Response:
-    """
-    Handle preflight requests.
-
-    Returns:
-        Preflight response
-    """
-
-    response = Response("", status=200)
-    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    response.headers["Access-Control-Max-Age"] = "7200"
-    return response
-
+@bp_api.before_request
+def handle_options_preflight():
+    if request.method == "OPTIONS":
+        response = Response("", status=200)
+        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Max-Age"] = "7200"
+        return response
 
 @bp_api.route("/publish_reports", methods=["GET"])
 @check_cors
@@ -447,4 +438,6 @@ bp_api.route("/status", methods=["GET"])(leaderboard_status)
 bp_api.route("/top_langs", methods=["GET"])(get_top_langs)
 bp_api.route("/top_users", methods=["GET"])(get_top_users)
 
-__all__ = ["bp_api"]
+__all__ = [
+    "bp_api",
+]
