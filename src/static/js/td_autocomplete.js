@@ -1,13 +1,13 @@
 
 // https://mdwiki.toolforge.org/api.php
-var api_end_point = document.location.origin + "/api.php";
+var api_end_point = document.location.origin + "/api";
 
 // attach autocomplete behavior to input field
 $(".td_user_input").autocomplete({
 	source: function (request, response) {
 		// make AJAX request to Wikipedia API
 		$.ajax({
-			url: api_end_point + "?get=users",
+			url: api_end_point + "/users",
 			dataType: "json",
 			data: {
 				userlike: request.term
@@ -35,7 +35,7 @@ $(".lang_input").autocomplete({
 
 		// Fetch data from API only once on first call
 		$.ajax({
-			url: api_end_point + "?get=lang_names",
+			url: api_end_point + "/lang_names",
 			dataType: "json",
 			success: function (data) {
 				cachedData = data.results; // تخزين البيانات مؤقتًا

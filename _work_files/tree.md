@@ -53,18 +53,9 @@ src/
 │   │   ├── c.js
 │   │   ├── card-tools.js
 │   │   ├── Chart.min.js
-│   │   ├── codes.js
-│   │   ├── color-modes.js
 │   │   ├── dark-mode.js
 │   │   ├── graph.js
-│   │   ├── leadtable.js
-│   │   ├── main.js
-│   │   ├── publish_reports.js
 │   │   ├── sidebar.js
-│   │   ├── sorttable.js
-│   │   ├── SVGLanguages.js
-│   │   ├── theme.js
-│   │   └── to.js
 │   ├── favicon.svg
 │   └── translate.svg
 ├── templates/
