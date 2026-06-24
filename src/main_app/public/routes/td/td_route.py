@@ -38,7 +38,19 @@ def results_api():
     depth = request.args.get("depth")
 
     start = time.time()
-    result_dict = results_api_result(code, camp, depth)
+
+    try:
+        result_dict = results_api_result(code, camp, depth)
+    except Exception:
+        logger.exception(
+            "results_api_result failed for code=%r camp=%r depth=%r",
+            code,
+            camp,
+            depth,
+        )
+        return jsonify({"error": "Failed to load results"}), 500
+
+    elapsed = time.time() - start
     elapsed = time.time() - start
 
     return jsonify(

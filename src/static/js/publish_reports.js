@@ -19,8 +19,18 @@ function populateFilterOptions(results) {
 
     for (const [id, values] of Object.entries(options)) {
         const select = document.getElementById(id);
-        select.innerHTML = '<option value="">-- All --</option>' +
-            values.map(value => `<option data-tokens="${value}" value="${value}">${value}</option>`).join('');
+        select.replaceChildren();
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "-- All --";
+        select.appendChild(allOption);
+        values.forEach((value) => {
+            const option = document.createElement("option");
+            option.value = String(value);
+            option.dataset.tokens = String(value);
+            option.textContent = String(value);
+            select.appendChild(option);
+        });
     }
 }
 

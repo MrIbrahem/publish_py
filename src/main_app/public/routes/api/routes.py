@@ -32,7 +32,9 @@ logger = logging.getLogger(__name__)
 def handle_options_preflight():
     if request.method == "OPTIONS":
         response = Response("", status=200)
-        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        requested_method = request.headers.get("Access-Control-Request-Method", "GET")
+        response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
+        # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
         response.headers["Access-Control-Max-Age"] = "7200"
         return response
@@ -417,7 +419,10 @@ def get_users() -> Response:
     """
     Handle users API requests. Returns all users names.
     """
-    userlike = request.args.get("userlike")
+    userlike = request.args.get("userlike", type=str)
+    if not userlike:
+        return jsonify({"error": "Query parameter 'userlike' is required"}), 400
+
     try:
         records = users_search(userlike)
     except Exception:

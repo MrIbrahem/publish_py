@@ -5,6 +5,7 @@ Admin-only routes for recent translations (last).
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from flask import render_template
 
@@ -14,7 +15,10 @@ from ...db.services.pages_query_service import list_pages_users, list_pages_with
 logger = logging.getLogger(__name__)
 
 
-def add_campaign(rows, cats_to_camp):
+def add_campaign(
+    rows: list[dict[str, Any]],
+    cats_to_camp: dict[str, str],
+) -> list[dict[str, Any]]:
     last_rows = []
     for row in rows:
         cat = row.get("cat")
