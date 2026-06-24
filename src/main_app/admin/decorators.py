@@ -12,16 +12,17 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..shared.auth.current_user import current_user
+from ..public.auth.utils import load_logged_in_user
 
 FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
+
 
 def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
     """Decorator enforcing that the current user is an administrator."""
 
     @wraps(view)
     def wrapped(*args, **kwargs):
-        user = current_user()
+        user = load_logged_in_user()
         if not user:
             return redirect(url_for("auth.login"))
         if not user.is_active_admin:

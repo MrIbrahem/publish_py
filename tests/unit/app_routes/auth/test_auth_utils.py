@@ -1,12 +1,12 @@
 """
-Unit tests for auth.decorators module.
+Unit tests for auth.utils module.
 
-Tests for authentication decorators.
+Tests for authentication utils.
 """
 
 from unittest.mock import MagicMock
 
-from src.main_app.shared.auth.decorators import (
+from src.main_app.public.auth import (
     oauth_required,
 )
 
@@ -16,9 +16,9 @@ class TestOAuthRequired:
 
     def test_redirects_when_no_user_and_oauth_enabled(self, app, monkeypatch):
         """Test that decorator redirects when no user and OAuth enabled."""
-        from src.main_app.config import OAuthConfig, Settings
+        from src.main_app.config import OAuthConfig
 
-        monkeypatch.setattr("src.main_app.shared.auth.decorators.current_user", lambda: None)
+        monkeypatch.setattr("src.main_app.public.auth.utils.load_user", lambda: None)
         # Create a mock Settings object with OAuth enabled
         mock_settings = MagicMock()
         mock_settings.oauth = OAuthConfig(
@@ -28,7 +28,7 @@ class TestOAuthRequired:
             encryption_key="test_encryption_key",
         )
         # Patch the entire settings object, not just oauth
-        monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.public.auth.utils.settings", mock_settings)
 
         @oauth_required
         def protected_view():
@@ -41,14 +41,14 @@ class TestOAuthRequired:
 
             result = protected_view()
 
-            assert result.status_code == 302  # Redirect
+            assert result.status_code == 302  # type: ignore # Redirect
 
     def test_allows_access_when_user_present(self, app, monkeypatch):
         """Test that decorator allows access when user is present."""
         from src.main_app.config import OAuthConfig
 
         mock_user = MagicMock()
-        monkeypatch.setattr("src.main_app.shared.auth.decorators.current_user", lambda: mock_user)
+        monkeypatch.setattr("src.main_app.public.auth.utils.load_user", lambda: mock_user)
         # Create a mock Settings object with OAuth enabled
         mock_settings = MagicMock()
         mock_settings.oauth = OAuthConfig(
@@ -57,7 +57,7 @@ class TestOAuthRequired:
             consumer_secret="test_secret",
             encryption_key="test_encryption_key",
         )
-        monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.public.auth.utils.settings", mock_settings)
 
         @oauth_required
         def protected_view():
@@ -70,12 +70,11 @@ class TestOAuthRequired:
 
     def test_allows_access_when_oauth_null(self, app, monkeypatch):
         """Test that decorator allows access when OAuth is None (disabled)."""
-        from src.main_app.config import OAuthConfig
 
         # Create a mock Settings object with oauth=None
         mock_settings = MagicMock()
         mock_settings.oauth = None
-        monkeypatch.setattr("src.main_app.shared.auth.decorators.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.public.auth.utils.settings", mock_settings)
 
         @oauth_required
         def protected_view():
