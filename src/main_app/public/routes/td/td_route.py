@@ -163,7 +163,7 @@ def table():
 
     # Identity / coordinator / full-translator flags — mirrors src/index.php.
     user = current_user()
-    user_coord = bool(user and user.username in active_coordinators())
+    user_coord = bool(user and user.is_active_admin)
     full_tr_user = bool(user and is_full_translator(user.username))
 
     parsed_settings = parsed["settings"]

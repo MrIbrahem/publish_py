@@ -32,7 +32,6 @@ def test_coordinator_workflow():
     assert any(x.username == "Wiki_User" for x in all_c)
 
     # Test active
-    active_coordinators.cache_clear()
     active = active_coordinators()
     assert "Wiki_User" in active
 
@@ -40,7 +39,6 @@ def test_coordinator_workflow():
     updated = set_coordinator_active(c.id, False)
     assert updated.is_active == 0
 
-    active_coordinators.cache_clear()
     assert "Wiki_User" not in active_coordinators()
 
     # Test is_active_coordinator
@@ -70,7 +68,6 @@ class TestListActiveCoordinators:
 
     def test_returns_active_usernames(self, monkeypatch):
         """Test that active_coordinators returns active coordinator usernames."""
-        active_coordinators.cache_clear()
         add_coordinator("Active_Editor")
         active = active_coordinators()
         assert "Active_Editor" in active
