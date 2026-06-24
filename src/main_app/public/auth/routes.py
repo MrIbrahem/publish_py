@@ -7,8 +7,7 @@ from __future__ import annotations
 import logging
 import secrets
 from collections.abc import Sequence
-from functools import wraps
-from typing import Any, Callable, cast
+from typing import Any, cast
 from urllib.parse import urlencode
 
 from flask import (
@@ -21,28 +20,47 @@ from flask import (
     session,
     url_for,
 )
+from mwoauth import RequestToken
+
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from ....config import settings
-from ....db.services.users import (
+from ...config import settings
+from ...db.services.users import (
     delete_user_token,
     is_active_coordinator,
     upsert_user_token,
 )
-from ....shared.auth.current_user import CurrentUser
-from ....shared.auth.mwoauth_handshake import (
+from ...shared.auth.current_user import CurrentUser
+from ...shared.auth.mwoauth_handshake import (
     OAuthIdentityError,
     complete_login,
     start_login,
 )
-from ....shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
+from ...shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
 from .rate_limit import callback_rate_limiter, login_rate_limiter
 
 logger = logging.getLogger(__name__)
-bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
+bp_auth = Blueprint("auth", __name__)
 
 oauth_state_nonce = settings.sessions.state_key
 request_token_key = settings.sessions.request_token_key
+
+
+# ---------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------
+
+
+def _set_response_cookies(user_id, response) -> None:
+    response.set_cookie(
+        settings.cookie.name,
+        sign_user_id(user_id),
+        httponly=settings.cookie.httponly,
+        secure=settings.cookie.secure,
+        samesite=settings.cookie.samesite,
+        max_age=settings.cookie.max_age,
+        path="/",
+    )
 
 
 def _client_key() -> str:
@@ -52,9 +70,7 @@ def _client_key() -> str:
     return request.remote_addr or "anonymous"
 
 
-def _load_request_token(raw: Sequence[Any] | None):
-    from mwoauth import RequestToken
-
+def _load_request_token(raw: Sequence[Any] | None) -> RequestToken:
     if not raw:
         raise ValueError("Missing OAuth request token")
 
@@ -64,18 +80,9 @@ def _load_request_token(raw: Sequence[Any] | None):
     return RequestToken(raw[0], raw[1])
 
 
-def login_required(fn: Callable[..., Any]) -> Callable[..., Any]:
-    """Decorator that redirects anonymous users to the index page."""
-
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        if not getattr(g, "is_authenticated", False):
-            logger.warning("login_required: unauthenticated access denied to %s", fn.__name__)
-            flash("You must be logged in to view this page", "warning")
-            return redirect(url_for("main.index", error="login-required"))
-        return fn(*args, **kwargs)
-
-    return wrapper
+# ---------------------------------------------------------
+# Routes
+# ---------------------------------------------------------
 
 
 @bp_auth.get("/login")
@@ -223,21 +230,14 @@ def callback() -> WerkzeugResponse:
     session["uid"] = user_id
     session["username"] = username
 
-    # ------------------
-    # set cookies
+    # Set response and cookies
     redirect_url = session.pop("post_login_redirect", url_for("main.index"))
     logger.info("OAuth callback complete, redirecting to: %s", redirect_url)
     response = make_response(redirect(redirect_url))
-    response.set_cookie(
-        settings.cookie.name,
-        sign_user_id(user_id),
-        httponly=settings.cookie.httponly,
-        secure=settings.cookie.secure,
-        samesite=settings.cookie.samesite,
-        max_age=settings.cookie.max_age,
-        path="/",
-    )
 
+    _set_response_cookies(user_id, response)
+
+    # Cache in g for the remainder of THIS request only
     g._current_user = CurrentUser(
         user_id=user_id,
         username=username,
@@ -262,10 +262,7 @@ def callback() -> WerkzeugResponse:
 
     return response
 
-
 @bp_auth.get("/logout")
-# @login_required
-# Users with stale cookies will be redirected with a "login-required" error instead of being able to clean up their authentication state
 def logout() -> WerkzeugResponse:
     user_id = session.pop("uid", None)
     session.pop(request_token_key, None)
@@ -307,5 +304,4 @@ def logout() -> WerkzeugResponse:
 
 __all__ = [
     "bp_auth",
-    "login_required",
 ]

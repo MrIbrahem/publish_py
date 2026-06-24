@@ -38,4 +38,4 @@ class TestCurrentUser:
         )
 
         with pytest.raises(AttributeError):
-            user.user_id = 99999 # type: ignore
+            user.user_id = 99999  # type: ignore

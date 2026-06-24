@@ -18,7 +18,7 @@ class TestAuthLogin:
 
     def test_login_redirects_when_oauth_not_configured(self, app: Flask, client: FlaskClient):
         """Test that login redirects to index when OAuth is not configured."""
-        with patch("src.main_app.public.routes.auth.routes.settings") as mock_settings:
+        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
 
             response = client.get("/auth/login", follow_redirects=False)
@@ -28,13 +28,13 @@ class TestAuthLogin:
 
     def test_login_rate_limit_blocks_excessive_requests(self, app: Flask, client: FlaskClient):
         """Test that login rate limit blocks excessive requests."""
-        with patch("src.main_app.public.routes.auth.routes.settings") as mock_settings:
+        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
             mock_settings.sessions.state_key = "oauth_state"
             mock_settings.sessions.request_token_key = "request_token"
 
             # Mock rate limiter to test rate limiting quickly
-            with patch("src.main_app.public.routes.auth.routes.login_rate_limiter") as mock_limiter:
+            with patch("src.main_app.public.auth.routes.login_rate_limiter") as mock_limiter:
                 call_count = 0
 
                 def allow_side_effect(_key):
@@ -46,7 +46,7 @@ class TestAuthLogin:
                 mock_limiter.allow.side_effect = allow_side_effect
                 mock_limiter.try_after.return_value = timedelta(seconds=30)
 
-                with patch("src.main_app.public.routes.auth.routes.start_login") as mock_start:
+                with patch("src.main_app.public.auth.routes.start_login") as mock_start:
                     mock_start.return_value = ("https://oauth.provider.com/authorize", MagicMock())
 
                     # Make 6 requests to exceed rate limit
@@ -58,15 +58,15 @@ class TestAuthLogin:
 
     def test_login_starts_oauth_flow(self, app: Flask, client: FlaskClient):
         """Test that login starts OAuth flow when properly configured."""
-        with patch("src.main_app.public.routes.auth.routes.settings") as mock_settings:
+        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
             mock_settings.sessions.state_key = "oauth_state"
             mock_settings.sessions.request_token_key = "request_token"
 
-            with patch("src.main_app.public.routes.auth.routes.start_login") as mock_start:
+            with patch("src.main_app.public.auth.routes.start_login") as mock_start:
                 mock_start.return_value = ("https://oauth.provider.com/authorize", MagicMock())
 
-                with patch("src.main_app.public.routes.auth.routes.login_rate_limiter") as mock_limiter:
+                with patch("src.main_app.public.auth.routes.login_rate_limiter") as mock_limiter:
                     mock_limiter.allow.return_value = True
 
                     response = client.get("/auth/login", follow_redirects=False)
@@ -81,7 +81,7 @@ class TestAuthCallback:
 
     def test_callback_redirects_when_oauth_not_configured(self, app: Flask, client: FlaskClient):
         """Test that callback redirects when OAuth is not configured."""
-        with patch("src.main_app.public.routes.auth.routes.settings") as mock_settings:
+        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
 
             response = client.get("/auth/callback?oauth_verifier=123&state=abc", follow_redirects=False)
@@ -90,7 +90,7 @@ class TestAuthCallback:
 
     def test_callback_validates_state_token(self, app: Flask, client: FlaskClient):
         """Test that callback validates state token."""
-        with patch("src.main_app.public.routes.auth.routes.settings") as mock_settings:
+        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
             mock_settings.sessions.state_key = "oauth_state"
             mock_settings.sessions.request_token_key = "request_token"
@@ -100,7 +100,7 @@ class TestAuthCallback:
             mock_settings.cookie.samesite = "Lax"
             mock_settings.cookie.max_age = 3600
 
-            with patch("src.main_app.public.routes.auth.routes.callback_rate_limiter") as mock_limiter:
+            with patch("src.main_app.public.auth.routes.callback_rate_limiter") as mock_limiter:
                 mock_limiter.allow.return_value = True
 
                 # Missing state should cause redirect
@@ -137,27 +137,6 @@ class TestAuthLogout:
         cookie_header = response.headers.get("Set-Cookie", "")
         # Cookie should have expired or be deleted
         assert "auth_cookie" in cookie_header.lower() or "Max-Age=0" in cookie_header or "Expires" in cookie_header
-
-
-@pytest.mark.integration
-class TestLoginRequiredDecorator:
-    """Integration tests for the login_required decorator."""
-
-    def test_login_required_redirects_anonymous(self, app: Flask, client: FlaskClient):
-        """Test that login_required redirects anonymous users."""
-        # Create a test route with login_required
-        from src.main_app.public.routes.auth.routes import login_required
-
-        @app.route("/test-protected")
-        @login_required
-        def protected_route():
-            return "Protected content"
-
-        response = client.get("/test-protected", follow_redirects=False)
-
-        assert response.status_code == 302
-        assert "login-required" in response.location or "/" in response.location
-
 
 class TestAuthRouteIntegration:
     """Integration tests for auth routes."""

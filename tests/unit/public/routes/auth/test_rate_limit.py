@@ -8,7 +8,7 @@ from datetime import timedelta
 
 import pytest
 
-from src.main_app.public.routes.auth.rate_limit import (
+from src.main_app.public.auth.rate_limit import (
     RateLimiter,
     callback_rate_limiter,
     login_rate_limiter,
