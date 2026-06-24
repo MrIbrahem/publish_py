@@ -14,21 +14,24 @@ from flask import (
     jsonify,
     render_template,
     request,
-    send_from_directory,
 )
 
 from ....db.services.config import get_all_settings_ready
 from ....db.services.content import get_lang_by_code, list_categories, list_langs
+from ....db.services.pages import (
+    count_category_members,
+    statics_by_category,
+)
 from ....db.services.users import active_coordinators, is_full_translator
 from ....shared.auth.identity import current_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result
 
-bp_main = Blueprint("main", __name__, url_prefix="")
+bp_td = Blueprint("td", __name__, url_prefix="/Translation_Dashboard")
 logger = logging.getLogger(__name__)
 
 
-@bp_main.get("/results_api")
+@bp_td.get("/results_api")
 def results_api():
     code = request.args.get("code")
     camp = request.args.get("camp")
@@ -119,7 +122,7 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
         }
     }
 
-@bp_main.get("/table")
+@bp_td.get("/table")
 def table():
     # Form data — unchanged from the previous index() implementation.
     try:
@@ -185,7 +188,7 @@ def table():
     )
 
 
-@bp_main.get("/")
+@bp_td.get("/")
 def index():
     # Form data — unchanged from the previous index() implementation.
     try:
@@ -217,16 +220,68 @@ def index():
     )
 
 
-@bp_main.get("/reports")
+@bp_td.get("/reports")
 def reports():
     return render_template(
         "reports.html",
     )
 
 
-@bp_main.get("/favicon.ico")
-def favicon():
-    return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
+@bp_td.get("/missing")
+def missing():
+    # logic from src/missing.php — Top languages by missing articles in Category:RTT.
+    category = request.args.get("cat") or "RTT"
 
+    try:
+        stats = statics_by_category(category)
+    except Exception:
+        logger.exception("statics_by_category failed for cat=%r", category)
+        flash("Failed to load missing statistics — please try again.", "danger")
+        stats = []
 
-__all__ = ["bp_main"]
+    try:
+        total = count_category_members(category)
+    except Exception:
+        logger.exception("count_category_members failed for cat=%r", category)
+        total = 0
+
+    # PHP merges per-language stats with the langs lookup (autonym + name).
+    langs_lookup: dict[str, dict] = {}
+    try:
+        for lang in list_langs():
+            data = lang.to_dict()
+            code = data.get("code")
+            if code:
+                langs_lookup[code] = data
+    except Exception:
+        logger.exception("list_langs failed while building missing-stats page")
+
+    rows: list[dict] = []
+    for stat in stats:
+        langcode = stat.get("language_code") or ""
+        if not langcode:
+            continue
+        lang_data = langs_lookup.get(langcode, {})
+        autonym = lang_data.get("autonym") or "! autonym"
+        langname = lang_data.get("name") or "! langname"
+        exists = int(stat.get("available_title_count") or 0)
+        # PHP: $missing = (int)$length - (int)$exists;
+        missing_count = max(total - exists, 0)
+        rows.append(
+            {
+                "langcode": langcode,
+                "langname": langname,
+                "autonym": autonym,
+                "exists": exists,
+                "missing": missing_count,
+            }
+        )
+
+    return render_template(
+        "td/missing.html",
+        category=category,
+        total=total,
+        rows=rows,
+    )
+
+__all__ = ["bp_td"]

@@ -19,7 +19,7 @@ from .public.routes import (
     bp_auth,
     bp_cxtoken,
     bp_fixrefs,
-    bp_leaderboard,
+    bp_td,
     bp_main,
     bp_publish,
 )
@@ -90,7 +90,7 @@ def create_app(config_class: Type) -> Flask:
     # db_url = build_db_url(settings.database_data.to_dict())
 
     app.register_blueprint(bp_main)
-    app.register_blueprint(bp_leaderboard)
+    app.register_blueprint(bp_td)
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_cxtoken)
     app.register_blueprint(bp_publish)

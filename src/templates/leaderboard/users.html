@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class='col-lg-3 col-md-6 border_debug'>
-                <form method="get" action="{{ url_for('leaderboard.users', username=username) }}" class="border rounded"
+                <form method="get" action="{{ url_for('td.leaderboard.users', username=username) }}" class="border rounded"
                     id="form_board">
                     <div class='container mt-3'>
                         <div class='row g-1'>
@@ -79,7 +79,7 @@
                             {{ loop.index }}
                         </th>
                         <td>
-                            <a href="{{ url_for('leaderboard.langs', lang_code=page.lang) }}">
+                            <a href="{{ url_for('td.leaderboard.langs', lang_code=page.lang) }}">
                                 {{ page.lang }}
                             </a>
                         </td>
@@ -89,7 +89,7 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
+                            <a href="{{ url_for('td.leaderboard.index', camp=page.campaign) }}">
                                 {{ page.campaign }}
                             </a>
                         </td>

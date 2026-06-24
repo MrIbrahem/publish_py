@@ -1,5 +1,5 @@
 {% macro nav_link(icon, text, url, path) %}
-{% set _active = request and request.path and request.path.startswith(path) %}
+{% set _active = (request and request.path and request.path.startswith(path)) or (url | check_active_route) %}
 <a class="nav-link {{ 'active fw-bold' if _active }}" href="{{ url }}" {% if _active %}aria-current="page" {% endif %}
     title="{{ text }}">
     <i class="bi {{ icon }}"></i> {{ text }}
@@ -13,7 +13,8 @@
                 <img class='med-logo' width="40px" height="40px" src='{{ url_for('static', filename='favicon.svg')}}'
                     decoding='async' alt='Wiki Project Med Foundation logo'>
                 {% block navbar_brand %}
-                WikiProjectMed Tools
+                <span class='d-none d-sm-inline tool_title' title=''>WikiProjectMed Translation Dashboard</span>
+                <span class='d-inline d-sm-none tool_title'>WikiProjectMed TD</span>
                 {% endblock %}
             </a>
             <div class="d-flex align-items-center order-lg-last">
@@ -85,6 +86,7 @@
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
+                    <!-- <div class="d-flex align-items-center"> <span class="navbar-text"> -->
                     {% if current_user %}
                     {% set profile_href = url_for('td.leaderboard.users', username=current_user.username) %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
@@ -102,11 +104,16 @@
                     </li>
                     {% else %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
+                        <!-- <button type="submit" form="mainForm" formaction="{{ url_for('auth.login') }}" formmethod="get"
+                            formnovalidate class="nav-link py-2 px-0 px-lg-2 btn btn-link">
+                            <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2"></i> <span class="navtitles">Login</span>
+                        </button> -->
                         <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('auth.login') }}">
                             <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
                         </a>
                     </li>
                     {% endif %}
+                    <!-- </span> </div> -->
                 </ul>
             </div>
         </div>
