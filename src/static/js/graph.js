@@ -1,75 +1,4 @@
 
-function graph_js_only(_labels, _data, _id) {
-
-    var ticksStyle = {
-        fontColor: '#495057',
-        fontStyle: 'bold'
-    }
-
-    var mode = "index"
-    var intersect = true
-
-    var areaChartOptions = {
-        title: {
-          display: false,
-          text: 'Translation by month',
-        },
-        
-        maintainAspectRatio: false,
-        
-        tooltips: {
-            mode: mode,
-            intersect: intersect
-        },
-        hover: {
-            mode: mode,
-            intersect: intersect
-        },
-        legend: {
-            display: false
-        },
-        scales: {
-            yAxes: [{
-                display: true,
-                gridLines: {
-                    display: true,
-                },
-                ticks: ticksStyle
-            }],
-            xAxes: [{
-                display: true,
-                gridLines: {
-                    display: false
-                },
-                ticks: ticksStyle
-            }]
-        },
-        elements : {
-            line : {
-                borderDash : [0, 0]
-            }
-        },
-    }
-    var visitorsChart = $("#" + _id);
-    // إنشاء الرسم البياني
-    var myChart = new Chart(visitorsChart, {
-        data: {
-            labels: _labels,
-            datasets: [{
-                type: "line",
-                data: _data,
-                backgroundColor: "transparent",
-                borderColor: '#007bff',
-                pointBorderColor: "#007bff",
-                pointBackgroundColor: "#007bff",
-                pointRadius: 3,
-                fill: false
-            }]
-        },
-        options: areaChartOptions
-    })
-}
-
 function graph_js(_labels, _data, _id) {
 
     var ticksStyle = {
@@ -81,7 +10,7 @@ function graph_js(_labels, _data, _id) {
     var intersect = true
 
     var _data2 = _data.slice()
-    // remove last element in _data 
+    // remove last element in _data
     _data.pop()
     _data.push(null)
 
@@ -94,15 +23,15 @@ function graph_js(_labels, _data, _id) {
 
     var len = _labels.length - 2
     var colors = new Array(len).fill('#007bff').concat(new Array(2).fill('#bcbcbc'));
-    
+
     var areaChartOptions = {
         title: {
-          display: false,
-          text: 'Translation by month',
+            display: false,
+            text: 'Translation by month',
         },
-        
+
         maintainAspectRatio: false,
-        
+
         tooltips: {
             mode: mode,
             intersect: intersect
@@ -130,9 +59,9 @@ function graph_js(_labels, _data, _id) {
                 ticks: ticksStyle
             }]
         },
-        elements : {
-            line : {
-                borderDash : [0, 0]
+        elements: {
+            line: {
+                borderDash: [0, 0]
             }
         },
     }
@@ -150,7 +79,7 @@ function graph_js(_labels, _data, _id) {
                 pointBackgroundColor: "#007bff",
                 pointRadius: 3,
                 fill: false
-            },{
+            }, {
                 type: "line",
                 data: _data2,
                 backgroundColor: "transparent",
@@ -163,4 +92,8 @@ function graph_js(_labels, _data, _id) {
         },
         options: areaChartOptions
     })
+}
+
+function render_graph(chart, _id) {
+    graph_js(chart.labels, chart.counts, _id)
 }

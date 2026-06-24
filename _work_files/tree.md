@@ -56,8 +56,7 @@ src/
 │   │   ├── codes.js
 │   │   ├── color-modes.js
 │   │   ├── dark-mode.js
-│   │   ├── g.js
-│   │   ├── graph_api.js
+│   │   ├── graph.js
 │   │   ├── leadtable.js
 │   │   ├── main.js
 │   │   ├── publish_reports.js

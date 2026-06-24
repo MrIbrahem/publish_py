@@ -27,8 +27,8 @@
                 </div>
             </div>
             <div class='col-lg-3 col-md-6 border_debug'>
-                <form method="get" action="{{ url_for('td.leaderboard.users', username=username) }}" class="border rounded"
-                    id="form_board">
+                <form method="get" action="{{ url_for('td.leaderboard.users', username=username) }}"
+                    class="border rounded" id="form_board">
                     <div class='container mt-3'>
                         <div class='row g-1'>
                             <div class="col-6">
@@ -153,19 +153,9 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/g.js') }}"></script>
-<script src="{{ url_for('static', filename='js/graph_api.js') }}"></script>
-
+{% if chart_data %}
 <script>
-    function getFormData(d) {
-        const formData = $('#form_board').serializeArray();
-        formData.forEach(field => {
-            if (field.value.trim()) {
-                d[field.name] = field.value;
-            }
-        });
-        return d;
-    }
-    graph_js({{ chart_labels| tojson }}, {{ chart_counts| tojson }}, 'chart_69e6e6d5e7ab7')
+    render_graph(JSON.parse('{{ chart_data|tojson }}'), 'chart_69e6e6d5e7ab7');
 </script>
+{% endif %}
 {% endblock %}

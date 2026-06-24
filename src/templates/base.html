@@ -78,9 +78,10 @@
     <script src="{{ url_for('static', filename='js/dark-mode.js') }}"></script>
     <script src="{{ url_for('static', filename='js/card-tools.js') }}"></script>
 
-    {% block extra_js %}{% endblock %}
     <script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/to.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/graph.js') }}"></script>
+    {% block extra_js %}{% endblock %}
     <script>
         $(document).ready(function () {
 

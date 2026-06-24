@@ -40,6 +40,7 @@ def index() -> str:
     user_groups = [x.g_title for x in list_projects()]
 
     cat = campaign_to_cats.get(camp) if camp and camp != "all" else None
+
     chart_data_raw = get_leaderboard_chart_data(
         camp=camp if camp != "all" else None,
         cat=cat,
@@ -58,8 +59,10 @@ def index() -> str:
         months=months,
         user_groups=user_groups,
         form=form_data,
-        chart_labels=chart_labels,
-        chart_counts=chart_counts,
+        chart_data={
+            "labels": chart_labels,
+            "counts": chart_counts,
+        },
     )
 
 
@@ -91,8 +94,10 @@ def langs(lang_code: str) -> str:
         years=lang_years,
         words_total=words_total,
         pageviews_total=pageviews_total,
-        chart_labels=chart_labels,
-        chart_counts=chart_counts,
+        chart_data={
+            "labels": chart_labels,
+            "counts": chart_counts,
+        },
     )
 
 
@@ -130,8 +135,10 @@ def users(username: str) -> str:
         selected_year=selected_year,
         words_total=words_total,
         pageviews_total=pageviews_total,
-        chart_labels=chart_labels,
-        chart_counts=chart_counts,
+        chart_data={
+            "labels": chart_labels,
+            "counts": chart_counts,
+        },
     )
 
 

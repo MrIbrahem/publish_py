@@ -206,8 +206,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/g.js') }}"></script>
-<script src="{{ url_for('static', filename='js/graph_api.js') }}"></script>
 <script>
     // when page ready
     $(document).ready(async function () {
@@ -230,10 +228,6 @@
         }
         // ---
         function getFormData(d) {
-            // d['get'] = 'top_users';
-            // ---
-            // '/api/top_users&year=&user_group=&cat=';
-            // ---
             const formData = $('#leaderboard_filter').serializeArray();
             formData.forEach(field => {
                 if (field.value.trim()) {
@@ -290,7 +284,11 @@
                 data: 'user',
                 title: 'User',
                 render: function (data, type) {
-                    return `<a href="/leaderboard/users/${data}">${data}</a>`;
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('td.leaderboard.users', username='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${data}</a>`;
                 }
             },
             {
@@ -344,7 +342,11 @@
                 data: 'lang',
                 title: 'Language',
                 render: function (data, type, row, meta) {
-                    return `<a href="/leaderboard/langs/${data}">${row.lang_name}</a>`;
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('td.leaderboard.langs', lang_code='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${row.lang_name}</a>`;
                 }
             },
             {
@@ -365,7 +367,7 @@
             ]
         });
         // ---
-        graph_js({{ chart_labels|tojson }}, {{ chart_counts|tojson }}, 'chart09')
+        render_graph(JSON.parse('{{ chart_data|tojson }}'), 'chart09');
         // ---
     })
 </script>
