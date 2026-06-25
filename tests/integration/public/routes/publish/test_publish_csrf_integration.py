@@ -21,8 +21,8 @@ def csrf_app() -> Flask:
     from flask import Flask
     from flask_wtf.csrf import CSRFProtect
 
-    app = Flask(__name__)
-    app.config.update(
+    mock_app = Flask(__name__)
+    mock_app.config.update(
         {
             "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
             "WTF_CSRF_ENABLED": True,
@@ -32,28 +32,28 @@ def csrf_app() -> Flask:
             "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
         }
     )
-    app.url_map.strict_slashes = False
+    mock_app.url_map.strict_slashes = False
 
     from src.main_app.extensions import db
 
-    db.init_app(app)
+    db.init_app(mock_app)
 
-    with app.app_context():
+    with mock_app.app_context():
         real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
         db.metadata.create_all(db.engine, tables=real_tables)
 
-    csrf = CSRFProtect(app)
+    csrf = CSRFProtect(mock_app)
     from src.main_app.public.routes.publish.routes import bp_publish
 
-    app.register_blueprint(bp_publish)
+    mock_app.register_blueprint(bp_publish)
     csrf.exempt(bp_publish)
 
-    return app
+    return mock_app
 
 
 @pytest.fixture
 def csrf_client(csrf_app):
-    """Create a test client with CSRF protection enabled."""
+    """Create a test mock_client with CSRF protection enabled."""
     return csrf_app.test_client()
 
 
@@ -97,7 +97,7 @@ class TestPublishEndpointWithCSRF2:
         """Test that no access error returns 403 even with CSRF enabled."""
         with (
             patch("src.main_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
+            patch("src.main_app.public.routes.publish.worker.to_do") as _mock_to_do,
             patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
@@ -128,7 +128,7 @@ class BasePublishTest:
     """Base class with shared fixtures for publish endpoint tests."""
 
     @pytest.fixture(autouse=True)
-    def mock_get_campaign_category(mocker):
+    def mock_get_campaign_category(self, mocker):
         with patch("src.main_app.public.routes.publish.to_db.get_campaign_category") as mocked:
             mocked.return_value = None
             yield mocked
@@ -194,8 +194,8 @@ class BasePublishTest:
             }
 
     # ── helper ──────────────────────────────────────────────────────────────
-    def _post(self, client, payload: dict):
-        return client.post(
+    def _post(self, mock_client, payload: dict):
+        return mock_client.post(
             "/publish",
             data=json.dumps(payload),
             content_type="application/json",

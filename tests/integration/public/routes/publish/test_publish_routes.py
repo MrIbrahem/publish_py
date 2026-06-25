@@ -44,15 +44,15 @@ def mock_user_token():
 class TestPublishPreflight:
     """Integration tests for the publish preflight endpoint."""
 
-    def test_preflight_returns_200(self, mock_validate_access, client: FlaskClient):
+    def test_preflight_returns_200(self, mock_validate_access, mock_client: FlaskClient):
         """Test that OPTIONS request returns 200."""
-        response = client.options("/publish/")
+        response = mock_client.options("/publish/")
 
         assert response.status_code == 200
 
-    def test_preflight_sets_cors_headers(self, mock_validate_access, client: FlaskClient):
+    def test_preflight_sets_cors_headers(self, mock_validate_access, mock_client: FlaskClient):
         """Test that preflight sets correct CORS headers."""
-        response = client.options("/publish/")
+        response = mock_client.options("/publish/")
 
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
@@ -62,22 +62,22 @@ class TestPublishPreflight:
 class TestPublishPost:
     """Integration tests for the publish POST endpoint."""
 
-    def test_publish_requires_post_method(self, mock_validate_access, client: FlaskClient):
+    def test_publish_requires_post_method(self, mock_validate_access, mock_client: FlaskClient):
         """Test that GET request to publish endpoint is not allowed."""
-        response = client.get("/publish/")
+        response = mock_client.get("/publish/")
 
         # Should return 405 Method Not Allowed
         assert response.status_code == 405
 
-    def test_publish_no_data_returns_error(self, mock_validate_access, client: FlaskClient):
+    def test_publish_no_data_returns_error(self, mock_validate_access, mock_client: FlaskClient):
         """Test that empty request data returns error."""
 
-        response = client.post("/publish/", data={})
+        response = mock_client.post("/publish/", data={})
 
         # Should handle empty data gracefully
         assert response.status_code == 400
 
-    def test_publish_missing_user_token_returns_403(self, mock_validate_access, client: FlaskClient):
+    def test_publish_missing_user_token_returns_403(self, mock_validate_access, mock_client: FlaskClient):
         """Test that missing user token returns 403."""
 
         with patch(
@@ -85,7 +85,7 @@ class TestPublishPost:
             return_value=None,
         ) as mock_get_token:
 
-            response = client.post(
+            response = mock_client.post(
                 "/publish/",
                 data={
                     "translate_type": "lead",
@@ -100,13 +100,13 @@ class TestPublishPost:
             assert "error" in data
             assert response.status_code == 403
 
-    def test_publish_with_valid_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
+    def test_publish_with_valid_data(self, mock_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test publishing with valid data."""
 
         with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success", "edit": {"newrevid": 12345}}
 
-            response = client.post(
+            response = mock_client.post(
                 "/publish/",
                 data={
                     "translate_type": "lead",
@@ -127,13 +127,13 @@ class TestPublishPost:
 class TestPublishFormData:
     """Integration tests for publish form data handling."""
 
-    def test_publish_accepts_form_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
+    def test_publish_accepts_form_data(self, mock_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test that publish accepts form data."""
 
         with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success"}
 
-            response = client.post(
+            response = mock_client.post(
                 "/publish/",
                 data={
                     "translate_type": "lead",
@@ -146,13 +146,13 @@ class TestPublishFormData:
 
             assert response.status_code == 200
 
-    def test_publish_accepts_json_data(self, mock_user_token, mock_validate_access, client: FlaskClient):
+    def test_publish_accepts_json_data(self, mock_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test that publish accepts JSON data."""
 
         with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success"}
 
-            response = client.post(
+            response = mock_client.post(
                 "/publish/",
                 json={
                     "translate_type": "lead",
@@ -172,13 +172,13 @@ class TestPublishFormData:
 class TestPublishCaptcha:
     """Integration tests for captcha handling in publish."""
 
-    def test_publish_with_captcha_params(self, mock_user_token, mock_validate_access, client: FlaskClient):
+    def test_publish_with_captcha_params(self, mock_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test publishing with captcha parameters."""
 
         with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
             mock_process.return_value = {"result": "success"}
 
-            response = client.post(
+            response = mock_client.post(
                 "/publish/",
                 data={
                     "translate_type": "lead",
@@ -197,9 +197,9 @@ class TestPublishCaptcha:
 class TestPublishRouteIntegration:
     """Integration tests for publish route."""
 
-    def test_publish_requires_post_method(self, mock_validate_access, client):
+    def test_publish_requires_post_method(self, mock_validate_access, mock_client):
         """Test that publish route requires POST method."""
-        response = client.get("/publish")
+        response = mock_client.get("/publish")
 
         # Should return 404 (not found) or 405 (method not allowed)
         assert response.status_code == 404

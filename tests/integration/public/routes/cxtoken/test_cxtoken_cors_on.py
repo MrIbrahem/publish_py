@@ -16,7 +16,7 @@ ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
 
 @pytest.fixture
-def app() -> Flask:
+def mock_app() -> Flask:
     """Create a test Flask application with CORS enabled."""
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", f"{ALLOWED_DOMAIN},mdwikicx.toolforge.org")
@@ -36,17 +36,17 @@ def app() -> Flask:
 
 
 @pytest.fixture
-def client(app: Flask) -> FlaskClient:
+def mock_client(mock_app: Flask) -> FlaskClient:
     """Create a test client."""
-    return app.test_client()
+    return mock_app.test_client()
 
 
 class TestCheckCorsOnCxtokenGet:
     """Tests for @check_cors decorator on cxtoken GET route with CORS_ENABLED."""
 
-    def test_get_disallowed_origin_returns_403(self, mock_is_denied, client):
+    def test_get_disallowed_origin_returns_403(self, mock_is_denied, mock_client):
         """GET from disallowed origin returns 403."""
-        response = client.get(
+        response = mock_client.get(
             "/cxtoken?wiki=en&user=TestUser",
             headers={"Origin": "https://evil.com"},
         )
@@ -55,7 +55,7 @@ class TestCheckCorsOnCxtokenGet:
         assert data["error"]["code"] == "access_denied"
         assert "authorized domains" in data["error"]["info"]
 
-    def test_get_allowed_origin_proceeds(self, mock_is_allowed_medwiki, client):
+    def test_get_allowed_origin_proceeds(self, mock_is_allowed_medwiki, mock_client):
         """GET from allowed origin passes CORS check and reaches handler."""
         with (
             patch(
@@ -63,7 +63,7 @@ class TestCheckCorsOnCxtokenGet:
                 return_value=None,
             ),
         ):
-            response = client.get(
+            response = mock_client.get(
                 "/cxtoken?wiki=en&user=UnknownUser",
                 headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
             )
@@ -72,14 +72,14 @@ class TestCheckCorsOnCxtokenGet:
             assert data["error"]["code"] == "no access"
             assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
 
-    def test_get_no_origin_returns_403(self, mock_is_denied, client):
+    def test_get_no_origin_returns_403(self, mock_is_denied, mock_client):
         """GET with no Origin header returns 403."""
-        response = client.get("/cxtoken?wiki=en&user=TestUser")
+        response = mock_client.get("/cxtoken?wiki=en&user=TestUser")
         assert response.status_code == 403
         data = response.get_json()
         assert data["error"]["code"] == "access_denied"
 
-    def test_get_allowed_origin_returns_cxtoken(self, mock_is_allowed_medwiki, client):
+    def test_get_allowed_origin_returns_cxtoken(self, mock_is_allowed_medwiki, mock_client):
         """GET from allowed origin returns cxtoken on success."""
         with (
             patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
@@ -90,7 +90,7 @@ class TestCheckCorsOnCxtokenGet:
             mock_get_token.return_value = mock_token
             mock_get_cxtoken.return_value = {"cxtoken": "test_cx_token_123"}
 
-            response = client.get(
+            response = mock_client.get(
                 "/cxtoken?wiki=en&user=TestUser",
                 headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
             )
@@ -103,9 +103,9 @@ class TestCheckCorsOnCxtokenGet:
 class TestCheckCorsOnCxtokenOptions:
     """Tests for @check_cors decorator on cxtoken OPTIONS route with CORS_ENABLED."""
 
-    def test_options_allowed_origin_returns_200(self, mock_is_allowed_medwiki, client):
+    def test_options_allowed_origin_returns_200(self, mock_is_allowed_medwiki, mock_client):
         """OPTIONS preflight from allowed origin returns 200 with CORS headers."""
-        response = client.options(
+        response = mock_client.options(
             "/cxtoken",
             headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
         )
@@ -113,9 +113,9 @@ class TestCheckCorsOnCxtokenOptions:
         assert "Access-Control-Allow-Methods" in response.headers
         assert response.headers["Access-Control-Allow-Origin"] == f"https://{ALLOWED_DOMAIN}"
 
-    def test_options_disallowed_origin_returns_403(self, mock_is_denied, client):
+    def test_options_disallowed_origin_returns_403(self, mock_is_denied, mock_client):
         """OPTIONS preflight from disallowed origin returns 403."""
-        response = client.options(
+        response = mock_client.options(
             "/cxtoken",
             headers={"Origin": "https://evil.com"},
         )
@@ -123,22 +123,22 @@ class TestCheckCorsOnCxtokenOptions:
         data = response.get_json()
         assert data["error"]["code"] == "access_denied"
 
-    def test_options_no_origin_returns_403(self, mock_is_denied, client):
+    def test_options_no_origin_returns_403(self, mock_is_denied, mock_client):
         """OPTIONS preflight with no Origin header returns 403."""
-        response = client.options("/cxtoken")
+        response = mock_client.options("/cxtoken")
         assert response.status_code == 403
 
 
 class TestCxtokenCorsOnIntegration:
     """Integration tests using real is_allowed behavior with CORS_ENABLED."""
 
-    def test_get_same_origin_passes_real_cors(self, app, client):
+    def test_get_same_origin_passes_real_cors(self, mock_app, mock_client):
         """GET from same origin passes real CORS check."""
         with patch(
             "src.main_app.public.routes.cxtoken.routes.get_user_token_by_username",
             return_value=None,
         ):
-            response = client.get(
+            response = mock_client.get(
                 "/cxtoken?wiki=en&user=UnknownUser",
                 base_url=f"https://{ALLOWED_DOMAIN}",
                 headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
@@ -147,9 +147,9 @@ class TestCxtokenCorsOnIntegration:
             data = response.get_json()
             assert data["error"]["code"] == "no access"
 
-    def test_get_disallowed_origin_blocked_real_cors(self, app, client):
+    def test_get_disallowed_origin_blocked_real_cors(self, mock_app, mock_client):
         """GET from disallowed origin is blocked by real CORS check."""
-        response = client.get(
+        response = mock_client.get(
             "/cxtoken?wiki=en&user=TestUser",
             base_url=f"https://{ALLOWED_DOMAIN}",
             headers={"Origin": "https://evil.com"},
@@ -158,9 +158,9 @@ class TestCxtokenCorsOnIntegration:
         data = response.get_json()
         assert data["error"]["code"] == "access_denied"
 
-    def test_options_same_origin_passes_real_cors(self, app, client):
+    def test_options_same_origin_passes_real_cors(self, mock_app, mock_client):
         """OPTIONS from same origin passes real CORS check."""
-        response = client.options(
+        response = mock_client.options(
             "/cxtoken",
             base_url=f"https://{ALLOWED_DOMAIN}",
             headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
@@ -168,9 +168,9 @@ class TestCxtokenCorsOnIntegration:
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
 
-    def test_options_from_allowed_cross_origin_passes_real_cors(self, app, client):
+    def test_options_from_allowed_cross_origin_passes_real_cors(self, mock_app, mock_client):
         """OPTIONS from allowed cross-origin domain passes real CORS check."""
-        response = client.options(
+        response = mock_client.options(
             "/cxtoken",
             base_url=f"https://{ALLOWED_DOMAIN}",
             headers={"Origin": "https://mdwikicx.toolforge.org"},

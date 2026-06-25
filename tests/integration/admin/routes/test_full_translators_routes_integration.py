@@ -16,9 +16,9 @@ from flask.testing import FlaskClient
 class TestFullTranslatorsDashboard:
     """Integration tests for full translators dashboard."""
 
-    def test_full_translators_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_full_translators_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that full translators dashboard requires admin access."""
-        response = client.get("/admin/full_translators/")
+        response = mock_client.get("/admin/full_translators/")
 
         # With mock_admin_required, should render successfully
         assert response.status_code == 200
@@ -41,9 +41,9 @@ class TestFullTranslatorsDashboard:
 class TestAddFullTranslator:
     """Integration tests for adding full translators."""
 
-    def test_add_full_translator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_add_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that adding full translator requires admin access."""
-        response = client.post("/admin/full_translators/add", data={"username": "NewTranslator"})
+        response = mock_client.post("/admin/full_translators/add", data={"username": "NewTranslator"})
 
         assert response.status_code == 302
         assert response.location == "/admin/full_translators/"
@@ -78,9 +78,9 @@ class TestAddFullTranslator:
 class TestDeleteFullTranslator:
     """Integration tests for deleting full translators."""
 
-    def test_delete_full_translator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_delete_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deleting full translator requires admin access."""
-        response = client.post("/admin/full_translators/1/delete")
+        response = mock_client.post("/admin/full_translators/1/delete")
 
         assert response.status_code == 302
         assert response.location == "/admin/full_translators/"
@@ -103,16 +103,16 @@ class TestDeleteFullTranslator:
 class TestActivateDeactivateFullTranslator:
     """Integration tests for activating/deactivating full translators."""
 
-    def test_activate_full_translator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_activate_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that activating full translator requires admin access."""
-        response = client.post("/admin/full_translators/1/activate")
+        response = mock_client.post("/admin/full_translators/1/activate")
 
         assert response.status_code == 302
         assert response.location == "/admin/full_translators/"
 
-    def test_deactivate_full_translator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_deactivate_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deactivating full translator requires admin access."""
-        response = client.post("/admin/full_translators/1/deactivate")
+        response = mock_client.post("/admin/full_translators/1/deactivate")
 
         assert response.status_code == 302
         assert response.location == "/admin/full_translators/"

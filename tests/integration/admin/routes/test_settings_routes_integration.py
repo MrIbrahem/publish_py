@@ -16,9 +16,9 @@ from flask.testing import FlaskClient
 class TestSettingsDashboard:
     """Integration tests for settings dashboard."""
 
-    def test_settings_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_settings_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that settings dashboard requires admin access."""
-        response = client.get("/admin/settings/")
+        response = mock_client.get("/admin/settings/")
 
         # With mock_admin_required, should render successfully
         assert response.status_code == 200
@@ -43,9 +43,9 @@ class TestSettingsDashboard:
 class TestCreateSetting:
     """Integration tests for creating settings."""
 
-    def test_create_setting_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_create_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that creating setting requires admin access."""
-        response = client.post(
+        response = mock_client.post(
             "/admin/settings/create",
             data={"key": "new_setting", "title": "New Setting", "value_type": "boolean"},
         )
@@ -94,9 +94,9 @@ class TestCreateSetting:
 class TestUpdateSetting:
     """Integration tests for updating settings."""
 
-    def test_update_setting_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_update_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that updating settings requires admin access."""
-        response = client.post("/admin/settings/update", data={"setting_test": "value"})
+        response = mock_client.post("/admin/settings/update", data={"setting_test": "value"})
 
         assert response.status_code == 302
         assert response.location == "/admin/settings/"

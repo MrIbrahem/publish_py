@@ -16,17 +16,17 @@ from flask.testing import FlaskClient
 class TestAuthLogin:
     """Integration tests for the /login route."""
 
-    def test_login_redirects_when_oauth_not_configured(self, app: Flask, client: FlaskClient):
+    def test_login_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login redirects to index when OAuth is not configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
 
-            response = client.get("/auth/login", follow_redirects=False)
+            response = mock_client.get("/auth/login", follow_redirects=False)
 
             assert response.status_code == 302
             assert "/" in response.location or "error=oauth-not-configured" in response.location
 
-    def test_login_rate_limit_blocks_excessive_requests(self, app: Flask, client: FlaskClient):
+    def test_login_rate_limit_blocks_excessive_requests(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login rate limit blocks excessive requests."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
@@ -51,12 +51,12 @@ class TestAuthLogin:
 
                     # Make 6 requests to exceed rate limit
                     for _ in range(6):
-                        response = client.get("/auth/login", follow_redirects=False)
+                        response = mock_client.get("/auth/login", follow_redirects=False)
 
                     # After rate limit exceeded, should redirect with warning
                     assert response.status_code == 302  # in [302, 429]
 
-    def test_login_starts_oauth_flow(self, app: Flask, client: FlaskClient):
+    def test_login_starts_oauth_flow(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login starts OAuth flow when properly configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
@@ -69,7 +69,7 @@ class TestAuthLogin:
                 with patch("src.main_app.public.auth.routes.login_rate_limiter") as mock_limiter:
                     mock_limiter.allow.return_value = True
 
-                    response = client.get("/auth/login", follow_redirects=False)
+                    response = mock_client.get("/auth/login", follow_redirects=False)
 
                     # Should redirect to OAuth provider
                     assert response.status_code == 302
@@ -79,16 +79,16 @@ class TestAuthLogin:
 class TestAuthCallback:
     """Integration tests for the /callback route."""
 
-    def test_callback_redirects_when_oauth_not_configured(self, app: Flask, client: FlaskClient):
+    def test_callback_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that callback redirects when OAuth is not configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
 
-            response = client.get("/auth/callback?oauth_verifier=123&state=abc", follow_redirects=False)
+            response = mock_client.get("/auth/callback?oauth_verifier=123&state=abc", follow_redirects=False)
 
             assert response.status_code == 302
 
-    def test_callback_validates_state_token(self, app: Flask, client: FlaskClient):
+    def test_callback_validates_state_token(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that callback validates state token."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
@@ -104,7 +104,7 @@ class TestAuthCallback:
                 mock_limiter.allow.return_value = True
 
                 # Missing state should cause redirect
-                response = client.get("/auth/callback?oauth_verifier=123", follow_redirects=False)
+                response = mock_client.get("/auth/callback?oauth_verifier=123", follow_redirects=False)
 
                 assert response.status_code == 302
                 assert "error" in response.location
@@ -114,23 +114,23 @@ class TestAuthCallback:
 class TestAuthLogout:
     """Integration tests for the /logout route."""
 
-    def test_logout_clears_session(self, app: Flask, client: FlaskClient):
+    def test_logout_clears_session(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that logout clears the session."""
-        with client.session_transaction() as sess:
+        with mock_client.session_transaction() as sess:
             sess["uid"] = 12345
             sess["username"] = "TestUser"
 
-        response = client.get("/auth/logout", follow_redirects=False)
+        response = mock_client.get("/auth/logout", follow_redirects=False)
 
         assert response.status_code == 302
 
-        with client.session_transaction() as sess:
+        with mock_client.session_transaction() as sess:
             assert "uid" not in sess
             assert "username" not in sess
 
-    def test_logout_deletes_cookie(self, app: Flask, client: FlaskClient):
+    def test_logout_deletes_cookie(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that logout deletes the authentication cookie."""
-        response = client.get("/auth/logout", follow_redirects=False)
+        response = mock_client.get("/auth/logout", follow_redirects=False)
 
         assert response.status_code == 302
         # Cookie should be set to delete
@@ -142,17 +142,17 @@ class TestAuthLogout:
 class TestAuthRouteIntegration:
     """Integration tests for auth routes."""
 
-    def test_login_route_exists(self, client):
+    def test_login_route_exists(self, mock_client):
         """Test that login route is accessible."""
-        response = client.get("/auth/login")
+        response = mock_client.get("/auth/login")
 
         # Route may return various status codes depending on configuration
         # Note: 500 is not allowed - server errors should fail the test
         assert response.status_code == 302  # in [200, 302, 404]
 
-    def test_logout_route_exists(self, client):
+    def test_logout_route_exists(self, mock_client):
         """Test that logout route is accessible."""
-        response = client.get("/auth/logout")
+        response = mock_client.get("/auth/logout")
 
         # Should redirect after logout or succeed
         # Note: 500 is not allowed - server errors should fail the test

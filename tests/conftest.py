@@ -100,21 +100,9 @@ def mock_app() -> Generator[Flask, Any, None]:  # noqa: UP043
     with application.app_context():
         yield application
 
-@pytest.fixture(scope="session")
-def app() -> Generator[Flask]:
-    """Create and configure a test Flask application.
-
-    Yields:
-        Flask application configured for testing.
-    """
-    app = create_app(TestingConfig)
-
-    with app.app_context():
-        yield app
-
 
 @pytest.fixture
-def client(app: Flask) -> FlaskClient:
+def mock_client(mock_app: Flask) -> FlaskClient:
     """Create a test client for the app.
 
     Args:
@@ -123,11 +111,11 @@ def client(app: Flask) -> FlaskClient:
     Returns:
         Test client for making HTTP requests.
     """
-    return app.test_client()
+    return mock_app.test_client()
 
 
 @pytest.fixture
-def runner(app):
+def runner(mock_app):
     """Create a test CLI runner for the app.
 
     Args:
@@ -136,11 +124,11 @@ def runner(app):
     Returns:
         Test CLI runner for invoking commands.
     """
-    return app.test_cli_runner()
+    return mock_app.test_cli_runner()
 
 
 @pytest.fixture
-def auth_client(app):
+def auth_client(mock_app):
     """Create an authenticated test client.
 
     This fixture provides a test client with a logged-in user session.
@@ -152,7 +140,7 @@ def auth_client(app):
     Returns:
         Authenticated test client.
     """
-    client = app.test_client()
+    client = mock_app.test_client()
 
     with client.session_transaction() as sess:
         sess["uid"] = 12345

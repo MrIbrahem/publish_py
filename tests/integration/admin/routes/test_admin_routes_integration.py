@@ -18,9 +18,9 @@ from src.main_app.shared.auth import CurrentUser
 class TestAdminIndex:
     """Integration tests for the admin index route."""
 
-    def test_admin_index_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_admin_index_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that admin index redirects to last dashboard."""
-        response = client.get("/admin/")
+        response = mock_client.get("/admin/")
 
         assert response.status_code == 302
         assert response.location.endswith("/admin/last")
@@ -57,35 +57,35 @@ class TestAdminSidebar:
 class TestAdminBlueprints:
     """Integration tests for registered admin blueprints."""
 
-    def test_coordinators_routes_registered(self, mock_admin_required, client: FlaskClient):
+    def test_coordinators_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that coordinators routes are registered."""
         # Check that the coordinators route exists
-        response = client.get("/admin/coordinators/")
+        response = mock_client.get("/admin/coordinators/")
 
         # Route should exist and be accessible with mocked admin
         assert response.status_code == 200
 
-    def test_full_translators_routes_registered(self, mock_admin_required, client: FlaskClient):
+    def test_full_translators_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that full translators routes are registered."""
-        response = client.get("/admin/full_translators/")
+        response = mock_client.get("/admin/full_translators/")
 
         assert response.status_code == 200
 
-    def test_users_no_inprocess_routes_registered(self, mock_admin_required, client: FlaskClient):
+    def test_users_no_inprocess_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that users no inprocess routes are registered."""
-        response = client.get("/admin/users_no_inprocess/")
+        response = mock_client.get("/admin/users_no_inprocess/")
 
         assert response.status_code == 200
 
-    def test_language_settings_routes_registered(self, mock_admin_required, client: FlaskClient):
+    def test_language_settings_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that language settings routes are registered."""
-        response = client.get("/admin/language_settings/")
+        response = mock_client.get("/admin/language_settings/")
 
         assert response.status_code == 200
 
-    def test_settings_routes_registered(self, mock_admin_required, client: FlaskClient):
+    def test_settings_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that settings routes are registered."""
-        response = client.get("/admin/settings/")
+        response = mock_client.get("/admin/settings/")
 
         assert response.status_code == 200
 
@@ -94,9 +94,9 @@ class TestAdminBlueprints:
 class TestAdminRouteAccess:
     """Integration tests for admin route access control."""
 
-    def test_anonymous_user_redirected(self, client: FlaskClient):
+    def test_anonymous_user_redirected(self, mock_client: FlaskClient):
         """Test that anonymous users are redirected from admin routes."""
-        response = client.get("/admin/", follow_redirects=False)
+        response = mock_client.get("/admin/", follow_redirects=False)
 
         # Should redirect to login
         assert response.status_code == 302
