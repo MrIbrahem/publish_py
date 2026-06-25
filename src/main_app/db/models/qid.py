@@ -31,6 +31,9 @@ class QidRecord(db.Model):
     title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
     def __init__(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
         self.validate()
 
@@ -73,6 +76,9 @@ class QidOthersRecord(db.Model):
     title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
     def __init__(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
         self.validate()
 
