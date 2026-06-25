@@ -15,7 +15,7 @@ def _make_response_with_headers() -> MagicMock:
 
 
 class TestCheckCorsDecoratedWithCorsDisabled:
-    def test_basics_empty_headers(self, mocker, mock_app):
+    def test_basics_empty_headers(self, mocker, app):
         response = MagicMock(
             headers={
                 "Referer": "",
@@ -23,7 +23,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
             },
             host_url="",
         )
-        mock_app.config["CORS_DISABLED"] = True
+        app.config["CORS_DISABLED"] = True
         mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
@@ -31,7 +31,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
 
         assert result.headers["Access-Control-Allow-Origin"] == "*"
 
-    def test_with_headers(self, mocker, mock_app):
+    def test_with_headers(self, mocker, app):
         response = MagicMock(
             headers={
                 "Referer": "https://google.com",
@@ -39,7 +39,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
             },
             host_url="https://books.google.com",
         )
-        mock_app.config["CORS_DISABLED"] = True
+        app.config["CORS_DISABLED"] = True
         mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
@@ -52,7 +52,7 @@ class TestCheckCorsDecoratedWithCorsDisabled:
 
 
 class TestCheckCorsDecoratedWithCorsEnabled:
-    def test_no_allowed_domains(self, mocker, mock_app):
+    def test_no_allowed_domains(self, mocker, app):
         response = MagicMock(
             headers={
                 "Referer": "https://com.net",
@@ -60,7 +60,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             },
             host_url="http://localhost",
         )
-        mock_app.config["CORS_DISABLED"] = False
+        app.config["CORS_DISABLED"] = False
         mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
         mocker.patch("src.main_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=[])
 
@@ -70,7 +70,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         assert result.status_code == 403
         assert headers == {"Content-Length": "110", "Content-Type": "application/json"}
 
-    def test_basics_403(self, mocker, mock_app):
+    def test_basics_403(self, mocker, app):
         response = MagicMock(
             headers={
                 "Referer": "https://google.com",
@@ -78,7 +78,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             },
             host_url="https://books.google.com",
         )
-        mock_app.config["CORS_DISABLED"] = False
+        app.config["CORS_DISABLED"] = False
         mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
 
         decorated = check_cors(lambda: _make_response_with_headers())
@@ -87,7 +87,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         headers = dict(result.headers.items())
         assert headers == {"Content-Length": "110", "Content-Type": "application/json"}
 
-    def test_basics_200(self, mocker, mock_app):
+    def test_basics_200(self, mocker, app):
         response = MagicMock(
             headers={
                 "Referer": "https://google.com/test#new",
@@ -95,7 +95,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             },
             host_url="https://ar.wikipedia.org",
         )
-        mock_app.config["CORS_DISABLED"] = False
+        app.config["CORS_DISABLED"] = False
         mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
         mocker.patch("src.main_app.shared.core.cors.is_allowed_checker._get_allowed_domains", return_value=["z.com"])
 
@@ -104,7 +104,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         headers = dict(result.headers.items())
         assert headers == {"Access-Control-Allow-Origin": "ftp://z.com"}
 
-    def test_basics_same_host_url(self, mocker, mock_app):
+    def test_basics_same_host_url(self, mocker, app):
         response = MagicMock(
             headers={
                 "Referer": "https://com.net",
@@ -112,7 +112,7 @@ class TestCheckCorsDecoratedWithCorsEnabled:
             },
             host_url="http://localhost",
         )
-        mock_app.config["CORS_DISABLED"] = False
+        app.config["CORS_DISABLED"] = False
         mocker.patch("src.main_app.shared.core.cors._load_request", return_value=response)
         mocker.patch(
             "src.main_app.shared.core.cors.is_allowed_checker._get_allowed_domains",

@@ -35,8 +35,8 @@ class MockModel(db.Model):
                 setattr(self, key, value)
 
 
-def test_base_model_to_dict(mock_app: Flask) -> None:
-    with mock_app.app_context():
+def test_base_model_to_dict(app: Flask) -> None:
+    with app.app_context():
         now = datetime(2025, 1, 1, 12, 0, 0)
         obj = MockModel(id=1, name="test", created_at=now)
 

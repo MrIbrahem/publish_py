@@ -21,8 +21,8 @@ def csrf_app() -> Flask:
     from flask import Flask
     from flask_wtf.csrf import CSRFProtect
 
-    mock_app = Flask(__name__)
-    mock_app.config.update(
+    app = Flask(__name__)
+    app.config.update(
         {
             "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
             "WTF_CSRF_ENABLED": True,
@@ -32,23 +32,23 @@ def csrf_app() -> Flask:
             "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
         }
     )
-    mock_app.url_map.strict_slashes = False
+    app.url_map.strict_slashes = False
 
     from src.main_app.extensions import db
 
-    db.init_app(mock_app)
+    db.init_app(app)
 
-    with mock_app.app_context():
+    with app.app_context():
         real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
         db.metadata.create_all(db.engine, tables=real_tables)
 
-    csrf = CSRFProtect(mock_app)
+    csrf = CSRFProtect(app)
     from src.main_app.public.routes.publish.routes import bp_publish
 
-    mock_app.register_blueprint(bp_publish)
+    app.register_blueprint(bp_publish)
     csrf.exempt(bp_publish)
 
-    return mock_app
+    return app
 
 
 @pytest.fixture

@@ -18,15 +18,15 @@ def mock_request(mocker):
 
     mocker.patch("src.main_app.shared.core.cors.request", mock_req)
 
-    mock_app = MagicMock()
-    mock_app.config = {"CORS_DISABLED": False}
-    mocker.patch("src.main_app.shared.core.cors.is_allowed_checker.current_app", mock_app)
+    app = MagicMock()
+    app.config = {"CORS_DISABLED": False}
+    mocker.patch("src.main_app.shared.core.cors.is_allowed_checker.current_app", app)
 
     mock_settings = MagicMock()
     mock_settings.cors.allowed_domains = ["trusted.com", "api.partner.net"]
     mocker.patch("src.main_app.shared.core.cors.is_allowed_checker.settings", mock_settings)
 
-    return mock_req, mock_app
+    return mock_req, app
 
 
 class TestCORSValidation:
@@ -51,8 +51,8 @@ class TestCORSValidation:
 
     def test_disabled_cors_bypass(self, mock_request):
         """Should allow everything if CORS_DISABLED is True."""
-        mock_req, mock_app = mock_request
-        mock_app.config["CORS_DISABLED"] = True
+        mock_req, app = mock_request
+        app.config["CORS_DISABLED"] = True
         mock_req.headers = {"Origin": "https://unknown-site.com"}
 
         # When CORS is disabled, returns origin or "*"

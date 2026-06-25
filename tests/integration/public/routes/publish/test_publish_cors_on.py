@@ -16,7 +16,7 @@ ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
 
 @pytest.fixture
-def mock_app() -> Flask:
+def app() -> Flask:
     """Create a test Flask application with CORS enabled."""
     import os
 
@@ -38,9 +38,9 @@ def mock_app() -> Flask:
 
 
 @pytest.fixture
-def mock_client(mock_app: Flask) -> FlaskClient:
+def mock_client(app: Flask) -> FlaskClient:
     """Create a test client."""
-    return mock_app.test_client()
+    return app.test_client()
 
 
 class TestCheckCorsOnPublish:
@@ -208,7 +208,7 @@ class TestValidateAccessOnPublish:
 class TestPublishCorsOnIntegration:
     """Integration tests using real is_allowed behavior with CORS_ENABLED."""
 
-    def test_options_same_origin_passes_real_cors(self, mock_app, mock_client):
+    def test_options_same_origin_passes_real_cors(self, app, mock_client):
         """OPTIONS from same origin passes real CORS check."""
         response = mock_client.options(
             "/publish/",
@@ -218,7 +218,7 @@ class TestPublishCorsOnIntegration:
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
 
-    def test_options_disallowed_origin_blocked_real_cors(self, mock_app, mock_client):
+    def test_options_disallowed_origin_blocked_real_cors(self, app, mock_client):
         """OPTIONS from disallowed origin is blocked by real CORS check."""
         response = mock_client.options(
             "/publish/",
@@ -229,7 +229,7 @@ class TestPublishCorsOnIntegration:
         data = response.get_json()
         assert data["error"]["code"] == "access_denied"
 
-    def test_options_from_allowed_cross_origin_passes_real_cors(self, mock_app, mock_client):
+    def test_options_from_allowed_cross_origin_passes_real_cors(self, app, mock_client):
         """OPTIONS from allowed cross-origin domain passes real CORS check."""
         response = mock_client.options(
             "/publish/",

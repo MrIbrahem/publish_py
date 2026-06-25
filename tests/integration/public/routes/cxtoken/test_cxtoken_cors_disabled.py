@@ -10,7 +10,7 @@ from src.main_app.config import TestingConfig
 
 
 @pytest.fixture
-def mock_app() -> Flask:
+def app() -> Flask:
     """Create a test Flask application."""
     # Environment variables are set in conftest.py
     app = Flask(__name__)
@@ -30,9 +30,9 @@ def mock_app() -> Flask:
 
 
 @pytest.fixture
-def mock_client(mock_app: Flask) -> FlaskClient:
+def mock_client(app: Flask) -> FlaskClient:
     """Create a test client."""
-    return mock_app.test_client()
+    return app.test_client()
 
 
 class TestCxtokenEndpoint:

@@ -15,7 +15,7 @@ def _make_response_with_headers():
 
 
 class TestValidateAccessControlAllowOrigin:
-    def test_allowed_domain_sets_header(self, mock_app, mock_load_request, mock_is_allowed, mock_check_secret):
+    def test_allowed_domain_sets_header(self, app, mock_load_request, mock_is_allowed, mock_check_secret):
         mock_is_allowed.return_value = "trusted.com"
         response = _make_response_with_headers()
         decorated = validate_access(lambda: response)
@@ -25,7 +25,7 @@ class TestValidateAccessControlAllowOrigin:
         assert result.headers["Access-Control-Allow-Origin"] == "https://trusted.com"
 
     def test_secret_code_valid_and_allowed_domain_uses_allowed_domain_in_header(
-        self, mock_app, mock_load_request, mock_is_allowed, mock_check_secret
+        self, app, mock_load_request, mock_is_allowed, mock_check_secret
     ):
         mock_is_allowed.return_value = "partner.net"
         mock_check_secret.return_value = "secret-host.com"
@@ -36,7 +36,7 @@ class TestValidateAccessControlAllowOrigin:
 
         assert result.headers["Access-Control-Allow-Origin"] == "https://partner.net"
 
-    def test_denied_returns_403_without_cors_header(self, mock_app, mock_load_request, mock_is_denied, mock_check_secret):
+    def test_denied_returns_403_without_cors_header(self, app, mock_load_request, mock_is_denied, mock_check_secret):
         mock_check_secret.return_value = None
 
         result = validate_access(lambda: _make_response_with_headers())()
@@ -45,7 +45,7 @@ class TestValidateAccessControlAllowOrigin:
         assert "Access-Control-Allow-Origin" not in result.headers
 
     def test_response_without_headers_attribute_no_error(
-        self, mock_app, mock_load_request, mock_is_allowed_medwiki, mock_check_secret
+        self, app, mock_load_request, mock_is_allowed_medwiki, mock_check_secret
     ):
         plain_response = "just a string"
         decorated = validate_access(lambda: plain_response)
@@ -55,7 +55,7 @@ class TestValidateAccessControlAllowOrigin:
         assert result == "just a string"
 
     def test_secret_code_valid_no_allowed_domain_sets_header_to_none(
-        self, mock_app, mock_load_request, mock_is_denied, mock_check_secret
+        self, app, mock_load_request, mock_is_denied, mock_check_secret
     ):
         mock_check_secret.return_value = "secret-host.com"
         response = _make_response_with_headers()
@@ -66,7 +66,7 @@ class TestValidateAccessControlAllowOrigin:
         assert result.headers.get("Access-Control-Allow-Origin") == "https://secret-host.com"
         # assert "Access-Control-Allow-Origin" not in result.headers
 
-    def test_all_results_none(self, mock_app, mock_load_request, mock_is_denied, mock_check_secret):
+    def test_all_results_none(self, app, mock_load_request, mock_is_denied, mock_check_secret):
         mock_check_secret.return_value = None
         response = _make_response_with_headers()
         decorated = validate_access(lambda: response)
@@ -78,7 +78,7 @@ class TestValidateAccessControlAllowOrigin:
 
 
 class TestCheckCorsAccessControlAllowOrigin:
-    def test_allowed_domain_sets_header(self, mock_app, mock_load_request, mock_is_allowed):
+    def test_allowed_domain_sets_header(self, app, mock_load_request, mock_is_allowed):
         mock_is_allowed.return_value = "trusted.com"
         response = _make_response_with_headers()
         decorated = check_cors(lambda: response)
@@ -87,7 +87,7 @@ class TestCheckCorsAccessControlAllowOrigin:
 
         assert result.headers["Access-Control-Allow-Origin"] == "https://trusted.com"
 
-    def test_different_allowed_domain_sets_header(self, mock_app, mock_load_request, mock_is_allowed):
+    def test_different_allowed_domain_sets_header(self, app, mock_load_request, mock_is_allowed):
         mock_is_allowed.return_value = "api.partner.net"
         response = _make_response_with_headers()
         decorated = check_cors(lambda: response)
@@ -96,13 +96,13 @@ class TestCheckCorsAccessControlAllowOrigin:
 
         assert result.headers["Access-Control-Allow-Origin"] == "https://api.partner.net"
 
-    def test_denied_returns_403_without_cors_header(self, mock_app, mock_load_request, mock_is_denied):
+    def test_denied_returns_403_without_cors_header(self, app, mock_load_request, mock_is_denied):
         result = check_cors(lambda: _make_response_with_headers())()
 
         assert result.status_code == 403
         assert "Access-Control-Allow-Origin" not in result.headers
 
-    def test_response_without_headers_attribute_no_error(self, mock_app, mock_load_request, mock_is_allowed_medwiki):
+    def test_response_without_headers_attribute_no_error(self, app, mock_load_request, mock_is_allowed_medwiki):
         plain_response = "just a string"
         decorated = check_cors(lambda: plain_response)
 

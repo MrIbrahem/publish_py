@@ -11,7 +11,7 @@ from src.main_app.config import TestingConfig
 
 
 @pytest.fixture
-def mock_app() -> Generator[Flask, Any]:
+def app() -> Generator[Flask, Any, None]:
     """Create a test Flask application."""
     _app = Flask(__name__)
     _app.url_map.strict_slashes = False
@@ -42,29 +42,29 @@ class TestSameOrigin:
             ("http://localhost/", "http://localhost"),
         ],
     )
-    def test_origin_matches_server(self, mock_app: Flask, origin, expected) -> None:
+    def test_origin_matches_server(self, app: Flask, origin, expected) -> None:
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(base_url=origin, headers={"Origin": origin.rstrip("/")}):
+        with app.test_request_context(base_url=origin, headers={"Origin": origin.rstrip("/")}):
             from flask import request
 
             assert is_allowed(request) == expected
 
-    def test_referer_matches_server(self, mock_app: Flask) -> None:
+    def test_referer_matches_server(self, app: Flask) -> None:
         """Referer pointing to same server → return host_url stripped."""
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(base_url="http://localhost/", headers={"Referer": "http://localhost/some/page"}):
+        with app.test_request_context(base_url="http://localhost/", headers={"Referer": "http://localhost/some/page"}):
             from flask import request
 
             result = is_allowed(request)
             assert result == "http://localhost"
 
-    def test_origin_and_referer_both_same_origin(self, mock_app: Flask) -> None:
+    def test_origin_and_referer_both_same_origin(self, app: Flask) -> None:
         """Both headers same-origin → still returns origin."""
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(
+        with app.test_request_context(
             base_url="http://localhost/", headers={"Origin": "http://localhost", "Referer": "http://localhost/page"}
         ):
             from flask import request
@@ -93,10 +93,10 @@ class TestAllowedDomains:
             ),
         ],
     )
-    def test_allowed_domain_granted(self, mock_app: Flask, headers: dict[str, str], expected) -> None:
+    def test_allowed_domain_granted(self, app: Flask, headers: dict[str, str], expected) -> None:
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(headers=headers):
+        with app.test_request_context(headers=headers):
             from flask import request
 
             assert is_allowed(request) == expected
@@ -118,15 +118,15 @@ class TestAllowedDomains:
             # {},
         ],
     )
-    def test_not_allowed_domain_denied(self, mock_app: Flask, headers: dict[str, str]) -> None:
+    def test_not_allowed_domain_denied(self, app: Flask, headers: dict[str, str]) -> None:
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(headers=headers):
+        with app.test_request_context(headers=headers):
             from flask import request
 
             assert is_allowed(request) is None
 
-    def test_referer_allowed_but_origin_denied(self, mock_app: Flask) -> None:
+    def test_referer_allowed_but_origin_denied(self, app: Flask) -> None:
         """
         Origin is untrusted but Referer is allowed.
         Current logic: iterates domains and checks both independently.
@@ -134,7 +134,7 @@ class TestAllowedDomains:
         """
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(
+        with app.test_request_context(
             headers={"Origin": "https://evil.com", "Referer": "https://medwiki.toolforge.org/page"}
         ):
             from flask import request
@@ -149,31 +149,31 @@ class TestAllowedDomains:
 
 
 class TestCorsDisabled:
-    def test_disabled_with_origin_returns_origin(self, mock_app: Flask) -> None:
-        mock_app.config["CORS_DISABLED"] = True
+    def test_disabled_with_origin_returns_origin(self, app: Flask) -> None:
+        app.config["CORS_DISABLED"] = True
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(headers={"Origin": "https://unknown.com"}):
+        with app.test_request_context(headers={"Origin": "https://unknown.com"}):
             from flask import request
 
             assert is_allowed(request) == "https://unknown.com"
 
-    def test_disabled_without_origin_returns_wildcard(self, mock_app: Flask) -> None:
+    def test_disabled_without_origin_returns_wildcard(self, app: Flask) -> None:
         """When CORS is disabled and no Origin header is present, return '*'."""
-        mock_app.config["CORS_DISABLED"] = True
+        app.config["CORS_DISABLED"] = True
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(base_url="http://localhost/", headers={}):
+        with app.test_request_context(base_url="http://localhost/", headers={}):
             from flask import request
 
             assert is_allowed(request) == "*"
 
-    def test_disabled_bypasses_denied_domain(self, mock_app: Flask) -> None:
+    def test_disabled_bypasses_denied_domain(self, app: Flask) -> None:
         """Even a normally-denied domain passes when CORS_DISABLED."""
-        mock_app.config["CORS_DISABLED"] = True
+        app.config["CORS_DISABLED"] = True
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(headers={"Origin": "https://evil.com"}):
+        with app.test_request_context(headers={"Origin": "https://evil.com"}):
             from flask import request
 
             assert is_allowed(request) == "https://evil.com"
@@ -185,37 +185,37 @@ class TestCorsDisabled:
 
 
 class TestEdgeCases:
-    def test_malformed_origin_denied(self, mock_app: Flask) -> None:
+    def test_malformed_origin_denied(self, app: Flask) -> None:
         """Malformed URL → get_host returns '' → denied."""
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(headers={"Origin": "not-a-valid-url"}):
+        with app.test_request_context(headers={"Origin": "not-a-valid-url"}):
             from flask import request
 
             assert is_allowed(request) is None
 
-    def test_malformed_referer_denied(self, mock_app: Flask) -> None:
+    def test_malformed_referer_denied(self, app: Flask) -> None:
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(headers={"Referer": ":::bad-url"}):
+        with app.test_request_context(headers={"Referer": ":::bad-url"}):
             from flask import request
 
             assert is_allowed(request) is None
 
-    def test_empty_origin_header(self, mock_app: Flask) -> None:
+    def test_empty_origin_header(self, app: Flask) -> None:
         """Empty Origin header (and no Referer) is treated as direct request."""
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(base_url="http://localhost/", headers={"Origin": ""}):
+        with app.test_request_context(base_url="http://localhost/", headers={"Origin": ""}):
             from flask import request
 
             assert is_allowed(request) == "http://localhost"
 
-    def test_origin_with_port_not_in_allowed(self, mock_app: Flask) -> None:
+    def test_origin_with_port_not_in_allowed(self, app: Flask) -> None:
         """medwiki.toolforge.org:8080 ≠ medwiki.toolforge.org → denied."""
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(headers={"Origin": "https://medwiki.toolforge.org:8080"}):
+        with app.test_request_context(headers={"Origin": "https://medwiki.toolforge.org:8080"}):
             from flask import request
 
             assert is_allowed(request) is None
