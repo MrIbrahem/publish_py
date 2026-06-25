@@ -160,12 +160,9 @@ class PagesUsersToMainRecord(db.Model):
 
     def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
-        if "new_target" not in kwargs:
-            kwargs["new_target"] = ""
-        if "new_user" not in kwargs:
-            kwargs["new_user"] = ""
-        if "new_qid" not in kwargs:
-            kwargs["new_qid"] = ""
+        for x in ["new_target", "new_user", "new_qid"]:
+            if x not in kwargs:
+                kwargs[x] = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
