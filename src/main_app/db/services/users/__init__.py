@@ -37,8 +37,8 @@ from .user_service import (
     users_search,
 )
 from .user_token_service import (
-    get_authenticated_user_token,
     delete_user_token_by_username,
+    get_authenticated_user_token,
     get_user_token,
     get_user_token_by_username,
     upsert_user_token,

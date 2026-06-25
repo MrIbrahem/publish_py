@@ -13,6 +13,9 @@ from flask import Flask, Response, flash, jsonify, render_template, request  # ,
 
 from .admin.admin_panel import admin_route_module
 from .db import init_db
+from .extensions import csrf_exempt, csrf_init_app
+from .extensions import db as _db
+from .extensions import migrate
 from .public.auth.utils import load_user
 from .public.routes import (
     bp_api,
@@ -24,9 +27,6 @@ from .public.routes import (
     bp_td,
 )
 from .shared.core.cookies import CookieHeaderClient
-from .extensions import csrf_exempt, csrf_init_app
-from .extensions import db as _db
-from .extensions import migrate
 from .shared.core.jinja_filters import filters
 
 logger = logging.getLogger(__name__)

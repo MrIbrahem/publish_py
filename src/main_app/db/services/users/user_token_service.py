@@ -10,9 +10,9 @@ from typing import Optional
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
-from ....shared.core.crypto import encrypt_value
 from ....extensions import db
-from ...models import UserTokenRecord, UserRecord
+from ....shared.core.crypto import encrypt_value
+from ...models import UserRecord, UserTokenRecord
 from ..utils import db_guard_rollback
 
 logger = logging.getLogger(__name__)
@@ -48,6 +48,7 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
     if not orm_obj:
         return None
     return orm_obj
+
 
 # ── INSERT, UPDATE, SET ──────────────────────────────────
 
@@ -123,10 +124,15 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
     if not username:
         return None
 
-    orm_obj = db.session.query(UserTokenRecord).filter(UserRecord.username == username, UserRecord.user_id == UserTokenRecord.user_id).first()
+    orm_obj = (
+        db.session.query(UserTokenRecord)
+        .filter(UserRecord.username == username, UserRecord.user_id == UserTokenRecord.user_id)
+        .first()
+    )
     if not orm_obj:
         return None
     return orm_obj
+
 
 def delete_user_token_by_username(username: str) -> bool:
     """Remove the stored OAuth credentials for the given username."""

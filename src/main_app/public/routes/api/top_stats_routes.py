@@ -23,8 +23,8 @@ from ....db.models import (
     ViewsNewAllRecord,
     WordRecord,
 )
-from ....shared.core.cors import check_cors
 from ....extensions import db
+from ....shared.core.cors import check_cors
 from .form_utils import FormData, get_form
 
 logger = logging.getLogger(__name__)

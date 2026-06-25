@@ -47,8 +47,8 @@ if sys:
 # Import after environment setup
 from src.main_app import create_app
 from src.main_app.config import TestingConfig
-from src.main_app.shared.auth import CurrentUser
 from src.main_app.extensions import db as _db
+from src.main_app.shared.auth import CurrentUser
 
 
 @pytest.fixture(autouse=True)

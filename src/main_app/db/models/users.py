@@ -7,8 +7,8 @@ from typing import Any
 from sqlalchemy import ForeignKey, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
-from ...shared.core.crypto import decrypt_value
 from ...extensions import db
+from ...shared.core.crypto import decrypt_value
 from ...shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
@@ -133,6 +133,7 @@ class AdminUserRecord(db.Model):
     def __repr__(self) -> str:
         return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
+
 class UserTokenRecord(db.Model):
     """
     OAuth credentials — child of users table.
@@ -212,6 +213,7 @@ class UserTokenRecord(db.Model):
         access_secret = decrypt_value(self.access_secret)
         return access_key, access_secret
 
+
 class UsersNoInprocessRecord(db.Model):
     """
     CREATE TABLE IF NOT EXISTS users_no_inprocess (
@@ -234,7 +236,6 @@ class UsersNoInprocessRecord(db.Model):
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
-
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -265,7 +266,6 @@ class FullTranslatorRecord(db.Model):
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
-
 
     def to_dict(self) -> dict[str, Any]:
         return {
