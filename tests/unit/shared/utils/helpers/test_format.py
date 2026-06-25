@@ -1,6 +1,5 @@
 """Tests for helpers.format module."""
 
-
 from src.main_app.config import settings
 from src.main_app.shared.utils.helpers.format import (
     determine_hashtag,

@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-
 from src.main_app.public.auth.rate_limit import (
     RateLimiter,
     callback_rate_limiter,

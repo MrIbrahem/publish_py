@@ -6,7 +6,6 @@ from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
-
 from src.main_app.shared.utils.helpers.files import _get_rand_id, get_reports_dir, to_do
 
 

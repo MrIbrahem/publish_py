@@ -5,7 +5,6 @@ import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
-
 from src.main_app.shared.utils.helpers.words import clear_words_cache, get_word_count
 
 

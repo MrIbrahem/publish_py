@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock, patch
 
 
-
 class TestGetRevid:
     """Tests for get_revid function."""
 

@@ -8,12 +8,14 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import extract, func
+
+from ....extensions import db
+from ...models import ReportRecord
+
 # from sqlalchemy.exc import IntegrityError
 # from sqlalchemy.types import Integer as SAInteger
 # from sqlalchemy.types import Numeric as SANumeric
 
-from ....extensions import db
-from ...models import ReportRecord
 
 logger = logging.getLogger(__name__)
 

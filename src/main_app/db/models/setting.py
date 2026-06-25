@@ -92,7 +92,6 @@ class SettingRecord(db.Model):
         if "value_type" not in kwargs:
             kwargs["value_type"] = "boolean"
 
-
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)

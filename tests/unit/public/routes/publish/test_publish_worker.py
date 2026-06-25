@@ -2,8 +2,6 @@
 Tests for app_routes.publish.worker module.
 """
 
-
-
 from src.main_app.public.routes.publish.worker import (
     _get_errors_file,
 )

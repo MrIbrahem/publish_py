@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-
 from src.main_app.shared.core.cors.publish_secret_checks import (
     _get_publish_secret_code,
     check_publish_secret_code,

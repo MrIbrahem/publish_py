@@ -6,7 +6,6 @@ Tests for word count lookup utilities.
 import json
 from unittest.mock import MagicMock, patch
 
-
 from src.main_app.shared.utils.helpers.words import (
     _load_words_table,
     clear_words_cache,

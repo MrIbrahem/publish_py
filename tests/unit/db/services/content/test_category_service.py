@@ -1,4 +1,3 @@
-
 import pytest
 
 from src.main_app.db.models import CategoryRecord

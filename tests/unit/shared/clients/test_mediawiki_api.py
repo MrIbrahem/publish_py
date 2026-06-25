@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock, patch
 
 
-
 class TestPublishDoEdit:
     """Tests for publish_do_edit function."""
 

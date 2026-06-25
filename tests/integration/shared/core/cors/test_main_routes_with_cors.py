@@ -4,8 +4,6 @@ These tests verify the integration of various components in API routes.
 """
 
 
-
-
 class TestCorsIntegration1:
     """Integration tests for CORS handling."""
 

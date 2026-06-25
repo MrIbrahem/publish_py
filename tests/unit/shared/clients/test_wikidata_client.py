@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock, patch
 
 
-
 class TestGetQidForMdtitle:
     """Tests for get_qid_for_mdtitle function."""
 
