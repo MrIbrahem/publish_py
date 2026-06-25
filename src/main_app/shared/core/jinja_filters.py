@@ -24,7 +24,7 @@ def _format_timestamp(
     if not format_str:
         format_str = "%Y-%m-%d %H:%M:%S"
 
-    if hasattr(value, "strftime"):
+    if isinstance(value, datetime) or hasattr(value, "strftime"):
         dt = value
     else:
         try:
@@ -117,7 +117,9 @@ def check_active_route(route_name: str) -> str:
 
 
 def is_job_running(job_status: str | None) -> bool:
-    return job_status and job_status.lower() in ["running", "pending"]
+    if not job_status:
+        return False
+    return job_status.lower() in ["running", "pending"]
 
 
 filters = {

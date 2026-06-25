@@ -10,9 +10,9 @@ from ....config import settings
 
 logger = logging.getLogger(__name__)
 
-_serializer = URLSafeTimedSerializer(settings.security.secret_key, salt="svg-translate-uid")
+_serializer = URLSafeTimedSerializer(settings.security.secret_key, salt=f"{settings.security.salt}-uid")
 
-_state_serializer = URLSafeTimedSerializer(settings.security.secret_key, salt="svg-translate-oauth-state")
+_state_serializer = URLSafeTimedSerializer(settings.security.secret_key, salt=f"{settings.security.salt}-oauth-state")
 
 
 def sign_user_id(user_id: int) -> str:

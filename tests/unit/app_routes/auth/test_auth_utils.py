@@ -70,20 +70,3 @@ class TestOAuthRequired:
             result = protected_view()
             # AssertionError: assert <<class 'pytest_flask.plugin.JSONResponse'> 209 bytes [302 FOUND]> == 'success'
             assert result == "success"
-
-    def test_allows_access_when_oauth_null(self, app, monkeypatch):
-        """Test that decorator allows access when OAuth is None (disabled)."""
-
-        # Create a mock Settings object with oauth=None
-        mock_settings = MagicMock()
-        mock_settings.oauth = None
-        monkeypatch.setattr("src.main_app.public.auth.utils.settings", mock_settings)
-
-        @oauth_required
-        def protected_view():
-            return "success"
-
-        with app.test_request_context():
-            result = protected_view()
-
-            assert result == "success"

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import threading
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -10,7 +9,7 @@ from cryptography.fernet import Fernet, InvalidToken
 from ...config import settings
 
 _fernet: Fernet | None = None
-# _fernet_lock = threading.Lock()
+_fernet_lock = threading.Lock()
 
 
 def _require_fernet() -> Fernet:
@@ -19,15 +18,15 @@ def _require_fernet() -> Fernet:
     if _fernet is not None:
         return _fernet
 
-    if settings.oauth is None or not settings.oauth.encryption_key:
-        raise RuntimeError("OAUTH_ENCRYPTION_KEY must be configured before using the crypto helpers")
+    with _fernet_lock:
+        if _fernet is not None:
+            return _fernet
 
-    key_bytes = (
-        settings.oauth.encryption_key.encode()
-        if isinstance(settings.oauth.encryption_key, str)
-        else settings.oauth.encryption_key
-    )
-    # with _fernet_lock:
+        if not settings.oauth or not settings.oauth.encryption_key:
+            raise RuntimeError("OAUTH_ENCRYPTION_KEY must be configured before using the crypto helpers")
+
+        enc_key = settings.oauth.encryption_key
+        key_bytes = enc_key.encode() if isinstance(enc_key, str) else enc_key
 
     try:
         _fernet = Fernet(key_bytes)
@@ -52,3 +51,9 @@ def decrypt_value(token: bytes) -> str:
     except InvalidToken as exc:
         raise ValueError("Unable to decrypt stored token") from exc
     return decrypted.decode("utf-8")
+
+
+__all__ = [
+    "encrypt_value",
+    "decrypt_value",
+]
