@@ -52,6 +52,7 @@ class UserRecord(db.Model):
 
         self.email = kwargs.get("email") or ""
         self.wiki = kwargs.get("wiki") or ""
+        self.user_group = kwargs.get("user_group") or "Uncategorized"
 
     def to_dict(self) -> dict[str, Any]:
         """Serializes the pure model instance into a dictionary."""
