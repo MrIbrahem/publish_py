@@ -10,7 +10,7 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import UserRecord
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ def get_user_by_username(username: str) -> UserRecord | None:
     return orm_obj
 
 
-def add_user(
+def create_user(
     username: str,
     email: str = "",
     wiki: str = "",
@@ -86,7 +86,7 @@ def add_user(
         email=email,
         wiki=wiki,
         user_group=user_group,
-        reg_date=func.now(),
+        created_at=func.now(),
     )
     db.session.add(orm_obj)
     try:
@@ -158,7 +158,7 @@ __all__ = [
     "list_users_by_group",
     "get_user",
     "get_user_by_username",
-    "add_user",
+    "create_user",
     "update_user",
     "update_user_data",
     "user_exists",

@@ -11,11 +11,13 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ....shared.core.crypto import encrypt_value
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import UserTokenRecord
 
 logger = logging.getLogger(__name__)
 
+def get_authenticated_user_token():
+    ...
 
 def upsert_user_token(*, user_id: int, username: str, access_key: str, access_secret: str) -> None:
     """Insert or update the encrypted OAuth credentials for a user."""

@@ -15,7 +15,7 @@ from typing import Any
 from sqlalchemy import JSON, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import db
+from ...extensions import db
 
 
 class LangRecord(db.Model):
@@ -98,13 +98,13 @@ class TranslateTypeRecord(db.Model):
     tt_lead: Mapped[int] = mapped_column(nullable=False, default=1)
     tt_full: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "tt_lead" not in kwargs:
             kwargs["tt_lead"] = 1
         if "tt_full" not in kwargs:
             kwargs["tt_full"] = 0
-        super().__init__(**kwargs)
+
 
     def to_dict(self) -> dict[str, Any]:
         return {

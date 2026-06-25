@@ -19,7 +19,7 @@ from ...db.models import ProjectRecord, UserRecord
 from ...db.services.content import list_projects
 from ...db.services.pages import list_of_users_by_translations_count
 from ...db.services.users import (
-    add_user,
+    create_user,
     delete_user,
     get_user,
     get_user_by_username,
@@ -90,7 +90,7 @@ def _add_user() -> ResponseReturnValue:
         return redirect(url_for("admin.users_emails.dashboard"))
 
     try:
-        record = add_user(
+        record = create_user(
             username=username,
             email=email,
             wiki=wiki,

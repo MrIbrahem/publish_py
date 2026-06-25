@@ -530,7 +530,7 @@ class UserRecord(BaseDb):
     username = Column(String(255), nullable=False, unique=True)
     wiki = Column(String(50), nullable=False, default="ar")
     user_group = Column(String(50), nullable=True)
-    reg_date = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, nullable=True)
 
 
 # ==================== AFTER (Strategy A - Minimal) ====================
@@ -553,7 +553,7 @@ class UserRecord(ModelMixin, db.Model):
     username: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     wiki: Mapped[str] = mapped_column(String(50), nullable=False, default="ar")
     user_group: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    reg_date: Mapped[DateTime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[DateTime | None] = mapped_column(DateTime, nullable=True)
 ```
 
 ### 5.5 Relationship Handling
@@ -849,7 +849,7 @@ def upgrade():
         sa.Column('username', sa.String(255), nullable=False),
         sa.Column('wiki', sa.String(50), nullable=False),
         sa.Column('user_group', sa.String(50), nullable=True),
-        sa.Column('reg_date', sa.DateTime(), nullable=True),
+        sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('user_id'),
         sa.UniqueConstraint('username'),
     )

@@ -15,7 +15,7 @@ from flask import (
 from ...db.services.analytics import get_total_views_for_target
 from ...db.services.pages import get_page_by_id, get_user_page_by_id
 from ...db.services.users import get_user_by_username
-from ...public.auth.utils import load_logged_in_user
+from ...public.auth.utils import load_user
 from ...public.routes.td.results_api import results_api_result
 from ..decorators import admin_required
 
@@ -53,7 +53,7 @@ def get_user_email(username: str) -> str | None:
 
 
 def get_currect_user_email() -> str | None:
-    currect_user = load_logged_in_user()
+    currect_user = load_user()
 
     if currect_user:
         return get_user_email(currect_user.username)

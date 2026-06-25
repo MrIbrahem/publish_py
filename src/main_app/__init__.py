@@ -13,7 +13,7 @@ from flask import Flask, Response, flash, jsonify, render_template, request  # ,
 
 from .admin.admin_panel import admin_route_module
 from .db import init_db
-from .public.auth.utils import load_logged_in_user
+from .public.auth.utils import load_user
 from .public.routes import (
     bp_api,
     bp_auth,
@@ -24,9 +24,9 @@ from .public.routes import (
     bp_td,
 )
 from .shared.core.cookies import CookieHeaderClient
-from .shared.core.extensions import csrf_exempt, csrf_init_app
-from .shared.core.extensions import db as _db
-from .shared.core.extensions import migrate
+from .extensions import csrf_exempt, csrf_init_app
+from .extensions import db as _db
+from .extensions import migrate
 from .shared.core.jinja_filters import filters
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ def context_data() -> dict[str, Any]:
     """
     used in @app.context_processor
     """
-    user = load_logged_in_user()
+    user = load_user()
     return {
         "current_user": user,
         "is_authenticated": user is not None,

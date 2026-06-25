@@ -23,7 +23,7 @@ from ....db.services.pages import (
     statics_by_category,
 )
 from ....db.services.users import is_full_translator
-from ....public.auth.utils import load_logged_in_user
+from ....public.auth.utils import load_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result
 
@@ -162,7 +162,7 @@ def table():
     parsed = _parse_request_args(camps_data, cats_data)
 
     # Identity / coordinator / full-translator flags — mirrors src/index.php.
-    user = load_logged_in_user()
+    user = load_user()
     user_coord = bool(user and user.is_active_admin)
     full_tr_user = bool(user and is_full_translator(user.username))
 

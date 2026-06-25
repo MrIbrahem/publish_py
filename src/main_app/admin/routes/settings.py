@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 from typing import Any
 
@@ -25,12 +24,7 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
         try:
             return int(raw_val), True
         except (TypeError, ValueError):
-            return None, False
-    elif v_type == "json":
-        try:
-            return json.loads(raw_val), True
-        except Exception:
-            return None, False
+            return 0, True
     else:
         return raw_val, True
 

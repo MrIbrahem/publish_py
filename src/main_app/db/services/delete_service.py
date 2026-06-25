@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Type
 
-from ...shared.core.extensions import db
+from ...extensions import db
 from ..models import (
     AdminUserRecord,
     AllArticlesRecord,

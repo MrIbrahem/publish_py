@@ -24,7 +24,7 @@ from ....db.models import (
     WordRecord,
 )
 from ....shared.core.cors import check_cors
-from ....shared.core.extensions import db
+from ....extensions import db
 from .form_utils import FormData, get_form
 
 logger = logging.getLogger(__name__)

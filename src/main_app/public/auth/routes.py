@@ -25,18 +25,21 @@ from mwoauth import RequestToken
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from ...config import settings
-from ...db.services.users import (
-    delete_user_token,
-    is_active_coordinator,
-    upsert_user_token,
+from ...db.services.users import delete_user_token
+from ...shared.core.cookies.cookie import (
+    extract_user_id,
+    sign_state_token,
+    sign_user_id,
+    verify_state_token,
 )
-from ...shared.auth.current_user import CurrentUser
+from ...shared.auth.auth_service import (
+    OAuthCallbackError,
+    complete_oauth_callback,
+)
 from ...shared.auth.mwoauth_handshake import (
     OAuthIdentityError,
-    complete_login,
     start_login,
 )
-from ...shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
 from .rate_limit import callback_rate_limiter, login_rate_limiter
 from .utils import load_logged_in_user
 
@@ -177,76 +180,29 @@ def callback() -> WerkzeugResponse:
     # access_token, identity
     try:
         query_string = urlencode(request.args)
-        access_token, identity = complete_login(request_token, query_string)
+        user_record = complete_oauth_callback(request_token, query_string)
     except OAuthIdentityError:
         logger.exception("OAuth identity verification failed")
         flash("Failed to verify OAuth identity", "danger")
-        return redirect(url_for("main.index", error="Failed to verify OAuth identity"))
+        return redirect(url_for("main.index"))
+    except OAuthCallbackError as exc:
+        logger.exception("OAuth callback failed: %s", exc)
+        flash(str(exc), exc.flash_category)
+        return redirect(url_for("main.index"))
 
-    # ------------------
-    # access_key, access_secret
-    token_key = getattr(access_token, "key", None)
-    token_secret = getattr(access_token, "secret", None)
-
-    if not (token_key and token_secret) and isinstance(access_token, Sequence):
-        token_key = access_token[0]
-        token_secret = access_token[1]
-
-    if not (token_key and token_secret):
-        logger.error("OAuth access token missing key/secret")
-        flash("Missing OAuth credentials", "danger")
-        return redirect(url_for("main.index", error="Missing credentials"))
-
-    # ------------------
-    # user info
-    user_identifier = identity.get("sub") or identity.get("id") or identity.get("central_id") or identity.get("user_id")
-    if not user_identifier:
-        logger.warning("OAuth callback failed: missing user identifier in identity")
-        flash("Missing user id", "danger")
-        return redirect(url_for("main.index", error="Missing id"))
-
-    try:
-        user_id = int(user_identifier)
-    except (TypeError, ValueError):
-        logger.exception("Invalid user identifier")
-        flash("Invalid user identifier", "danger")
-        return redirect(url_for("main.index", error="Invalid user identifier"))
-
-    username = identity.get("username") or identity.get("name")
-    if not username:
-        logger.warning("OAuth callback failed: missing username in identity")
-        flash("Missing username", "danger")
-        return redirect(url_for("main.index", error="Missing username"))
-
-    # ------------------
-    # upsert credentials
-    upsert_user_token(
-        user_id=user_id,
-        username=username,
-        access_key=str(token_key),
-        access_secret=str(token_secret),
-    )
+    user_id = user_record.user_id
 
     # Set sessions
     session["uid"] = user_id
-    session["username"] = username
+    session["username"] = user_record.username
 
     # Set response and cookies
-    redirect_url = session.pop("post_login_redirect", url_for("main.index"))
-    logger.info("OAuth callback complete, redirecting to: %s", redirect_url)
-    response = make_response(redirect(redirect_url))
+    response = make_response(redirect(session.pop("post_login_redirect", url_for("main.index"))))
 
     _set_response_cookies(user_id, response)
 
     # Cache in g for the remainder of THIS request only
-    g._current_user = CurrentUser(
-        user_id=user_id,
-        username=username,
-        access_token=str(token_key).encode(),
-        access_secret=str(token_secret).encode(),
-        is_active_admin=is_active_coordinator(username),
-    )
-    logger.info("OAuth login successful for user_id=%s username=%s", user_id, username)
+    g._current_user = user_record
 
     return response
 
@@ -279,7 +235,6 @@ def logout() -> WerkzeugResponse:
     else:
         flash("Session cleared.", "info")
 
-    flash("Logout successful.", "success")
     response = make_response(redirect(url_for("main.index")))
     response.delete_cookie(settings.cookie.name, path="/")
 

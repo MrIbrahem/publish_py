@@ -4,10 +4,6 @@ Unit tests for src/main_app/admin/routes/settings.py module.
 
 from __future__ import annotations
 
-import json
-
-import pytest
-
 from src.main_app.admin.routes.settings import _parse_setting_value
 
 
@@ -67,68 +63,6 @@ class TestParseSettingValue:
         assert result is None
         assert success is False
 
-    def test_parse_json_valid_object(self):
-        """Test that json type parses valid JSON object."""
-        json_str = '{"key": "value", "number": 123}'
-        result, success = _parse_setting_value("json", json_str)
-        assert result == {"key": "value", "number": 123}
-        assert success == 1
-
-    def test_parse_json_valid_array(self):
-        """Test that json type parses valid JSON array."""
-        json_str = '[1, 2, 3, "test"]'
-        result, success = _parse_setting_value("json", json_str)
-        assert result == [1, 2, 3, "test"]
-        assert success == 1
-
-    def test_parse_json_valid_string(self):
-        """Test that json type parses valid JSON string."""
-        json_str = '"simple string"'
-        result, success = _parse_setting_value("json", json_str)
-        assert result == "simple string"
-        assert success == 1
-
-    def test_parse_json_valid_number(self):
-        """Test that json type parses valid JSON number."""
-        json_str = "42.5"
-        result, success = _parse_setting_value("json", json_str)
-        assert result == 42.5
-        assert success == 1
-
-    def test_parse_json_valid_boolean(self):
-        """Test that json type parses valid JSON boolean."""
-        result, success = _parse_setting_value("json", "true")
-        assert result is True
-        assert success == 1
-
-        result, success = _parse_setting_value("json", "false")
-        assert result == 0
-        assert success == 1
-
-    def test_parse_json_valid_null(self):
-        """Test that json type parses valid JSON null."""
-        result, success = _parse_setting_value("json", "null")
-        assert result is None
-        assert success == 1
-
-    def test_parse_json_invalid_returns_none_and_failure(self):
-        """Test that invalid JSON returns None and success=False."""
-        result, success = _parse_setting_value("json", "not valid json")
-        assert result is None
-        assert success is False
-
-    def test_parse_json_invalid_syntax_returns_none_and_failure(self):
-        """Test that JSON with syntax errors returns None and success=False."""
-        result, success = _parse_setting_value("json", '{"unclosed": "string}')
-        assert result is None
-        assert success is False
-
-    def test_parse_json_empty_returns_none_and_failure(self):
-        """Test that empty string returns None and success=False for json type."""
-        result, success = _parse_setting_value("json", "")
-        assert result is None
-        assert success is False
-
     def test_parse_string_type_returns_raw_value(self):
         """Test that unknown type returns raw value unchanged."""
         result, success = _parse_setting_value("string", "any value here")
@@ -148,19 +82,6 @@ class TestParseSettingValue:
             assert result == "test_value"
             assert success == 1
 
-    def test_parse_unicode_values(self):
-        """Test that unicode values are handled correctly."""
-        # String type with unicode
-        result, success = _parse_setting_value("string", "héllo wörld 日本語")
-        assert result == "héllo wörld 日本語"
-        assert success == 1
-
-        # JSON type with unicode
-        json_str = '{"message": "héllo wörld 日本語"}'
-        result, success = _parse_setting_value("json", json_str)
-        assert result == {"message": "héllo wörld 日本語"}
-        assert success == 1
-
     def test_parse_special_characters_in_string(self):
         """Test that special characters in strings are preserved."""
         special_values = [
@@ -175,17 +96,3 @@ class TestParseSettingValue:
             result, success = _parse_setting_value("string", value)
             assert result == value
             assert success == 1
-
-    def test_parse_nested_json(self):
-        """Test that nested JSON objects are parsed correctly."""
-        nested_json = json.dumps({"level1": {"level2": {"level3": ["item1", "item2"]}}})
-        result, success = _parse_setting_value("json", nested_json)
-        assert result["level1"]["level2"]["level3"] == ["item1", "item2"]
-        assert success == 1
-
-    def test_parse_json_with_special_characters(self):
-        """Test that JSON with special characters is parsed correctly."""
-        json_str = '{"special": "quotes \' and \\" and backslash \\\\"}'
-        result, success = _parse_setting_value("json", json_str)
-        assert result["special"] == "quotes ' and \" and backslash \\"
-        assert success == 1

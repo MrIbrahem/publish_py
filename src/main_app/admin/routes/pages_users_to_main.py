@@ -13,7 +13,7 @@ from flask.typing import ResponseReturnValue
 from ...db.services.content import list_langs
 from ...db.services.delete_service import delete_user_page_to_main
 from ...db.services.pages import add_translate_row_to_db, pages_users_to_main_service
-from ...shared.core.extensions import db
+from ...extensions import db
 
 logger = logging.getLogger(__name__)
 

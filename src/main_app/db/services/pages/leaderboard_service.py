@@ -8,7 +8,7 @@ from typing import Any
 
 from sqlalchemy import func, text
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import CategoryRecord, PageRecord, UserRecord
 
 

@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import PageRecord, PagesUsersToMainRecord, QidRecord, UserPageRecord
 
 logger = logging.getLogger(__name__)

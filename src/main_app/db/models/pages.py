@@ -10,7 +10,7 @@ from typing import Any
 from sqlalchemy import ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import db
+from ...extensions import db
 
 
 class PageRecord(db.Model):
@@ -53,11 +53,11 @@ class PageRecord(db.Model):
     deleted: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
     mdwiki_revid: Mapped[int | None] = mapped_column()
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "deleted" not in kwargs:
             kwargs["deleted"] = 0
-        super().__init__(**kwargs)
+
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -117,11 +117,11 @@ class UserPageRecord(db.Model):
     deleted: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
     mdwiki_revid: Mapped[int | None] = mapped_column()
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "deleted" not in kwargs:
             kwargs["deleted"] = 0
-        super().__init__(**kwargs)
+
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -160,7 +160,7 @@ class PagesUsersToMainRecord(db.Model):
     new_user: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
     new_qid: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "new_target" not in kwargs:
             kwargs["new_target"] = ""
@@ -168,7 +168,7 @@ class PagesUsersToMainRecord(db.Model):
             kwargs["new_user"] = ""
         if "new_qid" not in kwargs:
             kwargs["new_qid"] = ""
-        super().__init__(**kwargs)
+
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -208,7 +208,7 @@ class InProcessRecord(db.Model):
     word: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
     add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "cat" not in kwargs:
             kwargs["cat"] = "RTT"
@@ -216,7 +216,7 @@ class InProcessRecord(db.Model):
             kwargs["translate_type"] = "lead"
         if "word" not in kwargs:
             kwargs["word"] = 0
-        super().__init__(**kwargs)
+
 
     def to_dict(self) -> dict[str, Any]:
         return {

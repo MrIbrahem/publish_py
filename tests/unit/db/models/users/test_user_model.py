@@ -23,7 +23,7 @@ class TestUserRecord:
         assert record.email == ""  # Default value
         assert record.wiki == ""  # Default value
         assert record.user_group == "Uncategorized"  # Default value
-        assert record.reg_date is None
+        assert record.created_at is None
 
     def test_create_with_all_fields(self):
         """Test creating UserRecord with all fields."""
@@ -34,14 +34,14 @@ class TestUserRecord:
             email="test@example.com",
             wiki="enwiki",
             user_group="Translator",
-            reg_date=now,
+            created_at=now,
         )
         assert record.user_id == 1
         assert record.username == "TestUser"
         assert record.email == "test@example.com"
         assert record.wiki == "enwiki"
         assert record.user_group == "Translator"
-        assert record.reg_date == now
+        assert record.created_at == now
 
     def test_to_dict(self):
         """Test converting UserRecord to dictionary."""
@@ -51,7 +51,7 @@ class TestUserRecord:
             email="test@example.com",
             wiki="enwiki",
             user_group="Translator",
-            reg_date=None,
+            created_at=None,
         )
         result = record.to_dict()
         assert result == {
@@ -60,5 +60,5 @@ class TestUserRecord:
             "email": "test@example.com",
             "wiki": "enwiki",
             "user_group": "Translator",
-            "reg_date": None,
+            "created_at": None,
         }

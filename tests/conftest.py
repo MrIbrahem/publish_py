@@ -31,7 +31,7 @@ if sys:
 
     os.environ.setdefault("WIKIDATA_DOMAIN", "test.wikidata.org")
 
-    os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
+    os.environ.setdefault("MAIN_DIR", "/tmp")
     os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
     os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
     os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
@@ -228,4 +228,4 @@ def mock_admin_required(mocker):
     """
     # Mock load_logged_in_user to return a valid user object
     mock_user = CurrentUser(user_id=0, username="ADMIN_USER", access_token="", access_secret="", is_active_admin=True)
-    mocker.patch("src.main_app.admin.decorators.load_logged_in_user", return_value=mock_user)
+    mocker.patch("src.main_app.admin.decorators.load_user", return_value=mock_user)

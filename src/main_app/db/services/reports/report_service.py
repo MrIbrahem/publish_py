@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.types import Integer as SAInteger
 from sqlalchemy.types import Numeric as SANumeric
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import ReportRecord
 
 logger = logging.getLogger(__name__)

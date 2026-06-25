@@ -21,7 +21,7 @@ from ...db.services.pages import (
     list_translated,
     update_page,
 )
-from ...shared.core.extensions import db
+from ...extensions import db
 
 logger = logging.getLogger(__name__)
 

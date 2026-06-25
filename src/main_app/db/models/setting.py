@@ -10,7 +10,7 @@ from typing import Any, Optional
 from sqlalchemy import Enum, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import LONGTEXT, db
+from ...extensions import LONGTEXT, db
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class LanguageSettingRecord(db.Model):
     expend: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
     add_en_lang: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "move_dots" not in kwargs:
             kwargs["move_dots"] = 0
@@ -44,7 +44,7 @@ class LanguageSettingRecord(db.Model):
             kwargs["expend"] = 0
         if "add_en_lang" not in kwargs:
             kwargs["add_en_lang"] = 0
-        super().__init__(**kwargs)
+
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -84,11 +84,11 @@ class SettingRecord(db.Model):
         default="boolean",
     )
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "value_type" not in kwargs:
             kwargs["value_type"] = "boolean"
-        super().__init__(**kwargs)
+
         # Parse value based on value_type after initialization
         self.value = self._parse_value(self.value, self.value_type)
 

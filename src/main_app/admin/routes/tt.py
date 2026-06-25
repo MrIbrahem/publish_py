@@ -15,7 +15,7 @@ from flask.typing import ResponseReturnValue
 
 from ...db.services.content import list_categories
 from ...db.services.pages import translate_type_service
-from ...shared.core.extensions import UniqueError
+from ...extensions import UniqueError
 
 logger = logging.getLogger(__name__)
 

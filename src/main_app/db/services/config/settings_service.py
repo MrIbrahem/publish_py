@@ -9,7 +9,7 @@ from typing import Any
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import SettingRecord
 from ..utils import db_guard
 

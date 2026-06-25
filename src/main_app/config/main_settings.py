@@ -139,7 +139,7 @@ def _load_oauth_config() -> OAuthConfig:
 
 
 def _get_paths() -> Paths:
-    flask_data_dir = os.getenv("FLASK_DATA_DIR") or "~/data"
+    flask_data_dir = os.getenv("MAIN_DIR") or "~/data"
     log_dir = f"{flask_data_dir}/logs"
     publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR") or f"{flask_data_dir}/publish_reports/reports_by_day"
     words_json_path = os.getenv("WORDS_JSON_PATH") or f"{flask_data_dir}/td/Tables/jsons/words.json"
@@ -219,7 +219,7 @@ def load_special_users() -> dict:
     return special_users
 
 
-def load_cors_config() -> UsersConfig:
+def load_cors_config() -> CorsConfig:
     # Load CORS configuration
     cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
     cors_domains = [d.strip() for d in cors_domains_str.split(",") if d.strip()]
