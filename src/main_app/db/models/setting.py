@@ -45,6 +45,10 @@ class LanguageSettingRecord(db.Model):
         if "add_en_lang" not in kwargs:
             kwargs["add_en_lang"] = 0
 
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -88,6 +92,10 @@ class SettingRecord(db.Model):
         if "value_type" not in kwargs:
             kwargs["value_type"] = "boolean"
 
+
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
         # Parse value based on value_type after initialization
         self.value = self._parse_value(self.value, self.value_type)
 

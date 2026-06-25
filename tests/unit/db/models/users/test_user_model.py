@@ -22,8 +22,8 @@ class TestUserRecord:
         assert record.username == "TestUser"
         assert record.email == ""  # Default value
         assert record.wiki == ""  # Default value
-        assert record.user_group == "Uncategorized"  # Default value
         assert record.created_at is None
+        assert record.user_group == "Uncategorized"  # Default value
 
     def test_create_with_all_fields(self):
         """Test creating UserRecord with all fields."""

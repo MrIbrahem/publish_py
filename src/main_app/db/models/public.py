@@ -105,6 +105,10 @@ class TranslateTypeRecord(db.Model):
         if "tt_full" not in kwargs:
             kwargs["tt_full"] = 0
 
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "tt_id": self.tt_id,

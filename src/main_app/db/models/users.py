@@ -35,8 +35,8 @@ class UserRecord(db.Model):
     user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
-    email: Mapped[str] = mapped_column(String(255), nullable=False, default="")
-    wiki: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    email: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
+    wiki: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
     user_group: Mapped[str] = mapped_column(
         String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'")
     )
@@ -49,6 +49,9 @@ class UserRecord(db.Model):
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+
+        self.email = kwargs.get("email") or ""
+        self.wiki = kwargs.get("wiki") or ""
 
     def to_dict(self) -> dict[str, Any]:
         """Serializes the pure model instance into a dictionary."""
@@ -237,6 +240,10 @@ class UsersNoInprocessRecord(db.Model):
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
 
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -266,6 +273,10 @@ class FullTranslatorRecord(db.Model):
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
+
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def to_dict(self) -> dict[str, Any]:
         return {
