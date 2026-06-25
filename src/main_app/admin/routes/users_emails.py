@@ -22,11 +22,8 @@ from ...db.services.users import (
     create_user,
     delete_user,
     get_user,
-    get_user_by_username,
     list_users,
-    list_users_by_group,
     update_user,
-    user_exists,
 )
 from ..decorators import admin_required
 

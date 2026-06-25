@@ -19,8 +19,6 @@ from flask.typing import ResponseReturnValue
 from ...db.services.content import (
     add_category,
     delete_category,
-    get_camp_to_cats,
-    get_campaign_category,
     list_categories,
     update_category,
 )

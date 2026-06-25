@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 from typing import Any, List
 
-from sqlalchemy import func, text
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db

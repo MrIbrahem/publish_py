@@ -8,10 +8,7 @@ from typing import Any, Type
 from ...extensions import db
 from ..models import (
     AdminUserRecord,
-    AllArticlesRecord,
-    AllQidsExistRecord,
     AssessmentRecord,
-    CategoryMemberRecord,
     CategoryRecord,
     EnwikiPageviewRecord,
     FullTranslatorRecord,
@@ -32,7 +29,6 @@ from ..models import (
     UserRecord,
     UsersNoInprocessRecord,
     UserTokenRecord,
-    ViewsNewAllRecord,
     ViewsNewRecord,
     WordRecord,
 )

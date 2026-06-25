@@ -6,7 +6,6 @@ SQLAlchemy-based service for managing coordinators.
 
 from __future__ import annotations
 
-import functools
 import logging
 from typing import List
 

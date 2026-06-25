@@ -84,7 +84,7 @@ def create_views_new_all_view(target: MetaData, connection: Connection, **kw: An
             try:
                 connection.execute(text(query))
                 logger.info(f"Successfully created view: {name}")
-            except Exception as e:
+            except Exception:
                 logger.exception(f"Error creating view {name}", exc_info=True)
         else:
             logger.info(f"View '{name}' already exists, skipping.")
