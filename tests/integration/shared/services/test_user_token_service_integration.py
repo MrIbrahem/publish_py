@@ -22,7 +22,6 @@ class TestUserServiceIntegration:
         user_id = user.user_id
         upsert_user_token(
             user_id=user_id,
-            username="TestUser",
             access_key="test_key",
             access_secret="test_secret",
         )
