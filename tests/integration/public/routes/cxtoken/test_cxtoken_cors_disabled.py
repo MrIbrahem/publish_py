@@ -136,7 +136,7 @@ class TestCxtokenEndpoint:
         with (
             patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
             patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
-            patch("src.main_app.public.routes.cxtoken.routes.delete_user_token_by_username") as mock_delete,
+            patch("src.main_app.public.routes.cxtoken.routes.delete_user_token") as mock_delete,
         ):
             # Mock user token
             mock_token = MagicMock()

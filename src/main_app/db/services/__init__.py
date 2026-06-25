@@ -51,9 +51,7 @@ from .pages import (
 from .reports import add_report, delete_report, list_reports, query_reports_with_filters
 from .users import (
     delete_user_token,
-    delete_user_token_by_username,
     get_user_token,
-    get_user_token_by_username,
     upsert_user_token,
 )
 from .wikidata import list_records, list_targets_by_lang
@@ -97,8 +95,6 @@ __all__ = [
     "upsert_user_token",
     "get_user_token",
     "delete_user_token",
-    "get_user_token_by_username",
-    "delete_user_token_by_username",
     # report_service
     "list_reports",
     "add_report",

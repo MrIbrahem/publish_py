@@ -37,7 +37,6 @@ from .user_service import (
     users_search,
 )
 from .user_token_service import (
-    delete_user_token_by_username,
     get_authenticated_user_token,
     get_user_token,
     get_user_token_by_username,
@@ -86,7 +85,6 @@ __all__ = [
     "delete_user_token",
     "get_user_token_by_username",
     "get_authenticated_user_token",
-    "delete_user_token_by_username",
     "list_users_no_inprocess",
     "list_active_users_no_inprocess",
     "get_users_no_inprocess",
