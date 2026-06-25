@@ -87,13 +87,13 @@
                 </ul>
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
                     <!-- <div class="d-flex align-items-center"> <span class="navbar-text"> -->
-                    {% if current_user %}
-                    {% set profile_href = url_for('td.leaderboard.users', username=current_user.username) %}
+                    {% if current_username %}
+                    {% set profile_href = url_for('td.leaderboard.users', username=current_username) %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
                         <a href="{{ profile_href }}"
                             class="nav-link py-2 px-0 px-lg-2 {{ profile_href | check_active_route }}">
                             <i class="fas fa-user fa-sm fa-fw mr-2"></i> <span
-                                class="navtitles">{{ current_user.username }}</span>
+                                class="navtitles">{{ current_username }}</span>
                         </a>
                     </li>
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
