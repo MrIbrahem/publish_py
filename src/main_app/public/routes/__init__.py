@@ -18,4 +18,5 @@ __all__ = [
     "bp_cxtoken",
     "bp_publish",
     "bp_fixrefs",
+    "bp_leaderboard",
 ]
