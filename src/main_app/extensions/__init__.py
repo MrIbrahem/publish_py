@@ -8,7 +8,7 @@ IMPORT RULE: Always import extensions from this module.
 Never instantiate extensions elsewhere.
 
 Usage:
-    from main_app.shared.core.extensions import db, migrate, csrf
+    from main_app.extensions import db, migrate, csrf
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ from ._csrf import (
 from .data_base import (
     db,
     metadata,
+    BaseModel,
 )
 from .db_types import LONGTEXT
 
@@ -32,6 +33,7 @@ migrate = Migrate()
 
 __all__ = [
     "db",
+    "BaseModel",
     "migrate",
     "csrf",
     "csrf_init_app",

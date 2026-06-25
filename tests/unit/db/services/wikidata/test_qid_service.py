@@ -148,7 +148,7 @@ from src.main_app.db.services.wikidata.qid_service import (
     insert,
     update,
 )
-from src.main_app.shared.core.extensions import db as _db
+from src.main_app.extensions import db as _db
 
 
 def _add_with_empty_qid(title: str) -> QidRecord:

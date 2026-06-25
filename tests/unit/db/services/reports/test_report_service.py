@@ -11,7 +11,7 @@ from src.main_app.db.services.reports.report_service import (
     list_reports,
     query_reports_with_filters,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 

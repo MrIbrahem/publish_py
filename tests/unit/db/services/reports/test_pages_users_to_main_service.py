@@ -12,7 +12,7 @@ from src.main_app.db.services.reports.pages_users_to_main_service import (
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 

@@ -22,7 +22,7 @@ def app() -> Flask:
     app.config.from_object(TestingConfig)
     app.config.update({"CORS_DISABLED": True})
 
-    from src.main_app.shared.core.extensions import db
+    from src.main_app.extensions import db
 
     db.init_app(app)
 

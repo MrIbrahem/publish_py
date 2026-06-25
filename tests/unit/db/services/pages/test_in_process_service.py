@@ -17,7 +17,7 @@ from src.main_app.db.services.pages.in_process_service import (
     list_in_process_by_user,
     update_in_process,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 

@@ -18,7 +18,7 @@ def app() -> Generator[Flask, Any, None]:
     app.config.from_object(TestingConfig)
     app.config.update({"CORS_DISABLED": False})
 
-    from src.main_app.shared.core.extensions import db
+    from src.main_app.extensions import db
 
     db.init_app(app)
 

@@ -12,7 +12,7 @@ from src.main_app.db.services.pages.page_service import (
     list_pages,
     update_page,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 

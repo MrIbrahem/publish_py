@@ -18,7 +18,7 @@ def app() -> Flask:
     app.secret_key = "test_secret"
     app.config.from_object(TestingConfig)
 
-    from src.main_app.shared.core.extensions import db
+    from src.main_app.extensions import db
 
     db.init_app(app)
 

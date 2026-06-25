@@ -21,7 +21,7 @@ from src.main_app.db.services.wikidata.qid_others_service import (
     list_records,
     update,
 )
-from src.main_app.shared.core.extensions import db as _db
+from src.main_app.extensions import db as _db
 
 pytestmark = pytest.mark.unit
 

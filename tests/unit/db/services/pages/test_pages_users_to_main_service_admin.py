@@ -25,7 +25,7 @@ from src.main_app.db.services.pages.pages_users_to_main_service import (
     get_user_page,
     list_pending,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 

@@ -13,7 +13,7 @@ from src.main_app.db.services.content.lang_service import (
 from src.main_app.db.services.delete_service import (
     delete_lang,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 

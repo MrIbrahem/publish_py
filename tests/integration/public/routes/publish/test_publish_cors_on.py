@@ -4,7 +4,7 @@ with CORS_ENABLED (CORS_DISABLED=False).
 """
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from flask import Flask
@@ -27,7 +27,7 @@ def app() -> Flask:
 
     app.config.from_object(TestingConfig)
     app.config.update({"CORS_DISABLED": False})
-    from src.main_app.shared.core.extensions import db
+    from src.main_app.extensions import db
 
     db.init_app(app)
 

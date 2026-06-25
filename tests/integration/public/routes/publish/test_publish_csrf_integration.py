@@ -34,7 +34,7 @@ def csrf_app() -> Flask:
     )
     app.url_map.strict_slashes = False
 
-    from src.main_app.shared.core.extensions import db
+    from src.main_app.extensions import db
 
     db.init_app(app)
 

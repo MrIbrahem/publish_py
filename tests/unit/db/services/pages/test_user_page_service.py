@@ -15,7 +15,7 @@ from src.main_app.db.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
