@@ -31,7 +31,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _env_int(name: str, default: int | None, safe: bool = False) -> int | None:
+def _env_int(name: str, default: int, safe: bool = False) -> int:
     """Convert environment variable to integer."""
     value = os.getenv(name)
     if value is None:

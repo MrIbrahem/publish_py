@@ -7,10 +7,10 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import Numeric, cast, extract, func, text
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.types import Integer as SAInteger
-from sqlalchemy.types import Numeric as SANumeric
+from sqlalchemy import extract, func
+# from sqlalchemy.exc import IntegrityError
+# from sqlalchemy.types import Integer as SAInteger
+# from sqlalchemy.types import Numeric as SANumeric
 
 from ....extensions import db
 from ...models import ReportRecord
