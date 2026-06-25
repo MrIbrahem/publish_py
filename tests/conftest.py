@@ -90,7 +90,7 @@ def stop_nets(request):
 
 
 @pytest.fixture(scope="session")
-def app() -> Generator[Flask, Any, None]:  # noqa: UP043
+def mock_app() -> Generator[Flask, Any, None]:  # noqa: UP043
     """
     Create and configure a test Flask application.
     """
@@ -102,45 +102,45 @@ def app() -> Generator[Flask, Any, None]:  # noqa: UP043
 
 
 @pytest.fixture
-def mock_client(app: Flask) -> FlaskClient:
+def mock_client(mock_app: Flask) -> FlaskClient:
     """Create a test client for the app.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Test client for making HTTP requests.
     """
-    return app.test_client()
+    return mock_app.test_client()
 
 
 @pytest.fixture
-def runner(app):
+def runner(mock_app):
     """Create a test CLI runner for the app.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Test CLI runner for invoking commands.
     """
-    return app.test_cli_runner()
+    return mock_app.test_cli_runner()
 
 
 @pytest.fixture
-def auth_client(app):
+def auth_client(mock_app):
     """Create an authenticated test client.
 
     This fixture provides a test client with a logged-in user session.
     Useful for testing protected routes.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Authenticated test client.
     """
-    client = app.test_client()
+    client = mock_app.test_client()
 
     with client.session_transaction() as sess:
         sess["uid"] = 12345
@@ -179,14 +179,14 @@ def mock_load_request(mocker):
 # ── db fixtures ───────────────────────────────────────────────────────────────────
 
 @pytest.fixture(autouse=True)
-def setup_db(app: Flask):
+def setup_db(mock_app: Flask):
     """
     Initialize an in-memory SQLite database for tests using Flask-SQLAlchemy.
 
     Creates all real tables (skipping views) and creates views manually.
     The Flask-SQLAlchemy session (db.session) is used throughout tests.
     """
-    with app.app_context():
+    with mock_app.app_context():
         # Create only real tables; skip view-backed mapped classes
         real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
         _db.metadata.create_all(_db.engine, tables=real_tables, checkfirst=True)

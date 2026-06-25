@@ -12,7 +12,7 @@ from src.main_app.config import TestingConfig
 
 
 @pytest.fixture
-def app() -> Flask:
+def mock_app() -> Flask:
     """Create a test Flask application."""
     import os
 
@@ -25,9 +25,9 @@ def app() -> Flask:
 
 
 @pytest.fixture
-def client(app: Flask, setup_db) -> FlaskClient:
+def client(mock_app: Flask, setup_db) -> FlaskClient:
     """Create a test client."""
-    return app.test_client()
+    return mock_app.test_client()
 
 
 class TestPostEndpoint:

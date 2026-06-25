@@ -16,31 +16,31 @@ ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
 
 @pytest.fixture
-def app() -> Flask:
+def mock_app() -> Flask:
     """Create a test Flask application with CORS enabled."""
     import os
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", f"{ALLOWED_DOMAIN},mdwikicx.toolforge.org")
 
-    app = Flask(__name__)
-    app.url_map.strict_slashes = False
+    mock_app = Flask(__name__)
+    mock_app.url_map.strict_slashes = False
 
-    app.config.from_object(TestingConfig)
-    app.config.update({"CORS_DISABLED": False})
+    mock_app.config.from_object(TestingConfig)
+    mock_app.config.update({"CORS_DISABLED": False})
     from src.main_app.extensions import db
 
-    db.init_app(app)
+    db.init_app(mock_app)
 
     from src.main_app.public.routes.publish.routes import bp_publish
 
-    app.register_blueprint(bp_publish)
-    return app
+    mock_app.register_blueprint(bp_publish)
+    return mock_app
 
 
 @pytest.fixture
-def mock_client(app: Flask) -> FlaskClient:
+def mock_client(mock_app: Flask) -> FlaskClient:
     """Create a test client."""
-    return app.test_client()
+    return mock_app.test_client()
 
 
 class TestCheckCorsOnPublish:
@@ -208,7 +208,7 @@ class TestValidateAccessOnPublish:
 class TestPublishCorsOnIntegration:
     """Integration tests using real is_allowed behavior with CORS_ENABLED."""
 
-    def test_options_same_origin_passes_real_cors(self, app, mock_client):
+    def test_options_same_origin_passes_real_cors(self, mock_app, mock_client):
         """OPTIONS from same origin passes real CORS check."""
         response = mock_client.options(
             "/publish/",
@@ -218,7 +218,7 @@ class TestPublishCorsOnIntegration:
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
 
-    def test_options_disallowed_origin_blocked_real_cors(self, app, mock_client):
+    def test_options_disallowed_origin_blocked_real_cors(self, mock_app, mock_client):
         """OPTIONS from disallowed origin is blocked by real CORS check."""
         response = mock_client.options(
             "/publish/",
@@ -229,7 +229,7 @@ class TestPublishCorsOnIntegration:
         data = response.get_json()
         assert data["error"]["code"] == "access_denied"
 
-    def test_options_from_allowed_cross_origin_passes_real_cors(self, app, mock_client):
+    def test_options_from_allowed_cross_origin_passes_real_cors(self, mock_app, mock_client):
         """OPTIONS from allowed cross-origin domain passes real CORS check."""
         response = mock_client.options(
             "/publish/",

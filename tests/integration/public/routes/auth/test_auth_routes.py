@@ -16,7 +16,7 @@ from flask.testing import FlaskClient
 class TestAuthLogin:
     """Integration tests for the /login route."""
 
-    def test_login_redirects_when_oauth_not_configured(self, app: Flask, mock_client: FlaskClient):
+    def test_login_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login redirects to index when OAuth is not configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
@@ -26,7 +26,7 @@ class TestAuthLogin:
             assert response.status_code == 302
             assert "/" in response.location or "error=oauth-not-configured" in response.location
 
-    def test_login_rate_limit_blocks_excessive_requests(self, app: Flask, mock_client: FlaskClient):
+    def test_login_rate_limit_blocks_excessive_requests(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login rate limit blocks excessive requests."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
@@ -56,7 +56,7 @@ class TestAuthLogin:
                     # After rate limit exceeded, should redirect with warning
                     assert response.status_code == 302  # in [302, 429]
 
-    def test_login_starts_oauth_flow(self, app: Flask, mock_client: FlaskClient):
+    def test_login_starts_oauth_flow(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login starts OAuth flow when properly configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
@@ -79,7 +79,7 @@ class TestAuthLogin:
 class TestAuthCallback:
     """Integration tests for the /callback route."""
 
-    def test_callback_redirects_when_oauth_not_configured(self, app: Flask, mock_client: FlaskClient):
+    def test_callback_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that callback redirects when OAuth is not configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = None
@@ -88,7 +88,7 @@ class TestAuthCallback:
 
             assert response.status_code == 302
 
-    def test_callback_validates_state_token(self, app: Flask, mock_client: FlaskClient):
+    def test_callback_validates_state_token(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that callback validates state token."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
             mock_settings.oauth = MagicMock()
@@ -114,7 +114,7 @@ class TestAuthCallback:
 class TestAuthLogout:
     """Integration tests for the /logout route."""
 
-    def test_logout_clears_session(self, app: Flask, mock_client: FlaskClient):
+    def test_logout_clears_session(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that logout clears the session."""
         with mock_client.session_transaction() as sess:
             sess["uid"] = 12345
@@ -128,7 +128,7 @@ class TestAuthLogout:
             assert "uid" not in sess
             assert "username" not in sess
 
-    def test_logout_deletes_cookie(self, app: Flask, mock_client: FlaskClient):
+    def test_logout_deletes_cookie(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that logout deletes the authentication cookie."""
         response = mock_client.get("/auth/logout", follow_redirects=False)
 

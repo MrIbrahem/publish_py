@@ -13,7 +13,7 @@ from flask.app import Flask
 
 @pytest.fixture
 def csrf_app() -> Flask:
-    """Create a Flask app with CSRF protection enabled (like Production)."""
+    """Create a Flask mock_app with CSRF protection enabled (like Production)."""
     import os
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
@@ -21,8 +21,8 @@ def csrf_app() -> Flask:
     from flask import Flask
     from flask_wtf.csrf import CSRFProtect
 
-    app = Flask(__name__)
-    app.config.update(
+    mock_app = Flask(__name__)
+    mock_app.config.update(
         {
             "SECRET_KEY": "test-secret-key-for-csrf-integration-tests",
             "WTF_CSRF_ENABLED": True,
@@ -32,23 +32,23 @@ def csrf_app() -> Flask:
             "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
         }
     )
-    app.url_map.strict_slashes = False
+    mock_app.url_map.strict_slashes = False
 
     from src.main_app.extensions import db
 
-    db.init_app(app)
+    db.init_app(mock_app)
 
-    with app.app_context():
+    with mock_app.app_context():
         real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
         db.metadata.create_all(db.engine, tables=real_tables)
 
-    csrf = CSRFProtect(app)
+    csrf = CSRFProtect(mock_app)
     from src.main_app.public.routes.publish.routes import bp_publish
 
-    app.register_blueprint(bp_publish)
+    mock_app.register_blueprint(bp_publish)
     csrf.exempt(bp_publish)
 
-    return app
+    return mock_app
 
 
 @pytest.fixture

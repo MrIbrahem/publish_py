@@ -4,8 +4,8 @@ from src.main_app.db.services.pages import get_leaderboard_chart_data
 from src.main_app.extensions import db
 
 
-def test_get_leaderboard_chart_data(app: Flask):
-    with app.app_context():
+def test_get_leaderboard_chart_data(mock_app: Flask):
+    with mock_app.app_context():
         # Setup test data
         u1 = UserRecord(username="user1", user_group="group1")
         db.session.add(u1)
