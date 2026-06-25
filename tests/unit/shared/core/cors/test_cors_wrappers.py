@@ -76,7 +76,6 @@ class TestValidateAccessDecorated:
 
         def my_func():
             """My docstring."""
-            pass
 
         decorated = validate_access(my_func)
         assert decorated.__name__ == "my_func"
@@ -125,7 +124,6 @@ class TestCheckCorsAccessDecorated:
 
         def my_func():
             """My docstring."""
-            pass
 
         decorated = check_cors(my_func)
         assert decorated.__name__ == "my_func"

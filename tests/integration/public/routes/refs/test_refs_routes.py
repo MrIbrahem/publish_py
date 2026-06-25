@@ -7,7 +7,6 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
 

@@ -5,7 +5,6 @@ Integration tests for src/main_app/public/routes/main/routes.py module.
 from __future__ import annotations
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
 

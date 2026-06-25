@@ -8,7 +8,6 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
-from itsdangerous import BadSignature, BadTimeSignature, URLSafeTimedSerializer
 
 from src.main_app.shared.core.cookies.cookie import (
     extract_user_id,

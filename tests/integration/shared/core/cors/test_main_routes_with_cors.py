@@ -3,10 +3,7 @@
 These tests verify the integration of various components in API routes.
 """
 
-import json
-from unittest.mock import MagicMock, patch
 
-import pytest
 
 
 class TestCorsIntegration1:

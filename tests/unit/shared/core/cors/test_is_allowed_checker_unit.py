@@ -1,6 +1,5 @@
 """Tests for is_allowed_checker module."""
 
-from unittest.mock import MagicMock
 
 import pytest
 

@@ -130,7 +130,6 @@ class TestGetTitleToQid:
 
     def test_handles_empty_qid(self, monkeypatch):
         """Test that get_title_to_qid handles empty QID values."""
-        pass
 
 
 # ---------------------------------------------------------------------------

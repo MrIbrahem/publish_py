@@ -4,9 +4,8 @@ Unit tests for extensions module.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
 from flask import Blueprint, Flask
 
 from src.main_app.extensions import csrf, csrf_exempt, csrf_init_app

@@ -2,16 +2,10 @@
 Tests for app_routes.publish.worker module.
 """
 
-import json
-from unittest.mock import MagicMock, patch
 
-import pytest
 
 from src.main_app.public.routes.publish.worker import (
     _get_errors_file,
-    _get_revid,
-    _handle_no_access,
-    _process_edit,
 )
 
 
