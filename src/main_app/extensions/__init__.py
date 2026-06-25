@@ -22,9 +22,9 @@ from ._csrf import (
     csrf_init_app,
 )
 from .data_base import (
+    BaseModel,
     db,
     metadata,
-    BaseModel,
 )
 from .db_types import LONGTEXT
 

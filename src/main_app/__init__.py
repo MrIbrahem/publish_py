@@ -13,13 +13,17 @@ from flask_wtf.csrf import CSRFError
 from .config import ensure_directories, settings
 from .db import init_db
 from .db.exceptions import DatabaseInitError
-from .extensions import csrf_exempt, csrf_init_app
+from .extensions import (
+    csrf_exempt,
+    csrf_init_app,
+)
 from .extensions import db as _db
-from .extensions import migrate
+from .extensions import (
+    migrate,
+)
 from .public import bp_publish, register_blueprints
-from .public.utils.routes_utils import context_data
-from .shared.core.cookies import CookieHeaderClient
-from .shared.core.jinja_filters import filters
+from .public.utils import context_data
+from .shared.core import CookieHeaderClient, filters
 
 logger = logging.getLogger(__name__)
 
@@ -121,9 +125,6 @@ def init_app_and_db(app, _db) -> bool:
     except Exception as e:
         logger.error("Failed to create tables: %s", e)
 
-    # Initialize CSRF protection
-    csrf_init_app(app)
-
     return False
 
 
@@ -149,6 +150,9 @@ def create_app(config_class: Type) -> Flask:
     app.url_map.strict_slashes = False
     app.test_client_class = CookieHeaderClient
     app.config.from_object(config_class())
+
+    # Initialize CSRF protection
+    csrf_init_app(app)
 
     @app.context_processor
     def _inject_data() -> dict[str, Any]:  # pragma: no cover - trivial wrapper
