@@ -86,6 +86,8 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
 
     try:
         record = delete_users_no_inprocess(record_id)
+        if not record:
+            raise ValueError(f"Unable to delete user with ID {record_id}")
     except ValueError as exc:
         logger.exception("Unable to delete user")
         flash(str(exc), "warning")

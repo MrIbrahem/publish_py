@@ -149,6 +149,14 @@ def dashboard(
 ) -> str:
     return msg_dashboard(last_table, id, user=user)
 
+def send_msg(
+    msg: str,
+    email_to: str,
+    email_from: str,
+    msg_title: str,
+    cc_to: str,
+):
+    ...
 
 @bp_msg.route("/send", methods=["POST"])
 @admin_required
@@ -161,6 +169,13 @@ def msg_post() -> str:
     ccme = data.get("ccme", "0")
     cc_to = data.get("cc_to", "") if str(ccme) == "1" else None
 
+    send_msg(
+        msg=msg,
+        email_to=email_to,
+        email_from=email_from,
+        msg_title=msg_title,
+        cc_to=cc_to,
+    )
     return render_template(
         "admins/email_msg/index.html",
         user_email=None,

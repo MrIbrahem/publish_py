@@ -27,7 +27,6 @@ def tt_index() -> str:
     """Render the Translate Type listing."""
     cat = request.args.get("cat", "All")
     translate_types = []
-    new_titles = []
     try:
         translate_types = translate_type_service.list_translate_types(cat=cat)
         # new_titles = translate_type_service.list_new_titles() if cat == "All" else []

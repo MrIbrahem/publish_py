@@ -103,6 +103,8 @@ def _delete_category(record_id: int) -> None:
 
     try:
         record = delete_category(record_id)
+        if not record:
+            raise ValueError("Category not found")
     except ValueError as exc:
         logger.exception("Unable to delete category")
         flash(str(exc), "warning")

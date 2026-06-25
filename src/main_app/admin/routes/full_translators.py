@@ -86,6 +86,8 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
 
     try:
         record = delete_full_translator(translator_id)
+        if not record:
+            raise ValueError(f"Unable to delete full translator with ID {translator_id}")
     except ValueError as exc:
         logger.exception("Unable to delete full translator")
         flash(str(exc), "warning")
