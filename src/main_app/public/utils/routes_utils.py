@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import logging
@@ -52,8 +51,6 @@ def load_auth_payload(user: Any | None) -> Dict[str, Any]:
             "access_secret": access_secret,
         }
     return {}
-
-
 
 
 __all__ = [

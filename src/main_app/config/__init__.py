@@ -20,7 +20,7 @@ from .flask_config import (
     TestingConfig,
     build_sqlalchemy_uri,
 )
-from .main_settings import settings, ensure_directories
+from .main_settings import ensure_directories, settings
 
 __all__ = [
     "Config",

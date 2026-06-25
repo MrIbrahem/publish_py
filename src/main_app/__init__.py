@@ -16,7 +16,7 @@ from .db.exceptions import DatabaseInitError
 from .extensions import csrf_exempt, csrf_init_app
 from .extensions import db as _db
 from .extensions import migrate
-from .public import register_blueprints, bp_publish
+from .public import bp_publish, register_blueprints
 from .public.utils.routes_utils import context_data
 from .shared.core.cookies import CookieHeaderClient
 from .shared.core.jinja_filters import filters
@@ -121,7 +121,11 @@ def init_app_and_db(app, _db) -> bool:
     except Exception as e:
         logger.error("Failed to create tables: %s", e)
 
+    # Initialize CSRF protection
+    csrf_init_app(app)
+
     return False
+
 
 def create_app(config_class: Type) -> Flask:
     """Instantiate and configure the Flask application.
@@ -146,9 +150,6 @@ def create_app(config_class: Type) -> Flask:
     app.test_client_class = CookieHeaderClient
     app.config.from_object(config_class())
 
-    # Initialize CSRF protection
-    csrf_init_app(app)
-
     @app.context_processor
     def _inject_data() -> dict[str, Any]:  # pragma: no cover - trivial wrapper
         return context_data(
@@ -158,7 +159,6 @@ def create_app(config_class: Type) -> Flask:
         )
 
     app.jinja_env.filters.update(filters)
-
 
     db_is_ok = True
     # Initialize Flask-SQLAlchemy and Flask-Migrate

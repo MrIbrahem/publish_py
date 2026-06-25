@@ -149,14 +149,15 @@ def dashboard(
 ) -> str:
     return msg_dashboard(last_table, id, user=user)
 
+
 def send_msg(
     msg: str,
     email_to: str,
     email_from: str,
     msg_title: str,
     cc_to: str,
-):
-    ...
+): ...
+
 
 @bp_msg.route("/send", methods=["POST"])
 @admin_required

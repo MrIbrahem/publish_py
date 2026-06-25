@@ -9,23 +9,7 @@ from typing import Any
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.model import Model
-from sqlalchemy import MetaData, Text, event, inspect, text
-from sqlalchemy.dialects.mysql import LONGTEXT as LONGTEXTSQLALCHEMY
-from sqlalchemy.engine import Connection, Dialect
-from sqlalchemy.types import TypeDecorator, TypeEngine
-
-
-class LONGTEXT(TypeDecorator):
-    """LONGTEXT for MySQL, Text for everything else."""
-
-    impl = Text
-    cache_ok = True
-
-    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine:
-        if dialect.name == "mysql":
-            return dialect.type_descriptor(LONGTEXTSQLALCHEMY())
-        return dialect.type_descriptor(Text())
-
+from sqlalchemy import MetaData
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +26,15 @@ class BaseModel(Model):
             data[column.name] = value  # type: ignore
         return data
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
 
+
+# expire_on_commit=False preserves current behavior where objects
+# remain accessible after commit without triggering new queries.
+# (The existing engine.py uses sessionmaker(expire_on_commit=False))
 
 # Naming convention for constraints (required for reliable Alembic migrations)
 convention = {
@@ -65,33 +53,12 @@ metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(
     model_class=BaseModel,
     metadata=metadata,
+    session_options={"expire_on_commit": False},
 )
 
 
-@event.listens_for(db.metadata, "after_create")
-def create_views_new_all_view(target: MetaData, connection: Connection, **kw: Any) -> None:
-    inspector = inspect(connection)
-    existing_views = inspector.get_view_names()
-
-    views_to_create = {
-        table.name: table.info.get("create_query")
-        for table in target.tables.values()
-        if table.info.get("is_view") and table.info.get("create_query")
-    }
-
-    for name, query in views_to_create.items():
-        if name not in existing_views:
-            try:
-                connection.execute(text(query))
-                logger.info(f"Successfully created view: {name}")
-            except Exception:
-                logger.exception(f"Error creating view {name}", exc_info=True)
-        else:
-            logger.info(f"View '{name}' already exists, skipping.")
-
-
 __all__ = [
+    "BaseModel",
     "db",
     "metadata",
-    "LONGTEXT",
 ]

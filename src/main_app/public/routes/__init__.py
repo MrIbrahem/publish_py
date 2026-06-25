@@ -25,6 +25,7 @@ def register_blueprints(app: Flask) -> None:
 
     app.register_blueprint(admin_route_module.bp)
 
+
 __all__ = [
     "register_blueprints",
     "bp_api",
