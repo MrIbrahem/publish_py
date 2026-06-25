@@ -48,7 +48,7 @@ if sys:
 from src.main_app import create_app
 from src.main_app.config import TestingConfig
 from src.main_app.shared.auth import CurrentUser
-from src.main_app.shared.core.extensions import db as _db
+from src.main_app.extensions import db as _db
 
 
 @pytest.fixture(autouse=True)
@@ -226,6 +226,6 @@ def mock_admin_required(mocker):
     Inject this fixture into admin route tests to bypass authentication
     so tests can focus on route functionality rather than auth.
     """
-    # Mock load_logged_in_user to return a valid user object
+    # Mock load_user to return a valid user object
     mock_user = CurrentUser(user_id=0, username="ADMIN_USER", access_token="", access_secret="", is_active_admin=True)
     mocker.patch("src.main_app.admin.decorators.load_user", return_value=mock_user)
