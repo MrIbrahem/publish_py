@@ -45,7 +45,6 @@ class LanguageSettingRecord(db.Model):
         if "add_en_lang" not in kwargs:
             kwargs["add_en_lang"] = 0
 
-
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,

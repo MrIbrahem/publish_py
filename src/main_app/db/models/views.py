@@ -34,7 +34,6 @@ class EnwikiPageviewRecord(db.Model):
         if "en_views" not in kwargs:
             kwargs["en_views"] = 0
 
-
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -70,7 +69,6 @@ class ViewsNewRecord(db.Model):
         # Apply Python-level defaults for fields not provided
         if "views" not in kwargs:
             kwargs["views"] = 0
-
 
     def to_dict(self) -> dict[str, Any]:
         return {

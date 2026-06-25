@@ -74,7 +74,6 @@ class QidOthersRecord(db.Model):
 
     def __init__(self, **kwargs: Any) -> None:
 
-
         self.validate()
 
     def validate(self):

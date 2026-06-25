@@ -58,7 +58,6 @@ class PageRecord(db.Model):
         if "deleted" not in kwargs:
             kwargs["deleted"] = 0
 
-
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -122,7 +121,6 @@ class UserPageRecord(db.Model):
         if "deleted" not in kwargs:
             kwargs["deleted"] = 0
 
-
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -168,7 +166,6 @@ class PagesUsersToMainRecord(db.Model):
             kwargs["new_user"] = ""
         if "new_qid" not in kwargs:
             kwargs["new_qid"] = ""
-
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -216,7 +213,6 @@ class InProcessRecord(db.Model):
             kwargs["translate_type"] = "lead"
         if "word" not in kwargs:
             kwargs["word"] = 0
-
 
     def to_dict(self) -> dict[str, Any]:
         return {
