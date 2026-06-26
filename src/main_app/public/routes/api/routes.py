@@ -17,8 +17,8 @@ from ....db.services.pages import get_in_process_counts_by_user, list_of_users_b
 from ....db.services.pages_query_service import list_pages_users, list_pages_with_views
 from ....db.services.reports import query_reports_with_filters
 from ....db.services.users import users_search
+from ....extensions import db
 from ....shared.core.cors import check_cors
-from ....shared.core.extensions import db
 from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.utils.web_utils import parse_select_fields
 from .leaderboard import leaderboard_status

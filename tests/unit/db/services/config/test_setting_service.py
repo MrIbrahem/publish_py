@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 # from src.main_app.db.models import SettingRecord
@@ -53,7 +51,7 @@ class TestGetSetting:
 
     def test_returns_setting_record(self, monkeypatch):
         """Test that function returns a SettingRecord."""
-        s = create_setting("analytics_id", "Google Analytics ID", "string", "UA-12345")
+        create_setting("analytics_id", "Google Analytics ID", "string", "UA-12345")
         result = get_setting_by_key("analytics_id")
         assert isinstance(result, SettingRecord)
         assert result.key == "analytics_id"
@@ -102,7 +100,7 @@ class TestDeleteSetting:
 
     def test_deletes_setting(self, monkeypatch):
         """Test that delete_setting calls store delete."""
-        s = create_setting("temporary_key", "Will be deleted")
+        create_setting("temporary_key", "Will be deleted")
         deleted = delete_setting_by_key("temporary_key")
         assert deleted is True
         assert get_setting_by_key("temporary_key") is None

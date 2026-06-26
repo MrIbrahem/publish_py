@@ -7,10 +7,10 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from sqlalchemy import and_, func, or_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import QidOthersRecord
 
 logger = logging.getLogger(__name__)

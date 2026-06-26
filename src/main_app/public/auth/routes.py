@@ -7,8 +7,7 @@ from __future__ import annotations
 import logging
 import secrets
 from collections.abc import Sequence
-from functools import wraps
-from typing import Any, Callable, cast
+from typing import Any, cast
 from urllib.parse import urlencode
 
 from flask import (
@@ -21,28 +20,50 @@ from flask import (
     session,
     url_for,
 )
+from mwoauth import RequestToken
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from ....config import settings
-from ....db.services.users import (
-    delete_user_token,
-    is_active_coordinator,
-    upsert_user_token,
+from ...config import settings
+from ...db.services.users import delete_user_token
+from ...shared.auth.auth_service import (
+    OAuthCallbackError,
+    complete_oauth_callback,
 )
-from ....shared.auth.current_user import CurrentUser
-from ....shared.auth.mwoauth_handshake import (
+from ...shared.auth.mwoauth_handshake import (
     OAuthIdentityError,
-    complete_login,
     start_login,
 )
-from ....shared.core.cookies.cookie import extract_user_id, sign_state_token, sign_user_id, verify_state_token
+from ...shared.core.cookies.cookie import (
+    extract_user_id,
+    sign_state_token,
+    sign_user_id,
+    verify_state_token,
+)
 from .rate_limit import callback_rate_limiter, login_rate_limiter
+from .utils import load_logged_in_user
 
 logger = logging.getLogger(__name__)
 bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 oauth_state_nonce = settings.sessions.state_key
 request_token_key = settings.sessions.request_token_key
+
+
+# ---------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------
+
+
+def _set_response_cookies(user_id, response) -> None:
+    response.set_cookie(
+        settings.cookie.name,
+        sign_user_id(user_id),
+        httponly=settings.cookie.httponly,
+        secure=settings.cookie.secure,
+        samesite=settings.cookie.samesite,
+        max_age=settings.cookie.max_age,
+        path="/",
+    )
 
 
 def _client_key() -> str:
@@ -52,9 +73,7 @@ def _client_key() -> str:
     return request.remote_addr or "anonymous"
 
 
-def _load_request_token(raw: Sequence[Any] | None):
-    from mwoauth import RequestToken
-
+def _load_request_token(raw: Sequence[Any] | None) -> RequestToken:
     if not raw:
         raise ValueError("Missing OAuth request token")
 
@@ -64,29 +83,26 @@ def _load_request_token(raw: Sequence[Any] | None):
     return RequestToken(raw[0], raw[1])
 
 
-def login_required(fn: Callable[..., Any]) -> Callable[..., Any]:
-    """Decorator that redirects anonymous users to the index page."""
+# ---------------------------------------------------------
+# Hooks
+# ---------------------------------------------------------
 
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        if not getattr(g, "is_authenticated", False):
-            logger.warning("login_required: unauthenticated access denied to %s", fn.__name__)
-            flash("You must be logged in to view this page", "warning")
-            return redirect(url_for("main.index", error="login-required"))
-        return fn(*args, **kwargs)
 
-    return wrapper
+# Register the hook right after defining the blueprint
+@bp_auth.before_app_request
+def before_request() -> None:
+    """Automatically load the user before any route is processed."""
+    load_logged_in_user()
+
+
+# ---------------------------------------------------------
+# Routes
+# ---------------------------------------------------------
 
 
 @bp_auth.get("/login")
 def login() -> WerkzeugResponse:
     logger.info("OAuth login initiated, client: %s", _client_key())
-
-    if settings.oauth is None:
-        flash("OAuth not configured", "danger")
-        logger.warning("OAuth login failed: OAuth not configured")
-        return redirect(url_for("main.index", error="oauth-not-configured"))
-
     if not login_rate_limiter.allow(_client_key()):
         time_left = login_rate_limiter.try_after(_client_key()).total_seconds()
         time_left_str = str(time_left).split(".")[0]
@@ -119,13 +135,6 @@ def login() -> WerkzeugResponse:
 @bp_auth.get("/callback")
 def callback() -> WerkzeugResponse:
     logger.info("OAuth callback initiated, client: %s", _client_key())
-    # ------------------
-    # use oauth
-    if settings.oauth is None:
-        flash("OAuth not configured", "danger")
-        logger.warning("OAuth callback failed: OAuth not configured")
-        return redirect(url_for("main.index", error="oauth-not-configured"))
-
     # ------------------
     # callback rate limiter
     if not callback_rate_limiter.allow(_client_key()):
@@ -170,102 +179,34 @@ def callback() -> WerkzeugResponse:
     # access_token, identity
     try:
         query_string = urlencode(request.args)
-        access_token, identity = complete_login(request_token, query_string)
+        user_record = complete_oauth_callback(request_token, query_string)
     except OAuthIdentityError:
         logger.exception("OAuth identity verification failed")
         flash("Failed to verify OAuth identity", "danger")
-        return redirect(url_for("main.index", error="Failed to verify OAuth identity"))
+        return redirect(url_for("main.index"))
+    except OAuthCallbackError as exc:
+        logger.exception("OAuth callback failed: %s", exc)
+        flash(str(exc), exc.flash_category)
+        return redirect(url_for("main.index"))
 
-    # ------------------
-    # access_key, access_secret
-    token_key = getattr(access_token, "key", None)
-    token_secret = getattr(access_token, "secret", None)
+    user_id = user_record.user_id
 
-    if not (token_key and token_secret) and isinstance(access_token, Sequence):
-        token_key = access_token[0]
-        token_secret = access_token[1]
-
-    if not (token_key and token_secret):
-        logger.error("OAuth access token missing key/secret")
-        flash("Missing OAuth credentials", "danger")
-        return redirect(url_for("main.index", error="Missing credentials"))
-
-    # ------------------
-    # user info
-    user_identifier = identity.get("sub") or identity.get("id") or identity.get("central_id") or identity.get("user_id")
-    if not user_identifier:
-        logger.warning("OAuth callback failed: missing user identifier in identity")
-        flash("Missing user id", "danger")
-        return redirect(url_for("main.index", error="Missing id"))
-
-    try:
-        user_id = int(user_identifier)
-    except (TypeError, ValueError):
-        logger.exception("Invalid user identifier")
-        flash("Invalid user identifier", "danger")
-        return redirect(url_for("main.index", error="Invalid user identifier"))
-
-    username = identity.get("username") or identity.get("name")
-    if not username:
-        logger.warning("OAuth callback failed: missing username in identity")
-        flash("Missing username", "danger")
-        return redirect(url_for("main.index", error="Missing username"))
-
-    # ------------------
-    # upsert credentials
-    upsert_user_token(
-        user_id=user_id,
-        username=username,
-        access_key=str(token_key),
-        access_secret=str(token_secret),
-    )
-
+    # Set sessions
     session["uid"] = user_id
-    session["username"] = username
+    session["username"] = user_record.username
 
-    # ------------------
-    # set cookies
-    redirect_url = session.pop("post_login_redirect", url_for("main.index"))
-    logger.info("OAuth callback complete, redirecting to: %s", redirect_url)
-    response = make_response(redirect(redirect_url))
-    response.set_cookie(
-        settings.cookie.name,
-        sign_user_id(user_id),
-        httponly=settings.cookie.httponly,
-        secure=settings.cookie.secure,
-        samesite=settings.cookie.samesite,
-        max_age=settings.cookie.max_age,
-        path="/",
-    )
+    # Set response and cookies
+    response = make_response(redirect(session.pop("post_login_redirect", url_for("main.index"))))
 
-    g._current_user = CurrentUser(
-        user_id=user_id,
-        username=username,
-        access_token=str(token_key).encode(),
-        access_secret=str(token_secret).encode(),
-        is_active_admin=is_active_coordinator(username),
-    )
-    g.is_authenticated = True
-    g.authenticated_user_id = str(user_id)
-    logger.info("OAuth login successful for user_id=%s username=%s", user_id, username)
+    _set_response_cookies(user_id, response)
 
-    oauth_config = settings.oauth  # Already validated as non-None above
-    if oauth_config:
-        g.oauth_credentials = {
-            "consumer_key": oauth_config.consumer_key,
-            "consumer_secret": oauth_config.consumer_secret,
-            "access_token": str(token_key),
-            "access_secret": str(token_secret),
-        }
-    else:
-        g.oauth_credentials = None
+    # Cache in g for the remainder of THIS request only
+    g._current_user = user_record
 
     return response
 
 
 @bp_auth.get("/logout")
-# @login_required
-# Users with stale cookies will be redirected with a "login-required" error instead of being able to clean up their authentication state
 def logout() -> WerkzeugResponse:
     user_id = session.pop("uid", None)
     session.pop(request_token_key, None)
@@ -293,19 +234,13 @@ def logout() -> WerkzeugResponse:
     else:
         flash("Session cleared.", "info")
 
-    flash("Logout successful.", "success")
     response = make_response(redirect(url_for("main.index")))
     response.delete_cookie(settings.cookie.name, path="/")
 
-    g.current_user = None
-    g.is_authenticated = False
-    g.oauth_credentials = None
-    g.authenticated_user_id = None
-
+    g._current_user = None
     return response
 
 
 __all__ = [
     "bp_auth",
-    "login_required",
 ]

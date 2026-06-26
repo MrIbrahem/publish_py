@@ -81,6 +81,8 @@ def _delete_project(record_id: int) -> None:
 
     try:
         record = delete_project(record_id)
+        if not record:
+            raise ValueError(f"Unable to delete project with ID {record_id}")
     except ValueError as exc:
         logger.exception("Unable to delete project")
         flash(str(exc), "warning")

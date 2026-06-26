@@ -5,8 +5,8 @@ Integration tests for user_token_service module.
 from src.main_app.db.services.delete_service import (
     delete_user_token,
 )
+from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
-    delete_user_token_by_username,
     get_user_token,
     get_user_token_by_username,
     upsert_user_token,
@@ -18,42 +18,36 @@ class TestUserServiceIntegration:
 
     def test_full_token_lifecycle(self):
         """Test complete CRUD lifecycle through service layer."""
+        user = create_user("TestUser")
+        user_id = user.user_id
         upsert_user_token(
-            user_id=12345,
-            username="TestUser",
+            user_id=user_id,
             access_key="test_key",
             access_secret="test_secret",
         )
 
-        result = get_user_token(12345)
+        result = get_user_token(user_id)
         assert result is not None
-        assert result.user_id == 12345
+        assert result.user_id == user_id
 
-        delete_user_token(12345)
+        delete_user_token(user_id)
 
-        result = get_user_token(12345)
+        result = get_user_token(user_id)
         assert result is None
 
     def test_username_lookup_integration(self):
         """Test username-based operations integrate correctly."""
+        user = create_user("TestUser")
+        user_id = user.user_id
         upsert_user_token(
-            user_id=12345,
-            username="TestUser",
+            user_id=user_id,
             access_key="test_key",
             access_secret="test_secret",
         )
 
         result = get_user_token_by_username("TestUser")
         assert result is not None
-        assert result.user_id == 12345
-
-    def test_empty_username_handling(self):
-        """Test service handles empty usernames gracefully."""
-        result = get_user_token_by_username("")
-        assert result is None
-
-        result = delete_user_token_by_username("   ")
-        assert result is False
+        assert result.user_id == user_id
 
     def test_lookup_error_handling(self):
         """Test service handles LookupError from DB layer."""

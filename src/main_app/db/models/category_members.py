@@ -14,7 +14,7 @@ from typing import Any
 from sqlalchemy import Index, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import db
+from ...extensions import db
 
 
 class CategoryMemberRecord(db.Model):

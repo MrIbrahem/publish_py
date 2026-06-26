@@ -8,7 +8,6 @@ Endpoints:
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import Any, Dict, List
 
 from flask import Response, jsonify, request
@@ -23,8 +22,8 @@ from ....db.models import (
     ViewsNewAllRecord,
     WordRecord,
 )
+from ....extensions import db
 from ....shared.core.cors import check_cors
-from ....shared.core.extensions import db
 from .form_utils import FormData, get_form
 
 logger = logging.getLogger(__name__)

@@ -7,7 +7,7 @@ from src.main_app.db.services.delete_service import (
     delete_user,
 )
 from src.main_app.db.services.users.user_service import (
-    add_user,
+    create_user,
     get_user,
     get_user_by_username,
     list_users,
@@ -15,13 +15,13 @@ from src.main_app.db.services.users.user_service import (
     update_user_data,
     user_exists,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
 
 def test_user_workflow():
-    u = add_user("Wiki_User", "jh@example.com", "enwiki", "Editor")
+    u = create_user("Wiki_User", "jh@example.com", "enwiki", "Editor")
     assert u.username == "Wiki_User"
 
     assert get_user(u.user_id).username == "Wiki_User"
@@ -45,8 +45,8 @@ class TestListUsers:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_user("Wiki_Admin")
-        add_user("Wiki_Editor")
+        create_user("Wiki_Admin")
+        create_user("Wiki_Editor")
         result = list_users()
         assert len(result) >= 2
 
@@ -56,8 +56,8 @@ class TestListUsersByGroup:
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns filtered list from store."""
-        add_user("Expert1", user_group="Medical_Board")
-        add_user("Expert2", user_group="General_Board")
+        create_user("Expert1", user_group="Medical_Board")
+        create_user("Expert2", user_group="General_Board")
         result = list_users_by_group("Medical_Board")
         assert len(result) == 1
         assert result[0].username == "Expert1"
@@ -68,7 +68,7 @@ class TestGetUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        u = add_user("ContributorA")
+        u = create_user("ContributorA")
         result = get_user(u.user_id)
         assert isinstance(result, UserRecord)
         assert result.username == "ContributorA"
@@ -82,7 +82,7 @@ class TestGetUserByUsername:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by username."""
-        add_user("Linguist_Specialist")
+        create_user("Linguist_Specialist")
         result = get_user_by_username("Linguist_Specialist")
         assert result.username == "Linguist_Specialist"
 
@@ -91,11 +91,11 @@ class TestGetUserByUsername:
 
 
 class TestAddUser:
-    """Tests for add_user function."""
+    """Tests for create_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_user("New_Researcher", "research@wiki.org", "enwiki", "Researcher")
+        record = create_user("New_Researcher", "research@wiki.org", "enwiki", "Researcher")
         assert record.username == "New_Researcher"
         assert record.email == "research@wiki.org"
 
@@ -106,11 +106,11 @@ class TestAddUser:
 
         with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
             with pytest.raises(ValueError, match="already exists"):
-                add_user("Duplicate")
+                create_user("Duplicate")
 
     def test_raises_error_if_no_username(self, monkeypatch):
         with pytest.raises(ValueError, match="Username is required"):
-            add_user("")
+            create_user("")
 
 
 class TestUpdateUser:
@@ -118,12 +118,12 @@ class TestUpdateUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        u = add_user("Bureaucrat1", email="old_email")
+        u = create_user("Bureaucrat1", email="old_email")
         updated = update_user_data(u.user_id, email="new_email")
         assert updated.email == "new_email"
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
-        u = add_user("No_Change")
+        u = create_user("No_Change")
         result = update_user_data(u.user_id)
         assert result.username == "No_Change"
 
@@ -137,7 +137,7 @@ class TestDeleteUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        u = add_user("Temporary_Account")
+        u = create_user("Temporary_Account")
         deleted = delete_user(u.user_id)
         assert deleted is True
         assert get_user(u.user_id) is None
@@ -151,7 +151,7 @@ class TestUserExists:
 
     def test_returns_true_when_user_exists(self, monkeypatch):
         """Test that function returns True when user found."""
-        add_user("Active_Member")
+        create_user("Active_Member")
         assert user_exists("Active_Member") is True
 
     def test_returns_false_when_user_not_found(self, monkeypatch):

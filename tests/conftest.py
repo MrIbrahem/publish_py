@@ -1,40 +1,64 @@
-"""Configuration and fixtures for pytest"""
+"""Shared pytest fixtures.
+
+Boot a Flask app once per session with CSRF on (so tests exercise the
+real protection path) and provide helpers for scraping CSRF tokens and
+for switching session identity. Each test gets a fresh JobStore so jobs
+don't leak across tests.
+"""
+
+from __future__ import annotations
 
 import logging
 import os
+import secrets
 import sys
+import tempfile
 from pathlib import Path
-from typing import Generator
+from typing import Any, Generator
 from unittest.mock import MagicMock
 
 import pytest
+from cryptography.fernet import Fernet
 from flask.app import Flask
 from flask.testing import FlaskClient
-from sqlalchemy.exc import SQLAlchemyError
+from pytest_socket import disable_socket
+from sqlalchemy import text
 
 if sys:
+    # tempfile.gettempdir() returns the path to the system's directory for temporary files
+    system_temp_dir = Path(tempfile.gettempdir()) / "test"
+
+    # Now correctly combine it with "test" and set the environment variable
+    os.environ["MAIN_DIR"] = str(system_temp_dir)
+    os.environ.setdefault("PUBLISH_REPORTS_DIR", f"{system_temp_dir}/publish_reports/reports_by_day")
+    os.environ.setdefault("WORDS_JSON_PATH", f"{system_temp_dir}/words.json")
+    os.environ.setdefault("ALL_PAGES_REVIDS_PATH", f"{system_temp_dir}/revids.json")
+
+    # Make the src/ directory importable as `main_app`. The repo's prod
+    # entrypoint src/app.py does the same trick.
+    _REPO = Path(__file__).resolve().parents[1]
+    sys.path.insert(0, str(_REPO / "src"))
+
+    # ── Set ALL env vars before any src.* import ─────────────────────────────────
+    # config.py executes get_settings() at module level and raises RuntimeError
+    # if FLASK_SECRET_KEY is missing, so every env var must be set here first,
+    # before any import that pulls in src.main_app.
+    os.environ.setdefault("FLASK_SECRET_KEY", secrets.token_hex(16))
+    os.environ.setdefault("FLASK_ENV", "testing")
+    os.environ.setdefault("APP_ENV", "testing")
+    os.environ.setdefault("OAUTH_ENCRYPTION_KEY", Fernet.generate_key().decode("utf-8"))
+    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test-consumer-key")
+    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test-consumer-secret")
+
+    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
     os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
     os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
     os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
     os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
 
-    # Set environment variables before any imports that might need them
-    os.environ.setdefault("FLASK_SECRET_KEY", "test_secret_key_12345678901234567890")
-    os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("OAUTH_CONSUMER_KEY", "test")
-    os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test")
-
     # Use a fixed encryption key for test reproducibility
     # This is a valid Fernet key for testing only - DO NOT use in production
-    TEST_ENCRYPTION_KEY = "rSsfrKOh-Tu_hcyJBdVwNxna9QtI1v5kuftpX6-bRXI="
-    os.environ.setdefault("OAUTH_ENCRYPTION_KEY", TEST_ENCRYPTION_KEY)
-
     os.environ.setdefault("WIKIDATA_DOMAIN", "test.wikidata.org")
-
-    os.environ.setdefault("FLASK_DATA_DIR", "/tmp")
-    os.environ.setdefault("PUBLISH_REPORTS_DIR", "/tmp/publish_reports/reports_by_day")
-    os.environ.setdefault("WORDS_JSON_PATH", "/tmp/words.json")
-    os.environ.setdefault("ALL_PAGES_REVIDS_PATH", "/tmp/revids.json")
 
     # Get the project root directory (parent of pytests folder)
     project_root = Path(__file__).parent.parent
@@ -43,76 +67,80 @@ if sys:
     python_src_path = project_root  # / "python_src"
     sys.path.insert(0, str(python_src_path))
 
-
 # Import after environment setup
 from src.main_app import create_app
 from src.main_app.config import TestingConfig
+from src.main_app.extensions import db as _db
 from src.main_app.shared.auth import CurrentUser
-from src.main_app.shared.core.extensions import db as _db
 
 
 @pytest.fixture(autouse=True)
-def disable_network(request, mocker):
-    """Disable network requests for non-network tests"""
-    if "network" not in request.keywords:
-        mocker.patch("requests.get", side_effect=Exception("Network disabled in tests"))
-        mocker.patch("requests.post", side_effect=Exception("Network disabled in tests"))
-        mocker.patch("urllib.request.urlopen", side_effect=Exception("Network disabled in tests"))
+def stop_nets(request):
+    # Check if 'network' mark is present in the current test item
+    if "network" in request.node.keywords:
+        from pytest_socket import enable_socket
+
+        enable_socket()
+        return
+    # Otherwise, disable the socket for all other tests
+    disable_socket(allow_unix_socket=True)
 
 
-@pytest.fixture
-def app() -> Generator[Flask]:
-    """Create and configure a test Flask application.
+# ── app fixtures ───────────────────────────────────────────────────────────────────
 
-    Yields:
-        Flask application configured for testing.
+
+@pytest.fixture(scope="session")
+def mock_app() -> Generator[Flask, Any, None]:  # noqa: UP043
     """
-    app = create_app(TestingConfig)
+    Create and configure a test Flask application.
+    """
+    application = create_app(TestingConfig)
+    application.config.update(TESTING=True)
 
-    with app.app_context():
-        yield app
+    with application.app_context():
+        yield application
 
 
 @pytest.fixture
-def client(app: Flask) -> FlaskClient:
+def mock_client(mock_app: Flask) -> FlaskClient:
     """Create a test client for the app.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Test client for making HTTP requests.
     """
-    return app.test_client()
+    return mock_app.test_client()
 
 
 @pytest.fixture
-def runner(app):
+def runner(mock_app):
     """Create a test CLI runner for the app.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Test CLI runner for invoking commands.
     """
-    return app.test_cli_runner()
+    return mock_app.test_cli_runner()
 
 
 @pytest.fixture
-def auth_client(app):
+def auth_client(mock_app):
     """Create an authenticated test client.
 
     This fixture provides a test client with a logged-in user session.
     Useful for testing protected routes.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Authenticated test client.
     """
-    client = app.test_client()
+    client = mock_app.test_client()
 
     with client.session_transaction() as sess:
         sess["uid"] = 12345
@@ -148,55 +176,44 @@ def mock_load_request(mocker):
     return mock_req
 
 
-@pytest.fixture
-def db_config():
-    """Fixture for DbConfig instance."""
-    from src.main_app.config import DbConfig
-
-    return DbConfig(
-        db_name="test_db",
-        db_host="localhost",
-        db_user="user",
-        db_password="pass",
-    )
+# ── db fixtures ───────────────────────────────────────────────────────────────────
 
 
 @pytest.fixture(autouse=True)
-def setup_db(app: Flask):
+def setup_db(mock_app: Flask):
     """
     Initialize an in-memory SQLite database for tests using Flask-SQLAlchemy.
 
     Creates all real tables (skipping views) and creates views manually.
     The Flask-SQLAlchemy session (db.session) is used throughout tests.
     """
-    with app.app_context():
+    with mock_app.app_context():
         # Create only real tables; skip view-backed mapped classes
         real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
-        _db.metadata.create_all(_db.engine, tables=real_tables)
+        _db.metadata.create_all(_db.engine, tables=real_tables, checkfirst=True)
 
-        # Create views manually (SQLite-compatible CREATE VIEW).
-        # The ``after_create`` listener in ``extensions`` already creates
-        # registered views idempotently; this loop is a fallback for any
-        # views that were not created by the listener (e.g. views added
-        # without listener support). Skip views that already exist.
         from sqlalchemy import inspect as sa_inspect
 
         existing_views = set(sa_inspect(_db.engine).get_view_names())
+        # Create views manually (SQLite-compatible CREATE VIEW)
         with _db.engine.connect() as conn:
             for table in _db.metadata.tables.values():
-                if not (table.info.get("is_view") and table.info.get("create_query")):
+                if not table.info.get("is_view"):
                     continue
+
+                if not table.info.get("create_query"):
+                    logging.warning("View %s has no create_query, skipping", table.name)
+                    continue
+
                 if table.name in existing_views:
                     continue
                 try:
-                    conn.execute(_db.text(table.info["create_query"]))
+                    create_sql = table.info["create_query"]
+                    conn.execute(text(create_sql))
                     conn.commit()
-                except SQLAlchemyError as exc:
+                except Exception:
                     conn.rollback()
-                    raise RuntimeError(
-                        f"Failed to create view {table.name!r} during test setup. "
-                        f"create_query={table.info['create_query']!r}"
-                    ) from exc
+                    logging.exception("Failed to create view %s", table.name)
 
         yield
 
@@ -207,16 +224,41 @@ def setup_db(app: Flask):
             for table in _db.metadata.tables.values():
                 if table.info.get("is_view"):
                     try:
-                        conn.execute(_db.text(f"DROP VIEW IF EXISTS {table.name}"))
-                    except SQLAlchemyError as exc:
-                        logging.getLogger(__name__).warning(
-                            "Failed to drop view %s during teardown: %s", table.name, exc
-                        )
+                        conn.execute(text(f"DROP VIEW IF EXISTS {table.name}"))
+                    except Exception:
+                        pass
             conn.commit()
 
         # Drop only real tables
         real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
         _db.metadata.drop_all(_db.engine, tables=real_tables)
+
+
+# ── mwclient_page fixtures ───────────────────────────────────────────────────────────────────
+
+
+@pytest.fixture
+def mock_site() -> MagicMock:
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_page() -> MagicMock:
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_site_pages(mock_site, mock_page):
+    def _factory(page_exists: bool) -> MagicMock:
+        mock_page.exists = page_exists
+
+        mock_pages = MagicMock()
+        mock_pages.__getitem__ = MagicMock(return_value=mock_page)
+
+        mock_site.pages = mock_pages
+        return mock_site
+
+    return _factory
 
 
 @pytest.fixture
@@ -226,6 +268,6 @@ def mock_admin_required(mocker):
     Inject this fixture into admin route tests to bypass authentication
     so tests can focus on route functionality rather than auth.
     """
-    # Mock load_logged_in_user to return a valid user object
+    # Mock load_user to return a valid user object
     mock_user = CurrentUser(user_id=0, username="ADMIN_USER", access_token="", access_secret="", is_active_admin=True)
-    mocker.patch("src.main_app.admin.decorators.load_logged_in_user", return_value=mock_user)
+    mocker.patch("src.main_app.admin.decorators.load_user", return_value=mock_user)

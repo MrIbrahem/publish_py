@@ -8,10 +8,10 @@ import logging
 from datetime import datetime
 from typing import Any, List
 
-from sqlalchemy import func, text
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import UserPageRecord
 
 logger = logging.getLogger(__name__)

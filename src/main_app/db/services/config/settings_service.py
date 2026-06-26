@@ -9,7 +9,7 @@ from typing import Any
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import SettingRecord
 from ..utils import db_guard
 
@@ -87,7 +87,7 @@ def update_setting(
     value: Any,
     value_type: str = "string",
     title: str | None = None,
-) -> SettingRecord:
+) -> bool:
     """
     Update an existing setting.
     """
@@ -102,7 +102,7 @@ def update_setting(
     if title:
         setting.title = title
     db.session.commit()
-    return setting
+    return True
 
 
 def create_setting(

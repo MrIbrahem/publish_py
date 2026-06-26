@@ -2,8 +2,6 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 
 class TestGetQidForMdtitle:
     """Tests for get_qid_for_mdtitle function."""

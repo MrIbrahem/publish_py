@@ -7,7 +7,6 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
 
@@ -15,15 +14,15 @@ from flask.testing import FlaskClient
 class TestRefsIndex:
     """Integration tests for the fixrefs index route."""
 
-    def test_fixrefs_index_returns_200(self, client: FlaskClient):
+    def test_fixrefs_index_returns_200(self, mock_client: FlaskClient):
         """Test that fixrefs index route returns 200."""
-        response = client.get("/fixrefs/")
+        response = mock_client.get("/fixrefs/")
 
         assert response.status_code == 200
 
-    def test_fixrefs_index_renders_template(self, client: FlaskClient):
+    def test_fixrefs_index_renders_template(self, mock_client: FlaskClient):
         """Test that fixrefs index renders template."""
-        response = client.get("/fixrefs/")
+        response = mock_client.get("/fixrefs/")
 
         assert response.status_code == 200
         assert response.content_type in ["text/html; charset=utf-8", "text/html"]
@@ -33,12 +32,12 @@ class TestRefsIndex:
 class TestRefsProcess:
     """Integration tests for the fixrefs process route."""
 
-    def test_fixrefs_process_post_returns_200(self, client: FlaskClient):
+    def test_fixrefs_process_post_returns_200(self, mock_client: FlaskClient):
         """Test that POST to fixrefs process returns 200."""
         with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.return_value = "Processed text with fixed references"
 
-            response = client.post(
+            response = mock_client.post(
                 "/fixrefs/",
                 data={
                     "source_title": "Source Title",
@@ -51,12 +50,12 @@ class TestRefsProcess:
 
             assert response.status_code == 200
 
-    def test_fixrefs_process_calls_do_changes_to_text(self, client: FlaskClient):
+    def test_fixrefs_process_calls_do_changes_to_text(self, mock_client: FlaskClient):
         """Test that fixrefs process calls do_changes_to_text_with_settings."""
         with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.return_value = "Processed text"
 
-            client.post(
+            mock_client.post(
                 "/fixrefs/",
                 data={
                     "source_title": "Source Title",
@@ -69,12 +68,12 @@ class TestRefsProcess:
 
             mock_do_changes.assert_called_once()
 
-    def test_fixrefs_process_handles_error(self, client: FlaskClient):
+    def test_fixrefs_process_handles_error(self, mock_client: FlaskClient):
         """Test that fixrefs process handles errors gracefully."""
         with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.side_effect = Exception("Processing error")
 
-            response = client.post(
+            response = mock_client.post(
                 "/fixrefs/",
                 data={
                     "source_title": "Source Title",
@@ -87,12 +86,12 @@ class TestRefsProcess:
             # Should not crash, should return error message in template
             assert response.status_code == 200
 
-    def test_fixrefs_process_preserves_form_data(self, client: FlaskClient):
+    def test_fixrefs_process_preserves_form_data(self, mock_client: FlaskClient):
         """Test that fixrefs process preserves form data in template."""
         with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
             mock_do_changes.return_value = "Processed"
 
-            response = client.post(
+            response = mock_client.post(
                 "/fixrefs/",
                 data={
                     "source_title": "My Source",

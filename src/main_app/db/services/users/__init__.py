@@ -26,7 +26,7 @@ from .full_translator_service import (
     update_full_translator,
 )
 from .user_service import (
-    add_user,
+    create_user,
     get_user,
     get_user_by_username,
     list_users,
@@ -37,7 +37,7 @@ from .user_service import (
     users_search,
 )
 from .user_token_service import (
-    delete_user_token_by_username,
+    get_authenticated_user_token,
     get_user_token,
     get_user_token_by_username,
     upsert_user_token,
@@ -74,7 +74,7 @@ __all__ = [
     "list_users_by_group",
     "get_user",
     "get_user_by_username",
-    "add_user",
+    "create_user",
     "update_user",
     "update_user_data",
     "delete_user",
@@ -84,7 +84,7 @@ __all__ = [
     "get_user_token",
     "delete_user_token",
     "get_user_token_by_username",
-    "delete_user_token_by_username",
+    "get_authenticated_user_token",
     "list_users_no_inprocess",
     "list_active_users_no_inprocess",
     "get_users_no_inprocess",

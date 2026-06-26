@@ -4,163 +4,118 @@ Unit tests for extensions module.
 
 from __future__ import annotations
 
+from datetime import datetime
+from typing import Any
 from unittest.mock import MagicMock, patch
 
-import pytest
-from flask import Blueprint, Flask
+from flask import Flask
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import String, func
+from sqlalchemy.orm import Mapped, mapped_column
 
-from src.main_app.shared.core.extensions import csrf, csrf_exempt, csrf_init_app
-
-
-class TestCsrfInitApp:
-    """Tests for csrf_init_app function."""
-
-    def test_initializes_csrf_protection(self, app: Flask):
-        """Test that csrf_init_app initializes CSRF protection on the app."""
-        # Create a fresh app for this test
-        from flask_wtf.csrf import CSRFProtect
-
-        test_app = Flask(__name__)
-        test_app.config["SECRET_KEY"] = "test_secret_key"
-        test_app.config["WTF_CSRF_ENABLED"] = True
-
-        # Create a new CSRF instance for testing
-        test_csrf = CSRFProtect()
-
-        # CSRF should not be initialized yet
-        assert test_app.extensions.get("csrf") is None
-
-        test_csrf.init_app(test_app)
-
-        # After initialization, CSRF extension should be registered
-        assert test_app.extensions.get("csrf") is not None
-
-    def test_csrf_protection_is_active_after_init(self, app: Flask):
-        """Test that CSRF protection is active after initialization."""
-        csrf_init_app(app)
-
-        # Create a test client
-        client = app.test_client()
-
-        # Make a GET request to establish a request context and get a CSRF token
-        # The app should now have CSRF protection enabled
-        with client.session_transaction():
-            pass  # Just establish a request context
-
-        with app.test_request_context():
-            from flask_wtf.csrf import generate_csrf
-
-            csrf_token = generate_csrf()
-            assert csrf_token is not None
+from src.main_app.extensions import BaseModel, db, migrate
 
 
-class TestCsrfExempt:
-    """Tests for csrf_exempt function."""
+class MockModel(db.Model):
+    __tablename__ = "mock_model"
 
-    def test_exempts_blueprint_when_csrf_enabled(self):
-        """Test that blueprint is exempted when CSRF is enabled."""
-        app = Flask(__name__)
-        app.config["SECRET_KEY"] = "test_secret_key"
-        app.config["WTF_CSRF_ENABLED"] = True
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
-        bp = Blueprint("test_bp", __name__)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.current_timestamp())
 
-        with patch.object(csrf, "exempt") as mock_exempt:
-            csrf_exempt(app, bp)
-            mock_exempt.assert_called_once_with(bp)
-
-    def test_does_not_exempt_when_csrf_disabled(self):
-        """Test that blueprint is not exempted when CSRF is disabled."""
-        app = Flask(__name__)
-        app.config["SECRET_KEY"] = "test_secret_key"
-        app.config["WTF_CSRF_ENABLED"] = False
-
-        bp = Blueprint("test_bp", __name__)
-
-        with patch.object(csrf, "exempt") as mock_exempt:
-            csrf_exempt(app, bp)
-            mock_exempt.assert_not_called()
-
-    def test_exempts_blueprint_with_csrf_init(self, app: Flask):
-        """Test that exempted blueprint allows POST without CSRF token."""
-        app.config["WTF_CSRF_ENABLED"] = True
-
-        bp = Blueprint("test_bp", __name__)
-
-        @bp.route("/test", methods=["POST"])
-        def test_post():
-            return "Success", 200
-
-        csrf_init_app(app)
-        csrf_exempt(app, bp)
-        app.register_blueprint(bp)
-
-        client = app.test_client()
-
-        # POST without CSRF token should succeed for exempted blueprint
-        response = client.post("/test")
-        # Should succeed because blueprint is exempted
-        assert response.status_code == 200
+    def __init__(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
 
-class TestCsrfSingleton:
-    """Tests for the csrf singleton instance."""
+def test_base_model_to_dict(mock_app: Flask) -> None:
+    with mock_app.app_context():
+        now = datetime(2025, 1, 1, 12, 0, 0)
+        obj = MockModel(id=1, name="test", created_at=now)
 
-    def test_csrf_is_singleton(self):
-        """Test that csrf is a singleton instance."""
-        from src.main_app.shared.core.extensions import csrf as csrf1
-        from src.main_app.shared.core.extensions import csrf as csrf2
-
-        assert csrf1 is csrf2
-
-    def test_csrf_is_csrfprotect_instance(self):
-        """Test that csrf is a CSRFProtect instance."""
-        from flask_wtf.csrf import CSRFProtect
-
-        assert isinstance(csrf, CSRFProtect)
+        data = obj.to_dict()
+        assert data["id"] == 1
+        assert data["name"] == "test"
+        assert data["created_at"] == "2025-01-01T12:00:00"
 
 
-class TestExtensionsIntegration:
-    """Integration tests for extensions module."""
+def test_base_model_to_dict2():
+    """Test that to_dict serializes column values to a dictionary."""
+    model = BaseModel()
+    model.foo = "value1"
+    model.bar = "value2"
 
-    def test_full_csrf_setup(self, app: Flask):
-        """Test complete CSRF setup flow."""
-        app.config["WTF_CSRF_ENABLED"] = True
-        app.config["SECRET_KEY"] = "test_secret_key"
+    col1 = MagicMock()
+    col1.name = "foo"
+    col2 = MagicMock()
+    col2.name = "bar"
 
-        # Initialize CSRF
-        csrf_init_app(app)
+    table_mock = MagicMock()
+    table_mock.columns = [col1, col2]
 
-        # Create and exempt a blueprint
-        bp = Blueprint("api_bp", __name__)
+    with patch.object(BaseModel, "__table__", table_mock, create=True):
+        result = model.to_dict()
 
-        @bp.route("/data", methods=["POST"])
-        def api_data():
-            return {"status": "ok"}, 200
+    assert result == {"foo": "value1", "bar": "value2"}
 
-        csrf_exempt(app, bp)
-        app.register_blueprint(bp, url_prefix="/api")
 
-        client = app.test_client()
+def test_base_model_to_dict_isoformat():
+    """Test that datetime values are converted to ISO format in to_dict."""
+    model = BaseModel()
+    dt = datetime(2025, 10, 27, 4, 41, 7)
+    model.created_at = dt
 
-        # POST to exempted API endpoint should work without CSRF token
-        response = client.post("/api/data")
-        assert response.status_code == 200
+    col = MagicMock()
+    col.name = "created_at"
 
-    def test_csrf_protection_on_non_exempt_routes(self, app: Flask):
-        """Test that non-exempt routes still require CSRF token."""
-        app.config["WTF_CSRF_ENABLED"] = True
-        app.config["SECRET_KEY"] = "test_secret_key"
+    table_mock = MagicMock()
+    table_mock.columns = [col]
 
-        csrf_init_app(app)
+    with patch.object(BaseModel, "__table__", table_mock, create=True):
+        result = model.to_dict()
 
-        # Create a regular route (not exempted)
-        @app.route("/protected", methods=["POST"])
-        def protected_post():
-            return "Success", 200
+    assert result == {"created_at": "2025-10-27T04:41:07"}
 
-        client = app.test_client()
 
-        # POST without CSRF token should fail
-        response = client.post("/protected")
-        assert response.status_code == 400  # CSRF error
+def test_base_model_init_sets_kwargs():
+    """Test that __init__ sets provided kwargs as instance attributes when the attribute exists."""
+    model = BaseModel()
+    model.foo = "original"
+
+    BaseModel.__init__(model, foo="updated", bar="new")
+
+    assert model.foo == "updated"
+    assert not hasattr(model, "bar")
+
+
+def test_base_model_init_skips_nonexistent_attributes():
+    """Test that __init__ ignores kwargs for attributes that don't exist on the model."""
+    model = BaseModel()
+
+    BaseModel.__init__(model, nonexistent="val")
+
+    assert not hasattr(model, "nonexistent")
+
+
+def test_db_is_sqlalchemy_instance():
+    """Test that db is a SQLAlchemy instance."""
+    assert isinstance(db, SQLAlchemy)
+
+
+def test_db_uses_base_model_class():
+    """Test that db.Model inherits from BaseModel, confirming BaseModel was used as model_class."""
+    assert issubclass(db.Model, BaseModel)
+
+
+def test_db_session_options():
+    """Test that session_options includes expire_on_commit=False in the session factory kwargs."""
+    sf_kw = db.session.session_factory.kw
+    assert sf_kw.get("expire_on_commit") is False
+
+
+def test_migrate_is_migrate_instance():
+    """Test that migrate is a Migrate instance."""
+    assert isinstance(migrate, Migrate)

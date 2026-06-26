@@ -6,21 +6,21 @@ This directory is the root package of the **MDWiki Translation Dashboard** -- a 
 
 ### Main Modules
 
-| File | Purpose |
-|------|---------|
-| `app.py` | Production WSGI entry point (23 lines) |
-| `app1.py` | Development WSGI entry point with `.env` loading (37 lines) |
+| File               | Purpose                                                              |
+| ------------------ | -------------------------------------------------------------------- |
+| `app.py`           | Production WSGI entry point (23 lines)                               |
+| `app1.py`          | Development WSGI entry point with `.env` loading (37 lines)          |
 | `logger_config.py` | Centralized logging with colored console + file handlers (117 lines) |
-| `__init__.py` | Package marker (empty) |
-| `main_app/` | The Flask application package (see its own README) |
+| `__init__.py`      | Package marker (empty)                                               |
+| `main_app/`        | The Flask application package (see its own README)                   |
 
 ### Technologies & Dependencies
 
-- **Python 3.13** with **Flask** application factory pattern
-- **PyMySQL** as the MySQL adapter (installed as MySQLdb shim)
-- **python-dotenv** for development environment variable loading
-- **colorlog** for colored terminal output
-- **WatchedFileHandler** for log-rotation-safe file logging
+-   **Python 3.13** with **Flask** application factory pattern
+-   **PyMySQL** as the MySQL adapter (installed as MySQLdb shim)
+-   **python-dotenv** for development environment variable loading
+-   **colorlog** for colored terminal output
+-   **WatchedFileHandler** for log-rotation-safe file logging
 
 ## Architecture & Code Quality Review
 
@@ -37,9 +37,9 @@ Both delegate to `main_app.create_app()` with their respective config class, fol
 
 ### Code Organization
 
-- **Flat structure**: Only 3 meaningful files at this level, which is appropriate for entry points
-- **Clear separation**: Entry points are minimal -- they bootstrap config, logging, and delegate to the app factory
-- **`isort:skip_file`**: Both entry points use this directive because `pymysql.install_as_MySQLdb()` and `load_dotenv()` must execute before other imports
+-   **Flat structure**: Only 3 meaningful files at this level, which is appropriate for entry points
+-   **Clear separation**: Entry points are minimal -- they bootstrap config, logging, and delegate to the app factory
+-   **`isort:skip_file`**: Both entry points use this directive because `pymysql.install_as_MySQLdb()` and `load_dotenv()` must execute before other imports
 
 ### Logging Architecture
 
@@ -54,16 +54,17 @@ configure_logging(level)
 ```
 
 Key design decisions:
-- **`WatchedFileHandler`** instead of `FileHandler` -- automatically reopens files after external log rotation (e.g., `logrotate`)
-- **Idempotent setup** -- `if project_logger.handlers: return` prevents duplicate handlers on repeated calls
-- **Fallback chain** -- if log directory creation fails, falls back to console-only logging
+
+-   **`WatchedFileHandler`** instead of `FileHandler` -- automatically reopens files after external log rotation (e.g., `logrotate`)
+-   **Idempotent setup** -- `if project_logger.handlers: return` prevents duplicate handlers on repeated calls
+-   **Fallback chain** -- if log directory creation fails, falls back to console-only logging
 
 ## Strengths
 
-- **Minimal entry points**: `app.py` is only 23 lines -- clean, focused, and easy to audit
-- **Environment-aware**: Clear separation between production (env vars from Toolforge) and development (`.env` file)
-- **Robust logging**: Handles directory creation, log rotation, and graceful degradation
-- **SQLAlchemy log suppression**: `app1.py` correctly sets SQLAlchemy logger to WARNING to reduce noise during development
+-   **Minimal entry points**: `app.py` is only 23 lines -- clean, focused, and easy to audit
+-   **Environment-aware**: Clear separation between production (env vars from Toolforge) and development (`.env` file)
+-   **Robust logging**: Handles directory creation, log rotation, and graceful degradation
+-   **SQLAlchemy log suppression**: `app1.py` correctly sets SQLAlchemy logger to WARNING to reduce noise during development
 
 ## Weaknesses
 
@@ -79,43 +80,46 @@ Key design decisions:
 
 ### Minor Issues
 
-- **`logger_config.py` type annotation mismatch**: The `level` parameter in `setup_logging()` is annotated as `str` but called with `logging.WARNING` (an `int`). The runtime handles this via `isinstance(level, str)`, but the annotation is misleading.
+-   **`logger_config.py` type annotation mismatch**: The `level` parameter in `setup_logging()` is annotated as `str` but called with `logging.WARNING` (an `int`). The runtime handles this via `isinstance(level, str)`, but the annotation is misleading.
 
-- **f-string in logging call** (`app1.py` line 22): Uses `logging.warning(f"Failed to load .env file from {_env_file_path}")` instead of the preferred lazy formatting: `logging.warning("Failed to load .env file from %s", _env_file_path)`.
+-   **f-string in logging call** (`app1.py` line 22): Uses `logging.warning(f"Failed to load .env file from {_env_file_path}")` instead of the preferred lazy formatting: `logging.warning("Failed to load .env file from %s", _env_file_path)`.
 
-- **Broad exception catch** (`app1.py` line 20-22): `except Exception` around `load_dotenv()` is overly broad. `load_dotenv()` returns `False` silently if the file doesn't exist; the catch could mask unexpected errors.
+-   **Broad exception catch** (`app1.py` line 20-22): `except Exception` around `load_dotenv()` is overly broad. `load_dotenv()` returns `False` silently if the file doesn't exist; the catch could mask unexpected errors.
 
 ## Areas That Need Attention
 
-| Area | Status |
-|------|--------|
-| Missing documentation | No README existed before this one |
-| Naming conventions | `app1.py` should be renamed |
-| Type annotations | `logger_config.py` needs `level: str | int` fix |
-| Test coverage | Entry points are not directly tested (app factory is tested separately) |
+| Area                  | Status                                                                  |
+| --------------------- | ----------------------------------------------------------------------- | -------- |
+| Missing documentation | No README existed before this one                                       |
+| Naming conventions    | `app1.py` should be renamed                                             |
+| Type annotations      | `logger_config.py` needs `level: str                                    | int` fix |
+| Test coverage         | Entry points are not directly tested (app factory is tested separately) |
 
 ## Improvement Plan
 
 ### Quick Wins
-- [ ] Rename `app1.py` to `app_dev.py` and update any scripts/docs that reference it
-- [ ] Fix `setup_logging` type annotation to `level: str | int = "WARNING"`
-- [ ] Replace f-string logging with `%s` lazy formatting
+
+-   [ ] Rename `app1.py` to `app_dev.py` and update any scripts/docs that reference it
+-   [ ] Fix `setup_logging` type annotation to `level: str | int = "WARNING"`
+-   [ ] Replace f-string logging with `%s` lazy formatting
 
 ### Medium-term Improvements
-- [ ] Extract shared bootstrap logic (`pymysql.install_as_MySQLdb()`) to a `bootstrap.py` module
-- [ ] Add a `pyproject.toml` to enable `pip install -e .` and eliminate `sys.path` manipulation
-- [ ] Add integration tests that verify both entry points can create an app instance
+
+-   [ ] Extract shared bootstrap logic (`pymysql.install_as_MySQLdb()`) to a `bootstrap.py` module
+-   [ ] Add a `pyproject.toml` to enable `pip install -e .` and eliminate `sys.path` manipulation
+-   [ ] Add integration tests that verify both entry points can create an app instance
 
 ### Long-term Recommendations
-- [ ] Consider a single entry point with `--dev` flag or environment-based config selection
-- [ ] Add structured logging (JSON format) for production log aggregation
+
+-   [ ] Consider a single entry point with `--dev` flag or environment-based config selection
+-   [ ] Add structured logging (JSON format) for production log aggregation
 
 ## Comprehensive Review
 
-| Metric | Score | Notes |
-|--------|-------|-------|
-| **Overall Rating** | **8/10** | Clean, minimal, well-structured entry points |
-| **Production Readiness** | Ready | Production entry point is solid |
-| **Technical Debt** | Low | Minor naming and type annotation issues |
-| **Risk Assessment** | Low | Entry points are isolated; failures here prevent app startup (fail-fast) |
-| **Maintainability** | High | Simple files, clear purpose, minimal dependencies |
+| Metric                   | Score    | Notes                                                                    |
+| ------------------------ | -------- | ------------------------------------------------------------------------ |
+| **Overall Rating**       | **8/10** | Clean, minimal, well-structured entry points                             |
+| **Production Readiness** | Ready    | Production entry point is solid                                          |
+| **Technical Debt**       | Low      | Minor naming and type annotation issues                                  |
+| **Risk Assessment**      | Low      | Entry points are isolated; failures here prevent app startup (fail-fast) |
+| **Maintainability**      | High     | Simple files, clear purpose, minimal dependencies                        |

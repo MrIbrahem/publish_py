@@ -1,3 +1,5 @@
+"""Application configuration helpers."""
+
 from __future__ import annotations
 
 from .classes import (
@@ -18,7 +20,7 @@ from .flask_config import (
     TestingConfig,
     build_sqlalchemy_uri,
 )
-from .main_settings import settings
+from .main_settings import ensure_directories, settings
 
 __all__ = [
     "Config",
@@ -37,4 +39,5 @@ __all__ = [
     "UsersConfig",
     "Settings",
     "settings",
+    "ensure_directories",
 ]

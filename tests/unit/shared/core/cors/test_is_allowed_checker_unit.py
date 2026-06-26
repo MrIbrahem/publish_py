@@ -1,7 +1,5 @@
 """Tests for is_allowed_checker module."""
 
-from unittest.mock import MagicMock
-
 import pytest
 
 from src.main_app.shared.core.cors.is_allowed_checker import get_host

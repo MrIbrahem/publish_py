@@ -9,7 +9,7 @@ from typing import Any
 from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import db
+from ...extensions import db
 
 
 class QidRecord(db.Model):
@@ -30,8 +30,11 @@ class QidRecord(db.Model):
     qid: Mapped[str] = mapped_column(String(20), nullable=False)
     title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
         self.validate()
 
     def validate(self):
@@ -72,8 +75,10 @@ class QidOthersRecord(db.Model):
     qid: Mapped[str] = mapped_column(String(20), nullable=False)
     title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
         self.validate()
 

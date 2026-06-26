@@ -4,10 +4,7 @@ Tests for word count lookup utilities.
 """
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from src.main_app.shared.utils.helpers.words import (
     _load_words_table,

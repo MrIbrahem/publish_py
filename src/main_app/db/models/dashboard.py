@@ -10,7 +10,7 @@ from typing import Any
 from sqlalchemy import String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import db
+from ...extensions import db
 
 logger = logging.getLogger(__name__)
 

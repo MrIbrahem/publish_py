@@ -5,13 +5,10 @@ from __future__ import annotations
 import logging
 from typing import Any, Type
 
-from ...shared.core.extensions import db
+from ...extensions import db
 from ..models import (
     AdminUserRecord,
-    AllArticlesRecord,
-    AllQidsExistRecord,
     AssessmentRecord,
-    CategoryMemberRecord,
     CategoryRecord,
     EnwikiPageviewRecord,
     FullTranslatorRecord,
@@ -32,7 +29,6 @@ from ..models import (
     UserRecord,
     UsersNoInprocessRecord,
     UserTokenRecord,
-    ViewsNewAllRecord,
     ViewsNewRecord,
     WordRecord,
 )
@@ -127,10 +123,14 @@ def delete_user_page_to_main(page_id: int) -> bool:
         return False
 
     try:
-        db.session.query(PagesUsersToMainRecord).filter(PagesUsersToMainRecord.id == page_id).delete(
-            synchronize_session=False
-        )
-        db.session.query(UserPageRecord).filter(UserPageRecord.id == page_id).delete(synchronize_session=False)
+        to_main = db.session.get(PagesUsersToMainRecord, page_id)
+        if to_main:
+            db.session.delete(to_main)
+
+        user_page = db.session.get(UserPageRecord, page_id)
+        if user_page:
+            db.session.delete(user_page)
+
         db.session.commit()
     except Exception:
         logger.exception("Failed to delete pages_users(_to_main) id=%r", page_id)

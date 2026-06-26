@@ -2,8 +2,6 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 
 class TestPublishDoEdit:
     """Tests for publish_do_edit function."""

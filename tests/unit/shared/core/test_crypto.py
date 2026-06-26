@@ -140,8 +140,8 @@ class TestRoundTrip:
     def test_oauth_token_like_values(self) -> None:
         """Test with values that resemble OAuth tokens."""
         # Simulate OAuth access token and secret
-        access_token: str = "abcdefghijklmnop1234567890"  # noqa: S105
-        access_secret: str = "secret_value_with_special_chars+/="  # noqa: S105
+        access_token: str = "abcdefghijklmnop1234567890"
+        access_secret: str = "secret_value_with_special_chars+/="
 
         encrypted_token: bytes = encrypt_value(access_token)
         encrypted_secret: bytes = encrypt_value(access_secret)

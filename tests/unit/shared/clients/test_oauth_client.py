@@ -2,8 +2,6 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 
 class TestGetOauthClient:
     """Tests for get_oauth_client function."""

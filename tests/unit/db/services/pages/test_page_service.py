@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -11,8 +11,12 @@ from src.main_app.db.services.pages.page_service import (
     insert_page_target,
     list_pages,
     update_page,
+    count_translated,
+    get_by_id,
+    list_translated,
 )
-from src.main_app.shared.core.extensions import db
+
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
@@ -161,12 +165,6 @@ class TestInsertPageTarget:
 #   - count_translated(lang)
 #   - get_by_id(page_id)
 # ---------------------------------------------------------------------------
-
-from src.main_app.db.services.pages.page_service import (
-    count_translated,
-    get_by_id,
-    list_translated,
-)
 
 
 def _make_page(title: str, lang: str, target: str, user: str = "u") -> PageRecord:

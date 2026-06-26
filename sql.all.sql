@@ -308,7 +308,7 @@ CREATE TABLE
         `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
         `wiki` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
         `user_group` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Uncategorized',
-        `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`user_id`)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 

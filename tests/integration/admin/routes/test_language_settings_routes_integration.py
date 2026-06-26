@@ -9,7 +9,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
 
@@ -17,9 +16,9 @@ from flask.testing import FlaskClient
 class TestLanguageSettingsDashboard:
     """Integration tests for language settings dashboard."""
 
-    def test_language_settings_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_language_settings_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that language settings dashboard requires admin access."""
-        response = client.get("/admin/language_settings/")
+        response = mock_client.get("/admin/language_settings/")
 
         # With mock_admin_required, should render successfully
         assert response.status_code == 200
@@ -49,9 +48,9 @@ class TestLanguageSettingsDashboard:
 class TestAddLanguageSetting:
     """Integration tests for adding language settings."""
 
-    def test_add_language_setting_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_add_language_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that adding language setting requires admin access."""
-        response = client.post("/admin/language_settings/add", data={"lang_code": "fr"})
+        response = mock_client.post("/admin/language_settings/add", data={"lang_code": "fr"})
 
         assert response.status_code == 302
         assert response.location == "/admin/language_settings/"
@@ -93,9 +92,9 @@ class TestAddLanguageSetting:
 class TestUpdateLanguageSetting:
     """Integration tests for updating language settings."""
 
-    def test_update_language_setting_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_update_language_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that updating language setting requires admin access."""
-        response = client.post("/admin/language_settings/1/update", data={"move_dots": "1"})
+        response = mock_client.post("/admin/language_settings/1/update", data={"move_dots": "1"})
 
         assert response.status_code == 302
         assert response.location == "/admin/language_settings/"
@@ -124,9 +123,9 @@ class TestUpdateLanguageSetting:
 class TestDeleteLanguageSetting:
     """Integration tests for deleting language settings."""
 
-    def test_delete_language_setting_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_delete_language_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deleting language setting requires admin access."""
-        response = client.post("/admin/language_settings/1/delete")
+        response = mock_client.post("/admin/language_settings/1/delete")
 
         assert response.status_code == 302
         assert response.location == "/admin/language_settings/"

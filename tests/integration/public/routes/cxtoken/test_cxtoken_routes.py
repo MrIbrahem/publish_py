@@ -7,7 +7,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
 
@@ -15,15 +14,15 @@ from flask.testing import FlaskClient
 class TestCxTokenPreflight:
     """Integration tests for the CORS preflight endpoint."""
 
-    def test_preflight_returns_200(self, client: FlaskClient):
+    def test_preflight_returns_200(self, mock_client: FlaskClient):
         """Test that OPTIONS request returns 200."""
-        response = client.options("/cxtoken/")
+        response = mock_client.options("/cxtoken/")
 
         assert response.status_code == 200
 
-    def test_preflight_sets_cors_headers(self, client: FlaskClient):
+    def test_preflight_sets_cors_headers(self, mock_client: FlaskClient):
         """Test that preflight sets CORS headers."""
-        response = client.options("/cxtoken/")
+        response = mock_client.options("/cxtoken/")
 
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
@@ -35,36 +34,36 @@ class TestCxTokenPreflight:
 class TestCxTokenGet:
     """Integration tests for the cxtoken GET endpoint."""
 
-    def test_missing_parameters_returns_400(self, client: FlaskClient):
+    def test_missing_parameters_returns_400(self, mock_client: FlaskClient):
         """Test that missing wiki/user parameters returns 400."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            response = client.get("/cxtoken/")
+            response = mock_client.get("/cxtoken/")
 
             assert response.status_code == 400
             data = response.get_json()
             assert "error" in data
 
-    def test_missing_wiki_returns_400(self, client: FlaskClient):
+    def test_missing_wiki_returns_400(self, mock_client: FlaskClient):
         """Test that missing wiki parameter returns 400."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            response = client.get("/cxtoken/?user=TestUser")
+            response = mock_client.get("/cxtoken/?user=TestUser")
 
             assert response.status_code == 400
 
-    def test_missing_user_returns_400(self, client: FlaskClient):
+    def test_missing_user_returns_400(self, mock_client: FlaskClient):
         """Test that missing user parameter returns 400."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            response = client.get("/cxtoken/?wiki=en")
+            response = mock_client.get("/cxtoken/?wiki=en")
 
             assert response.status_code == 400
 
-    def test_no_user_token_returns_403(self, client: FlaskClient):
+    def test_no_user_token_returns_403(self, mock_client: FlaskClient):
         """Test that request without valid user token returns 403."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
@@ -72,13 +71,13 @@ class TestCxTokenGet:
             with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
                 mock_get_token.return_value = None
 
-                response = client.get("/cxtoken/?wiki=en&user=TestUser")
+                response = mock_client.get("/cxtoken/?wiki=en&user=TestUser")
 
                 assert response.status_code == 403
                 data = response.get_json()
                 assert "error" in data
 
-    def test_valid_request_returns_cxtoken(self, client: FlaskClient):
+    def test_valid_request_returns_cxtoken(self, mock_client: FlaskClient):
         """Test that valid request returns cxtoken."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
@@ -93,7 +92,7 @@ class TestCxTokenGet:
                     mock_get_cxtoken.return_value = {"csrftoken": "test_token_123"}
 
                     with patch("src.main_app.public.routes.cxtoken.routes.store_jwt"):
-                        response = client.get("/cxtoken/?wiki=en&user=TestUser")
+                        response = mock_client.get("/cxtoken/?wiki=en&user=TestUser")
 
                         assert response.status_code == 200
                         data = response.get_json()
@@ -104,7 +103,7 @@ class TestCxTokenGet:
 class TestCxTokenCache:
     """Integration tests for cxtoken caching."""
 
-    def test_cached_cxtoken_returned_from_cache(self, client: FlaskClient):
+    def test_cached_cxtoken_returned_from_cache(self, mock_client: FlaskClient):
         """Test that cached cxtoken is returned from cache."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
@@ -112,7 +111,7 @@ class TestCxTokenCache:
             with patch("src.main_app.public.routes.cxtoken.routes.get_from_store") as mock_from_store:
                 mock_from_store.return_value = {"csrftoken": "cached_token_123"}
 
-                response = client.get("/cxtoken/?wiki=en&user=TestUser")
+                response = mock_client.get("/cxtoken/?wiki=en&user=TestUser")
 
                 assert response.status_code == 200
                 data = response.get_json()
@@ -123,7 +122,7 @@ class TestCxTokenCache:
 class TestCxTokenUserFormatting:
     """Integration tests for user formatting in cxtoken."""
 
-    def test_user_underscores_replaced_with_spaces(self, client: FlaskClient):
+    def test_user_underscores_replaced_with_spaces(self, mock_client: FlaskClient):
         """Test that underscores in username are replaced with spaces."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
@@ -134,12 +133,12 @@ class TestCxTokenUserFormatting:
                 with patch("src.main_app.public.routes.cxtoken.routes._format_user") as mock_format:
                     mock_format.return_value = "Test User"
 
-                    response = client.get("/cxtoken/?wiki=en&user=Test_User")
+                    mock_client.get("/cxtoken/?wiki=en&user=Test_User")
 
                     # Check that formatting was called
                     mock_format.assert_called()
 
-    def test_special_users_mapping_applied(self, client: FlaskClient):
+    def test_special_users_mapping_applied(self, mock_client: FlaskClient):
         """Test that special user mappings are applied."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
@@ -150,7 +149,7 @@ class TestCxTokenUserFormatting:
                 with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
                     mock_get_token.return_value = None
 
-                    response = client.get("/cxtoken/?wiki=en&user=SpecialUser")
+                    mock_client.get("/cxtoken/?wiki=en&user=SpecialUser")
 
                     # The formatted user should be "MappedUser" after applying special_users mapping
 
@@ -158,18 +157,18 @@ class TestCxTokenUserFormatting:
 class TestCxtokenRouteIntegration:
     """Integration tests for cxtoken route."""
 
-    def test_cxtoken_requires_authentication(self, client):
+    def test_cxtoken_requires_authentication(self, mock_client):
         """Test that cxtoken route requires authentication."""
-        response = client.get("/cxtoken?wiki=arwiki")
+        response = mock_client.get("/cxtoken?wiki=arwiki")
 
         # Should redirect to login or return 400 (bad request)
         assert response.status_code == 400
 
-    def test_cxtoken_rejects_missing_user_param(self, client):
+    def test_cxtoken_rejects_missing_user_param(self, mock_client):
         """Test that cxtoken route rejects requests without user parameter."""
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
-            response = client.get("/cxtoken/?wiki=arwiki")
+            response = mock_client.get("/cxtoken/?wiki=arwiki")
             assert response.status_code == 400
 
     def test_cxtoken_rejects_missing_wiki_param(self, auth_client):

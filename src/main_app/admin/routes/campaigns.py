@@ -19,8 +19,6 @@ from flask.typing import ResponseReturnValue
 from ...db.services.content import (
     add_category,
     delete_category,
-    get_camp_to_cats,
-    get_campaign_category,
     list_categories,
     update_category,
 )
@@ -105,6 +103,8 @@ def _delete_category(record_id: int) -> None:
 
     try:
         record = delete_category(record_id)
+        if not record:
+            raise ValueError("Category not found")
     except ValueError as exc:
         logger.exception("Unable to delete category")
         flash(str(exc), "warning")

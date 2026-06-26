@@ -11,7 +11,7 @@ from typing import Any
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import LONGTEXT, db
+from ...extensions import LONGTEXT, db
 
 logger = logging.getLogger(__name__)
 

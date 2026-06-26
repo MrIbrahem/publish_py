@@ -31,7 +31,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _env_int(name: str, default: int | None, safe: bool = False) -> int | None:
+def _env_int(name: str, default: int, safe: bool = False) -> int:
     """Convert environment variable to integer."""
     value = os.getenv(name)
     if value is None:
@@ -139,7 +139,7 @@ def _load_oauth_config() -> OAuthConfig:
 
 
 def _get_paths() -> Paths:
-    flask_data_dir = os.getenv("FLASK_DATA_DIR") or "~/data"
+    flask_data_dir = os.getenv("MAIN_DIR") or "~/data"
     log_dir = f"{flask_data_dir}/logs"
     publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR") or f"{flask_data_dir}/publish_reports/reports_by_day"
     words_json_path = os.getenv("WORDS_JSON_PATH") or f"{flask_data_dir}/td/Tables/jsons/words.json"
@@ -219,7 +219,7 @@ def load_special_users() -> dict:
     return special_users
 
 
-def load_cors_config() -> UsersConfig:
+def load_cors_config() -> CorsConfig:
     # Load CORS configuration
     cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
     cors_domains = [d.strip() for d in cors_domains_str.split(",") if d.strip()]
@@ -307,10 +307,14 @@ def ensure_directories() -> None:
         settings.paths.flask_data_dir,
         settings.paths.log_dir,
         settings.paths.publish_reports_dir,
+    ]:
+        Path(dir_name).mkdir(parents=True, exist_ok=True)
+
+    for file_name in [
         settings.paths.words_json_path,
         settings.paths.revids_file_path,
     ]:
-        Path(dir_name).mkdir(parents=True, exist_ok=True)
+        Path(file_name).parent.mkdir(parents=True, exist_ok=True)
 
 
 __all__ = [

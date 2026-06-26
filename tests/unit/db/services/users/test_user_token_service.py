@@ -1,132 +1,300 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-import pytest
+from flask import Flask
 
 from src.main_app.db.models import UserTokenRecord
 from src.main_app.db.services.delete_service import (
     delete_user_token,
 )
+from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
-    delete_user_token_by_username,
+    create_user_token,
+    get_authenticated_user_token,
     get_user_token,
-    get_user_token_by_username,
+    update_user_token,
     upsert_user_token,
 )
 
 
-def test_user_token_workflow():
-    upsert_user_token(
-        user_id=12345, username="ExampleWikiEditor", access_key="oauth_key_123", access_secret="oauth_secret_456"
-    )
-    t = get_user_token(12345)
-    assert t.username == "ExampleWikiEditor"
-    assert get_user_token_by_username("ExampleWikiEditor").user_id == 12345
-
-    deleted = delete_user_token_by_username("ExampleWikiEditor")
-    assert deleted is True
-    assert get_user_token(12345) is None
-
-    upsert_user_token(user_id=67890, username="TrustedContributor", access_key="key2", access_secret="secret2")
-
-    deleted = delete_user_token(67890)
-    assert deleted is True
-    assert get_user_token(67890) is None
+def test_delete_user_cascades(mock_app: Flask) -> None:
+    with mock_app.app_context():
+        user = create_user("svc_dave")
+        upsert_user_token(user_id=user.user_id, access_key="k", access_secret="s")
+        assert get_user_token(user.user_id) is not None
 
 
-class TestUpsertUserToken:
-    """Tests for upsert_user_token function."""
+def test_upsert_get_delete_user_token(mock_app: Flask) -> None:
+    with mock_app.app_context():
+        # Test insert
+        user = create_user("svc_eve")
+        upsert_user_token(user_id=user.user_id, access_key="key", access_secret="secret")
 
-    def test_inserts_new_token(self, monkeypatch):
-        """Test that function inserts a new token."""
-        upsert_user_token(user_id=1, username="GlobalAdmin", access_key="k1", access_secret="s1")
-        record = get_user_token(1)
-        assert record.username == "GlobalAdmin"
+        token_record = get_user_token(user.user_id)
+        assert token_record is not None
+        assert token_record.access_token is not None
+        assert token_record.access_secret is not None
 
-    def test_updates_existing_token(self, monkeypatch):
-        """Test that function updates an existing token."""
-        upsert_user_token(user_id=1, username="GlobalAdmin", access_key="k1", access_secret="s1")
-        upsert_user_token(user_id=1, username="GlobalAdmin_Updated", access_key="k2", access_secret="s2")
-        record = get_user_token(1)
-        assert record.username == "GlobalAdmin_Updated"
+        # Test update
+        upsert_user_token(user_id=user.user_id, access_key="new_key", access_secret="new_secret")
+        token_record = get_user_token(user.user_id)
 
-    def test_raises_error_if_no_username(self, monkeypatch):
-        with pytest.raises(ValueError, match="Username is required"):
-            upsert_user_token(user_id=1, username="", access_key="k", access_secret="s")
+        # Test delete token only
+        delete_user_token(user.user_id)
+        assert get_user_token(user.user_id) is None
+
+
+class TestUserTokenRecord:
+    """Tests for UserTokenRecord dataclass."""
+
+    def test_user_token_record_creation(self):
+        """Test creating a UserTokenRecord."""
+        record = UserTokenRecord(
+            user_id=123,
+            access_token=b"encrypted_token",
+            access_secret=b"encrypted_secret",
+        )
+
+        assert record.user_id == 123
+        assert record.access_token == b"encrypted_token"
+        assert record.access_secret == b"encrypted_secret"
+        assert record.created_at is None
+        assert record.updated_at is None
+        assert record.last_used_at is None
+        assert record.rotated_at is None
+
+    def test_user_token_record_with_timestamps(self):
+        """Test creating a UserTokenRecord with timestamps."""
+        record = UserTokenRecord(
+            user_id=456,
+            access_token=b"token",
+            access_secret=b"secret",
+            created_at="2024-01-01 00:00:00",
+            updated_at="2024-01-02 00:00:00",
+            last_used_at="2024-01-03 00:00:00",
+            rotated_at="2024-01-04 00:00:00",
+        )
+
+        assert record.created_at == "2024-01-01 00:00:00"
+        assert record.updated_at == "2024-01-02 00:00:00"
+        assert record.last_used_at == "2024-01-03 00:00:00"
+        assert record.rotated_at == "2024-01-04 00:00:00"
+
+    def test_decrypted_success(self):
+        """Test decrypted method returns decrypted credentials."""
+
+        record = UserTokenRecord(
+            user_id=789,
+            access_token=b"encrypted_token",
+            access_secret=b"encrypted_secret",
+        )
+
+        assert record.access_token == b"encrypted_token"
+        assert record.access_secret == b"encrypted_secret"
+
+
+class TestGetAuthenticatedUserToken:
+    """Tests for get_authenticated_user_token."""
+
+    def test_returns_token_when_user_exists(self, monkeypatch):
+        """Test returns token when user exists and has user relationship loaded."""
+        mock_token = MagicMock()
+        mock_token.user = MagicMock(username="testuser")
+        mock_query = MagicMock()
+        mock_query.options.return_value.filter.return_value.first.return_value = mock_token
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
+
+        result = get_authenticated_user_token(1)
+
+        assert result == mock_token
+
+    def test_returns_none_when_token_is_none(self, monkeypatch):
+        """Test returns None when token query returns None."""
+        mock_query = MagicMock()
+        mock_query.options.return_value.filter.return_value.first.return_value = None
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
+
+        result = get_authenticated_user_token(1)
+
+        assert result is None
+
+    def test_returns_none_when_token_user_is_none(self, monkeypatch):
+        """Test returns None when token.user is None."""
+        mock_token = MagicMock()
+        mock_token.user = None
+        mock_query = MagicMock()
+        mock_query.options.return_value.filter.return_value.first.return_value = mock_token
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
+
+        result = get_authenticated_user_token(1)
+
+        assert result is None
+
+    def test_handles_exception_gracefully(self, monkeypatch):
+        """Test returns None when an exception is raised."""
+        mock_query = MagicMock()
+        mock_query.options.side_effect = Exception("DB error")
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
+
+        result = get_authenticated_user_token(1)
+
+        assert result is None
 
 
 class TestGetUserToken:
-    """Tests for get_user_token function."""
+    """Tests for get_user_token."""
 
-    def test_returns_none_for_empty_user_id(self):
-        """Test that None is returned for empty user_id."""
-        assert get_user_token(None) is None
-        assert get_user_token("") is None
+    def test_returns_token_for_valid_user_id(self, monkeypatch):
+        """Test returns token for a valid integer user_id."""
+        mock_token = MagicMock(spec=UserTokenRecord, user_id=1)
+        mock_query = MagicMock()
+        mock_query.filter.return_value.first.return_value = mock_token
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
-    def test_returns_record_when_found(self, monkeypatch):
-        """Test that record is returned when found."""
-        upsert_user_token(user_id=100, username="MedicineBot", access_key="k1", access_secret="s1")
-        record = get_user_token(100)
-        assert isinstance(record, UserTokenRecord)
-        assert record.user_id == 100
+        result = get_user_token(1)
 
-    def test_returns_none_when_not_found(self, monkeypatch):
-        """Test that None is returned when user not found."""
-        assert get_user_token(999999) is None
+        assert result == mock_token
 
+    def test_returns_token_for_valid_user_id_str(self, monkeypatch):
+        """Test returns token for a valid string user_id."""
+        mock_token = MagicMock(spec=UserTokenRecord, user_id=1)
+        mock_query = MagicMock()
+        mock_query.filter.return_value.first.return_value = mock_token
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
-class TestDeleteUserToken:
-    """Tests for delete_user_token function."""
+        result = get_user_token("1")
 
-    def test_returns_none_for_empty_user_id(self, monkeypatch):
-        """Test that None is returned for empty user_id."""
-        assert delete_user_token(None) is False
+        assert result == mock_token
 
-    def test_deletes_the_token(self, monkeypatch):
-        """Test that function deletes the token."""
-        upsert_user_token(user_id=200, username="TranslatorHelper", access_key="k1", access_secret="s1")
-        deleted = delete_user_token(200)
-        assert deleted is True
-        assert get_user_token(200) is None
+    def test_returns_none_for_none_user_id(self):
+        """Test returns None when user_id is None."""
+        result = get_user_token(None)
 
+        assert result is None
 
-class TestGetUserTokenByUsername:
-    """Tests for get_user_token_by_username function."""
+    def test_returns_none_for_zero_user_id(self):
+        """Test returns None when user_id is 0 (falsy check)."""
+        result = get_user_token(0)
 
-    def test_returns_none_for_empty_username(self):
-        """Test that None is returned for empty username."""
-        assert get_user_token_by_username("") is None
-        assert get_user_token_by_username("   ") is None
+        assert result is None
 
-    def test_strips_whitespace_from_username(self, monkeypatch):
-        """Test that username is stripped of whitespace."""
-        upsert_user_token(user_id=300, username="CleanUser", access_key="k1", access_secret="s1")
-        assert get_user_token_by_username("  CleanUser  ").user_id == 300
+    def test_returns_none_for_empty_string_user_id(self):
+        """Test returns None when user_id is an empty string."""
+        result = get_user_token("")
 
-    def test_returns_record_when_found(self, monkeypatch):
-        """Test that record is returned when found."""
-        upsert_user_token(user_id=400, username="ActiveBureaucrat", access_key="k1", access_secret="s1")
-        assert get_user_token_by_username("ActiveBureaucrat").user_id == 400
+        assert result is None
 
-    def test_returns_none_when_not_found(self, monkeypatch):
-        """Test that None is returned when user not found."""
-        assert get_user_token_by_username("GhostEditor") is None
+    def test_returns_none_when_no_token_found(self, monkeypatch):
+        """Test returns None when no matching token record exists."""
+        mock_query = MagicMock()
+        mock_query.filter.return_value.first.return_value = None
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
+
+        result = get_user_token(999)
+
+        assert result is None
 
 
-class TestUserDeleteTokenByUsername:
-    """Tests for delete_user_token_by_username function."""
+class TestCreateUserToken:
+    """Tests for create_user_token."""
 
-    def test_returns_none_for_empty_username(self, monkeypatch):
-        """Test that None is returned for empty username."""
-        assert delete_user_token_by_username("") is False
+    def test_creates_and_returns_record(self, monkeypatch):
+        """Test creates a new UserTokenRecord and returns it."""
+        mock_db = MagicMock()
+        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.encrypt_value",
+            lambda x: b"enc_" + x.encode(),
+        )
 
-    def test_deletes_by_user_id_when_found(self, monkeypatch):
-        """Test that token is deleted by user_id when username found."""
-        upsert_user_token(user_id=5000, username="OneTimeUser", access_key="k1", access_secret="s1")
-        deleted = delete_user_token_by_username("OneTimeUser")
-        assert get_user_token(5000) is None
-        assert deleted is True
+        result = create_user_token(1, "key", "secret")
 
-    def test_skips_delete_when_user_not_found(self, monkeypatch):
-        """Test that delete is skipped when username not found."""
-        deleted = delete_user_token_by_username("NonExistentUser")
-        assert deleted is False
+        assert result.user_id == 1
+        assert result.access_token == b"enc_key"
+        assert result.access_secret == b"enc_secret"
+        mock_db.session.add.assert_called_once_with(result)
+        mock_db.session.commit.assert_called_once()
+        mock_db.session.refresh.assert_called_once_with(result)
+
+
+class TestUpdateUserToken:
+    """Tests for update_user_token."""
+
+    def test_updates_existing_token(self, monkeypatch):
+        """Test updates fields on an existing token record."""
+        mock_db = MagicMock()
+        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.encrypt_value",
+            lambda x: b"enc_" + x.encode(),
+        )
+        mock_record = MagicMock(spec=UserTokenRecord)
+        mock_db.session.query.return_value.filter.return_value.first.return_value = mock_record
+
+        result = update_user_token(1, "new_key", "new_secret")
+
+        assert result == mock_record
+        assert result.access_token == b"enc_new_key"
+        assert result.access_secret == b"enc_new_secret"
+        mock_db.session.commit.assert_called_once()
+        mock_db.session.refresh.assert_called_once_with(result)
+
+    def test_returns_none_when_token_not_found(self, monkeypatch):
+        """Test returns None when no token record exists for the user."""
+        mock_db = MagicMock()
+        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
+        mock_db.session.query.return_value.filter.return_value.first.return_value = None
+
+        result = update_user_token(999, "key", "secret")
+
+        assert result is None
+
+
+class TestUpsertUserToken:
+    """Tests for upsert_user_token."""
+
+    def test_calls_create_when_no_existing_token(self, monkeypatch):
+        """Test calls create_user_token when no existing token is found."""
+        mock_db = MagicMock()
+        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.encrypt_value",
+            lambda x: b"enc_" + x.encode(),
+        )
+        mock_db.session.query.return_value.filter.return_value.first.return_value = None
+
+        result = upsert_user_token(1, "key", "secret")
+
+        assert result.user_id == 1
+        assert result.access_token == b"enc_key"
+        assert result.access_secret == b"enc_secret"
+
+    def test_calls_update_when_token_exists(self, monkeypatch):
+        """Test calls update_user_token when an existing token is found."""
+        mock_db = MagicMock()
+        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.encrypt_value",
+            lambda x: b"enc_" + x.encode(),
+        )
+        mock_record = MagicMock(spec=UserTokenRecord)
+        mock_db.session.query.return_value.filter.return_value.first.return_value = mock_record
+
+        result = upsert_user_token(1, "new_key", "new_secret")
+
+        assert result == mock_record
+        assert result.access_token == b"enc_new_key"
+        assert result.access_secret == b"enc_new_secret"

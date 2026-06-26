@@ -9,7 +9,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
 
@@ -17,9 +16,9 @@ from flask.testing import FlaskClient
 class TestCoordinatorsDashboard:
     """Integration tests for coordinators dashboard."""
 
-    def test_coordinators_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_coordinators_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that coordinators dashboard requires admin access."""
-        response = client.get("/admin/coordinators/")
+        response = mock_client.get("/admin/coordinators/")
 
         # With mock_admin_required, should render successfully
         assert response.status_code == 200
@@ -42,9 +41,9 @@ class TestCoordinatorsDashboard:
 class TestAddCoordinator:
     """Integration tests for adding coordinators."""
 
-    def test_add_coordinator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_add_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that adding coordinator requires admin access."""
-        response = client.post("/admin/coordinators/add", data={"username": "NewCoordinator"})
+        response = mock_client.post("/admin/coordinators/add", data={"username": "NewCoordinator"})
 
         assert response.status_code == 302
         assert response.location == "/admin/coordinators/"
@@ -81,9 +80,9 @@ class TestAddCoordinator:
 class TestDeleteCoordinator:
     """Integration tests for deleting coordinators."""
 
-    def test_delete_coordinator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_delete_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deleting coordinator requires admin access."""
-        response = client.post("/admin/coordinators/1/delete")
+        response = mock_client.post("/admin/coordinators/1/delete")
 
         assert response.status_code == 302
         assert response.location == "/admin/coordinators/"
@@ -106,16 +105,16 @@ class TestDeleteCoordinator:
 class TestActivateDeactivateCoordinator:
     """Integration tests for activating/deactivating coordinators."""
 
-    def test_activate_coordinator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_activate_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that activating coordinator requires admin access."""
-        response = client.post("/admin/coordinators/1/activate")
+        response = mock_client.post("/admin/coordinators/1/activate")
 
         assert response.status_code == 302
         assert response.location == "/admin/coordinators/"
 
-    def test_deactivate_coordinator_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_deactivate_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deactivating coordinator requires admin access."""
-        response = client.post("/admin/coordinators/1/deactivate")
+        response = mock_client.post("/admin/coordinators/1/deactivate")
 
         assert response.status_code == 302
         assert response.location == "/admin/coordinators/"

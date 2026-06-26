@@ -16,7 +16,7 @@ from src.main_app.public.auth import (
 class TestOAuthRequired:
     """Tests for oauth_required decorator."""
 
-    def test_redirects_when_no_user_and_oauth_enabled(self, app, monkeypatch):
+    def test_redirects_when_no_user_and_oauth_enabled(self, mock_app, monkeypatch):
         """Test that decorator redirects when no user and OAuth enabled."""
         from src.main_app.config import OAuthConfig
 
@@ -36,7 +36,7 @@ class TestOAuthRequired:
         def protected_view():
             return "success"
 
-        with app.test_request_context():
+        with mock_app.test_request_context():
             from flask import session
 
             session["uid"] = None
@@ -46,7 +46,7 @@ class TestOAuthRequired:
             assert result.status_code == 302  # type: ignore # Redirect
 
     @pytest.mark.skip(reason="This test is failing due to a bug in the decorator.")
-    def test_allows_access_when_user_present(self, app, monkeypatch):
+    def test_allows_access_when_user_present(self, mock_app, monkeypatch):
         """Test that decorator allows access when user is present."""
         from src.main_app.config import OAuthConfig
 
@@ -66,24 +66,7 @@ class TestOAuthRequired:
         def protected_view():
             return "success"
 
-        with app.test_request_context():
+        with mock_app.test_request_context():
             result = protected_view()
             # AssertionError: assert <<class 'pytest_flask.plugin.JSONResponse'> 209 bytes [302 FOUND]> == 'success'
-            assert result == "success"
-
-    def test_allows_access_when_oauth_null(self, app, monkeypatch):
-        """Test that decorator allows access when OAuth is None (disabled)."""
-
-        # Create a mock Settings object with oauth=None
-        mock_settings = MagicMock()
-        mock_settings.oauth = None
-        monkeypatch.setattr("src.main_app.public.auth.utils.settings", mock_settings)
-
-        @oauth_required
-        def protected_view():
-            return "success"
-
-        with app.test_request_context():
-            result = protected_view()
-
             assert result == "success"

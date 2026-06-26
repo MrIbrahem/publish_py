@@ -8,52 +8,34 @@ import logging
 from typing import Optional
 
 from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
+from ....extensions import db
 from ....shared.core.crypto import encrypt_value
-from ....shared.core.extensions import db
-from ...models import UserTokenRecord
+from ...models import UserRecord, UserTokenRecord
+from ..utils import db_guard_rollback
 
 logger = logging.getLogger(__name__)
 
 
-def upsert_user_token(*, user_id: int, username: str, access_key: str, access_secret: str) -> None:
-    """Insert or update the encrypted OAuth credentials for a user."""
-    username = username.strip()
-    if not username:
-        raise ValueError("Username is required")
+# ── SELECT ───────────────────────────────────────────────
 
-    encrypted_token = encrypt_value(access_key)
-    encrypted_secret = encrypt_value(access_secret)
-    now = func.current_timestamp()
 
-    # orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
-    # # user_id is the primary key for UserTokenRecord
-    orm_obj = db.session.get(UserTokenRecord, user_id)
-    if orm_obj:
-        orm_obj.username = username
-        orm_obj.access_token = encrypted_token
-        orm_obj.access_secret = encrypted_secret
-        orm_obj.updated_at = now
-        orm_obj.last_used_at = now
-        orm_obj.rotated_at = now
-    else:
-        orm_obj = UserTokenRecord(
-            user_id=user_id,
-            username=username,
-            access_token=encrypted_token,
-            access_secret=encrypted_secret,
-            created_at=now,
-            updated_at=now,
-            last_used_at=now,
-        )
-        db.session.add(orm_obj)
-
+def get_authenticated_user_token(user_id: int) -> None | UserTokenRecord:
+    """Fetch the CurrentUser composite for session restoration."""
     try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
+        token = (
+            db.session.query(UserTokenRecord)
+            .options(joinedload(UserTokenRecord.user))
+            .filter(UserTokenRecord.user_id == user_id)
+            .first()
+        )
+        if not token or not token.user:
+            return None
+        return token
+    except Exception as e:
+        logger.error("Error loading user for ID %s: %s", user_id, e)
+        return None
 
 
 def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
@@ -62,12 +44,77 @@ def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
         return None
 
     user_id = int(user_id)
-    # orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
-
-    # # user_id is the primary key for UserTokenRecord
-    orm_obj = db.session.get(UserTokenRecord, user_id)
+    orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
     if not orm_obj:
         return None
+    return orm_obj
+
+
+# ── INSERT, UPDATE, SET ──────────────────────────────────
+
+
+@db_guard_rollback
+def create_user_token(user_id: int, access_key: str, access_secret: str) -> UserTokenRecord:
+    """ """
+    encrypted_token = encrypt_value(access_key)
+    encrypted_secret = encrypt_value(access_secret)
+
+    record = UserTokenRecord(
+        user_id=user_id,
+        access_token=encrypted_token,
+        access_secret=encrypted_secret,
+    )
+    db.session.add(record)
+
+    db.session.commit()
+    db.session.refresh(record)
+
+    return record
+
+
+@db_guard_rollback
+def update_user_token(user_id: int, access_key: str, access_secret: str) -> UserTokenRecord | None:
+    """
+    update the encrypted OAuth credentials for a user.
+    """
+    orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+
+    if not orm_obj:
+        return None
+
+    encrypted_token = encrypt_value(access_key)
+    encrypted_secret = encrypt_value(access_secret)
+    now = func.current_timestamp()
+
+    orm_obj.access_token = encrypted_token
+    orm_obj.access_secret = encrypted_secret
+    orm_obj.updated_at = now
+    orm_obj.last_used_at = now
+    orm_obj.rotated_at = now
+
+    db.session.commit()
+    db.session.refresh(orm_obj)
+    return orm_obj
+
+
+@db_guard_rollback
+def upsert_user_token(
+    user_id: int,
+    access_key: str,
+    access_secret: str,
+) -> UserTokenRecord:
+    """
+    Upsert the encrypted OAuth credentials for a user.
+    Creates a new token row if one does not exist.
+    """
+
+    # record = db.session.get(UserTokenRecord, user_id)
+    record = db.session.query(UserTokenRecord).filter(UserTokenRecord.user_id == user_id).first()
+    if record:
+        orm_obj = update_user_token(user_id, access_key, access_secret)
+    else:
+        orm_obj = create_user_token(user_id, access_key, access_secret)
+
     return orm_obj
 
 
@@ -77,34 +124,19 @@ def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
     if not username:
         return None
 
-    orm_obj = db.session.query(UserTokenRecord).filter(UserTokenRecord.username == username).first()
+    orm_obj = (
+        db.session.query(UserTokenRecord)
+        .filter(UserRecord.username == username, UserRecord.user_id == UserTokenRecord.user_id)
+        .first()
+    )
     if not orm_obj:
         return None
     return orm_obj
 
 
-def delete_user_token_by_username(username: str) -> bool:
-    """Remove the stored OAuth credentials for the given username."""
-    username = username.strip()
-    if not username:
-        return False
-    orm_obj = get_user_token_by_username(username)
-    if not orm_obj:
-        return False
-    db.session.delete(orm_obj)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-
-    deleted = get_user_token_by_username(username)
-    return deleted is None
-
-
 __all__ = [
     "upsert_user_token",
     "get_user_token",
+    "update_user_token",
     "get_user_token_by_username",
-    "delete_user_token_by_username",
 ]

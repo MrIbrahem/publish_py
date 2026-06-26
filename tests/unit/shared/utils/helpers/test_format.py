@@ -1,7 +1,5 @@
 """Tests for helpers.format module."""
 
-import pytest
-
 from src.main_app.config import settings
 from src.main_app.shared.utils.helpers.format import (
     determine_hashtag,

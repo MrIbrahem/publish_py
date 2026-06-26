@@ -15,7 +15,7 @@ from flask import (
 from ...db.services.analytics import get_total_views_for_target
 from ...db.services.pages import get_page_by_id, get_user_page_by_id
 from ...db.services.users import get_user_by_username
-from ...public.auth.utils import load_logged_in_user
+from ...public.auth.utils import load_user
 from ...public.routes.td.results_api import results_api_result
 from ..decorators import admin_required
 
@@ -53,7 +53,7 @@ def get_user_email(username: str) -> str | None:
 
 
 def get_currect_user_email() -> str | None:
-    currect_user = load_logged_in_user()
+    currect_user = load_user()
 
     if currect_user:
         return get_user_email(currect_user.username)
@@ -150,6 +150,15 @@ def dashboard(
     return msg_dashboard(last_table, id, user=user)
 
 
+def send_msg(
+    msg: str,
+    email_to: str,
+    email_from: str,
+    msg_title: str,
+    cc_to: str,
+): ...
+
+
 @bp_msg.route("/send", methods=["POST"])
 @admin_required
 def msg_post() -> str:
@@ -161,6 +170,13 @@ def msg_post() -> str:
     ccme = data.get("ccme", "0")
     cc_to = data.get("cc_to", "") if str(ccme) == "1" else None
 
+    send_msg(
+        msg=msg,
+        email_to=email_to,
+        email_from=email_from,
+        msg_title=msg_title,
+        cc_to=cc_to,
+    )
     return render_template(
         "admins/email_msg/index.html",
         user_email=None,

@@ -9,7 +9,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import CategoryRecord
 
 logger = logging.getLogger(__name__)

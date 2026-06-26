@@ -100,6 +100,8 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
 
     try:
         record = delete_language_setting(setting_id)
+        if not record:
+            raise ValueError(f"Unable to delete setting with ID {setting_id}")
     except ValueError as exc:
         logger.exception("Unable to delete language setting")
         flash(str(exc), "warning")

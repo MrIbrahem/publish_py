@@ -8,36 +8,37 @@ IMPORT RULE: Always import extensions from this module.
 Never instantiate extensions elsewhere.
 
 Usage:
-    from main_app.shared.core.extensions import db, migrate, csrf
+    from main_app.extensions import db, migrate, csrf
 """
 
 from __future__ import annotations
 
 from flask_migrate import Migrate
 
-from ....db.exceptions import UniqueError
+from ..db.exceptions import UniqueError
 from ._csrf import (
     csrf,
     csrf_exempt,
     csrf_init_app,
 )
 from .data_base import (
-    LONGTEXT,
+    BaseModel,
     db,
     metadata,
 )
+from .db_types import LONGTEXT
 
 # Flask-Migrate instance (Alembic integration)
 migrate = Migrate()
 
-
 __all__ = [
     "db",
-    "metadata",
-    "LONGTEXT",
+    "BaseModel",
     "migrate",
     "csrf",
     "csrf_init_app",
-    "csrf_exempt",
     "UniqueError",
+    "csrf_exempt",
+    "metadata",
+    "LONGTEXT",
 ]

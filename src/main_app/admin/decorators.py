@@ -12,7 +12,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ..public.auth.utils import load_logged_in_user
+from ..public.auth.utils import load_user
 
 FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
 
@@ -22,7 +22,7 @@ def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
 
     @wraps(view)
     def wrapped(*args, **kwargs):
-        user = load_logged_in_user()
+        user = load_user()
         if not user:
             return redirect(url_for("auth.login"))
         if not user.is_active_admin:

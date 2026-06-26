@@ -4,47 +4,112 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import LargeBinary, String, text
-from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy import ForeignKey, String, func, text
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
+from ...extensions import db
 from ...shared.core.crypto import decrypt_value
-from ...shared.core.extensions import db
 from ...shared.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 
 
-class UserTokenRecord(db.Model):
+class UserRecord(db.Model):
     """
-    CREATE TABLE IF NOT EXISTS user_tokens (
-        user_id int NOT NULL,
+    Stable user identity — source of truth for user_id and username.
+
+    CREATE TABLE IF NOT EXISTS users (
+        user_id int NOT NULL AUTO_INCREMENT,
         username varchar(255) NOT NULL,
-        access_token varbinary(1024) NOT NULL,
-        access_secret varbinary(1024) NOT NULL,
-        created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        last_used_at datetime DEFAULT NULL,
-        rotated_at datetime DEFAULT NULL,
+        created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        email varchar(255) NOT NULL DEFAULT '',
+        wiki varchar(255) NOT NULL DEFAULT '',
+        user_group varchar(120) NOT NULL DEFAULT 'Uncategorized',
         PRIMARY KEY (user_id),
-        UNIQUE KEY uq_user_tokens_username (username)
-    )
+        UNIQUE KEY uq_users_username (username)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
     """
 
-    __tablename__ = "user_tokens"
+    __tablename__ = "users"
 
-    user_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    access_token: Mapped[bytes] = mapped_column(LargeBinary(1024), nullable=False)
-    access_secret: Mapped[bytes] = mapped_column(LargeBinary(1024), nullable=False)
 
-    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
+    email: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
+    wiki: Mapped[str] = mapped_column(String(255), nullable=False, default="", server_default=text("''"))
+    user_group: Mapped[str] = mapped_column(
+        String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'")
+    )
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.current_timestamp())
+
+    # One-to-One relationship with UserTokenRecord using the modern SQLAlchemy 2.0 style
+    token: Mapped[UserTokenRecord | None] = relationship(back_populates="user", uselist=False)
+
+    def __init__(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+        self.email = kwargs.get("email") or ""
+        self.wiki = kwargs.get("wiki") or ""
+        self.user_group = kwargs.get("user_group") or "Uncategorized"
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serializes the pure model instance into a dictionary."""
+        data: dict[str, Any] = {}
+        table_keys = [
+            "user_id",
+            "username",
+            "email",
+            "wiki",
+            "user_group",
+            "created_at",
+        ]
+        for column in table_keys:
+            value = getattr(self, column)
+            if hasattr(value, "isoformat"):
+                value = value.isoformat()
+            data[column] = value
+
+        return data
+
+
+class AdminUserRecord(db.Model):
+    """
+    Coordinator/admin role — username references users.username.
+
+    CREATE TABLE `coordinators` (
+      id int NOT NULL AUTO_INCREMENT,
+      username varchar(255) NOT NULL,
+      is_active tinyint(1) NOT NULL DEFAULT '0',
+      created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+      UNIQUE KEY username (username),
+      CONSTRAINT admin_users_ibfk_1 FOREIGN KEY (username)
+        REFERENCES users (username) ON DELETE CASCADE ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    """
+
+    __tablename__ = "coordinators"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    # Modern approach for defining foreign keys
+    username: Mapped[str] = mapped_column(
+        ForeignKey("users.username", ondelete="CASCADE", onupdate="CASCADE"), unique=True, nullable=False
+    )
+
+    # Python application default and database-level server default configuration
+    is_active: Mapped[bool] = mapped_column(nullable=False, default=True, server_default=text("1"))
+
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.current_timestamp())
     updated_at: Mapped[datetime] = mapped_column(
         nullable=False,
-        server_default=db.func.current_timestamp(),
-        server_onupdate=db.func.current_timestamp(),
+        server_default=func.current_timestamp(),
+        server_onupdate=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
     )
-    last_used_at: Mapped[datetime | None] = mapped_column(server_default=db.func.current_timestamp())
-    rotated_at: Mapped[datetime | None] = mapped_column()
 
     def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():
@@ -52,20 +117,98 @@ class UserTokenRecord(db.Model):
                 setattr(self, key, value)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "user_id": self.user_id,
-            "username": self.username,
-            "access_token": self.access_token,
-            "access_secret": self.access_secret,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-            "last_used_at": self.last_used_at,
-            "rotated_at": self.rotated_at,
-        }
+        """Serializes the pure model instance into a dictionary."""
+        data: dict[str, Any] = {}
+        table_keys = [
+            "id",
+            "username",
+            "is_active",
+            "created_at",
+            "updated_at",
+        ]
+        for column in table_keys:
+            value = getattr(self, column)
+            if hasattr(value, "isoformat"):
+                value = value.isoformat()
+            data[column] = value
+
+        return data
+
+    def __repr__(self) -> str:
+        return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
+
+
+class UserTokenRecord(db.Model):
+    """
+    OAuth credentials — child of users table.
+
+    CREATE TABLE IF NOT EXISTS user_tokens (
+        user_id int NOT NULL,
+        access_token varbinary(1024) NOT NULL,
+        access_secret varbinary(1024) NOT NULL,
+        created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        last_used_at datetime DEFAULT NULL,
+        rotated_at datetime DEFAULT NULL,
+        PRIMARY KEY (user_id),
+      CONSTRAINT `user_tokens_ibfk_1` FOREIGN KEY (`user_id`)
+        REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+    )
+    """
+
+    __tablename__ = "user_tokens"
+
+    # Modern consolidated syntax for a field acting as both a Primary Key and a Foreign Key
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.user_id", ondelete="CASCADE", onupdate="CASCADE"), primary_key=True
+    )
+
+    # LargeBinary maps strictly to Python bytes
+    access_token: Mapped[bytes] = mapped_column(db.LargeBinary(1024), nullable=False)
+    access_secret: Mapped[bytes] = mapped_column(db.LargeBinary(1024), nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.current_timestamp())
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False,
+        server_default=func.current_timestamp(),
+        server_onupdate=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
+
+    last_used_at: Mapped[datetime | None] = mapped_column(nullable=True, server_default=func.current_timestamp())
+    rotated_at: Mapped[datetime | None] = mapped_column(nullable=True)
+
+    # Clean explicit relationship mapping matching SQLAlchemy 2.0 recommendations via back_populates
+    user: Mapped[UserRecord] = relationship(back_populates="token")
 
     @validates("access_token", "access_secret")
-    def validate_bytes(self, key, value):
+    def validate_bytes(self, key, value) -> bytes:
         return coerce_bytes(value)
+
+    def __init__(self, **kwargs: Any) -> None:
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serializes the pure model instance into a dictionary."""
+        data: dict[str, Any] = {}
+        table_keys = [
+            "user_id",
+            # "access_token",
+            # "access_secret",
+            "created_at",
+            "updated_at",
+            "last_used_at",
+            "rotated_at",
+        ]
+        for column in table_keys:
+            value = getattr(self, column)
+            if hasattr(value, "isoformat"):
+                value = value.isoformat()
+            data[column] = value
+
+        return data
 
     def decrypted(self) -> tuple[str, str]:
         """Return the decrypted access token and secret."""
@@ -73,51 +216,6 @@ class UserTokenRecord(db.Model):
         access_key = decrypt_value(self.access_token)
         access_secret = decrypt_value(self.access_secret)
         return access_key, access_secret
-
-
-class UserRecord(db.Model):
-    """
-    CREATE TABLE IF NOT EXISTS users (
-        user_id int NOT NULL AUTO_INCREMENT,
-        username varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-        email varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-        wiki varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-        user_group varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Uncategorized',
-        reg_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (user_id)
-    )
-    """
-
-    __tablename__ = "users"
-
-    user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), nullable=False, default="")
-    wiki: Mapped[str] = mapped_column(String(255), nullable=False, default="")
-    user_group: Mapped[str] = mapped_column(
-        String(120), nullable=False, default="Uncategorized", server_default=text("'Uncategorized'")
-    )
-    reg_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
-
-    def __init__(self, **kwargs) -> None:
-        # Apply Python-level defaults for fields not provided
-        if "email" not in kwargs:
-            kwargs["email"] = ""
-        if "wiki" not in kwargs:
-            kwargs["wiki"] = ""
-        if "user_group" not in kwargs:
-            kwargs["user_group"] = "Uncategorized"
-        super().__init__(**kwargs)
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "user_id": self.user_id,
-            "username": self.username,
-            "email": self.email,
-            "wiki": self.wiki,
-            "user_group": self.user_group,
-            "reg_date": self.reg_date,
-        }
 
 
 class UsersNoInprocessRecord(db.Model):
@@ -138,11 +236,14 @@ class UsersNoInprocessRecord(db.Model):
     user: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     is_active: Mapped[int] = mapped_column(nullable=False, default=1)
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
-        super().__init__(**kwargs)
+
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -150,35 +251,6 @@ class UsersNoInprocessRecord(db.Model):
             "user": self.user,
             "is_active": self.is_active,
         }
-
-
-class AdminUserRecord(db.Model):
-    """
-    ORM model for the coordinators table.
-    CREATE TABLE IF NOT EXISTS coordinators (
-        id int unsigned NOT NULL AUTO_INCREMENT,
-        username varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-        is_active int NOT NULL DEFAULT '1',
-        PRIMARY KEY (id),
-        UNIQUE KEY username (username)
-      )
-    """
-
-    __tablename__ = "coordinators"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-
-    # Python application default and database-level server default configuration
-    is_active: Mapped[int] = mapped_column(nullable=False, default=1, server_default=text("1"))
-
-    def __init__(self, **kwargs: Any) -> None:
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
-    def __repr__(self) -> str:
-        return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
 
 
 class FullTranslatorRecord(db.Model):
@@ -198,11 +270,14 @@ class FullTranslatorRecord(db.Model):
     user: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     is_active: Mapped[int] = mapped_column(nullable=False, default=1)
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "is_active" not in kwargs:
             kwargs["is_active"] = 1
-        super().__init__(**kwargs)
+
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -214,8 +289,8 @@ class FullTranslatorRecord(db.Model):
 
 __all__ = [
     "AdminUserRecord",
-    "FullTranslatorRecord",
-    "UsersNoInprocessRecord",
     "UserTokenRecord",
     "UserRecord",
+    "FullTranslatorRecord",
+    "UsersNoInprocessRecord",
 ]

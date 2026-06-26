@@ -18,7 +18,7 @@ from typing import List
 
 from sqlalchemy import text
 
-from ....shared.core.extensions import db
+from ....extensions import db
 
 logger = logging.getLogger(__name__)
 

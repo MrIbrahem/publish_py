@@ -11,7 +11,7 @@ from typing import Any, List
 from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import PageRecord
 from ..analytics.word_service import get_word_counts_for_title
 

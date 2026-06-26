@@ -31,5 +31,7 @@ class TestCoordinatorRecord:
         assert result == {
             "id": 1,
             "username": "TestUser",
+            "created_at": None,
+            "updated_at": None,
             "is_active": 1,
         }

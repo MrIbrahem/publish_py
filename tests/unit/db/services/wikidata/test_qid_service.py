@@ -12,7 +12,12 @@ from src.main_app.db.services.wikidata.qid_service import (
     get_title_to_qid,
     list_records,
     update_qid,
+    get_by_qid,
+    get_by_title,
+    insert,
+    update,
 )
+from src.main_app.extensions import db as _db
 
 
 def test_qid_workflow():
@@ -130,7 +135,6 @@ class TestGetTitleToQid:
 
     def test_handles_empty_qid(self, monkeypatch):
         """Test that get_title_to_qid handles empty QID values."""
-        pass
 
 
 # ---------------------------------------------------------------------------
@@ -141,15 +145,6 @@ class TestGetTitleToQid:
 #   - insert(title, qid)
 #   - update(qid_id, title, qid)
 # ---------------------------------------------------------------------------
-
-from src.main_app.db.services.wikidata.qid_service import (
-    get_by_qid,
-    get_by_title,
-    insert,
-    update,
-)
-from src.main_app.shared.core.extensions import db as _db
-
 
 def _add_with_empty_qid(title: str) -> QidRecord:
     """Insert a row with an empty qid column (model __init__ rejects ``""``)."""

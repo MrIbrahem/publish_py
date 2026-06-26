@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from src.main_app.db.models import CategoryRecord
@@ -146,11 +144,9 @@ class TestGetCampToCats:
         """Test that get_camp_to_cats handles empty category values."""
         # This is to cover the 'record.category or ""' part
         # We need to bypass add_category validation if possible, or use one that allows empty category
-        pass
 
     def test_skips_empty_campaign(self, monkeypatch):
         """Test that get_camp_to_cats skips records with empty campaign."""
         # In add_category, if campaign is None it defaults to "".
         # But CategoryRecord __post_init__ might raise ValueError if campaign is empty.
         # Let's check CategoryRecord.
-        pass

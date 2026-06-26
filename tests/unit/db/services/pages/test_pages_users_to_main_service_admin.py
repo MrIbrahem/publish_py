@@ -25,7 +25,7 @@ from src.main_app.db.services.pages.pages_users_to_main_service import (
     get_user_page,
     list_pending,
 )
-from src.main_app.shared.core.extensions import db
+from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
@@ -237,7 +237,7 @@ class TestDeleteUserPage:
 
     def test_returns_false_and_rolls_back_on_db_error(self):
         with patch("src.main_app.db.services.delete_service.db.session") as mock_session:
-            mock_session.query.return_value.filter.return_value.delete.side_effect = Exception("boom")
+            mock_session.get.side_effect = Exception("boom")
             ok = delete_user_page_to_main(1)
             assert ok is False
             mock_session.rollback.assert_called_once()

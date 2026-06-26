@@ -9,7 +9,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from flask.app import Flask
 from flask.testing import FlaskClient
 
 
@@ -17,9 +16,9 @@ from flask.testing import FlaskClient
 class TestUsersNoInprocessDashboard:
     """Integration tests for users no inprocess dashboard."""
 
-    def test_users_no_inprocess_dashboard_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_users_no_inprocess_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that users no inprocess dashboard requires admin access."""
-        response = client.get("/admin/users_no_inprocess/")
+        response = mock_client.get("/admin/users_no_inprocess/")
 
         # With mock_admin_required, should render successfully
         assert response.status_code == 200
@@ -42,9 +41,9 @@ class TestUsersNoInprocessDashboard:
 class TestAddUserNoInprocess:
     """Integration tests for adding users not in process."""
 
-    def test_add_user_no_inprocess_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_add_user_no_inprocess_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that adding user requires admin access."""
-        response = client.post("/admin/users_no_inprocess/add", data={"username": "NewUser"})
+        response = mock_client.post("/admin/users_no_inprocess/add", data={"username": "NewUser"})
 
         assert response.status_code == 302
         assert response.location == "/admin/users_no_inprocess/"
@@ -79,9 +78,9 @@ class TestAddUserNoInprocess:
 class TestDeleteUserNoInprocess:
     """Integration tests for deleting users not in process."""
 
-    def test_delete_user_no_inprocess_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_delete_user_no_inprocess_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deleting user requires admin access."""
-        response = client.post("/admin/users_no_inprocess/1/delete")
+        response = mock_client.post("/admin/users_no_inprocess/1/delete")
 
         assert response.status_code == 302
         assert response.location == "/admin/users_no_inprocess/"
@@ -104,16 +103,16 @@ class TestDeleteUserNoInprocess:
 class TestActivateDeactivateUserNoInprocess:
     """Integration tests for activating/deactivating users not in process."""
 
-    def test_activate_user_no_inprocess_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_activate_user_no_inprocess_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that activating user requires admin access."""
-        response = client.post("/admin/users_no_inprocess/1/activate")
+        response = mock_client.post("/admin/users_no_inprocess/1/activate")
 
         assert response.status_code == 302
         assert response.location == "/admin/users_no_inprocess/"
 
-    def test_deactivate_user_no_inprocess_requires_admin(self, mock_admin_required, client: FlaskClient):
+    def test_deactivate_user_no_inprocess_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deactivating user requires admin access."""
-        response = client.post("/admin/users_no_inprocess/1/deactivate")
+        response = mock_client.post("/admin/users_no_inprocess/1/deactivate")
 
         assert response.status_code == 302
         assert response.location == "/admin/users_no_inprocess/"

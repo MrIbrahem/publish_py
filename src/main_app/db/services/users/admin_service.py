@@ -6,13 +6,12 @@ SQLAlchemy-based service for managing coordinators.
 
 from __future__ import annotations
 
-import functools
 import logging
 from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...exceptions import DuplicateUserError, UserNotFoundError
 from ...models import AdminUserRecord
 from ..delete_service import delete_record_by_pk

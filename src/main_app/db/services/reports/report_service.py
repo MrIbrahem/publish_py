@@ -7,13 +7,15 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import Numeric, cast, extract, func, text
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.types import Integer as SAInteger
-from sqlalchemy.types import Numeric as SANumeric
+from sqlalchemy import extract, func
 
-from ....shared.core.extensions import db
+from ....extensions import db
 from ...models import ReportRecord
+
+# from sqlalchemy.exc import IntegrityError
+# from sqlalchemy.types import Integer as SAInteger
+# from sqlalchemy.types import Numeric as SANumeric
+
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +89,7 @@ def query_reports_with_filters(
             elif value in (">0", "&#62;0"):
                 # query = query.filter(column > 0)
                 # This seems to be for numeric results if any?
-                pass
+                logger.debug("Filter '>0' is not supported for column '%s'", name)
                 # Apply a numeric ">0" predicate. For string columns,
                 # cast to integer so the comparison is meaningful in SQL.
                 # If the column type is unknown / non-comparable, raise.

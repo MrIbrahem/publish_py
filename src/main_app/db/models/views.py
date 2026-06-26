@@ -9,7 +9,7 @@ from typing import Any
 from sqlalchemy import String, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ...shared.core.extensions import db
+from ...extensions import db
 
 
 class EnwikiPageviewRecord(db.Model):
@@ -29,11 +29,14 @@ class EnwikiPageviewRecord(db.Model):
     title: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     en_views: Mapped[int | None] = mapped_column(default=0, server_default=text("0"))
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "en_views" not in kwargs:
             kwargs["en_views"] = 0
-        super().__init__(**kwargs)
+
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -66,11 +69,14 @@ class ViewsNewRecord(db.Model):
 
     __table_args__ = (UniqueConstraint("target", "lang", "year", name="target_lang_year"),)
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         # Apply Python-level defaults for fields not provided
         if "views" not in kwargs:
             kwargs["views"] = 0
-        super().__init__(**kwargs)
+
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     def to_dict(self) -> dict[str, Any]:
         return {
