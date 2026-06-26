@@ -307,10 +307,14 @@ def ensure_directories() -> None:
         settings.paths.flask_data_dir,
         settings.paths.log_dir,
         settings.paths.publish_reports_dir,
+    ]:
+        Path(dir_name).mkdir(parents=True, exist_ok=True)
+
+    for file_name in [
         settings.paths.words_json_path,
         settings.paths.revids_file_path,
     ]:
-        Path(dir_name).mkdir(parents=True, exist_ok=True)
+        Path(file_name).parent.mkdir(parents=True, exist_ok=True)
 
 
 __all__ = [
