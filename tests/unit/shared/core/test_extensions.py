@@ -14,7 +14,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.main_app.extensions import BaseModel, csrf, csrf_exempt, csrf_init_app, db, migrate
+from src.main_app.extensions import BaseModel, db, migrate
 
 
 class MockModel(db.Model):

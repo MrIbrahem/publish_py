@@ -11,7 +11,7 @@ from src.main_app.config import TestingConfig
 
 
 @pytest.fixture
-def mock_app() -> Generator[Flask, Any, None]:
+def mock_app() -> Generator[Flask, Any]:
     """Create a test Flask application."""
     _app = Flask(__name__)
     _app.url_map.strict_slashes = False
