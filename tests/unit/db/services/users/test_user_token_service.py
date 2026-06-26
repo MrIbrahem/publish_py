@@ -1,18 +1,20 @@
-
 from unittest.mock import MagicMock
+
 from flask import Flask
+
 from src.main_app.db.models import UserTokenRecord
 from src.main_app.db.services.delete_service import (
     delete_user_token,
 )
 from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
-    update_user_token,
     create_user_token,
-    get_user_token,
-    upsert_user_token,
     get_authenticated_user_token,
+    get_user_token,
+    update_user_token,
+    upsert_user_token,
 )
+
 
 def test_delete_user_cascades(mock_app: Flask) -> None:
     with mock_app.app_context():
@@ -99,7 +101,9 @@ class TestGetAuthenticatedUserToken:
         mock_token.user = MagicMock(username="testuser")
         mock_query = MagicMock()
         mock_query.options.return_value.filter.return_value.first.return_value = mock_token
-        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
         result = get_authenticated_user_token(1)
 
@@ -109,7 +113,9 @@ class TestGetAuthenticatedUserToken:
         """Test returns None when token query returns None."""
         mock_query = MagicMock()
         mock_query.options.return_value.filter.return_value.first.return_value = None
-        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
         result = get_authenticated_user_token(1)
 
@@ -121,7 +127,9 @@ class TestGetAuthenticatedUserToken:
         mock_token.user = None
         mock_query = MagicMock()
         mock_query.options.return_value.filter.return_value.first.return_value = mock_token
-        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
         result = get_authenticated_user_token(1)
 
@@ -131,7 +139,9 @@ class TestGetAuthenticatedUserToken:
         """Test returns None when an exception is raised."""
         mock_query = MagicMock()
         mock_query.options.side_effect = Exception("DB error")
-        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
         result = get_authenticated_user_token(1)
 
@@ -146,7 +156,9 @@ class TestGetUserToken:
         mock_token = MagicMock(spec=UserTokenRecord, user_id=1)
         mock_query = MagicMock()
         mock_query.filter.return_value.first.return_value = mock_token
-        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
         result = get_user_token(1)
 
@@ -157,7 +169,9 @@ class TestGetUserToken:
         mock_token = MagicMock(spec=UserTokenRecord, user_id=1)
         mock_query = MagicMock()
         mock_query.filter.return_value.first.return_value = mock_token
-        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
         result = get_user_token("1")
 
@@ -185,7 +199,9 @@ class TestGetUserToken:
         """Test returns None when no matching token record exists."""
         mock_query = MagicMock()
         mock_query.filter.return_value.first.return_value = None
-        monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query)
+        monkeypatch.setattr(
+            "src.main_app.db.services.users.user_token_service.db.session.query", lambda cls: mock_query
+        )
 
         result = get_user_token(999)
 

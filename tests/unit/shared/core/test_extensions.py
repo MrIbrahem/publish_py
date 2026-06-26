@@ -4,21 +4,17 @@ Unit tests for extensions module.
 
 from __future__ import annotations
 
-from unittest.mock import patch
-
-from flask import Flask
-
 from datetime import datetime
 from typing import Any
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
+from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.main_app.extensions import csrf, csrf_exempt, csrf_init_app
-from src.main_app.extensions import BaseModel, db, migrate
+from src.main_app.extensions import BaseModel, csrf, csrf_exempt, csrf_init_app, db, migrate
 
 
 class MockModel(db.Model):

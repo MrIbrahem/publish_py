@@ -94,7 +94,9 @@ class TestCheckPublishSecretCode:
             lambda: "correct_secret",
         )
 
-        with mock_app.test_request_context(headers={"X-Secret-Key": "correct_secret"}, base_url="https://api.example.com"):
+        with mock_app.test_request_context(
+            headers={"X-Secret-Key": "correct_secret"}, base_url="https://api.example.com"
+        ):
             result = check_publish_secret_code()
 
             assert "example.com" in result

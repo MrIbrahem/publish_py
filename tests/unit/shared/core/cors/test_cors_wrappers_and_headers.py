@@ -36,7 +36,9 @@ class TestValidateAccessControlAllowOrigin:
 
         assert result.headers["Access-Control-Allow-Origin"] == "https://partner.net"
 
-    def test_denied_returns_403_without_cors_header(self, mock_app, mock_load_request, mock_is_denied, mock_check_secret):
+    def test_denied_returns_403_without_cors_header(
+        self, mock_app, mock_load_request, mock_is_denied, mock_check_secret
+    ):
         mock_check_secret.return_value = None
 
         result = validate_access(lambda: _make_response_with_headers())()

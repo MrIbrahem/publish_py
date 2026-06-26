@@ -11,9 +11,8 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
-from ....db.services.delete_service import delete_user_token
-
 from ....config import settings
+from ....db.services.delete_service import delete_user_token
 from ....db.services.users import (
     get_user_token_by_username,
 )

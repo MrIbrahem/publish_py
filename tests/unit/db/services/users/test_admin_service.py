@@ -1,5 +1,6 @@
 # ruff: noqa: F401
 from unittest.mock import MagicMock, patch
+
 import pytest
 
 from src.main_app.db.exceptions import DuplicateUserError

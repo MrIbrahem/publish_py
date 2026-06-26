@@ -20,7 +20,9 @@ class TestValidateAccessDecorated:
         mock_func.assert_called_once()
         assert result == "ok"
 
-    def test_valid_secret_code_calls_wrapped_function(self, mock_app, mock_load_request, mock_is_denied, mock_check_secret):
+    def test_valid_secret_code_calls_wrapped_function(
+        self, mock_app, mock_load_request, mock_is_denied, mock_check_secret
+    ):
         mock_check_secret.return_value = "secret-host.com"
         mock_func = MagicMock(return_value="ok")
         decorated = validate_access(mock_func)
@@ -53,7 +55,9 @@ class TestValidateAccessDecorated:
         mock_func.assert_not_called()
         assert result.status_code == 403
 
-    def test_neither_valid_returns_secret_key_error(self, mock_app, mock_load_request, mock_is_denied, mock_check_secret):
+    def test_neither_valid_returns_secret_key_error(
+        self, mock_app, mock_load_request, mock_is_denied, mock_check_secret
+    ):
         mock_check_secret.return_value = None
         decorated = validate_access(lambda: "ok")
 

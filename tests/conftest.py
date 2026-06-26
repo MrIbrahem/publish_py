@@ -178,6 +178,7 @@ def mock_load_request(mocker):
 
 # ── db fixtures ───────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture(autouse=True)
 def setup_db(mock_app: Flask):
     """

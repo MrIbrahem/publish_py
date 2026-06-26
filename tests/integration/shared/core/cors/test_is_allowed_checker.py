@@ -54,7 +54,9 @@ class TestSameOrigin:
         """Referer pointing to same server → return host_url stripped."""
         from src.main_app.shared.core.cors.is_allowed_checker import is_allowed
 
-        with mock_app.test_request_context(base_url="http://localhost/", headers={"Referer": "http://localhost/some/page"}):
+        with mock_app.test_request_context(
+            base_url="http://localhost/", headers={"Referer": "http://localhost/some/page"}
+        ):
             from flask import request
 
             result = is_allowed(request)

@@ -1,4 +1,5 @@
 from flask.app import Flask
+
 from src.main_app.db.models import CategoryRecord, PageRecord, UserRecord
 from src.main_app.db.services.pages import get_leaderboard_chart_data
 from src.main_app.extensions import db
