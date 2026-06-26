@@ -13,20 +13,20 @@ from src.main_app.config import TestingConfig
 def mock_app() -> Flask:
     """Create a test Flask application."""
     # Environment variables are set in conftest.py
-    app = Flask(__name__)
-    app.url_map.strict_slashes = False
-    app.secret_key = "test_secret"
-    app.config.from_object(TestingConfig)
+    mock_app = Flask(__name__)
+    mock_app.url_map.strict_slashes = False
+    mock_app.secret_key = "test_secret"
+    mock_app.config.from_object(TestingConfig)
 
     from src.main_app.extensions import db
 
-    db.init_app(app)
+    db.init_app(mock_app)
 
     # Import and register the blueprint
     from src.main_app.public.routes.cxtoken.routes import bp_cxtoken
 
-    app.register_blueprint(bp_cxtoken)
-    return app
+    mock_app.register_blueprint(bp_cxtoken)
+    return mock_app
 
 
 @pytest.fixture

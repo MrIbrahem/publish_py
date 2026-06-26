@@ -7,35 +7,27 @@ import pytest
 from flask import Flask
 from flask.testing import FlaskClient
 
+from src.main_app import create_app
 from src.main_app.config import TestingConfig
 
 
 @pytest.fixture
-def app() -> Flask:
+def mock_app() -> Flask:
     """Create a test Flask application."""
     import os
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", "")
 
-    app = Flask(__name__)
-    app.url_map.strict_slashes = False
-    app.config.from_object(TestingConfig)
-    app.config.update({"CORS_DISABLED": True})
+    _app = create_app(TestingConfig)
+    _app.config.update({"CORS_DISABLED": True})
 
-    from src.main_app.extensions import db
-
-    db.init_app(app)
-
-    from src.main_app.public.routes.publish.routes import bp_publish
-
-    app.register_blueprint(bp_publish)
-    return app
+    return _app
 
 
 @pytest.fixture
-def client(app: Flask) -> FlaskClient:
+def client(mock_app: Flask, setup_db) -> FlaskClient:
     """Create a test client."""
-    return app.test_client()
+    return mock_app.test_client()
 
 
 class TestPostEndpoint:

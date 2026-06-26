@@ -106,7 +106,7 @@ def mock_client(mock_app: Flask) -> FlaskClient:
     """Create a test client for the app.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Test client for making HTTP requests.
@@ -119,7 +119,7 @@ def runner(mock_app):
     """Create a test CLI runner for the app.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Test CLI runner for invoking commands.
@@ -135,7 +135,7 @@ def auth_client(mock_app):
     Useful for testing protected routes.
 
     Args:
-        app: The Flask application fixture.
+        mock_app: The Flask application fixture.
 
     Returns:
         Authenticated test client.

@@ -22,19 +22,19 @@ def mock_app() -> Flask:
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", f"{ALLOWED_DOMAIN},mdwikicx.toolforge.org")
 
-    app = Flask(__name__)
-    app.url_map.strict_slashes = False
+    mock_app = Flask(__name__)
+    mock_app.url_map.strict_slashes = False
 
-    app.config.from_object(TestingConfig)
-    app.config.update({"CORS_DISABLED": False})
+    mock_app.config.from_object(TestingConfig)
+    mock_app.config.update({"CORS_DISABLED": False})
     from src.main_app.extensions import db
 
-    db.init_app(app)
+    db.init_app(mock_app)
 
     from src.main_app.public.routes.publish.routes import bp_publish
 
-    app.register_blueprint(bp_publish)
-    return app
+    mock_app.register_blueprint(bp_publish)
+    return mock_app
 
 
 @pytest.fixture

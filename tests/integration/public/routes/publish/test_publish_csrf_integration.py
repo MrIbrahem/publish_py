@@ -13,7 +13,7 @@ from flask.app import Flask
 
 @pytest.fixture
 def csrf_app() -> Flask:
-    """Create a Flask app with CSRF protection enabled (like Production)."""
+    """Create a Flask mock_app with CSRF protection enabled (like Production)."""
     import os
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
