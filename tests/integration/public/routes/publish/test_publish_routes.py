@@ -83,7 +83,7 @@ class TestPublishPost:
         with patch(
             "src.main_app.public.routes.publish.routes.get_user_token_by_username",
             return_value=None,
-        ) as mock_get_token:
+        ):
 
             response = mock_client.post(
                 "/publish/",

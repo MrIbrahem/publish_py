@@ -133,7 +133,7 @@ class TestCxTokenUserFormatting:
                 with patch("src.main_app.public.routes.cxtoken.routes._format_user") as mock_format:
                     mock_format.return_value = "Test User"
 
-                    response = mock_client.get("/cxtoken/?wiki=en&user=Test_User")
+                    mock_client.get("/cxtoken/?wiki=en&user=Test_User")
 
                     # Check that formatting was called
                     mock_format.assert_called()
@@ -149,7 +149,7 @@ class TestCxTokenUserFormatting:
                 with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
                     mock_get_token.return_value = None
 
-                    response = mock_client.get("/cxtoken/?wiki=en&user=SpecialUser")
+                    mock_client.get("/cxtoken/?wiki=en&user=SpecialUser")
 
                     # The formatted user should be "MappedUser" after applying special_users mapping
 
