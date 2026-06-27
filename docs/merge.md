@@ -19,8 +19,15 @@
 
 ### Source Endpoints
 
-| source Endpoint | Method | Description |
-| --------------- | ------ | ----------- |
+| Endpoint        | Method | Description             |
+| --------------- | ------ | ----------------------- |
+| `/`             | GET    | Main entry              |
+| `/fixwikirefs/` | GET    | Fix References tool     |
+| `/views/`       | GET    | Pageviews Dashboard     |
+| `/prior/`       | GET    | Prior List Dashboard    |
+| `/WHO/`         | GET    | WHO Essential Medicines |
+| `/gmail1/`      | POST   | Gmail Sender            |
+| `/404.php`      | GET    | Custom 404 handler      |
 
 ### Flask Endpoints
 
@@ -56,13 +63,15 @@
 
 ### Flask Endpoints
 
-| Route                                      | Method | Description           | Status |
-| ------------------------------------------ | ------ | --------------------- | ------ |
-| `/Translation_Dashboard`                   | GET    | Homepage              |        |
-| `/Translation_Dashboard/missing`           | GET    | Missing pages report  |        |
-| `/Translation_Dashboard/leaderboard`       | GET    |                       | ✔️     |
-| `/Translation_Dashboard/leaderboard/langs` | GET    | languages leaderboard | ✔️     |
-| `/Translation_Dashboard/leaderboard/users` | GET    | users leaderboard     | ✔️     |
+| Endpoint                                               | Method | Description             |
+| ------------------------------------------------------ | ------ | ----------------------- |
+| `/Translation_Dashboard/`                              | GET    | Dashboard index         |
+| `/Translation_Dashboard/results_api`                   | GET    | Translation results API |
+| `/Translation_Dashboard/table`                         | GET    | Translation table       |
+| `/Translation_Dashboard/missing`                       | GET    | Missing translations    |
+| `/Translation_Dashboard/leaderboard/`                  | GET    | Leaderboard index       |
+| `/Translation_Dashboard/leaderboard/langs/<lang_code>` | GET    | Leaderboard by language |
+| `/Translation_Dashboard/leaderboard/users/<username>`  | GET    | Leaderboard by user     |
 
 ---
 
@@ -80,10 +89,13 @@ Manages the final steps in the process of publishing Wikipedia articles that hav
 
 ### Flask Endpoints
 
-| Route      | Method | Description | Status |
-| ---------- | ------ | ----------- | ------ |
-| `/`        | GET    | Homepage    | ✔️     |
-| `/reports` | GET    |             | ✔️     |
+| Endpoint    | Method  | Description        |
+| ----------- | ------- | ------------------ |
+| `/cxtoken/` | GET     | CX Token page      |
+| `/cxtoken/` | OPTIONS | CX Token preflight |
+| `/publish/` | POST    | Publish article    |
+| `/publish/` | OPTIONS | Publish preflight  |
+| `/reports`  | GET     | Reports page       |
 
 ---
 
@@ -101,11 +113,11 @@ Manages the final steps in the process of publishing Wikipedia articles that hav
 
 ### Flask Endpoints
 
-| Route       | Method | Description | Status |
-| ----------- | ------ | ----------- | ------ |
-| `/login`    | GET    |             | ✔️     |
-| `/callback` | GET    |             | ✔️     |
-| `/logout`   | GET    |             | ✔️     |
+| Endpoint         | Method | Description           |
+| ---------------- | ------ | --------------------- |
+| `/auth/login`    | GET    | MediaWiki OAuth login |
+| `/auth/callback` | GET    | OAuth callback        |
+| `/auth/logout`   | GET    | Logout                |
 
 ---
 
@@ -122,9 +134,12 @@ Manages the final steps in the process of publishing Wikipedia articles that hav
 
 ### Flask Endpoints
 
-| Route | Method | Description | Status |
-| ----- | ------ | ----------- | ------ |
-| `/`   | GET    | Homepage    |        |
+| Endpoint           | Method | Description      |
+| ------------------ | ------ | ---------------- |
+| `/fixrefs/`        | GET    | Tool index       |
+| `/fixrefs/`        | POST   | Process wikitext |
+| `/fixrefs/test`    | GET    | Test page        |
+| `/fixrefs/process` | GET    | Process page     |
 
 ---
 
@@ -190,32 +205,22 @@ Manages the final steps in the process of publishing Wikipedia articles that hav
 
 ### Flask Endpoints
 
-| Route | Method | Description | Status |
-| ----- | ------ | ----------- | ------ |
-| `/`   | GET    | Homepage    |        |
-
----
-
-## new html
-
-### Source Endpoints
-
-| Endpoint             | Method | Description                                                             |
-| -------------------- | ------ | ----------------------------------------------------------------------- |
-| `/`                  | GET    | Main entry - router (redirects to dashboard or processes `title` param) |
-| `/check.php`         | GET    | Check if cached content exists for a revision ID                        |
-| `/open.php`          | GET    | View generated files (wikitext, HTML, segments) by revision ID          |
-| `/fix.php`           | GET    | Wikitext fix testing form                                               |
-| `/fix.php`           | POST   | Apply wikitext fixes and display result                                 |
-| `/revisions.php`     | GET    | Revisions dashboard (HTML table)                                        |
-| `/revisions_api.php` | GET    | Revisions API (JSON payload)                                            |
-| `/revisions.html`    | GET    | Static dashboard page                                                   |
-
-### Flask Endpoints
-
-| Route | Method | Description | Status |
-| ----- | ------ | ----------- | ------ |
-| `/`   | GET    | Homepage    |        |
+| Endpoint                           | Method | Description                |
+| ---------------------------------- | ------ | -------------------------- |
+| `/api/publish_reports`             | GET    | Publish reports data       |
+| `/api/publish_reports/stats`       | GET    | Publish reports stats      |
+| `/api/in_process`                  | GET    | In-process pages           |
+| `/api/in_process_total`            | GET    | In-process total count     |
+| `/api/pages_users`                 | GET    | Pages per user             |
+| `/api/pages_with_views`            | GET    | Pages with view counts     |
+| `/api/categories`                  | GET    | Categories                 |
+| `/api/distinct_langs`              | GET    | Distinct languages         |
+| `/api/users_by_translations_count` | GET    | Users by translation count |
+| `/api/langs`                       | GET    | Languages list             |
+| `/api/users`                       | GET    | Users list                 |
+| `/api/status`                      | GET    | Leaderboard status         |
+| `/api/top_langs`                   | GET    | Top languages              |
+| `/api/top_users`                   | GET    | Top users                  |
 
 ---
 
@@ -223,53 +228,186 @@ Manages the final steps in the process of publishing Wikipedia articles that hav
 
 ### Source Endpoints
 
-| Endpoint                         | Method   | Description                                             |
-| -------------------------------- | -------- | ------------------------------------------------------- |
-| `/`                              | GET      | Main entry — recent translations dashboard              |
-| `?ty=last`                       | GET      | Recent translations table                               |
-| `?ty=last1`                      | GET      | Recent translations (SQL-based)                         |
-| `?ty=categories`                 | GET      | Translation languages with Wikidata category status     |
-| `?ty=process`                    | GET      | Translations currently in progress                      |
-| `?ty=process_total`              | GET      | Per-user translation count summary                      |
-| `?ty=recent_helps`               | GET      | Helper utilities for recent translations                |
-| `?ty=stat`                       | GET      | Per-category article statistics                         |
-| `?ty=sidebar`                    | GET      | Sidebar HTML (for AJAX reload)                          |
-| `?ty=Campaigns`                  | GET/POST | List and edit translation campaigns                     |
-| `?ty=Campaigns/post`             | POST     | Save/update/delete campaign categories                  |
-| `?ty=Emails`                     | GET/POST | List users with emails and project filters              |
-| `?ty=Emails/post`                | POST     | Save user email/wiki/project edits                      |
-| `?ty=Emails/msg`                 | GET/POST | Compose and send email to translator                    |
-| `?ty=Emails/edit_user`           | GET      | Edit or add a single user                               |
-| `?ty=add`                        | GET/POST | Add new translation entries                             |
-| `?ty=add/post`                   | POST     | Save new translation rows                               |
-| `?ty=admins`                     | GET/POST | List, add, delete coordinators                          |
-| `?ty=admins/post`                | POST     | Save coordinator changes                                |
-| `?ty=full_translators`           | GET/POST | Manage full article translators                         |
-| `?ty=full_translators/post`      | POST     | Save full translator changes                            |
-| `?ty=last_coord`                 | GET      | Coordinator view of recent translations                 |
-| `?ty=pages_users_to_main`        | GET      | Pages needing move to main namespace                    |
-| `?ty=pages_users_to_main/fix_it` | GET/POST | Edit page transfer details                              |
-| `?ty=projects`                   | GET/POST | Manage project groups                                   |
-| `?ty=projects/post`              | POST     | Save project changes                                    |
-| `?ty=qids`                       | GET      | List Wikidata QIDs                                      |
-| `?ty=qids/edit_qid`              | GET/POST | Edit or add a QID entry                                 |
-| `?ty=qids/post`                  | POST     | Save QID changes                                        |
-| `?ty=reports`                    | GET      | View publish reports with filters                       |
-| `?ty=settings`                   | GET/POST | Manage application settings                             |
-| `?ty=settings/post`              | POST     | Save settings changes                                   |
-| `?ty=translated`                 | GET      | Paginated list of all translated pages                  |
-| `?ty=translated/edit_page`       | GET/POST | Edit or delete a translated page                        |
-| `?ty=tt`                         | GET      | List articles by translate type                         |
-| `?ty=tt/edit_translate_type`     | GET/POST | Edit or add translate type                              |
-| `?ty=tt/post`                    | POST     | Save translate type changes                             |
-| `?ty=users_no_inprocess`         | GET/POST | Manage users excluded from "in process"                 |
-| `?ty=users_no_inprocess/post`    | POST     | Save exclusion list changes                             |
-| `?ty=wikirefs_options`           | GET      | Per-language fix wikirefs settings                      |
-| `?ty=wikirefs_options/edit`      | GET/POST | Edit language settings                                  |
-| `sugust.php`                     | GET      | JSON endpoint for article suggestions (`?title=&lang=`) |
+| Endpoint             | Method   | Description                                             |
+| -------------------- | -------- | ------------------------------------------------------- |
+| `/`                  | GET      | Main entry — recent translations dashboard              |
+| `?ty=reports`        | GET      | View publish reports with filters                       |
+| `?ty=stat`           | GET      | Per-category article statistics                         |
+| `?ty=sidebar`        | GET      | Sidebar HTML (for AJAX reload)                          |
+| `?ty=categories`     | GET      | Translation languages with Wikidata category status     |
+| `?ty=Campaigns`      | GET/POST | List and edit translation campaigns                     |
+| `?ty=Campaigns/post` | POST     | Save/update/delete campaign categories                  |
+| `?ty=projects`       | GET/POST | Manage project groups                                   |
+| `?ty=projects/post`  | POST     | Save project changes                                    |
+| `?ty=settings`       | GET/POST | Manage application settings                             |
+| `?ty=settings/post`  | POST     | Save settings changes                                   |
+| `sugust.php`         | GET      | JSON endpoint for article suggestions (`?title=&lang=`) |
+
+#### Recent translations
+
+| Endpoint                         | Method   | Description                              |
+| -------------------------------- | -------- | ---------------------------------------- |
+| `?ty=last`                       | GET      | Recent translations table                |
+| `?ty=last1`                      | GET      | Recent translations (SQL-based)          |
+| `?ty=process`                    | GET      | Translations currently in progress       |
+| `?ty=process_total`              | GET      | Per-user translation count summary       |
+| `?ty=last_coord`                 | GET      | Coordinator view of recent translations  |
+| `?ty=recent_helps`               | GET      | Helper utilities for recent translations |
+| `?ty=pages_users_to_main`        | GET      | Pages needing move to main namespace     |
+| `?ty=pages_users_to_main/fix_it` | GET/POST | Edit page transfer details               |
+
+#### Pages
+
+| Endpoint                     | Method   | Description                            |
+| ---------------------------- | -------- | -------------------------------------- |
+| `?ty=translated`             | GET      | Paginated list of all translated pages |
+| `?ty=translated/edit_page`   | GET/POST | Edit or delete a translated page       |
+| `?ty=tt`                     | GET      | List articles by translate type        |
+| `?ty=tt/edit_translate_type` | GET/POST | Edit or add translate type             |
+| `?ty=tt/post`                | POST     | Save translate type changes            |
+| `?ty=add`                    | GET/POST | Add new translation entries            |
+| `?ty=add/post`               | POST     | Save new translation rows              |
+
+#### Qids
+
+| Endpoint            | Method   | Description             |
+| ------------------- | -------- | ----------------------- |
+| `?ty=qids`          | GET      | List Wikidata QIDs      |
+| `?ty=qids/edit_qid` | GET/POST | Edit or add a QID entry |
+| `?ty=qids/post`     | POST     | Save QID changes        |
+
+#### Users
+
+| Endpoint                      | Method   | Description                                |
+| ----------------------------- | -------- | ------------------------------------------ |
+| `?ty=Emails`                  | GET/POST | List users with emails and project filters |
+| `?ty=Emails/post`             | POST     | Save user email/wiki/project edits         |
+| `?ty=Emails/msg`              | GET/POST | Compose and send email to translator       |
+| `?ty=Emails/edit_user`        | GET      | Edit or add a single user                  |
+| `?ty=users_no_inprocess`      | GET/POST | Manage users excluded from "in process"    |
+| `?ty=users_no_inprocess/post` | POST     | Save exclusion list changes                |
+
+#### Roles Management
+
+| Endpoint                    | Method   | Description                     |
+| --------------------------- | -------- | ------------------------------- |
+| `?ty=admins`                | GET/POST | List, add, delete coordinators  |
+| `?ty=admins/post`           | POST     | Save coordinator changes        |
+| `?ty=full_translators`      | GET/POST | Manage full article translators |
+| `?ty=full_translators/post` | POST     | Save full translator changes    |
+
+#### Language Settings
+
+| Endpoint                    | Method   | Description                        |
+| --------------------------- | -------- | ---------------------------------- |
+| `?ty=wikirefs_options`      | GET      | Per-language fix wikirefs settings |
+| `?ty=wikirefs_options/edit` | GET/POST | Edit language settings             |
 
 ### Flask Endpoints
 
-| Route | Method | Description | Status |
-| ----- | ------ | ----------- | ------ |
-| `/`   | GET    | Homepage    |        |
+| Endpoint                         | Method | Description                   |
+| -------------------------------- | ------ | ----------------------------- |
+| `/admin/`                        | GET    | Admin panel index             |
+| `/admin/last`                    | GET    | Last dashboard                |
+| `/admin/last/pages/<lang>`       | GET    | Dashboard pages by lang       |
+| `/admin/last/pages/`             | GET    | Dashboard all pages           |
+| `/admin/last/pages_users/<lang>` | GET    | Dashboard pages/users by lang |
+| `/admin/last/pages_users/`       | GET    | Dashboard all pages/users     |
+| `/admin/reports`                 | GET    | Admin reports                 |
+| `/admin/process`                 | GET    | In-process dashboard          |
+| `/admin/process_total`           | GET    | In-process total dashboard    |
+| `/admin/edit_done`               | GET    | Edit done page                |
+| `/admin/categories`              | GET    | Categories dashboard          |
+
+#### Users
+
+| Endpoint                                    | Method | Description                    |
+| ------------------------------------------- | ------ | ------------------------------ |
+| `/admin/coordinators/`                      | GET    | Coordinators dashboard         |
+| `/admin/coordinators/add`                   | POST   | Add coordinator                |
+| `/admin/coordinators/<id>/activate`         | POST   | Activate coordinator           |
+| `/admin/coordinators/<id>/deactivate`       | POST   | Deactivate coordinator         |
+| `/admin/coordinators/<id>/delete`           | POST   | Delete coordinator             |
+| `/admin/full_translators/`                  | GET    | Full translators dashboard     |
+| `/admin/full_translators/add`               | POST   | Add full translator            |
+| `/admin/full_translators/<id>/delete`       | POST   | Delete full translator         |
+| `/admin/full_translators/<id>/activate`     | POST   | Activate translator record     |
+| `/admin/full_translators/<id>/deactivate`   | POST   | Deactivate translator record   |
+| `/admin/users_no_inprocess/`                | GET    | No-inprocess users dashboard   |
+| `/admin/users_no_inprocess/add`             | POST   | Add no-inprocess user          |
+| `/admin/users_no_inprocess/<id>/delete`     | POST   | Delete no-inprocess user       |
+| `/admin/users_no_inprocess/<id>/activate`   | POST   | Activate no-inprocess record   |
+| `/admin/users_no_inprocess/<id>/deactivate` | POST   | Deactivate no-inprocess record |
+
+#### Language Settings
+
+| Endpoint                               | Method | Description        |
+| -------------------------------------- | ------ | ------------------ |
+| `/admin/language_settings/`            | GET    | Settings dashboard |
+| `/admin/language_settings/add`         | POST   | Add setting        |
+| `/admin/language_settings/<id>/update` | POST   | Update setting     |
+| `/admin/language_settings/<id>/delete` | POST   | Delete setting     |
+
+#### Translation Tools
+
+| Endpoint                       | Method | Description                 |
+| ------------------------------ | ------ | --------------------------- |
+| `/admin/add/`                  | GET    | Add translation form        |
+| `/admin/add/`                  | POST   | Add translation submit      |
+| `/admin/tt/`                   | GET    | Translation tools index     |
+| `/admin/tt/`                   | POST   | Edit translation tool       |
+| `/admin/tt/edit`               | GET    | Edit translation tool form  |
+| `/admin/tt/add`                | GET    | Add translation tool form   |
+| `/admin/tt/add`                | POST   | Add translation tool submit |
+| `/admin/translated/`           | GET    | Translated pages index      |
+| `/admin/translated/edit`       | GET    | Edit translated page        |
+| `/admin/translated/edit`       | POST   | Edit translated page submit |
+| `/admin/translated_users/`     | GET    | Translated users index      |
+| `/admin/translated_users/edit` | GET    | Edit translated user        |
+| `/admin/translated_users/edit` | POST   | Edit translated user submit |
+
+#### Communications
+
+| Endpoint                                              | Method | Description              |
+| ----------------------------------------------------- | ------ | ------------------------ |
+| `/admin/email_msg/dashboard/<last_table>/<id>`        | GET    | Email message dashboard  |
+| `/admin/email_msg/dashboard/<last_table>/<id>/<user>` | GET    | Email dashboard for user |
+| `/admin/email_msg/send`                               | POST   | Send email message       |
+| `/admin/users_emails/`                                | GET    | Users emails dashboard   |
+| `/admin/users_emails/add`                             | POST   | Add user email           |
+| `/admin/users_emails/<id>/delete`                     | POST   | Delete user email        |
+| `/admin/users_emails/<id>/update`                     | POST   | Update user email        |
+| `/admin/users_emails/<id>/edit`                       | GET    | Edit user email form     |
+
+#### QIDs
+
+| Endpoint                  | Method | Description           |
+| ------------------------- | ------ | --------------------- |
+| `/admin/qids/`            | GET    | QIDs index            |
+| `/admin/qids/`            | POST   | Edit QID submit       |
+| `/admin/qids/edit`        | GET    | Edit QID form         |
+| `/admin/qids/add`         | GET    | Add QID form          |
+| `/admin/qids/add`         | POST   | Add QID submit        |
+| `/admin/qids_others/`     | GET    | Other QIDs index      |
+| `/admin/qids_others/`     | POST   | Edit other QID submit |
+| `/admin/qids_others/edit` | GET    | Edit other QID form   |
+| `/admin/qids_others/add`  | GET    | Add other QID form    |
+| `/admin/qids_others/add`  | POST   | Add other QID submit  |
+
+#### Utilities
+
+| Endpoint                            | Method | Description               |
+| ----------------------------------- | ------ | ------------------------- |
+| `/admin/pages_users_to_main/`       | GET    | Pages-users to main index |
+| `/admin/pages_users_to_main/fix_it` | GET    | Fix pages-users form      |
+| `/admin/pages_users_to_main/fix_it` | POST   | Fix pages-users submit    |
+| `/admin/stat/`                      | GET    | Statistics dashboard      |
+| `/admin/settings/`                  | GET    | Settings dashboard        |
+| `/admin/settings/create`            | POST   | Create setting            |
+| `/admin/settings/update`            | POST   | Update setting            |
+| `/admin/projects/`                  | GET    | Projects dashboard        |
+| `/admin/projects/add`               | POST   | Add project               |
+| `/admin/projects/update`            | POST   | Update project            |
+| `/admin/campaigns/`                 | GET    | Campaigns dashboard       |
+| `/admin/campaigns/add`              | POST   | Add campaign              |
+| `/admin/campaigns/update`           | POST   | Update campaign           |

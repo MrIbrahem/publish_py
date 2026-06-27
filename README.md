@@ -2,13 +2,13 @@
 
 Flask web application for mdwiki tools.
 
-## Endpoints
-
--   read [docs/merge.md](docs/merge.md) for more informations
-
 ### Publish endpoint
 
 publishing Wikipedia articles translated via ContentTranslation tool. Takes wikitext, refines it using the fix_refs repository, publishes to Wikipedia via MediaWiki API, and links articles to Wikidata.
+
+## End points
+
+-   read [docs/merge.md](docs/merge.md) for more informations
 
 **Stack**: Python 3.13, Flask, SQLAlchemy, MySQL/MariaDB, MediaWiki OAuth
 
