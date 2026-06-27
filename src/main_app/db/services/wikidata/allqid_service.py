@@ -29,7 +29,7 @@ def list_targets_by_lang(lang: str) -> List[dict]:
 			JOIN all_qids_exists t ON t.qid = q.qid
 			LEFT JOIN category_members aa ON aa.article_id = q.title
 		WHERE
-			t.code = ?
+			t.code = :lang
 			AND t.target != ''
 			AND t.target IS NOT NULL
 		GROUP BY
