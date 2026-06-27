@@ -18,20 +18,22 @@ def list_targets_by_lang(lang: str) -> List[dict]:
     """ """
     sql = text(
         """
-        SELECT
-            t.qid AS qid,
-            q.title AS title,
-            aa.category AS category,
-            t.code AS code,
-            t.target AS target
-        FROM
-            qids q
-            JOIN all_qids_exists t ON t.qid = q.qid
-            LEFT JOIN all_articles aa ON aa.article_id = q.title
-        WHERE
-            t.code = :lang
-            AND t.target != ''
-            AND t.target IS NOT NULL
+		SELECT
+			t.qid AS qid,
+			q.title AS title,
+			MIN(aa.category) AS category,
+			t.code AS code,
+			t.target AS target
+		FROM
+			qids q
+			JOIN all_qids_exists t ON t.qid = q.qid
+			LEFT JOIN category_members aa ON aa.article_id = q.title
+		WHERE
+			t.code = :lang
+			AND t.target != ''
+			AND t.target IS NOT NULL
+		GROUP BY
+			t.qid, q.title, t.code, t.target
     """
     )
     rows = db.session.execute(sql, {"lang": lang}).fetchall()

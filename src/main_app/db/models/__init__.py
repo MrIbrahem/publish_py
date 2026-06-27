@@ -1,4 +1,3 @@
-from .all_articles import AllArticlesRecord
 from .category_members import CategoryMemberRecord
 from .dashboard import (
     CategoryRecord,
@@ -44,7 +43,6 @@ from .views import (
 )
 
 __all__ = [
-    "AllArticlesRecord",
     "AllQidsExistRecord",
     "AssessmentRecord",
     "CategoryMemberRecord",
