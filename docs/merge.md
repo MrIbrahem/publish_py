@@ -1,17 +1,17 @@
-# Overview
+> report date: 2026-06-27
 
 # Code Sources
 
-| Endpoint                            | status | Method    | Description                  | Source                                                                                                                                  |
-| ----------------------------------- | ------ | --------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`                                 |        | GET       | Main entry                   | [Mdwiki-TD/mdwiki.toolforge.org](https://github.com/Mdwiki-TD/mdwiki.toolforge.org)                                                     |
-| `/Translation_Dashboard`            |        | GET       | -                            | [Mdwiki-TD/Translation-Dashboard](https://github.com/Mdwiki-TD/Translation-Dashboard)                                                   |
-| `/publish`, `/cxtoken` , `/reports` | ✔️     | POST      | Publish endpoint and Reports | [Mdwiki-TD/publish](https://github.com/Mdwiki-TD/publish)                                                                               |
-| `/login`, `/logout`, `/callback`    | ✔️     | GET       | OAuth                        | [Mdwiki-TD/auth-repo](https://github.com/Mdwiki-TD/auth-repo)                                                                           |
-| `/fixrefs`                          | ✔️     | GET, POST | Fix refs                     | [MrIbrahem/fix_refs_new_py](https://github.com/MrIbrahem/fix_refs_new_py) & [Mdwiki-TD/fix_refs](https://github.com/Mdwiki-TD/fix_refs) |
-| `/api`                              |        | GET       | API                          | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API)                                                                                 |
-| `/new_html`                         |        | GET       | -                            | [mdwikicx/new_html](https://github.com/mdwikicx/new_html)                                                                               |
-| `/admin`                            |        | GET       | -                            | [Mdwiki-TD/tdc](https://github.com/Mdwiki-TD/tdc/)                                                                                      |
+| Endpoint                            | Method    | Description                  | Source                                                                                                                                  |
+| ----------------------------------- | --------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                                 | GET       | Main entry                   | [Mdwiki-TD/mdwiki.toolforge.org](https://github.com/Mdwiki-TD/mdwiki.toolforge.org)                                                     |
+| `/Translation_Dashboard`            | GET       | -                            | [Mdwiki-TD/Translation-Dashboard](https://github.com/Mdwiki-TD/Translation-Dashboard)                                                   |
+| `/publish`, `/cxtoken` , `/reports` | POST      | Publish endpoint and Reports | [Mdwiki-TD/publish](https://github.com/Mdwiki-TD/publish)                                                                               |
+| `/login`, `/logout`, `/callback`    | GET       | OAuth                        | [Mdwiki-TD/auth-repo](https://github.com/Mdwiki-TD/auth-repo)                                                                           |
+| `/fixrefs`                          | GET, POST | Fix refs                     | [MrIbrahem/fix_refs_new_py](https://github.com/MrIbrahem/fix_refs_new_py) & [Mdwiki-TD/fix_refs](https://github.com/Mdwiki-TD/fix_refs) |
+| `/api`                              | GET       | API                          | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API)                                                                                 |
+| `/new_html`                         | GET       | -                            | [mdwikicx/new_html](https://github.com/mdwikicx/new_html)                                                                               |
+| `/admin`                            | GET       | -                            | [Mdwiki-TD/tdc](https://github.com/Mdwiki-TD/tdc/)                                                                                      |
 
 # End points
 
@@ -19,15 +19,13 @@
 
 ### Source Endpoints
 
-| Endpoint        | Method | Description             | Flask status |
-| --------------- | ------ | ----------------------- | ------------ |
-| `/`             | GET    | Main entry              | ✔️           |
-| `/fixwikirefs/` | GET    | Fix References tool     | ❌           |
-| `/views/`       | GET    | Pageviews Dashboard     | ❌           |
-| `/prior/`       | GET    | Prior List Dashboard    | ❌           |
-| `/WHO/`         | GET    | WHO Essential Medicines | ❌           |
-| `/gmail1/`      | POST   | Gmail Sender            | ❌           |
-| `/404.php`      | GET    | Custom 404 handler      | ❌           |
+| Endpoint   | Method | Description             | Flask status |
+| ---------- | ------ | ----------------------- | ------------ |
+| `/`        | GET    | Main entry              | ✔️           |
+| `/views/`  | GET    | Pageviews Dashboard     | ❌           |
+| `/prior/`  | GET    | Prior List Dashboard    | ❌           |
+| `/WHO/`    | GET    | WHO Essential Medicines | ❌           |
+| `/gmail1/` | POST   | Gmail Sender            | ❌           |
 
 ### Flask Endpoints
 
@@ -55,11 +53,6 @@
 | `/leaderboard.php?graph_api=1`               | GET    | Translation timeline graph (API-driven JS)                                | ❌           |
 | `/missing.php`                               | GET    | Missing articles — top languages by missing article count                 | ✔️           |
 | `/sitelinks.php`                             | GET    | Wikidata sitelinks report                                                 | ❌           |
-| `/translate.php`                             | GET    | Redirect to Content Translation tool                                      | ❌           |
-| `/x.php`                                     | GET    | AJAX-based leaderboard using DataTables                                   | ❌           |
-| `/auth.php`                                  | GET    | Redirect to authentication                                                | ❌           |
-| `/coordinator.php`                           | GET    | Redirect to coordinator tools                                             | ❌           |
-| `/404.php`                                   | GET    | 404 error page                                                            | ❌           |
 
 ### Flask Endpoints
 
@@ -76,8 +69,6 @@
 ---
 
 ## Publish
-
-Manages the final steps in the process of publishing Wikipedia articles that have been translated using the [ContentTranslation tool](https://github.com/mdwikicx/cx-1) in [medwiki.toolforge.org](http://medwiki.toolforge.org/). It takes the translated text in wikitext format, refines it further, and then publishes it to Wikipedia.
 
 ### Source Endpoints
 
@@ -103,13 +94,12 @@ Manages the final steps in the process of publishing Wikipedia articles that hav
 
 ### Source Endpoints
 
-| Endpoint                               | Method | Description                                                                     | Flask status |
-| -------------------------------------- | ------ | ------------------------------------------------------------------------------- | ------------ |
-| `/auth/` or `/auth/index.php`          | GET    | Auth status page — shows login link or authenticated username with logout       | ❌           |
-| `/auth/login.php` or `/?a=login`       | GET    | Initiate OAuth login — redirects to MediaWiki authorization page                | ✔️           |
-| `/auth/callback.php` or `/?a=callback` | GET    | OAuth callback handler — completes auth, stores tokens, sets cookies, redirects | ✔️           |
-| `/auth/logout.php` or `/?a=logout`     | GET    | Destroy session and clear cookies, then redirect                                | ✔️           |
-| `/auth/get_user.php` or `/?a=get_user` | GET    | JSON API — returns `{"username": "..."}`                                        | ❌           |
+| Endpoint                               | Method | Description                                      | Flask status |
+| -------------------------------------- | ------ | ------------------------------------------------ | ------------ |
+| `/auth/login.php` or `/?a=login`       | GET    | Initiate OAuth login                             | ✔️           |
+| `/auth/callback.php` or `/?a=callback` | GET    | OAuth callback handler                           | ✔️           |
+| `/auth/logout.php` or `/?a=logout`     | GET    | Destroy session and clear cookies, then redirect | ✔️           |
+| `/auth/get_user.php` or `/?a=get_user` | GET    | JSON API — returns `{"username": "..."}`         | ❌           |
 
 ### Flask Endpoints
 
@@ -245,16 +235,13 @@ Manages the final steps in the process of publishing Wikipedia articles that hav
 
 #### Recent translations
 
-| Endpoint                         | Method   | Description                              | Flask status |
-| -------------------------------- | -------- | ---------------------------------------- | ------------ |
-| `?ty=last`                       | GET      | Recent translations table                | ✔️           |
-| `?ty=last1`                      | GET      | Recent translations (SQL-based)          | ❌           |
-| `?ty=process`                    | GET      | Translations currently in progress       | ✔️           |
-| `?ty=process_total`              | GET      | Per-user translation count summary       | ✔️           |
-| `?ty=last_coord`                 | GET      | Coordinator view of recent translations  | ❌           |
-| `?ty=recent_helps`               | GET      | Helper utilities for recent translations | ❌           |
-| `?ty=pages_users_to_main`        | GET      | Pages needing move to main namespace     | ✔️           |
-| `?ty=pages_users_to_main/fix_it` | GET/POST | Edit page transfer details               | ✔️           |
+| Endpoint                         | Method   | Description                          | Flask status |
+| -------------------------------- | -------- | ------------------------------------ | ------------ |
+| `?ty=last`                       | GET      | Recent translations table            | ✔️           |
+| `?ty=process`                    | GET      | Translations currently in progress   | ✔️           |
+| `?ty=process_total`              | GET      | Per-user translation count summary   | ✔️           |
+| `?ty=pages_users_to_main`        | GET      | Pages needing move to main namespace | ✔️           |
+| `?ty=pages_users_to_main/fix_it` | GET/POST | Edit page transfer details           | ✔️           |
 
 #### Pages
 
