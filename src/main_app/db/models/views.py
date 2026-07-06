@@ -121,8 +121,10 @@ class ViewsNewAllRecord(db.Model):
         {
             "info": {
                 "is_view": True,
+                "replace_the_view": True,
                 "create_query": """
-                    CREATE VIEW views_new_all AS
+                    CREATE OR REPLACE VIEW
+                        views_new_all AS
                     SELECT v.target AS target,
                         v.lang AS lang,
                         SUM(v.views) AS views
