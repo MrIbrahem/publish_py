@@ -46,3 +46,4 @@ src/main_app/db/services/_main_service.py
 /.commandcode
 /.claude/skills
 _work_files/add_all.py
+**.pyc.**
