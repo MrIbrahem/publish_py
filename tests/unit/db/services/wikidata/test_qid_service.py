@@ -8,14 +8,14 @@ from src.main_app.db.services.delete_service import (
 )
 from src.main_app.db.services.wikidata.qid_service import (
     add_qid,
-    get_page_qid,
-    get_title_to_qid,
-    list_records,
-    update_qid,
     get_by_qid,
     get_by_title,
+    get_page_qid,
+    get_title_to_qid,
     insert,
+    list_records,
     update,
+    update_qid,
 )
 from src.main_app.extensions import db as _db
 
@@ -145,6 +145,7 @@ class TestGetTitleToQid:
 #   - insert(title, qid)
 #   - update(qid_id, title, qid)
 # ---------------------------------------------------------------------------
+
 
 def _add_with_empty_qid(title: str) -> QidRecord:
     """Insert a row with an empty qid column (model __init__ rejects ``""``)."""

@@ -8,14 +8,13 @@ from src.main_app.db.services.delete_service import (
 )
 from src.main_app.db.services.pages.page_service import (
     add_page,
-    insert_page_target,
-    list_pages,
-    update_page,
     count_translated,
     get_by_id,
+    insert_page_target,
+    list_pages,
     list_translated,
+    update_page,
 )
-
 from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
