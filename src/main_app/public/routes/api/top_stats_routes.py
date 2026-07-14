@@ -285,8 +285,8 @@ def get_top_users() -> Response:
             query = query.limit(int(form.limit))
         results = query.all()
 
-    except Exception:
-        logger.exception("Error fetching top_users data")
+    except Exception as e:
+        logger.error("Error fetching top_users data %s", str(e))
         return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500  # type: ignore
 
     # Convert results to list of dicts

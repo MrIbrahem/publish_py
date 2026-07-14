@@ -200,6 +200,7 @@ def setup_db(mock_app: Flask):
         # Create views manually (SQLite-compatible CREATE VIEW)
 
         with _db.engine.connect() as conn:
+
             for table in _db.metadata.tables.values():
                 if not table.info.get("is_view"):
                     continue
@@ -210,8 +211,9 @@ def setup_db(mock_app: Flask):
 
                 if table.name in existing_views:
                     continue
+
+                create_sql = table.info["create_query"]
                 try:
-                    create_sql = table.info["create_query"]
                     conn.execute(text(create_sql))
                     conn.commit()
                 except Exception:
