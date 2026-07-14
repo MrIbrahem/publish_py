@@ -161,6 +161,11 @@ def get_top_langs() -> Response:
 
         results = query.all()
 
+    except Exception:
+        logger.exception("Error fetching top_langs data")
+        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500  # type: ignore
+
+    try:
         # Convert results to list of dicts
         data: list[dict[str, Any]] = [
             {
@@ -172,10 +177,9 @@ def get_top_langs() -> Response:
             }
             for row in results
         ]
-
     except Exception:
-        logger.exception("Error fetching top_langs data")
-        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500  # type: ignore
+        logger.exception("Error processing top_langs data")
+        return jsonify({"error": "An internal error occurred while processing top_langs data"}), 500  # type: ignore
 
     response_data = {
         "results": data,
@@ -289,16 +293,20 @@ def get_top_users() -> Response:
         logger.error("Error fetching top_users data %s", str(e))
         return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500  # type: ignore
 
-    # Convert results to list of dicts
-    data: list[dict[str, Any]] = [
-        {
-            "user": row.user,
-            "targets": row.targets,
-            "words": int(row.words) if row.words else 0,
-            "views": int(row.views) if row.views else 0,
-        }
-        for row in results
-    ]
+    try:
+        # Convert results to list of dicts
+        data: list[dict[str, Any]] = [
+            {
+                "user": row.user,
+                "targets": row.targets,
+                "words": int(row.words) if row.words else 0,
+                "views": int(row.views) if row.views else 0,
+            }
+            for row in results
+        ]
+    except Exception as e:
+        logger.error("Error converting top_users data %s", str(e))
+        return jsonify({"error": "An internal error occurred while converting top_users data"}), 500  # type: ignore
 
     response_data = {
         "results": data,
