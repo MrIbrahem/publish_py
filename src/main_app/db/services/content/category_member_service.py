@@ -83,17 +83,18 @@ def batch_sync_category_members(data: list[dict]) -> None:
     try:
         existing_rows = set(db.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all())
         new_rows = []
+        seen = set()
         for row in data:
             cat = row.get("category", "")
             aid = row.get("article_id", "")
-            if cat and aid and (cat, aid) not in existing_rows:
+            if cat and aid and (cat, aid) not in existing_rows and (cat, aid) not in seen:
                 new_rows.append({"category": cat, "article_id": aid})
-
+                seen.add((cat, aid))
         if new_rows:
             db.session.execute(
                 text(
                     """
-                    INSERT IGNORE INTO category_members (category, article_id)
+                    INSERT INTO category_members (category, article_id)
                     VALUES (:category, :article_id)
                 """
                 ),
