@@ -11,6 +11,16 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class SidebarGroup:
+    """Sidebar group item definition."""
+
+    id: str
+    title: str
+    icon: str | None = None
+    items: list[SidebarItem] | None = None
+
+
+@dataclass
 class SidebarItem:
     """Sidebar menu item definition."""
 
@@ -50,13 +60,11 @@ def generate_list_item(item: SidebarItem) -> str:
 class Sidebar:
     def __init__(
         self,
-        menu: dict[str, list[SidebarItem]],
-        menu_icons: dict[str, str],
+        menu: list[SidebarGroup],
         active_route: str,
         path: str | None = None,
     ) -> None:
         self.menu = menu
-        self.menu_icons = menu_icons
         self.active_route = active_route
         self.path = path
 
@@ -74,19 +82,19 @@ class Sidebar:
             tuple[str, str]: The active group key and the active item ID.
         """
         # First pass: look for an exact match across all groups
-        for key, items in self.menu.items():
-            for item in items:
+        for group in self.menu:
+            for item in group.items:
                 if self.path == item.href:
-                    return key, item.id
+                    return group.title, item.id
 
         # Second pass: fallback match (startswith or active_route)
-        for key, items in self.menu.items():
-            for item in items:
+        for group in self.menu:
+            for item in group.items:
                 if (self.path and item.href and self.path.startswith(item.href)) or self.active_route == item.id:
-                    return key, item.id
+                    return group.title, item.id
 
         # Default to the first group if no match is found
-        active_group = list(self.menu.keys())[0] if self.menu else ""
+        active_group = [x.title for x in self.menu][0] if self.menu else ""
         return active_group, ""
 
     def create_side(self) -> str:
@@ -140,38 +148,35 @@ class Sidebar:
 
         sidebar_parts = ["<ul class='list-unstyled'>"]
 
-        for group, items in self.menu.items():
-            sub_items_str = build_sub_items(items, active_id)
+        for group_obj in self.menu:
+            sub_items_str = build_sub_items(group_obj.items, active_id)
 
             if not sub_items_str:
                 continue
 
-            group_id = group.lower().replace(" ", "_")
-
-            match group == active_group:
+            match group_obj.title == active_group:
                 case True:
                     show, expanded = "show", "true"
                 case False:
                     show, expanded = "", "false"
 
-            icon = self.menu_icons.get(group, "")
-            icon_tag = f"<i class='bi {icon} me-1'></i>" if icon else ""
+            icon_tag = f"<i class='bi {group_obj.icon} me-1'></i>" if group_obj.icon else ""
 
             # Formatting the button and the collapse container
             button_html = f"""
                 <button class="btn btn-toggle align-items-center rounded"
                         data-bs-toggle="collapse"
-                        data-bs-target="#{group_id}-collapse"
+                        data-bs-target="#{group_obj.id}-collapse"
                         aria-expanded="{expanded}">
                     {icon_tag}
-                    <span class='hide-on-collapse-inline'>{group}</span>
+                    <span class='hide-on-collapse-inline'>{group_obj.title}</span>
                 </button>
             """
 
             group_container = f"""
                 <li class="mb-1">
                     {button_html}
-                    {collapse_tpl.format(show=show, group_id=group_id, sub_items=sub_items_str)}
+                    {collapse_tpl.format(show=show, group_id=group_obj.id, sub_items=sub_items_str)}
                 </li>
                 <li class="border-top my-1"></li>"""
 
@@ -182,9 +187,13 @@ class Sidebar:
 
 
 @functools.lru_cache(maxsize=1)
-def load_menu() -> dict[str, list[SidebarItem]]:
-    main_menu = {
-        "Translations": [
+def load_groups_menu() -> list[SidebarGroup]:
+
+    translations = SidebarGroup(
+        id="translations",
+        title="Translations",
+        icon="bi-translate",
+        items=[
             SidebarItem(
                 id="last",
                 admin=1,
@@ -214,7 +223,13 @@ def load_menu() -> dict[str, list[SidebarItem]]:
                 icon="bi-file-earmark-text",
             ),
         ],
-        "Pages": [
+    )
+
+    pages = SidebarGroup(
+        id="pages",
+        title="Pages",
+        icon="bi-file-text",
+        items=[
             SidebarItem(
                 id="tt_load",
                 admin=1,
@@ -265,7 +280,13 @@ def load_menu() -> dict[str, list[SidebarItem]]:
                 icon="bi-list-check",
             ),
         ],
-        "Users": [
+    )
+
+    users = SidebarGroup(
+        id="users",
+        title="Users",
+        icon="bi-people",
+        items=[
             SidebarItem(
                 id="coordinators",
                 admin=1,
@@ -295,7 +316,13 @@ def load_menu() -> dict[str, list[SidebarItem]]:
                 icon="bi-hourglass",
             ),
         ],
-        "Others": [
+    )
+
+    others = SidebarGroup(
+        id="others",
+        title="Others",
+        icon="bi-three-dots",
+        items=[
             SidebarItem(
                 id="projects",
                 admin=1,
@@ -325,7 +352,13 @@ def load_menu() -> dict[str, list[SidebarItem]]:
                 icon="bi-tags",
             ),
         ],
-        "Tools": [
+    )
+
+    tools = SidebarGroup(
+        id="tools",
+        title="Tools",
+        icon="bi-tools",
+        items=[
             SidebarItem(
                 id="stat",
                 admin=0,
@@ -349,25 +382,22 @@ def load_menu() -> dict[str, list[SidebarItem]]:
                 icon="bi-wrench",
             ),
         ],
-    }
-
-    return main_menu
+    )
+    new_menu = [
+        translations,
+        pages,
+        users,
+        others,
+        tools,
+    ]
+    return new_menu
 
 
 def create_side(active_route: str, path: str | None = None) -> str:
     """Generate sidebar HTML structure based on menu definitions."""
-    main_menu = load_menu()
+    main_menu = load_groups_menu()
 
-    main_menu_icons = {
-        "Translations": "bi-translate",
-        "Pages": "bi-file-text",
-        "Qids": "bi-database",
-        "Users": "bi-people",
-        "Others": "bi-three-dots",
-        "Tools": "bi-tools",
-    }
-
-    model = Sidebar(main_menu, main_menu_icons, active_route, path)
+    model = Sidebar(main_menu, active_route, path)
     sidebar = model.create_side()
 
     return sidebar

@@ -9,8 +9,8 @@ from typing import List
 
 from sqlalchemy import text
 
-from ...models import CategoryMemberRecord
 from ....extensions import db
+from ...models import CategoryMemberRecord
 
 logger = logging.getLogger(__name__)
 
@@ -34,32 +34,20 @@ def list_distinct_article_ids() -> list[str]:
     Mirrors old ``select DISTINCT article_id from category_members``.
     """
 
-    rows = (
-        db.session.query(CategoryMemberRecord.article_id)
-        .distinct()
-        .all()
-    )
+    rows = db.session.query(CategoryMemberRecord.article_id).distinct().all()
     return [row.article_id for row in rows]
 
 
 def count_by_category(category: str) -> int:
     """Return the number of members in *category*."""
 
-    return (
-        db.session.query(CategoryMemberRecord)
-        .filter(CategoryMemberRecord.category == category)
-        .count()
-    )
+    return db.session.query(CategoryMemberRecord).filter(CategoryMemberRecord.category == category).count()
 
 
 def get_members_by_category(category: str) -> List[CategoryMemberRecord]:
     """Return all member records for *category*."""
 
-    return (
-        db.session.query(CategoryMemberRecord)
-        .filter(CategoryMemberRecord.category == category)
-        .all()
-    )
+    return db.session.query(CategoryMemberRecord).filter(CategoryMemberRecord.category == category).all()
 
 
 def add_category_member(category: str, article_id: str) -> bool:
@@ -94,9 +82,7 @@ def batch_sync_category_members(data: list[dict]) -> None:
     """
 
     try:
-        existing_rows = set(
-            db.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all()
-        )
+        existing_rows = set(db.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all())
         new_rows = []
         for row in data:
             cat = row.get("category", "")
@@ -106,10 +92,12 @@ def batch_sync_category_members(data: list[dict]) -> None:
 
         if new_rows:
             db.session.execute(
-                text("""
+                text(
+                    """
                     INSERT IGNORE INTO category_members (category, article_id)
                     VALUES (:category, :article_id)
-                """),
+                """
+                ),
                 new_rows,
             )
             db.session.commit()
