@@ -285,20 +285,20 @@ def get_top_users() -> Response:
             query = query.limit(int(form.limit))
         results = query.all()
 
-        # Convert results to list of dicts
-        data: list[dict[str, Any]] = [
-            {
-                "user": row.user,
-                "targets": row.targets,
-                "words": int(row.words) if row.words else 0,
-                "views": int(row.views) if row.views else 0,
-            }
-            for row in results
-        ]
-
     except Exception:
         logger.exception("Error fetching top_users data")
         return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500  # type: ignore
+
+    # Convert results to list of dicts
+    data: list[dict[str, Any]] = [
+        {
+            "user": row.user,
+            "targets": row.targets,
+            "words": int(row.words) if row.words else 0,
+            "views": int(row.views) if row.views else 0,
+        }
+        for row in results
+    ]
 
     response_data = {
         "results": data,

@@ -1,4 +1,5 @@
-"""Shared pytest fixtures.
+"""
+Shared pytest fixtures.
 
 Boot a Flask app once per session with CSRF on (so tests exercise the
 real protection path) and provide helpers for scraping CSRF tokens and
@@ -26,10 +27,11 @@ from sqlalchemy import text
 
 if sys:
     # tempfile.gettempdir() returns the path to the system's directory for temporary files
-    system_temp_dir = Path(tempfile.gettempdir()) / "test"
+    system_temp_dir = Path(tempfile.gettempdir())
 
     # Now correctly combine it with "test" and set the environment variable
-    os.environ["MAIN_DIR"] = str(system_temp_dir)
+    os.environ["MAIN_DIR"] = str(system_temp_dir / "test")
+
     os.environ.setdefault("PUBLISH_REPORTS_DIR", f"{system_temp_dir}/publish_reports/reports_by_day")
     os.environ.setdefault("WORDS_JSON_PATH", f"{system_temp_dir}/words.json")
     os.environ.setdefault("ALL_PAGES_REVIDS_PATH", f"{system_temp_dir}/revids.json")
@@ -196,13 +198,14 @@ def setup_db(mock_app: Flask):
 
         existing_views = set(sa_inspect(_db.engine).get_view_names())
         # Create views manually (SQLite-compatible CREATE VIEW)
+
         with _db.engine.connect() as conn:
             for table in _db.metadata.tables.values():
                 if not table.info.get("is_view"):
                     continue
 
                 if not table.info.get("create_query"):
-                    logging.warning("View %s has no create_query, skipping", table.name)
+                    logging.error("View %s has no create_query, skipping", table.name)
                     continue
 
                 if table.name in existing_views:
@@ -213,7 +216,7 @@ def setup_db(mock_app: Flask):
                     conn.commit()
                 except Exception:
                     conn.rollback()
-                    logging.exception("Failed to create view %s", table.name)
+                    logging.error("Failed to create view %s", table.name)
 
         yield
 
