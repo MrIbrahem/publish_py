@@ -47,20 +47,24 @@ def create_views(_db: SQLAlchemy) -> None:
                 continue
 
             if not table.info.get("create_query"):
-                logger.warning("View %s has no create_query, skipping", table.name)
+                logger.error("View %s has no create_query, skipping", table.name)
                 continue
 
             create_sql = table.info["create_query"]
-
-            if not table.info.get("replace_the_view"):
-                if table.name in existing_views:
+            if table.name in existing_views:
+                if table.info.get("replace_the_view"):
+                    try:
+                        with conn.begin():
+                            conn.execute(text(f"DROP VIEW IF EXISTS {table.name}"))
+                    except Exception:
+                        logger.exception("Failed to drop view %s", table.name)
+                else:
                     continue
-
             try:
                 with conn.begin():
                     conn.execute(text(create_sql))
             except Exception:
-                logger.exception("Failed to create view %s", table.name)
+                logger.error("Failed to create view %s", table.name)
 
 
 def receive_connect(dbapi_conn, connection_record) -> None:
