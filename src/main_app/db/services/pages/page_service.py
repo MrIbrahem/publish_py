@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any, List
+from typing import Any
 
 from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
@@ -18,7 +18,7 @@ from ..analytics.word_service import get_word_counts_for_title
 logger = logging.getLogger(__name__)
 
 
-def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> List[PageRecord]:
+def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> list[PageRecord]:
     """Return translated pages (target not empty) optionally filtered by language."""
     query = db.session.query(PageRecord).filter(PageRecord.target.isnot(None), PageRecord.target != "")
     if lang and lang.lower() != "all":
@@ -44,13 +44,13 @@ def get_page_by_id(page_id: int) -> PageRecord | None:
     return db.session.get(PageRecord, page_id)
 
 
-def list_pages() -> List[PageRecord]:
+def list_pages() -> list[PageRecord]:
     """Return all pages."""
     orm_objs = db.session.query(PageRecord).order_by(PageRecord.id.asc()).all()
     return orm_objs
 
 
-def list_pages_by_lang_cat(lang: str, cat: str) -> List[PageRecord]:
+def list_pages_by_lang_cat(lang: str, cat: str) -> list[PageRecord]:
     """Return pages filtered by language and category."""
     return db.session.query(PageRecord).filter(PageRecord.lang == lang, PageRecord.cat == cat).all()
 

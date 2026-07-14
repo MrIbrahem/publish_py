@@ -23,7 +23,6 @@ Reference PHP modules:
 from __future__ import annotations
 
 from html import escape
-from typing import Optional
 from urllib.parse import quote, urlencode
 
 from ...db.services.config import get_setting_by_key
@@ -44,7 +43,7 @@ def _wiki_path(title: str) -> str:
     return _php_rawurlencode(title.replace(" ", "_"))
 
 
-def mdwiki_cat_link(category: str, name: Optional[str] = None) -> str:
+def mdwiki_cat_link(category: str, name: str | None = None) -> str:
     """``<a target="_blank">`` for a mdwiki category (PHP make_mdwiki_cat_url)."""
     if not category:
         return category or ""

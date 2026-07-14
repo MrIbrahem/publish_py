@@ -8,7 +8,7 @@ Endpoints:
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import Response, jsonify, request
 from sqlalchemy import case, cast
@@ -162,7 +162,7 @@ def get_top_langs() -> Response:
         results = query.all()
 
         # Convert results to list of dicts
-        data: List[Dict[str, Any]] = [
+        data: list[dict[str, Any]] = [
             {
                 "lang": row.lang,
                 "lang_name": row.lang_name if row.lang_name else row.lang,
@@ -286,7 +286,7 @@ def get_top_users() -> Response:
         results = query.all()
 
         # Convert results to list of dicts
-        data: List[Dict[str, Any]] = [
+        data: list[dict[str, Any]] = [
             {
                 "user": row.user,
                 "targets": row.targets,

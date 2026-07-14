@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any, List
+from typing import Any
 
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -17,13 +17,13 @@ from ...models import UserPageRecord
 logger = logging.getLogger(__name__)
 
 
-def list_user_pages() -> List[UserPageRecord]:
+def list_user_pages() -> list[UserPageRecord]:
     """Return all pages_users."""
     orm_objs = db.session.query(UserPageRecord).order_by(UserPageRecord.id.asc()).all()
     return orm_objs
 
 
-def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> List[UserPageRecord]:
+def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> list[UserPageRecord]:
     """Return translated user pages (target not empty) optionally filtered by language."""
     query = db.session.query(UserPageRecord).filter(UserPageRecord.target.isnot(None), UserPageRecord.target != "")
     if lang and lang.lower() != "all":

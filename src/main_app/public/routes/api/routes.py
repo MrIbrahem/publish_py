@@ -6,7 +6,7 @@ Mirrors: php_src/endpoints/index.php?get=publish_reports
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
@@ -79,11 +79,11 @@ def get_publish_reports() -> Response:
     select = validated.pop("select", None)  # type: ignore
 
     select_fields = parse_select_fields(select)
-    filters: Dict[str, Any] = validated  # type: ignore
+    filters: dict[str, Any] = validated  # type: ignore
 
     try:
         # Query database
-        records: List[ReportRecord] = query_reports_with_filters(filters, select_fields, limit)
+        records: list[ReportRecord] = query_reports_with_filters(filters, select_fields, limit)
 
     except Exception:
         logger.exception("Error fetching publish_reports")
@@ -128,7 +128,7 @@ def publish_reports_stats() -> Response:
         )
 
         # Convert results to list of dicts
-        data: List[Dict[str, Any]] = [
+        data: list[dict[str, Any]] = [
             {
                 "year": int(row.year) if row.year else None,
                 "month": int(row.month) if row.month else None,
@@ -196,7 +196,7 @@ def get_in_process() -> Response:
         results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()
 
         # Convert results to list of dicts
-        data: List[Dict[str, Any]] = [
+        data: list[dict[str, Any]] = [
             {
                 "id": row.id,
                 "title": row.title,

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from flask import (
     Blueprint,
@@ -30,7 +29,7 @@ from ..decorators import admin_required
 logger = logging.getLogger(__name__)
 
 
-def filter_users(users: List[UserRecord], project_name: str):
+def filter_users(users: list[UserRecord], project_name: str):
     if project_name == "All":
         return users
 
@@ -44,9 +43,9 @@ def filter_users(users: List[UserRecord], project_name: str):
 def _dashboard():
     """Render the users not in process management dashboard."""
 
-    projects: List[ProjectRecord] = list_projects()
+    projects: list[ProjectRecord] = list_projects()
 
-    users: List[UserRecord] = list_users()
+    users: list[UserRecord] = list_users()
     total = len(users)
 
     project_name = request.args.get("project", "").strip()

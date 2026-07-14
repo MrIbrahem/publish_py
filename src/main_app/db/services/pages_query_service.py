@@ -5,7 +5,7 @@ SQLAlchemy-based service for pages_users and pages_with_views queries.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from ...extensions import db
 from ..models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
@@ -13,7 +13,7 @@ from ..models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllReco
 logger = logging.getLogger(__name__)
 
 
-def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
+def list_pages_users(limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
     """
     Return pages_users records with joined category campaign data.
 
@@ -50,7 +50,7 @@ def list_pages_users(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
     ]
 
 
-def list_pages_with_views(limit: int = 100, lang: str = "") -> List[Dict[str, Any]]:
+def list_pages_with_views(limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
     """
     Return pages records with views from views_new_all.
 

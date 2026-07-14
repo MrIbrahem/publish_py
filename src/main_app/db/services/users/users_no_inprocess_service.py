@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing users_no_inprocess.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,13 +14,13 @@ from ...models import UsersNoInprocessRecord
 logger = logging.getLogger(__name__)
 
 
-def list_users_no_inprocess() -> List[UsersNoInprocessRecord]:
+def list_users_no_inprocess() -> list[UsersNoInprocessRecord]:
     """Return all users_no_inprocess records."""
     orm_objs = db.session.query(UsersNoInprocessRecord).order_by(UsersNoInprocessRecord.id.asc()).all()
     return orm_objs
 
 
-def list_active_users_no_inprocess() -> List[UsersNoInprocessRecord]:
+def list_active_users_no_inprocess() -> list[UsersNoInprocessRecord]:
     """Return all is_active users_no_inprocess records."""
     orm_objs = (
         db.session.query(UsersNoInprocessRecord)

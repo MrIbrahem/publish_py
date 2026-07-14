@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing translate types.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import PageRecord, QidRecord, TranslateTypeRecord
 logger = logging.getLogger(__name__)
 
 
-def list_translate_types(cat: str = "All") -> List[TranslateTypeRecord]:
+def list_translate_types(cat: str = "All") -> list[TranslateTypeRecord]:
     """Return translate_type records, optionally filtered by category membership.
 
     When ``cat != "All"``, only records whose ``tt_title`` matches a page in the
@@ -28,7 +27,7 @@ def list_translate_types(cat: str = "All") -> List[TranslateTypeRecord]:
     return query.order_by(TranslateTypeRecord.tt_id.asc()).all()
 
 
-def list_new_titles() -> List[str]:
+def list_new_titles() -> list[str]:
     """Return titles in the qids table that are not yet in translate_type."""
     existing_titles = db.session.query(TranslateTypeRecord.tt_title).subquery()
     rows = (
@@ -41,7 +40,7 @@ def list_new_titles() -> List[str]:
     return [row[0] for row in rows if row[0]]
 
 
-def list_lead_enabled_types() -> List[TranslateTypeRecord]:
+def list_lead_enabled_types() -> list[TranslateTypeRecord]:
     """Return translate_type records with lead enabled."""
     orm_objs = (
         db.session.query(TranslateTypeRecord)
@@ -52,7 +51,7 @@ def list_lead_enabled_types() -> List[TranslateTypeRecord]:
     return orm_objs
 
 
-def list_full_enabled_types() -> List[TranslateTypeRecord]:
+def list_full_enabled_types() -> list[TranslateTypeRecord]:
     """Return translate_type records with full enabled."""
     orm_objs = (
         db.session.query(TranslateTypeRecord)

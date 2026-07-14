@@ -5,7 +5,7 @@ SQLAlchemy-based service for managing publish reports.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from sqlalchemy import extract, func
 
@@ -20,7 +20,7 @@ from ...models import ReportRecord
 logger = logging.getLogger(__name__)
 
 
-def list_reports() -> List[ReportRecord]:
+def list_reports() -> list[ReportRecord]:
     """Return all report records."""
     orm_objs = db.session.query(ReportRecord).order_by(ReportRecord.id.desc()).all()
     return orm_objs
@@ -51,10 +51,10 @@ def add_report(
 
 
 def query_reports_with_filters(
-    filters: Dict[str, Any],
-    select_fields: Optional[List[str]] = None,
-    limit: Optional[int] = None,
-) -> List[ReportRecord]:
+    filters: dict[str, Any],
+    select_fields: list[str] | None = None,
+    limit: int | None = None,
+) -> list[ReportRecord]:
     """Query reports with dynamic filtering."""
 
     COLUMN_MAP = {

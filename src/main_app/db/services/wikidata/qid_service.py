@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing QIDs.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
@@ -65,7 +64,7 @@ def get_page_qid(title: str) -> QidRecord | None:
     return orm_obj
 
 
-def list_records(dis: str = "all") -> List[QidRecord]:
+def list_records(dis: str = "all") -> list[QidRecord]:
     """Return QID records, optionally filtered by ``dis``.
 
     - ``"all"``: every row in qids.
@@ -179,7 +178,7 @@ def update(qid_id: int, title: str, qid: str) -> bool:
         return False
 
 
-def list_qid_records() -> List[QidRecord]:
+def list_qid_records() -> list[QidRecord]:
     """Return all QID records (legacy alias kept for compatibility)."""
     return db.session.query(QidRecord).order_by(QidRecord.id.asc()).all()
 

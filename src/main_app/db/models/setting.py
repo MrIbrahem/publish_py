@@ -5,7 +5,7 @@ Admin domain models.
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import Enum, String, text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -98,7 +98,7 @@ class SettingRecord(db.Model):
         # Parse value based on value_type after initialization
         self.value = self._parse_value(self.value, self.value_type)
 
-    def _parse_value(self, value: Optional[str], value_type: str) -> Any:
+    def _parse_value(self, value: str | None, value_type: str) -> Any:
         if value is None:
             return None
         if value_type == "boolean":

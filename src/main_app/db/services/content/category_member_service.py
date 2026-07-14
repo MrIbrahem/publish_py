@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing category_members table.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy import text
 
@@ -44,7 +43,7 @@ def count_by_category(category: str) -> int:
     return db.session.query(CategoryMemberRecord).filter(CategoryMemberRecord.category == category).count()
 
 
-def get_members_by_category(category: str) -> List[CategoryMemberRecord]:
+def get_members_by_category(category: str) -> list[CategoryMemberRecord]:
     """Return all member records for *category*."""
 
     return db.session.query(CategoryMemberRecord).filter(CategoryMemberRecord.category == category).all()

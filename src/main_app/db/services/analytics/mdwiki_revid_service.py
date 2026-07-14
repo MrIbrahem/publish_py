@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing mdwiki revids.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import MdwikiRevidRecord
 logger = logging.getLogger(__name__)
 
 
-def list_mdwiki_revids() -> List[MdwikiRevidRecord]:
+def list_mdwiki_revids() -> list[MdwikiRevidRecord]:
     """Return all mdwiki_revid records."""
     orm_objs = db.session.query(MdwikiRevidRecord).order_by(MdwikiRevidRecord.title.asc()).all()
     return orm_objs

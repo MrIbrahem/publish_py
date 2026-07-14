@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing views new.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,13 +14,13 @@ from ...models import ViewsNewRecord
 logger = logging.getLogger(__name__)
 
 
-def list_views_new() -> List[ViewsNewRecord]:
+def list_views_new() -> list[ViewsNewRecord]:
     """Return all views_new records."""
     orm_objs = db.session.query(ViewsNewRecord).order_by(ViewsNewRecord.id.asc()).all()
     return orm_objs
 
 
-def list_views_by_target(target: str, lang: str | None = None) -> List[ViewsNewRecord]:
+def list_views_by_target(target: str, lang: str | None = None) -> list[ViewsNewRecord]:
     """Return views_new records for a specific target."""
     query = db.session.query(ViewsNewRecord).filter(ViewsNewRecord.target == target)
     if lang:
@@ -32,7 +31,7 @@ def list_views_by_target(target: str, lang: str | None = None) -> List[ViewsNewR
     return orm_objs
 
 
-def list_views_by_lang(lang: str) -> List[ViewsNewRecord]:
+def list_views_by_lang(lang: str) -> list[ViewsNewRecord]:
     """Return views_new records for a specific language."""
     orm_objs = (
         db.session.query(ViewsNewRecord).filter(ViewsNewRecord.lang == lang).order_by(ViewsNewRecord.id.asc()).all()

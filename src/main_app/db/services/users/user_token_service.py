@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing user tokens.
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -38,7 +37,7 @@ def get_authenticated_user_token(user_id: int) -> None | UserTokenRecord:
         return None
 
 
-def get_user_token(user_id: str | int) -> Optional[UserTokenRecord]:
+def get_user_token(user_id: str | int) -> UserTokenRecord | None:
     """Fetch the encrypted OAuth credentials for a user."""
     if not user_id:
         return None
@@ -118,7 +117,7 @@ def upsert_user_token(
     return orm_obj
 
 
-def get_user_token_by_username(username: str) -> Optional[UserTokenRecord]:
+def get_user_token_by_username(username: str) -> UserTokenRecord | None:
     """Fetch the encrypted OAuth credentials for a user by username."""
     username = username.strip()
     if not username:

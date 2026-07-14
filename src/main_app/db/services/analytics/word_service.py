@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing words.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import WordRecord
 logger = logging.getLogger(__name__)
 
 
-def list_words() -> List[WordRecord]:
+def list_words() -> list[WordRecord]:
     """Return all word records."""
     orm_objs = db.session.query(WordRecord).order_by(WordRecord.w_id.asc()).all()
     return orm_objs

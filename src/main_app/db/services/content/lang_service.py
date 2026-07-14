@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing languages.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import LangRecord
 logger = logging.getLogger(__name__)
 
 
-def list_langs() -> List[LangRecord]:
+def list_langs() -> list[LangRecord]:
     """Return all language records."""
     orm_objs = db.session.query(LangRecord).order_by(LangRecord.lang_id.asc()).all()
     return orm_objs

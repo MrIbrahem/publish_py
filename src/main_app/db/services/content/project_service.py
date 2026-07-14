@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing projects.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import ProjectRecord
 logger = logging.getLogger(__name__)
 
 
-def list_projects() -> List[ProjectRecord]:
+def list_projects() -> list[ProjectRecord]:
     """Return all project records."""
     orm_objs = db.session.query(ProjectRecord).order_by(ProjectRecord.g_title.asc()).all()
     return orm_objs

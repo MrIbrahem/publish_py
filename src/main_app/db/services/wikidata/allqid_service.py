@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing QIDs.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy import text
 
@@ -14,7 +13,7 @@ from ....extensions import db
 logger = logging.getLogger(__name__)
 
 
-def list_targets_by_lang(lang: str) -> List[dict]:
+def list_targets_by_lang(lang: str) -> list[dict]:
     """ """
     sql = text(
         """

@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing full translators.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,13 +14,13 @@ from ...models import FullTranslatorRecord
 logger = logging.getLogger(__name__)
 
 
-def list_full_translators() -> List[FullTranslatorRecord]:
+def list_full_translators() -> list[FullTranslatorRecord]:
     """Return all full translator records."""
     orm_objs = db.session.query(FullTranslatorRecord).order_by(FullTranslatorRecord.id.asc()).all()
     return orm_objs
 
 
-def list_active_full_translators() -> List[FullTranslatorRecord]:
+def list_active_full_translators() -> list[FullTranslatorRecord]:
     """Return all is_active full translator records."""
     orm_objs = (
         db.session.query(FullTranslatorRecord)
