@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing refs counts.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import RefsCountRecord
 logger = logging.getLogger(__name__)
 
 
-def list_refs_counts() -> List[RefsCountRecord]:
+def list_refs_counts() -> list[RefsCountRecord]:
     """Return all refs_count records."""
     orm_objs = db.session.query(RefsCountRecord).order_by(RefsCountRecord.r_id.asc()).all()
     return orm_objs

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import logging
 from dataclasses import dataclass
 from typing import Any
@@ -9,10 +10,14 @@ from flask import has_request_context, url_for
 logger = logging.getLogger(__name__)
 
 
-def _safe_url_for(endpoint: str, fallback: str, **values) -> str:
-    if has_request_context():
-        return url_for(endpoint, **values)
-    return fallback
+@dataclass
+class SidebarGroup:
+    """Sidebar group item definition."""
+
+    id: str
+    title: str
+    items: list[SidebarItem]
+    icon: str
 
 
 @dataclass
@@ -26,6 +31,12 @@ class SidebarItem:
     icon: str | None = None
     target: str | None = None
     disabled: bool = False
+
+
+def _safe_url_for(endpoint: str, fallback: str, **values) -> str:
+    if has_request_context():
+        return url_for(endpoint, **values)
+    return fallback
 
 
 def generate_list_item(item: SidebarItem) -> str:
@@ -46,19 +57,143 @@ def generate_list_item(item: SidebarItem) -> str:
     return link.strip()
 
 
-def create_side(active_route: str, path: str | None = None) -> str:
-    """Generate sidebar HTML structure based on menu definitions."""
-    main_menu_icons = {
-        "Translations": "bi-translate",
-        "Pages": "bi-file-text",
-        "Qids": "bi-database",
-        "Users": "bi-people",
-        "Others": "bi-three-dots",
-        "Tools": "bi-tools",
-    }
+class Sidebar:
+    def __init__(
+        self,
+        menu: list[SidebarGroup],
+        active_route: str,
+        path: str | None = None,
+    ) -> None:
+        self.menu = menu
+        self.active_route = active_route
+        self.path = path
 
-    main_menu = {
-        "Translations": [
+    def get_the_active_group_and_sub(self) -> tuple[str, str]:
+        """
+        Determines the active menu group and the active menu item ID based on the current path or active route.
+
+        This method iterates through the menu items to find an exact match for the current path.
+        If an exact match is found, it immediately sets the corresponding group and item ID as active.
+        If no exact match is found, it falls back to checking if the current path starts with an item's href,
+        or if an item's ID matches the active_route attribute.
+        If no active group is determined after checking all items, it defaults to the first group in the menu.
+
+        Returns:
+            tuple[str, str]: The active group key and the active item ID.
+        """
+        # First pass: look for an exact match across all groups
+        for group in self.menu:
+            for item in group.items:
+                if self.path == item.href:
+                    return group.title, item.id
+
+        # Second pass: fallback match (startswith or active_route)
+        for group in self.menu:
+            for item in group.items:
+                if (self.path and item.href and self.path.startswith(item.href)) or self.active_route == item.id:
+                    return group.title, item.id
+
+        # Default to the first group if no match is found
+        active_group = self.menu[0].title if self.menu else ""
+        return active_group, ""
+
+    def create_side(self) -> str:
+        """Generate sidebar HTML structure based on menu definitions.
+
+        This method constructs a responsive sidebar with collapsible groups and
+        sub-items. It determines the active menu item to highlight it and expand
+        its parent group. The generated HTML includes separate structures for
+        desktop and mobile views using Bootstrap utility classes.
+
+        Returns:
+            str: A string containing the formatted HTML structure of the sidebar.
+        """
+
+        # Helper lambda to generate sub-items HTML string using a comprehension
+        def build_sub_items(items, active_id) -> str:
+            sub_items: list[Any] = []
+
+            for item in items:
+                if item.disabled:
+                    continue
+
+                css_class = "active" if item.id == active_id else ""
+
+                link = generate_list_item(item)
+
+                sub_items.append(f"<li id='{item.id}' class='{css_class}'>{link}</li>")
+
+            sub_items_str = "".join(sub_items)
+            return sub_items_str
+
+        active_group, active_id = self.get_the_active_group_and_sub()
+
+        # Template for the collapsible content (shared by desktop and mobile)
+        collapse_tpl = """
+            <div class="collapse {show}" id="{group_id}-collapse">
+                <div class="d-none d-md-inline">
+                    <!-- desktop -->
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        {sub_items}
+                    </ul>
+                </div>
+                <div class="d-inline d-md-none">
+                    <!-- mobile -->
+                    <ul class="navbar-nav flex-row flex-wrap btn-toggle-nav-mobile list-unstyled fw-normal pb-1 small">
+                        {sub_items}
+                    </ul>
+                </div>
+            </div>
+        """
+
+        sidebar_parts = ["<ul class='list-unstyled'>"]
+
+        for group_obj in self.menu:
+            sub_items_str = build_sub_items(group_obj.items, active_id)
+
+            if not sub_items_str:
+                continue
+
+            match group_obj.title == active_group:
+                case True:
+                    show, expanded = "show", "true"
+                case False:
+                    show, expanded = "", "false"
+
+            icon_tag = f"<i class='bi {group_obj.icon} me-1'></i>" if group_obj.icon else ""
+
+            # Formatting the button and the collapse container
+            button_html = f"""
+                <button class="btn btn-toggle align-items-center rounded"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#{group_obj.id}-collapse"
+                        aria-expanded="{expanded}">
+                    {icon_tag}
+                    <span class='hide-on-collapse-inline'>{group_obj.title}</span>
+                </button>
+            """
+
+            group_container = f"""
+                <li class="mb-1">
+                    {button_html}
+                    {collapse_tpl.format(show=show, group_id=group_obj.id, sub_items=sub_items_str)}
+                </li>
+                <li class="border-top my-1"></li>"""
+
+            sidebar_parts.append(group_container.strip())
+
+        sidebar_parts.append("</ul>")
+        return "\n".join(sidebar_parts)
+
+
+@functools.lru_cache(maxsize=1)
+def load_groups_menu() -> list[SidebarGroup]:
+
+    translations = SidebarGroup(
+        id="translations",
+        title="Translations",
+        icon="bi-translate",
+        items=[
             SidebarItem(
                 id="last",
                 admin=1,
@@ -88,7 +223,13 @@ def create_side(active_route: str, path: str | None = None) -> str:
                 icon="bi-file-earmark-text",
             ),
         ],
-        "Pages": [
+    )
+
+    pages = SidebarGroup(
+        id="pages",
+        title="Pages",
+        icon="bi-file-text",
+        items=[
             SidebarItem(
                 id="tt_load",
                 admin=1,
@@ -139,7 +280,13 @@ def create_side(active_route: str, path: str | None = None) -> str:
                 icon="bi-list-check",
             ),
         ],
-        "Users": [
+    )
+
+    users = SidebarGroup(
+        id="users",
+        title="Users",
+        icon="bi-people",
+        items=[
             SidebarItem(
                 id="coordinators",
                 admin=1,
@@ -169,7 +316,13 @@ def create_side(active_route: str, path: str | None = None) -> str:
                 icon="bi-hourglass",
             ),
         ],
-        "Others": [
+    )
+
+    others = SidebarGroup(
+        id="others",
+        title="Others",
+        icon="bi-three-dots",
+        items=[
             SidebarItem(
                 id="projects",
                 admin=1,
@@ -199,7 +352,13 @@ def create_side(active_route: str, path: str | None = None) -> str:
                 icon="bi-tags",
             ),
         ],
-        "Tools": [
+    )
+
+    tools = SidebarGroup(
+        id="tools",
+        title="Tools",
+        icon="bi-tools",
+        items=[
             SidebarItem(
                 id="stat",
                 admin=0,
@@ -223,73 +382,25 @@ def create_side(active_route: str, path: str | None = None) -> str:
                 icon="bi-wrench",
             ),
         ],
-    }
+    )
+    new_menu = [
+        translations,
+        pages,
+        users,
+        others,
+        tools,
+    ]
+    return new_menu
 
-    sidebar = ["<ul class='list-unstyled'>"]
 
-    # logger.debug(f"Generating sidebar for active_route='{active_route}'")
+def create_side(active_route: str, path: str | None = None) -> str:
+    """Generate sidebar HTML structure based on menu definitions."""
+    main_menu = load_groups_menu()
 
-    for key, items in main_menu.items():
-        lis: list[Any] = []
-        group_is_active = False
-        key_id = key.lower().replace(" ", "_")
-        css_class_full = [item.href for item in items if path == item.href]
+    model = Sidebar(main_menu, active_route, path)
+    sidebar = model.create_side()
 
-        for item in items:
-            if item.disabled:
-                continue
-
-            css_class = "active" if item.href in css_class_full else ""
-
-            if not css_class_full:
-                if path == item.href or (path and path.startswith(item.href)):
-                    css_class = "active"
-
-                if not css_class and active_route == item.id:
-                    css_class = "active"
-
-            link = generate_list_item(item)
-
-            lis.append(f"<li id='{item.id}' class='{css_class}'>{link}</li>")
-            if css_class:
-                group_is_active = True
-
-        if lis:
-            show = "show" if group_is_active else ""
-            expanded = "true" if group_is_active else "false"
-            icon = main_menu_icons.get(key, "")
-            icon_tag = f"<i class='bi {icon} me-1'></i>" if icon else ""
-
-            group_html = f"""
-                <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#{key_id}-collapse"
-                            aria-expanded="{expanded}">
-                        {icon_tag}
-                        <span class='hide-on-collapse-inline'>{key}</span>
-                    </button>
-                    <div class="collapse {show}" id="{key_id}-collapse">
-                        <div class="d-none d-md-inline">
-                            <!-- desktop -->
-                            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                                {"".join(lis)}
-                            </ul>
-                        </div>
-                        <div class="d-inline d-md-none">
-                            <!-- mobile -->
-                            <ul class="navbar-nav flex-row flex-wrap btn-toggle-nav-mobile list-unstyled fw-normal pb-1 small">
-                                {"".join(lis)}
-                            </ul>
-                        </div>
-                    </div>
-                </li>
-                <li class="border-top my-1"></li>
-            """
-            sidebar.append(group_html.strip())
-
-    sidebar.append("</ul>")
-    return "\n".join(sidebar)
+    return sidebar
 
 
 __all__ = [

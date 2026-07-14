@@ -14,7 +14,6 @@ table is created when the Flask app launches).
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy import text
 
@@ -64,7 +63,7 @@ def count_category_members(cat: str) -> int:
     return int(members or 0)
 
 
-def statics_by_category(cat: str) -> List[dict]:
+def statics_by_category(cat: str) -> list[dict]:
     """Return per-language counts of available titles for ``cat`` (PHP statics_by_category)."""
     if not cat:
         return []

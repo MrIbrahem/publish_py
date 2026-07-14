@@ -11,7 +11,7 @@ Mirrors the PHP code under ``coordinator/admin/pages_users_to_main/*.php``:
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ....extensions import db
 from ...models import PageRecord, PagesUsersToMainRecord, QidRecord, UserPageRecord
@@ -19,14 +19,14 @@ from ...models import PageRecord, PagesUsersToMainRecord, QidRecord, UserPageRec
 logger = logging.getLogger(__name__)
 
 
-def _row_to_dict(row: Any) -> Dict[str, Any]:
+def _row_to_dict(row: Any) -> dict[str, Any]:
     """Convert a result row (tuple of columns from a join) into a dict."""
     if hasattr(row, "_asdict"):
         return dict(row._asdict())
     return dict(row)
 
 
-def list_pending(lang: str = "All") -> List[Dict[str, Any]]:
+def list_pending(lang: str = "All") -> list[dict[str, Any]]:
     """Return user pages flagged for promotion to main pages.
 
     Mirrors PHP ``get_pages_users_to_main($lang)``: an inner join between
@@ -69,14 +69,14 @@ def list_pending(lang: str = "All") -> List[Dict[str, Any]]:
     ]
 
 
-def get_user_page(page_id: int) -> Optional[UserPageRecord]:
+def get_user_page(page_id: int) -> UserPageRecord | None:
     """Return the ``pages_users`` row for the given id."""
     if not page_id:
         return None
     return db.session.get(UserPageRecord, page_id)
 
 
-def check_main_page_exists(title: str, lang: str) -> Optional[PageRecord]:
+def check_main_page_exists(title: str, lang: str) -> PageRecord | None:
     """Return the first non-empty-target ``pages`` row for (title, lang).
 
     Used to warn that a duplicate exists before the move.

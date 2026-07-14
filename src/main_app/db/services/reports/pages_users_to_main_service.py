@@ -15,7 +15,7 @@ from ...models import PagesUsersToMainRecord
 logger = logging.getLogger(__name__)
 
 
-def list_pages_users_to_main() -> List[PagesUsersToMainRecord]:
+def list_pages_users_to_main() -> list[PagesUsersToMainRecord]:
     """Return all pages_users_to_main records."""
     orm_objs = db.session.query(PagesUsersToMainRecord).order_by(PagesUsersToMainRecord.id.asc()).all()
     return orm_objs

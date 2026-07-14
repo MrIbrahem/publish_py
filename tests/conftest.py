@@ -1,4 +1,5 @@
-"""Shared pytest fixtures.
+"""
+Shared pytest fixtures.
 
 Boot a Flask app once per session with CSRF on (so tests exercise the
 real protection path) and provide helpers for scraping CSRF tokens and
@@ -8,7 +9,6 @@ don't leak across tests.
 
 from __future__ import annotations
 
-import logging
 import os
 import secrets
 import sys
@@ -26,10 +26,11 @@ from sqlalchemy import text
 
 if sys:
     # tempfile.gettempdir() returns the path to the system's directory for temporary files
-    system_temp_dir = Path(tempfile.gettempdir()) / "test"
+    system_temp_dir = Path(tempfile.gettempdir())
 
     # Now correctly combine it with "test" and set the environment variable
-    os.environ["MAIN_DIR"] = str(system_temp_dir)
+    os.environ["MAIN_DIR"] = str(system_temp_dir / "test")
+
     os.environ.setdefault("PUBLISH_REPORTS_DIR", f"{system_temp_dir}/publish_reports/reports_by_day")
     os.environ.setdefault("WORDS_JSON_PATH", f"{system_temp_dir}/words.json")
     os.environ.setdefault("ALL_PAGES_REVIDS_PATH", f"{system_temp_dir}/revids.json")
@@ -70,6 +71,7 @@ if sys:
 # Import after environment setup
 from src.main_app import create_app
 from src.main_app.config import TestingConfig
+from src.main_app.db.create_helper import create_tables, create_views
 from src.main_app.extensions import db as _db
 from src.main_app.shared.auth import CurrentUser
 
@@ -188,32 +190,8 @@ def setup_db(mock_app: Flask):
     The Flask-SQLAlchemy session (db.session) is used throughout tests.
     """
     with mock_app.app_context():
-        # Create only real tables; skip view-backed mapped classes
-        real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
-        _db.metadata.create_all(_db.engine, tables=real_tables, checkfirst=True)
-
-        from sqlalchemy import inspect as sa_inspect
-
-        existing_views = set(sa_inspect(_db.engine).get_view_names())
-        # Create views manually (SQLite-compatible CREATE VIEW)
-        with _db.engine.connect() as conn:
-            for table in _db.metadata.tables.values():
-                if not table.info.get("is_view"):
-                    continue
-
-                if not table.info.get("create_query"):
-                    logging.warning("View %s has no create_query, skipping", table.name)
-                    continue
-
-                if table.name in existing_views:
-                    continue
-                try:
-                    create_sql = table.info["create_query"]
-                    conn.execute(text(create_sql))
-                    conn.commit()
-                except Exception:
-                    conn.rollback()
-                    logging.exception("Failed to create view %s", table.name)
+        create_tables(_db)
+        create_views(_db)
 
         yield
 

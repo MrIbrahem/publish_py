@@ -8,7 +8,7 @@ Endpoints:
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import Response, jsonify, request
 from sqlalchemy import case, cast
@@ -161,8 +161,13 @@ def get_top_langs() -> Response:
 
         results = query.all()
 
+    except Exception:
+        logger.exception("Error fetching top_langs data")
+        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500  # type: ignore
+
+    try:
         # Convert results to list of dicts
-        data: List[Dict[str, Any]] = [
+        data: list[dict[str, Any]] = [
             {
                 "lang": row.lang,
                 "lang_name": row.lang_name if row.lang_name else row.lang,
@@ -172,10 +177,9 @@ def get_top_langs() -> Response:
             }
             for row in results
         ]
-
     except Exception:
-        logger.exception("Error fetching top_langs data")
-        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500  # type: ignore
+        logger.exception("Error processing top_langs data")
+        return jsonify({"error": "An internal error occurred while processing top_langs data"}), 500  # type: ignore
 
     response_data = {
         "results": data,
@@ -285,8 +289,13 @@ def get_top_users() -> Response:
             query = query.limit(int(form.limit))
         results = query.all()
 
+    except Exception as e:
+        logger.error("Error fetching top_users data %s", str(e))
+        return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500  # type: ignore
+
+    try:
         # Convert results to list of dicts
-        data: List[Dict[str, Any]] = [
+        data: list[dict[str, Any]] = [
             {
                 "user": row.user,
                 "targets": row.targets,
@@ -295,10 +304,9 @@ def get_top_users() -> Response:
             }
             for row in results
         ]
-
-    except Exception:
-        logger.exception("Error fetching top_users data")
-        return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500  # type: ignore
+    except Exception as e:
+        logger.error("Error converting top_users data %s", str(e))
+        return jsonify({"error": "An internal error occurred while converting top_users data"}), 500  # type: ignore
 
     response_data = {
         "results": data,

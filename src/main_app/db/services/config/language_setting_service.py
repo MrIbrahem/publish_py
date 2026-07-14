@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing language settings.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import LanguageSettingRecord
 logger = logging.getLogger(__name__)
 
 
-def list_language_settings() -> List[LanguageSettingRecord]:
+def list_language_settings() -> list[LanguageSettingRecord]:
     """Return all language setting records."""
     orm_objs = db.session.query(LanguageSettingRecord).order_by(LanguageSettingRecord.id.asc()).all()
     return orm_objs

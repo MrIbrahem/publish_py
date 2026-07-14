@@ -73,11 +73,10 @@ def _update_category(
     campaign: str,
     display: str | None = "",
     category2: str | None = "",
-    depth: int = 0,
+    depth: int | str = 0,
     is_default: int = 0,
 ) -> None:
     """Update an existing category record."""
-
     try:
         record = update_category(
             category_id=category_id,

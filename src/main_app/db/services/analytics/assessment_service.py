@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing assessments.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,7 +14,7 @@ from ...models import AssessmentRecord
 logger = logging.getLogger(__name__)
 
 
-def list_assessments() -> List[AssessmentRecord]:
+def list_assessments() -> list[AssessmentRecord]:
     """Return all assessment records."""
     orm_objs = db.session.query(AssessmentRecord).order_by(AssessmentRecord.id.asc()).all()
     return orm_objs

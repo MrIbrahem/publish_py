@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing categories.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.orm import Session
 
@@ -108,7 +107,7 @@ def get_campaign_category(campaign: str) -> CategoryRecord | None:
     return orm_obj
 
 
-def list_categories() -> List[CategoryRecord]:
+def list_categories() -> list[CategoryRecord]:
     """Return all categories."""
     orm_objs = db.session.query(CategoryRecord).order_by(CategoryRecord.id.asc()).all()
     return orm_objs

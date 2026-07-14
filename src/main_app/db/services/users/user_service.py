@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing users.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -16,13 +15,13 @@ from ...models import UserRecord
 logger = logging.getLogger(__name__)
 
 
-def list_users() -> List[UserRecord]:
+def list_users() -> list[UserRecord]:
     """Return all user records."""
     orm_objs = db.session.query(UserRecord).order_by(UserRecord.user_id.asc()).all()
     return orm_objs
 
 
-def users_search(userlike: str | None) -> List[str]:
+def users_search(userlike: str | None) -> list[str]:
     """Return all user records where there username start with userlike."""
     if not userlike:
         return []
@@ -37,7 +36,7 @@ def users_search(userlike: str | None) -> List[str]:
     return [x.username for x in rows]
 
 
-def list_users_by_group(user_group: str) -> List[UserRecord]:
+def list_users_by_group(user_group: str) -> list[UserRecord]:
     """Return user records by group."""
     orm_objs = (
         db.session.query(UserRecord)

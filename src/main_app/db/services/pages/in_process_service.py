@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing in-process translations.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -16,13 +15,13 @@ from ...models import InProcessRecord
 logger = logging.getLogger(__name__)
 
 
-def list_in_process() -> List[InProcessRecord]:
+def list_in_process() -> list[InProcessRecord]:
     """Return all in_process records."""
     orm_objs = db.session.query(InProcessRecord).order_by(InProcessRecord.id.asc()).all()
     return orm_objs
 
 
-def list_in_process_by_user(user: str) -> List[InProcessRecord]:
+def list_in_process_by_user(user: str) -> list[InProcessRecord]:
     """Return in_process records for a specific user."""
     orm_objs = (
         db.session.query(InProcessRecord).filter(InProcessRecord.user == user).order_by(InProcessRecord.id.asc()).all()
@@ -30,7 +29,7 @@ def list_in_process_by_user(user: str) -> List[InProcessRecord]:
     return orm_objs
 
 
-def list_in_process_by_lang(lang: str) -> List[InProcessRecord]:
+def list_in_process_by_lang(lang: str) -> list[InProcessRecord]:
     """Return in_process records for a specific language."""
     orm_objs = (
         db.session.query(InProcessRecord).filter(InProcessRecord.lang == lang).order_by(InProcessRecord.id.asc()).all()
@@ -146,7 +145,7 @@ def is_in_process(title: str, user: str, lang: str) -> bool:
     return record is not None
 
 
-def get_in_process_counts_by_user() -> List[dict]:
+def get_in_process_counts_by_user() -> list[dict]:
     """Get count of in-process translations per user, sorted by count descending."""
     results = (
         db.session.query(

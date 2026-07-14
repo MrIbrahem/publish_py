@@ -17,7 +17,7 @@ each article's primary category only). The matching SQLAlchemy model is
 from __future__ import annotations
 
 import logging
-from typing import Any, List
+from typing import Any
 
 from sqlalchemy import text
 
@@ -81,11 +81,11 @@ _EXISTS_SQL = text(
 )
 
 
-def _rows_to_dicts(rows: list[Any]) -> List[dict]:
+def _rows_to_dicts(rows: list[Any]) -> list[dict]:
     return [dict(row._mapping) for row in rows]
 
 
-def missing_by_lang_and_category(lang: str, cat: str) -> List[dict]:
+def missing_by_lang_and_category(lang: str, cat: str) -> list[dict]:
     """Return missing-target articles for ``lang`` in category ``cat``."""
     if not lang or not cat:
         return []
@@ -93,7 +93,7 @@ def missing_by_lang_and_category(lang: str, cat: str) -> List[dict]:
     return _rows_to_dicts(rows)
 
 
-def exists_by_lang_and_category(lang: str, cat: str) -> List[dict]:
+def exists_by_lang_and_category(lang: str, cat: str) -> list[dict]:
     """Return already-translated articles for ``lang`` in category ``cat``."""
     if not lang or not cat:
         return []

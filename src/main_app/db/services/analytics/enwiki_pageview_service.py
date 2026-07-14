@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing enwiki pageviews.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 
@@ -15,13 +14,13 @@ from ...models import EnwikiPageviewRecord
 logger = logging.getLogger(__name__)
 
 
-def list_enwiki_pageviews() -> List[EnwikiPageviewRecord]:
+def list_enwiki_pageviews() -> list[EnwikiPageviewRecord]:
     """Return all enwiki pageview records."""
     orm_objs = db.session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.id.asc()).all()
     return orm_objs
 
 
-def get_top_enwiki_pageviews(limit: int = 100) -> List[EnwikiPageviewRecord]:
+def get_top_enwiki_pageviews(limit: int = 100) -> list[EnwikiPageviewRecord]:
     """Return top enwiki pageview records by view count."""
     orm_objs = db.session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.en_views.desc()).limit(limit).all()
     return orm_objs
