@@ -123,11 +123,17 @@ class ViewsNewAllRecord(db.Model):
                 "is_view": True,
                 "replace_the_view": True,
                 "create_query": """
+                    CREATE OR REPLACE VIEW views_new_all AS
+                    SELECT target, lang, SUM(views) AS views
+                    FROM views_new
+                    GROUP BY target, lang
+                """,
+                "create_query_sqlite3": """
                     CREATE VIEW IF NOT EXISTS views_new_all AS
                     SELECT target, lang, SUM(views) AS views
                     FROM views_new
                     GROUP BY target, lang
-                    """,
+                """,
             }
         },
     )

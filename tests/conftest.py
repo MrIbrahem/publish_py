@@ -205,14 +205,15 @@ def setup_db(mock_app: Flask):
                 if not table.info.get("is_view"):
                     continue
 
-                if not table.info.get("create_query"):
+                create_sql = table.info.get("create_query_sqlite3") or table.info.get("create_query")
+
+                if not create_sql:
                     logging.error("View %s has no create_query, skipping", table.name)
                     continue
 
                 if table.name in existing_views:
                     continue
 
-                create_sql = table.info["create_query"]
                 try:
                     conn.execute(text(create_sql))
                     conn.commit()
