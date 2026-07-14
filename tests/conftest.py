@@ -24,7 +24,6 @@ from flask.testing import FlaskClient
 from pytest_socket import disable_socket
 from sqlalchemy import text
 
-
 if sys:
     # tempfile.gettempdir() returns the path to the system's directory for temporary files
     system_temp_dir = Path(tempfile.gettempdir())

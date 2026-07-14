@@ -52,7 +52,6 @@ def create_views(_db: SQLAlchemy) -> None:
             except Exception:
                 logger.error("Failed to create view %s", table.name)
 
-
 __all__ = [
     "create_views",
     "create_tables",
