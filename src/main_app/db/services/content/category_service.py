@@ -5,6 +5,7 @@ SQLAlchemy-based service for managing categories.
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -14,7 +15,7 @@ from ...models import CategoryRecord
 logger = logging.getLogger(__name__)
 
 
-def set_default_category(session: Session) -> None:
+def set_default_category(session: Session | Any) -> None:
     session.query(CategoryRecord).update({CategoryRecord.is_default: 0})
     # orm_obj.is_default = 1
     # session.commit()
