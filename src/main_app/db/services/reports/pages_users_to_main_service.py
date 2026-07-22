@@ -5,7 +5,6 @@ SQLAlchemy-based service for managing pages_users_to_main.
 from __future__ import annotations
 
 import logging
-from typing import List
 
 from sqlalchemy.exc import IntegrityError
 

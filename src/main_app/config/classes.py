@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # --- Data Classes for Configuration Sections ---
 
@@ -13,7 +13,7 @@ from typing import Any, Optional
 class OtherConfig:
     """configs not in specific sections"""
 
-    csrf_time_limit: Optional[int]  # None means never expire
+    csrf_time_limit: int | None  # None means never expire
     user_agent: str
     wiki_domain: str
     static_server: str

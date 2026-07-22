@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from collections import namedtuple
 from collections.abc import Sequence
 from typing import Any
 
