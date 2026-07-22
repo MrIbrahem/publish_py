@@ -10,6 +10,7 @@ from typing import Any
 from flask import Flask, Response, flash, jsonify, render_template, request
 from flask_wtf.csrf import CSRFError
 
+from .admin import register_bp_admin_blueprints
 from .config import ensure_directories, settings
 from .db import init_db
 from .db.exceptions import DatabaseInitError
@@ -173,6 +174,7 @@ def create_app(config_class: type) -> Flask:
     register_error_pages(app)
 
     if db_is_ok:
+        register_bp_admin_blueprints(app)
         register_blueprints(app)
         # register_cli_jobs(app)
         csrf_exempt(app, bp_publish)

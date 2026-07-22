@@ -1,10 +1,8 @@
-"""
-Admin Blueprints
-"""
+"""Admin blueprint package."""
 
-from flask import Blueprint
+from flask import Blueprint, Flask
 
-from .admin_panel import AdminPanelRoutes
+from .admin_panel import AdminPanel
 from .routes import (
     CoordinatorsRoutes,
     add_bp,
@@ -26,32 +24,35 @@ from .routes import (
 )
 
 
-def register_bp_admin_blueprints() -> None:
-
-    _bp = Blueprint("admin", __name__, url_prefix="/admin")
-    admin_route_module = AdminPanelRoutes(_bp)
+def register_bp_admin_blueprints(app: Flask) -> None:
+    bp_admin = Blueprint("admin", __name__, url_prefix="/admin")
+    admin_model = AdminPanel(bp_admin)
 
     coordinators_bp = Blueprint("coordinators", __name__, url_prefix="/coordinators")
     coordinators_module = CoordinatorsRoutes(coordinators_bp)
 
-    _bp.register_blueprint(coordinators_module.bp)
-    _bp.register_blueprint(fulltranslators_module.bp)
-    _bp.register_blueprint(usersnoinprocess_module.bp)
-    _bp.register_blueprint(languagesettings_module.bp)
-    _bp.register_blueprint(add_bp)
-    _bp.register_blueprint(tt_bp)
-    _bp.register_blueprint(translated_bp)
-    _bp.register_blueprint(translated_users_bp)
+    bp_admin.register_blueprint(coordinators_module.bp)
+    bp_admin.register_blueprint(fulltranslators_module.bp)
+    bp_admin.register_blueprint(usersnoinprocess_module.bp)
+    bp_admin.register_blueprint(languagesettings_module.bp)
+    bp_admin.register_blueprint(add_bp)
+    bp_admin.register_blueprint(tt_bp)
+    bp_admin.register_blueprint(translated_bp)
+    bp_admin.register_blueprint(translated_users_bp)
 
-    _bp.register_blueprint(bp_msg)
-    _bp.register_blueprint(qids_module.bp)
-    _bp.register_blueprint(qids_others_module.bp)
-    _bp.register_blueprint(pages_users_to_main_bp)
-    _bp.register_blueprint(stat_bp)
-    _bp.register_blueprint(settings_module.bp)
-    _bp.register_blueprint(projects_module.bp)
-    _bp.register_blueprint(campaigns_module.bp)
-    _bp.register_blueprint(users_emails_module.bp)
+    bp_admin.register_blueprint(bp_msg)
+    bp_admin.register_blueprint(qids_module.bp)
+    bp_admin.register_blueprint(qids_others_module.bp)
+    bp_admin.register_blueprint(pages_users_to_main_bp)
+    bp_admin.register_blueprint(stat_bp)
+    bp_admin.register_blueprint(settings_module.bp)
+    bp_admin.register_blueprint(projects_module.bp)
+    bp_admin.register_blueprint(campaigns_module.bp)
+    bp_admin.register_blueprint(users_emails_module.bp)
+
+    app.register_blueprint(bp_admin)
 
 
-register_bp_admin_blueprints()
+__all__ = [
+    "register_bp_admin_blueprints",
+]
