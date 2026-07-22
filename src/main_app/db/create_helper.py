@@ -45,6 +45,7 @@ def create_views(_db: SQLAlchemy) -> None:
                             conn.execute(text(f"DROP VIEW IF EXISTS {table.name}"))
                     except Exception:
                         logger.exception("Failed to drop view %s", table.name)
+                        continue
                 else:
                     continue
             try:

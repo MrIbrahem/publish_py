@@ -81,7 +81,7 @@ _EXISTS_SQL = text(
 )
 
 
-def _rows_to_dicts(rows: list[Any]) -> list[dict]:
+def _rows_to_dicts(rows: list[Any] | Any) -> list[dict]:
     return [dict(row._mapping) for row in rows]
 
 

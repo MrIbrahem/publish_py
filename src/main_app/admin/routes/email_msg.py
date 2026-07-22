@@ -35,7 +35,7 @@ def make_translate_link(sugust: str, langcode: str) -> str:
     return here_url
 
 
-def make_sugustion(langcode: str, title: str) -> str | None:
+def make_sugustion(langcode: str | None, title: str | None) -> str | None:
 
     if not langcode or not title:
         return None
@@ -61,7 +61,7 @@ def get_currect_user_email() -> str | None:
     return None
 
 
-def get_page_data(last_table: str, id: int) -> dict[str, Any]:
+def get_page_data(last_table: str, id: int) -> dict[str, str | Any]:
     if last_table == "pages":
         page_record = get_page_by_id(id)
     else:
@@ -81,7 +81,7 @@ def create_blank_link(url: str, title: str) -> str:
     return f"<a target='_blank' href='{url}'>{title}</a>"
 
 
-def create_email_msg(page_data: dict[str, Any], sugust: str) -> str:
+def create_email_msg(page_data: dict[str, Any], sugust: str | None) -> str:
     if not sugust:
         return ""
     title = page_data.get("title", "")
@@ -122,7 +122,7 @@ def msg_dashboard(
     page_data = get_page_data(last_table, id)
     username = page_data.get("user", "") or user
 
-    user_email = get_user_email(username)
+    user_email = get_user_email(str(username))
     currect_user_email = get_currect_user_email()
 
     sugust = make_sugustion(page_data.get("lang"), page_data.get("title"))
@@ -155,7 +155,7 @@ def send_msg(
     email_to: str,
     email_from: str,
     msg_title: str,
-    cc_to: str,
+    cc_to: str | None,
 ): ...
 
 

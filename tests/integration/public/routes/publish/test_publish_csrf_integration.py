@@ -159,7 +159,7 @@ class BasePublishTest:
             patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
             patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
-            patch("src.main_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
             patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
             patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page") as mock_user_find_exists,
             patch("src.main_app.public.routes.publish.to_db.insert_page_target") as mock_insert_page,
@@ -338,7 +338,7 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 class TestComplexWorkflows(BasePublishTest):
     def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
-        with (patch("src.main_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,):
+        with (patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,):
             mock_should_add.return_value = True
 
             # أول استدعاء يفشل، الثاني ينجح عبر fallback user

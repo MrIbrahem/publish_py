@@ -100,7 +100,7 @@ class TestPostEndpoint:
             patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.main_app.public.routes.publish.worker.to_do"),
             patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
-            patch("src.main_app.public.routes.publish.worker.shouldAddedToWikidata") as mock_should_add,
+            patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
             patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page"),
             patch("src.main_app.public.routes.publish.to_db.insert_page_target"),
             patch("src.main_app.public.routes.publish.to_db.get_campaign_category"),

@@ -51,7 +51,7 @@ def _get_revid(sourcetitle) -> str:
     return revid
 
 
-def shouldAddedToWikidata(lang, title) -> bool:
+def should_added_to_wikidata(lang, title) -> bool:
     """ """
     page_information = get_title_info(title, lang)
     if not page_information:
@@ -177,7 +177,7 @@ def _handle_successful_edit(
     """
     link_result: dict[str, Any] = {}
 
-    if not shouldAddedToWikidata(lang, title):
+    if not should_added_to_wikidata(lang, title):
         # skip link to wd for user pages
         return {"error": "skip link to wd for user pages"}
 

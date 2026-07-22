@@ -15,8 +15,8 @@ class FormData:
     cat: str | None
     camp: str | None
     year: int | None
-    lang: int | None
-    user: int | None
+    lang: str | None
+    user: str | None
     month: int | None
 
 
