@@ -82,9 +82,13 @@ def to_do(tab: dict[str, Any], status: str) -> None:
     # Write to reports_by_day directory (PHP-style file-based reports)
     try:
         reports_dir = get_reports_dir()
-        file_path = reports_dir / f"{status}.json"
+    except Exception as e:
+        logger.error(f"Failed to write to reports file {status}.json: {e}")
+        return
 
+    file_path = reports_dir / f"{status}.json"
+    try:
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(log_entry, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        logger.error(f"Failed to write to reports file {file_path}: {e}")
+        logger.error(f"Failed to write to reports file {status}.json: {e}")
