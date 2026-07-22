@@ -86,7 +86,7 @@ def generate_domain_test_placeholders(src_root: str, test_root, src_name: str = 
 
                 if test_filename in list_of_all_tests_files:
                     duplicate_names.append(test_filename)
-                    # continue
+                    continue
 
                 # Create the directory if it doesn't exist
                 target_dir.mkdir(parents=True, exist_ok=True)
