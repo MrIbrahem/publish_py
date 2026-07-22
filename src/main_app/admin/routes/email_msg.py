@@ -35,7 +35,7 @@ def make_translate_link(sugust: str, langcode: str) -> str:
     return here_url
 
 
-def make_sugustion(langcode: str | None, title: str| None) -> str | None:
+def make_sugustion(langcode: str | None, title: str | None) -> str | None:
 
     if not langcode or not title:
         return None

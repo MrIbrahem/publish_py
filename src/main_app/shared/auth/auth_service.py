@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from collections import namedtuple
 import logging
+from collections import namedtuple
 from collections.abc import Sequence
 from typing import Any
+
 from mwoauth import AccessToken
 
 from .auth_users_service import AuthUserService
