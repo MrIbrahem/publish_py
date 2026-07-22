@@ -19,7 +19,7 @@ from .routes import (
 
 def register_blueprints(app: Flask) -> None:
     bp_main = Blueprint("main", __name__)
-    main_model = MainRoutes(Blueprint("main", __name__))
+    main_model = MainRoutes(bp_main)
 
     bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
     auth_model = AuthRoutes(bp_auth)
@@ -30,10 +30,10 @@ def register_blueprints(app: Flask) -> None:
     bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
     cx_model = CxTokenRoutes(bp_cxtoken)
 
-    bp_td = Blueprint("td", __name__, url_prefix="/Translation_Dashboard")
     bp_leaderboard = Blueprint("leaderboard", __name__, url_prefix="/leaderboard")
-
     leaderboard_model = LeaderBoardRoutes(bp_leaderboard)
+
+    bp_td = Blueprint("td", __name__, url_prefix="/Translation_Dashboard")
     td_model = TDRoutes(bp_td)
 
     bp_td.register_blueprint(leaderboard_model.bp)

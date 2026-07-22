@@ -155,8 +155,8 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
 
 
 class UsersEmails:
-    def __init__(self) -> None:
-        self.bp = Blueprint("users_emails", __name__, url_prefix="/users_emails")
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -190,4 +190,6 @@ class UsersEmails:
             return render_template("admins/users_emails/edit.html", row=user)
 
 
-users_emails_module = UsersEmails()
+__all__ = [
+    "UsersEmails",
+]

@@ -6,6 +6,7 @@ import logging
 from typing import Any
 
 from flask import (
+    Blueprint,
     flash,
     redirect,
     render_template,
@@ -118,7 +119,7 @@ def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
 class CoordinatorsRoutes:
     """Jobs management routes."""
 
-    def __init__(self, bp) -> None:
+    def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
         self._setup_routes()
 

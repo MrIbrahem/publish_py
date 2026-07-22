@@ -101,8 +101,8 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
 
 
 class UsersNoInprocess:
-    def __init__(self) -> None:
-        self.bp = Blueprint("users_no_inprocess", __name__, url_prefix="/users_no_inprocess")
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -132,4 +132,6 @@ class UsersNoInprocess:
             return _set_record_active_status(record_id, False)
 
 
-usersnoinprocess_module = UsersNoInprocess()
+__all__ = [
+    "UsersNoInprocess",
+]

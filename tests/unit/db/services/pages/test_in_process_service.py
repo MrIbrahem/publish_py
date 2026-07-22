@@ -139,7 +139,7 @@ class TestAddInProcess:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):  # type: ignore
             with pytest.raises(ValueError, match="already exists"):
                 add_in_process("Duplicate", "User", "en")
 

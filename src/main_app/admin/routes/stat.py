@@ -16,26 +16,35 @@ from ...db.services.pages import page_service, user_page_service
 logger = logging.getLogger(__name__)
 
 
-stat_bp = Blueprint("stat", __name__, url_prefix="/stat")
+class StaticsRoutes:
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        self._setup_routes()
+
+    def _setup_routes(self) -> None:
+
+        @self.bp.route("/", methods=["GET"])
+        def stat_index() -> str:
+            """Render a minimal statistics overview."""
+            try:
+                pages_count = page_service.count_translated()
+            except Exception:
+                logger.exception("Failed to count translated pages")
+                pages_count = 0
+
+            try:
+                user_pages_count = user_page_service.count_translated()
+            except Exception:
+                logger.exception("Failed to count translated user pages")
+                user_pages_count = 0
+
+            return render_template(
+                "admins/stat.html",
+                pages_count=pages_count,
+                user_pages_count=user_pages_count,
+            )
 
 
-@stat_bp.route("/", methods=["GET"])
-def stat_index() -> str:
-    """Render a minimal statistics overview."""
-    try:
-        pages_count = page_service.count_translated()
-    except Exception:
-        logger.exception("Failed to count translated pages")
-        pages_count = 0
-
-    try:
-        user_pages_count = user_page_service.count_translated()
-    except Exception:
-        logger.exception("Failed to count translated user pages")
-        user_pages_count = 0
-
-    return render_template(
-        "admins/stat.html",
-        pages_count=pages_count,
-        user_pages_count=user_pages_count,
-    )
+__all__ = [
+    "StaticsRoutes",
+]

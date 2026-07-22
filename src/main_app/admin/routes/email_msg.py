@@ -21,7 +21,14 @@ from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
-bp_msg = Blueprint("email_msg", __name__, url_prefix="/email_msg")
+
+def send_msg(
+    msg: str,
+    email_to: str,
+    email_from: str,
+    msg_title: str,
+    cc_to: str | None,
+): ...
 
 
 def make_translate_link(sugust: str, langcode: str) -> str:
@@ -139,52 +146,49 @@ def msg_dashboard(
     )
 
 
-@bp_msg.route("/dashboard/<string:last_table>/<int:id>", methods=["GET"])
-@bp_msg.route("/dashboard/<string:last_table>/<int:id>/<string:user>", methods=["GET"])
-@admin_required
-def dashboard(
-    last_table: str,
-    id: int,
-    user: str | None = None,
-) -> str:
-    return msg_dashboard(last_table, id, user=user)
+class EmailMsgRoutes:
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        self._setup_routes()
 
+    def _setup_routes(self) -> None:
 
-def send_msg(
-    msg: str,
-    email_to: str,
-    email_from: str,
-    msg_title: str,
-    cc_to: str | None,
-): ...
+        @self.bp.route("/dashboard/<string:last_table>/<int:id>", methods=["GET"])
+        @self.bp.route("/dashboard/<string:last_table>/<int:id>/<string:user>", methods=["GET"])
+        @admin_required
+        def dashboard(
+            last_table: str,
+            id: int,
+            user: str | None = None,
+        ) -> str:
+            return msg_dashboard(last_table, id, user=user)
 
+        @self.bp.route("/send", methods=["POST"])
+        @admin_required
+        def msg_post() -> str:
+            data = request.form
+            msg = data.get("msg", "")
+            email_to = data.get("email_to", "")
+            email_from = data.get("email_from", "mdwiki.org@gmail.com")
+            msg_title = data.get("msg_title", "Wiki Project Med Translation Dashboard")
+            ccme = data.get("ccme", "0")
+            cc_to = data.get("cc_to", "") if str(ccme) == "1" else None
 
-@bp_msg.route("/send", methods=["POST"])
-@admin_required
-def msg_post() -> str:
-    data = request.form
-    msg = data.get("msg", "")
-    email_to = data.get("email_to", "")
-    email_from = data.get("email_from", "mdwiki.org@gmail.com")
-    msg_title = data.get("msg_title", "Wiki Project Med Translation Dashboard")
-    ccme = data.get("ccme", "0")
-    cc_to = data.get("cc_to", "") if str(ccme) == "1" else None
-
-    send_msg(
-        msg=msg,
-        email_to=email_to,
-        email_from=email_from,
-        msg_title=msg_title,
-        cc_to=cc_to,
-    )
-    return render_template(
-        "admins/email_msg/index.html",
-        user_email=None,
-        cc_me_email=None,
-        msg=None,
-    )
+            send_msg(
+                msg=msg,
+                email_to=email_to,
+                email_from=email_from,
+                msg_title=msg_title,
+                cc_to=cc_to,
+            )
+            return render_template(
+                "admins/email_msg/index.html",
+                user_email=None,
+                cc_me_email=None,
+                msg=None,
+            )
 
 
 __all__ = [
-    "bp_msg",
+    "EmailMsgRoutes",
 ]

@@ -429,60 +429,17 @@ class ApiRoutes:
         self.bp.route("/top_langs", methods=["GET"])(get_top_langs)
         self.bp.route("/top_users", methods=["GET"])(get_top_users)
 
-        @self.bp.route("/publish_reports", methods=["GET"])
-        @check_cors
-        def get_publish_reports() -> tuple[Response, int] | Response:
-            return get_publish_reports()
-
-        @self.bp.route("/publish_reports/stats", methods=["GET"])
-        @check_cors
-        def publish_reports_stats() -> tuple[Response, int] | Response:
-            return publish_reports_stats()
-
-        @self.bp.route("/in_process", methods=["GET"])
-        @check_cors
-        def get_in_process() -> tuple[Response, int] | Response:
-            return get_in_process()
-
-        @self.bp.route("/in_process_total", methods=["GET"])
-        @check_cors
-        def get_in_process_total() -> tuple[Response, int] | Response:
-            return get_in_process_total()
-
-        @self.bp.route("/pages_users", methods=["GET"])
-        @check_cors
-        def get_pages_users() -> tuple[Response, int] | Response:
-            return get_pages_users()
-
-        @self.bp.route("/pages_with_views", methods=["GET"])
-        @check_cors
-        def get_pages_with_views() -> tuple[Response, int] | Response:
-            return get_pages_with_views()
-
-        @self.bp.route("/categories", methods=["GET"])
-        @check_cors
-        def get_categories() -> tuple[Response, int] | Response:
-            return get_categories()
-
-        @self.bp.route("/distinct_langs", methods=["GET"])
-        @check_cors
-        def get_distinct_langs() -> tuple[Response, int] | Response:
-            return get_distinct_langs()
-
-        @self.bp.route("/users_by_translations_count", methods=["GET"])
-        @check_cors
-        def users_by_translations_count() -> tuple[Response, int] | Response:
-            return users_by_translations_count()
-
-        @self.bp.route("/langs", methods=["GET"])
-        @check_cors
-        def get_langs() -> tuple[Response, int] | Response:
-            return get_langs()
-
-        @self.bp.route("/users", methods=["GET"])
-        @check_cors
-        def get_users() -> tuple[Response, int] | Response:
-            return get_users()
+        self.bp.route("/publish_reports", methods=["GET"])(check_cors(get_publish_reports))
+        self.bp.route("/publish_reports/stats", methods=["GET"])(check_cors(publish_reports_stats))
+        self.bp.route("/in_process", methods=["GET"])(check_cors(get_in_process))
+        self.bp.route("/in_process_total", methods=["GET"])(check_cors(get_in_process_total))
+        self.bp.route("/pages_users", methods=["GET"])(check_cors(get_pages_users))
+        self.bp.route("/pages_with_views", methods=["GET"])(check_cors(get_pages_with_views))
+        self.bp.route("/categories", methods=["GET"])(check_cors(get_categories))
+        self.bp.route("/distinct_langs", methods=["GET"])(check_cors(get_distinct_langs))
+        self.bp.route("/users_by_translations_count", methods=["GET"])(check_cors(users_by_translations_count))
+        self.bp.route("/langs", methods=["GET"])(check_cors(get_langs))
+        self.bp.route("/users", methods=["GET"])(check_cors(get_users))
 
 
 __all__ = [
