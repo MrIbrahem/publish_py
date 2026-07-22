@@ -124,7 +124,7 @@ ignore = [
     # "UP035",  # Use `X | Y` for type unions instead of `Union[X, Y]`
     # "I001",   # Import block is un-sorted or un-formatted
     # "N999",   # Invalid module name
-    # "UP015",  # Unnecessary open mode parameters
+    "UP015",  # Unnecessary open mode parameters
 ]
 select = [
     "E",       # pycodestyle (error)
