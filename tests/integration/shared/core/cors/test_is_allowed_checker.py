@@ -2,8 +2,8 @@
 Tests for is_allowed — grouped by behavior branch.
 """
 
-from typing import Any
 from collections.abc import Generator
+from typing import Any
 
 import pytest
 from flask import Flask
