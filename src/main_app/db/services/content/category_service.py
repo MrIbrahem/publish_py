@@ -69,7 +69,7 @@ def update_category(
     campaign: str,
     display: str | None = "",
     category2: str | None = "",
-    depth: int = 0,
+    depth: int | str = 0,
     is_default: int = 0,
 ) -> CategoryRecord:
     """Update category."""
@@ -83,7 +83,7 @@ def update_category(
 
     orm_obj.category2 = category2 or ""
 
-    orm_obj.depth = depth
+    orm_obj.depth = int(depth)
 
     if is_default:
         # set this category as default by unsetting default flag on all other categories

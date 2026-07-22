@@ -12,6 +12,7 @@ import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from werkzeug.wrappers.response import Response
 
 from ...db.services.content import list_categories
 from ...db.services.pages import translate_type_service
@@ -44,7 +45,7 @@ def tt_index() -> str:
 
 
 @tt_bp.route("/edit", methods=["GET"])
-def tt_edit() -> str:
+def tt_edit() -> Response | str:
     """Render the add/edit popup form for a single translate_type row."""
     tt_id_raw = request.args.get("id", "")
     if not tt_id_raw:
@@ -58,7 +59,7 @@ def tt_edit() -> str:
         translate_types = None
 
     if not translate_types:
-        flash(f"Failed to load translate_type id={tt_id}", "danger")
+        flash(f"Failed to load translate_type tt_id_raw={tt_id_raw}", "danger")
         return redirect(url_for("admin.edit_done"))
 
     return render_template(
@@ -90,6 +91,10 @@ def tt_edit_post() -> ResponseReturnValue:
         except ValueError:
             flash(f"Invalid id: {tt_id_raw}", "danger")
             return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
+
+    if not tt_id:
+        flash(f"Failed to load translate_type id={tt_id}", "danger")
+        return redirect(url_for("admin.edit_done"))
 
     try:
         translate_types = translate_type_service.get_translate_type(tt_id)

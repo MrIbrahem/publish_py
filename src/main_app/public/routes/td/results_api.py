@@ -116,7 +116,7 @@ def _make_mdwiki_cat_url(category: str, name: str | None = None) -> str:
 def results_api_result(
     code: str | None,
     camp: str | None,
-    depth: str | None,
+    depth: str | int | None,
     cat2: str | None = None,
 ) -> dict[str, Any]:
     code = code or "ar"

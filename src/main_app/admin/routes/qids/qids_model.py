@@ -6,6 +6,7 @@ import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from werkzeug.wrappers.response import Response
 
 from ....db.models import QidOthersRecord, QidRecord
 
@@ -93,7 +94,7 @@ class QidsModel:
             )
 
         @self.bp.route("/edit", methods=["GET"])
-        def edit() -> str:
+        def edit() -> Response | str:
             """Render the add/edit popup for a single row."""
             qid_id = None
             qid_id_raw = request.args.get("id", "")
