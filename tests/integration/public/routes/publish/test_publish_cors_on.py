@@ -7,7 +7,7 @@ import json
 from unittest.mock import patch
 
 import pytest
-from flask import Flask
+from flask import Blueprint, Flask
 from flask.testing import FlaskClient
 
 from src.main_app.config import TestingConfig
@@ -31,9 +31,11 @@ def mock_app() -> Flask:
 
     db.init_app(mock_app)
 
-    from src.main_app.public.routes.publish.routes import bp_publish
+    from src.main_app.public.routes.publish.routes import PublishRoutes
 
-    mock_app.register_blueprint(bp_publish)
+    publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
+
+    mock_app.register_blueprint(publish_model.bp)
     return mock_app
 
 

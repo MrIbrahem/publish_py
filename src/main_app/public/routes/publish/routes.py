@@ -16,7 +16,6 @@ from ....shared.schemas import PublishRequestSchema
 from ....shared.utils.helpers.format import format_title, format_user
 from .worker import _handle_no_access, _process_edit
 
-bp_publish = Blueprint("publish", __name__, url_prefix="/publish")
 logger = logging.getLogger(__name__)
 
 
@@ -88,51 +87,58 @@ def _handle_form(request_data) -> Response:
     return response
 
 
-@bp_publish.route("/", methods=["OPTIONS"])
-@check_cors
-def publish_preflight() -> Response:
-    response = Response("", status=200)
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
-    return response
+class PublishRoutes:
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        self._setup_routes()
 
+    def _setup_routes(self) -> None:
 
-@bp_publish.route("/", methods=["POST"])
-@validate_access
-def index() -> Response:
-    """Handle post/publish requests.
-
-    Request Body (JSON):
-        user: Username
-        title: Target page title
-        target: Target language code
-        sourcetitle: Source page title
-        text: Page content
-        revid: Source revision ID (optional)
-        campaign: Campaign name (optional)
-        wpCaptchaId: Captcha ID (optional)
-        wpCaptchaWord: Captcha answer (optional)
-
-    Returns:
-        JSON response with edit result
-    """
-
-    # Get request data
-    request_data = request.form.to_dict()
-    if not request_data:
-        json_data = request.get_json(silent=True)
-        if json_data is None:
-            request_data = {}
-        elif isinstance(json_data, dict):
-            request_data = json_data
-        else:
-            response = jsonify({"error": {"code": "request_error", "info": "JSON body must be an object"}})
-            response.status_code = 400
+        @self.bp.route("/", methods=["OPTIONS"])
+        @check_cors
+        def publish_preflight() -> Response:
+            response = Response("", status=200)
+            response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
             return response
 
-    return _handle_form(request_data)
+
+        @self.bp.route("/", methods=["POST"])
+        @validate_access
+        def index() -> Response:
+            """Handle post/publish requests.
+
+            Request Body (JSON):
+                user: Username
+                title: Target page title
+                target: Target language code
+                sourcetitle: Source page title
+                text: Page content
+                revid: Source revision ID (optional)
+                campaign: Campaign name (optional)
+                wpCaptchaId: Captcha ID (optional)
+                wpCaptchaWord: Captcha answer (optional)
+
+            Returns:
+                JSON response with edit result
+            """
+
+            # Get request data
+            request_data = request.form.to_dict()
+            if not request_data:
+                json_data = request.get_json(silent=True)
+                if json_data is None:
+                    request_data = {}
+                elif isinstance(json_data, dict):
+                    request_data = json_data
+                else:
+                    response = jsonify({"error": {"code": "request_error", "info": "JSON body must be an object"}})
+                    response.status_code = 400
+                    return response
+
+            return _handle_form(request_data)
 
 
 __all__ = [
-    "bp_publish",
+    "PublishRoutes",
 ]

@@ -24,49 +24,6 @@ bp_fixrefs = Blueprint("fixrefs", __name__, url_prefix="/fixrefs")
 logger = logging.getLogger(__name__)
 
 
-@bp_fixrefs.route("/", methods=["GET"])
-def index() -> str:
-    return render_template(
-        "fixrefs/index.html",
-        result=None,
-        form={},
-    )
-
-
-@oauth_required
-@bp_fixrefs.route("/test", methods=["GET"])
-def test() -> str:
-    tests_data = [
-        {
-            "source_title": "Decitabine/cedazuridine",
-            "title": "Decitabina/cedazuridina",
-            "lang": "es",
-            "mdwiki_revid": 1478161,
-        },
-        {
-            "source_title": "Tropicamide",
-            "title": "Usuario:Mr. Ibrahem/Tropicamida",
-            "lang": "es",
-            "mdwiki_revid": 1408734,
-        },
-        {
-            "source_title": "Fatty liver disease",
-            "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
-            "lang": "hy",
-            "mdwiki_revid": 1458412,
-        },
-    ]
-    item = random.choice(tests_data)
-
-    return render_template(
-        "fixrefs/index.html",
-        **item,
-        form={
-            "infobox": 1,
-        },
-    )
-
-
 def _process(data) -> str:
     source_title = data.get("source_title", "")
     title = data.get("title", "")
@@ -127,6 +84,46 @@ def _process(data) -> str:
         },
     )
 
+@bp_fixrefs.route("/", methods=["GET"])
+def index() -> str:
+    return render_template(
+        "fixrefs/index.html",
+        result=None,
+        form={},
+    )
+
+@oauth_required
+@bp_fixrefs.route("/test", methods=["GET"])
+def test() -> str:
+    tests_data = [
+        {
+            "source_title": "Decitabine/cedazuridine",
+            "title": "Decitabina/cedazuridina",
+            "lang": "es",
+            "mdwiki_revid": 1478161,
+        },
+        {
+            "source_title": "Tropicamide",
+            "title": "Usuario:Mr. Ibrahem/Tropicamida",
+            "lang": "es",
+            "mdwiki_revid": 1408734,
+        },
+        {
+            "source_title": "Fatty liver disease",
+            "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
+            "lang": "hy",
+            "mdwiki_revid": 1458412,
+        },
+    ]
+    item = random.choice(tests_data)
+
+    return render_template(
+        "fixrefs/index.html",
+        **item,
+        form={
+            "infobox": 1,
+        },
+    )
 
 @oauth_required
 @bp_fixrefs.route("/", methods=["POST"])

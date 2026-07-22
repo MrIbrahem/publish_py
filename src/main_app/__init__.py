@@ -22,7 +22,7 @@ from .extensions import db as _db
 from .extensions import (
     migrate,
 )
-from .public import bp_publish, register_blueprints
+from .public import register_blueprints
 from .public.utils import context_data
 from .shared.core import CookieHeaderClient, filters
 
@@ -177,7 +177,6 @@ def create_app(config_class: type) -> Flask:
         register_bp_admin_blueprints(app)
         register_blueprints(app)
         # register_cli_jobs(app)
-        csrf_exempt(app, bp_publish)
     else:
 
         @app.before_request
