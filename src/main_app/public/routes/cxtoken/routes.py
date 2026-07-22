@@ -21,7 +21,6 @@ from ....shared.core.cors import check_cors
 from ....shared.schemas import CXTokenRequestSchema
 from .cache import get_from_store, store_jwt
 
-bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
 logger = logging.getLogger(__name__)
 
 
@@ -62,64 +61,69 @@ def get_cxtoken_for_user_wiki(wiki, user):
     return cxtoken, 200
 
 
-@bp_cxtoken.route("/", methods=["OPTIONS"])
-@check_cors
-def index_preflight() -> Response:
-    """
-    Handle preflight requests.
+class CxTokenRoutes:
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        self._setup_routes()
 
-    Returns:
-        Preflight response
-    """
+    def _setup_routes(self) -> None:
+        @self.bp.route("/", methods=["OPTIONS"])
+        @check_cors
+        def index_preflight() -> Response:
+            """
+            Handle preflight requests.
 
-    response = Response("", status=200)
-    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    response.headers["Access-Control-Max-Age"] = "7200"
-    return response
+            Returns:
+                Preflight response
+            """
 
+            response = Response("", status=200)
+            response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+            response.headers["Access-Control-Max-Age"] = "7200"
+            return response
 
-@bp_cxtoken.route("/", methods=["GET"])
-@check_cors
-def index() -> Response:
-    """Handle cxtoken requests.
+        @self.bp.route("/", methods=["GET"])
+        @check_cors
+        def index() -> Response:
+            """Handle cxtoken requests.
 
-    Query Parameters:
-        wiki: Wiki language code (e.g., 'en')
-        user: Username
+            Query Parameters:
+                wiki: Wiki language code (e.g., 'en')
+                user: Username
 
-    Returns:
-        JSON response with cxtoken data or error
-    """
-    try:
-        validated_data = CXTokenRequestSchema().load(request.args, unknown="exclude")
-    except ValidationError as err:
-        response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
-        response.status_code = 400
-        return response
+            Returns:
+                JSON response with cxtoken data or error
+            """
+            try:
+                validated_data = CXTokenRequestSchema().load(request.args, unknown="exclude")
+            except ValidationError as err:
+                response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
+                response.status_code = 400
+                return response
 
-    # Get request parameters
-    wiki = validated_data.get("wiki", "")  # type: ignore
-    user = validated_data.get("user", "")  # type: ignore
+            # Get request parameters
+            wiki = validated_data.get("wiki", "")  # type: ignore
+            user = validated_data.get("user", "")  # type: ignore
 
-    # Format user (apply special user mappings)
-    user = _format_user(user)
+            # Format user (apply special user mappings)
+            user = _format_user(user)
 
-    if _from_cache := get_from_store(user, wiki):
-        cxtoken = _from_cache
-        status_code = 200
-    else:
-        cxtoken, status_code = get_cxtoken_for_user_wiki(wiki, user)
+            if _from_cache := get_from_store(user, wiki):
+                cxtoken = _from_cache
+                status_code = 200
+            else:
+                cxtoken, status_code = get_cxtoken_for_user_wiki(wiki, user)
 
-        if status_code == 200:
-            store_jwt(cxtoken, user, wiki)
+                if status_code == 200:
+                    store_jwt(cxtoken, user, wiki)
 
-    response = jsonify(cxtoken)
-    response.status_code = status_code
+            response = jsonify(cxtoken)
+            response.status_code = status_code
 
-    return response
+            return response
 
 
 __all__ = [
-    "bp_cxtoken",
+    "CxTokenRoutes",
 ]

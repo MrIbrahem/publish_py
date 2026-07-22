@@ -2,19 +2,19 @@
 Flask public routes
 """
 
-from .api.routes import bp_api
-from .cxtoken.routes import bp_cxtoken
-from .main import bp_main
+from .api.routes import ApiRoutes
+from .cxtoken.routes import CxTokenRoutes
+from .main import MainRoutes
 from .publish.routes import bp_publish
 from .refs.routes import bp_fixrefs
-from .td import bp_leaderboard, bp_td
+from .td import LeaderBoardRoutes, TDRoutes
 
 __all__ = [
-    "bp_api",
-    "bp_main",
-    "bp_td",
-    "bp_cxtoken",
+    "ApiRoutes",
+    "MainRoutes",
+    "TDRoutes",
+    "CxTokenRoutes",
     "bp_publish",
     "bp_fixrefs",
-    "bp_leaderboard",
+    "LeaderBoardRoutes",
 ]

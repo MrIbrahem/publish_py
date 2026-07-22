@@ -1,5 +1,5 @@
-from .routes import bp_api
+from .routes import ApiRoutes
 
 __all__ = [
-    "bp_api",
+    "ApiRoutes",
 ]

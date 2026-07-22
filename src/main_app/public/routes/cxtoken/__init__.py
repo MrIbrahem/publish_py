@@ -1,5 +1,5 @@
-from .routes import bp_cxtoken
+from .routes import CxTokenRoutes
 
 __all__ = [
-    "bp_cxtoken",
+    "CxTokenRoutes",
 ]

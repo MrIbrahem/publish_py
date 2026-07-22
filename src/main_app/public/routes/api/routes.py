@@ -1,4 +1,5 @@
-"""API endpoints for API.
+"""
+API endpoints for API.
 
 Mirrors: php_src/endpoints/index.php?get=publish_reports
 """
@@ -24,24 +25,9 @@ from ....shared.utils.web_utils import parse_select_fields
 from .leaderboard import leaderboard_status
 from .top_stats_routes import get_top_langs, get_top_users
 
-bp_api = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
 
 
-@bp_api.before_request
-def handle_options_preflight():
-    if request.method == "OPTIONS":
-        response = Response("", status=200)
-        requested_method = request.headers.get("Access-Control-Request-Method", "GET")
-        response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
-        # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        response.headers["Access-Control-Max-Age"] = "7200"
-        return response
-
-
-@bp_api.route("/publish_reports", methods=["GET"])
-@check_cors
 def get_publish_reports() -> tuple[Response, int] | Response:
     """
     Handle publish_reports API requests.
@@ -103,8 +89,6 @@ def get_publish_reports() -> tuple[Response, int] | Response:
     return response
 
 
-@bp_api.route("/publish_reports/stats", methods=["GET"])
-@check_cors
 def publish_reports_stats() -> tuple[Response, int] | Response:
     """
     Handle publish_reports_stats API requests.
@@ -151,8 +135,6 @@ def publish_reports_stats() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/in_process", methods=["GET"])
-@check_cors
 def get_in_process() -> tuple[Response, int] | Response:
     """
     Handle in_process API requests.
@@ -224,8 +206,6 @@ def get_in_process() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/in_process_total", methods=["GET"])
-@check_cors
 def get_in_process_total() -> tuple[Response, int] | Response:
     """
     Handle in_process_total API requests.
@@ -255,8 +235,6 @@ def get_in_process_total() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/pages_users", methods=["GET"])
-@check_cors
 def get_pages_users() -> tuple[Response, int] | Response:
     """
     Handle pages_users API requests.
@@ -288,8 +266,6 @@ def get_pages_users() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/pages_with_views", methods=["GET"])
-@check_cors
 def get_pages_with_views() -> tuple[Response, int] | Response:
     """
     Handle pages_with_views API requests.
@@ -321,8 +297,6 @@ def get_pages_with_views() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/categories", methods=["GET"])
-@check_cors
 def get_categories() -> tuple[Response, int] | Response:
     """
     Handle categories API requests. Returns all category records.
@@ -342,8 +316,6 @@ def get_categories() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/distinct_langs", methods=["GET"])
-@check_cors
 def get_distinct_langs() -> tuple[Response, int] | Response:
     """
     Return distinct languages from pages joined with categories.
@@ -369,8 +341,6 @@ def get_distinct_langs() -> tuple[Response, int] | Response:
     return jsonify({"results": data, "count": len(data)})
 
 
-@bp_api.route("/users_by_translations_count", methods=["GET"])
-@check_cors
 def users_by_translations_count() -> tuple[Response, int] | Response:
     """C
     Handle pages_with_views API requests.
@@ -392,8 +362,6 @@ def users_by_translations_count() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/langs", methods=["GET"])
-@check_cors
 def get_langs() -> tuple[Response, int] | Response:
     """
     Handle langs API requests. Returns all language records.
@@ -413,8 +381,6 @@ def get_langs() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-@bp_api.route("/users", methods=["GET"])
-@check_cors
 def get_users() -> tuple[Response, int] | Response:
     """
     Handle users API requests. Returns all users names.
@@ -439,12 +405,86 @@ def get_users() -> tuple[Response, int] | Response:
     return jsonify(response_data)
 
 
-bp_api.route("/status", methods=["GET"])(leaderboard_status)
+class ApiRoutes:
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        self._setup_routes()
 
-# Register top_stats routes
-bp_api.route("/top_langs", methods=["GET"])(get_top_langs)
-bp_api.route("/top_users", methods=["GET"])(get_top_users)
+    def _setup_routes(self) -> None:
+
+        @self.bp.before_request
+        def handle_options_preflight():
+            if request.method == "OPTIONS":
+                response = Response("", status=200)
+                requested_method = request.headers.get("Access-Control-Request-Method", "GET")
+                response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
+                # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+                response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                response.headers["Access-Control-Max-Age"] = "7200"
+                return response
+
+        self.bp.route("/status", methods=["GET"])(leaderboard_status)
+
+        # Register top_stats routes
+        self.bp.route("/top_langs", methods=["GET"])(get_top_langs)
+        self.bp.route("/top_users", methods=["GET"])(get_top_users)
+
+        @self.bp.route("/publish_reports", methods=["GET"])
+        @check_cors
+        def get_publish_reports() -> tuple[Response, int] | Response:
+            return get_publish_reports()
+
+        @self.bp.route("/publish_reports/stats", methods=["GET"])
+        @check_cors
+        def publish_reports_stats() -> tuple[Response, int] | Response:
+            return publish_reports_stats()
+
+        @self.bp.route("/in_process", methods=["GET"])
+        @check_cors
+        def get_in_process() -> tuple[Response, int] | Response:
+            return get_in_process()
+
+        @self.bp.route("/in_process_total", methods=["GET"])
+        @check_cors
+        def get_in_process_total() -> tuple[Response, int] | Response:
+            return get_in_process_total()
+
+        @self.bp.route("/pages_users", methods=["GET"])
+        @check_cors
+        def get_pages_users() -> tuple[Response, int] | Response:
+            return get_pages_users()
+
+        @self.bp.route("/pages_with_views", methods=["GET"])
+        @check_cors
+        def get_pages_with_views() -> tuple[Response, int] | Response:
+            return get_pages_with_views()
+
+        @self.bp.route("/categories", methods=["GET"])
+        @check_cors
+        def get_categories() -> tuple[Response, int] | Response:
+            return get_categories()
+
+        @self.bp.route("/distinct_langs", methods=["GET"])
+        @check_cors
+        def get_distinct_langs() -> tuple[Response, int] | Response:
+            return get_distinct_langs()
+
+        @self.bp.route("/users_by_translations_count", methods=["GET"])
+        @check_cors
+        def users_by_translations_count() -> tuple[Response, int] | Response:
+            return users_by_translations_count()
+
+        @self.bp.route("/langs", methods=["GET"])
+        @check_cors
+        def get_langs() -> tuple[Response, int] | Response:
+            return get_langs()
+
+        @self.bp.route("/users", methods=["GET"])
+        @check_cors
+        def get_users() -> tuple[Response, int] | Response:
+            return get_users()
+
 
 __all__ = [
-    "bp_api",
+    "ApiRoutes",
 ]
