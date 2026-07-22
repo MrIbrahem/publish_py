@@ -102,7 +102,6 @@ class PublishRoutes:
             response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
             return response
 
-
         @self.bp.route("/", methods=["POST"])
         @validate_access
         def index() -> Response:

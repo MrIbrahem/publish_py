@@ -5,17 +5,17 @@ Public Blueprints
 from flask import Blueprint, Flask
 
 from ..extensions import csrf_exempt
-
 from .auth.routes import AuthRoutes
 from .routes import (
     ApiRoutes,
     CxTokenRoutes,
+    FixRefsRoutes,
     LeaderBoardRoutes,
     MainRoutes,
-    TDRoutes,
-    bp_fixrefs,
     PublishRoutes,
+    TDRoutes,
 )
+
 
 def register_blueprints(app: Flask) -> None:
     bp_main = Blueprint("main", __name__)
@@ -40,6 +40,9 @@ def register_blueprints(app: Flask) -> None:
 
     publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
 
+    bp_fixrefs = Blueprint("fixrefs", __name__, url_prefix="/fixrefs")
+    fixrefs_model = FixRefsRoutes(bp_fixrefs)
+
     app.register_blueprint(main_model.bp)
     app.register_blueprint(api_model.bp)
     app.register_blueprint(auth_model.bp)
@@ -47,9 +50,10 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(cx_model.bp)
 
     app.register_blueprint(publish_model.bp)
-    app.register_blueprint(bp_fixrefs)
+    app.register_blueprint(fixrefs_model.bp)
 
     csrf_exempt(app, publish_model.bp)
+
 
 __all__ = [
     "register_blueprints",

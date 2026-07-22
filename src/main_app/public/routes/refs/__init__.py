@@ -1,5 +1,5 @@
-from .routes import bp_fixrefs
+from .routes import FixRefsRoutes
 
 __all__ = [
-    "bp_fixrefs",
+    "FixRefsRoutes",
 ]

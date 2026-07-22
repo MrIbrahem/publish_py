@@ -20,7 +20,6 @@ from ....shared.utils.helpers.text_processor import (
     do_changes_to_text_with_settings,
 )
 
-bp_fixrefs = Blueprint("fixrefs", __name__, url_prefix="/fixrefs")
 logger = logging.getLogger(__name__)
 
 
@@ -84,63 +83,69 @@ def _process(data) -> str:
         },
     )
 
-@bp_fixrefs.route("/", methods=["GET"])
-def index() -> str:
-    return render_template(
-        "fixrefs/index.html",
-        result=None,
-        form={},
-    )
 
-@oauth_required
-@bp_fixrefs.route("/test", methods=["GET"])
-def test() -> str:
-    tests_data = [
-        {
-            "source_title": "Decitabine/cedazuridine",
-            "title": "Decitabina/cedazuridina",
-            "lang": "es",
-            "mdwiki_revid": 1478161,
-        },
-        {
-            "source_title": "Tropicamide",
-            "title": "Usuario:Mr. Ibrahem/Tropicamida",
-            "lang": "es",
-            "mdwiki_revid": 1408734,
-        },
-        {
-            "source_title": "Fatty liver disease",
-            "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
-            "lang": "hy",
-            "mdwiki_revid": 1458412,
-        },
-    ]
-    item = random.choice(tests_data)
+class FixRefsRoutes:
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        self._setup_routes()
 
-    return render_template(
-        "fixrefs/index.html",
-        **item,
-        form={
-            "infobox": 1,
-        },
-    )
+    def _setup_routes(self) -> None:
+        @self.bp.route("/", methods=["GET"])
+        def index() -> str:
+            return render_template(
+                "fixrefs/index.html",
+                result=None,
+                form={},
+            )
 
-@oauth_required
-@bp_fixrefs.route("/", methods=["POST"])
-def process_new() -> str:
-    data = request.form.to_dict()
-    logger.info("Processing text with settings: %s", data)
-    return _process(data)
+        @oauth_required
+        @self.bp.route("/test", methods=["GET"])
+        def test() -> str:
+            tests_data = [
+                {
+                    "source_title": "Decitabine/cedazuridine",
+                    "title": "Decitabina/cedazuridina",
+                    "lang": "es",
+                    "mdwiki_revid": 1478161,
+                },
+                {
+                    "source_title": "Tropicamide",
+                    "title": "Usuario:Mr. Ibrahem/Tropicamida",
+                    "lang": "es",
+                    "mdwiki_revid": 1408734,
+                },
+                {
+                    "source_title": "Fatty liver disease",
+                    "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
+                    "lang": "hy",
+                    "mdwiki_revid": 1458412,
+                },
+            ]
+            item = random.choice(tests_data)
 
+            return render_template(
+                "fixrefs/index.html",
+                **item,
+                form={
+                    "infobox": 1,
+                },
+            )
 
-@oauth_required
-@bp_fixrefs.route("/process", methods=["GET"])
-def process() -> str:
-    data = request.args
-    logger.info("Processing text with settings: %s", data)
-    return _process(data)
+        @oauth_required
+        @self.bp.route("/", methods=["POST"])
+        def process_new() -> str:
+            data = request.form.to_dict()
+            logger.info("Processing text with settings: %s", data)
+            return _process(data)
+
+        @oauth_required
+        @self.bp.route("/process", methods=["GET"])
+        def process() -> str:
+            data = request.args
+            logger.info("Processing text with settings: %s", data)
+            return _process(data)
 
 
 __all__ = [
-    "bp_fixrefs",
+    "FixRefsRoutes",
 ]

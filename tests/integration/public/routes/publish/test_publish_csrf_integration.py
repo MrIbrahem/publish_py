@@ -7,8 +7,8 @@ using a configuration similar to ProductionConfig.
 import json
 from unittest.mock import MagicMock, patch
 
-from flask import Blueprint
 import pytest
+from flask import Blueprint
 from flask.app import Flask
 
 

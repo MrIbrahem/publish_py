@@ -15,7 +15,6 @@ from .config import ensure_directories, settings
 from .db import init_db
 from .db.exceptions import DatabaseInitError
 from .extensions import (
-    csrf_exempt,
     csrf_init_app,
 )
 from .extensions import db as _db
