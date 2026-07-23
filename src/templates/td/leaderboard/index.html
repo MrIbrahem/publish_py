@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row g-3">
-        <form method="get" action="{{ url_for('td.leaderboard.index') }}" id="leaderboard_filter">
+        <form method="get" action="{{ url_for('leaderboard.index') }}" id="leaderboard_filter">
             <div class="row g-3">
                 <div class="col-md-3">
                     <span align="center">
@@ -285,7 +285,7 @@
                 title: 'User',
                 render: function (data, type) {
                     // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
-                    const baseUrl = "{{ url_for('td.leaderboard.users', username='PLACEHOLDER') }}";
+                    const baseUrl = "{{ url_for('leaderboard.users', username='PLACEHOLDER') }}";
                     const finalUrl = baseUrl.replace('PLACEHOLDER', data);
 
                     return `<a href="${finalUrl}">${data}</a>`;
@@ -343,7 +343,7 @@
                 title: 'Language',
                 render: function (data, type, row, meta) {
                     // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
-                    const baseUrl = "{{ url_for('td.leaderboard.langs', lang_code='PLACEHOLDER') }}";
+                    const baseUrl = "{{ url_for('leaderboard.langs', lang_code='PLACEHOLDER') }}";
                     const finalUrl = baseUrl.replace('PLACEHOLDER', data);
 
                     return `<a href="${finalUrl}">${row.lang_name}</a>`;

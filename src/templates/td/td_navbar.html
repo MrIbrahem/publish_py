@@ -34,7 +34,7 @@
                         {{ nav_link(
                             'bi-bar-chart-line',
                             'Leaderboard',
-                            url_for('td.leaderboard.index'),
+                            url_for('leaderboard.index'),
                             '/Translation_Dashboard/leaderboard',
                             )
                         }}
@@ -88,7 +88,7 @@
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
                     <!-- <div class="d-flex align-items-center"> <span class="navbar-text"> -->
                     {% if current_username %}
-                    {% set profile_href = url_for('td.leaderboard.users', username=current_username) %}
+                    {% set profile_href = url_for('leaderboard.users', username=current_username) %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
                         <a href="{{ profile_href }}"
                             class="nav-link py-2 px-0 px-lg-2 {{ profile_href | check_active_route }}">
