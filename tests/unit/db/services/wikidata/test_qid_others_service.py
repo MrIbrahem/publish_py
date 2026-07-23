@@ -14,6 +14,7 @@ import pytest
 
 from src.main_app.db.models import QidOthersRecord
 from src.main_app.db.services.wikidata.qid_others_service import (
+    QidOthersService,
     add_or_update_qid,
     get_by_qid,
     get_by_title,
@@ -32,6 +33,14 @@ def _add_with_empty_qid(title: str) -> QidOthersRecord:
     record.qid = ""
     _db.session.commit()
     return record
+
+
+class TestQidOthersService:
+    """Tests for `QidOthersService` class."""
+
+    def test_get_by_qid_returns_none_when_qid_missing(self, monkeypatch):
+        service = QidOthersService()
+        assert service.get_by_qid("Q9999") is None
 
 
 class TestListQidsOthersByDis:

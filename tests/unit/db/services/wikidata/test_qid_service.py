@@ -7,6 +7,7 @@ from src.main_app.db.services.delete_service import (
     delete_qid,
 )
 from src.main_app.db.services.wikidata.qid_service import (
+    QidService,
     add_or_update_qid,
     get_by_qid,
     get_by_title,
@@ -45,6 +46,14 @@ def test_qid_workflow():
     # Test delete
     delete_qid(q.id)
     assert get_record_by_title("World") is None
+
+
+class TestQidService:
+    """Tests for `QidService` class."""
+
+    def test_get_by_qid_returns_none_when_qid_missing(self, monkeypatch):
+        service = QidService()
+        assert service.get_by_qid("Q9999") is None
 
 
 class TestGetPageQid:

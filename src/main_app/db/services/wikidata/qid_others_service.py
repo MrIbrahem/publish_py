@@ -14,14 +14,16 @@ from ...models import QidOthersRecord
 
 logger = logging.getLogger(__name__)
 
+ServiceRecord = QidOthersRecord
 
-def add_or_update_qid(title: str, qid: str) -> QidOthersRecord:
+
+def add_or_update_qid(title: str, qid: str) -> ServiceRecord:
     """Add or update a QID for a title."""
-    orm_obj = db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
+    orm_obj = db.session.query(ServiceRecord).filter(ServiceRecord.title == title).first()
     if orm_obj:
         orm_obj.qid = qid
     else:
-        orm_obj = QidOthersRecord(title=title, qid=qid)
+        orm_obj = ServiceRecord(title=title, qid=qid)
 
     orm_obj.validate()
 
@@ -44,24 +46,24 @@ def insert(title: str, qid: str) -> bool:
     if not title or not qid:
         return False
     try:
-        existing = db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
+        existing = db.session.query(ServiceRecord).filter(ServiceRecord.title == title).first()
         if existing:
             if not existing.qid:
                 existing.qid = qid
                 db.session.commit()
             return True
 
-        orm_obj = QidOthersRecord(title=title, qid=qid)
+        orm_obj = ServiceRecord(title=title, qid=qid)
         db.session.add(orm_obj)
         db.session.commit()
         return True
     except Exception:
-        logger.exception("Failed to insert qids_others title=%r qid=%r", title, qid)
+        logger.exception("Failed to insert record title=%r qid=%r", title, qid)
         db.session.rollback()
         return False
 
 
-def update_qid(qid_id: int, title: str, qid: str) -> QidOthersRecord:
+def update_qid(qid_id: int, title: str, qid: str) -> ServiceRecord:
     """Update an existing row by primary key."""
     title = (title or "").strip()
     qid = (qid or "").strip()
@@ -69,7 +71,7 @@ def update_qid(qid_id: int, title: str, qid: str) -> QidOthersRecord:
     if not qid_id or not title or not qid:
         raise ValueError("qid_id, title, and qid are required")
 
-    orm_obj = db.session.get(QidOthersRecord, qid_id)
+    orm_obj = db.session.get(ServiceRecord, qid_id)
     if not orm_obj:
         raise ValueError(f"record with ID {qid_id} not found")
 
@@ -97,83 +99,80 @@ def update_record(qid_id: int, title: str, qid: str) -> bool:
         return False
 
 
-def get_record_by_title(title: str) -> QidOthersRecord | None:
+def get_record_by_title(title: str) -> ServiceRecord | None:
     """Get the QID for a page title."""
-    orm_obj = db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
+    orm_obj = db.session.query(ServiceRecord).filter(ServiceRecord.title == title).first()
     if not orm_obj:
         logger.warning(f"QID for title {title} not found")
         return None
     return orm_obj
 
 
-def list_records(dis: str = "all") -> list[QidOthersRecord]:
+def list_records(dis: str = "all") -> list[ServiceRecord]:
     """Return records, optionally filtered by ``dis``.
 
     - ``"all"``: every row.
     - ``"empty"``: rows where qid is NULL or empty string.
     - ``"duplicate"``: rows that share a title or qid with another row.
     """
-    base = db.session.query(QidOthersRecord)
+    base = db.session.query(ServiceRecord)
     if dis == "empty":
         rows = (
-            base.filter(or_(QidOthersRecord.qid.is_(None), QidOthersRecord.qid == ""))
-            .order_by(QidOthersRecord.id.asc())
+            base.filter(or_(ServiceRecord.qid.is_(None), ServiceRecord.qid == ""))
+            .order_by(ServiceRecord.id.asc())
             .all()
         )
         return rows
     if dis == "duplicate":
-        other = aliased(QidOthersRecord)
+        other = aliased(ServiceRecord)
         rows = (
             base.join(
                 other,
                 and_(
-                    QidOthersRecord.id != other.id,
+                    ServiceRecord.id != other.id,
                     or_(
-                        QidOthersRecord.qid == other.qid,
-                        QidOthersRecord.title == other.title,
+                        ServiceRecord.qid == other.qid,
+                        ServiceRecord.title == other.title,
                     ),
                 ),
             )
-            .order_by(QidOthersRecord.id.asc())
+            .order_by(ServiceRecord.id.asc())
             .distinct()
             .all()
         )
         return rows
     # default: all
-    return base.order_by(QidOthersRecord.id.asc()).all()
+    return base.order_by(ServiceRecord.id.asc()).all()
 
 
-def get_by_qid(qid: str) -> QidOthersRecord | None:
+def get_by_qid(qid: str) -> ServiceRecord | None:
     """Get the first record matching the given qid string."""
     if not qid:
         return None
-    return db.session.query(QidOthersRecord).filter(QidOthersRecord.qid == qid).first()
+    return db.session.query(ServiceRecord).filter(ServiceRecord.qid == qid).first()
 
 
-def get_by_id(qid_id: int) -> QidOthersRecord | None:
+def get_by_id(qid_id: int) -> ServiceRecord | None:
     """Get a record by its primary key ID."""
-    return db.session.get(QidOthersRecord, qid_id)
+    return db.session.get(ServiceRecord, qid_id)
 
 
-def get_by_title(title: str) -> QidOthersRecord | None:
+def get_by_title(title: str) -> ServiceRecord | None:
     """Get the record matching the given title."""
     if not title:
         return None
-    return db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
+    return db.session.query(ServiceRecord).filter(ServiceRecord.title == title).first()
 
 
-def list_qid_records() -> list[QidOthersRecord]:
+def list_qid_records() -> list[ServiceRecord]:
     """Return all QID records (legacy alias kept for compatibility)."""
-    return db.session.query(QidOthersRecord).order_by(QidOthersRecord.id.asc()).all()
+    return db.session.query(ServiceRecord).order_by(ServiceRecord.id.asc()).all()
 
 
 def get_title_to_qid() -> dict[str, str]:
     """Retrieve title to QID mapping from database."""
     qids = list_qid_records()
     return {record.title: record.qid or "" for record in qids}
-
-
-ServiceRecord = QidOthersRecord
 
 
 class QidOthersService:
@@ -227,14 +226,14 @@ class QidOthersService:
 __all__ = [
     "QidOthersService",
     "add_or_update_qid",
-    "update_qid",
-    "get_record_by_title",
-    "list_records",
-    "list_qid_records",
-    "get_title_to_qid",
+    "get_by_id",
     "get_by_qid",
     "get_by_title",
+    "get_record_by_title",
+    "get_title_to_qid",
     "insert",
+    "list_qid_records",
+    "list_records",
+    "update_qid",
     "update_record",
-    "get_by_id",
 ]
