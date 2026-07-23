@@ -28,7 +28,7 @@ class TestSetup:
         record = self.service.add_or_update(title, "Q999")
         record.qid = ""
         _db.session.commit()
-        return record
+        return record # type: ignore
 
 class TestQidService(TestSetup):
     """Tests for `QidService` class."""
@@ -41,6 +41,7 @@ class TestQidService(TestSetup):
 
         # Test get
         q2 = self.service.get_record_by_title("Earth")
+        assert q2 is not None
         assert q2.qid == "Q2"
 
         # Test list
@@ -262,7 +263,7 @@ class TestInsert(TestSetup):
         assert self.service.insert("   ", "Q1") is False
 
     def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
-        with patch("src.main_app.db.services.wikidata.qid_service.db.session") as mock_session:
+        with patch("src.main_app.db.services.wikidata.qid_shared_service.db.session") as mock_session:
             mock_session.query.return_value.filter.return_value.first.return_value = None
             mock_session.commit.side_effect = Exception("boom")
             ok = self.service.insert("Will_fail", "Q1")
@@ -291,7 +292,7 @@ class TestUpdate(TestSetup):
         assert self.service.update_record(record.id, "T", "") is False
 
     def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
-        with patch("src.main_app.db.services.wikidata.qid_service.db.session") as mock_session:
+        with patch("src.main_app.db.services.wikidata.qid_shared_service.db.session") as mock_session:
             mock_session.commit.side_effect = Exception("boom")
             mock_session.get.return_value = MagicMock()
             ok = self.service.update_record(1, "T", "Q1")
