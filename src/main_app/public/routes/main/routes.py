@@ -22,21 +22,22 @@ class MainRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        def index() -> str:
-            return render_template(
-                "index.html",
-            )
+        self.bp.route("/", methods=["GET"])(self.index)
+        self.bp.route("/reports", methods=["GET"])(self.reports)
+        self.bp.get("/favicon.ico")(self.favicon)
 
-        @self.bp.route("/reports", methods=["GET"])
-        def reports():
-            return render_template(
-                "reports.html",
-            )
+    def index(self) -> str:
+        return render_template(
+            "index.html",
+        )
 
-        @self.bp.get("/favicon.ico")
-        def favicon() -> Response:
-            return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
+    def reports(self):
+        return render_template(
+            "reports.html",
+        )
+
+    def favicon(self) -> Response:
+        return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
 
 
 __all__ = [

@@ -117,187 +117,188 @@ class TDRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.get("/results_api")
-        def results_api():
-            code = request.args.get("code")
-            camp = request.args.get("camp")
-            depth = request.args.get("depth")
+        self.bp.get("/results_api")(self.results_api)
+        self.bp.get("/table")(self.table)
+        self.bp.get("/")(self.index)
+        self.bp.get("/missing")(self.missing)
 
-            start = time.time()
+    def results_api(self):
+        code = request.args.get("code")
+        camp = request.args.get("camp")
+        depth = request.args.get("depth")
 
+        start = time.time()
+
+        try:
+            result_dict = results_api_result(code, camp, depth)
+        except Exception:
+            logger.exception(
+                "results_api_result failed for code=%r camp=%r depth=%r",
+                code,
+                camp,
+                depth,
+            )
+            return jsonify({"error": "Failed to load results"}), 500
+
+        elapsed = time.time() - start
+        elapsed = time.time() - start
+
+        return jsonify(
+            {
+                "execution_time": round(elapsed, 6),
+                "results": result_dict,
+            }
+        )
+
+    def table(self):
+        # Form data — unchanged from the previous index() implementation.
+        try:
+            langs = [x.to_dict() for x in list_langs()]
+            campaigns_records = list_categories()
+            campaigns = [x.to_dict() for x in campaigns_records]
+        except Exception:
+            logger.exception("Failed to load languages/campaigns for index page")
+            flash("Failed to load page data — please try again.", "danger")
+            langs = []
+            campaigns = []
+
+        # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
+        camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
+        cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
+
+        parsed = _parse_request_args(camps_data, cats_data)
+
+        # Identity / coordinator / full-translator flags — mirrors src/index.php.
+        user = load_user()
+        user_coord = bool(user and user.is_active_admin)
+        full_tr_user = bool(user and is_full_translator(user.username))
+
+        parsed_settings = parsed["settings"]
+
+        # PHP: only invoke results_loader_2026 when both code and camp are valid.
+        results_bundle = {}
+        if parsed["code"] and parsed["camp"] and parsed["code_lang_name"]:
             try:
-                result_dict = results_api_result(code, camp, depth)
+                results_bundle = results_loader_2026(
+                    code=parsed["code"],
+                    camp=parsed["camp"],
+                    cat=parsed["cat"],
+                    tra_type=parsed["tra_type"],
+                    code_lang_name=parsed["code_lang_name"],
+                    user_coord=user_coord,
+                    settings=parsed_settings,
+                    full_tr_user=full_tr_user,
+                )
             except Exception:
                 logger.exception(
-                    "results_api_result failed for code=%r camp=%r depth=%r",
-                    code,
-                    camp,
-                    depth,
+                    "results_loader_2026 failed for code=%r camp=%r cat=%r",
+                    parsed["code"],
+                    parsed["camp"],
+                    parsed["cat"],
                 )
-                return jsonify({"error": "Failed to load results"}), 500
+                flash("Failed to load results — please try again.", "danger")
 
-            elapsed = time.time() - start
-            elapsed = time.time() - start
+        if results_bundle.get("summary_data"):
+            results_bundle["summary_data"]["code_lang_name"] = parsed["code_lang_name"]
 
-            return jsonify(
+        return render_template(
+            "td/index.html",
+            settings=parsed_settings,
+            langs=langs,
+            campaigns=campaigns,
+            args={
+                "code": parsed["code"],
+                "camp": parsed["camp"],
+                "type": parsed["tra_type"],
+            },
+            results=results_bundle,
+        )
+
+    def index(self):
+        # Form data — unchanged from the previous index() implementation.
+        try:
+            langs = [x.to_dict() for x in list_langs()]
+            campaigns_records = list_categories()
+            campaigns = [x.to_dict() for x in campaigns_records]
+        except Exception:
+            logger.exception("Failed to load languages/campaigns for index page")
+            flash("Failed to load page data — please try again.", "danger")
+            langs = []
+            campaigns = []
+
+        # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
+        camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
+        cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
+
+        parsed = _parse_request_args(camps_data, cats_data)
+
+        return render_template(
+            "td/index.html",
+            settings=parsed["settings"],
+            langs=langs,
+            campaigns=campaigns,
+            args={
+                "code": parsed["code"],
+                "camp": parsed["camp"],
+                "type": parsed["tra_type"],
+            },
+        )
+
+    def missing(self):
+        # logic from src/missing.php — Top languages by missing articles in Category:RTT.
+        category = request.args.get("cat") or "RTT"
+
+        try:
+            stats = statics_by_category(category)
+        except Exception:
+            logger.exception("statics_by_category failed for cat=%r", category)
+            flash("Failed to load missing statistics — please try again.", "danger")
+            stats = []
+
+        try:
+            total = count_category_members(category)
+        except Exception:
+            logger.exception("count_category_members failed for cat=%r", category)
+            total = 0
+
+        # PHP merges per-language stats with the langs lookup (autonym + name).
+        langs_lookup: dict[str, dict] = {}
+        try:
+            for lang in list_langs():
+                data = lang.to_dict()
+                code = data.get("code")
+                if code:
+                    langs_lookup[code] = data
+        except Exception:
+            logger.exception("list_langs failed while building missing-stats page")
+
+        rows: list[dict] = []
+        for stat in stats:
+            langcode = stat.get("language_code") or ""
+            if not langcode:
+                continue
+            lang_data = langs_lookup.get(langcode, {})
+            autonym = lang_data.get("autonym") or "! autonym"
+            langname = lang_data.get("name") or "! langname"
+            exists = int(stat.get("available_title_count") or 0)
+            # PHP: $missing = (int)$length - (int)$exists;
+            missing_count = max(total - exists, 0)
+            rows.append(
                 {
-                    "execution_time": round(elapsed, 6),
-                    "results": result_dict,
+                    "langcode": langcode,
+                    "langname": langname,
+                    "autonym": autonym,
+                    "exists": exists,
+                    "missing": missing_count,
                 }
             )
 
-        @self.bp.get("/table")
-        def table():
-            # Form data — unchanged from the previous index() implementation.
-            try:
-                langs = [x.to_dict() for x in list_langs()]
-                campaigns_records = list_categories()
-                campaigns = [x.to_dict() for x in campaigns_records]
-            except Exception:
-                logger.exception("Failed to load languages/campaigns for index page")
-                flash("Failed to load page data — please try again.", "danger")
-                langs = []
-                campaigns = []
-
-            # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
-            camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
-            cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
-
-            parsed = _parse_request_args(camps_data, cats_data)
-
-            # Identity / coordinator / full-translator flags — mirrors src/index.php.
-            user = load_user()
-            user_coord = bool(user and user.is_active_admin)
-            full_tr_user = bool(user and is_full_translator(user.username))
-
-            parsed_settings = parsed["settings"]
-
-            # PHP: only invoke results_loader_2026 when both code and camp are valid.
-            results_bundle = {}
-            if parsed["code"] and parsed["camp"] and parsed["code_lang_name"]:
-                try:
-                    results_bundle = results_loader_2026(
-                        code=parsed["code"],
-                        camp=parsed["camp"],
-                        cat=parsed["cat"],
-                        tra_type=parsed["tra_type"],
-                        code_lang_name=parsed["code_lang_name"],
-                        user_coord=user_coord,
-                        settings=parsed_settings,
-                        full_tr_user=full_tr_user,
-                    )
-                except Exception:
-                    logger.exception(
-                        "results_loader_2026 failed for code=%r camp=%r cat=%r",
-                        parsed["code"],
-                        parsed["camp"],
-                        parsed["cat"],
-                    )
-                    flash("Failed to load results — please try again.", "danger")
-
-            if results_bundle.get("summary_data"):
-                results_bundle["summary_data"]["code_lang_name"] = parsed["code_lang_name"]
-
-            return render_template(
-                "td/index.html",
-                settings=parsed_settings,
-                langs=langs,
-                campaigns=campaigns,
-                args={
-                    "code": parsed["code"],
-                    "camp": parsed["camp"],
-                    "type": parsed["tra_type"],
-                },
-                results=results_bundle,
-            )
-
-        @self.bp.get("/")
-        def index():
-            # Form data — unchanged from the previous index() implementation.
-            try:
-                langs = [x.to_dict() for x in list_langs()]
-                campaigns_records = list_categories()
-                campaigns = [x.to_dict() for x in campaigns_records]
-            except Exception:
-                logger.exception("Failed to load languages/campaigns for index page")
-                flash("Failed to load page data — please try again.", "danger")
-                langs = []
-                campaigns = []
-
-            # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
-            camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
-            cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
-
-            parsed = _parse_request_args(camps_data, cats_data)
-
-            return render_template(
-                "td/index.html",
-                settings=parsed["settings"],
-                langs=langs,
-                campaigns=campaigns,
-                args={
-                    "code": parsed["code"],
-                    "camp": parsed["camp"],
-                    "type": parsed["tra_type"],
-                },
-            )
-
-        @self.bp.get("/missing")
-        def missing():
-            # logic from src/missing.php — Top languages by missing articles in Category:RTT.
-            category = request.args.get("cat") or "RTT"
-
-            try:
-                stats = statics_by_category(category)
-            except Exception:
-                logger.exception("statics_by_category failed for cat=%r", category)
-                flash("Failed to load missing statistics — please try again.", "danger")
-                stats = []
-
-            try:
-                total = count_category_members(category)
-            except Exception:
-                logger.exception("count_category_members failed for cat=%r", category)
-                total = 0
-
-            # PHP merges per-language stats with the langs lookup (autonym + name).
-            langs_lookup: dict[str, dict] = {}
-            try:
-                for lang in list_langs():
-                    data = lang.to_dict()
-                    code = data.get("code")
-                    if code:
-                        langs_lookup[code] = data
-            except Exception:
-                logger.exception("list_langs failed while building missing-stats page")
-
-            rows: list[dict] = []
-            for stat in stats:
-                langcode = stat.get("language_code") or ""
-                if not langcode:
-                    continue
-                lang_data = langs_lookup.get(langcode, {})
-                autonym = lang_data.get("autonym") or "! autonym"
-                langname = lang_data.get("name") or "! langname"
-                exists = int(stat.get("available_title_count") or 0)
-                # PHP: $missing = (int)$length - (int)$exists;
-                missing_count = max(total - exists, 0)
-                rows.append(
-                    {
-                        "langcode": langcode,
-                        "langname": langname,
-                        "autonym": autonym,
-                        "exists": exists,
-                        "missing": missing_count,
-                    }
-                )
-
-            return render_template(
-                "td/missing.html",
-                category=category,
-                total=total,
-                rows=rows,
-            )
+        return render_template(
+            "td/missing.html",
+            category=category,
+            total=total,
+            rows=rows,
+        )
 
 
 __all__ = [

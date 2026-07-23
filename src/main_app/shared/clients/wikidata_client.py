@@ -7,16 +7,17 @@ import json
 import logging
 from typing import Any
 
-from ...db.models import QidRecord
 from ...config import settings
+from ...db.models import QidRecord
 from ...db.services.wikidata import QidService
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)
 
+
 def get_record_by_title(title: str) -> QidRecord | None:
     """Retrieve the record for a given page title."""
-    return QidService().get_record_by_title(title=title)
+    return QidService().get_record_by_title(title=title)  # type: ignore
 
 
 def get_qid_for_mdtitle(title: str) -> str | None:

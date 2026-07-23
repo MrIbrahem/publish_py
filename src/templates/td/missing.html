@@ -37,12 +37,12 @@
                             {{ row.autonym }}
                         </td>
                         <td>
-                            {{ "{:,}".format(row.exists) }}
+                            {{ row.exists | commas }}
                         </td>
                         <td data-search="{{ row.missing }}">
                             <a
                                 href="{{ url_for('td.index', cat=category, depth=1, doit='Do+it', code=row.langcode, type='lead') }}">
-                                {{ "{:,}".format(row.missing) }}
+                                {{ row.missing | commas }}
                             </a>
                         </td>
                     </tr>

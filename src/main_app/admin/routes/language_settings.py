@@ -120,25 +120,22 @@ class LanguageSettings:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        @admin_required
-        def dashboard():
-            return _language_settings_dashboard()
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.post("/add")(admin_required(self.add))
+        self.bp.post("/<int:setting_id>/update")(admin_required(self.update))
+        self.bp.post("/<int:setting_id>/delete")(admin_required(self.delete))
 
-        @self.bp.post("/add")
-        @admin_required
-        def add() -> ResponseReturnValue:
-            return _add_language_setting()
+    def dashboard(self):
+        return _language_settings_dashboard()
 
-        @self.bp.post("/<int:setting_id>/update")
-        @admin_required
-        def update(setting_id: int) -> ResponseReturnValue:
-            return _update_language_setting(setting_id)
+    def add(self) -> ResponseReturnValue:
+        return _add_language_setting()
 
-        @self.bp.post("/<int:setting_id>/delete")
-        @admin_required
-        def delete(setting_id: int) -> ResponseReturnValue:
-            return _delete_language_setting(setting_id)
+    def update(self, setting_id: int) -> ResponseReturnValue:
+        return _update_language_setting(setting_id)
+
+    def delete(self, setting_id: int) -> ResponseReturnValue:
+        return _delete_language_setting(setting_id)
 
 
 __all__ = [

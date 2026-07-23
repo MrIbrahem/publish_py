@@ -160,34 +160,30 @@ class UsersEmails:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        @admin_required
-        def dashboard():
-            return _dashboard()
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.post("/add")(admin_required(self.add))
+        self.bp.post("/<int:record_id>/delete")(admin_required(self.delete))
+        self.bp.post("/<int:record_id>/update")(admin_required(self.update))
+        self.bp.route("/<int:record_id>/edit", methods=["GET"])(admin_required(self.edit))
 
-        @self.bp.post("/add")
-        @admin_required
-        def add() -> ResponseReturnValue:
-            return _add_user()
+    def dashboard(self):
+        return _dashboard()
 
-        @self.bp.post("/<int:record_id>/delete")
-        @admin_required
-        def delete(record_id: int) -> ResponseReturnValue:
-            return _delete_user(record_id)
+    def add(self) -> ResponseReturnValue:
+        return _add_user()
 
-        @self.bp.post("/<int:record_id>/update")
-        @admin_required
-        def update(record_id: int) -> ResponseReturnValue:
-            return _update_record(record_id)
+    def delete(self, record_id: int) -> ResponseReturnValue:
+        return _delete_user(record_id)
 
-        @self.bp.route("/<int:record_id>/edit", methods=["GET"])
-        @admin_required
-        def edit(record_id: int) -> ResponseReturnValue:
-            user = get_user(record_id)
-            if not user:
-                flash(f"User with ID {record_id} not found.", "danger")
-                return redirect(url_for("admin.users_emails.dashboard"))
-            return render_template("admins/users_emails/edit.html", row=user)
+    def update(self, record_id: int) -> ResponseReturnValue:
+        return _update_record(record_id)
+
+    def edit(self, record_id: int) -> ResponseReturnValue:
+        user = get_user(record_id)
+        if not user:
+            flash(f"User with ID {record_id} not found.", "danger")
+            return redirect(url_for("admin.users_emails.dashboard"))
+        return render_template("admins/users_emails/edit.html", row=user)
 
 
 __all__ = [

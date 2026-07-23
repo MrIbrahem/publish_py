@@ -30,13 +30,13 @@ class StaticsRoutes:
             pages_count = page_service.count_translated()
         except Exception:
             logger.exception("Failed to count translated pages")
-            pages_count = 0
+            pages_count = None
 
         try:
             user_pages_count = user_page_service.count_translated()
         except Exception:
             logger.exception("Failed to count translated user pages")
-            user_pages_count = 0
+            user_pages_count = None
 
         return render_template(
             "admins/stat.html",

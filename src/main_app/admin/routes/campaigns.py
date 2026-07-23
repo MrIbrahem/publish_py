@@ -120,52 +120,50 @@ class CampaignsDashboard:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        @admin_required
-        def dashboard():
-            return _campaigns_dashboard()
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.post("/add")(admin_required(self.add_record))
+        self.bp.post("/update")(admin_required(self.update))
 
-        @self.bp.post("/add")
-        @admin_required
-        def add_record() -> ResponseReturnValue:
-            return _add_campaign_and_category()
+    def dashboard(self):
+        return _campaigns_dashboard()
 
-        @self.bp.post("/update")
-        @admin_required
-        def update() -> ResponseReturnValue:
-            default_cat = request.form.get("default_cat")
-            ids = request.form.getlist("rows[][id]")
-            campaigns = request.form.getlist("rows[][campaign]")
-            categories = request.form.getlist("rows[][category]")
-            categories2 = request.form.getlist("rows[][category2]")
-            depths = request.form.getlist("rows[][depth]")
-            displays = request.form.getlist("rows[][display]")
-            deletes = request.form.getlist("rows[][delete]")
+    def add_record(self) -> ResponseReturnValue:
+        return _add_campaign_and_category()
 
-            for i, id in enumerate(ids):
-                is_default = id == default_cat
-                record_id = int(id)
-                campaign = campaigns[i] if i < len(campaigns) else ""
-                category = categories[i] if i < len(categories) else ""
-                category2 = categories2[i] if i < len(categories2) else ""
-                display = displays[i] if i < len(displays) else ""
-                depth = depths[i] if i < len(depths) else 0
-                is_deleted = str(record_id) in deletes
+    def update(self) -> ResponseReturnValue:
+        default_cat = request.form.get("default_cat")
+        ids = request.form.getlist("rows[][id]")
+        campaigns = request.form.getlist("rows[][campaign]")
+        categories = request.form.getlist("rows[][category]")
+        categories2 = request.form.getlist("rows[][category2]")
+        depths = request.form.getlist("rows[][depth]")
+        displays = request.form.getlist("rows[][display]")
+        deletes = request.form.getlist("rows[][delete]")
 
-                if is_deleted:
-                    _delete_category(record_id)
-                elif category:
-                    _update_category(
-                        category_id=record_id,
-                        category=category,
-                        campaign=campaign,
-                        display=display,
-                        category2=category2,
-                        depth=depth,
-                        is_default=is_default,
-                    )
+        for i, id in enumerate(ids):
+            is_default = id == default_cat
+            record_id = int(id)
+            campaign = campaigns[i] if i < len(campaigns) else ""
+            category = categories[i] if i < len(categories) else ""
+            category2 = categories2[i] if i < len(categories2) else ""
+            display = displays[i] if i < len(displays) else ""
+            depth = depths[i] if i < len(depths) else 0
+            is_deleted = str(record_id) in deletes
 
-            return redirect(url_for("admin.campaigns.dashboard"))
+            if is_deleted:
+                _delete_category(record_id)
+            elif category:
+                _update_category(
+                    category_id=record_id,
+                    category=category,
+                    campaign=campaign,
+                    display=display,
+                    category2=category2,
+                    depth=depth,
+                    is_default=is_default,
+                )
+
+        return redirect(url_for("admin.campaigns.dashboard"))
 
 
 __all__ = [

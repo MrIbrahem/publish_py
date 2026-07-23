@@ -90,60 +90,58 @@ class FixRefsRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        def index() -> str:
-            return render_template(
-                "fixrefs/index.html",
-                result=None,
-                form={},
-            )
+        self.bp.route("/", methods=["GET"])(self.index)
+        self.bp.route("/test", methods=["GET"])(self.test)
+        oauth_required(self.bp.route("/", methods=["POST"])(self.process_new))
+        oauth_required(self.bp.route("/process", methods=["GET"])(self.process))
 
-        @oauth_required
-        @self.bp.route("/test", methods=["GET"])
-        def test() -> str:
-            tests_data = [
-                {
-                    "source_title": "Decitabine/cedazuridine",
-                    "title": "Decitabina/cedazuridina",
-                    "lang": "es",
-                    "mdwiki_revid": 1478161,
-                },
-                {
-                    "source_title": "Tropicamide",
-                    "title": "Usuario:Mr. Ibrahem/Tropicamida",
-                    "lang": "es",
-                    "mdwiki_revid": 1408734,
-                },
-                {
-                    "source_title": "Fatty liver disease",
-                    "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
-                    "lang": "hy",
-                    "mdwiki_revid": 1458412,
-                },
-            ]
-            item = random.choice(tests_data)
+    def index(self) -> str:
+        return render_template(
+            "fixrefs/index.html",
+            result=None,
+            form={},
+        )
 
-            return render_template(
-                "fixrefs/index.html",
-                **item,
-                form={
-                    "infobox": 1,
-                },
-            )
+    def test(self) -> str:
+        tests_data = [
+            {
+                "source_title": "Decitabine/cedazuridine",
+                "title": "Decitabina/cedazuridina",
+                "lang": "es",
+                "mdwiki_revid": 1478161,
+            },
+            {
+                "source_title": "Tropicamide",
+                "title": "Usuario:Mr. Ibrahem/Tropicamida",
+                "lang": "es",
+                "mdwiki_revid": 1408734,
+            },
+            {
+                "source_title": "Fatty liver disease",
+                "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
+                "lang": "hy",
+                "mdwiki_revid": 1458412,
+            },
+        ]
+        item = random.choice(tests_data)
 
-        @oauth_required
-        @self.bp.route("/", methods=["POST"])
-        def process_new() -> str:
-            data = request.form.to_dict()
-            logger.info("Processing text with settings: %s", data)
-            return _process(data)
+        return render_template(
+            "fixrefs/index.html",
+            **item,
+            form={
+                "infobox": 1,
+            },
+        )
 
-        @oauth_required
-        @self.bp.route("/process", methods=["GET"])
-        def process() -> str:
-            data = request.args
-            logger.info("Processing text with settings: %s", data)
-            return _process(data)
+    def process_new(self) -> str:
+        data = request.form.to_dict()
+        logger.info("Processing text with settings: %s", data)
+        return _process(data)
+
+    def process(self) -> str:
+        data = request.args
+        logger.info("Processing text with settings: %s", data)
+        return _process(data)
 
 
 __all__ = [
