@@ -10,7 +10,6 @@ from .allqid_service import (
 from .qid_others_service import (
     QidOthersService,
     add_qid_other,
-    get_page_qid_other,
     update_qid_other,
 )
 from .qid_service import (
@@ -19,7 +18,7 @@ from .qid_service import (
     get_by_id,
     get_by_qid,
     get_by_title,
-    get_page_qid,
+    get_record_by_title,
     get_title_to_qid,
     insert,
     list_qid_records,
@@ -35,7 +34,6 @@ __all__ = [
     "add_qid_other",
     "update_qid_other",
     "delete_qid_other",
-    "get_page_qid_other",
     "list_records",
     "list_qid_records",
     "get_title_to_qid",
@@ -47,5 +45,5 @@ __all__ = [
     "add_qid",
     "update_qid",
     "delete_qid",
-    "get_page_qid",
+    "get_record_by_title",
 ]

@@ -55,7 +55,44 @@ def update_qid_other(qid_id: int, title: str, qid: str) -> QidOthersRecord:
     return orm_obj
 
 
-def get_page_qid_other(title: str) -> QidOthersRecord | None:
+def update_record(qid_id: int, title: str, qid: str) -> bool:
+    """Update an existing qids_others row by primary key."""
+    title = (title or "").strip()
+    qid = (qid or "").strip()
+
+    if not qid_id or not title or not qid:
+        return False
+
+    orm_obj = None
+
+    try:
+        orm_obj = db.session.get(QidOthersRecord, qid_id)
+    except Exception:
+        logger.exception("Failed to update qid id=%r", qid_id)
+        return False
+
+    if not orm_obj:
+        return False
+
+    orm_obj.title = title
+    orm_obj.qid = qid
+
+    try:
+        orm_obj.validate()
+    except Exception:
+        logger.exception("Failed to validate")
+        return False
+
+    try:
+        db.session.commit()
+        return True
+    except Exception:
+        logger.exception("Failed to update qids_others id=%r", qid_id)
+        db.session.rollback()
+        return False
+
+
+def get_record_by_title(title: str) -> QidOthersRecord | None:
     """Get the QID for a page title."""
     orm_obj = db.session.query(QidOthersRecord).filter(QidOthersRecord.title == title).first()
     if not orm_obj:
@@ -143,44 +180,6 @@ def insert(title: str, qid: str) -> bool:
         db.session.rollback()
         return False
 
-
-def update_record(qid_id: int, title: str, qid: str) -> bool:
-    """Update an existing qids_others row by primary key."""
-    title = (title or "").strip()
-    qid = (qid or "").strip()
-
-    if not qid_id or not title or not qid:
-        return False
-
-    orm_obj = None
-
-    try:
-        orm_obj = db.session.get(QidOthersRecord, qid_id)
-    except Exception:
-        logger.exception("Failed to update qid id=%r", qid_id)
-        return False
-
-    if not orm_obj:
-        return False
-
-    orm_obj.title = title
-    orm_obj.qid = qid
-
-    try:
-        orm_obj.validate()
-    except Exception:
-        logger.exception("Failed to validate")
-        return False
-
-    try:
-        db.session.commit()
-        return True
-    except Exception:
-        logger.exception("Failed to update qids_others id=%r", qid_id)
-        db.session.rollback()
-        return False
-
-
 def list_qid_records() -> list[QidOthersRecord]:
     """Return all QID records (legacy alias kept for compatibility)."""
     return db.session.query(QidOthersRecord).order_by(QidOthersRecord.id.asc()).all()
@@ -203,9 +202,9 @@ class QidOthersService:
         """Update an existing QID record by its ID."""
         return update_qid_other(qid_id=qid_id, title=title, qid=qid)
 
-    def get_page_qid_other(self, title: str) -> QidOthersRecord | None:
+    def get_record_by_title(self, title: str) -> QidOthersRecord | None:
         """Retrieve the QID record for a given page title."""
-        return get_page_qid_other(title=title)
+        return get_record_by_title(title=title)
 
     def list_records(self, dis: str = "all") -> list[QidOthersRecord]:
         """List QID records with optional filtering (all, empty, duplicate)."""
@@ -244,7 +243,7 @@ __all__ = [
     "QidOthersService",
     "add_qid_other",
     "update_qid_other",
-    "get_page_qid_other",
+    "get_record_by_title",
     "list_records",
     "list_qid_records",
     "get_title_to_qid",

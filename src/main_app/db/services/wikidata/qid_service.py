@@ -55,7 +55,44 @@ def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
     return orm_obj
 
 
-def get_page_qid(title: str) -> QidRecord | None:
+def update_record(qid_id: int, title: str, qid: str) -> bool:
+    """Update an existing qids row by primary key."""
+    title = (title or "").strip()
+    qid = (qid or "").strip()
+
+    if not qid_id or not title or not qid:
+        return False
+
+    orm_obj = None
+
+    try:
+        orm_obj = db.session.get(QidRecord, qid_id)
+    except Exception:
+        logger.exception("Failed to update qid id=%r", qid_id)
+        return False
+
+    if not orm_obj:
+        return False
+
+    orm_obj.title = title
+    orm_obj.qid = qid
+
+    try:
+        orm_obj.validate()
+    except Exception:
+        logger.exception("Failed to validate")
+        return False
+
+    try:
+        db.session.commit()
+        return True
+    except Exception:
+        logger.exception("Failed to update qid id=%r", qid_id)
+        db.session.rollback()
+        return False
+
+
+def get_record_by_title(title: str) -> QidRecord | None:
     """Get the QID for a page title."""
     orm_obj = db.session.query(QidRecord).filter(QidRecord.title == title).first()
     if not orm_obj:
@@ -140,44 +177,6 @@ def insert(title: str, qid: str) -> bool:
         db.session.rollback()
         return False
 
-
-def update_record(qid_id: int, title: str, qid: str) -> bool:
-    """Update an existing qids row by primary key."""
-    title = (title or "").strip()
-    qid = (qid or "").strip()
-
-    if not qid_id or not title or not qid:
-        return False
-
-    orm_obj = None
-
-    try:
-        orm_obj = db.session.get(QidRecord, qid_id)
-    except Exception:
-        logger.exception("Failed to update qid id=%r", qid_id)
-        return False
-
-    if not orm_obj:
-        return False
-
-    orm_obj.title = title
-    orm_obj.qid = qid
-
-    try:
-        orm_obj.validate()
-    except Exception:
-        logger.exception("Failed to validate")
-        return False
-
-    try:
-        db.session.commit()
-        return True
-    except Exception:
-        logger.exception("Failed to update qid id=%r", qid_id)
-        db.session.rollback()
-        return False
-
-
 def list_qid_records() -> list[QidRecord]:
     """Return all QID records (legacy alias kept for compatibility)."""
     return db.session.query(QidRecord).order_by(QidRecord.id.asc()).all()
@@ -192,7 +191,7 @@ def get_title_to_qid() -> dict[str, str]:
 class QidService:
     """Service class for managing QID records."""
 
-    def add_qid(self, title: str, qid: str) -> QidRecord:
+    def add(self, title: str, qid: str) -> QidRecord:
         """Add or update a QID record for a given title."""
         return add_qid(title=title, qid=qid)
 
@@ -200,9 +199,9 @@ class QidService:
         """Update an existing QID record by its ID."""
         return update_qid(qid_id=qid_id, title=title, qid=qid)
 
-    def get_page_qid(self, title: str) -> QidRecord | None:
+    def get_record_by_title(self, title: str) -> QidRecord | None:
         """Retrieve the QID record for a given page title."""
-        return get_page_qid(title=title)
+        return get_record_by_title(title=title)
 
     def list_records(self, dis: str = "all") -> list[QidRecord]:
         """List QID records with optional filtering (all, empty, duplicate)."""
@@ -241,7 +240,7 @@ __all__ = [
     "QidService",
     "add_qid",
     "update_qid",
-    "get_page_qid",
+    "get_record_by_title",
     "list_records",
     "list_qid_records",
     "get_title_to_qid",

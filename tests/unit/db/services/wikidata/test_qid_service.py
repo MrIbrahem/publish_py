@@ -10,7 +10,7 @@ from src.main_app.db.services.wikidata.qid_service import (
     add_qid,
     get_by_qid,
     get_by_title,
-    get_page_qid,
+    get_record_by_title,
     get_title_to_qid,
     insert,
     list_records,
@@ -27,7 +27,7 @@ def test_qid_workflow():
     assert q.qid == "Q2"
 
     # Test get
-    q2 = get_page_qid("Earth")
+    q2 = get_record_by_title("Earth")
     assert q2.qid == "Q2"
 
     # Test list
@@ -44,22 +44,22 @@ def test_qid_workflow():
 
     # Test delete
     delete_qid(q.id)
-    assert get_page_qid("World") is None
+    assert get_record_by_title("World") is None
 
 
 class TestGetPageQid:
-    """Tests for get_page_qid function."""
+    """Tests for get_record_by_title function."""
 
     def test_returns_qid_record(self, monkeypatch):
         """Test that function returns a QidRecord."""
         add_qid("Mars", "Q111")
-        result = get_page_qid("Mars")
+        result = get_record_by_title("Mars")
         assert isinstance(result, QidRecord)
         assert result.qid == "Q111"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         """Test that function returns None when QID not found."""
-        result = get_page_qid("Nonexistent Planet")
+        result = get_record_by_title("Nonexistent Planet")
         assert result is None
 
 

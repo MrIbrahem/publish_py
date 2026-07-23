@@ -8,7 +8,7 @@ import logging
 from typing import Any
 
 from ...config import settings
-from ...db.services.wikidata import get_page_qid
+from ...db.services.wikidata import get_record_by_title
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def get_qid_for_mdtitle(title: str) -> str | None:
     Returns:
         QID string or None if not found
     """
-    qid_obj = get_page_qid(title)
+    qid_obj = get_record_by_title(title)
     if qid_obj:
         return qid_obj.qid
 
