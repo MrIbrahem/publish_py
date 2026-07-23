@@ -1,5 +1,5 @@
 """
-SQLAlchemy-based service for managing qids_others table.
+SQLAlchemy-based service for managing QIDs.
 """
 
 from __future__ import annotations
@@ -8,6 +8,8 @@ import logging
 
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
+
+from ..delete_service import delete_record_by_pk
 
 from ....extensions import db
 from ...models import QidOthersRecord
@@ -222,18 +224,10 @@ class QidOthersService:
         """Update an existing record and return success status as boolean."""
         return update_record(qid_id=qid_id, title=title, qid=qid)
 
+    def delete(self, qid_id: int) -> bool:
+        return delete_record_by_pk(ServiceRecord, qid_id)
+
 
 __all__ = [
     "QidOthersService",
-    "add_or_update_qid",
-    "get_by_id",
-    "get_by_qid",
-    "get_by_title",
-    "get_record_by_title",
-    "get_title_to_qid",
-    "insert",
-    "list_qid_records",
-    "list_records",
-    "update_qid",
-    "update_record",
 ]
