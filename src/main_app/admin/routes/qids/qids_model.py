@@ -52,11 +52,11 @@ class QidsModel:
     def __init__(
         self,
         endpoint: str,
-        url_prefix: str,
+        bp: Blueprint,
         title_label: str,
         service,
     ) -> None:
-        self.bp = Blueprint(endpoint, __name__, url_prefix=url_prefix)
+        self.bp = bp
         self.endpoint = endpoint
         self.title_label = title_label
         self.service = service

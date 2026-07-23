@@ -94,8 +94,8 @@ def _delete_project(record_id: int) -> None:
 
 
 class ProjectsDashboard:
-    def __init__(self) -> None:
-        self.bp = Blueprint("projects", __name__, url_prefix="/projects")
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -131,10 +131,6 @@ class ProjectsDashboard:
             return redirect(url_for("admin.projects.dashboard"))
 
 
-projects_module = ProjectsDashboard()
-
-
 __all__ = [
     "ProjectsDashboard",
-    "projects_module",
 ]

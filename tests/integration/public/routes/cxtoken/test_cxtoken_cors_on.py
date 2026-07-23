@@ -7,7 +7,7 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pytest
-from flask import Flask
+from flask import Blueprint, Flask
 from flask.testing import FlaskClient
 
 from src.main_app.config import TestingConfig
@@ -29,9 +29,12 @@ def mock_app() -> Flask:
 
     db.init_app(mock_app)
 
-    from src.main_app.public.routes.cxtoken.routes import bp_cxtoken
+    from src.main_app.public.routes.cxtoken.routes import CxTokenRoutes
 
-    mock_app.register_blueprint(bp_cxtoken)
+    bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
+    cx_model = CxTokenRoutes(bp_cxtoken)
+
+    mock_app.register_blueprint(cx_model.bp)
     return mock_app
 
 

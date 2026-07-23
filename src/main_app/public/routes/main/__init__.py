@@ -1,5 +1,5 @@
-from .routes import bp_main
+from .routes import MainRoutes
 
 __all__ = [
-    "bp_main",
+    "MainRoutes",
 ]

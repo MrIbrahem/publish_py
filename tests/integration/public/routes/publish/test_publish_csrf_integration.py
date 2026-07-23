@@ -8,6 +8,7 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
+from flask import Blueprint
 from flask.app import Flask
 
 
@@ -43,10 +44,12 @@ def csrf_app() -> Flask:
         db.metadata.create_all(db.engine, tables=real_tables)
 
     csrf = CSRFProtect(mock_app)
-    from src.main_app.public.routes.publish.routes import bp_publish
+    from src.main_app.public.routes.publish.routes import PublishRoutes
 
-    mock_app.register_blueprint(bp_publish)
-    csrf.exempt(bp_publish)
+    publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
+
+    mock_app.register_blueprint(publish_model.bp)
+    csrf.exempt(publish_model.bp)
 
     return mock_app
 

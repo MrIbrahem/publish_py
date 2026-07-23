@@ -1,4 +1,5 @@
 import functools
+from typing import Any
 from urllib.parse import urlparse
 
 import validators
@@ -17,7 +18,7 @@ def is_domain(text: str):
     return validators.domain(text)
 
 
-def _validate_url(text: str) -> str:
+def _validate_url(text: str | Any) -> str:
     if not text or not isinstance(text, str):
         return ""
 

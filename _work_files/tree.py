@@ -12,7 +12,6 @@ skip_list = [
     "example.env",
     "*.html",
     "*.php",
-    "results_api_php_code",
 ]
 
 tree: str = DisplayTree(

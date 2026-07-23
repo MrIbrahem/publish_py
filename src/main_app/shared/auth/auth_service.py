@@ -24,6 +24,9 @@ class OAuthCallbackError(Exception):
 
 def extract_token_credentials(access_token: AccessToken | Any) -> tuple[str, str]:
     """Extract key/secret from an OAuth access token object."""
+    if not access_token:
+        raise OAuthCallbackError("Missing OAuth credentials")
+
     token_key = getattr(access_token, "key", None)
     token_secret = getattr(access_token, "secret", None)
 

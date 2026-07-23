@@ -11,30 +11,34 @@ from flask import (
     render_template,
     send_from_directory,
 )
+from flask.wrappers import Response
 
-bp_main = Blueprint("main", __name__, url_prefix="")
 logger = logging.getLogger(__name__)
 
 
-@bp_main.get("/")
-def index():
-    return render_template(
-        "index.html",
-    )
+class MainRoutes:
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        self._setup_routes()
 
+    def _setup_routes(self) -> None:
+        @self.bp.route("/", methods=["GET"])
+        def index() -> str:
+            return render_template(
+                "index.html",
+            )
 
-@bp_main.get("/reports")
-def reports():
-    return render_template(
-        "reports.html",
-    )
+        @self.bp.route("/reports", methods=["GET"])
+        def reports():
+            return render_template(
+                "reports.html",
+            )
 
-
-@bp_main.get("/favicon.ico")
-def favicon():
-    return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
+        @self.bp.get("/favicon.ico")
+        def favicon() -> Response:
+            return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
 
 
 __all__ = [
-    "bp_main",
+    "MainRoutes",
 ]

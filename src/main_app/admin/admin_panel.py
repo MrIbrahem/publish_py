@@ -21,11 +21,11 @@ from .sidebar import create_side
 logger = logging.getLogger(__name__)
 
 
-class AdminPanelRoutes:
+class AdminPanel:
     """admin panel routes."""
 
-    def __init__(self) -> None:
-        self.bp = Blueprint("admin", __name__, url_prefix="/admin")
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -99,9 +99,6 @@ class AdminPanelRoutes:
             return {"sidebar": sidebar_html}
 
 
-admin_route_module = AdminPanelRoutes()
-
-
 __all__ = [
-    "admin_route_module",
+    "AdminPanel",
 ]

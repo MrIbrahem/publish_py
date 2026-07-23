@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from ...db.models.users import UserRecord
+from ...db.models import UserRecord
 from ...db.services.users import (
     create_user,
     get_authenticated_user_token,

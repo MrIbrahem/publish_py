@@ -115,8 +115,8 @@ def _delete_category(record_id: int) -> None:
 
 
 class CampaignsDashboard:
-    def __init__(self) -> None:
-        self.bp = Blueprint("campaigns", __name__, url_prefix="/campaigns")
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -168,10 +168,6 @@ class CampaignsDashboard:
             return redirect(url_for("admin.campaigns.dashboard"))
 
 
-campaigns_module = CampaignsDashboard()
-
-
 __all__ = [
     "CampaignsDashboard",
-    "campaigns_module",
 ]

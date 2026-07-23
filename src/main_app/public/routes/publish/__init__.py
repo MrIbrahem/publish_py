@@ -1,5 +1,5 @@
-from .routes import bp_publish
+from .routes import PublishRoutes
 
 __all__ = [
-    "bp_publish",
+    "PublishRoutes",
 ]

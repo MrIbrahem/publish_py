@@ -18,10 +18,10 @@ def csrf_init_app(app: Flask) -> None:
     csrf.init_app(app)
 
 
-def csrf_exempt(app: Flask, bp_publish: Blueprint) -> None:
+def csrf_exempt(app: Flask, _bp: Blueprint) -> None:
     """Exempt a blueprint from CSRF protection."""
     if app.config.get("WTF_CSRF_ENABLED"):
-        csrf.exempt(bp_publish)
+        csrf.exempt(_bp)
 
 
 __all__ = [

@@ -101,8 +101,8 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
 
 
 class FullTranslators:
-    def __init__(self) -> None:
-        self.bp = Blueprint("full_translators", __name__, url_prefix="/full_translators")
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -133,10 +133,6 @@ class FullTranslators:
             return _set_record_active_status(record_id, False)
 
 
-fulltranslators_module = FullTranslators()
-
-
 __all__ = [
     "FullTranslators",
-    "fulltranslators_module",
 ]

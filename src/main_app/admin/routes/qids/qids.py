@@ -8,9 +8,25 @@ from __future__ import annotations
 
 import logging
 
+from flask import Blueprint
+
 from ....db.services.wikidata import qid_service
 from .qids_model import QidsModel
 
 logger = logging.getLogger(__name__)
 
-qids_module = QidsModel(endpoint="qids", url_prefix="/qids", title_label="TD Qids", service=qid_service)
+
+class QidsRoutes(QidsModel):
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        super().__init__(
+            endpoint="qids",
+            bp=bp,
+            title_label="TD Qids",
+            service=qid_service,
+        )
+
+
+__all__ = [
+    "QidsRoutes",
+]

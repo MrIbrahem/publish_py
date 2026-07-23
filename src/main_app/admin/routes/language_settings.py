@@ -115,8 +115,8 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
 
 
 class LanguageSettings:
-    def __init__(self) -> None:
-        self.bp = Blueprint("language_settings", __name__, url_prefix="/language_settings")
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -141,10 +141,6 @@ class LanguageSettings:
             return _delete_language_setting(setting_id)
 
 
-languagesettings_module = LanguageSettings()
-
-
 __all__ = [
     "LanguageSettings",
-    "languagesettings_module",
 ]
