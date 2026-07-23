@@ -26,6 +26,7 @@ class TestSetup:
         Insert a row with an empty qid column (model __init__ rejects ``""``).
         """
         record = self.service.add_or_update(title, "Q999")
+        assert record is not None
         record.qid = ""
         _db.session.commit()
         return record # type: ignore
@@ -36,6 +37,7 @@ class TestQidOthersService(TestSetup):
     def test_qid_workflow(self):
         # Test add
         q = self.service.add_or_update("Earth", "Q2")
+        assert q is not None
         assert q.title == "Earth"
         assert q.qid == "Q2"
 
@@ -54,6 +56,7 @@ class TestQidOthersService(TestSetup):
 
         # Test self.service.update_record
         updated = self.service.update(q.id, "World", "Q2")
+        assert updated is not None
         assert updated.title == "World"
 
         # Test delete
@@ -88,12 +91,15 @@ class TestAddQid(TestSetup):
     def test_adds_qid_and_returns_record(self, monkeypatch):
         """Test that self.service.add_or_update adds a QID and returns the record."""
         record = self.service.add_or_update("Jupiter", "Q121")
+        assert record is not None
         assert record.title == "Jupiter"
         assert record.qid == "Q121"
 
     def test_updates_existing_qid(self, monkeypatch):
         self.service.add_or_update("Venus", "Q1")
         updated = self.service.add_or_update("Venus", "Q2")
+        assert updated is not None
+
         assert updated.qid == "Q2"
 
 
@@ -103,7 +109,11 @@ class TestUpdateQid(TestSetup):
     def test_updates_qid_and_returns_record(self, monkeypatch):
         """Test that self.service.update updates and returns the record."""
         q = self.service.add_or_update("Saturn", "Q193")
+        assert q is not None
+
         updated = self.service.update(q.id, "Saturnian System", "Q193")
+        assert updated is not None
+
         assert updated.title == "Saturnian System"
         assert updated.qid == "Q193"
 
@@ -118,6 +128,8 @@ class TestDeleteQid(TestSetup):
     def test_deletes_qid(self, monkeypatch):
         """Test that self.service.delete calls store delete."""
         q = self.service.add_or_update("Uranus", "Q324")
+        assert q is not None
+
         self.service.delete(q.id)
         assert not any(x.id == q.id for x in self.service.list_records())
 
@@ -252,6 +264,8 @@ class TestInsert(TestSetup):
 
     def test_does_not_overwrite_existing_non_empty_qid(self, monkeypatch):
         record = self.service.add_or_update("Already_set", "Q302")
+        assert record is not None
+
         ok = self.service.insert("Already_set", "Q303")
         assert ok is True  # PHP returns success even when no-op.
         _db.session.refresh(record)
@@ -276,8 +290,11 @@ class TestUpdate(TestSetup):
 
     def test_updates_existing_row(self, monkeypatch):
         record = self.service.add_or_update("Old_title", "Q400")
+        assert record is not None
+
         ok = self.service.update_record(record.id, "New_title", "Q401")
         assert ok is True
+
         _db.session.refresh(record)
         assert record.title == "New_title"
         assert record.qid == "Q401"
@@ -288,6 +305,8 @@ class TestUpdate(TestSetup):
 
     def test_returns_false_when_title_or_qid_blank(self, monkeypatch):
         record = self.service.add_or_update("Solid", "Q500")
+        assert record is not None
+
         assert self.service.update_record(record.id, "", "Q1") is False
         assert self.service.update_record(record.id, "T", "") is False
 

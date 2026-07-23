@@ -113,7 +113,7 @@ def update_record(model: type[ServiceRecord], qid_id: int, title: str, qid: str)
         return False
 
 
-def get_record_by_title(model: type[ServiceRecord], title: str):
+def get_record_by_title(model: type[ServiceRecord], title: str) -> None | ServiceRecord:
     """Get the QID for a page title."""
     orm_obj = db.session.query(model).filter(model.title == title).first()
     if not orm_obj:
