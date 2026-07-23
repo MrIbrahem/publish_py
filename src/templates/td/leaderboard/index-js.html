@@ -20,7 +20,7 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row g-2">
-        <form method="get" action="{{ url_for('leaderboard.index2') }}" id="leaderboard_filter">
+        <form method="get" action="{{ url_for('leaderboard.index') }}" id="leaderboard_filter">
             <div class="row g-2">
                 <div class="col-md-3">
                     <span align="center">
@@ -72,23 +72,23 @@
                         <tbody>
                             <tr>
                                 <td><b>Users</b></td>
-                                <td><span id="c_user">{{ numbers_summary.users }}</span></td>
+                                <td><span id="c_user">{{ numbers_summary.users | commas }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Articles</b></td>
-                                <td><span id="c_articles">{{ numbers_summary.articles }}</span></td>
+                                <td><span id="c_articles">{{ numbers_summary.articles | commas }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Words</b></td>
-                                <td><span id="c_words">{{ numbers_summary.words }}</span></td>
+                                <td><span id="c_words">{{ numbers_summary.words | commas }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Languages</b></td>
-                                <td><span id="c_lang">{{ numbers_summary.languages }}</span></td>
+                                <td><span id="c_lang">{{ numbers_summary.languages | commas }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Pageviews</b></td>
-                                <td><span id="c_pv">{{ numbers_summary.pageviews }}</span></td>
+                                <td><span id="c_pv">{{ numbers_summary.pageviews | commas }}</span></td>
                             </tr>
                         </tbody>
                     </table>

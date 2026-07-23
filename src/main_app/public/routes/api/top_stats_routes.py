@@ -52,7 +52,7 @@ def apply_filters(form: FormData, query: Query) -> Query:
     return query
 
 
-def get_top_langs(request_args: MultiDict[str, str]) -> dict[str, str] | dict[str, Any]:
+def get_top_langs(request_args: MultiDict[str, str]) -> dict[str, Any]:
     """
     Handle top_langs API requests.
     Returns aggregated statistics per language.
@@ -184,7 +184,7 @@ def get_top_langs(request_args: MultiDict[str, str]) -> dict[str, str] | dict[st
     return response_data
 
 
-def get_top_users(request_args: MultiDict[str, str]) -> dict[str, str] | dict[str, Any]:
+def get_top_users(request_args: MultiDict[str, str]) -> dict[str, Any]:
     """
     Handle top_users API requests.
     Returns aggregated statistics per user.

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import func, text
+from sqlalchemy import desc, func, text
 
 from ....extensions import db
 from ...models import CategoryRecord, PageRecord, UserRecord
@@ -126,7 +126,7 @@ def get_pages(
     return [dict(row._mapping) for row in rows]
 
 
-def top_lang_of_users(username: str) -> dict[str, int]:
+def top_lang_of_user(username: str) -> dict[str, int]:
     """
     SELECT
         p.user,
@@ -157,6 +157,46 @@ def top_lang_of_users(username: str) -> dict[str, int]:
     )
     result = {row.lang: row.cnt for row in data}
     return result
+
+
+def top_lang_of_users() -> list[dict[Any, Any]]:
+    """
+    SELECT
+        p.user,
+        p.lang,
+        COUNT(p.target) AS count
+    FROM
+        pages p
+    WHERE
+        p.target != ''
+        AND p.target IS NOT NULL
+    GROUP BY
+        p.user,
+        p.lang
+    result_example: { "user": "DaSupremo", "lang": "gpe", "count": 451 }
+    """
+    ranked = (
+        db.session.query(
+            PageRecord.user,
+            PageRecord.lang,
+            func.count(PageRecord.target).label("count"),
+            func.row_number()
+            .over(partition_by=PageRecord.user, order_by=func.count(PageRecord.target).desc())
+            .label("rn"),
+        )
+        .filter(PageRecord.target != "", PageRecord.target.isnot(None))
+        .group_by(PageRecord.user, PageRecord.lang)
+        .subquery()
+    )
+
+    data = (
+        db.session.query(ranked.c.user, ranked.c.lang, ranked.c.count)
+        .filter(ranked.c.rn == 1)
+        .order_by(desc(ranked.c.count))
+        .all()
+    )
+    result_list = [dict(x._mapping) for x in data]
+    return result_list
 
 
 def get_leaderboard_chart_data(
@@ -246,7 +286,7 @@ __all__ = [
     "get_months_of_pages_years",
     "list_of_users_by_translations_count",
     "get_pages",
-    "top_lang_of_users",
+    "top_lang_of_user",
     "get_leaderboard_chart_data",
     "get_chart_data_formatted",
 ]
