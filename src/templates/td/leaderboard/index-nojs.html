@@ -1,0 +1,373 @@
+{% extends "td/td_base.html" %}
+{% from "_macros.html" import select_options, card_header %}
+
+{% macro filter_select(id, options, selected, label=None, width='col-md-4', wrapper_class='input-group', default_label='All') %}
+<div class="{{ width }}">
+    <div class="{{ wrapper_class }}">
+        {% if label %}
+        <span class="input-group-text">{{ label }}</span>
+        {% endif %}
+        <select dir="ltr" id="{{ id }}" name="{{ id }}" class="form-select" data-bs-theme="auto">
+            <option value="all">{{ default_label }}</option>
+            {% if options %}
+            {{ select_options(options, selected) }}
+            {% endif %}
+        </select>
+    </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row g-2">
+        <form method="get" action="{{ url_for('leaderboard.index2') }}" id="leaderboard_filter">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <span align="center">
+                        <h3>Leaderboard</h3>
+                    </span>
+                </div>
+                <div class="col-md-8">
+                    <div class="row">
+                        {{ filter_select('camp', form_data.campaigns, selected_data.camp, label='Campaign') }}
+                        {{ filter_select('user_group', form_data.user_groups, selected_data.user_group, label='Translators') }}
+                        <div class="col-md-4">
+                            <div class="row">
+                                {% set width='col-md-8 col-sm-6' if selected_data.year and selected_data.year != "all" else 'col-md-12' %}
+                                {{ filter_select('year', form_data.years, selected_data.year, label='Year', width=width) }}
+                                {% if selected_data.year and selected_data.year != "all" %}
+                                {{ filter_select('month', form_data.months, selected_data.month, width='col-md-4 col-sm-6') }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="aligncenter col-md-1 col-sm-3">
+                    <input class="btn btn-outline-primary" type="submit" value="Filter">
+                </div>
+            </div>
+        </form>
+
+        <hr />
+        <div class="col-md-3">
+            <div class="card card2 mb-3">
+                <div class="card-header">
+                    <span class="card-title" style="font-weight:bold;">
+                        Numbers
+                    </span>
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body1 card2">
+                    <table class='table compact table-striped table_text_left leaderboard_tables'>
+                        <thead>
+                            <tr>
+                                <th class="spannowrap">Type</th>
+                                <th>Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>Users</b></td>
+                                <td><span id="c_user">{{ numbers_summary.users }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Articles</b></td>
+                                <td><span id="c_articles">{{ numbers_summary.articles }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Words</b></td>
+                                <td><span id="c_words">{{ numbers_summary.words }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Languages</b></td>
+                                <td><span id="c_lang">{{ numbers_summary.languages }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Pageviews</b></td>
+                                <td><span id="c_pv">{{ numbers_summary.pageviews }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header aligncenter" style="font-weight:bold;">
+                    Translation by month
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body1 card5px">
+                    <div class="position-relative">
+                        <canvas id="chart09" height="200" class="invert-on-dark"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card card2 mb-3">
+                <div class="card-header">
+                    <span class="card-title" style="font-weight:bold;">
+                        Top users by number of translation
+                    </span>
+                    <div style='float: right'>
+                        <button type="button" class="btn-tool" href="#" data-bs-toggle="modal"
+                            data-bs-target="#targets">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body1 card2">
+                    <table class='table compact table-striped table_text_left leaderboard_tables' id='Topusers'
+                        style='margin-top: 0px !important;margin-bottom: 0px !important'>
+                        <thead>
+                            <tr>
+                                <th class="spannowrap">#</th>
+                                <th class="spannowrap">User</th>
+                                <th>Number</th>
+                                <th>Words</th>
+                                <th>Pageviews</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card2 mb-3">
+                <div class="card-header">
+                    <span class="card-title" style="font-weight:bold;">
+                        Top languages by number of Articles
+                    </span>
+                    <div class="card-tools">
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body1 card2">
+                    <table class='table compact table-striped table_text_left leaderboard_tables' id='Toplangs'
+                        style='margin-top: 0px !important;margin-bottom: 0px !important'>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class='spannowrap'>Language</th>
+                                <th>Count</th>
+                                <!-- <th>Words</th> -->
+                                <th>Pageviews</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="targets" tabindex="-1" role="dialog" aria-labelledby="2716" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="2716"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"><textarea cols='55' rows='10' id='users_targets' name='users_targets'>cc</textarea>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-outline-primary" onclick="copy_target_text('users_targets')">Copy</a>
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function copy_target_text(id) {
+        let textarea = document.getElementById(id);
+        textarea.select();
+        document.execCommand("copy");
+    }
+    // when page ready
+    $(document).ready(async function () {
+        $('.sortable').DataTable({
+            stateSave: true,
+            paging: false,
+            info: false,
+            searching: false
+        });
+        // ---
+        const campaign_to_categories = {};
+        // ---
+        async function get_categories() {
+            const response = await fetch('/api/categories');
+            const data = await response.json();
+
+            data.results.forEach(item => {
+                campaign_to_categories[item.campaign] = item.category;
+            });
+        }
+        // ---
+        function getFormData(d) {
+            const formData = $('#leaderboard_filter').serializeArray();
+            formData.forEach(field => {
+                if (field.value.trim()) {
+                    d[field.name] = field.value;
+                }
+            });
+            // ---
+            d["cat"] = campaign_to_categories[d["camp"]] ?? '';
+            // ---
+            return d;
+        }
+        // ---
+        await get_categories();
+        // ---
+        $('#Topusers').DataTable({
+            stateSave: true,
+            paging: false,
+            info: false,
+            searching: false,
+            ajax: {
+                url: '/api/top_users',
+                data: getFormData,
+                dataSrc: function (json) {
+                    // احتساب الإجماليات
+                    let totalUsers = json.results.length;
+                    let totalTargets = 0;
+                    let totalWords = 0;
+                    let totalViews = 0;
+
+                    json.results.forEach(function (row) {
+                        totalTargets += Number(row.targets) || 0;
+                        totalWords += Number(row.words) || 0;
+                        totalViews += Number(row.views) || 0;
+                    });
+
+                    // تحديث عناصر HTML
+                    $('#c_user').text(totalUsers.toLocaleString());
+                    $('#c_articles').text(totalTargets.toLocaleString());
+                    $('#c_words').text(totalWords.toLocaleString());
+                    $('#c_pv').text(totalViews.toLocaleString());
+
+                    return json.results;
+                }
+            },
+            columns: [{ // رقم تسلسلي تلقائي
+                data: null,
+                title: '#',
+                render: function (data, type, row, meta) {
+                    return meta.row + 1;
+                },
+                className: 'dt-center'
+            },
+            {
+                data: 'user',
+                title: 'User',
+                render: function (data, type) {
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('leaderboard.users', username='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${data}</a>`;
+                }
+            },
+            {
+                data: 'targets',
+                title: 'Number',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            },
+            {
+                data: 'words',
+                title: 'Words',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            },
+            {
+                data: 'views',
+                title: 'Pageviews',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            }
+            ]
+        });
+        // ---
+        $('#Toplangs').DataTable({
+            stateSave: true,
+            paging: false,
+            info: false,
+            searching: false,
+            ajax: {
+                url: '/api/top_langs',
+                data: getFormData,
+                dataSrc: function (json) {
+                    let total = json.results.length;
+                    $('#c_lang').text(total);
+
+                    return json.results;
+                }
+            },
+            columns: [{ // رقم تسلسلي تلقائي
+                data: null,
+                title: '#',
+                render: function (data, type, row, meta) {
+                    return meta.row + 1;
+                },
+                className: 'dt-center'
+            },
+            {
+                data: 'lang',
+                title: 'Language',
+                render: function (data, type, row, meta) {
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('leaderboard.langs', lang_code='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${row.lang_name}</a>`;
+                }
+            },
+            {
+                data: 'targets',
+                title: 'Count',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            },
+            // { data: 'words', visible: false },
+            {
+                data: 'views',
+                title: 'Pageviews',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            }
+            ]
+        });
+        // ---
+        render_graph(JSON.parse('{{ chart_data|tojson }}'), 'chart09');
+        // ---
+    })
+</script>
+{% endblock %}

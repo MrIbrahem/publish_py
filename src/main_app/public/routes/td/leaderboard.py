@@ -64,6 +64,13 @@ class LeaderBoardRoutes:
 
             pages_rows = []
 
+            numbers_summary = {
+                "users": 0,
+                "articles": 0,
+                "words": 0,
+                "languages": 0,
+                "pageviews": 0,
+            }
             return render_template(
                 "td/leaderboard/index.html",
                 # data to use in form
@@ -72,6 +79,58 @@ class LeaderBoardRoutes:
                 chart_data=chart_data,
                 # main data
                 pages=pages_rows,
+                numbers_summary=numbers_summary,
+            )
+
+        @self.bp.get("/2")
+        def index2() -> str:
+            year = request.args.get("year", type=int)
+            # month = request.args.get("month", type=int)
+            camp = request.args.get("camp", type=str)
+            user_group = request.args.get("user_group", type=str)
+
+            campaign_to_cats = get_camp_to_cats()
+            campaigns = campaign_to_cats.keys()
+            years: list[int] = get_pages_years()
+            months: list[int] = get_months_of_pages_years(year) if year else []
+            user_groups = [x.g_title for x in list_projects()]
+
+            cat = campaign_to_cats.get(camp) if camp and camp != "all" else None
+
+            chart_data = get_chart_data_formatted(
+                camp=camp if camp != "all" else None,
+                cat=cat,
+                user_group=user_group if user_group != "all" else None,
+                year=year,
+                # month=month, # dont filter chart by month
+            )
+
+            form_selected_data = request.args
+            form_data = {
+                "campaigns": campaigns,
+                "years": years,
+                "months": months,
+                "user_groups": user_groups,
+            }
+
+            pages_rows = []
+
+            numbers_summary = {
+                "users": 0,
+                "articles": 0,
+                "words": 0,
+                "languages": 0,
+                "pageviews": 0,
+            }
+            return render_template(
+                "td/leaderboard/index-nojs.html",
+                # data to use in form
+                form_data=form_data,
+                selected_data=form_selected_data,
+                chart_data=chart_data,
+                # main data
+                pages=pages_rows,
+                numbers_summary=numbers_summary,
             )
 
         @self.bp.get("/langs/<string:lang_code>")
@@ -91,7 +150,6 @@ class LeaderBoardRoutes:
                 lang=lang_code,
                 year=selected_year,
             )
-
             return render_template(
                 "td/leaderboard/langs.html",
                 lang_code=lang_code,
