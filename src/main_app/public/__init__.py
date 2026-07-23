@@ -2,6 +2,9 @@
 Public Blueprints
 """
 
+from dataclasses import dataclass, field
+from typing import Any
+
 from flask import Blueprint, Flask
 
 from ..extensions import csrf_exempt
@@ -17,41 +20,33 @@ from .routes import (
 )
 
 
+@dataclass(frozen=True)
+class PublicRouteModule:
+    route_cls: type
+    name: str
+    url_prefix: str = ""
+    extra_kwargs: dict[str, Any] = field(default_factory=dict)
+
+
+PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
+    PublicRouteModule(MainRoutes, "main"),
+    PublicRouteModule(AuthRoutes, "auth", "/auth"),
+    PublicRouteModule(ApiRoutes, "api", "/api"),
+    PublicRouteModule(CxTokenRoutes, "cxtoken", "/cxtoken"),
+    PublicRouteModule(FixRefsRoutes, "fixrefs", "/fixrefs"),
+    PublicRouteModule(TDRoutes, "td", "/Translation_Dashboard"),
+    PublicRouteModule(LeaderBoardRoutes, "leaderboard", "/Translation_Dashboard/leaderboard"),
+]
+
+
 def register_blueprints(app: Flask) -> None:
-    bp_main = Blueprint("main", __name__)
-    main_model = MainRoutes(bp_main)
-
-    bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
-    auth_model = AuthRoutes(bp_auth)
-
-    bp_api = Blueprint("api", __name__, url_prefix="/api")
-    api_model = ApiRoutes(bp_api)
-
-    bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
-    cx_model = CxTokenRoutes(bp_cxtoken)
-
-    bp_leaderboard = Blueprint("leaderboard", __name__, url_prefix="/leaderboard")
-    leaderboard_model = LeaderBoardRoutes(bp_leaderboard)
-
-    bp_td = Blueprint("td", __name__, url_prefix="/Translation_Dashboard")
-    td_model = TDRoutes(bp_td)
-
-    bp_td.register_blueprint(leaderboard_model.bp)
+    for module in PUBLIC_ROUTE_MODULES:
+        bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
+        route_instance = module.route_cls(bp=bp, **module.extra_kwargs)
+        app.register_blueprint(route_instance.bp)
 
     publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
-
-    bp_fixrefs = Blueprint("fixrefs", __name__, url_prefix="/fixrefs")
-    fixrefs_model = FixRefsRoutes(bp_fixrefs)
-
-    app.register_blueprint(main_model.bp)
-    app.register_blueprint(api_model.bp)
-    app.register_blueprint(auth_model.bp)
-    app.register_blueprint(td_model.bp)
-    app.register_blueprint(cx_model.bp)
-
     app.register_blueprint(publish_model.bp)
-    app.register_blueprint(fixrefs_model.bp)
-
     csrf_exempt(app, publish_model.bp)
 
 

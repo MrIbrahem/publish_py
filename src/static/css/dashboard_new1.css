@@ -224,6 +224,7 @@ a {
 }
 
 .card.collapsed-card .card-body,
+.card.collapsed-card .card-body1,
 .card.collapsed-card .card-footer {
 	display: none;
 }

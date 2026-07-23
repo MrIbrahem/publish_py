@@ -35,7 +35,7 @@
                         </a>
                     </li>
                     <li class="{{ nav_item_class }}">
-                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('td.leaderboard.index') }}"
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('leaderboard.index') }}"
                             target="_blank">
                             <span class="navtitles">Leaderboard</span>
                         </a>
@@ -57,7 +57,7 @@
                 </ul>
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
                     {% if current_username %}
-                    {% set profile_href = url_for('td.leaderboard.users', username=current_username) %}
+                    {% set profile_href = url_for('leaderboard.users', username=current_username) %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
                         <a href="{{ profile_href }}"
                             class="nav-link py-2 px-0 px-lg-2 {{ profile_href | check_active_route }}">

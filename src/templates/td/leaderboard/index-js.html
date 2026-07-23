@@ -132,7 +132,7 @@
                     </div>
                 </div>
                 <div class="card-body1 card2">
-                    <table class='table compact table-striped table_text_left leaderboard_tables sortable' id='Topusers'
+                    <table class='table compact table-striped table_text_left leaderboard_tables' id='Topusers'
                         style='margin-top: 0px !important;margin-bottom: 0px !important'>
                         <thead>
                             <tr>
@@ -144,29 +144,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% if result and result.users %}
-                            {% for row in result.users %}
-                            <tr>
-                                <th>
-                                    {{ loop.index }}
-                                </th>
-                                <td>
-                                    <a href="{{ url_for('leaderboard.users', username=row.user) }}">
-                                        {{ row.user }}
-                                    </a>
-                                </td>
-                                <td>
-                                    {{ row.targets | commas }}
-                                </td>
-                                <td>
-                                    {{ row.words | commas }}
-                                </td>
-                                <td>
-                                    {{ row.views | commas }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% endif %}
                         </tbody>
                         <tfoot>
                         </tfoot>
@@ -188,7 +165,7 @@
                     </div>
                 </div>
                 <div class="card-body1 card2">
-                    <table class='table compact table-striped table_text_left leaderboard_tables sortable' id='Toplangs'
+                    <table class='table compact table-striped table_text_left leaderboard_tables' id='Toplangs'
                         style='margin-top: 0px !important;margin-bottom: 0px !important'>
                         <thead>
                             <tr>
@@ -200,26 +177,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% if result and result.langs %}
-                            {% for row in result.langs %}
-                            <tr>
-                                <th>
-                                    {{ loop.index }}
-                                </th>
-                                <td>
-                                    <a href="{{ url_for('leaderboard.langs', lang_code=row.lang) }}">
-                                        {{ row.lang_name }}
-                                    </a>
-                                </td>
-                                <td>
-                                    {{ row.targets | commas }}
-                                </td>
-                                <td>
-                                    {{ row.views | commas }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -228,26 +185,14 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="targets" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="targets" tabindex="-1" role="dialog" aria-labelledby="2716" aria-hidden="true">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">
-                    Targets
-                </h3>
+                <h6 class="modal-title" id="2716"></h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <textarea cols='70' rows='10' id='users_targets' name='users_targets'>
-                {%- if result and result.users -%}
-                {%- for row in result.users -%}
-                    {%- if result.users_top_langs and result.users_top_langs[row.user] -%}
-                        {%- set user_top_lang = result.users_top_langs[row.user] -%}
-                        {{ "#{{#target:User:" ~ row.user ~ "|" ~ user_top_lang.lang ~ ".wikipedia.org}} # " ~ user_top_lang.count ~ "\n"}}
-                    {%- endif -%}
-                {%- endfor -%}
-                {%- endif -%}
-            </textarea>
+            <div class="modal-body"><textarea cols='55' rows='10' id='users_targets' name='users_targets'>cc</textarea>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-outline-primary" onclick="copy_target_text('users_targets')">Copy</a>
@@ -273,7 +218,160 @@
             info: false,
             searching: false
         });
+        // ---
+        const campaign_to_categories = {};
+        // ---
+        async function get_categories() {
+            const response = await fetch('/api/categories');
+            const data = await response.json();
+
+            data.results.forEach(item => {
+                campaign_to_categories[item.campaign] = item.category;
+            });
+        }
+        // ---
+        function getFormData(d) {
+            const formData = $('#leaderboard_filter').serializeArray();
+            formData.forEach(field => {
+                if (field.value.trim()) {
+                    d[field.name] = field.value;
+                }
+            });
+            // ---
+            d["cat"] = campaign_to_categories[d["camp"]] ?? '';
+            // ---
+            return d;
+        }
+        // ---
+        await get_categories();
+        // ---
+        $('#Topusers').DataTable({
+            stateSave: true,
+            paging: false,
+            info: false,
+            searching: false,
+            ajax: {
+                url: '/api/top_users',
+                data: getFormData,
+                dataSrc: function (json) {
+                    // احتساب الإجماليات
+                    let totalUsers = json.results.length;
+                    let totalTargets = 0;
+                    let totalWords = 0;
+                    let totalViews = 0;
+
+                    json.results.forEach(function (row) {
+                        totalTargets += Number(row.targets) || 0;
+                        totalWords += Number(row.words) || 0;
+                        totalViews += Number(row.views) || 0;
+                    });
+
+                    // تحديث عناصر HTML
+                    $('#c_user').text(totalUsers.toLocaleString());
+                    $('#c_articles').text(totalTargets.toLocaleString());
+                    $('#c_words').text(totalWords.toLocaleString());
+                    $('#c_pv').text(totalViews.toLocaleString());
+
+                    return json.results;
+                }
+            },
+            columns: [{ // رقم تسلسلي تلقائي
+                data: null,
+                title: '#',
+                render: function (data, type, row, meta) {
+                    return meta.row + 1;
+                },
+                className: 'dt-center'
+            },
+            {
+                data: 'user',
+                title: 'User',
+                render: function (data, type) {
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('leaderboard.users', username='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${data}</a>`;
+                }
+            },
+            {
+                data: 'targets',
+                title: 'Number',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            },
+            {
+                data: 'words',
+                title: 'Words',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            },
+            {
+                data: 'views',
+                title: 'Pageviews',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            }
+            ]
+        });
+        // ---
+        $('#Toplangs').DataTable({
+            stateSave: true,
+            paging: false,
+            info: false,
+            searching: false,
+            ajax: {
+                url: '/api/top_langs',
+                data: getFormData,
+                dataSrc: function (json) {
+                    let total = json.results.length;
+                    $('#c_lang').text(total);
+
+                    return json.results;
+                }
+            },
+            columns: [{ // رقم تسلسلي تلقائي
+                data: null,
+                title: '#',
+                render: function (data, type, row, meta) {
+                    return meta.row + 1;
+                },
+                className: 'dt-center'
+            },
+            {
+                data: 'lang',
+                title: 'Language',
+                render: function (data, type, row, meta) {
+                    // Generate the URL via Flask with a placeholder, then replace it dynamically in JS
+                    const baseUrl = "{{ url_for('leaderboard.langs', lang_code='PLACEHOLDER') }}";
+                    const finalUrl = baseUrl.replace('PLACEHOLDER', data);
+
+                    return `<a href="${finalUrl}">${row.lang_name}</a>`;
+                }
+            },
+            {
+                data: 'targets',
+                title: 'Count',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            },
+            // { data: 'words', visible: false },
+            {
+                data: 'views',
+                title: 'Pageviews',
+                render: function (data) {
+                    return Number(data).toLocaleString();
+                }
+            }
+            ]
+        });
+        // ---
         render_graph(JSON.parse('{{ chart_data|tojson }}'), 'chart09');
+        // ---
     })
 </script>
 {% endblock %}

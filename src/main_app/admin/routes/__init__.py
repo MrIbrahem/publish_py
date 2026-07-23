@@ -1,5 +1,8 @@
 """Admin blueprint package."""
 
+from dataclasses import dataclass, field
+from typing import Any
+
 from .add_translate import AddTranslateRoutes
 from .campaigns import CampaignsDashboard
 from .coordinators import CoordinatorsRoutes
@@ -18,22 +21,35 @@ from .tt import TranslateTypeRoutes
 from .users_emails import UsersEmails
 from .users_no_inprocess import UsersNoInprocess
 
+
+@dataclass(frozen=True)
+class AdminRouteModule:
+    route_cls: type
+    name: str
+    url_prefix: str = ""
+    extra_kwargs: dict[str, Any] = field(default_factory=dict)
+
+
+ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
+    AdminRouteModule(CoordinatorsRoutes, "coordinators", "/coordinators"),
+    AdminRouteModule(TranslateTypeRoutes, "tt", "/tt"),
+    AdminRouteModule(TranslatedRoutes, "translated", "/translated"),
+    AdminRouteModule(TranslatedUsersRoutes, "translated_users", "/translated_users"),
+    AdminRouteModule(StaticsRoutes, "stat", "/stat"),
+    AdminRouteModule(PagesUsersMainRoutes, "pages_users_to_main", "/pages_users_to_main"),
+    AdminRouteModule(EmailMsgRoutes, "email_msg", "/email_msg"),
+    AdminRouteModule(AddTranslateRoutes, "add", "/add"),
+    AdminRouteModule(ProjectsDashboard, "projects", "/projects"),
+    AdminRouteModule(CampaignsDashboard, "campaigns", "/campaigns"),
+    AdminRouteModule(FullTranslators, "full_translators", "/full_translators"),
+    AdminRouteModule(LanguageSettings, "language_settings", "/language_settings"),
+    AdminRouteModule(SettingsRoutes, "settings", "/settings"),
+    AdminRouteModule(UsersEmails, "users_emails", "/users_emails"),
+    AdminRouteModule(UsersNoInprocess, "users_no_inprocess", "/users_no_inprocess"),
+    AdminRouteModule(QidsRoutes, "qids", "/qids"),
+    AdminRouteModule(QidsOthersRoutes, "qids_others", "/qids_others"),
+]
+
 __all__ = [
-    "CoordinatorsRoutes",
-    "AddTranslateRoutes",
-    "EmailMsgRoutes",
-    "PagesUsersMainRoutes",
-    "ProjectsDashboard",
-    "QidsRoutes",
-    "QidsOthersRoutes",
-    "StaticsRoutes",
-    "TranslatedRoutes",
-    "TranslatedUsersRoutes",
-    "TranslateTypeRoutes",
-    "UsersEmails",
-    "UsersNoInprocess",
-    "SettingsRoutes",
-    "CampaignsDashboard",
-    "FullTranslators",
-    "LanguageSettings",
+    "ADMIN_ROUTE_MODULES",
 ]

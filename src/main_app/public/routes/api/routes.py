@@ -14,7 +14,7 @@ from marshmallow import ValidationError
 
 from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
 from ....db.services.content import list_categories, list_langs
-from ....db.services.pages import get_in_process_counts_by_user, list_of_users_by_translations_count
+from ....db.services.pages import get_in_process_counts_by_user, list_of_users_by_translations_count, top_lang_of_users
 from ....db.services.pages_query_service import list_pages_users, list_pages_with_views
 from ....db.services.reports import query_reports_with_filters
 from ....db.services.users import users_search
@@ -426,8 +426,33 @@ class ApiRoutes:
         self.bp.route("/status", methods=["GET"])(leaderboard_status)
 
         # Register top_stats routes
-        self.bp.route("/top_langs", methods=["GET"])(get_top_langs)
-        self.bp.route("/top_users", methods=["GET"])(get_top_users)
+        @self.bp.route("/top_langs", methods=["GET"])
+        @check_cors
+        def _get_top_langs() -> tuple[Response, int] | Response:
+            data = get_top_langs(request.args)
+            if data.get("error"):
+                return jsonify(data), 500
+
+            return jsonify(data)
+
+        @self.bp.route("/top_users", methods=["GET"])
+        @check_cors
+        def _get_top_users() -> tuple[Response, int] | Response:
+            data = get_top_users(request.args)
+            if data.get("error"):
+                return jsonify(data), 500
+
+            return jsonify(data)
+
+        @self.bp.route("/top_lang_of_users", methods=["GET"])
+        @check_cors
+        def _get_top_lang_of_users() -> tuple[Response, int] | Response:
+            try:
+                data = top_lang_of_users()
+            except Exception:
+                logger.exception("Error fetching top_lang_of_users data")
+                return jsonify({"error": "An internal error occurred"}), 500
+            return jsonify(data)
 
         self.bp.route("/publish_reports", methods=["GET"])(check_cors(get_publish_reports))
         self.bp.route("/publish_reports/stats", methods=["GET"])(check_cors(publish_reports_stats))

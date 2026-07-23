@@ -137,7 +137,7 @@ def _make_missing_row_dict(
     *,
     title: str,
     title_data: dict,
-    cnt: int,
+    count: int,
     is_full_row: bool,
     tra_type: str,
     langcode: str,
@@ -161,8 +161,8 @@ def _make_missing_row_dict(
         is_video_title=is_video_title,
     )
 
-    # PHP "$cnt2 = $full && (substr != 'video:') ? '$cnt.Full' : $cnt"
-    display_n: str = f"{cnt}.Full" if is_full_row and not is_video_title else str(cnt)
+    # PHP "$count = $full && (substr != 'video:') ? '$count.Full' : $count"
+    display_n: str = f"{count}.Full" if is_full_row and not is_video_title else str(count)
 
     return {
         "n": display_n,
@@ -202,7 +202,7 @@ def _build_missing_rows(
             items_by_title[title] = row
 
     rows: list[dict[str, Any]] = []
-    cnt = 1
+    numb = 1
 
     for title, title_data in items_by_title.items():
         if not title:
@@ -213,7 +213,7 @@ def _build_missing_rows(
         primary_row = _make_missing_row_dict(
             title=display_title,
             title_data=title_data,
-            cnt=cnt,
+            count=numb,
             is_full_row=False,
             tra_type=tra_type,
             langcode=langcode,
@@ -225,7 +225,7 @@ def _build_missing_rows(
         # PHP: "if (!$do_full || $full_tr_user) { emit and continue; }"
         if not do_full or full_tr_user:
             rows.append(primary_row)
-            cnt += 1
+            numb += 1
             continue
 
         no_lead = display_title in nolead_titles
@@ -243,7 +243,7 @@ def _build_missing_rows(
                 _make_missing_row_dict(
                     title=display_title,
                     title_data=title_data,
-                    cnt=cnt,
+                    count=numb,
                     is_full_row=True,
                     tra_type="all",
                     langcode=langcode,
@@ -253,7 +253,7 @@ def _build_missing_rows(
                 )
             )
 
-        cnt += 1
+        numb += 1
 
     return rows
 
@@ -327,7 +327,7 @@ def _build_inprocess_rows(
 ) -> list[dict[str, Any]]:
     """Mirror of PHP ``make_results_table_inprocess``."""
     rows: list[dict[str, Any]] = []
-    cnt = 1
+    numb = 1
 
     for title, title_tab in inprocess.items():
         if not title:
@@ -360,7 +360,7 @@ def _build_inprocess_rows(
 
         rows.append(
             {
-                "n": str(cnt),
+                "n": str(numb),
                 "title": display_title,
                 "translate_html": translate_html,
                 "en_views": en_views,
@@ -374,7 +374,7 @@ def _build_inprocess_rows(
             }
         )
 
-        cnt += 1
+        numb += 1
 
     return rows
 
@@ -398,7 +398,7 @@ def _build_exists_rows(
     Returns ``(rows, count_translated, count_translated_before)``.
     """
     rows: list[dict[str, Any]] = []
-    cnt = 1
+    numb = 1
     count_translated = 0
     count_translated_before = 0
 
@@ -431,7 +431,7 @@ def _build_exists_rows(
 
         rows.append(
             {
-                "n": str(cnt),
+                "n": str(numb),
                 "display_title": display_title,
                 "translate_html": translate_html,
                 "translated_html": translated_html,
@@ -440,7 +440,7 @@ def _build_exists_rows(
             }
         )
 
-        cnt += 1
+        numb += 1
 
     return rows, count_translated, count_translated_before
 
