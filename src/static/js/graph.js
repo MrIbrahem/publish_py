@@ -5,7 +5,14 @@
  * @param {string} _id
  */
 function graph_js(_labels, _data, _id) {
-
+    if (_data.length == 0) {
+        console.log("graph_js: No data")
+        return
+    }
+    if (_labels.length == 0) {
+        console.log("graph_js: No labels")
+        return
+    }
     var ticksStyle = {
         fontColor: '#495057',
         fontStyle: 'bold'
