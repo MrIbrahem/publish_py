@@ -78,7 +78,7 @@
 {% set url = "https://pageviews.wmcloud.org/?project=" ~ lang ~ ".wikipedia.org&platform=all-access&agent=all-agents&start=" ~ (pupdate or '2019-01-01') ~ "&end=" ~ yesterday ~ "&redirects=0&pages=" ~ (target | replace(' ', '_') | urlencode) %}
 {% if views %}
 <a href="{{ url }}" target="_blank">
-    {{ "{:,}".format(views) }}
+    {{ views | commas }}
 </a>
 {% else %}
 {# Formats pupdate by removing dashes, or defaults to '20190101' #}

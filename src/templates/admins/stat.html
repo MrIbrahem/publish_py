@@ -13,7 +13,7 @@
                 <div class="card text-center h-100">
                     <div class="card-body">
                         <h5 class="card-title">Translated Pages (Main)</h5>
-                        <p class="display-6 mb-0">{{ "{:,}".format(pages_count) }}</p>
+                        <p class="display-6 mb-0">{{ pages_count | commas }}</p>
                     </div>
                 </div>
             </div>
@@ -21,7 +21,7 @@
                 <div class="card text-center h-100">
                     <div class="card-body">
                         <h5 class="card-title">Translated Pages (User)</h5>
-                        <p class="display-6 mb-0">{{ "{:,}".format(user_pages_count) }}</p>
+                        <p class="display-6 mb-0">{{ user_pages_count | commas }}</p>
                     </div>
                 </div>
             </div>
