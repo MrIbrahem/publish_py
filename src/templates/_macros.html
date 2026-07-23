@@ -1,3 +1,69 @@
+{# Shared Jinja macros. #}
+{%- macro commons_file_link(filename, label="") -%}
+{% if filename %}
+<a href="https://commons.wikimedia.org/wiki/File:{{ filename | replace('File:', '') | replace(' ', '_') | urlencode }}"
+    target="_blank" rel="noopener noreferrer">
+    {% if label %}
+    {{ label }}
+    {% else %}
+    File:{{ filename | replace('File:', '') }}
+    {% endif %}
+</a>
+{% endif %}
+{%- endmacro -%}
+
+{%- macro csrf() -%}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{%- endmacro -%}
+
+{%- macro flash_messages() -%}
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+<div class="container">
+    <div class="alert-stack mb-4">
+        {% for category, message in messages %}
+        {% set bs_class = {'message':'info','warning':'warning','danger':'danger','error':'danger','success':'success','info':'info'}.get(category.lower(), 'info') %}
+        <div class="alert alert-{{ bs_class }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+{%- endmacro -%}
+
+{# Card header macro for collapsible cards #}
+{% macro card_header_leaderboard(title, sub_title="") %}
+<span class='card-title h5'>{{ title|safe }}</span>
+{% if sub_title %}
+<span>
+    {{ sub_title }}
+</span>
+{% endif %}
+<div class="card-tools">
+    <button type="button" class="btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+    </button>
+</div>
+{% endmacro %}
+
+{# Card header macro for collapsible cards #}
+{% macro card_header(title, sub_title="") %}
+<span class='card-title h5'>{{ title|safe }}</span>
+{% if sub_title %}
+<span>
+    {{ sub_title }}
+</span>
+{% endif %}
+<div class="card-tools">
+    <button type="button" class="btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+    </button>
+</div>
+{% endmacro %}
+
 {% macro select_options(data, selectd) %}
 {% for item in data %}
 <option value="{{ item }}" {% if item | string == selectd | string %} selected {% endif %}>{{ item }}</option>

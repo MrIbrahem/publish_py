@@ -1,5 +1,5 @@
 {% extends "td/td_base.html" %}
-{% from "_macros.html" import select_options %}
+{% from "_macros.html" import select_options, card_header %}
 
 {% block content %}
 <div class="container-fluid">
@@ -47,7 +47,7 @@
                                         {% endif %}
                                     </select>
                                 </div>
-                                {% if selected_data.year %}
+                                {% if selected_data.year and selected_data.year != "all" %}
                                 <div class="input-group w-50">
                                     <select dir="ltr" id="month" name="month" class="form-select" data-bs-theme="auto">
                                         <option value="All">All</option>
@@ -74,12 +74,10 @@
                     <span class="card-title" style="font-weight:bold;">
                         Numbers
                     </span>
-                    <div style='float: right'>
-
-                    </div>
                     <div class="card-tools">
-                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                class="fas fa-minus"></i></button>
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="card-body1 card2">
@@ -119,8 +117,9 @@
                 <div class="card-header aligncenter" style="font-weight:bold;">
                     Translation by month
                     <div class="card-tools">
-                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                class="fas fa-minus"></i></button>
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="card-body1 card5px">
@@ -143,8 +142,9 @@
                         </button>
                     </div>
                     <div class="card-tools">
-                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                class="fas fa-minus"></i></button>
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="card-body1 card2">
@@ -173,12 +173,10 @@
                     <span class="card-title" style="font-weight:bold;">
                         Top languages by number of Articles
                     </span>
-                    <div style='float: right'>
-
-                    </div>
                     <div class="card-tools">
-                        <button type="button" class="btn-tool" data-card-widget="collapse"><i
-                                class="fas fa-minus"></i></button>
+                        <button type="button" class="btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="card-body1 card2">

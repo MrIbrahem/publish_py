@@ -1,5 +1,6 @@
 {# Orchestrator partial — port of src/backend/results_2026/index.php (Results_tables_2026 + card_result). #}
 {# `results` is the bundle returned by results_loader_2026(). #}
+{% from "_macros.html" import card_header %}
 
 {% macro results_summary(data) %}
 {#
@@ -19,15 +20,7 @@ Found {{ data.total }} pages in
 <br>
 <div class="card">
     <div class="card-header">
-        <span class="card-title h5">Results: ({{ results.summary_count }}{% if results.test %}test:{% endif %})</span>
-        <span>
-            {{ results_summary(results.summary_data) }}
-        </span>
-        <div class="card-tools">
-            <button type="button" class="btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
+        {{ card_header("Results: (" ~ results.summary_count ~ ")", results_summary(results.summary_data)) }}
     </div>
     <div class="card-body1 card2">
         {% include "results_2026/_results_table.html" %}
@@ -39,12 +32,7 @@ Found {{ data.total }} pages in
 <br>
 <div class="card">
     <div class="card-header">
-        <span class="card-title h5">In process: ({{ results.inprocess_count }})</span>
-        <div class="card-tools">
-            <button type="button" class="btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
+        {{ card_header("In process: (" ~ results.inprocess_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
         {% include "results_2026/_inprocess_table.html" %}
@@ -57,12 +45,7 @@ Found {{ data.total }} pages in
 <br>
 <div class="card">
     <div class="card-header">
-        <span class="card-title h5">Exists: ({{ results.exists_count }})</span>
-        <div class="card-tools">
-            <button type="button" class="btn-tool" data-card-widget="collapse">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
+        {{ card_header("Exists: (" ~ results.exists_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
         {% include "results_2026/_exists_table.html" %}
