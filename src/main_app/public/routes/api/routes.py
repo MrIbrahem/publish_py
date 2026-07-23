@@ -426,8 +426,23 @@ class ApiRoutes:
         self.bp.route("/status", methods=["GET"])(leaderboard_status)
 
         # Register top_stats routes
-        self.bp.route("/top_langs", methods=["GET"])(get_top_langs)
-        self.bp.route("/top_users", methods=["GET"])(get_top_users)
+        @self.bp.route("/top_langs", methods=["GET"])
+        @check_cors
+        def _get_top_langs() -> tuple[Response, int] | Response:
+            data = get_top_langs(request.args)
+            if data.get("error"):
+                return jsonify(data), 500
+
+            return jsonify(data)
+
+        @self.bp.route("/top_users", methods=["GET"])
+        @check_cors
+        def _get_top_users() -> tuple[Response, int] | Response:
+            data = get_top_users(request.args)
+            if data.get("error"):
+                return jsonify(data), 500
+
+            return jsonify(data)
 
         self.bp.route("/publish_reports", methods=["GET"])(check_cors(get_publish_reports))
         self.bp.route("/publish_reports/stats", methods=["GET"])(check_cors(publish_reports_stats))

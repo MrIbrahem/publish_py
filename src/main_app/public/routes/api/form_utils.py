@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
+from werkzeug.datastructures import MultiDict
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +22,7 @@ class FormData:
     month: int | None
 
 
-def get_form(request_args) -> FormData:
+def get_form(request_args: MultiDict[str, str]) -> FormData:
     # limit
     limit = request_args.get("limit", type=int)
 
@@ -47,6 +49,7 @@ def get_form(request_args) -> FormData:
     lang = request_args.get("lang", default="all", type=str)
     if lang.lower() == "all":
         lang = None
+
     return FormData(
         limit=limit,
         user_group=user_group,

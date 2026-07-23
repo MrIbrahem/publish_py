@@ -72,23 +72,23 @@
                         <tbody>
                             <tr>
                                 <td><b>Users</b></td>
-                                <td><span id="c_user">0</span></td>
+                                <td><span id="c_user">{{ numbers_summary.users }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Articles</b></td>
-                                <td><span id="c_articles">0</span></td>
+                                <td><span id="c_articles">{{ numbers_summary.articles }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Words</b></td>
-                                <td><span id="c_words">0</span></td>
+                                <td><span id="c_words">{{ numbers_summary.words }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Languages</b></td>
-                                <td><span id="c_lang">0</span></td>
+                                <td><span id="c_lang">{{ numbers_summary.languages }}</span></td>
                             </tr>
                             <tr>
                                 <td><b>Pageviews</b></td>
-                                <td><span id="c_pv">0</span></td>
+                                <td><span id="c_pv">{{ numbers_summary.pageviews }}</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -181,11 +181,31 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="targets" tabindex="-1" role="dialog" aria-labelledby="2716" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="2716"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"><textarea cols='55' rows='10' id='users_targets' name='users_targets'>cc</textarea>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-outline-primary" onclick="copy_target_text('users_targets')">Copy</a>
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    function copy_target_text(id) {
+        let textarea = document.getElementById(id);
+        textarea.select();
+        document.execCommand("copy");
+    }
     // when page ready
     $(document).ready(async function () {
         $('.sortable').DataTable({

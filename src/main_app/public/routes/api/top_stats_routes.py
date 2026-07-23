@@ -10,9 +10,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from flask import Response, jsonify, request
 from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
+from werkzeug.datastructures import MultiDict
 
 from ....db.models import (
     CategoryRecord,
@@ -23,16 +23,12 @@ from ....db.models import (
     WordRecord,
 )
 from ....extensions import db
-from ....shared.core.cors import check_cors
 from .form_utils import FormData, get_form
 
 logger = logging.getLogger(__name__)
 
 
-def apply_filters(
-    form: FormData,
-    query: Query,
-) -> Query:
+def apply_filters(form: FormData, query: Query) -> Query:
     if form.cat:
         query = query.filter(PageRecord.cat == form.cat)
     elif form.camp:
@@ -56,8 +52,7 @@ def apply_filters(
     return query
 
 
-@check_cors
-def get_top_langs() -> Response:
+def get_top_langs(request_args: MultiDict[str, str]) -> dict[str, str] | dict[str, Any]:
     """
     Handle top_langs API requests.
     Returns aggregated statistics per language.
@@ -112,7 +107,7 @@ def get_top_langs() -> Response:
 
     # /api/top_langs?camp=Video&user_group=all&year=all&month=All&cat=RTTVideo
 
-    form = get_form(request.args)
+    form = get_form(request_args)
 
     try:
         # Build the word count expression
@@ -163,7 +158,7 @@ def get_top_langs() -> Response:
 
     except Exception:
         logger.exception("Error fetching top_langs data")
-        return jsonify({"error": "An internal error occurred while fetching top_langs data"}), 500  # type: ignore
+        return {"error": "An internal error occurred while fetching top_langs data"}
 
     try:
         # Convert results to list of dicts
@@ -179,18 +174,17 @@ def get_top_langs() -> Response:
         ]
     except Exception:
         logger.exception("Error processing top_langs data")
-        return jsonify({"error": "An internal error occurred while processing top_langs data"}), 500  # type: ignore
+        return {"error": "An internal error occurred while processing top_langs data"}
 
     response_data = {
         "results": data,
         "count": len(data),
     }
 
-    return jsonify(response_data)
+    return response_data
 
 
-@check_cors
-def get_top_users() -> Response:
+def get_top_users(request_args: MultiDict[str, str]) -> dict[str, str] | dict[str, Any]:
     """
     Handle top_users API requests.
     Returns aggregated statistics per user.
@@ -242,7 +236,7 @@ def get_top_users() -> Response:
         JSON response with user statistics
     """
 
-    form = get_form(request.args)
+    form = get_form(request_args)
 
     try:
         # Build the word count expression
@@ -291,7 +285,7 @@ def get_top_users() -> Response:
 
     except Exception as e:
         logger.error("Error fetching top_users data %s", str(e))
-        return jsonify({"error": "An internal error occurred while fetching top_users data"}), 500  # type: ignore
+        return {"error": "An internal error occurred while fetching top_users data"}
 
     try:
         # Convert results to list of dicts
@@ -306,14 +300,17 @@ def get_top_users() -> Response:
         ]
     except Exception as e:
         logger.error("Error converting top_users data %s", str(e))
-        return jsonify({"error": "An internal error occurred while converting top_users data"}), 500  # type: ignore
+        return {"error": "An internal error occurred while converting top_users data"}
 
     response_data = {
         "results": data,
         "count": len(data),
     }
 
-    return jsonify(response_data)
+    return response_data
 
 
-__all__ = ["get_top_langs", "get_top_users"]
+__all__ = [
+    "get_top_langs",
+    "get_top_users",
+]
