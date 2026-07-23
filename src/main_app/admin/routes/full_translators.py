@@ -106,31 +106,27 @@ class FullTranslators:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        @admin_required
-        def dashboard():
-            # Call the internal function _full_translators_dashboard to return the full dashboard
-            return _full_translators_dashboard()
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.post("/add")(admin_required(self.add))
+        self.bp.post("/<int:translator_id>/delete")(admin_required(self.delete))
+        self.bp.post("/<int:record_id>/activate")(admin_required(self.activate))
+        self.bp.post("/<int:record_id>/deactivate")(admin_required(self.deactivate))
 
-        @self.bp.post("/add")
-        @admin_required
-        def add() -> ResponseReturnValue:
-            return _add_full_translator()
+    def dashboard(self):
+        # Call the internal function _full_translators_dashboard to return the full dashboard
+        return _full_translators_dashboard()
 
-        @self.bp.post("/<int:translator_id>/delete")
-        @admin_required
-        def delete(translator_id: int) -> ResponseReturnValue:
-            return _delete_full_translator(translator_id)
+    def add(self) -> ResponseReturnValue:
+        return _add_full_translator()
 
-        @self.bp.post("/<int:record_id>/activate")
-        @admin_required
-        def activate(record_id: int) -> ResponseReturnValue:
-            return _set_record_active_status(record_id, True)
+    def delete(self, translator_id: int) -> ResponseReturnValue:
+        return _delete_full_translator(translator_id)
 
-        @self.bp.post("/<int:record_id>/deactivate")
-        @admin_required
-        def deactivate(record_id: int) -> ResponseReturnValue:
-            return _set_record_active_status(record_id, False)
+    def activate(self, record_id: int) -> ResponseReturnValue:
+        return _set_record_active_status(record_id, True)
+
+    def deactivate(self, record_id: int) -> ResponseReturnValue:
+        return _set_record_active_status(record_id, False)
 
 
 __all__ = [
