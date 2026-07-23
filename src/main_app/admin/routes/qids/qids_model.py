@@ -9,6 +9,7 @@ from flask.typing import ResponseReturnValue
 from werkzeug.wrappers.response import Response
 
 from ....db.models import QidOthersRecord, QidRecord
+from ....db.services.wikidata import QidOthersService, QidService
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,7 @@ class QidsModel:
         endpoint: str,
         bp: Blueprint,
         title_label: str,
-        service,
+        service: QidService | QidOthersService,
     ) -> None:
         self.bp = bp
         self.endpoint = endpoint
@@ -104,7 +105,7 @@ class QidsModel:
                 flash(f"Invalid ID: {qid_id_raw}", "danger")
                 return redirect(url_for("admin.edit_done"))
 
-            record: QidRecord | QidOthersRecord = self.service.get_by_id(qid_id)
+            record: QidRecord | QidOthersRecord | None = self.service.get_by_id(qid_id)
             if not record:
                 flash(f"Record not found. id={qid_id}", "danger")
                 return redirect(url_for("admin.edit_done"))

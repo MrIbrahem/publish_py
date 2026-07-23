@@ -10,7 +10,7 @@ import logging
 
 from flask import Blueprint
 
-from ....db.services.wikidata import qid_service
+from ....db.services.wikidata import QidService
 from .qids_model import QidsModel
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ class QidsRoutes(QidsModel):
             endpoint="qids",
             bp=bp,
             title_label="TD Qids",
-            service=qid_service,
+            service=QidService(),
         )
 
 

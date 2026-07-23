@@ -112,7 +112,6 @@ class UsersNoInprocess:
         self.bp.post("/<int:record_id>/activate")(admin_required(self.activate))
         self.bp.post("/<int:record_id>/deactivate")(admin_required(self.deactivate))
 
-
     def dashboard(self):
         return _users_no_inprocess_dashboard()
 
@@ -127,6 +126,7 @@ class UsersNoInprocess:
 
     def deactivate(self, record_id: int) -> ResponseReturnValue:
         return _set_record_active_status(record_id, False)
+
 
 __all__ = [
     "UsersNoInprocess",

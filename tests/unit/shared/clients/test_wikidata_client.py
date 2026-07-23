@@ -8,7 +8,7 @@ class TestGetQidForMdtitle:
 
     def test_returns_qid_when_found(self):
         """Test that QID is returned when found in database."""
-        with patch("src.main_app.shared.clients.wikidata_client.get_page_qid") as mock_get_db:
+        with patch("src.main_app.shared.clients.wikidata_client.get_record_by_title") as mock_get_db:
             mock_db = MagicMock()
             mock_db.qid = "Q12345"
             mock_get_db.return_value = mock_db
@@ -21,7 +21,7 @@ class TestGetQidForMdtitle:
 
     def test_returns_none_on_error(self):
         """Test that None is returned on database error."""
-        with patch("src.main_app.shared.clients.wikidata_client.get_page_qid") as mock_get_db:
+        with patch("src.main_app.shared.clients.wikidata_client.get_record_by_title") as mock_get_db:
             mock_db = MagicMock()
             mock_db.qid = None
             mock_db.fetch_query_safe.side_effect = Exception("Database error")

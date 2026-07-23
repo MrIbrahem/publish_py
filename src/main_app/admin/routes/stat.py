@@ -22,27 +22,27 @@ class StaticsRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
+        self.bp.route("/", methods=["GET"])(self.stat_index)
 
-        @self.bp.route("/", methods=["GET"])
-        def stat_index() -> str:
-            """Render a minimal statistics overview."""
-            try:
-                pages_count = page_service.count_translated()
-            except Exception:
-                logger.exception("Failed to count translated pages")
-                pages_count = 0
+    def stat_index(self) -> str:
+        """Render a minimal statistics overview."""
+        try:
+            pages_count = page_service.count_translated()
+        except Exception:
+            logger.exception("Failed to count translated pages")
+            pages_count = 0
 
-            try:
-                user_pages_count = user_page_service.count_translated()
-            except Exception:
-                logger.exception("Failed to count translated user pages")
-                user_pages_count = 0
+        try:
+            user_pages_count = user_page_service.count_translated()
+        except Exception:
+            logger.exception("Failed to count translated user pages")
+            user_pages_count = 0
 
-            return render_template(
-                "admins/stat.html",
-                pages_count=pages_count,
-                user_pages_count=user_pages_count,
-            )
+        return render_template(
+            "admins/stat.html",
+            pages_count=pages_count,
+            user_pages_count=user_pages_count,
+        )
 
 
 __all__ = [
