@@ -106,31 +106,27 @@ class UsersNoInprocess:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        @admin_required
-        def dashboard():
-            return _users_no_inprocess_dashboard()
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.post("/add")(admin_required(self.add))
+        self.bp.post("/<int:record_id>/delete")(admin_required(self.delete))
+        self.bp.post("/<int:record_id>/activate")(admin_required(self.activate))
+        self.bp.post("/<int:record_id>/deactivate")(admin_required(self.deactivate))
 
-        @self.bp.post("/add")
-        @admin_required
-        def add() -> ResponseReturnValue:
-            return _add_user_no_inprocess()
 
-        @self.bp.post("/<int:record_id>/delete")
-        @admin_required
-        def delete(record_id: int) -> ResponseReturnValue:
-            return _delete_user_no_inprocess(record_id)
+    def dashboard(self):
+        return _users_no_inprocess_dashboard()
 
-        @self.bp.post("/<int:record_id>/activate")
-        @admin_required
-        def activate(record_id: int) -> ResponseReturnValue:
-            return _set_record_active_status(record_id, True)
+    def add(self) -> ResponseReturnValue:
+        return _add_user_no_inprocess()
 
-        @self.bp.post("/<int:record_id>/deactivate")
-        @admin_required
-        def deactivate(record_id: int) -> ResponseReturnValue:
-            return _set_record_active_status(record_id, False)
+    def deactivate(self, record_id: int) -> ResponseReturnValue:
+        return _set_record_active_status(record_id, False)
 
+    def activate(self, record_id: int) -> ResponseReturnValue:
+        return _set_record_active_status(record_id, True)
+
+    def delete(self, record_id: int) -> ResponseReturnValue:
+        return _delete_user_no_inprocess(record_id)
 
 __all__ = [
     "UsersNoInprocess",
