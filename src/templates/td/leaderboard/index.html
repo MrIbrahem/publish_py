@@ -19,38 +19,24 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div class="row g-3">
+    <div class="row g-2">
         <form method="get" action="{{ url_for('leaderboard.index') }}" id="leaderboard_filter">
-            <div class="row g-3">
+            <div class="row g-2">
                 <div class="col-md-3">
                     <span align="center">
                         <h3>Leaderboard</h3>
                     </span>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-8">
                     <div class="row">
                         {{ filter_select('camp', form_data.campaigns, selected_data.camp, label='Campaign') }}
                         {{ filter_select('user_group', form_data.user_groups, selected_data.user_group, label='Translators') }}
                         <div class="col-md-4">
-                            <div class="d-flex justify-content-center align-items-center gap-2">
-                                <div class="input-group">
-                                    <span class="input-group-text">Year</span>
-                                    <select dir="ltr" id="year" name="year" class="form-select" data-bs-theme="auto">
-                                        <option value="all">All</option>
-                                        {% if form_data and form_data.years %}
-                                        {{ select_options(form_data.years, selected_data.year) }}
-                                        {% endif %}
-                                    </select>
-                                </div>
+                            <div class="row">
+                                {% set width='col-md-8 col-sm-6' if selected_data.year and selected_data.year != "all" else 'col-md-12' %}
+                                {{ filter_select('year', form_data.years, selected_data.year, label='Year', width=width) }}
                                 {% if selected_data.year and selected_data.year != "all" %}
-                                <div class="input-group w-50">
-                                    <select dir="ltr" id="month" name="month" class="form-select" data-bs-theme="auto">
-                                        <option value="All">All</option>
-                                        {% if form_data and form_data.months %}
-                                        {{ select_options(form_data.months, selected_data.month) }}
-                                        {% endif %}
-                                    </select>
-                                </div>
+                                {{ filter_select('month', form_data.months, selected_data.month, width='col-md-4 col-sm-6') }}
                                 {% endif %}
                             </div>
                         </div>
