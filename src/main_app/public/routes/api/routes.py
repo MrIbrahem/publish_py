@@ -446,8 +446,12 @@ class ApiRoutes:
 
         @self.bp.route("/top_lang_of_users", methods=["GET"])
         @check_cors
-        def _get_top_lang_of_users() -> Response:
-            data = top_lang_of_users()
+        def _get_top_lang_of_users() -> tuple[Response, int] | Response:
+            try:
+                data = top_lang_of_users()
+            except Exception:
+                logger.exception("Error fetching top_lang_of_users data")
+                return jsonify({"error": "An internal error occurred"}), 500
             return jsonify(data)
 
         self.bp.route("/publish_reports", methods=["GET"])(check_cors(get_publish_reports))

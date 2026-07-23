@@ -121,7 +121,7 @@ def is_job_running(job_status: str | None) -> bool:
     return job_status.lower() in ["running", "pending"]
 
 
-def commas_filter(value):
+def commas_filter(value: str) -> str:
     try:
         return f"{value:,}"
     except (ValueError, TypeError):
