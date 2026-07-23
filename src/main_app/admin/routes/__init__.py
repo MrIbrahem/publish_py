@@ -26,7 +26,7 @@ from .users_no_inprocess import UsersNoInprocess
 class AdminRouteModule:
     route_cls: type
     name: str
-    url_prefix: str
+    url_prefix: str = ""
     extra_kwargs: dict[str, Any] = field(default_factory=dict)
 
 
