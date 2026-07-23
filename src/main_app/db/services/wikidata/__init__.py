@@ -24,7 +24,7 @@ from .qid_service import (
     insert,
     list_qid_records,
     list_records,
-    update,
+    update_record,
     update_qid,
 )
 
@@ -42,7 +42,7 @@ __all__ = [
     "get_by_qid",
     "get_by_title",
     "insert",
-    "update",
+    "update_record",
     "get_by_id",
     "add_qid",
     "update_qid",

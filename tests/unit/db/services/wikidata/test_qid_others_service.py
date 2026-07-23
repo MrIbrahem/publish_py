@@ -5,7 +5,7 @@ Covers the new functions exposed for the admin/qids_others blueprint:
 - ``get_by_qid``
 - ``get_by_title``
 - ``insert``
-- ``update``
+- ``update_record``
 """
 
 from unittest.mock import MagicMock, patch
@@ -19,7 +19,7 @@ from src.main_app.db.services.wikidata.qid_others_service import (
     get_by_title,
     insert,
     list_records,
-    update,
+    update_record,
 )
 from src.main_app.extensions import db as _db
 
@@ -131,25 +131,25 @@ class TestInsert:
 class TestUpdate:
     def test_updates_existing_row(self, monkeypatch):
         record = add_qid_other("Old_title", "Q400")
-        ok = update(record.id, "New_title", "Q401")
+        ok = update_record(record.id, "New_title", "Q401")
         assert ok is True
         _db.session.refresh(record)
         assert record.title == "New_title"
         assert record.qid == "Q401"
 
     def test_returns_false_when_id_missing(self, monkeypatch):
-        assert update(0, "T", "Q1") is False
-        assert update(99999, "T", "Q1") is False
+        assert update_record(0, "T", "Q1") is False
+        assert update_record(99999, "T", "Q1") is False
 
     def test_returns_false_when_title_or_qid_blank(self, monkeypatch):
         record = add_qid_other("Solid", "Q500")
-        assert update(record.id, "", "Q1") is False
-        assert update(record.id, "T", "") is False
+        assert update_record(record.id, "", "Q1") is False
+        assert update_record(record.id, "T", "") is False
 
     def test_returns_false_and_rolls_back_on_db_error(self, monkeypatch):
         with patch("src.main_app.db.services.wikidata.qid_others_service.db.session") as mock_session:
             mock_session.commit.side_effect = Exception("boom")
             mock_session.get.return_value = MagicMock()
-            ok = update(1, "T", "Q1")
+            ok = update_record(1, "T", "Q1")
             assert ok is False
             mock_session.rollback.assert_called_once()

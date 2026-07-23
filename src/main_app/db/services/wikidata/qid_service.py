@@ -141,7 +141,7 @@ def insert(title: str, qid: str) -> bool:
         return False
 
 
-def update(qid_id: int, title: str, qid: str) -> bool:
+def update_record(qid_id: int, title: str, qid: str) -> bool:
     """Update an existing qids row by primary key."""
     title = (title or "").strip()
     qid = (qid or "").strip()
@@ -234,7 +234,7 @@ class QidService:
 
     def update(self, qid_id: int, title: str, qid: str) -> bool:
         """Update an existing QID record and return success status as boolean."""
-        return update(qid_id=qid_id, title=title, qid=qid)
+        return update_record(qid_id=qid_id, title=title, qid=qid)
 
 
 __all__ = [
@@ -248,6 +248,6 @@ __all__ = [
     "get_by_qid",
     "get_by_title",
     "insert",
-    "update",
+    "update_record",
     "get_by_id",
 ]
