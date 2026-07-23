@@ -36,7 +36,13 @@ def add_qid(title: str, qid: str) -> QidRecord:
 
 
 def update_qid(qid_id: int, title: str, qid: str) -> QidRecord:
-    """Update a QID record."""
+    """Update an existing qids row by primary key."""
+    title = (title or "").strip()
+    qid = (qid or "").strip()
+
+    if not qid_id or not title or not qid:
+        raise ValueError("qid_id, title, and qid are required")
+
     orm_obj = db.session.get(QidRecord, qid_id)
     if not orm_obj:
         raise ValueError(f"QID record with ID {qid_id} not found")
