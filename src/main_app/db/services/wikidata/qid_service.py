@@ -189,7 +189,56 @@ def get_title_to_qid() -> dict[str, str]:
     return {record.title: record.qid or "" for record in qids}
 
 
+class QidService:
+    """Service class for managing QID records."""
+
+    def add_qid(self, title: str, qid: str) -> QidRecord:
+        """Add or update a QID record for a given title."""
+        return add_qid(title=title, qid=qid)
+
+    def update_qid(self, qid_id: int, title: str, qid: str) -> QidRecord:
+        """Update an existing QID record by its ID."""
+        return update_qid(qid_id=qid_id, title=title, qid=qid)
+
+    def get_page_qid(self, title: str) -> QidRecord | None:
+        """Retrieve the QID record for a given page title."""
+        return get_page_qid(title=title)
+
+    def list_records(self, dis: str = "all") -> list[QidRecord]:
+        """List QID records with optional filtering (all, empty, duplicate)."""
+        return list_records(dis=dis)
+
+    def list_qid_records(self) -> list[QidRecord]:
+        """Return all QID records."""
+        return list_qid_records()
+
+    def get_title_to_qid(self) -> dict[str, str]:
+        """Retrieve a mapping dictionary of title to QID."""
+        return get_title_to_qid()
+
+    def get_by_qid(self, qid: str) -> QidRecord | None:
+        """Get the first QID record matching the specified QID string."""
+        return get_by_qid(qid=qid)
+
+    def get_by_title(self, title: str) -> QidRecord | None:
+        """Get the QID record matching the specified title."""
+        return get_by_title(title=title)
+
+    def get_by_id(self, qid_id: int) -> QidRecord | None:
+        """Get a QID record by its primary key ID."""
+        return get_by_id(qid_id=qid_id)
+
+    def insert(self, title: str, qid: str) -> bool:
+        """Insert a new QID record or update if the title already exists."""
+        return insert(title=title, qid=qid)
+
+    def update(self, qid_id: int, title: str, qid: str) -> bool:
+        """Update an existing QID record and return success status as boolean."""
+        return update(qid_id=qid_id, title=title, qid=qid)
+
+
 __all__ = [
+    "QidService",
     "add_qid",
     "update_qid",
     "get_page_qid",

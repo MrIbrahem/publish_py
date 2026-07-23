@@ -8,11 +8,13 @@ from .allqid_service import (
     list_targets_by_lang,
 )
 from .qid_others_service import (
+    QidOthersService,
     add_qid_other,
     get_page_qid_other,
     update_qid_other,
 )
 from .qid_service import (
+    QidService,
     add_qid,
     get_by_id,
     get_by_qid,
@@ -27,6 +29,8 @@ from .qid_service import (
 )
 
 __all__ = [
+    "QidService",
+    "QidOthersService",
     "list_targets_by_lang",
     "add_qid_other",
     "update_qid_other",
