@@ -56,6 +56,9 @@ def insert(model: type[ServiceRecord], title: str, qid: str) -> bool:
     qid = (qid or "").strip()
     if not title or not qid:
         return False
+
+    # TODO: validate qid
+
     try:
         existing = db.session.query(model).filter(model.title == title).first()
         if existing:
@@ -200,52 +203,99 @@ class BaseQidService:
     def __init__(self, model: type[ServiceRecord]) -> None:
         self.model = model
 
-    def add_or_update(self, title: str, qid: str) -> ServiceRecord:
+    def add_or_update(self, title: str, qid: str) -> ServiceRecord | None:
         """Add or update a record for a given title."""
-        return add_or_update_qid(self.model, title=title, qid=qid)
+        try:
+            return add_or_update_qid(self.model, title=title, qid=qid)
+        except Exception as e:
+            logger.exception("Failed to add or update qid: %s", e)
+            return None
 
-    def update(self, qid_id: int, title: str, qid: str) -> ServiceRecord:
+    def update(self, qid_id: int, title: str, qid: str) -> ServiceRecord | None:
         """Update an existing record by its ID."""
-        return update_qid(self.model, qid_id=qid_id, title=title, qid=qid)
+        try:
+            return update_qid(self.model, qid_id=qid_id, title=title, qid=qid)
+        except Exception as e:
+            logger.exception("Failed to update qid id=%r: %s", qid_id, e)
+            return None
 
     def get_record_by_title(self, title: str) -> ServiceRecord | None:
         """Retrieve the record for a given page title."""
-        return get_record_by_title(self.model, title=title)
+        try:
+            return get_record_by_title(self.model, title=title)
+        except Exception as e:
+            logger.exception("Failed to get record by title: %s", e)
+            return None
 
     def list_records(self, dis: str = "all") -> list[ServiceRecord]:
         """List QID records with optional filtering (all, empty, duplicate)."""
-        return list_records(self.model, dis=dis)
+        try:
+            return list_records(self.model, dis=dis)
+        except Exception as e:
+            logger.exception("Failed to list records: %s", e)
+            return []
 
     def list_qid_records(self) -> list[ServiceRecord]:
         """Return all QID records."""
-        return list_qid_records(self.model)
+        try:
+            return list_qid_records(self.model)
+        except Exception as e:
+            logger.exception("Failed to list qid records: %s", e)
+            return []
 
     def get_title_to_qid(self) -> dict[str, str]:
         """Retrieve a mapping dictionary of title to QID."""
-        return get_title_to_qid(self.model)
+        try:
+            return get_title_to_qid(self.model)
+        except Exception as e:
+            logger.exception("Failed to get title to qid: %s", e)
+            return {}
 
-    def get_by_qid(self, qid: str):
+    def get_by_qid(self, qid: str) -> ServiceRecord | None:
         """Get the first record matching the specified QID string."""
-        return get_by_qid(self.model, qid=qid)
+        try:
+            return get_by_qid(self.model, qid=qid)
+        except Exception as e:
+            logger.exception("Failed to get record by qid: %s", e)
+            return None
 
     def get_by_title(self, title: str) -> ServiceRecord | None:
         """Get the record matching the specified title."""
-        return get_by_title(self.model, title=title)
+        try:
+            return get_by_title(self.model, title=title)
+        except Exception as e:
+            logger.exception("Failed to get record by title: %s", e)
+            return None
 
     def get_by_id(self, qid_id: int) -> ServiceRecord | None:
         """Get a record by its primary key ID."""
-        return get_by_id(self.model, qid_id=qid_id)
+        try:
+            return get_by_id(self.model, qid_id=qid_id)
+        except Exception as e:
+            logger.exception("Failed to get record by id: %s", e)
 
     def insert(self, title: str, qid: str) -> bool:
         """Insert a new record or update if the title already exists."""
-        return insert(self.model, title=title, qid=qid)
+        try:
+            return insert(self.model, title=title, qid=qid)
+        except Exception as e:
+            logger.exception("Failed to insert qid: %s", e)
+            return False
 
     def update_record(self, qid_id: int, title: str, qid: str) -> bool:
         """Update an existing record and return success status as boolean."""
-        return update_record(self.model, qid_id=qid_id, title=title, qid=qid)
+        try:
+            return update_record(self.model, qid_id=qid_id, title=title, qid=qid)
+        except Exception as e:
+            logger.exception("Failed to update qid id=%r: %s", qid_id, e)
+            return False
 
     def delete(self, qid_id: int) -> bool:
-        return delete_record_by_pk(self.model, qid_id)
+        try:
+            return delete_record_by_pk(self.model, qid_id)
+        except Exception as e:
+            logger.exception("Failed to delete qid id=%r: %s", qid_id, e)
+            return False
 
 
 __all__ = [
