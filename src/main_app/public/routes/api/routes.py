@@ -462,6 +462,7 @@ class ApiRoutes:
             return jsonify({"error": "An internal error occurred"}), 500
         return jsonify(data)
 
+
 __all__ = [
     "ApiRoutes",
 ]

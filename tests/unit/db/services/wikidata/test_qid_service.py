@@ -14,6 +14,7 @@ from src.main_app.extensions import db as _db
 
 pytestmark = pytest.mark.unit
 
+
 class TestSetup:
     """Tests for `QidService` class."""
 
@@ -30,7 +31,8 @@ class TestSetup:
 
         record.qid = ""
         _db.session.commit()
-        return record # type: ignore
+        return record  # type: ignore
+
 
 class TestQidService(TestSetup):
     """Tests for `QidService` class."""
@@ -63,7 +65,6 @@ class TestQidService(TestSetup):
         # Test delete
         self.service.delete(q.id)
         assert self.service.get_record_by_title("World") is None
-
 
     def test_get_by_qid_returns_none_when_qid_missing(self, monkeypatch):
         service = QidService()
@@ -173,6 +174,7 @@ class TestGetTitleToQid(TestSetup):
 #   - self.service.insert(title, qid)
 #   - self.service.update_record(qid_id, title, qid)
 # ---------------------------------------------------------------------------
+
 
 class TestListQidsByDis(TestSetup):
     """

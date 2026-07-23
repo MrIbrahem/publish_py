@@ -19,14 +19,14 @@ import logging
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
 
-from ..delete_service import delete_record_by_pk
-
 from ....extensions import db
-from ...models import QidRecord, QidOthersRecord
+from ...models import QidOthersRecord, QidRecord
+from ..delete_service import delete_record_by_pk
 
 logger = logging.getLogger(__name__)
 
 ServiceRecord = QidRecord | QidOthersRecord
+
 
 def add_or_update_qid(model: type[ServiceRecord], title: str, qid: str) -> ServiceRecord:
     """Add or update a QID for a title."""
@@ -131,11 +131,7 @@ def list_records(model: type[ServiceRecord], dis: str = "all") -> list:
     """
     base = db.session.query(model)
     if dis == "empty":
-        rows = (
-            base.filter(or_(model.qid.is_(None), model.qid == ""))
-            .order_by(model.id.asc())
-            .all()
-        )
+        rows = base.filter(or_(model.qid.is_(None), model.qid == "")).order_by(model.id.asc()).all()
         return rows
     if dis == "duplicate":
         other = aliased(model)
