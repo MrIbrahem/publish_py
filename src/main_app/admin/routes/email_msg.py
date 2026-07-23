@@ -152,41 +152,45 @@ class EmailMsgRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
+        self.bp.route("/dashboard/<string:last_table>/<int:id>", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.add_url_rule(
+            "/dashboard/<string:last_table>/<int:id>/<string:user>",
+            endpoint="dashboard_with_user",
+            view_func=admin_required(self.dashboard),
+            methods=["GET"],
+        )
+        self.bp.route("/send", methods=["POST"])(admin_required(self.msg_post))
 
-        @self.bp.route("/dashboard/<string:last_table>/<int:id>", methods=["GET"])
-        @self.bp.route("/dashboard/<string:last_table>/<int:id>/<string:user>", methods=["GET"])
-        @admin_required
-        def dashboard(
-            last_table: str,
-            id: int,
-            user: str | None = None,
-        ) -> str:
-            return msg_dashboard(last_table, id, user=user)
+    def dashboard(
+        self,
+        last_table: str,
+        id: int,
+        user: str | None = None,
+    ) -> str:
+        return msg_dashboard(last_table, id, user=user)
 
-        @self.bp.route("/send", methods=["POST"])
-        @admin_required
-        def msg_post() -> str:
-            data = request.form
-            msg = data.get("msg", "")
-            email_to = data.get("email_to", "")
-            email_from = data.get("email_from", "mdwiki.org@gmail.com")
-            msg_title = data.get("msg_title", "Wiki Project Med Translation Dashboard")
-            ccme = data.get("ccme", "0")
-            cc_to = data.get("cc_to", "") if str(ccme) == "1" else None
+    def msg_post(self) -> str:
+        data = request.form
+        msg = data.get("msg", "")
+        email_to = data.get("email_to", "")
+        email_from = data.get("email_from", "mdwiki.org@gmail.com")
+        msg_title = data.get("msg_title", "Wiki Project Med Translation Dashboard")
+        ccme = data.get("ccme", "0")
+        cc_to = data.get("cc_to", "") if str(ccme) == "1" else None
 
-            send_msg(
-                msg=msg,
-                email_to=email_to,
-                email_from=email_from,
-                msg_title=msg_title,
-                cc_to=cc_to,
-            )
-            return render_template(
-                "admins/email_msg/index.html",
-                user_email=None,
-                cc_me_email=None,
-                msg=None,
-            )
+        send_msg(
+            msg=msg,
+            email_to=email_to,
+            email_from=email_from,
+            msg_title=msg_title,
+            cc_to=cc_to,
+        )
+        return render_template(
+            "admins/email_msg/index.html",
+            user_email=None,
+            cc_me_email=None,
+            msg=None,
+        )
 
 
 __all__ = [

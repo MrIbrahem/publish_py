@@ -124,30 +124,26 @@ class CoordinatorsRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        @admin_required
-        def dashboard():
-            return _coordinators_dashboard()
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.post("/add")(admin_required(self.add))
+        self.bp.post("/<int:coordinator_id>/activate")(admin_required(self.activate))
+        self.bp.post("/<int:coordinator_id>/deactivate")(admin_required(self.deactivate))
+        self.bp.post("/<int:coordinator_id>/delete")(admin_required(self.delete))
 
-        @self.bp.post("/add")
-        @admin_required
-        def add() -> ResponseReturnValue:
-            return _add_coordinator()
+    def dashboard(self) -> str:
+        return _coordinators_dashboard()
 
-        @self.bp.post("/<int:coordinator_id>/activate")
-        @admin_required
-        def activate(coordinator_id: int) -> ResponseReturnValue:
-            return _set_record_active_status(coordinator_id, True)
+    def add(self) -> ResponseReturnValue:
+        return _add_coordinator()
 
-        @self.bp.post("/<int:coordinator_id>/deactivate")
-        @admin_required
-        def deactivate(coordinator_id: int) -> ResponseReturnValue:
-            return _set_record_active_status(coordinator_id, False)
+    def activate(self, coordinator_id: int) -> ResponseReturnValue:
+        return _set_record_active_status(coordinator_id, True)
 
-        @self.bp.post("/<int:coordinator_id>/delete")
-        @admin_required
-        def delete(coordinator_id: int) -> ResponseReturnValue:
-            return _delete_coordinator(coordinator_id)
+    def deactivate(self, coordinator_id: int) -> ResponseReturnValue:
+        return _set_record_active_status(coordinator_id, False)
+
+    def delete(self, coordinator_id: int) -> ResponseReturnValue:
+        return _delete_coordinator(coordinator_id)
 
 
 __all__ = [
