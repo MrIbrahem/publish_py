@@ -9,12 +9,10 @@ from .allqid_service import (
 )
 from .qid_others_service import (
     QidOthersService,
-    add_qid_other,
-    update_qid_other,
 )
 from .qid_service import (
     QidService,
-    add_qid,
+    add_or_update_qid,
     get_by_id,
     get_by_qid,
     get_by_title,
@@ -23,16 +21,14 @@ from .qid_service import (
     insert,
     list_qid_records,
     list_records,
-    update_record,
     update_qid,
+    update_record,
 )
 
 __all__ = [
     "QidService",
     "QidOthersService",
     "list_targets_by_lang",
-    "add_qid_other",
-    "update_qid_other",
     "delete_qid_other",
     "list_records",
     "list_qid_records",
@@ -42,7 +38,7 @@ __all__ = [
     "insert",
     "update_record",
     "get_by_id",
-    "add_qid",
+    "add_or_update_qid",
     "update_qid",
     "delete_qid",
     "get_record_by_title",

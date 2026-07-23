@@ -14,7 +14,7 @@ import pytest
 
 from src.main_app.db.models import QidOthersRecord
 from src.main_app.db.services.wikidata.qid_others_service import (
-    add_qid_other,
+    add_or_update_qid,
     get_by_qid,
     get_by_title,
     insert,
@@ -28,7 +28,7 @@ pytestmark = pytest.mark.unit
 
 def _add_with_empty_qid(title: str) -> QidOthersRecord:
     """Insert a row whose qid column is empty (model __init__ rejects ``""``)."""
-    record = add_qid_other(title, "Q999")
+    record = add_or_update_qid(title, "Q999")
     record.qid = ""
     _db.session.commit()
     return record
@@ -38,13 +38,13 @@ class TestListQidsOthersByDis:
     """Tests for the ``dis`` filter on list_records."""
 
     def test_dis_all_returns_every_row(self, monkeypatch):
-        add_qid_other("A", "Q1")
-        add_qid_other("B", "Q2")
+        add_or_update_qid("A", "Q1")
+        add_or_update_qid("B", "Q2")
         rows = list_records(dis="all")
         assert {r.title for r in rows} >= {"A", "B"}
 
     def test_dis_empty_returns_only_rows_with_empty_or_null_qid(self, monkeypatch):
-        add_qid_other("Has_qid", "Q1")
+        add_or_update_qid("Has_qid", "Q1")
         _add_with_empty_qid("Missing_qid")
         rows = list_records(dis="empty")
         assert {r.title for r in rows} == {"Missing_qid"}
@@ -52,22 +52,22 @@ class TestListQidsOthersByDis:
     def test_dis_duplicate_returns_rows_sharing_qid(self, monkeypatch):
         # Title is UNIQUE, qid is not -> two rows sharing the same qid get
         # surfaced by the duplicate filter.
-        add_qid_other("First", "Q42")
-        add_qid_other("Second", "Q42")
-        add_qid_other("Solo", "Q43")
+        add_or_update_qid("First", "Q42")
+        add_or_update_qid("Second", "Q42")
+        add_or_update_qid("Solo", "Q43")
         titles = {r.title for r in list_records(dis="duplicate")}
         assert "First" in titles
         assert "Second" in titles
         assert "Solo" not in titles
 
     def test_dis_default_is_all(self, monkeypatch):
-        add_qid_other("Anything", "Q1")
+        add_or_update_qid("Anything", "Q1")
         assert len(list_records()) == 1
 
 
 class TestGetByQid:
     def test_returns_record_when_qid_exists(self, monkeypatch):
-        add_qid_other("Some_title", "Q100")
+        add_or_update_qid("Some_title", "Q100")
         record = get_by_qid("Q100")
         assert record is not None
         assert record.title == "Some_title"
@@ -81,7 +81,7 @@ class TestGetByQid:
 
 class TestGetByTitle:
     def test_returns_record_when_title_exists(self, monkeypatch):
-        add_qid_other("Findable", "Q200")
+        add_or_update_qid("Findable", "Q200")
         record = get_by_title("Findable")
         assert record is not None
         assert record.qid == "Q200"
@@ -108,7 +108,7 @@ class TestInsert:
         assert record.qid == "Q301"
 
     def test_does_not_overwrite_existing_non_empty_qid(self, monkeypatch):
-        record = add_qid_other("Already_set", "Q302")
+        record = add_or_update_qid("Already_set", "Q302")
         ok = insert("Already_set", "Q303")
         assert ok is True
         _db.session.refresh(record)
@@ -130,7 +130,7 @@ class TestInsert:
 
 class TestUpdate:
     def test_updates_existing_row(self, monkeypatch):
-        record = add_qid_other("Old_title", "Q400")
+        record = add_or_update_qid("Old_title", "Q400")
         ok = update_record(record.id, "New_title", "Q401")
         assert ok is True
         _db.session.refresh(record)
@@ -142,7 +142,7 @@ class TestUpdate:
         assert update_record(99999, "T", "Q1") is False
 
     def test_returns_false_when_title_or_qid_blank(self, monkeypatch):
-        record = add_qid_other("Solid", "Q500")
+        record = add_or_update_qid("Solid", "Q500")
         assert update_record(record.id, "", "Q1") is False
         assert update_record(record.id, "T", "") is False
 
