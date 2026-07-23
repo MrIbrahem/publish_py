@@ -93,49 +93,47 @@ class PublishRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
+        self.bp.route("/", methods=["OPTIONS"])(check_cors(self.publish_preflight))
+        self.bp.route("/", methods=["POST"])(validate_access(self.index))
 
-        @self.bp.route("/", methods=["OPTIONS"])
-        @check_cors
-        def publish_preflight() -> Response:
-            response = Response("", status=200)
-            response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
-            return response
+    def publish_preflight(self) -> Response:
+        response = Response("", status=200)
+        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
+        return response
 
-        @self.bp.route("/", methods=["POST"])
-        @validate_access
-        def index() -> Response:
-            """Handle post/publish requests.
+    def index(self) -> Response:
+        """Handle post/publish requests.
 
-            Request Body (JSON):
-                user: Username
-                title: Target page title
-                target: Target language code
-                sourcetitle: Source page title
-                text: Page content
-                revid: Source revision ID (optional)
-                campaign: Campaign name (optional)
-                wpCaptchaId: Captcha ID (optional)
-                wpCaptchaWord: Captcha answer (optional)
+        Request Body (JSON):
+            user: Username
+            title: Target page title
+            target: Target language code
+            sourcetitle: Source page title
+            text: Page content
+            revid: Source revision ID (optional)
+            campaign: Campaign name (optional)
+            wpCaptchaId: Captcha ID (optional)
+            wpCaptchaWord: Captcha answer (optional)
 
-            Returns:
-                JSON response with edit result
-            """
+        Returns:
+            JSON response with edit result
+        """
 
-            # Get request data
-            request_data = request.form.to_dict()
-            if not request_data:
-                json_data = request.get_json(silent=True)
-                if json_data is None:
-                    request_data = {}
-                elif isinstance(json_data, dict):
-                    request_data = json_data
-                else:
-                    response = jsonify({"error": {"code": "request_error", "info": "JSON body must be an object"}})
-                    response.status_code = 400
-                    return response
+        # Get request data
+        request_data = request.form.to_dict()
+        if not request_data:
+            json_data = request.get_json(silent=True)
+            if json_data is None:
+                request_data = {}
+            elif isinstance(json_data, dict):
+                request_data = json_data
+            else:
+                response = jsonify({"error": {"code": "request_error", "info": "JSON body must be an object"}})
+                response.status_code = 400
+                return response
 
-            return _handle_form(request_data)
+        return _handle_form(request_data)
 
 
 __all__ = [

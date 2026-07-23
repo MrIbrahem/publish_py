@@ -69,154 +69,155 @@ class QidsModel:
         return is_valid(qid_id, qid, title, existing_by_qid, existing_by_title)
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["GET"])
-        def index() -> str:
-            """List of rows with optional filter (all / empty / duplicate)."""
-            dis = request.args.get("dis", "all")
-            if dis not in VALID_DIS:
-                dis = "all"
+        self.bp.route("/", methods=["GET"])(self.index)
+        self.bp.route("/edit", methods=["GET"])(self.edit)
+        self.bp.route("/add", methods=["GET"])(self.add)
+        self.bp.route("/", methods=["POST"])(self.edit_post)
+        self.bp.route("/add", methods=["POST"])(self.add_post)
 
-            try:
-                rows = self.service.list_records(dis=dis)
-            except Exception:
-                logger.exception("Failed to list qids rows dis=%r", dis)
-                rows = []
+    def index(self) -> str:
+        """List of rows with optional filter (all / empty / duplicate)."""
+        dis = request.args.get("dis", "all")
+        if dis not in VALID_DIS:
+            dis = "all"
 
-            return render_template(
-                "admins/qids/index.html",
-                rows=rows,
-                dis=dis,
-                qid_table=self.endpoint,
-                title_label=self.title_label,
-                index_endpoint=f"admin.{self.endpoint}.index",
-                edit_endpoint=f"admin.{self.endpoint}.edit",
-                post_endpoint=f"admin.{self.endpoint}.edit_post",
-                add_endpoint=f"admin.{self.endpoint}.add",
-            )
+        try:
+            rows = self.service.list_records(dis=dis)
+        except Exception:
+            logger.exception("Failed to list qids rows dis=%r", dis)
+            rows = []
 
-        @self.bp.route("/edit", methods=["GET"])
-        def edit() -> Response | str:
-            """Render the add/edit popup for a single row."""
-            qid_id = None
-            qid_id_raw = request.args.get("id", "")
-            try:
-                qid_id = int(qid_id_raw)
-            except (ValueError, TypeError):
-                flash(f"Invalid ID: {qid_id_raw}", "danger")
-                return redirect(url_for("admin.edit_done"))
+        return render_template(
+            "admins/qids/index.html",
+            rows=rows,
+            dis=dis,
+            qid_table=self.endpoint,
+            title_label=self.title_label,
+            index_endpoint=f"admin.{self.endpoint}.index",
+            edit_endpoint=f"admin.{self.endpoint}.edit",
+            post_endpoint=f"admin.{self.endpoint}.edit_post",
+            add_endpoint=f"admin.{self.endpoint}.add",
+        )
 
-            record: QidRecord | QidOthersRecord | None = self.service.get_by_id(qid_id)
-            if not record:
-                flash(f"Record not found. id={qid_id}", "danger")
-                return redirect(url_for("admin.edit_done"))
+    def edit(self) -> Response | str:
+        """Render the add/edit popup for a single row."""
+        qid_id = None
+        qid_id_raw = request.args.get("id", "")
+        try:
+            qid_id = int(qid_id_raw)
+        except (ValueError, TypeError):
+            flash(f"Invalid ID: {qid_id_raw}", "danger")
+            return redirect(url_for("admin.edit_done"))
 
-            return render_template(
-                "admins/qids/edit.html",
-                id=qid_id,
-                title=record.title,
-                qid=record.qid,
-                qid_table=self.endpoint,
-                post_endpoint=f"admin.{self.endpoint}.edit_post",
-            )
+        record: QidRecord | QidOthersRecord | None = self.service.get_by_id(qid_id)
+        if not record:
+            flash(f"Record not found. id={qid_id}", "danger")
+            return redirect(url_for("admin.edit_done"))
 
-        @self.bp.route("/add", methods=["GET"])
-        def add() -> str:
-            """Render the add popup for a single qids row."""
-            return render_template(
-                "admins/qids/edit.html",
-                new=1,
-                title="",
-                qid="",
-                qid_table=self.endpoint,
-                post_endpoint=f"admin.{self.endpoint}.add_post",
-            )
+        return render_template(
+            "admins/qids/edit.html",
+            id=qid_id,
+            title=record.title,
+            qid=record.qid,
+            qid_table=self.endpoint,
+            post_endpoint=f"admin.{self.endpoint}.edit_post",
+        )
 
-        @self.bp.route("/", methods=["POST"])
-        def edit_post() -> ResponseReturnValue:
-            """update a row."""
-            qid_id_raw = (request.form.get("id") or "").strip()
-            title = (request.form.get("title") or "").strip()
-            qid = (request.form.get("qid") or "").strip()
+    def add(self) -> str:
+        """Render the add popup for a single qids row."""
+        return render_template(
+            "admins/qids/edit.html",
+            new=1,
+            title="",
+            qid="",
+            qid_table=self.endpoint,
+            post_endpoint=f"admin.{self.endpoint}.add_post",
+        )
 
-            edit_done_ep = redirect(url_for("admin.edit_done"))
+    def edit_post(self) -> ResponseReturnValue:
+        """update a row."""
+        qid_id_raw = (request.form.get("id") or "").strip()
+        title = (request.form.get("title") or "").strip()
+        qid = (request.form.get("qid") or "").strip()
 
-            qid_id: int | None = None
-            try:
-                qid_id = int(qid_id_raw)
-            except ValueError:
-                flash(f"Invalid id: {qid_id_raw}", "danger")
-                return edit_done_ep
+        edit_done_ep = redirect(url_for("admin.edit_done"))
 
-            edit_redirect_to = redirect(url_for(f"admin.{self.endpoint}.edit", id=qid_id))
+        qid_id: int | None = None
+        try:
+            qid_id = int(qid_id_raw)
+        except ValueError:
+            flash(f"Invalid id: {qid_id_raw}", "danger")
+            return edit_done_ep
 
-            if not title:
-                flash(f"Title is required. qid=({qid})", "danger")
-                return edit_redirect_to
+        edit_redirect_to = redirect(url_for(f"admin.{self.endpoint}.edit", id=qid_id))
 
-            if not qid:
-                flash(f"Qid is required. title=({title})", "danger")
-                return edit_redirect_to
-
-            try:
-                if not self.is_valid(qid_id, qid, title):
-                    return edit_redirect_to
-
-            except Exception:
-                logger.exception("Failed to save qids row id=%r title=%r qid=%r", qid_id, title, qid)
-                flash(f"Failed to check data for title: {title}, Qid: {qid}.", "danger")
-                return edit_redirect_to
-
-            try:
-                ok = self.service.update(qid_id, title, qid)
-            except Exception:
-                logger.exception("Failed to save row id=%r title=%r qid=%r", qid_id, title, qid)
-                ok = False
-
-            if ok:
-                flash(f"Data saved successfully for title: {title}, Qid: {qid}.", "success")
-                return edit_done_ep
-
-            flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
-
+        if not title:
+            flash(f"Title is required. qid=({qid})", "danger")
             return edit_redirect_to
 
-        @self.bp.route("/add", methods=["POST"])
-        def add_post() -> ResponseReturnValue:
-            """Insert a qid row"""
-            title = (request.form.get("title") or "").strip()
-            qid = (request.form.get("qid") or "").strip()
-
-            edit_done_ep = redirect(url_for("admin.edit_done"))
-
-            edit_redirect_to = redirect(url_for(f"admin.{self.endpoint}.add"))
-
-            if not title:
-                flash(f"Title is required. qid=({qid})", "danger")
-                return edit_redirect_to
-
-            if not qid:
-                flash(f"Qid is required. title=({title})", "danger")
-                return edit_redirect_to
-
-            try:
-                if not self.is_valid(False, qid, title):
-                    return edit_redirect_to
-
-            except Exception:
-                logger.exception("Failed to save qids row title=%r qid=%r", title, qid)
-                flash(f"Failed to check data for title: {title}, Qid: {qid}.", "danger")
-                return edit_redirect_to
-
-            try:
-                ok = self.service.insert(title, qid)
-            except Exception:
-                logger.exception("Failed to save row title=%r qid=%r", title, qid)
-                ok = False
-
-            if ok:
-                flash(f"Data saved successfully for title: {title}, Qid: {qid}.", "success")
-                return edit_done_ep
-
-            flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
-
+        if not qid:
+            flash(f"Qid is required. title=({title})", "danger")
             return edit_redirect_to
+
+        try:
+            if not self.is_valid(qid_id, qid, title):
+                return edit_redirect_to
+
+        except Exception:
+            logger.exception("Failed to save qids row id=%r title=%r qid=%r", qid_id, title, qid)
+            flash(f"Failed to check data for title: {title}, Qid: {qid}.", "danger")
+            return edit_redirect_to
+
+        try:
+            ok = self.service.update(qid_id, title, qid)
+        except Exception:
+            logger.exception("Failed to save row id=%r title=%r qid=%r", qid_id, title, qid)
+            ok = False
+
+        if ok:
+            flash(f"Data saved successfully for title: {title}, Qid: {qid}.", "success")
+            return edit_done_ep
+
+        flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
+
+        return edit_redirect_to
+
+    def add_post(self) -> ResponseReturnValue:
+        """Insert a qid row"""
+        title = (request.form.get("title") or "").strip()
+        qid = (request.form.get("qid") or "").strip()
+
+        edit_done_ep = redirect(url_for("admin.edit_done"))
+
+        edit_redirect_to = redirect(url_for(f"admin.{self.endpoint}.add"))
+
+        if not title:
+            flash(f"Title is required. qid=({qid})", "danger")
+            return edit_redirect_to
+
+        if not qid:
+            flash(f"Qid is required. title=({title})", "danger")
+            return edit_redirect_to
+
+        try:
+            if not self.is_valid(False, qid, title):
+                return edit_redirect_to
+
+        except Exception:
+            logger.exception("Failed to save qids row title=%r qid=%r", title, qid)
+            flash(f"Failed to check data for title: {title}, Qid: {qid}.", "danger")
+            return edit_redirect_to
+
+        try:
+            ok = self.service.insert(title, qid)
+        except Exception:
+            logger.exception("Failed to save row title=%r qid=%r", title, qid)
+            ok = False
+
+        if ok:
+            flash(f"Data saved successfully for title: {title}, Qid: {qid}.", "success")
+            return edit_done_ep
+
+        flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
+
+        return edit_redirect_to

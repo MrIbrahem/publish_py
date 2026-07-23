@@ -412,48 +412,12 @@ class ApiRoutes:
 
     def _setup_routes(self) -> None:
 
-        @self.bp.before_request
-        def handle_options_preflight():
-            if request.method == "OPTIONS":
-                response = Response("", status=200)
-                requested_method = request.headers.get("Access-Control-Request-Method", "GET")
-                response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
-                # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-                response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-                response.headers["Access-Control-Max-Age"] = "7200"
-                return response
+        self.bp.before_request(self.handle_options_preflight)
 
         self.bp.route("/status", methods=["GET"])(leaderboard_status)
-
-        # Register top_stats routes
-        @self.bp.route("/top_langs", methods=["GET"])
-        @check_cors
-        def _get_top_langs() -> tuple[Response, int] | Response:
-            data = get_top_langs(request.args)
-            if data.get("error"):
-                return jsonify(data), 500
-
-            return jsonify(data)
-
-        @self.bp.route("/top_users", methods=["GET"])
-        @check_cors
-        def _get_top_users() -> tuple[Response, int] | Response:
-            data = get_top_users(request.args)
-            if data.get("error"):
-                return jsonify(data), 500
-
-            return jsonify(data)
-
-        @self.bp.route("/top_lang_of_users", methods=["GET"])
-        @check_cors
-        def _get_top_lang_of_users() -> tuple[Response, int] | Response:
-            try:
-                data = top_lang_of_users()
-            except Exception:
-                logger.exception("Error fetching top_lang_of_users data")
-                return jsonify({"error": "An internal error occurred"}), 500
-            return jsonify(data)
-
+        self.bp.route("/top_langs", methods=["GET"])(check_cors(self.get_top_langs))
+        self.bp.route("/top_users", methods=["GET"])(check_cors(self.get_top_users))
+        self.bp.route("/top_lang_of_users", methods=["GET"])(check_cors(self.get_top_lang_of_users))
         self.bp.route("/publish_reports", methods=["GET"])(check_cors(get_publish_reports))
         self.bp.route("/publish_reports/stats", methods=["GET"])(check_cors(publish_reports_stats))
         self.bp.route("/in_process", methods=["GET"])(check_cors(get_in_process))
@@ -466,6 +430,37 @@ class ApiRoutes:
         self.bp.route("/langs", methods=["GET"])(check_cors(get_langs))
         self.bp.route("/users", methods=["GET"])(check_cors(get_users))
 
+    def handle_options_preflight(self):
+        if request.method == "OPTIONS":
+            response = Response("", status=200)
+            requested_method = request.headers.get("Access-Control-Request-Method", "GET")
+            response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
+            # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+            response.headers["Access-Control-Max-Age"] = "7200"
+            return response
+
+    def get_top_langs(self) -> tuple[Response, int] | Response:
+        data = get_top_langs(request.args)
+        if data.get("error"):
+            return jsonify(data), 500
+
+        return jsonify(data)
+
+    def get_top_users(self) -> tuple[Response, int] | Response:
+        data = get_top_users(request.args)
+        if data.get("error"):
+            return jsonify(data), 500
+
+        return jsonify(data)
+
+    def get_top_lang_of_users(self) -> tuple[Response, int] | Response:
+        try:
+            data = top_lang_of_users()
+        except Exception:
+            logger.exception("Error fetching top_lang_of_users data")
+            return jsonify({"error": "An internal error occurred"}), 500
+        return jsonify(data)
 
 __all__ = [
     "ApiRoutes",

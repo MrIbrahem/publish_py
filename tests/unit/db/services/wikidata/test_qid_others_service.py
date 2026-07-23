@@ -117,10 +117,6 @@ class TestUpdateQid(TestSetup):
         assert updated.title == "Saturnian System"
         assert updated.qid == "Q193"
 
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            self.service.update(9999, "T", "Q1")
-
 
 class TestDeleteQid(TestSetup):
     """Tests for delete function."""

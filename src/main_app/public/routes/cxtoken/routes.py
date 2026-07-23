@@ -67,61 +67,60 @@ class CxTokenRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        @self.bp.route("/", methods=["OPTIONS"])
-        @check_cors
-        def index_preflight() -> Response:
-            """
-            Handle preflight requests.
+        self.bp.route("/", methods=["OPTIONS"])(check_cors(self.index_preflight))
+        self.bp.route("/", methods=["GET"])(check_cors(self.index))
 
-            Returns:
-                Preflight response
-            """
+    def index_preflight(self) -> Response:
+        """
+        Handle preflight requests.
 
-            response = Response("", status=200)
-            response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-            response.headers["Access-Control-Max-Age"] = "7200"
+        Returns:
+            Preflight response
+        """
+
+        response = Response("", status=200)
+        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Max-Age"] = "7200"
+        return response
+
+    def index(self) -> Response:
+        """Handle cxtoken requests.
+
+        Query Parameters:
+            wiki: Wiki language code (e.g., 'en')
+            user: Username
+
+        Returns:
+            JSON response with cxtoken data or error
+        """
+        try:
+            validated_data = CXTokenRequestSchema().load(request.args, unknown="exclude")
+        except ValidationError as err:
+            response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
+            response.status_code = 400
             return response
 
-        @self.bp.route("/", methods=["GET"])
-        @check_cors
-        def index() -> Response:
-            """Handle cxtoken requests.
+        # Get request parameters
+        wiki = validated_data.get("wiki", "")  # type: ignore
+        user = validated_data.get("user", "")  # type: ignore
 
-            Query Parameters:
-                wiki: Wiki language code (e.g., 'en')
-                user: Username
+        # Format user (apply special user mappings)
+        user = _format_user(user)
 
-            Returns:
-                JSON response with cxtoken data or error
-            """
-            try:
-                validated_data = CXTokenRequestSchema().load(request.args, unknown="exclude")
-            except ValidationError as err:
-                response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
-                response.status_code = 400
-                return response
+        if _from_cache := get_from_store(user, wiki):
+            cxtoken = _from_cache
+            status_code = 200
+        else:
+            cxtoken, status_code = get_cxtoken_for_user_wiki(wiki, user)
 
-            # Get request parameters
-            wiki = validated_data.get("wiki", "")  # type: ignore
-            user = validated_data.get("user", "")  # type: ignore
+            if status_code == 200:
+                store_jwt(cxtoken, user, wiki)
 
-            # Format user (apply special user mappings)
-            user = _format_user(user)
+        response = jsonify(cxtoken)
+        response.status_code = status_code
 
-            if _from_cache := get_from_store(user, wiki):
-                cxtoken = _from_cache
-                status_code = 200
-            else:
-                cxtoken, status_code = get_cxtoken_for_user_wiki(wiki, user)
-
-                if status_code == 200:
-                    store_jwt(cxtoken, user, wiki)
-
-            response = jsonify(cxtoken)
-            response.status_code = status_code
-
-            return response
+        return response
 
 
 __all__ = [
