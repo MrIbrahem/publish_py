@@ -119,14 +119,14 @@ class UsersNoInprocess:
     def add(self) -> ResponseReturnValue:
         return _add_user_no_inprocess()
 
-    def deactivate(self, record_id: int) -> ResponseReturnValue:
-        return _set_record_active_status(record_id, False)
+    def delete(self, record_id: int) -> ResponseReturnValue:
+        return _delete_user_no_inprocess(record_id)
 
     def activate(self, record_id: int) -> ResponseReturnValue:
         return _set_record_active_status(record_id, True)
 
-    def delete(self, record_id: int) -> ResponseReturnValue:
-        return _delete_user_no_inprocess(record_id)
+    def deactivate(self, record_id: int) -> ResponseReturnValue:
+        return _set_record_active_status(record_id, False)
 
 __all__ = [
     "UsersNoInprocess",
