@@ -1,6 +1,22 @@
 {% extends "td/td_base.html" %}
 {% from "_macros.html" import select_options, card_header %}
 
+{% macro filter_select(id, options, selected, label=None, width='col-md-4', wrapper_class='input-group', default_label='All') %}
+<div class="{{ width }}">
+    <div class="{{ wrapper_class }}">
+        {% if label %}
+        <span class="input-group-text">{{ label }}</span>
+        {% endif %}
+        <select dir="ltr" id="{{ id }}" name="{{ id }}" class="form-select" data-bs-theme="auto">
+            <option value="all">{{ default_label }}</option>
+            {% if options %}
+            {{ select_options(options, selected) }}
+            {% endif %}
+        </select>
+    </div>
+</div>
+{% endmacro %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row g-3">
@@ -13,29 +29,8 @@
                 </div>
                 <div class="col-md-7">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <span class="input-group-text">Campaign</span>
-                                <select dir="ltr" id="camp" name="camp" class="form-select" data-bs-theme="auto">
-                                    <option value="all">All</option>
-                                    {% if form_data and form_data.campaigns %}
-                                    {{ select_options(form_data.campaigns, selected_data.camp) }}
-                                    {% endif %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <span class="input-group-text">Translators</span>
-                                <select dir="ltr" id="user_group" name="user_group" class="form-select"
-                                    data-bs-theme="auto">
-                                    <option value="all">All</option>
-                                    {% if form_data and form_data.user_groups %}
-                                    {{ select_options(form_data.user_groups, selected_data.user_group) }}
-                                    {% endif %}
-                                </select>
-                            </div>
-                        </div>
+                        {{ filter_select('camp', form_data.campaigns, selected_data.camp, label='Campaign') }}
+                        {{ filter_select('user_group', form_data.user_groups, selected_data.user_group, label='Translators') }}
                         <div class="col-md-4">
                             <div class="d-flex justify-content-center align-items-center gap-2">
                                 <div class="input-group">
