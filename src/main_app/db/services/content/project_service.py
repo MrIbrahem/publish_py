@@ -19,7 +19,7 @@ class ProjectService(CRUDService[ProjectRecord, int]):
     model = ProjectRecord
 
 
-project_crud = ProjectService()
+project_crud = ProjectService(db.session)
 
 
 def list_projects() -> list[ProjectRecord]:

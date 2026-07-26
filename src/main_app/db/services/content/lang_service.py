@@ -19,7 +19,7 @@ class LangService(CRUDService[LangRecord, int]):
     model = LangRecord
 
 
-lang_crud = LangService()
+lang_crud = LangService(db.session)
 
 
 def list_langs() -> list[LangRecord]:

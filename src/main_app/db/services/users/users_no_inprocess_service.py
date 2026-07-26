@@ -19,7 +19,7 @@ class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord, int]):
     model = UsersNoInprocessRecord
 
 
-users_no_inprocess_crud = UsersNoInprocessService()
+users_no_inprocess_crud = UsersNoInprocessService(db.session)
 
 
 def list_users_no_inprocess() -> list[UsersNoInprocessRecord]:

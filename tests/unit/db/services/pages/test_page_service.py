@@ -87,11 +87,13 @@ class TestAddPage:
 
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
+        from src.main_app.db.services.pages.page_service import pages_crud
 
         with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
-            mock_session.commit.side_effect = IntegrityError(None, None, None)
-            with pytest.raises(ValueError, match="already exists"):
-                add_page("Duplicate", "lead", "Test", "en", "TestUser", "t1.html")
+            with patch.object(pages_crud, "session", mock_session):
+                mock_session.commit.side_effect = IntegrityError(None, None, None)
+                with pytest.raises(ValueError, match="already exists"):
+                    add_page("Duplicate", "lead", "Test", "en", "TestUser", "t1.html")
 
 
 class TestUpdatePage:
@@ -151,11 +153,14 @@ class TestInsertPageTarget:
         assert p.word == 1200
 
     def test_handles_exception(self, monkeypatch):
-        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
-            mock_session.commit.side_effect = Exception("DB Error")
+        from src.main_app.db.services.pages.page_service import pages_crud
 
-            success = insert_page_target("Error", "t", "c", "l", "u", "t")
-            assert success is False
+        with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
+            with patch.object(pages_crud, "session", mock_session):
+                mock_session.commit.side_effect = Exception("DB Error")
+
+                success = insert_page_target("Error", "t", "c", "l", "u", "t")
+                assert success is False
 
 
 # ---------------------------------------------------------------------------

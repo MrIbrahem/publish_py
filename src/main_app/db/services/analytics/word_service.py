@@ -10,19 +10,26 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import WordRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class WordService(CRUDService[WordRecord, int]):
+    model = WordRecord
+
+
+word_crud = WordService(db.session)
+
+
 def list_words() -> list[WordRecord]:
     """Return all word records."""
-    orm_objs = db.session.query(WordRecord).order_by(WordRecord.w_id.asc()).all()
-    return orm_objs
+    return list(word_crud.list(order_by=[WordRecord.w_id.asc()]))
 
 
 def get_word(word_id: int) -> WordRecord | None:
     """Get a word record by ID."""
-    orm_obj = db.session.get(WordRecord, word_id)
+    orm_obj = word_crud.get(word_id)
     if not orm_obj:
         logger.warning(f"Word record with ID {word_id} not found")
         return None
@@ -31,10 +38,7 @@ def get_word(word_id: int) -> WordRecord | None:
 
 def get_word_by_title(title: str) -> WordRecord | None:
     """Get a word record by title."""
-    orm_obj = db.session.query(WordRecord).filter(WordRecord.w_title == title).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return word_crud.get_by(w_title=title)
 
 
 def add_word(
@@ -47,16 +51,10 @@ def add_word(
     if not w_title:
         raise ValueError("Title is required")
 
-    orm_obj = WordRecord(w_title=w_title, w_lead_words=w_lead_words, w_all_words=w_all_words)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return word_crud.create(w_title=w_title, w_lead_words=w_lead_words, w_all_words=w_all_words)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"Word count for '{w_title}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_word(
@@ -69,35 +67,25 @@ def add_or_update_word(
     if not w_title:
         raise ValueError("Title is required")
 
-    orm_obj = db.session.query(WordRecord).filter(WordRecord.w_title == w_title).first()
-    if orm_obj:
-        orm_obj.w_lead_words = w_lead_words
-        orm_obj.w_all_words = w_all_words
-    else:
-        orm_obj = WordRecord(w_title=w_title, w_lead_words=w_lead_words, w_all_words=w_all_words)
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    return word_crud.upsert(
+        keys={"w_title": w_title},
+        w_lead_words=w_lead_words,
+        w_all_words=w_all_words,
+    )
 
 
 def update_word(word_id: int, **kwargs) -> WordRecord:
     """Update a word record."""
-    orm_obj = db.session.get(WordRecord, word_id)
-    if not orm_obj:
-        raise ValueError(f"Word record with ID {word_id} not found")
-
     if not kwargs:
+        orm_obj = word_crud.get(word_id)
+        if not orm_obj:
+            raise ValueError(f"Word record with ID {word_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return word_crud.update(word_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"Word record with ID {word_id} not found") from exc
 
 
 def get_word_counts_for_title(title: str) -> tuple[int | None, int | None]:

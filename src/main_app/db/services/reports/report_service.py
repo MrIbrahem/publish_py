@@ -11,6 +11,7 @@ from sqlalchemy import extract, func
 
 from ....extensions import db
 from ...models import ReportRecord
+from ..base import CRUDService
 
 # from sqlalchemy.exc import IntegrityError
 # from sqlalchemy.types import Integer as SAInteger
@@ -20,10 +21,16 @@ from ...models import ReportRecord
 logger = logging.getLogger(__name__)
 
 
+class ReportService(CRUDService[ReportRecord, int]):
+    model = ReportRecord
+
+
+report_crud = ReportService(db.session)
+
+
 def list_reports() -> list[ReportRecord]:
     """Return all report records."""
-    orm_objs = db.session.query(ReportRecord).order_by(ReportRecord.id.desc()).all()
-    return orm_objs
+    return list(report_crud.list(order_by=[ReportRecord.id.desc()]))
 
 
 def add_report(
@@ -35,7 +42,7 @@ def add_report(
     data: str,
 ) -> ReportRecord:
     """Add a new report record."""
-    orm_obj = ReportRecord(
+    return report_crud.create(
         title=title,
         user=user,
         lang=lang,
@@ -44,10 +51,6 @@ def add_report(
         data=data,
         date=func.now(),
     )
-    db.session.add(orm_obj)
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def query_reports_with_filters(
@@ -65,7 +68,7 @@ def query_reports_with_filters(
         "result": ReportRecord.result,
     }
 
-    query = db.session.query(ReportRecord)
+    query = report_crud.session.query(ReportRecord)
 
     for name, value in filters.items():
         if str(value).lower() == "all":

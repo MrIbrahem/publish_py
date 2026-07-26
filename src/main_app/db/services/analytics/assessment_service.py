@@ -10,20 +10,26 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import AssessmentRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class AssessmentService(CRUDService[AssessmentRecord, int]):
+    model = AssessmentRecord
+
+
+assessment_crud = AssessmentService(db.session)
+
+
 def list_assessments() -> list[AssessmentRecord]:
     """Return all assessment records."""
-    orm_objs = db.session.query(AssessmentRecord).order_by(AssessmentRecord.id.asc()).all()
-    return orm_objs
+    return list(assessment_crud.list(order_by=[AssessmentRecord.id.asc()]))
 
 
 def get_assessment(assessment_id: int) -> AssessmentRecord | None:
     """Get an assessment record by ID."""
-    # orm_obj = db.session.query(AssessmentRecord).filter(AssessmentRecord.id == assessment_id).first()
-    orm_obj = db.session.get(AssessmentRecord, assessment_id)
+    orm_obj = assessment_crud.get(assessment_id)
     if not orm_obj:
         logger.warning(f"Assessment record with ID {assessment_id} not found")
         return None
@@ -32,10 +38,7 @@ def get_assessment(assessment_id: int) -> AssessmentRecord | None:
 
 def get_assessment_by_title(title: str) -> AssessmentRecord | None:
     """Get an assessment record by title."""
-    orm_obj = db.session.query(AssessmentRecord).filter(AssessmentRecord.title == title).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return assessment_crud.get_by(title=title)
 
 
 def add_assessment(title: str, importance: str | None = None) -> AssessmentRecord:
@@ -44,16 +47,10 @@ def add_assessment(title: str, importance: str | None = None) -> AssessmentRecor
     if not title:
         raise ValueError("Title is required")
 
-    orm_obj = AssessmentRecord(title=title, importance=importance)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return assessment_crud.create(title=title, importance=importance)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"Assessment for '{title}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_assessment(title: str, importance: str | None = None) -> AssessmentRecord:
@@ -62,34 +59,21 @@ def add_or_update_assessment(title: str, importance: str | None = None) -> Asses
     if not title:
         raise ValueError("Title is required")
 
-    orm_obj = db.session.query(AssessmentRecord).filter(AssessmentRecord.title == title).first()
-    if orm_obj:
-        orm_obj.importance = importance
-    else:
-        orm_obj = AssessmentRecord(title=title, importance=importance)
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    return assessment_crud.upsert(keys={"title": title}, importance=importance)
 
 
 def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
     """Update an assessment record."""
-    orm_obj = db.session.get(AssessmentRecord, assessment_id)
-    if not orm_obj:
-        raise ValueError(f"Assessment record with ID {assessment_id} not found")
-
     if not kwargs:
+        orm_obj = assessment_crud.get(assessment_id)
+        if not orm_obj:
+            raise ValueError(f"Assessment record with ID {assessment_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return assessment_crud.update(assessment_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"Assessment record with ID {assessment_id} not found") from exc
 
 
 __all__ = [

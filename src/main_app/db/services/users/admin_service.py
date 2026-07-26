@@ -24,7 +24,7 @@ class AdminUserService(CRUDService[AdminUserRecord, int]):
     model = AdminUserRecord
 
 
-admin_crud = AdminUserService()
+admin_crud = AdminUserService(db.session)
 
 # ── SELECT ───────────────────────────────────────────────
 

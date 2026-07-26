@@ -17,7 +17,7 @@ from __future__ import annotations
 import logging
 
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import Session, aliased
 
 from ....extensions import db
 from ...models import QidOthersRecord, QidRecord
@@ -185,7 +185,10 @@ def get_title_to_qid(model: type[ServiceRecord]) -> dict[str, str]:
     return {record.title: record.qid or "" for record in records}
 
 
-class BaseQidService:
+from ..base import CRUDService
+
+
+class BaseQidService(CRUDService[ServiceRecord, int]):
     """Generic service class for managing QID-like records.
 
     Subclasses (or direct instances) are bound to a specific ORM
@@ -193,10 +196,11 @@ class BaseQidService:
 
         class QidService(BaseQidService):
             def __init__(self):
-                super().__init__(QidRecord)
+                super().__init__(QidRecord, db.session)
     """
 
-    def __init__(self, model: type[ServiceRecord]) -> None:
+    def __init__(self, model: type[ServiceRecord], session: Session) -> None:
+        super().__init__(session)
         self.model = model
 
     def add_or_update(self, title: str, qid: str) -> ServiceRecord | None:
@@ -269,6 +273,7 @@ class BaseQidService:
             return get_by_id(self.model, qid_id=qid_id)
         except Exception as e:
             logger.exception("Failed to get record by id: %s", e)
+            return None
 
     def insert(self, title: str, qid: str) -> bool:
         """Insert a new record or update if the title already exists."""

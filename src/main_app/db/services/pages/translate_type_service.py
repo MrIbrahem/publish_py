@@ -10,8 +10,16 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import UniqueError, db
 from ...models import PageRecord, QidRecord, TranslateTypeRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
+
+
+class TranslateTypeService(CRUDService[TranslateTypeRecord, int]):
+    model = TranslateTypeRecord
+
+
+translate_type_crud = TranslateTypeService(db.session)
 
 
 def list_translate_types(cat: str = "All") -> list[TranslateTypeRecord]:
@@ -20,19 +28,19 @@ def list_translate_types(cat: str = "All") -> list[TranslateTypeRecord]:
     When ``cat != "All"``, only records whose ``tt_title`` matches a page in the
     given category are returned.
     """
-    query = db.session.query(TranslateTypeRecord)
+    query = translate_type_crud.session.query(TranslateTypeRecord)
     if cat and cat.lower() != "all":
-        titles_in_cat = db.session.query(PageRecord.title).filter(PageRecord.cat == cat).distinct()
+        titles_in_cat = translate_type_crud.session.query(PageRecord.title).filter(PageRecord.cat == cat).distinct()
         query = query.filter(TranslateTypeRecord.tt_title.in_(titles_in_cat))
     return query.order_by(TranslateTypeRecord.tt_id.asc()).all()
 
 
 def list_new_titles() -> list[str]:
     """Return titles in the qids table that are not yet in translate_type."""
-    existing_titles = db.session.query(TranslateTypeRecord.tt_title).subquery()
+    existing_titles = translate_type_crud.session.query(TranslateTypeRecord.tt_title).subquery()
     rows = (
-        db.session.query(QidRecord.title)
-        .filter(QidRecord.title.notin_(db.session.query(existing_titles.c.tt_title)))
+        translate_type_crud.session.query(QidRecord.title)
+        .filter(QidRecord.title.notin_(translate_type_crud.session.query(existing_titles.c.tt_title)))
         .distinct()
         .order_by(QidRecord.title.asc())
         .all()
@@ -42,31 +50,17 @@ def list_new_titles() -> list[str]:
 
 def list_lead_enabled_types() -> list[TranslateTypeRecord]:
     """Return translate_type records with lead enabled."""
-    orm_objs = (
-        db.session.query(TranslateTypeRecord)
-        .filter(TranslateTypeRecord.tt_lead == 1)
-        .order_by(TranslateTypeRecord.tt_id.asc())
-        .all()
-    )
-    return orm_objs
+    return list(translate_type_crud.list(filters={"tt_lead": 1}, order_by=[TranslateTypeRecord.tt_id.asc()]))
 
 
 def list_full_enabled_types() -> list[TranslateTypeRecord]:
     """Return translate_type records with full enabled."""
-    orm_objs = (
-        db.session.query(TranslateTypeRecord)
-        .filter(TranslateTypeRecord.tt_full == 1)
-        .order_by(TranslateTypeRecord.tt_id.asc())
-        .all()
-    )
-    return orm_objs
+    return list(translate_type_crud.list(filters={"tt_full": 1}, order_by=[TranslateTypeRecord.tt_id.asc()]))
 
 
 def get_translate_type(tt_id: int) -> TranslateTypeRecord | None:
     """Get a translate_type record by ID."""
-    # orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_id == tt_id).first()
-    # tt_id is the primary key for TranslateTypeRecord
-    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
+    orm_obj = translate_type_crud.get(tt_id)
     if not orm_obj:
         logger.warning(f"TranslateType record with ID {tt_id} not found")
         return None
@@ -75,10 +69,7 @@ def get_translate_type(tt_id: int) -> TranslateTypeRecord | None:
 
 def get_translate_type_by_title(title: str) -> TranslateTypeRecord | None:
     """Get a translate_type record by title."""
-    orm_obj = db.session.query(TranslateTypeRecord).filter(TranslateTypeRecord.tt_title == title).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return translate_type_crud.get_by(tt_title=title)
 
 
 def add_translate_type(
@@ -91,16 +82,10 @@ def add_translate_type(
     if not tt_title:
         raise ValueError("Title is required")
 
-    orm_obj = TranslateTypeRecord(tt_title=tt_title, tt_lead=tt_lead, tt_full=tt_full)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return translate_type_crud.create(tt_title=tt_title, tt_lead=tt_lead, tt_full=tt_full)
     except IntegrityError:
-        db.session.rollback()
         raise UniqueError(title=tt_title) from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def update_translate_type(
@@ -110,31 +95,23 @@ def update_translate_type(
     tt_full: int | None = None,
 ) -> TranslateTypeRecord:
     """Update a translate_type record."""
-    # tt_id is the primary key for TranslateTypeRecord
-    orm_obj = db.session.get(TranslateTypeRecord, tt_id)
-    if not orm_obj:
-        raise ValueError(f"TranslateType record with ID {tt_id} not found")
-
+    kwargs = {}
     if tt_title:
         tt_title = tt_title.strip()
-        orm_obj.tt_title = tt_title
+        kwargs["tt_title"] = tt_title
 
     if tt_lead is not None:
-        orm_obj.tt_lead = int(tt_lead)
+        kwargs["tt_lead"] = int(tt_lead)
 
     if tt_full is not None:
-        orm_obj.tt_full = int(tt_full)
+        kwargs["tt_full"] = int(tt_full)
 
     try:
-        db.session.commit()
-        db.session.refresh(orm_obj)
+        return translate_type_crud.update(tt_id, **kwargs)
     except IntegrityError:
-        db.session.rollback()
         raise UniqueError(title=tt_title) from None
-    except Exception:
-        db.session.rollback()
-        raise
-    return orm_obj
+    except ValueError as exc:
+        raise ValueError(f"TranslateType record with ID {tt_id} not found") from exc
 
 
 def can_translate_lead(title: str) -> bool:

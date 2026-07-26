@@ -10,8 +10,16 @@ from sqlalchemy import text
 
 from ....extensions import db
 from ...models import CategoryMemberRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
+
+
+class CategoryMemberService(CRUDService[CategoryMemberRecord, int]):
+    model = CategoryMemberRecord
+
+
+category_member_crud = CategoryMemberService(db.session)
 
 
 def get_all_category_members() -> dict[str, list[str]]:
@@ -21,7 +29,7 @@ def get_all_category_members() -> dict[str, list[str]]:
     """
     data: dict[str, list[str]] = {}
 
-    rows = db.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all()
+    rows = category_member_crud.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all()
     for category, article_id in rows:
         data.setdefault(category, []).append(article_id)
     return data
@@ -33,43 +41,33 @@ def list_distinct_article_ids() -> list[str]:
     Mirrors old ``select DISTINCT article_id from category_members``.
     """
 
-    rows = db.session.query(CategoryMemberRecord.article_id).distinct().all()
+    rows = category_member_crud.session.query(CategoryMemberRecord.article_id).distinct().all()
     return [row.article_id for row in rows]
 
 
 def count_by_category(category: str) -> int:
     """Return the number of members in *category*."""
 
-    return db.session.query(CategoryMemberRecord).filter(CategoryMemberRecord.category == category).count()
+    return category_member_crud.count(filters={"category": category})
 
 
 def get_members_by_category(category: str) -> list[CategoryMemberRecord]:
     """Return all member records for *category*."""
 
-    return db.session.query(CategoryMemberRecord).filter(CategoryMemberRecord.category == category).all()
+    return list(category_member_crud.list(filters={"category": category}))
 
 
 def add_category_member(category: str, article_id: str) -> bool:
     """Insert a single category member row. Returns True on success."""
 
     try:
-        existing = (
-            db.session.query(CategoryMemberRecord)
-            .filter(
-                CategoryMemberRecord.category == category,
-                CategoryMemberRecord.article_id == article_id,
-            )
-            .first()
-        )
+        existing = category_member_crud.get_by(category=category, article_id=article_id)
         if existing:
             return True
-        orm_obj = CategoryMemberRecord(category=category, article_id=article_id)
-        db.session.add(orm_obj)
-        db.session.commit()
+        category_member_crud.create(category=category, article_id=article_id)
         return True
     except Exception:
         logger.exception("Failed to add category member %s / %s", category, article_id)
-        db.session.rollback()
         return False
 
 
@@ -81,7 +79,7 @@ def batch_sync_category_members(data: list[dict]) -> None:
     """
 
     try:
-        existing_rows = set(db.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all())
+        existing_rows = set(category_member_crud.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all())
         new_rows = []
         seen = set()
         for row in data:

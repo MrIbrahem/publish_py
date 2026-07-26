@@ -26,22 +26,8 @@ class CRUDService(Generic[ModelT, PKT]):
 
     model: Type[ModelT]
 
-    def __init__(self, session: Session | None = None) -> None:
-        self._session = session
-
-    @property
-    def session(self) -> Session:
-        if self._session is not None:
-            return self._session
-        # Support mocking of db in subclass module namespaces during tests
-        import sys
-        module_name = self.__class__.__module__
-        if module_name in sys.modules:
-            mod = sys.modules[module_name]
-            if hasattr(mod, "db"):
-                return getattr(mod, "db").session
-        from ...extensions import db
-        return db.session
+    def __init__(self, session: Session) -> None:
+        self.session = session
 
     def _base_select(self):
         """Return the base SELECT statement for the model."""

@@ -20,7 +20,7 @@ class UserService(CRUDService[UserRecord, int]):
     model = UserRecord
 
 
-user_crud = UserService()
+user_crud = UserService(db.session)
 
 
 def list_users() -> list[UserRecord]:

@@ -19,7 +19,7 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord, int]):
     model = FullTranslatorRecord
 
 
-full_translator_crud = FullTranslatorService()
+full_translator_crud = FullTranslatorService(db.session)
 
 
 def list_full_translators() -> list[FullTranslatorRecord]:

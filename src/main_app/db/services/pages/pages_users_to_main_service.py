@@ -15,8 +15,16 @@ from typing import Any
 
 from ....extensions import db
 from ...models import PageRecord, PagesUsersToMainRecord, QidRecord, UserPageRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
+
+
+class PagesUsersToMainPagesService(CRUDService[PagesUsersToMainRecord, int]):
+    model = PagesUsersToMainRecord
+
+
+pages_users_to_main_pages_crud = PagesUsersToMainPagesService(db.session)
 
 
 def _row_to_dict(row: Any) -> dict[str, Any]:
@@ -34,7 +42,7 @@ def list_pending(lang: str = "All") -> list[dict[str, Any]]:
     ``qids.title``), optionally filtered by language.
     """
     query = (
-        db.session.query(
+        pages_users_to_main_pages_crud.session.query(
             UserPageRecord.id.label("id"),
             UserPageRecord.user.label("user"),
             UserPageRecord.lang.label("lang"),
@@ -73,7 +81,7 @@ def get_user_page(page_id: int) -> UserPageRecord | None:
     """Return the ``pages_users`` row for the given id."""
     if not page_id:
         return None
-    return db.session.get(UserPageRecord, page_id)
+    return pages_users_to_main_pages_crud.session.get(UserPageRecord, page_id)
 
 
 def check_main_page_exists(title: str, lang: str) -> PageRecord | None:
@@ -84,7 +92,7 @@ def check_main_page_exists(title: str, lang: str) -> PageRecord | None:
     if not title or not lang:
         return None
     return (
-        db.session.query(PageRecord)
+        pages_users_to_main_pages_crud.session.query(PageRecord)
         .filter(
             PageRecord.title == title,
             PageRecord.lang == lang,

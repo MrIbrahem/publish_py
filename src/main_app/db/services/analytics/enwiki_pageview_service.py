@@ -10,25 +10,31 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import EnwikiPageviewRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord, int]):
+    model = EnwikiPageviewRecord
+
+
+enwiki_pageview_crud = EnwikiPageviewService(db.session)
+
+
 def list_enwiki_pageviews() -> list[EnwikiPageviewRecord]:
     """Return all enwiki pageview records."""
-    orm_objs = db.session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.id.asc()).all()
-    return orm_objs
+    return list(enwiki_pageview_crud.list(order_by=[EnwikiPageviewRecord.id.asc()]))
 
 
 def get_top_enwiki_pageviews(limit: int = 100) -> list[EnwikiPageviewRecord]:
     """Return top enwiki pageview records by view count."""
-    orm_objs = db.session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.en_views.desc()).limit(limit).all()
-    return orm_objs
+    return list(enwiki_pageview_crud.list(order_by=[EnwikiPageviewRecord.en_views.desc()], limit=limit))
 
 
 def get_enwiki_pageview(pageview_id: int) -> EnwikiPageviewRecord | None:
     """Get an enwiki pageview record by ID."""
-    orm_obj = db.session.get(EnwikiPageviewRecord, pageview_id)
+    orm_obj = enwiki_pageview_crud.get(pageview_id)
     if not orm_obj:
         logger.warning(f"Enwiki pageview record with ID {pageview_id} not found")
         return None
@@ -37,10 +43,7 @@ def get_enwiki_pageview(pageview_id: int) -> EnwikiPageviewRecord | None:
 
 def get_enwiki_pageview_by_title(title: str) -> EnwikiPageviewRecord | None:
     """Get an enwiki pageview record by title."""
-    orm_obj = db.session.query(EnwikiPageviewRecord).filter(EnwikiPageviewRecord.title == title).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return enwiki_pageview_crud.get_by(title=title)
 
 
 def add_enwiki_pageview(title: str, en_views: int | None = 0) -> EnwikiPageviewRecord:
@@ -49,16 +52,10 @@ def add_enwiki_pageview(title: str, en_views: int | None = 0) -> EnwikiPageviewR
     if not title:
         raise ValueError("Title is required")
 
-    orm_obj = EnwikiPageviewRecord(title=title, en_views=en_views)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return enwiki_pageview_crud.create(title=title, en_views=en_views)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"Enwiki pageview for '{title}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_enwiki_pageview(title: str, en_views: int | None = 0) -> EnwikiPageviewRecord:
@@ -67,34 +64,21 @@ def add_or_update_enwiki_pageview(title: str, en_views: int | None = 0) -> Enwik
     if not title:
         raise ValueError("Title is required")
 
-    orm_obj = db.session.query(EnwikiPageviewRecord).filter(EnwikiPageviewRecord.title == title).first()
-    if orm_obj:
-        orm_obj.en_views = en_views
-    else:
-        orm_obj = EnwikiPageviewRecord(title=title, en_views=en_views)
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    return enwiki_pageview_crud.upsert(keys={"title": title}, en_views=en_views)
 
 
 def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
     """Update an enwiki pageview record."""
-    orm_obj = db.session.get(EnwikiPageviewRecord, pageview_id)
-    if not orm_obj:
-        raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
-
     if not kwargs:
+        orm_obj = enwiki_pageview_crud.get(pageview_id)
+        if not orm_obj:
+            raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return enwiki_pageview_crud.update(pageview_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found") from exc
 
 
 __all__ = [
