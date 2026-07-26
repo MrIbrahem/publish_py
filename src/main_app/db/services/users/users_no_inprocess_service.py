@@ -10,30 +10,31 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import UsersNoInprocessRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord, int]):
+    model = UsersNoInprocessRecord
+
+
+users_no_inprocess_crud = UsersNoInprocessService()
+
+
 def list_users_no_inprocess() -> list[UsersNoInprocessRecord]:
     """Return all users_no_inprocess records."""
-    orm_objs = db.session.query(UsersNoInprocessRecord).order_by(UsersNoInprocessRecord.id.asc()).all()
-    return orm_objs
+    return list(users_no_inprocess_crud.list(order_by=[UsersNoInprocessRecord.id.asc()]))
 
 
 def list_active_users_no_inprocess() -> list[UsersNoInprocessRecord]:
     """Return all is_active users_no_inprocess records."""
-    orm_objs = (
-        db.session.query(UsersNoInprocessRecord)
-        .filter(UsersNoInprocessRecord.is_active == 1)
-        .order_by(UsersNoInprocessRecord.id.asc())
-        .all()
-    )
-    return orm_objs
+    return list(users_no_inprocess_crud.list(filters={"is_active": 1}, order_by=[UsersNoInprocessRecord.id.asc()]))
 
 
 def get_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord | None:
     """Get a users_no_inprocess record by ID."""
-    orm_obj = db.session.get(UsersNoInprocessRecord, record_id)
+    orm_obj = users_no_inprocess_crud.get(record_id)
     if not orm_obj:
         logger.warning(f"UsersNoInprocess record with ID {record_id} not found")
         return None
@@ -42,10 +43,7 @@ def get_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord | None:
 
 def get_users_no_inprocess_by_user(user: str) -> UsersNoInprocessRecord | None:
     """Get a users_no_inprocess record by username."""
-    orm_obj = db.session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.user == user).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return users_no_inprocess_crud.get_by(user=user)
 
 
 def add_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRecord:
@@ -54,16 +52,10 @@ def add_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRec
     if not user:
         raise ValueError("User is required")
 
-    orm_obj = UsersNoInprocessRecord(user=user, is_active=is_active)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return users_no_inprocess_crud.create(user=user, is_active=is_active)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"UsersNoInprocess '{user}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoInprocessRecord:
@@ -72,42 +64,21 @@ def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoIn
     if not user:
         raise ValueError("User is required")
 
-    orm_obj = db.session.query(UsersNoInprocessRecord).filter(UsersNoInprocessRecord.user == user).first()
-    if orm_obj:
-        orm_obj.is_active = is_active
-    else:
-        orm_obj = UsersNoInprocessRecord(user=user, is_active=is_active)
-        db.session.add(orm_obj)
-
-    try:
-        db.session.commit()
-        db.session.refresh(orm_obj)
-    except Exception:
-        db.session.rollback()
-        raise
-    return orm_obj
+    return users_no_inprocess_crud.upsert(keys={"user": user}, is_active=is_active)
 
 
 def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecord:
     """Update a users_no_inprocess record."""
-    orm_obj = db.session.get(UsersNoInprocessRecord, record_id)
-    if not orm_obj:
-        raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
-
     if not kwargs:
+        orm_obj = users_no_inprocess_crud.get(record_id)
+        if not orm_obj:
+            raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
     try:
-        db.session.commit()
-        db.session.refresh(orm_obj)
-    except Exception:
-        db.session.rollback()
-        raise
-    return orm_obj
+        return users_no_inprocess_crud.update(record_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"UsersNoInprocess record with ID {record_id} not found") from exc
 
 
 def should_hide_from_inprocess(user: str) -> bool:

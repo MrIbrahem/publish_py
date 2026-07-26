@@ -10,21 +10,26 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import LangRecord
+from ..base import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class LangService(CRUDService[LangRecord, int]):
+    model = LangRecord
+
+
+lang_crud = LangService()
+
+
 def list_langs() -> list[LangRecord]:
     """Return all language records."""
-    orm_objs = db.session.query(LangRecord).order_by(LangRecord.lang_id.asc()).all()
-    return orm_objs
+    return list(lang_crud.list(order_by=[LangRecord.lang_id.asc()]))
 
 
 def get_lang(lang_id: int) -> LangRecord | None:
     """Get a language record by ID."""
-    # orm_obj = db.session.query(LangRecord).filter(LangRecord.lang_id == lang_id).first()
-    # lang_id is the primary key for LangRecord
-    orm_obj = db.session.get(LangRecord, lang_id)
+    orm_obj = lang_crud.get(lang_id)
     if not orm_obj:
         logger.warning(f"Language record with ID {lang_id} not found")
         return None
@@ -33,10 +38,7 @@ def get_lang(lang_id: int) -> LangRecord | None:
 
 def get_lang_by_code(code: str) -> LangRecord | None:
     """Get a language record by code."""
-    orm_obj = db.session.query(LangRecord).filter(LangRecord.code == code).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return lang_crud.get_by(code=code)
 
 
 def add_lang(
@@ -50,16 +52,10 @@ def add_lang(
     if not code:
         raise ValueError("Language code is required")
 
-    orm_obj = LangRecord(code=code, autonym=autonym, name=name, redirects=redirects)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return lang_crud.create(code=code, autonym=autonym, name=name, redirects=redirects)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"Language '{code}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_lang(
@@ -73,18 +69,7 @@ def add_or_update_lang(
     if not code:
         raise ValueError("Language code is required")
 
-    orm_obj = db.session.query(LangRecord).filter(LangRecord.code == code).first()
-    if orm_obj:
-        orm_obj.autonym = autonym
-        orm_obj.name = name
-        orm_obj.redirects = redirects
-    else:
-        orm_obj = LangRecord(code=code, autonym=autonym, name=name, redirects=redirects)
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    return lang_crud.upsert(keys={"code": code}, autonym=autonym, name=name, redirects=redirects)
 
 
 __all__ = [
