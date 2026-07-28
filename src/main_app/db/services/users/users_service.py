@@ -8,8 +8,8 @@ import logging
 
 from sqlalchemy.exc import IntegrityError
 
-from ...exceptions import UserNotFoundError
 from ....extensions import db
+from ...exceptions import UserNotFoundError
 from ...models import UserRecord
 from ..crud_service import CRUDService
 
@@ -78,7 +78,6 @@ class UsersService(CRUDService[UserRecord]):
         except ValueError as exc:
             raise ValueError(f"User record with ID {user_id} not found") from exc
 
-
     def users_search(self, userlike: str | None) -> list[str]:
         """Return all user records where there username start with userlike."""
         if not userlike:
@@ -93,7 +92,6 @@ class UsersService(CRUDService[UserRecord]):
         )
         return [x.username for x in rows]
 
-
     def list_users_by_group(self, user_group: str) -> list[UserRecord]:
         """Return user records by group."""
         return list(
@@ -105,6 +103,7 @@ class UsersService(CRUDService[UserRecord]):
 
 
 user_crud = UsersService()
+
 
 def list_users() -> list[UserRecord]:
     return user_crud.list_users()
@@ -132,7 +131,12 @@ def create_user(
     wiki: str = "",
     user_group: str = "Uncategorized",
 ) -> UserRecord:
-    return user_crud.create_user(username, email=email, wiki=wiki, user_group=user_group,)
+    return user_crud.create_user(
+        username,
+        email=email,
+        wiki=wiki,
+        user_group=user_group,
+    )
 
 
 def update_user(
@@ -160,7 +164,6 @@ def user_exists(username: str) -> bool:
 
 __all__ = [
     "UsersService",
-
     "list_users",
     "list_users_by_group",
     "get_user",

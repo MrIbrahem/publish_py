@@ -23,6 +23,7 @@ class MaxUserConnectionsError(Exception):
 class UserNotFoundError(LookupError):
     """Raised when a referenced user does not exist in users."""
 
+
 class DuplicateRecordError(Exception):
     """Raised when attempting to create a user or coordinator that already exists."""
 

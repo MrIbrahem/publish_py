@@ -25,18 +25,6 @@ from .full_translator_service import (
     list_full_translators,
     update_full_translator,
 )
-from .users_service import (
-    UsersService,
-    create_user,
-    get_user,
-    get_user_by_username,
-    list_users,
-    list_users_by_group,
-    update_user,
-    update_user_data,
-    user_exists,
-    users_search,
-)
 from .user_token_service import (
     UserTokenService,
     get_authenticated_user_token,
@@ -54,13 +42,24 @@ from .users_no_inprocess_service import (
     should_hide_from_inprocess,
     update_users_no_inprocess,
 )
+from .users_service import (
+    UsersService,
+    create_user,
+    get_user,
+    get_user_by_username,
+    list_users,
+    list_users_by_group,
+    update_user,
+    update_user_data,
+    user_exists,
+    users_search,
+)
 
 __all__ = [
     # classes
     "AdminService",
     "UsersService",
     "UserTokenService",
-
     # functions
     "list_coordinators",
     "get_coordinator_by_id",

@@ -9,14 +9,12 @@ import logging
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
-from ..crud_service import CRUDService
-
 from ....extensions import db
 from ....shared.core.crypto import encrypt_value
 from ...models import UserTokenRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
-
 
 
 class UserTokenService(CRUDService[UserTokenRecord]):
@@ -136,11 +134,14 @@ def get_user_token(user_id: str | int) -> UserTokenRecord | None:
 
 # ── INSERT, UPDATE, SET ──────────────────────────────────
 
+
 def create_user_token(user_id: int, access_key: str, access_secret: str) -> UserTokenRecord:
     return user_token_crud.create_user_token(user_id, access_key, access_secret)
 
+
 def update_user_token(user_id: int, access_key: str, access_secret: str) -> UserTokenRecord | None:
     return user_token_crud.update_user_token(user_id, access_key, access_secret)
+
 
 def upsert_user_token(
     user_id: int,
@@ -149,8 +150,10 @@ def upsert_user_token(
 ) -> UserTokenRecord | None:
     return user_token_crud.upsert_user_token(user_id, access_key, access_secret)
 
+
 def get_user_token_by_username(username: str) -> UserTokenRecord | None:
     return user_token_crud.get_by(username=username)
+
 
 __all__ = [
     "UserTokenService",

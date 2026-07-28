@@ -17,6 +17,7 @@ from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
+
 class AdminService(CRUDService[AdminUserRecord]):
     def __init__(self) -> None:
         super().__init__(db.session, AdminUserRecord)
@@ -91,7 +92,9 @@ class AdminService(CRUDService[AdminUserRecord]):
             self.session.rollback()
             return None
 
+
 admin_crud = AdminService()
+
 
 def is_active_coordinator(username: str) -> bool:
     return admin_crud.is_active_coordinator(username=username)
@@ -104,6 +107,7 @@ def list_coordinators() -> list[AdminUserRecord]:
 def get_coordinator_by_id(coordinator_id: int) -> AdminUserRecord | None:
     return admin_crud.get_coordinator_by_id(coordinator_id)
 
+
 def add_coordinator(username: str) -> AdminUserRecord:
     return admin_crud.add_coordinator(username=username)
 
@@ -114,6 +118,7 @@ def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRec
 
 def delete_coordinator(coordinator_id: int) -> bool:
     return admin_crud.delete(coordinator_id)
+
 
 __all__ = [
     "list_coordinators",

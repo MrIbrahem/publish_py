@@ -13,6 +13,7 @@ from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
+
 def _serialize_value(value: Any, value_type: str) -> str | None:
     if value is None:
         return None
@@ -51,6 +52,7 @@ def format_values(records: list[SettingRecord]) -> dict[str, Any]:
         data[x.key] = val
 
     return data
+
 
 class SettingsService(CRUDService[SettingRecord]):
     def __init__(self) -> None:
@@ -138,13 +140,13 @@ class SettingsService(CRUDService[SettingRecord]):
             logger.error("Failed to create new record: %s", exc)
             return None
 
-
     def delete_setting_by_key(self, key: str) -> bool:
         record = self.get_by(key=key)
         if record is None:
             return False
 
         return self.delete_record(record)
+
 
 setting_crud = SettingsService()
 
@@ -168,6 +170,7 @@ def get_setting_by_key(key: str) -> SettingRecord | None:
 def get_setting_by_id(setting_id: int) -> SettingRecord | None:
     return setting_crud.get_setting_by_id(setting_id)
 
+
 def update_setting(
     key: str,
     value: Any,
@@ -175,6 +178,7 @@ def update_setting(
     title: str | None = None,
 ) -> bool:
     return setting_crud.update_setting(key, value, value_type, title)
+
 
 def create_setting(
     key: str,
