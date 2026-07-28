@@ -43,10 +43,6 @@ class AllQidsService:
         rows = self.session.execute(sql, {"lang": lang}).fetchall()
         return [dict(row._mapping) for row in rows]
 
-
-list_targets_by_lang = AllQidsService().list_targets_by_lang
-
 __all__ = [
     "AllQidsService",
-    "list_targets_by_lang",
 ]
