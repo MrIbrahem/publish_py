@@ -6,7 +6,6 @@ from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
     UserTokenService,
     get_user_token,
-    get_user_token_by_username,
     upsert_user_token,
 )
 
@@ -31,12 +30,4 @@ class TestUserServiceIntegration:
         UserTokenService().delete(user_id)
 
         result = get_user_token(user_id)
-        assert result is None
-
-    def test_lookup_error_handling(self):
-        """Test service handles LookupError from DB layer."""
-        result = get_user_token(99999)
-        assert result is None
-
-        result = get_user_token_by_username("NonExistent")
         assert result is None

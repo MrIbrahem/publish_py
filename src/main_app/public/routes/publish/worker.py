@@ -9,7 +9,10 @@ from typing import Any
 from ....config import settings
 from ....db.models import LanguageSettingRecord
 from ....db.services import (
-    LanguageSettingService, ReportService, UserTokenService, MdwikiRevidService,
+    LanguageSettingService,
+    MdwikiRevidService,
+    ReportService,
+    UserTokenService,
 )
 from ....shared.clients import (
     get_revid,
@@ -28,7 +31,6 @@ from ....shared.utils.helpers import (
 from .to_db import add_to_db
 
 logger = logging.getLogger(__name__)
-
 
 def load_language_settings(lang: str) -> LanguageSettingRecord:
     """Load language settings for the given language.
@@ -138,29 +140,28 @@ def _retry_with_fallback_user(
 
     # Retry with fallback user credentials
     token_service = UserTokenService()
-    fallback_token = token_service.get_user_token_by_username(fallback_user)
+    fallback_token = token_service.get_user_token_by_username(user)
 
-    if fallback_token is not None:
-        fallback_access_key, fallback_access_secret = fallback_token.decrypted()
+    if fallback_token is None:
+        return {}
 
-        link_result = link_to_wikidata(
-            sourcetitle,
-            lang,
-            fallback_user,
-            title,
-            fallback_access_key,
-            fallback_access_secret,
-        )
+    fallback_access_key, fallback_access_secret = fallback_token.decrypted()
 
-        if "error" not in link_result:
-            link_result["fallback_user"] = fallback_user
-            link_result["original_user"] = user
-            logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
+    link_result = link_to_wikidata(
+        sourcetitle,
+        lang,
+        fallback_user,
+        title,
+        fallback_access_key,
+        fallback_access_secret,
+    )
 
-        return link_result
+    if "error" not in link_result:
+        link_result["fallback_user"] = fallback_user
+        link_result["original_user"] = user
+        logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
 
-    return {}
-
+    return link_result
 
 def _handle_successful_edit(
     sourcetitle: str,

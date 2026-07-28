@@ -5,17 +5,29 @@ SQLAlchemy-based service for managing user tokens.
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy import func
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 from ....extensions import db
 from ....shared.core.crypto import encrypt_value
-from ...models import UserTokenRecord
+from ...models import UserTokenRecord, UserRecord
 from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
+def _get_user_token_by_username(username: str, session: Session | Any) -> UserTokenRecord | None:
+    try:
+        return (
+            session.query(UserTokenRecord)
+            .join(UserRecord, UserTokenRecord.user_id == UserRecord.user_id)
+            .filter(UserRecord.username == username)
+            .first()
+        )
+    except Exception as exc:
+        logger.error("Error getting token by username %s: %s", username, exc)
+        return None
 
 class UserTokenService(CRUDService[UserTokenRecord]):
     def __init__(self) -> None:
@@ -114,8 +126,7 @@ class UserTokenService(CRUDService[UserTokenRecord]):
             return self.create_user_token(user_id, encrypted_token, encrypted_secret)
 
     def get_user_token_by_username(self, username: str) -> UserTokenRecord | None:
-        return _crud.get_by(user=username)
-
+        return _get_user_token_by_username(username, self.session)
 
 _crud = UserTokenService()
 
@@ -123,11 +134,10 @@ get_authenticated_user_token = _crud.get_authenticated_user_token
 get_user_token = _crud.get_user_token
 upsert_user_token = _crud.upsert_user_token
 create_user_token = _crud.create_user_token
-get_user_token_by_username = _crud.get_user_token_by_username
+
 
 __all__ = [
     "UserTokenService",
     "upsert_user_token",
     "get_user_token",
-    "get_user_token_by_username",
 ]
