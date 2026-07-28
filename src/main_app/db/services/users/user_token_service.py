@@ -162,6 +162,7 @@ def upsert_user_token(
 
     return user_token_crud.upsert_user_token(user_id, encrypted_token, encrypted_secret)
 
+
 def create_user_token(
     user_id: int,
     encrypted_token: bytes,

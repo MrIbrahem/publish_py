@@ -6,6 +6,7 @@ from ..delete_service import (
     delete_setting_by_key,
 )
 from .language_setting_service import (
+    LanguageSettingService,
     add_language_setting,
     add_or_update_language_setting,
     get_language_setting,
@@ -14,6 +15,7 @@ from .language_setting_service import (
     update_language_setting,
 )
 from .settings_service import (
+    SettingsService,
     create_setting,
     get_all_settings_raw,
     get_all_settings_ready,
@@ -24,6 +26,8 @@ from .settings_service import (
 )
 
 __all__ = [
+    "SettingsService",
+    "LanguageSettingService",
     "get_all_settings_ready",
     "list_language_settings",
     "get_language_setting",

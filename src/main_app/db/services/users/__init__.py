@@ -16,6 +16,7 @@ from .admin_service import (
     set_coordinator_active,
 )
 from .full_translator_service import (
+    FullTranslatorService,
     add_full_translator,
     add_or_update_full_translator,
     get_full_translator,
@@ -33,6 +34,7 @@ from .user_token_service import (
     upsert_user_token,
 )
 from .users_no_inprocess_service import (
+    UsersNoInprocessService,
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,
     get_users_no_inprocess,
@@ -60,6 +62,8 @@ __all__ = [
     "AdminService",
     "UsersService",
     "UserTokenService",
+    "FullTranslatorService",
+    "UsersNoInprocessService",
     # functions
     "list_coordinators",
     "get_coordinator_by_id",

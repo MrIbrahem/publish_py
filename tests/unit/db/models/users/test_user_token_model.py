@@ -98,4 +98,3 @@ class TestUserTokenRecord2:
 
         assert record.access_token == b"encrypted_token"
         assert record.access_secret == b"encrypted_secret"
-

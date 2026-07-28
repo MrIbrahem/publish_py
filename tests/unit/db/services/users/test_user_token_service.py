@@ -1,10 +1,8 @@
-
 from src.main_app.db.services.delete_service import (
     delete_user_token,
 )
 from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
-    UserTokenService,
     create_user_token,
     get_authenticated_user_token,
     get_user_token,
@@ -36,6 +34,7 @@ def test_upsert_get_delete_user_token() -> None:
     # Test delete token only
     delete_user_token(user.user_id)
     assert get_user_token(user.user_id) is None
+
 
 class TestGetAuthenticatedUserToken:
     """Tests for get_authenticated_user_token."""
@@ -94,7 +93,7 @@ class TestGetUserToken:
 
     def test_returns_none_for_none_user_id(self):
         """Test returns None when user_id is None."""
-        result = get_user_token(None) # type: ignore
+        result = get_user_token(None)  # type: ignore
 
         assert result is None
 

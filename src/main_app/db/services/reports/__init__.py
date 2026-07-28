@@ -5,18 +5,22 @@ from ..delete_service import (
     delete_report,
 )
 from .pages_users_to_main_service import (
+    PagesUsersToMainService,
     add_pages_users_to_main,
     get_pages_users_to_main,
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
 from .report_service import (
+    ReportService,
     add_report,
     list_reports,
     query_reports_with_filters,
 )
 
 __all__ = [
+    "ReportService",
+    "PagesUsersToMainService",
     "list_pages_users_to_main",
     "get_pages_users_to_main",
     "add_pages_users_to_main",
