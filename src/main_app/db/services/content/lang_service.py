@@ -81,12 +81,12 @@ class LangService(CRUDService[LangRecord]):
         return instance
 
 
-_curd = LangService()
-list_langs = _curd.list_langs
-get_lang = _curd.get_lang
-get_lang_by_code = _curd.get_lang_by_code
-add_lang = _curd.add_lang
-add_or_update_lang = _curd.add_or_update_lang
+_crud = LangService()
+list_langs = _crud.list_langs
+get_lang = _crud.get_lang
+get_lang_by_code = _crud.get_lang_by_code
+add_lang = _crud.add_lang
+add_or_update_lang = _crud.add_or_update_lang
 
 
 __all__ = [

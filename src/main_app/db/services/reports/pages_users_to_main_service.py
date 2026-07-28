@@ -57,11 +57,11 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
         return self.update_or_404(record_id, **kwargs)
 
 
-_curd = PagesUsersToMainService()
-list_pages_users_to_main = _curd.list_pages_users_to_main
-get_pages_users_to_main = _curd.get_pages_users_to_main
-add_pages_users_to_main = _curd.add_pages_users_to_main
-update_pages_users_to_main = _curd.update_pages_users_to_main
+_crud = PagesUsersToMainService()
+list_pages_users_to_main = _crud.list_pages_users_to_main
+get_pages_users_to_main = _crud.get_pages_users_to_main
+add_pages_users_to_main = _crud.add_pages_users_to_main
+update_pages_users_to_main = _crud.update_pages_users_to_main
 
 
 __all__ = [
