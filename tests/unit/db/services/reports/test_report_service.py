@@ -1,10 +1,10 @@
 import pytest
 
-from src.main_app.sqlite_db.models import ReportRecord
-from src.main_app.sqlite_db.services.delete_service import (
+from src.main_app.db.models import ReportRecord
+from src.main_app.db.services.delete_service import (
     delete_report,
 )
-from src.main_app.sqlite_db.services.reports.report_service import (
+from src.main_app.db.services.reports.report_service import (
     add_report,
     list_reports,
     query_reports_with_filters,
