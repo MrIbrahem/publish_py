@@ -12,6 +12,11 @@ from src.main_app.db.services.analytics.enwiki_pageview_service import (
     update_enwiki_pageview,
 )
 
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = EnwikiPageviewService()
+
 
 def test_enwiki_pageview_workflow():
     # Test add
