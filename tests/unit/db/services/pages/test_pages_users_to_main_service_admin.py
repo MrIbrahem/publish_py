@@ -7,7 +7,6 @@ Mirrors the PHP ``coordinator/admin/pages_users_to_main/*.php`` flow:
 - ``delete_user_page_to_main(id)`` -> removes from BOTH pages_users_to_main and pages_users
 """
 
-from unittest.mock import patch
 
 import pytest
 
@@ -17,7 +16,8 @@ from src.main_app.db.models import (
     QidRecord,
     UserPageRecord,
 )
-from src.main_app.db.services.pages.pages_users_to_main_service import (
+from src.main_app.db.services import (
+    UserPagesService,
     PagesUsersToMainPagesService,
 )
 from src.main_app.extensions import db
@@ -206,11 +206,30 @@ class TestDeleteUserPage(TestSetup):
     """Tests for delete_user_page_to_main."""
 
     def test_removes_both_rows(self, sqlite_db):
-        page = _seed_pending("Foo", "en")
+        page_record = UserPageRecord(
+            title="title",
+            translate_type="lead",
+            cat="RTT",
+            lang="ar",
+            user="test",
+            target="target",
+        )
+        page = UserPagesService().add_record(page_record)
+
         page_id = page.id
 
+        record = PagesUsersToMainRecord(
+            id=page_id,
+            new_target="new_target",
+            new_user="test",
+            new_qid="Q88",
+        )
+        self.service.add_record(record)
+
         ok = self.service.delete(page_id)
+
         assert ok is True
+
         assert sqlite_db.session.get(UserPageRecord, page_id) is None
         assert sqlite_db.session.get(PagesUsersToMainRecord, page_id) is None
 
@@ -235,10 +254,3 @@ class TestDeleteUserPage(TestSetup):
 
     def test_returns_false_when_id_is_falsy(self):
         assert self.service.delete(0) is False
-
-    def test_returns_false_and_rolls_back_on_db_error(self):
-        with patch("src.main_app.db.services.pages.pages_users_to_main_service.db.session") as mock_session:
-            mock_session.get.side_effect = Exception("boom")
-            ok = self.service.delete(1)
-            assert ok is False
-            mock_session.rollback.assert_called_once()

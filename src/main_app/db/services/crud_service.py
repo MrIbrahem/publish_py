@@ -119,6 +119,22 @@ class CRUDService[ModelT]:
     # Write
     # ------------------------------------------------------------------ #
 
+    def add_record(self, instance: ModelT) -> ModelT:
+        """Instantiate the model with `fields` and persist it."""
+        try:
+            self.session.add(instance)
+        except Exception:
+            logger.error("Error adding %s", self.model_name)
+            raise
+
+        try:
+            self.commit()
+            self.session.refresh(instance)
+            return instance
+        except Exception:
+            logger.error("Error adding %s", self.model_name)
+            raise
+
     def create(self, **fields: Any) -> ModelT:
         """Instantiate the model with `fields` and persist it."""
         try:
