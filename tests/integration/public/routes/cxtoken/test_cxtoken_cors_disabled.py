@@ -10,7 +10,7 @@ from src.main_app.config import TestingConfig
 
 
 @pytest.fixture
-def mock_app() -> Flask:
+def mock_app(sqlite_db) -> Flask:
     """Create a test Flask application."""
     # Environment variables are set in conftest.py
     mock_app = Flask(__name__)
@@ -18,9 +18,7 @@ def mock_app() -> Flask:
     mock_app.secret_key = "test_secret"
     mock_app.config.from_object(TestingConfig)
 
-    from src.main_app.extensions import db
-
-    db.init_app(mock_app)
+    sqlite_db.init_app(mock_app)
 
     # Import and register the blueprint
     from src.main_app.public.routes.cxtoken.routes import CxTokenRoutes

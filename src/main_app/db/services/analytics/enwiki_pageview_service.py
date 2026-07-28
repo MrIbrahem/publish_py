@@ -10,92 +10,77 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import EnwikiPageviewRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
-def list_enwiki_pageviews() -> list[EnwikiPageviewRecord]:
-    """Return all enwiki pageview records."""
-    orm_objs = db.session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.id.asc()).all()
-    return orm_objs
+class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
+    model = EnwikiPageviewRecord
 
+    def __init__(self):
+        super().__init__(db.session, EnwikiPageviewRecord)
 
-def get_top_enwiki_pageviews(limit: int = 100) -> list[EnwikiPageviewRecord]:
-    """Return top enwiki pageview records by view count."""
-    orm_objs = db.session.query(EnwikiPageviewRecord).order_by(EnwikiPageviewRecord.en_views.desc()).limit(limit).all()
-    return orm_objs
+    def list_enwiki_pageviews(self) -> list[EnwikiPageviewRecord]:
+        """Return all enwiki pageview records."""
+        return list(
+            self.list(
+                order_by=[EnwikiPageviewRecord.id.asc()],
+            )
+        )
 
+    def get_top_enwiki_pageviews(self, limit: int = 100) -> list[EnwikiPageviewRecord]:
+        """Return top enwiki pageview records by view count."""
+        return list(self.list(order_by=[EnwikiPageviewRecord.en_views.desc()], limit=limit))
 
-def get_enwiki_pageview(pageview_id: int) -> EnwikiPageviewRecord | None:
-    """Get an enwiki pageview record by ID."""
-    orm_obj = db.session.get(EnwikiPageviewRecord, pageview_id)
-    if not orm_obj:
-        logger.warning(f"Enwiki pageview record with ID {pageview_id} not found")
-        return None
-    return orm_obj
-
-
-def get_enwiki_pageview_by_title(title: str) -> EnwikiPageviewRecord | None:
-    """Get an enwiki pageview record by title."""
-    orm_obj = db.session.query(EnwikiPageviewRecord).filter(EnwikiPageviewRecord.title == title).first()
-    if not orm_obj:
-        return None
-    return orm_obj
-
-
-def add_enwiki_pageview(title: str, en_views: int | None = 0) -> EnwikiPageviewRecord:
-    """Add a new enwiki pageview record."""
-    title = title.strip()
-    if not title:
-        raise ValueError("Title is required")
-
-    orm_obj = EnwikiPageviewRecord(title=title, en_views=en_views)
-    db.session.add(orm_obj)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        raise ValueError(f"Enwiki pageview for '{title}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
-
-
-def add_or_update_enwiki_pageview(title: str, en_views: int | None = 0) -> EnwikiPageviewRecord:
-    """Add or update an enwiki pageview record."""
-    title = title.strip()
-    if not title:
-        raise ValueError("Title is required")
-
-    orm_obj = db.session.query(EnwikiPageviewRecord).filter(EnwikiPageviewRecord.title == title).first()
-    if orm_obj:
-        orm_obj.en_views = en_views
-    else:
-        orm_obj = EnwikiPageviewRecord(title=title, en_views=en_views)
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
-
-
-def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
-    """Update an enwiki pageview record."""
-    orm_obj = db.session.get(EnwikiPageviewRecord, pageview_id)
-    if not orm_obj:
-        raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
-
-    if not kwargs:
+    def get_enwiki_pageview(self, pageview_id: int) -> EnwikiPageviewRecord | None:
+        """Get an enwiki pageview record by ID."""
+        orm_obj = self.get(pageview_id)
+        if not orm_obj:
+            logger.warning(f"Enwiki pageview record with ID {pageview_id} not found")
+            return None
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
+    def get_enwiki_pageview_by_title(self, title: str) -> EnwikiPageviewRecord | None:
+        """Get an enwiki pageview record by title."""
+        return self.get_by(title=title)
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    def add_enwiki_pageview(self, title: str, en_views: int | None = 0) -> EnwikiPageviewRecord:
+        """Add a new enwiki pageview record."""
+        title = title.strip()
+        if not title:
+            raise ValueError("Title is required")
 
+        try:
+            return self.create(title=title, en_views=en_views)
+        except IntegrityError:
+            raise ValueError(f"Enwiki pageview for '{title}' already exists") from None
+
+    def add_or_update_enwiki_pageview(self, title: str, en_views: int | None = 0) -> EnwikiPageviewRecord:
+        """Add or update an enwiki pageview record."""
+        title = title.strip()
+        if not title:
+            raise ValueError("Title is required")
+
+        instance, is_new = self.upsert_by(
+            keys={"title": title},
+            en_views=en_views,
+        )
+        return instance
+
+    def update_enwiki_pageview(self, pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
+        """Update an enwiki pageview record."""
+        return self.update_or_404(pageview_id, **kwargs)
+
+
+_crud = EnwikiPageviewService()
+list_enwiki_pageviews = _crud.list_enwiki_pageviews
+get_top_enwiki_pageviews = _crud.get_top_enwiki_pageviews
+get_enwiki_pageview = _crud.get_enwiki_pageview
+get_enwiki_pageview_by_title = _crud.get_enwiki_pageview_by_title
+add_enwiki_pageview = _crud.add_enwiki_pageview
+add_or_update_enwiki_pageview = _crud.add_or_update_enwiki_pageview
+update_enwiki_pageview = _crud.update_enwiki_pageview
 
 __all__ = [
     "list_enwiki_pageviews",

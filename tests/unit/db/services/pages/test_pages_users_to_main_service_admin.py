@@ -68,11 +68,11 @@ def _seed_pending(
 class TestListPending:
     """Tests for list_pending."""
 
-    def test_returns_joined_rows(self):
+    def test_returns_joined_rows(self, sqlite_db):
         page = _seed_pending("Foo", "en")
         # Provide a qid so the outer-join fills the ``qid`` column.
-        db.session.add(QidRecord(title="Foo", qid="Q1"))
-        db.session.commit()
+        sqlite_db.session.add(QidRecord(title="Foo", qid="Q1"))
+        sqlite_db.session.commit()
 
         rows = list_pending(lang="All")
         assert len(rows) == 1
@@ -88,10 +88,10 @@ class TestListPending:
         assert row["qid"] == "Q1"
         assert row["pupdate"] == "2026-01-01"
 
-    def test_excludes_user_pages_without_to_main_row(self):
+    def test_excludes_user_pages_without_to_main_row(self, sqlite_db):
         # A pages_users row WITHOUT a matching pages_users_to_main row must
         # not appear (the inner join filters it out).
-        db.session.add(
+        sqlite_db.session.add(
             UserPageRecord(
                 title="No_override",
                 translate_type="lead",
@@ -102,7 +102,7 @@ class TestListPending:
             )
         )
         _seed_pending("Has_override", "en")
-        db.session.commit()
+        sqlite_db.session.commit()
 
         titles = {r["title"] for r in list_pending(lang="All")}
         assert titles == {"Has_override"}
@@ -149,8 +149,8 @@ class TestGetUserPage:
 class TestCheckMainPageExists:
     """Tests for check_main_page_exists."""
 
-    def test_returns_record_when_main_page_with_target_exists(self):
-        db.session.add(
+    def test_returns_record_when_main_page_with_target_exists(self, sqlite_db):
+        sqlite_db.session.add(
             PageRecord(
                 title="Foo",
                 translate_type="lead",
@@ -160,13 +160,13 @@ class TestCheckMainPageExists:
                 target="real_target.html",
             )
         )
-        db.session.commit()
+        sqlite_db.session.commit()
         result = check_main_page_exists("Foo", "en")
         assert result is not None
         assert result.target == "real_target.html"
 
-    def test_returns_none_when_target_is_empty(self):
-        db.session.add(
+    def test_returns_none_when_target_is_empty(self, sqlite_db):
+        sqlite_db.session.add(
             PageRecord(
                 title="Empty",
                 translate_type="lead",
@@ -176,11 +176,11 @@ class TestCheckMainPageExists:
                 target="",
             )
         )
-        db.session.commit()
+        sqlite_db.session.commit()
         assert check_main_page_exists("Empty", "en") is None
 
-    def test_returns_none_when_target_is_null(self):
-        db.session.add(
+    def test_returns_none_when_target_is_null(self, sqlite_db):
+        sqlite_db.session.add(
             PageRecord(
                 title="Null_target",
                 translate_type="lead",
@@ -190,7 +190,7 @@ class TestCheckMainPageExists:
                 target=None,
             )
         )
-        db.session.commit()
+        sqlite_db.session.commit()
         assert check_main_page_exists("Null_target", "en") is None
 
     def test_returns_none_when_no_match(self):
@@ -204,16 +204,16 @@ class TestCheckMainPageExists:
 class TestDeleteUserPage:
     """Tests for delete_user_page_to_main."""
 
-    def test_removes_both_rows(self):
+    def test_removes_both_rows(self, sqlite_db):
         page = _seed_pending("Foo", "en")
         page_id = page.id
 
         ok = delete_user_page_to_main(page_id)
         assert ok is True
-        assert db.session.get(UserPageRecord, page_id) is None
-        assert db.session.get(PagesUsersToMainRecord, page_id) is None
+        assert sqlite_db.session.get(UserPageRecord, page_id) is None
+        assert sqlite_db.session.get(PagesUsersToMainRecord, page_id) is None
 
-    def test_returns_true_when_user_page_only(self):
+    def test_returns_true_when_user_page_only(self, sqlite_db):
         # PHP path: even if only the pages_users row is present, the deletion
         # should succeed (both queries are issued, idempotent).
         page = UserPageRecord(
@@ -224,13 +224,13 @@ class TestDeleteUserPage:
             user="u",
             target="t",
         )
-        db.session.add(page)
-        db.session.commit()
+        sqlite_db.session.add(page)
+        sqlite_db.session.commit()
         page_id = page.id  # capture before delete; ORM proxy raises after.
 
         ok = delete_user_page_to_main(page_id)
         assert ok is True
-        assert db.session.get(UserPageRecord, page_id) is None
+        assert sqlite_db.session.get(UserPageRecord, page_id) is None
 
     def test_returns_false_when_id_is_falsy(self):
         assert delete_user_page_to_main(0) is False

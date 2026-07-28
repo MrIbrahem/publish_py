@@ -16,7 +16,7 @@ ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
 
 @pytest.fixture
-def mock_app() -> Flask:
+def mock_app(sqlite_db) -> Flask:
     """Create a test Flask application with CORS enabled."""
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", f"{ALLOWED_DOMAIN},mdwikicx.toolforge.org")
@@ -25,9 +25,8 @@ def mock_app() -> Flask:
     mock_app.url_map.strict_slashes = False
     mock_app.config.from_object(TestingConfig)
     mock_app.config.update({"CORS_DISABLED": False})
-    from src.main_app.extensions import db
 
-    db.init_app(mock_app)
+    sqlite_db.init_app(mock_app)
 
     from src.main_app.public.routes.cxtoken.routes import CxTokenRoutes
 

@@ -6,6 +6,7 @@ from ..delete_service import (
     delete_project,
 )
 from .category_service import (
+    CategoryService,
     add_category,
     get_camp_to_cats,
     get_campaign_category,
@@ -13,6 +14,7 @@ from .category_service import (
     update_category,
 )
 from .lang_service import (
+    LangService,
     add_lang,
     add_or_update_lang,
     get_lang,
@@ -20,6 +22,7 @@ from .lang_service import (
     list_langs,
 )
 from .project_service import (
+    ProjectService,
     add_project,
     get_project,
     get_project_by_title,
@@ -29,6 +32,9 @@ from .project_service import (
 )
 
 __all__ = [
+    "CategoryService",
+    "LangService",
+    "ProjectService",
     "add_category",
     "update_category",
     "delete_category",

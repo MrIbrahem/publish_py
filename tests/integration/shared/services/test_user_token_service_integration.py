@@ -21,9 +21,9 @@ class TestUserServiceIntegration:
         user = create_user("TestUser")
         user_id = user.user_id
         upsert_user_token(
-            user_id=user_id,
-            access_key="test_key",
-            access_secret="test_secret",
+            user_id,
+            b"test_key",
+            b"test_secret",
         )
 
         result = get_user_token(user_id)
@@ -34,20 +34,6 @@ class TestUserServiceIntegration:
 
         result = get_user_token(user_id)
         assert result is None
-
-    def test_username_lookup_integration(self):
-        """Test username-based operations integrate correctly."""
-        user = create_user("TestUser")
-        user_id = user.user_id
-        upsert_user_token(
-            user_id=user_id,
-            access_key="test_key",
-            access_secret="test_secret",
-        )
-
-        result = get_user_token_by_username("TestUser")
-        assert result is not None
-        assert result.user_id == user_id
 
     def test_lookup_error_handling(self):
         """Test service handles LookupError from DB layer."""

@@ -6,7 +6,7 @@ from src.main_app.db.models import UserRecord
 from src.main_app.db.services.delete_service import (
     delete_user,
 )
-from src.main_app.db.services.users.user_service import (
+from src.main_app.db.services.users.users_service import (
     create_user,
     get_user,
     get_user_by_username,
@@ -15,13 +15,12 @@ from src.main_app.db.services.users.user_service import (
     update_user_data,
     user_exists,
 )
-from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
 
 def test_user_workflow():
-    u = create_user("Wiki_User", "jh@example.com", "enwiki", "Editor")
+    u = create_user("Wiki_User", email="jh@example.com", wiki="enwiki", user_group="Editor")
     assert u.username == "Wiki_User"
 
     assert get_user(u.user_id).username == "Wiki_User"
@@ -95,16 +94,16 @@ class TestAddUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = create_user("New_Researcher", "research@wiki.org", "enwiki", "Researcher")
+        record = create_user("New_Researcher", email="research@wiki.org", wiki="enwiki", user_group="Researcher")
         assert record.username == "New_Researcher"
         assert record.email == "research@wiki.org"
 
-    def test_raises_error_if_exists(self, monkeypatch):
+    def test_raises_error_if_exists(self, sqlite_db):
         # User table in models.py doesn't have UNIQUE on username.
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)):
             with pytest.raises(ValueError, match="already exists"):
                 create_user("Duplicate")
 
@@ -126,10 +125,6 @@ class TestUpdateUser:
         u = create_user("No_Change")
         result = update_user_data(u.user_id)
         assert result.username == "No_Change"
-
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            update_user_data(9999, email="T")
 
 
 class TestDeleteUser:

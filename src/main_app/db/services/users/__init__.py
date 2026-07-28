@@ -7,7 +7,7 @@ from ..delete_service import (
     delete_users_no_inprocess,
 )
 from .admin_service import (
-    active_coordinators,
+    AdminService,
     add_coordinator,
     delete_coordinator,
     get_coordinator_by_id,
@@ -16,6 +16,7 @@ from .admin_service import (
     set_coordinator_active,
 )
 from .full_translator_service import (
+    FullTranslatorService,
     add_full_translator,
     add_or_update_full_translator,
     get_full_translator,
@@ -25,7 +26,26 @@ from .full_translator_service import (
     list_full_translators,
     update_full_translator,
 )
-from .user_service import (
+from .user_token_service import (
+    UserTokenService,
+    get_authenticated_user_token,
+    get_user_token,
+    get_user_token_by_username,
+    upsert_user_token,
+)
+from .users_no_inprocess_service import (
+    UsersNoInprocessService,
+    add_or_update_users_no_inprocess,
+    add_users_no_inprocess,
+    get_users_no_inprocess,
+    get_users_no_inprocess_by_user,
+    list_active_users_no_inprocess,
+    list_users_no_inprocess,
+    should_hide_from_inprocess,
+    update_users_no_inprocess,
+)
+from .users_service import (
+    UsersService,
     create_user,
     get_user,
     get_user_by_username,
@@ -36,26 +56,16 @@ from .user_service import (
     user_exists,
     users_search,
 )
-from .user_token_service import (
-    get_authenticated_user_token,
-    get_user_token,
-    get_user_token_by_username,
-    upsert_user_token,
-)
-from .users_no_inprocess_service import (
-    add_or_update_users_no_inprocess,
-    add_users_no_inprocess,
-    get_users_no_inprocess,
-    get_users_no_inprocess_by_user,
-    list_active_users_no_inprocess,
-    list_users_no_inprocess,
-    should_hide_from_inprocess,
-    update_users_no_inprocess,
-)
 
 __all__ = [
+    # classes
+    "AdminService",
+    "UsersService",
+    "UserTokenService",
+    "FullTranslatorService",
+    "UsersNoInprocessService",
+    # functions
     "list_coordinators",
-    "active_coordinators",
     "get_coordinator_by_id",
     "add_coordinator",
     "delete_coordinator",

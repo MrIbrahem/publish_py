@@ -15,7 +15,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.exceptions import DuplicateUserError, UserNotFoundError
+from ...db.exceptions import DuplicateRecordError, UserNotFoundError
 from ...db.services.users import (
     add_coordinator,
     delete_coordinator,
@@ -62,7 +62,7 @@ def _add_coordinator() -> ResponseReturnValue:
     except UserNotFoundError as exc:
         logger.error("UserNotFoundError: %s", exc)
         flash(f"User '{username}' does not exist", "warning")
-    except DuplicateUserError:
+    except DuplicateRecordError:
         logger.error(f"Coordinator '{username}' already exists")
         flash(f"Coordinator '{username}' already exists", "warning")
     except (LookupError, ValueError):

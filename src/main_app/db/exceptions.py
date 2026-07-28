@@ -24,11 +24,7 @@ class UserNotFoundError(LookupError):
     """Raised when a referenced user does not exist in users."""
 
 
-class DuplicateJobError(Exception):
-    """Raised when attempting to create a job of a type that already has an active (pending/running) instance."""
-
-
-class DuplicateUserError(Exception):
+class DuplicateRecordError(Exception):
     """Raised when attempting to create a user or coordinator that already exists."""
 
 
@@ -43,7 +39,7 @@ __all__ = [
     "DatabaseInitError",
     "MaxUserConnectionsError",
     "UserNotFoundError",
-    "DuplicateUserError",
-    "DuplicateJobError",
+    "DuplicateRecordError",
+    "DuplicateRecordError",
     "InsufficientDatabaseConfigError",
 ]

@@ -7,6 +7,7 @@ from ..delete_service import (
     delete_user_page,
 )
 from .in_process_service import (
+    InProcessService,
     add_in_process,
     delete_in_process_by_title_user_lang,
     get_in_process,
@@ -33,6 +34,7 @@ from .missing_stats_service import (
     statics_by_category,
 )
 from .page_service import (
+    PagesService,
     add_page,
     add_translate_row_to_db,
     find_page_record,
@@ -44,6 +46,7 @@ from .page_service import (
     update_page,
 )
 from .pages_users_to_main_service import (
+    PagesUsersToMainPagesService,
     check_main_page_exists,
     get_user_page,
     list_pending,
@@ -53,6 +56,7 @@ from .results_2026_service import (
     missing_by_lang_and_category,
 )
 from .translate_type_service import (
+    TranslateTypeService,
     add_translate_type,
     can_translate_full,
     can_translate_lead,
@@ -65,6 +69,7 @@ from .translate_type_service import (
     update_translate_type,
 )
 from .user_page_service import (
+    UserPagesService,
     add_user_page,
     count_translated,
     find_user_page_record,
@@ -77,6 +82,11 @@ from .user_page_service import (
 )
 
 __all__ = [
+    "PagesService",
+    "PagesUsersToMainPagesService",
+    "TranslateTypeService",
+    "UserPagesService",
+    "InProcessService",
     "list_in_process",
     "list_in_process_by_user",
     "list_in_process_by_lang",

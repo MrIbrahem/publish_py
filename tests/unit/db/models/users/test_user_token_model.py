@@ -49,3 +49,52 @@ class TestUserTokenRecord:
 
         assert result == ("decrypted_token", "decrypted_secret")
         assert mock_decrypt.call_count == 2
+
+
+class TestUserTokenRecord2:
+    """Tests for UserTokenRecord dataclass."""
+
+    def test_user_token_record_creation(self):
+        """Test creating a UserTokenRecord."""
+        record = UserTokenRecord(
+            user_id=123,
+            access_token=b"encrypted_token",
+            access_secret=b"encrypted_secret",
+        )
+
+        assert record.user_id == 123
+        assert record.access_token == b"encrypted_token"
+        assert record.access_secret == b"encrypted_secret"
+        assert record.created_at is None
+        assert record.updated_at is None
+        assert record.last_used_at is None
+        assert record.rotated_at is None
+
+    def test_user_token_record_with_timestamps(self):
+        """Test creating a UserTokenRecord with timestamps."""
+        record = UserTokenRecord(
+            user_id=456,
+            access_token=b"token",
+            access_secret=b"secret",
+            created_at="2024-01-01 00:00:00",
+            updated_at="2024-01-02 00:00:00",
+            last_used_at="2024-01-03 00:00:00",
+            rotated_at="2024-01-04 00:00:00",
+        )
+
+        assert record.created_at == "2024-01-01 00:00:00"
+        assert record.updated_at == "2024-01-02 00:00:00"
+        assert record.last_used_at == "2024-01-03 00:00:00"
+        assert record.rotated_at == "2024-01-04 00:00:00"
+
+    def test_decrypted_success(self):
+        """Test decrypted method returns decrypted credentials."""
+
+        record = UserTokenRecord(
+            user_id=789,
+            access_token=b"encrypted_token",
+            access_secret=b"encrypted_secret",
+        )
+
+        assert record.access_token == b"encrypted_token"
+        assert record.access_secret == b"encrypted_secret"

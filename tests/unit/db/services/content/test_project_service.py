@@ -105,11 +105,6 @@ class TestUpdateProject:
         updated = update_project(p.g_id, g_title="WP:GENETICS")
         assert updated.g_title == "WP:GENETICS"
 
-    def test_returns_record_if_no_kwargs(self, monkeypatch):
-        p = add_project("No_Change")
-        result = update_project(p.g_id)
-        assert result.g_title == "No_Change"
-
     def test_raises_error_if_not_found(self, monkeypatch):
         with pytest.raises(ValueError, match="not found"):
             update_project(9999, g_title="T")

@@ -12,20 +12,18 @@ from src.main_app.config import TestingConfig
 
 
 @pytest.fixture
-def mock_app() -> Generator[Flask, Any]:
+def mock_app(sqlite_db) -> Generator[Flask, Any]:
     """Create a test Flask application."""
     _app = Flask(__name__)
     _app.url_map.strict_slashes = False
     _app.config.from_object(TestingConfig)
     _app.config.update({"CORS_DISABLED": False})
 
-    from src.main_app.extensions import db
-
-    db.init_app(_app)
+    sqlite_db.init_app(_app)
 
     with _app.app_context():
-        real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
-        db.metadata.create_all(db.engine, tables=real_tables)
+        real_tables = [t for t in sqlite_db.metadata.tables.values() if not t.info.get("is_view")]
+        sqlite_db.metadata.create_all(sqlite_db.engine, tables=real_tables)
 
     yield _app
 

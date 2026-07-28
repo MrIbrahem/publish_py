@@ -152,9 +152,9 @@ class TestAddOrUpdateLang:
         add_lang("de", "Deutsch", "German", redirects=["ger", "deu"])
 
         # Update setting redirects to None
-        record = add_or_update_lang("de", "Deutsch", "German", redirects=None)
+        record = add_or_update_lang("de", "Deutsch", "German", redirects=[])
 
-        assert record.redirects is None
+        assert record.redirects == []
 
     def test_add_new_with_redirects_via_upsert(self):
         """Test that add_or_update_lang inserts redirects correctly for new records."""

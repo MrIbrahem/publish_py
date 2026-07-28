@@ -13,6 +13,7 @@ from ...db.services.users import (
     is_active_coordinator,
     upsert_user_token,
 )
+from ..core.crypto import encrypt_value
 from .current_user import CurrentUser
 
 logger = logging.getLogger(__name__)
@@ -48,11 +49,14 @@ class AuthUserService:
             return None
 
         try:
+            encrypted_token = encrypt_value(access_key)
+            encrypted_secret = encrypt_value(access_secret)
+
             # 1. Update or insert into database via repository
             upsert_user_token(
                 user_id=user_id,
-                access_key=access_key,
-                access_secret=access_secret,
+                encrypted_token=encrypted_token,
+                encrypted_secret=encrypted_secret,
             )
 
         except Exception as e:

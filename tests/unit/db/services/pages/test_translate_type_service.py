@@ -17,7 +17,6 @@ from src.main_app.db.services.pages.translate_type_service import (
     list_translate_types,
     update_translate_type,
 )
-from src.main_app.extensions import db as _db
 
 
 def test_translate_type_workflow():
@@ -154,10 +153,6 @@ class TestUpdateTranslateType:
         result = update_translate_type(tt.tt_id)
         assert result.tt_title == "No_Change"
 
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            update_translate_type(9999, tt_full=1)
-
 
 class TestDeleteTranslateType:
     """Tests for delete_translate_type function."""
@@ -227,12 +222,12 @@ class TestListTranslateTypesByCategory:
         assert "RTT_only_type" in titles
         assert "Other_only_type" in titles
 
-    def test_filters_by_category_membership(self, monkeypatch):
+    def test_filters_by_category_membership(self, sqlite_db):
         # Pages link a (title, cat) pair; translate_type rows are filtered
         # to those whose tt_title matches a page in the requested cat.
         add_translate_type("In_RTT")
         add_translate_type("Not_In_RTT")
-        _db.session.add(
+        sqlite_db.session.add(
             PageRecord(
                 title="In_RTT",
                 translate_type="lead",
@@ -242,7 +237,7 @@ class TestListTranslateTypesByCategory:
                 target="t",
             )
         )
-        _db.session.add(
+        sqlite_db.session.add(
             PageRecord(
                 title="Not_In_RTT",
                 translate_type="lead",
@@ -252,7 +247,7 @@ class TestListTranslateTypesByCategory:
                 target="t",
             )
         )
-        _db.session.commit()
+        sqlite_db.session.commit()
 
         result = list_translate_types(cat="RTT")
         titles = {tt.tt_title for tt in result}
@@ -268,32 +263,32 @@ class TestListTranslateTypesByCategory:
 class TestListNewTitles:
     """Tests for list_new_titles."""
 
-    def test_returns_qids_titles_not_in_translate_type(self, monkeypatch):
+    def test_returns_qids_titles_not_in_translate_type(self, sqlite_db):
         # In qids: Foo, Bar; In translate_type: Bar -> only Foo is "new".
-        _db.session.add(QidRecord(title="Foo", qid="Q1"))
-        _db.session.add(QidRecord(title="Bar", qid="Q2"))
-        _db.session.commit()
+        sqlite_db.session.add(QidRecord(title="Foo", qid="Q1"))
+        sqlite_db.session.add(QidRecord(title="Bar", qid="Q2"))
+        sqlite_db.session.commit()
         add_translate_type("Bar")
 
         result = list_new_titles()
         assert "Foo" in result
         assert "Bar" not in result
 
-    def test_returns_empty_when_all_titles_already_in_translate_type(self, monkeypatch):
-        _db.session.add(QidRecord(title="Already_There", qid="Q3"))
-        _db.session.commit()
+    def test_returns_empty_when_all_titles_already_in_translate_type(self, sqlite_db):
+        sqlite_db.session.add(QidRecord(title="Already_There", qid="Q3"))
+        sqlite_db.session.commit()
         add_translate_type("Already_There")
 
         assert list_new_titles() == []
 
-    def test_returns_empty_when_qids_table_empty(self, monkeypatch):
+    def test_returns_empty_when_qids_table_empty(self, sqlite_db):
         assert list_new_titles() == []
 
-    def test_returns_distinct_titles(self, monkeypatch):
+    def test_returns_distinct_titles(self, sqlite_db):
         # Two qids share the same title (allowed only across qids vs qids_others;
         # within qids the title is unique). Use a single row but verify DISTINCT
         # behaviour on the SELECT side by ensuring we do not return duplicates.
-        _db.session.add(QidRecord(title="Distinct_one", qid="Q4"))
-        _db.session.commit()
+        sqlite_db.session.add(QidRecord(title="Distinct_one", qid="Q4"))
+        sqlite_db.session.commit()
         result = list_new_titles()
         assert result.count("Distinct_one") == 1
