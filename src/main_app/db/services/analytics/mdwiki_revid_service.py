@@ -15,7 +15,7 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class MdwikiRevidService(CRUDService[MdwikiRevidRecord, str]):
+class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
     model = MdwikiRevidRecord
 
     def __init__(self):
