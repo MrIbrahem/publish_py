@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class FullTranslatorService(CRUDService[FullTranslatorRecord, int]):
+class FullTranslatorService(CRUDService[FullTranslatorRecord]):
     model = FullTranslatorRecord
+    def __init__(self):
+        super().__init__(db.session, FullTranslatorRecord)
 
 
-full_translator_crud = FullTranslatorService(db.session)
+full_translator_crud = FullTranslatorService()
 
 
 def list_full_translators() -> list[FullTranslatorRecord]:

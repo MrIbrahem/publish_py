@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class RefsCountService(CRUDService[RefsCountRecord, int]):
+class RefsCountService(CRUDService[RefsCountRecord]):
     model = RefsCountRecord
+    def __init__(self):
+        super().__init__(db.session, RefsCountRecord)
 
 
-refs_count_crud = RefsCountService(db.session)
+refs_count_crud = RefsCountService()
 
 
 def list_refs_counts() -> list[RefsCountRecord]:

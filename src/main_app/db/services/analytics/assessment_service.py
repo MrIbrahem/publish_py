@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class AssessmentService(CRUDService[AssessmentRecord, int]):
+class AssessmentService(CRUDService[AssessmentRecord]):
     model = AssessmentRecord
+    def __init__(self):
+        super().__init__(db.session, AssessmentRecord)
 
 
-assessment_crud = AssessmentService(db.session)
+assessment_crud = AssessmentService()
 
 
 def list_assessments() -> list[AssessmentRecord]:

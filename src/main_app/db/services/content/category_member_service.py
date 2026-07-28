@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class CategoryMemberService(CRUDService[CategoryMemberRecord, int]):
+class CategoryMemberService(CRUDService[CategoryMemberRecord]):
     model = CategoryMemberRecord
+    def __init__(self):
+        super().__init__(db.session, CategoryMemberRecord)
 
 
-category_member_crud = CategoryMemberService(db.session)
+category_member_crud = CategoryMemberService()
 
 
 def get_all_category_members() -> dict[str, list[str]]:

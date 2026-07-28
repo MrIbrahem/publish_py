@@ -20,11 +20,13 @@ from ..utils import db_guard_rollback
 logger = logging.getLogger(__name__)
 
 
-class AdminUserService(CRUDService[AdminUserRecord, int]):
+class AdminUserService(CRUDService[AdminUserRecord]):
     model = AdminUserRecord
+    def __init__(self):
+        super().__init__(db.session, AdminUserRecord)
 
 
-admin_crud = AdminUserService(db.session)
+admin_crud = AdminUserService()
 
 # ── SELECT ───────────────────────────────────────────────
 

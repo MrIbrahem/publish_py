@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class ProjectService(CRUDService[ProjectRecord, int]):
+class ProjectService(CRUDService[ProjectRecord]):
     model = ProjectRecord
+    def __init__(self):
+        super().__init__(db.session, ProjectRecord)
 
 
-project_crud = ProjectService(db.session)
+project_crud = ProjectService()
 
 
 def list_projects() -> list[ProjectRecord]:

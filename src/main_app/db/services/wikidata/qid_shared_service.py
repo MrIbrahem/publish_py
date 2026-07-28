@@ -186,7 +186,7 @@ def get_title_to_qid(model: type[ServiceRecord]) -> dict[str, str]:
     return {record.title: record.qid or "" for record in records}
 
 
-class BaseQidService(CRUDService[ServiceRecord, int]):
+class BaseQidService(CRUDService[ServiceRecord]):
     """Generic service class for managing QID-like records.
 
     Subclasses (or direct instances) are bound to a specific ORM
@@ -198,7 +198,7 @@ class BaseQidService(CRUDService[ServiceRecord, int]):
     """
 
     def __init__(self, model: type[ServiceRecord], session: Session) -> None:
-        super().__init__(session)
+        super().__init__(session, model)
         self.model = model
 
     def add_or_update(self, title: str, qid: str) -> ServiceRecord | None:

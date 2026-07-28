@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class ViewsNewService(CRUDService[ViewsNewRecord, int]):
+class ViewsNewService(CRUDService[ViewsNewRecord]):
     model = ViewsNewRecord
+    def __init__(self):
+        super().__init__(db.session, ViewsNewRecord)
 
 
-views_new_crud = ViewsNewService(db.session)
+views_new_crud = ViewsNewService()
 
 
 def list_views_new() -> list[ViewsNewRecord]:

@@ -21,11 +21,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class ReportService(CRUDService[ReportRecord, int]):
+class ReportService(CRUDService[ReportRecord]):
     model = ReportRecord
+    def __init__(self):
+        super().__init__(db.session, ReportRecord)
 
 
-report_crud = ReportService(db.session)
+report_crud = ReportService()
 
 
 def list_reports() -> list[ReportRecord]:

@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord, int]):
+class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
     model = PagesUsersToMainRecord
+    def __init__(self):
+        super().__init__(db.session, PagesUsersToMainRecord)
 
 
-pages_users_to_main_crud = PagesUsersToMainService(db.session)
+pages_users_to_main_crud = PagesUsersToMainService()
 
 
 def list_pages_users_to_main() -> list[PagesUsersToMainRecord]:

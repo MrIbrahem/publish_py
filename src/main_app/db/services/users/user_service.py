@@ -16,11 +16,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class UserService(CRUDService[UserRecord, int]):
+class UserService(CRUDService[UserRecord]):
     model = UserRecord
+    def __init__(self):
+        super().__init__(db.session, UserRecord)
 
 
-user_crud = UserService(db.session)
+user_crud = UserService()
 
 
 def list_users() -> list[UserRecord]:

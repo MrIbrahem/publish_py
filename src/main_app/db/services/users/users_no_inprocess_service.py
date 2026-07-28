@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord, int]):
+class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord]):
     model = UsersNoInprocessRecord
+    def __init__(self):
+        super().__init__(db.session, UsersNoInprocessRecord)
 
 
-users_no_inprocess_crud = UsersNoInprocessService(db.session)
+users_no_inprocess_crud = UsersNoInprocessService()
 
 
 def list_users_no_inprocess() -> list[UsersNoInprocessRecord]:

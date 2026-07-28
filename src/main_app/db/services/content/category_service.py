@@ -16,11 +16,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class CategoryService(CRUDService[CategoryRecord, int]):
+class CategoryService(CRUDService[CategoryRecord]):
     model = CategoryRecord
+    def __init__(self):
+        super().__init__(db.session, CategoryRecord)
 
 
-category_crud = CategoryService(db.session)
+category_crud = CategoryService()
 
 
 def set_default_category(session: Session | Any) -> None:

@@ -17,11 +17,13 @@ from ..utils import db_guard
 logger = logging.getLogger(__name__)
 
 
-class SettingService(CRUDService[SettingRecord, int]):
+class SettingService(CRUDService[SettingRecord]):
     model = SettingRecord
+    def __init__(self):
+        super().__init__(db.session, SettingRecord)
 
 
-setting_crud = SettingService(db.session)
+setting_crud = SettingService()
 
 
 def _serialize_value(value: Any, value_type: str) -> str | None:

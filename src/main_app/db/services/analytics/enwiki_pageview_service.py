@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord, int]):
+class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
     model = EnwikiPageviewRecord
+    def __init__(self):
+        super().__init__(db.session, EnwikiPageviewRecord)
 
 
-enwiki_pageview_crud = EnwikiPageviewService(db.session)
+enwiki_pageview_crud = EnwikiPageviewService()
 
 
 def list_enwiki_pageviews() -> list[EnwikiPageviewRecord]:

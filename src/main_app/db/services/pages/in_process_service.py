@@ -16,11 +16,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class InProcessService(CRUDService[InProcessRecord, int]):
+class InProcessService(CRUDService[InProcessRecord]):
     model = InProcessRecord
+    def __init__(self):
+        super().__init__(db.session, InProcessRecord)
 
 
-in_process_crud = InProcessService(db.session)
+in_process_crud = InProcessService()
 
 
 def list_in_process() -> list[InProcessRecord]:

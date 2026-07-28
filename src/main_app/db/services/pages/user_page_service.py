@@ -18,11 +18,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class UserPagesService(CRUDService[UserPageRecord, int]):
+class UserPagesService(CRUDService[UserPageRecord]):
     model = UserPageRecord
+    def __init__(self):
+        super().__init__(db.session, UserPageRecord)
 
 
-user_pages_crud = UserPagesService(db.session)
+user_pages_crud = UserPagesService()
 
 
 def list_user_pages() -> list[UserPageRecord]:

@@ -15,11 +15,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class LangService(CRUDService[LangRecord, int]):
+class LangService(CRUDService[LangRecord]):
     model = LangRecord
+    def __init__(self):
+        super().__init__(db.session, LangRecord)
 
 
-lang_crud = LangService(db.session)
+lang_crud = LangService()
 
 
 def list_langs() -> list[LangRecord]:

@@ -19,11 +19,13 @@ from ..crud_service import CRUDService
 logger = logging.getLogger(__name__)
 
 
-class PagesService(CRUDService[PageRecord, int]):
+class PagesService(CRUDService[PageRecord]):
     model = PageRecord
+    def __init__(self):
+        super().__init__(db.session, PageRecord)
 
 
-pages_crud = PagesService(db.session)
+pages_crud = PagesService()
 
 
 def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> list[PageRecord]:
