@@ -10,30 +10,34 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import FullTranslatorRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class FullTranslatorService(CRUDService[FullTranslatorRecord, int]):
+    model = FullTranslatorRecord
+
+
+full_translator_crud = FullTranslatorService(db.session)
+
+
 def list_full_translators() -> list[FullTranslatorRecord]:
     """Return all full translator records."""
-    orm_objs = db.session.query(FullTranslatorRecord).order_by(FullTranslatorRecord.id.asc()).all()
-    return orm_objs
+    return list(full_translator_crud.list(order_by=[FullTranslatorRecord.id.asc()],))
 
 
 def list_active_full_translators() -> list[FullTranslatorRecord]:
     """Return all is_active full translator records."""
-    orm_objs = (
-        db.session.query(FullTranslatorRecord)
-        .filter(FullTranslatorRecord.is_active == 1)
-        .order_by(FullTranslatorRecord.id.asc())
-        .all()
-    )
-    return orm_objs
+    return list(
+        full_translator_crud.list(
+            filters={"is_active": 1}, order_by=[FullTranslatorRecord.id.asc()],)
+                )
 
 
 def get_full_translator(translator_id: int) -> FullTranslatorRecord | None:
     """Get a full translator record by ID."""
-    orm_obj = db.session.get(FullTranslatorRecord, translator_id)
+    orm_obj = full_translator_crud.get(translator_id)
     if not orm_obj:
         logger.warning(f"Full translator record with ID {translator_id} not found")
         return None
@@ -42,10 +46,7 @@ def get_full_translator(translator_id: int) -> FullTranslatorRecord | None:
 
 def get_full_translator_by_user(user: str) -> FullTranslatorRecord | None:
     """Get a full translator record by username."""
-    orm_obj = db.session.query(FullTranslatorRecord).filter(FullTranslatorRecord.user == user).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return full_translator_crud.get_by(user=user)
 
 
 def add_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
@@ -54,16 +55,10 @@ def add_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
     if not user:
         raise ValueError("User is required")
 
-    orm_obj = FullTranslatorRecord(user=user, is_active=is_active)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return full_translator_crud.create(user=user, is_active=is_active)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"Full translator '{user}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslatorRecord:
@@ -72,34 +67,23 @@ def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslat
     if not user:
         raise ValueError("User is required")
 
-    orm_obj = db.session.query(FullTranslatorRecord).filter(FullTranslatorRecord.user == user).first()
-    if orm_obj:
-        orm_obj.is_active = is_active
-    else:
-        orm_obj = FullTranslatorRecord(user=user, is_active=is_active)
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    return full_translator_crud.upsert(
+        keys={"user": user}, is_active=is_active,
+                                       )
 
 
 def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord:
     """Update a full translator record."""
-    orm_obj = db.session.get(FullTranslatorRecord, translator_id)
-    if not orm_obj:
-        raise ValueError(f"Full translator record with ID {translator_id} not found")
-
     if not kwargs:
+        orm_obj = full_translator_crud.get(translator_id)
+        if not orm_obj:
+            raise ValueError(f"Full translator record with ID {translator_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return full_translator_crud.update(translator_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"Full translator record with ID {translator_id} not found") from exc
 
 
 def is_full_translator(user: str) -> bool:

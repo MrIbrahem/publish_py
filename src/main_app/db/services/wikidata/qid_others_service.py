@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import logging
 
+from ....extensions import db
 from ...models import QidOthersRecord
 from .qid_shared_service import BaseQidService
 
@@ -18,7 +19,7 @@ class QidOthersService(BaseQidService):
     """Service class for managing QID records."""
 
     def __init__(self) -> None:
-        super().__init__(QidOthersRecord)
+        super().__init__(QidOthersRecord, db.session)
 
 
 __all__ = [

@@ -11,14 +11,21 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import UserRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class UserService(CRUDService[UserRecord, int]):
+    model = UserRecord
+
+
+user_crud = UserService(db.session)
+
+
 def list_users() -> list[UserRecord]:
     """Return all user records."""
-    orm_objs = db.session.query(UserRecord).order_by(UserRecord.user_id.asc()).all()
-    return orm_objs
+    return list(user_crud.list(order_by=[UserRecord.user_id.asc()]))
 
 
 def users_search(userlike: str | None) -> list[str]:
@@ -38,23 +45,19 @@ def users_search(userlike: str | None) -> list[str]:
 
 def list_users_by_group(user_group: str) -> list[UserRecord]:
     """Return user records by group."""
-    orm_objs = (
-        db.session.query(UserRecord)
-        .filter(UserRecord.user_group == user_group)
-        .order_by(UserRecord.user_id.asc())
-        .all()
-    )
-    return orm_objs
+    return list(
+        user_crud.list(
+        filters={"user_group": user_group},
+        order_by=[UserRecord.user_id.asc()],
+        )
+        )
 
 
 def get_user(user_id: int) -> UserRecord | None:
     """
     Get a user record by ID.
     """
-    # db\.session\.query\((\w+)\).filter\(\1\.(id|\w+_id) == (id|\w+_id)\)\.first\(\)
-    # orm_obj = db.session.get(UserRecord, user_id)
-    # user_id is the primary key for UserRecord
-    orm_obj = db.session.get(UserRecord, user_id)
+    orm_obj = user_crud.get(user_id)
     if not orm_obj:
         logger.warning(f"User record with ID {user_id} not found")
         return None
@@ -63,10 +66,7 @@ def get_user(user_id: int) -> UserRecord | None:
 
 def get_user_by_username(username: str) -> UserRecord | None:
     """Get a user record by username."""
-    orm_obj = db.session.query(UserRecord).filter(UserRecord.username == username).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return user_crud.get_by(username=username)
 
 
 def create_user(
@@ -80,22 +80,16 @@ def create_user(
     if not username:
         raise ValueError("Username is required")
 
-    orm_obj = UserRecord(
-        username=username,
-        email=email,
-        wiki=wiki,
-        user_group=user_group,
-        created_at=func.now(),
-    )
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return user_crud.create(
+            username=username,
+            email=email,
+            wiki=wiki,
+            user_group=user_group,
+            created_at=func.now(),
+        )
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"User '{username}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def update_user(
@@ -111,18 +105,16 @@ def update_user(
     if not username:
         raise ValueError("Username is required")
 
-    orm_obj = db.session.get(UserRecord, user_id)
-    if not orm_obj:
-        raise ValueError(f"User record with ID {user_id} not found")
-
-    orm_obj.username = username
-    orm_obj.email = email
-    orm_obj.wiki = wiki
-    orm_obj.user_group = user_group
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return user_crud.update(
+            user_id,
+            username=username,
+            email=email,
+            wiki=wiki,
+            user_group=user_group,
+        )
+    except ValueError as exc:
+        raise ValueError(f"User record with ID {user_id} not found") from exc
 
 
 def update_user_data(
@@ -130,20 +122,16 @@ def update_user_data(
     **kwargs,
 ) -> UserRecord:
     """Update a user record."""
-    orm_obj = db.session.get(UserRecord, user_id)
-    if not orm_obj:
-        raise ValueError(f"User record with ID {user_id} not found")
-
     if not kwargs:
+        orm_obj = user_crud.get(user_id)
+        if not orm_obj:
+            raise ValueError(f"User record with ID {user_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return user_crud.update(user_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"User record with ID {user_id} not found") from exc
 
 
 def user_exists(username: str) -> bool:
