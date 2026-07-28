@@ -75,33 +75,27 @@ class UserTokenService(CRUDService[UserTokenRecord]):
 
     def update_user_token(
         self,
-        user_id: int,
+        orm_obj: UserTokenRecord,
         encrypted_token: bytes,
         encrypted_secret: bytes,
     ) -> UserTokenRecord | None:
         """
         update the encrypted OAuth credentials for a user.
         """
-        orm_obj = self.get_record_by_id(user_id)
-
-        if not orm_obj:
-            return None
-
+        now = func.current_timestamp()
+        data = {
+            "access_token": encrypted_token,
+            "access_secret": encrypted_secret,
+            "updated_at": now,
+            "last_used_at": now,
+            "rotated_at": now,
+        }
         try:
-            now = func.current_timestamp()
 
-            orm_obj.access_token = encrypted_token
-            orm_obj.access_secret = encrypted_secret
-            orm_obj.updated_at = now
-            orm_obj.last_used_at = now
-            orm_obj.rotated_at = now
-
-            self.session.commit()
-            self.session.refresh(orm_obj)
+            self.update(orm_obj, **data)
             return orm_obj
         except Exception as exc:
-            logger.error("Error updating token for user %s: %s", user_id, exc)
-            self.session.rollback()
+            logger.error("Error updating token for user %s: %s", orm_obj.user_id, exc)
             return None
 
     def upsert_user_token(
@@ -114,93 +108,27 @@ class UserTokenService(CRUDService[UserTokenRecord]):
         Upsert the encrypted OAuth credentials for a user.
         Creates a new token row if one does not exist.
         """
-        try:
-            record = self.get_record_by_id(user_id)
-            if record:
-                return self.update_user_token(user_id, encrypted_token, encrypted_secret)
-            else:
-                return self.create_user_token(user_id, encrypted_token, encrypted_secret)
+        record = self.get_record_by_id(user_id)
+        if record:
+            return self.update_user_token(record, encrypted_token, encrypted_secret)
+        else:
+            return self.create_user_token(user_id, encrypted_token, encrypted_secret)
 
-        except Exception as exc:
-            self.session.rollback()
-            raise exc
+    def get_user_token_by_username(self, username: str) -> UserTokenRecord | None:
+        return user_token_crud.get_by(user=username)
 
 
 user_token_crud = UserTokenService()
 
-
-def get_authenticated_user_token(user_id: int) -> None | UserTokenRecord:
-    return user_token_crud.get_authenticated_user_token(user_id)
-
-
-def get_user_token(user_id: str | int) -> UserTokenRecord | None:
-    return user_token_crud.get_user_token(user_id)
-
-
-# ── INSERT, UPDATE, SET ──────────────────────────────────
-
-
-def create_user_token_str(user_id: int, access_key: str, access_secret: str) -> UserTokenRecord:
-    encrypted_token = encrypt_value(access_key)
-    encrypted_secret = encrypt_value(access_secret)
-
-    return user_token_crud.create_user_token(user_id, encrypted_token, encrypted_secret)
-
-
-def update_user_token_str(user_id: int, access_key: str, access_secret: str) -> UserTokenRecord | None:
-    encrypted_token = encrypt_value(access_key)
-    encrypted_secret = encrypt_value(access_secret)
-
-    return user_token_crud.update_user_token(user_id, encrypted_token, encrypted_secret)
-
-
-def upsert_user_token(
-    user_id: int,
-    encrypted_token: bytes,
-    encrypted_secret: bytes,
-) -> UserTokenRecord | None:
-
-    return user_token_crud.upsert_user_token(user_id, encrypted_token, encrypted_secret)
-
-
-def create_user_token(
-    user_id: int,
-    encrypted_token: bytes,
-    encrypted_secret: bytes,
-) -> UserTokenRecord | None:
-
-    return user_token_crud.create_user_token(user_id, encrypted_token, encrypted_secret)
-
-
-def update_user_token(
-    user_id: int,
-    encrypted_token: bytes,
-    encrypted_secret: bytes,
-) -> UserTokenRecord | None:
-
-    return user_token_crud.update_user_token(user_id, encrypted_token, encrypted_secret)
-
-
-def upsert_user_token_str(
-    user_id: int,
-    access_key: str,
-    access_secret: str,
-) -> UserTokenRecord | None:
-    encrypted_token = encrypt_value(access_key)
-    encrypted_secret = encrypt_value(access_secret)
-
-    return user_token_crud.upsert_user_token(user_id, encrypted_token, encrypted_secret)
-
-
-def get_user_token_by_username(username: str) -> UserTokenRecord | None:
-    return user_token_crud.get_by(username=username)
-
+get_authenticated_user_token = user_token_crud.get_authenticated_user_token
+get_user_token = user_token_crud.get_user_token
+upsert_user_token = user_token_crud.upsert_user_token
+create_user_token = user_token_crud.create_user_token
+get_user_token_by_username = user_token_crud.get_user_token_by_username
 
 __all__ = [
     "UserTokenService",
     "upsert_user_token",
-    "upsert_user_token_str",
     "get_user_token",
-    "update_user_token_str",
     "get_user_token_by_username",
 ]

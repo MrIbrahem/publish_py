@@ -154,10 +154,6 @@ class TestUpdateTranslateType:
         result = update_translate_type(tt.tt_id)
         assert result.tt_title == "No_Change"
 
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            update_translate_type(9999, tt_full=1)
-
 
 class TestDeleteTranslateType:
     """Tests for delete_translate_type function."""

@@ -9,7 +9,7 @@ from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
     get_user_token,
     get_user_token_by_username,
-    upsert_user_token_str,
+    upsert_user_token,
 )
 
 
@@ -20,10 +20,10 @@ class TestUserServiceIntegration:
         """Test complete CRUD lifecycle through service layer."""
         user = create_user("TestUser")
         user_id = user.user_id
-        upsert_user_token_str(
-            user_id=user_id,
-            access_key="test_key",
-            access_secret="test_secret",
+        upsert_user_token(
+            user_id,
+            b"test_key",
+            b"test_secret",
         )
 
         result = get_user_token(user_id)
@@ -37,17 +37,17 @@ class TestUserServiceIntegration:
 
     def test_username_lookup_integration(self):
         """Test username-based operations integrate correctly."""
-        user = create_user("TestUser")
-        user_id = user.user_id
-        upsert_user_token_str(
-            user_id=user_id,
-            access_key="test_key",
-            access_secret="test_secret",
+        user = create_user("TestUserz")
+
+        upsert_user_token(
+            user.user_id,
+            b"test_key",
+            b"test_secret",
         )
 
-        result = get_user_token_by_username("TestUser")
+        result = get_user_token_by_username("TestUserz")
         assert result is not None
-        assert result.user_id == user_id
+        assert result.user_id == user.user_id
 
     def test_lookup_error_handling(self):
         """Test service handles LookupError from DB layer."""

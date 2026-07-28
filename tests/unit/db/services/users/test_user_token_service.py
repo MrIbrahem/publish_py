@@ -6,7 +6,6 @@ from src.main_app.db.services.users.user_token_service import (
     create_user_token,
     get_authenticated_user_token,
     get_user_token,
-    update_user_token,
     upsert_user_token,
 )
 
@@ -130,27 +129,6 @@ class TestCreateUserToken:
         assert result.access_secret == b"secret"
 
 
-class TestUpdateUserToken:
-    """Tests for update_user_token."""
-
-    def test_updates_existing_token(self):
-        """Test updates fields on an existing token record."""
-
-        user = create_user("svc_eve")
-        result = create_user_token(user.user_id, b"key", b"secret")
-
-        result = update_user_token(user.user_id, b"new_key", b"new_secret")
-        assert result is not None
-
-        assert result.access_token == b"new_key"
-        assert result.access_secret == b"new_secret"
-
-    def test_returns_none_when_token_not_found(self):
-        """Test returns None when no token record exists for the user."""
-        result = update_user_token(999, b"key", b"secret")
-
-        assert result is None
-
 
 class TestUpsertUserToken:
     """Tests for upsert_user_token."""
@@ -167,11 +145,3 @@ class TestUpsertUserToken:
         assert result.user_id == user.user_id
         assert result.access_token == b"enc_key"
         assert result.access_secret == b"enc_secret"
-
-    def test_try_update_user_token_when_token_not_exists(self):
-        """Test update_user_token when an existing token is found."""
-        user = create_user("testz")
-
-        result = update_user_token(user.user_id, b"new_key", b"new_secret")
-
-        assert result is None

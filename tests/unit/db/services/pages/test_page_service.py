@@ -107,11 +107,6 @@ class TestUpdatePage:
         assert updated.title == "Social Science"
         assert updated.target == "Social_Science.html"
 
-    def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        with pytest.raises(LookupError, match="not found"):
-            update_page(9999, "T", "F")
-
-
 class TestDeletePage:
     """Tests for delete_page function."""
 

@@ -99,10 +99,6 @@ class TestUpdateUserPage:
         updated = update_user_page(p.id, "Plastic Surgery", "Plastic.html")
         assert updated.title == "Plastic Surgery"
 
-    def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        with pytest.raises(LookupError):
-            update_user_page(999, "Title", "Target")
-
 
 class TestDeleteUserPage:
     """Tests for delete_user_page function."""

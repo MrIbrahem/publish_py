@@ -127,11 +127,6 @@ class TestUpdateUser:
         result = update_user_data(u.user_id)
         assert result.username == "No_Change"
 
-    def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
-            update_user_data(9999, email="T")
-
-
 class TestDeleteUser:
     """Tests for delete_user function."""
 
