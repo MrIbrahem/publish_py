@@ -5,8 +5,7 @@ import logging
 from typing import Any
 
 from ....db.models import PageRecord, UserPageRecord
-from ....db.services.content import CategoryService
-from ....db.services.pages import PagesService, UserPagesService
+from ....db.services import CategoryService, PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 

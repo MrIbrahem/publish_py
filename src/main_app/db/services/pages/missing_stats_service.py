@@ -48,30 +48,39 @@ _STATS_BY_CATEGORY_SQL = text(
 )
 
 
-def count_category_members(cat: str) -> int:
-    """Return the total number of articles in ``cat`` (PHP count_category_members).
+class MissingStatsService:
 
-    PHP returns a list of rows; the consumer pulls ``$row['members']`` from
-    the first row. The Python port returns the integer directly.
-    """
-    if not cat:
-        return 0
-    row = db.session.execute(_COUNT_MEMBERS_SQL, {"cat": cat}).fetchone()
-    if row is None:
-        return 0
-    members = row._mapping.get("members")
-    return int(members or 0)
+    def __init__(self):
+        self.session = db.session
+
+    def count_category_members(self, cat: str) -> int:
+        """Return the total number of articles in ``cat`` (PHP count_category_members).
+
+        PHP returns a list of rows; the consumer pulls ``$row['members']`` from
+        the first row. The Python port returns the integer directly.
+        """
+        if not cat:
+            return 0
+        row = db.session.execute(_COUNT_MEMBERS_SQL, {"cat": cat}).fetchone()
+        if row is None:
+            return 0
+        members = row._mapping.get("members")
+        return int(members or 0)
+
+    def statics_by_category(self, cat: str) -> list[dict]:
+        """Return per-language counts of available titles for ``cat`` (PHP statics_by_category)."""
+        if not cat:
+            return []
+        rows = db.session.execute(_STATS_BY_CATEGORY_SQL, {"cat": cat}).fetchall()
+        return [dict(row._mapping) for row in rows]
 
 
-def statics_by_category(cat: str) -> list[dict]:
-    """Return per-language counts of available titles for ``cat`` (PHP statics_by_category)."""
-    if not cat:
-        return []
-    rows = db.session.execute(_STATS_BY_CATEGORY_SQL, {"cat": cat}).fetchall()
-    return [dict(row._mapping) for row in rows]
-
+_crud = MissingStatsService()
+count_category_members = _crud.count_category_members
+statics_by_category = _crud.statics_by_category
 
 __all__ = [
+    "MissingStatsService",
     "count_category_members",
     "statics_by_category",
 ]

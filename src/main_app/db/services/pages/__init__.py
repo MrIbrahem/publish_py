@@ -25,6 +25,7 @@ from .leaderboard_service import (
     top_lang_of_users,
 )
 from .missing_stats_service import (
+    MissingStatsService,
     count_category_members,
     statics_by_category,
 )
@@ -79,6 +80,7 @@ from .user_page_service import (
 
 __all__ = [
     "Results2026Service",
+    "MissingStatsService",
     "LeaderboardService",
     "PagesService",
     "PagesUsersToMainPagesService",

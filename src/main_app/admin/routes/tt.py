@@ -14,8 +14,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from werkzeug.wrappers.response import Response
 
-from ...db.services.content import list_categories
-from ...db.services.pages import translate_type_service
+from ...db.services import CategoryService, TranslateTypeService
 from ...extensions import UniqueError
 
 logger = logging.getLogger(__name__)
@@ -24,6 +23,7 @@ logger = logging.getLogger(__name__)
 class TranslateTypeRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.translate_type_service = TranslateTypeService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -38,12 +38,14 @@ class TranslateTypeRoutes:
         cat = request.args.get("cat", "All")
         translate_types = []
         try:
-            translate_types = translate_type_service.list_translate_types(cat=cat)
-            # new_titles = translate_type_service.list_new_titles() if cat == "All" else []
+            translate_types = self.translate_type_service.list_translate_types(cat=cat)
+            # new_titles = self.translate_type_service.list_new_titles() if cat == "All" else []
         except Exception:
             logger.exception("Failed to load translate_type rows for cat=%r", cat)
 
-        categories = list_categories()
+        category_service = CategoryService()
+        categories = category_service.list_categories()
+
         return render_template(
             "admins/tt/index.html",
             translate_types=translate_types,
@@ -60,7 +62,7 @@ class TranslateTypeRoutes:
             return redirect(url_for("admin.edit_done"))
         try:
             tt_id = int(tt_id_raw)
-            translate_types = translate_type_service.get_translate_type(tt_id)
+            translate_types = self.translate_type_service.get_translate_type(tt_id)
         except (ValueError, TypeError):
             logger.exception("Invalid translate_type id=%r", tt_id_raw)
             translate_types = None
@@ -102,7 +104,7 @@ class TranslateTypeRoutes:
             return redirect(url_for("admin.edit_done"))
 
         try:
-            translate_types = translate_type_service.get_translate_type(tt_id)
+            translate_types = self.translate_type_service.get_translate_type(tt_id)
         except Exception:
             logger.exception("Failed to load translate_type rows for id=%r", tt_id)
             translate_types = None
@@ -112,7 +114,7 @@ class TranslateTypeRoutes:
             return redirect(url_for("admin.edit_done"))
 
         try:
-            result = translate_type_service.update_translate_type(tt_id, title, lead, full)
+            result = self.translate_type_service.update_translate_type(tt_id, title, lead, full)
         except UniqueError:
             logger.warning("Failed to update translate_type, duplicate item with title=%r", title)
             flash(f"Failed, title: {title} is used in other item.", "danger")
@@ -151,7 +153,7 @@ class TranslateTypeRoutes:
             return redirect(url_for("admin.tt.add"))
 
         try:
-            result = translate_type_service.add_translate_type(tt_title=title, tt_lead=lead, tt_full=full)
+            result = self.translate_type_service.add_translate_type(tt_title=title, tt_lead=lead, tt_full=full)
         except UniqueError:
             logger.warning("Failed to insert translate_type, duplicate item with title=%r", title)
             flash(f"Failed, title: {title} is used in other item.", "danger")

@@ -11,7 +11,7 @@ import logging
 
 from flask import Blueprint, render_template
 
-from ...db.services.pages import page_service, user_page_service
+from ...db.services import PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +27,13 @@ class StaticsRoutes:
     def stat_index(self) -> str:
         """Render a minimal statistics overview."""
         try:
-            pages_count = page_service.count_translated()
+            pages_count = PagesService().count_translated()
         except Exception:
             logger.exception("Failed to count translated pages")
             pages_count = None
 
         try:
-            user_pages_count = user_page_service.count_translated()
+            user_pages_count = UserPagesService().count_translated()
         except Exception:
             logger.exception("Failed to count translated user pages")
             user_pages_count = None

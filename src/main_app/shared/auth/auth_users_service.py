@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 from ...db.models import UserRecord
-from ...db.services.users import (
+from ...db.services import (
     AdminService,
     UsersService,
     UserTokenService,

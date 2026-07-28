@@ -7,7 +7,7 @@ from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from ...db.services.config import SettingsService
+from ...db.services import SettingsService
 from ..decorators import admin_required
 
 
