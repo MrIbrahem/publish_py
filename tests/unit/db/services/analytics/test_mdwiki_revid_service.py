@@ -10,6 +10,11 @@ from src.main_app.db.services.analytics.mdwiki_revid_service import (
     update_mdwiki_revid,
 )
 
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = MdwikiRevidService()
+
 
 def test_mdwiki_revid_workflow():
     # Test add
