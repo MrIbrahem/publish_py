@@ -16,13 +16,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ...db.exceptions import DuplicateRecordError, UserNotFoundError
-from ...db.services.users import (
-    add_coordinator,
-    delete_coordinator,
-    get_coordinator_by_id,
-    list_coordinators,
-    set_coordinator_active,
-)
+from ...db.services.users import AdminService
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -31,7 +25,8 @@ logger = logging.getLogger(__name__)
 def _coordinators_dashboard() -> str:
     """Render the coordinator management dashboard."""
     try:
-        coordinators = list_coordinators()
+        service = AdminService()
+        coordinators = service.list_coordinators()
     except Exception as e:  # pragma: no cover - defensive guard
         logger.error(f"Unable to list coordinators: {e}")
         flash("Unable to list coordinators.", "danger")
@@ -58,7 +53,8 @@ def _add_coordinator() -> ResponseReturnValue:
         return redirect(url_for("admin.coordinators.dashboard"))
 
     try:
-        record = add_coordinator(username)
+        service = AdminService()
+        record = service.add_coordinator(username)
     except UserNotFoundError as exc:
         logger.error("UserNotFoundError: %s", exc)
         flash(f"User '{username}' does not exist", "warning")
@@ -80,7 +76,8 @@ def _add_coordinator() -> ResponseReturnValue:
 def _set_record_active_status(coordinator_id: int, is_active: bool) -> ResponseReturnValue:
     """Shared helper to update coordinator is_active status."""
     try:
-        record = set_coordinator_active(coordinator_id, is_active)
+        service = AdminService()
+        record = service.set_coordinator_active(coordinator_id, is_active)
         if record is None:
             raise LookupError(f"Coordinator with id {coordinator_id} not found")
     except LookupError:
@@ -100,10 +97,11 @@ def _delete_coordinator(coordinator_id: int) -> ResponseReturnValue:
     """Remove a coordinator entirely."""
 
     try:
-        record = get_coordinator_by_id(coordinator_id)
+        service = AdminService()
+        record = service.get_coordinator_by_id(coordinator_id)
         if record is None:
             raise LookupError(f"Coordinator with id {coordinator_id} not found")
-        delete_coordinator(coordinator_id)
+        service.delete_coordinator(coordinator_id)
     except LookupError:
         logger.exception("Unable to delete coordinator.")
         flash(f"Coordinator id {coordinator_id} was not found", "warning")

@@ -2,6 +2,7 @@ import pytest
 
 from src.main_app.db.models import RefsCountRecord
 from src.main_app.db.services.analytics.refs_count_service import (
+    RefsCountService,
     add_or_update_refs_count,
     add_refs_count,
     get_ref_counts_for_title,
@@ -10,50 +11,54 @@ from src.main_app.db.services.analytics.refs_count_service import (
     list_refs_counts,
     update_refs_count,
 )
-from src.main_app.db.services.delete_service import (
-    delete_refs_count,
-)
 
 
-def test_refs_count_workflow():
-    # Test add
-    r = add_refs_count("Aspirin", 15, 120)
-    assert r.r_title == "Aspirin"
-    assert r.r_lead_refs == 15
-
-    # Test get
-    r2 = get_refs_count(r.r_id)
-    assert r2.r_title == "Aspirin"
-
-    # Test get by title
-    r3 = get_refs_count_by_title("Aspirin")
-    assert r3.r_id == r.r_id
-
-    # Test get_ref_counts_for_title
-    lead, all_refs = get_ref_counts_for_title("Aspirin")
-    assert lead == 15
-    assert all_refs == 120
-
-    # Test list
-    all_r = list_refs_counts()
-    assert any(x.r_title == "Aspirin" for x in all_r)
-
-    # Test update
-    updated = update_refs_count(r.r_id, r_lead_refs=20)
-    assert updated.r_lead_refs == 20
-
-    # Test add_or_update
-    r4 = add_or_update_refs_count("Aspirin", 25, 150)
-    assert r4.r_lead_refs == 25
-
-    # Test delete
-    deleted = delete_refs_count(r.r_id)
-    assert deleted is True
-    assert get_refs_count(r.r_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = RefsCountService()
 
 
-class TestListRefsCounts:
-    """Tests for list_refs_counts function."""
+class TestRefsCountService(TestSetup):
+    """Tests for RefsCountService class."""
+
+    def test_refs_count_workflow(self):
+        # Test add
+        r = add_refs_count("Aspirin", 15, 120)
+        assert r.r_title == "Aspirin"
+        assert r.r_lead_refs == 15
+
+        # Test get
+        r2 = get_refs_count(r.r_id)
+        assert r2 is not None
+        assert r2.r_title == "Aspirin"
+
+        # Test get by title
+        r3 = get_refs_count_by_title("Aspirin")
+        assert r3 is not None
+        assert r3.r_id == r.r_id
+
+        # Test get_ref_counts_for_title
+        lead, all_refs = get_ref_counts_for_title("Aspirin")
+        assert lead == 15
+        assert all_refs == 120
+
+        # Test list
+        all_r = list_refs_counts()
+        assert any(x.r_title == "Aspirin" for x in all_r)
+
+        # Test update
+        updated = update_refs_count(r.r_id, r_lead_refs=20)
+        assert updated.r_lead_refs == 20
+
+        # Test add_or_update
+        r4 = add_or_update_refs_count("Aspirin", 25, 150)
+        assert r4.r_lead_refs == 25
+
+        # Test delete
+        deleted = RefsCountService().delete(r.r_id)
+        assert deleted is True
+        assert get_refs_count(r.r_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
@@ -63,7 +68,7 @@ class TestListRefsCounts:
         assert len(result) >= 2
 
 
-class TestGetRefsCount:
+class TestGetRefsCount(TestSetup):
     """Tests for get_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -77,20 +82,21 @@ class TestGetRefsCount:
         assert get_refs_count(9999) is None
 
 
-class TestGetRefsCountByTitle:
+class TestGetRefsCountByTitle(TestSetup):
     """Tests for get_refs_count_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title."""
         add_refs_count("Penicillin")
         result = get_refs_count_by_title("Penicillin")
+        assert result is not None
         assert result.r_title == "Penicillin"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert get_refs_count_by_title("Ghost") is None
 
 
-class TestAddRefsCount:
+class TestAddRefsCount(TestSetup):
     """Tests for add_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -110,7 +116,7 @@ class TestAddRefsCount:
             add_refs_count("")
 
 
-class TestAddOrUpdateRefsCount:
+class TestAddOrUpdateRefsCount(TestSetup):
     """Tests for add_or_update_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -126,7 +132,7 @@ class TestAddOrUpdateRefsCount:
             add_or_update_refs_count(" ")
 
 
-class TestUpdateRefsCount:
+class TestUpdateRefsCount(TestSetup):
     """Tests for update_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -145,21 +151,21 @@ class TestUpdateRefsCount:
             update_refs_count(9999, r_lead_refs=10)
 
 
-class TestDeleteRefsCount:
+class TestDeleteRefsCount(TestSetup):
     """Tests for delete_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         r = add_refs_count("Diazepam")
-        deleted = delete_refs_count(r.r_id)
+        deleted = RefsCountService().delete(r.r_id)
         assert deleted is True
         assert get_refs_count(r.r_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_refs_count(9999) is False
+        assert RefsCountService().delete(9999) is False
 
 
-class TestGetRefsCountsForTitle:
+class TestGetRefsCountsForTitle(TestSetup):
     """Tests for get_ref_counts_for_title function."""
 
     def test_returns_counts_when_record_exists(self, monkeypatch):

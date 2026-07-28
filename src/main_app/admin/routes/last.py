@@ -9,8 +9,7 @@ from typing import Any
 
 from flask import render_template
 
-from ...db.services.content import get_camp_to_cats, list_langs
-from ...db.services.pages_query_service import list_pages_users, list_pages_with_views
+from ...db.services import CategoryService, LangService, PagesQueryService
 
 logger = logging.getLogger(__name__)
 
@@ -39,18 +38,21 @@ def last_translations_dashboard(
         lang = "All"
 
     # Fetch data based on table type
+    service = PagesQueryService()
     if last_table == "pages":
-        rows = list_pages_with_views(limit=100, lang=lang)
+        rows = service.list_pages_with_views(limit=100, lang=lang)
     else:
-        rows = list_pages_users(limit=100, lang=lang)
+        rows = service.list_pages_users(limit=100, lang=lang)
 
-    camps = get_camp_to_cats()
+    category_service = CategoryService()
+    camps = category_service.get_camp_to_cats()
     cats_to_camp = {v: x for x, v in camps.items() if v}
 
     last_rows = add_campaign(rows, cats_to_camp)
 
     # Get languages for dropdown
-    languages = list_langs()
+    lang_service = LangService()
+    languages = lang_service.list_langs()
 
     return render_template(
         "admins/last/index.html",

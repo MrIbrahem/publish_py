@@ -50,7 +50,7 @@ class CategoryService(CRUDService[CategoryRecord]):
 
         if is_default:
             # set this category as default by unsetting default flag on all other categories
-            set_default_category(db.session)
+            set_default_category(self.session)
             orm_obj = self.update(orm_obj, is_default=1)
         else:
             orm_obj = self.update(orm_obj, is_default=0)
@@ -86,7 +86,7 @@ class CategoryService(CRUDService[CategoryRecord]):
 
         if is_default:
             # set this category as default by unsetting default flag on all other categories
-            set_default_category(db.session)
+            set_default_category(self.session)
             self.update(record, is_default=1)
         else:
             self.update(record, is_default=0)

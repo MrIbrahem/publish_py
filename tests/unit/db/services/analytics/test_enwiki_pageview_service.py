@@ -2,6 +2,7 @@ import pytest
 
 from src.main_app.db.models import EnwikiPageviewRecord
 from src.main_app.db.services.analytics.enwiki_pageview_service import (
+    EnwikiPageviewService,
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
     get_enwiki_pageview,
@@ -10,49 +11,53 @@ from src.main_app.db.services.analytics.enwiki_pageview_service import (
     list_enwiki_pageviews,
     update_enwiki_pageview,
 )
-from src.main_app.db.services.delete_service import (
-    delete_enwiki_pageview,
-)
 
 
-def test_enwiki_pageview_workflow():
-    # Test add
-    p = add_enwiki_pageview("Anatomy", 5000)
-    assert p.title == "Anatomy"
-    assert p.en_views == 5000
-
-    # Test get
-    p2 = get_enwiki_pageview(p.id)
-    assert p2.title == "Anatomy"
-
-    # Test get by title
-    p3 = get_enwiki_pageview_by_title("Anatomy")
-    assert p3.id == p.id
-
-    # Test list
-    all_p = list_enwiki_pageviews()
-    assert any(x.title == "Anatomy" for x in all_p)
-
-    # Test top views
-    top = get_top_enwiki_pageviews(1)
-    assert top[0].title == "Anatomy"
-
-    # Test update
-    updated = update_enwiki_pageview(p.id, en_views=7500)
-    assert updated.en_views == 7500
-
-    # Test add_or_update
-    p4 = add_or_update_enwiki_pageview("Anatomy", 10000)
-    assert p4.en_views == 10000
-
-    # Test delete
-    deleted = delete_enwiki_pageview(p.id)
-    assert deleted is True
-    assert get_enwiki_pageview(p.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = EnwikiPageviewService()
 
 
-class TestListEnwikiPageviews:
-    """Tests for list_enwiki_pageviews function."""
+class TestEnwikiPageviewService(TestSetup):
+    """Tests for EnwikiPageviewService class."""
+
+    def test_enwiki_pageview_workflow(self):
+        # Test add
+        p = add_enwiki_pageview("Anatomy", 5000)
+        assert p.title == "Anatomy"
+        assert p.en_views == 5000
+
+        # Test get
+        p2 = get_enwiki_pageview(p.id)
+        assert p2 is not None
+        assert p2.title == "Anatomy"
+
+        # Test get by title
+        p3 = get_enwiki_pageview_by_title("Anatomy")
+        assert p3 is not None
+        assert p3.id == p.id
+
+        # Test list
+        all_p = list_enwiki_pageviews()
+        assert any(x.title == "Anatomy" for x in all_p)
+
+        # Test top views
+        top = get_top_enwiki_pageviews(1)
+        assert top[0].title == "Anatomy"
+
+        # Test update
+        updated = update_enwiki_pageview(p.id, en_views=7500)
+        assert updated.en_views == 7500
+
+        # Test add_or_update
+        p4 = add_or_update_enwiki_pageview("Anatomy", 10000)
+        assert p4.en_views == 10000
+
+        # Test delete
+        deleted = EnwikiPageviewService().delete(p.id)
+        assert deleted is True
+        assert get_enwiki_pageview(p.id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
@@ -62,7 +67,7 @@ class TestListEnwikiPageviews:
         assert len(result) >= 2
 
 
-class TestGetTopEnwikiPageviews:
+class TestGetTopEnwikiPageviews(TestSetup):
     """Tests for get_top_enwiki_pageviews function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -78,7 +83,7 @@ class TestGetTopEnwikiPageviews:
         get_top_enwiki_pageviews()
 
 
-class TestGetEnwikiPageview:
+class TestGetEnwikiPageview(TestSetup):
     """Tests for get_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -92,20 +97,21 @@ class TestGetEnwikiPageview:
         assert get_enwiki_pageview(9999) is None
 
 
-class TestGetEnwikiPageviewByTitle:
+class TestGetEnwikiPageviewByTitle(TestSetup):
     """Tests for get_enwiki_pageview_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title."""
         add_enwiki_pageview("Microbiology")
         result = get_enwiki_pageview_by_title("Microbiology")
+        assert result is not None
         assert result.title == "Microbiology"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert get_enwiki_pageview_by_title("Ghost") is None
 
 
-class TestAddEnwikiPageview:
+class TestAddEnwikiPageview(TestSetup):
     """Tests for add_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -124,7 +130,7 @@ class TestAddEnwikiPageview:
             add_enwiki_pageview("")
 
 
-class TestAddOrUpdateEnwikiPageview:
+class TestAddOrUpdateEnwikiPageview(TestSetup):
     """Tests for add_or_update_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -139,7 +145,7 @@ class TestAddOrUpdateEnwikiPageview:
             add_or_update_enwiki_pageview("  ")
 
 
-class TestUpdateEnwikiPageview:
+class TestUpdateEnwikiPageview(TestSetup):
     """Tests for update_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -158,15 +164,15 @@ class TestUpdateEnwikiPageview:
             update_enwiki_pageview(9999, en_views=10)
 
 
-class TestDeleteEnwikiPageview:
+class TestDeleteEnwikiPageview(TestSetup):
     """Tests for delete_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         p = add_enwiki_pageview("Pathology")
-        deleted = delete_enwiki_pageview(p.id)
+        deleted = EnwikiPageviewService().delete(p.id)
         assert deleted is True
         assert get_enwiki_pageview(p.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_enwiki_pageview(9999) is False
+        assert EnwikiPageviewService().delete(9999) is False

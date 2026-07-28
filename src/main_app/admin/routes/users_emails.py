@@ -15,15 +15,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ...db.models import ProjectRecord, UserRecord
-from ...db.services.content import list_projects
-from ...db.services.pages import list_of_users_by_translations_count
-from ...db.services.users import (
-    create_user,
-    delete_user,
-    get_user,
-    list_users,
-    update_user,
-)
+from ...db.services import LeaderboardService, ProjectService, UsersService
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -40,19 +32,18 @@ def filter_users(users: list[UserRecord], project_name: str):
     return users
 
 
-def _dashboard():
+def _dashboard(
+    users: list[UserRecord],
+    users_counts: dict[str, int],
+    projects: list[ProjectRecord],
+):
     """Render the users not in process management dashboard."""
 
-    projects: list[ProjectRecord] = list_projects()
-
-    users: list[UserRecord] = list_users()
     total = len(users)
 
     project_name = request.args.get("project", "").strip()
     if project_name:
         users = filter_users(users, project_name)
-
-    users_counts: dict[str, int] = list_of_users_by_translations_count()
 
     users_data = []
 
@@ -86,7 +77,8 @@ def _add_user() -> ResponseReturnValue:
         return redirect(url_for("admin.users_emails.dashboard"))
 
     try:
-        record = create_user(
+        service = UsersService()
+        record = service.create_user(
             username=username,
             email=email,
             wiki=wiki,
@@ -116,7 +108,8 @@ def _update_record(user_id: int) -> ResponseReturnValue:
         return redirect(url_for("admin.users_emails.dashboard"))
 
     try:
-        record = update_user(
+        service = UsersService()
+        record = service.update_user(
             user_id=user_id,
             username=username,
             email=email,
@@ -139,7 +132,8 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
     """Remove a user not in process record entirely."""
 
     try:
-        record = delete_user(record_id)
+        service = UsersService()
+        record = service.delete(record_id)
         if not record:
             raise ValueError(f"Unable to delete user with ID {record_id}")
     except ValueError as exc:
@@ -157,6 +151,7 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
 class UsersEmails:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.user_service = UsersService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -167,7 +162,15 @@ class UsersEmails:
         self.bp.route("/<int:record_id>/edit", methods=["GET"])(admin_required(self.edit))
 
     def dashboard(self):
-        return _dashboard()
+        users: list[UserRecord] = self.user_service.list_users()
+
+        projects_service = ProjectService()
+        projects: list[ProjectRecord] = projects_service.list_projects()
+
+        lederboard_service = LeaderboardService()
+        users_counts: dict[str, int] = lederboard_service.list_of_users_by_translations_count()
+
+        return _dashboard(users, users_counts, projects)
 
     def add(self) -> ResponseReturnValue:
         return _add_user()
@@ -179,7 +182,7 @@ class UsersEmails:
         return _update_record(record_id)
 
     def edit(self, record_id: int) -> ResponseReturnValue:
-        user = get_user(record_id)
+        user = self.user_service.get_user(record_id)
         if not user:
             flash(f"User with ID {record_id} not found.", "danger")
             return redirect(url_for("admin.users_emails.dashboard"))

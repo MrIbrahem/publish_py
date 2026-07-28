@@ -13,16 +13,20 @@ from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
 from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
-from ....db.services.content import list_categories, list_langs
-from ....db.services.pages import get_in_process_counts_by_user, list_of_users_by_translations_count, top_lang_of_users
-from ....db.services.pages_query_service import list_pages_users, list_pages_with_views
-from ....db.services.reports import query_reports_with_filters
-from ....db.services.users import users_search
+from ....db.services import (
+    CategoryService,
+    InProcessService,
+    LangService,
+    LeaderboardService,
+    PagesQueryService,
+    ReportService,
+    UsersService,
+)
 from ....extensions import db
 from ....shared.core.cors import check_cors
 from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.utils.web_utils import parse_select_fields
-from .leaderboard import leaderboard_status
+from .form_utils import FormData, get_form
 from .top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
@@ -69,7 +73,8 @@ def get_publish_reports() -> tuple[Response, int] | Response:
 
     try:
         # Query database
-        records: list[ReportRecord] = query_reports_with_filters(filters, select_fields, limit)
+        service = ReportService()
+        records: list[ReportRecord] = service.query_reports_with_filters(filters, select_fields, limit)
 
     except Exception:
         logger.exception("Error fetching publish_reports")
@@ -221,7 +226,8 @@ def get_in_process_total() -> tuple[Response, int] | Response:
         JSON response with user counts
     """
     try:
-        data = get_in_process_counts_by_user()
+        service = InProcessService()
+        data = service.get_in_process_counts_by_user()
 
     except Exception:
         logger.exception("Error fetching in_process_total data")
@@ -253,7 +259,7 @@ def get_pages_users() -> tuple[Response, int] | Response:
         JSON response with pages_users records
     """
     try:
-        data = list_pages_users(limit=100)
+        data = PagesQueryService().list_pages_users(limit=100)
     except Exception:
         logger.exception("Error fetching pages_users data")
         return jsonify({"error": "An internal error occurred while fetching pages_users data"}), 500
@@ -284,7 +290,7 @@ def get_pages_with_views() -> tuple[Response, int] | Response:
         JSON response with pages records including views
     """
     try:
-        data = list_pages_with_views()
+        data = PagesQueryService().list_pages_with_views()
     except Exception:
         logger.exception("Error fetching pages_with_views data")
         return jsonify({"error": "An internal error occurred while fetching pages_with_views data"}), 500
@@ -302,7 +308,8 @@ def get_categories() -> tuple[Response, int] | Response:
     Handle categories API requests. Returns all category records.
     """
     try:
-        records = list_categories()
+        category_service = CategoryService()
+        records = category_service.list_categories()
     except Exception:
         logger.exception("Error fetching categories data")
         return jsonify({"error": "An internal error occurred while fetching categories data"}), 500
@@ -345,8 +352,9 @@ def users_by_translations_count() -> tuple[Response, int] | Response:
     """C
     Handle pages_with_views API requests.
     """
+    service = LeaderboardService()
     try:
-        data = list_of_users_by_translations_count()
+        data = service.list_of_users_by_translations_count()
     except Exception:
         logger.exception("Error fetching list_of_users_by_translations_count data")
         return jsonify({"error": "An internal error occurred while fetching v data"}), 500
@@ -367,7 +375,8 @@ def get_langs() -> tuple[Response, int] | Response:
     Handle langs API requests. Returns all language records.
     """
     try:
-        records = list_langs()
+        lang_service = LangService()
+        records = lang_service.list_langs()
     except Exception:
         logger.exception("Error fetching langs data")
         return jsonify({"error": "An internal error occurred while fetching langs data"}), 500
@@ -390,7 +399,8 @@ def get_users() -> tuple[Response, int] | Response:
         return jsonify({"error": "Query parameter 'userlike' is required"}), 400
 
     try:
-        records = users_search(userlike)
+        service = UsersService()
+        records = service.users_search(userlike)
     except Exception:
         logger.exception("Error fetching users data")
         return jsonify({"error": "An internal error occurred while fetching users data"}), 500
@@ -408,13 +418,14 @@ def get_users() -> tuple[Response, int] | Response:
 class ApiRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.leaderboard_service = LeaderboardService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
 
         self.bp.before_request(self.handle_options_preflight)
 
-        self.bp.route("/status", methods=["GET"])(leaderboard_status)
+        self.bp.route("/status", methods=["GET"])(self.leaderboard_status)
         self.bp.route("/top_langs", methods=["GET"])(check_cors(self.get_top_langs))
         self.bp.route("/top_users", methods=["GET"])(check_cors(self.get_top_users))
         self.bp.route("/top_lang_of_users", methods=["GET"])(check_cors(self.get_top_lang_of_users))
@@ -456,11 +467,35 @@ class ApiRoutes:
 
     def get_top_lang_of_users(self) -> tuple[Response, int] | Response:
         try:
-            data = top_lang_of_users()
+            data = self.leaderboard_service.top_lang_of_users()
         except Exception:
             logger.exception("Error fetching top_lang_of_users data")
             return jsonify({"error": "An internal error occurred"}), 500
         return jsonify(data)
+
+    def leaderboard_status(self) -> Response:
+        """
+        Handle leaderboard API requests.
+        /api/status?camp=Video&user_group=WIKI&year=2025&month=02&cat=RTTVideo
+        """
+        form: FormData = get_form(request.args)
+
+        data = self.leaderboard_service.get_leaderboard_chart_data(
+            camp=form.camp,
+            cat=form.cat,
+            user_group=form.user_group,
+            year=form.year,
+            month=form.month,
+            lang=form.lang,
+            user=form.user,
+        )
+
+        response_data = {
+            "results": data,
+            "count": len(data),
+        }
+
+        return jsonify(response_data)
 
 
 __all__ = [

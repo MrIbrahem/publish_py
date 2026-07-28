@@ -18,12 +18,11 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....db.services.pages import (
-    exists_by_lang_and_category,
-    list_in_process_by_lang,
-    list_pages_by_lang_cat,
-    list_translate_types,
-    missing_by_lang_and_category,
+from ....db.services import (
+    InProcessService,
+    PagesService,
+    Results2026Service,
+    TranslateTypeService,
 )
 from ....shared.utils.wiki_links import (
     content_translation_url,
@@ -38,7 +37,8 @@ logger = logging.getLogger(__name__)
 
 def _get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str, dict]:
     """Mirror of PHP ``getinprocess_n($missing, $code)``."""
-    records = list_in_process_by_lang(code)
+    service = InProcessService()
+    records = service.list_in_process_by_lang(code)
     result: dict[str, dict] = {}
     for r in records:
         if r.title not in missing_titles:
@@ -69,7 +69,8 @@ def _load_translate_type_sets() -> tuple[set[str], set[str]]:
     nolead: set[str] = set()
     full: set[str] = set()
     try:
-        rows = list_translate_types()
+        service = TranslateTypeService()
+        rows = service.list_translate_types()
     except Exception:
         logger.exception("Failed to load translate_type rows")
         return nolead, full
@@ -555,12 +556,14 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
       - ``missing``   is a list[missing row dict] (in DB order)
     """
     # logic from results_2026/get_results_2026.php — exists_via_td
-    exists_via_td_rows = list_pages_by_lang_cat(code, cat)
+    pages_service = PagesService()
+    exists_via_td_rows = pages_service.list_pages_by_lang_cat(code, cat)
     exists_via_td = {p.title: p for p in exists_via_td_rows}
 
-    items_missing = missing_by_lang_and_category(code, cat)
+    result_2026_service = Results2026Service()
+    items_missing = result_2026_service.missing_by_lang_and_category(code, cat)
     missing_by_title = {row["title"]: row for row in items_missing if row.get("title")}
-    items_exists_list = exists_by_lang_and_category(code, cat)
+    items_exists_list = result_2026_service.exists_by_lang_and_category(code, cat)
     items_exists: dict[str, dict] = {row["title"]: row for row in items_exists_list}
 
     # Tag each exists row with via="td" or via="before" — PHP foreach loop.

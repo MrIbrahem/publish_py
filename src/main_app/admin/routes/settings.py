@@ -7,12 +7,7 @@ from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from ...db.services.config import (
-    create_setting,
-    delete_setting_by_key,
-    get_all_settings_raw,
-    update_setting,
-)
+from ...db.services.config import SettingsService
 from ..decorators import admin_required
 
 
@@ -29,46 +24,10 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
         return raw_val, True
 
 
-def settings_update_form(request_form) -> tuple[list[str], list[str]]:
-    all_settings = get_all_settings_raw()
-    failed_keys: list[str] = []
-    deleted_keys: list[str] = []
-
-    for setting in all_settings:
-        key = setting["key"]
-        v_type = setting["value_type"]
-        form_key = f"setting_{key}"
-        delete_key = f"delete_{key}"
-
-        # Check if marked for deletion
-        if request_form.get(delete_key) == "on":
-            if delete_setting_by_key(key):
-                deleted_keys.append(key)
-            else:
-                failed_keys.append(key)
-            continue
-
-        if v_type == "boolean":
-            raw_val = request_form.get(form_key, "")
-        elif form_key in request_form:
-            raw_val = request_form.get(form_key, "")
-        else:
-            continue
-
-        value, success = _parse_setting_value(v_type, raw_val)
-        if not success:
-            failed_keys.append(key)
-            continue
-
-        if not update_setting(key, value, v_type):
-            failed_keys.append(key)
-
-    return failed_keys, deleted_keys
-
-
 class SettingsRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.settings_service = SettingsService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -77,7 +36,7 @@ class SettingsRoutes:
         self.bp.post("/update")(admin_required(self.update))
 
     def dashboard(self):
-        settings_list = get_all_settings_raw()
+        settings_list = self.settings_service.get_all_settings_raw()
         return render_template(
             "admins/settings.html",
             settings_list=settings_list,
@@ -96,7 +55,7 @@ class SettingsRoutes:
             return redirect(url_for("admin.settings.dashboard"))
 
         if key and title:
-            success = create_setting(key, title, value_type)
+            success = self.settings_service.create_setting(key, title, value_type)
             if success:
                 flash("Setting created successfully.", "success")
             else:
@@ -107,7 +66,7 @@ class SettingsRoutes:
         return redirect(url_for("admin.settings.dashboard"))
 
     def update(self):
-        failed_keys, deleted_keys = settings_update_form(request.form)
+        failed_keys, deleted_keys = self.settings_update_form(request.form)
         # Invalidate runtime cache only if all updates succeeded
         if not failed_keys:
             if deleted_keys:
@@ -117,6 +76,42 @@ class SettingsRoutes:
         else:
             flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
         return redirect(url_for("admin.settings.dashboard"))
+
+    def settings_update_form(self, request_form) -> tuple[list[str], list[str]]:
+        all_settings = self.settings_service.get_all_settings_raw()
+        failed_keys: list[str] = []
+        deleted_keys: list[str] = []
+
+        for setting in all_settings:
+            key = setting["key"]
+            v_type = setting["value_type"]
+            form_key = f"setting_{key}"
+            delete_key = f"delete_{key}"
+
+            # Check if marked for deletion
+            if request_form.get(delete_key) == "on":
+                if self.settings_service.delete_setting_by_key(key):
+                    deleted_keys.append(key)
+                else:
+                    failed_keys.append(key)
+                continue
+
+            if v_type == "boolean":
+                raw_val = request_form.get(form_key, "")
+            elif form_key in request_form:
+                raw_val = request_form.get(form_key, "")
+            else:
+                continue
+
+            value, success = _parse_setting_value(v_type, raw_val)
+            if not success:
+                failed_keys.append(key)
+                continue
+
+            if not self.settings_service.update_setting(key, value, v_type):
+                failed_keys.append(key)
+
+        return failed_keys, deleted_keys
 
 
 __all__ = [

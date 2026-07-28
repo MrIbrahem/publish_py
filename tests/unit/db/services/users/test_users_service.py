@@ -3,10 +3,8 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserRecord
-from src.main_app.db.services.delete_service import (
-    delete_user,
-)
 from src.main_app.db.services.users.users_service import (
+    UsersService,
     create_user,
     get_user,
     get_user_by_username,
@@ -19,28 +17,38 @@ from src.main_app.db.services.users.users_service import (
 pytestmark = pytest.mark.unit
 
 
-def test_user_workflow():
-    u = create_user("Wiki_User", email="jh@example.com", wiki="enwiki", user_group="Editor")
-    assert u.username == "Wiki_User"
-
-    assert get_user(u.user_id).username == "Wiki_User"
-    assert get_user_by_username("Wiki_User").user_id == u.user_id
-
-    assert any(x.username == "Wiki_User" for x in list_users())
-    assert any(x.username == "Wiki_User" for x in list_users_by_group("Editor"))
-
-    updated = update_user_data(u.user_id, email="jh_new@example.com")
-    assert updated.email == "jh_new@example.com"
-
-    assert user_exists("Wiki_User") is True
-
-    deleted = delete_user(u.user_id)
-    assert deleted is True
-    assert get_user(u.user_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = UsersService()
 
 
-class TestListUsers:
-    """Tests for list_users function."""
+class TestUsersService(TestSetup):
+    """Tests for UsersService class."""
+
+    def test_user_workflow(self):
+        u = create_user("Wiki_User", email="jh@example.com", wiki="enwiki", user_group="Editor")
+        assert u.username == "Wiki_User"
+
+        _user = get_user(u.user_id)
+        assert _user is not None
+        assert _user.username == "Wiki_User"
+        _by_name = get_user_by_username("Wiki_User")
+        assert _by_name is not None
+        assert _by_name.user_id == u.user_id
+
+        assert any(x.username == "Wiki_User" for x in list_users())
+        assert any(x.username == "Wiki_User" for x in list_users_by_group("Editor"))
+
+        updated = update_user_data(u.user_id, email="jh_new@example.com")
+        assert updated is not None
+        assert updated.email == "jh_new@example.com"
+
+        assert user_exists("Wiki_User") is True
+
+        deleted = UsersService().delete(u.user_id)
+        assert deleted is True
+        assert get_user(u.user_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
@@ -50,7 +58,7 @@ class TestListUsers:
         assert len(result) >= 2
 
 
-class TestListUsersByGroup:
+class TestListUsersByGroup(TestSetup):
     """Tests for list_users_by_group function."""
 
     def test_returns_list_from_store(self, monkeypatch):
@@ -62,7 +70,7 @@ class TestListUsersByGroup:
         assert result[0].username == "Expert1"
 
 
-class TestGetUser:
+class TestGetUser(TestSetup):
     """Tests for get_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -76,20 +84,21 @@ class TestGetUser:
         assert get_user(9999) is None
 
 
-class TestGetUserByUsername:
+class TestGetUserByUsername(TestSetup):
     """Tests for get_user_by_username function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by username."""
         create_user("Linguist_Specialist")
         result = get_user_by_username("Linguist_Specialist")
+        assert result is not None
         assert result.username == "Linguist_Specialist"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert get_user_by_username("Ghost") is None
 
 
-class TestAddUser:
+class TestAddUser(TestSetup):
     """Tests for create_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -103,7 +112,9 @@ class TestAddUser:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(
+            sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)
+        ):  # pyright: ignore[reportArgumentType]
             with pytest.raises(ValueError, match="already exists"):
                 create_user("Duplicate")
 
@@ -112,36 +123,38 @@ class TestAddUser:
             create_user("")
 
 
-class TestUpdateUser:
+class TestUpdateUser(TestSetup):
     """Tests for update_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
         u = create_user("Bureaucrat1", email="old_email")
         updated = update_user_data(u.user_id, email="new_email")
+        assert updated is not None
         assert updated.email == "new_email"
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         u = create_user("No_Change")
         result = update_user_data(u.user_id)
+        assert result is not None
         assert result.username == "No_Change"
 
 
-class TestDeleteUser:
+class TestDeleteUser(TestSetup):
     """Tests for delete_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         u = create_user("Temporary_Account")
-        deleted = delete_user(u.user_id)
+        deleted = UsersService().delete(u.user_id)
         assert deleted is True
         assert get_user(u.user_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_user(9999) is False
+        assert UsersService().delete(9999) is False
 
 
-class TestUserExists:
+class TestUserExists(TestSetup):
     """Tests for user_exists function."""
 
     def test_returns_true_when_user_exists(self, monkeypatch):

@@ -239,7 +239,7 @@ class TestApiRoutes:
 
     def test_publish_reports_internal_error_handling(self, mock_client: FlaskClient):
         """Test that publish_reports handles internal errors gracefully."""
-        with patch("src.main_app.public.routes.api.routes.query_reports_with_filters") as mock_query:
+        with patch("src.main_app.public.routes.api.routes.ReportService.query_reports_with_filters") as mock_query:
             mock_query.side_effect = Exception("Database error")
 
             response = mock_client.get("/api/publish_reports?limit=5")

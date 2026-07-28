@@ -10,14 +10,7 @@ import logging
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content import list_langs
-from ...db.services.pages import (
-    count_translated,
-    delete_user_page,
-    get_user_page_by_id,
-    list_translated,
-    update_user_page,
-)
+from ...db.services import LangService, UserPagesService
 from ...extensions import db
 
 logger = logging.getLogger(__name__)
@@ -33,6 +26,7 @@ def _safe_int(value: str | None, default: int) -> int:
 class TranslatedUsersRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.user_pages_service = UserPagesService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -48,11 +42,13 @@ class TranslatedUsersRoutes:
         offset = (page - 1) * limit
 
         try:
-            rows = list_translated(lang=lang, limit=limit, offset=offset)
-            total_count = count_translated(lang=lang)
+            rows = self.user_pages_service.list_translated(lang=lang, limit=limit, offset=offset)
+            total_count = self.user_pages_service.count_translated(lang=lang)
         except Exception:
             logger.exception("Failed to list translated user pages lang=%r", lang)
             rows, total_count = [], 0
+
+        langs = LangService().list_langs()
 
         return render_template(
             "admins/translated/index.html",
@@ -61,7 +57,7 @@ class TranslatedUsersRoutes:
             lang=lang,
             page=page,
             limit=limit,
-            languages=list_langs(),
+            languages=langs,
             table_label="User",
             endpoint="admin.translated_users.index",
             edit_endpoint="admin.translated_users.edit",
@@ -74,7 +70,7 @@ class TranslatedUsersRoutes:
         if page_id <= 0:
             abort(400, description="id is required")
 
-        row = get_user_page_by_id(page_id)
+        row = self.user_pages_service.get_user_page_by_id(page_id)
         if not row:
             abort(404)
 
@@ -94,7 +90,7 @@ class TranslatedUsersRoutes:
 
         if "delete" in request.form:
             try:
-                delete_user_page(page_id)
+                self.user_pages_service.delete(page_id)
                 flash(f"User page id {page_id} deleted.", "success")
             except Exception:
                 logger.exception("Failed to delete user page id=%r", page_id)
@@ -112,7 +108,7 @@ class TranslatedUsersRoutes:
             return redirect(url_for("admin.translated_users.edit", id=page_id))
 
         try:
-            row = update_user_page(
+            row = self.user_pages_service.update_user_page(
                 page_id=page_id,
                 title=title,
                 target=target,

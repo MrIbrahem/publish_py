@@ -1,11 +1,5 @@
 """Pages db services."""
 
-from ..delete_service import (
-    delete_in_process,
-    delete_page,
-    delete_translate_type,
-    delete_user_page,
-)
 from .in_process_service import (
     InProcessService,
     add_in_process,
@@ -20,6 +14,7 @@ from .in_process_service import (
     update_in_process,
 )
 from .leaderboard_service import (
+    LeaderboardService,
     get_chart_data_formatted,
     get_leaderboard_chart_data,
     get_months_of_pages_years,
@@ -52,6 +47,7 @@ from .pages_users_to_main_service import (
     list_pending,
 )
 from .results_2026_service import (
+    Results2026Service,
     exists_by_lang_and_category,
     missing_by_lang_and_category,
 )
@@ -82,6 +78,8 @@ from .user_page_service import (
 )
 
 __all__ = [
+    "Results2026Service",
+    "LeaderboardService",
     "PagesService",
     "PagesUsersToMainPagesService",
     "TranslateTypeService",
@@ -94,7 +92,6 @@ __all__ = [
     "get_in_process_by_title_user_lang",
     "add_in_process",
     "update_in_process",
-    "delete_in_process",
     "delete_in_process_by_title_user_lang",
     "is_in_process",
     "get_in_process_counts_by_user",
@@ -114,13 +111,11 @@ __all__ = [
     "find_page_record",
     "add_page",
     "update_page",
-    "delete_page",
     "insert_page_target",
     "add_translate_row_to_db",
     "list_pending",
     "get_user_page",
     "check_main_page_exists",
-    "delete_user_page",
     "missing_by_lang_and_category",
     "exists_by_lang_and_category",
     "list_translate_types",
@@ -131,7 +126,6 @@ __all__ = [
     "get_translate_type_by_title",
     "add_translate_type",
     "update_translate_type",
-    "delete_translate_type",
     "can_translate_lead",
     "can_translate_full",
     "list_user_pages",

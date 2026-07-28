@@ -11,6 +11,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask.testing import FlaskClient
 
+from src.main_app.db.services import LangService, LanguageSettingService
+
 
 @pytest.mark.integration
 class TestLanguageSettingsDashboard:
@@ -26,22 +28,18 @@ class TestLanguageSettingsDashboard:
     def test_language_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
         """Test that language settings dashboard lists settings."""
 
-        with patch("src.main_app.admin.routes.language_settings.list_language_settings") as mock_list:
-            mock_list.return_value = [
-                MagicMock(lang_code="en", move_dots=1, expend=0, add_en_lang=1),
-                MagicMock(lang_code="ar", move_dots=0, expend=1, add_en_lang=0),
-            ]
+        langs_service = LangService()
+        langs_service.add_lang("en", "English", "English")
+        langs_service.add_lang("ar", "Arabic", "Arabic")
 
-            with patch("src.main_app.admin.routes.language_settings.list_langs") as mock_langs:
-                mock_langs.return_value = [
-                    MagicMock(code="en", name="English"),
-                    MagicMock(code="ar", name="Arabic"),
-                ]
+        lang_setting_service = LanguageSettingService()
+        lang_setting_service.add_language_setting(lang_code="en", move_dots=1, expend=0, add_en_lang=1)
+        lang_setting_service.add_language_setting(lang_code="ar", move_dots=0, expend=1, add_en_lang=0)
 
-                response = auth_client.get("/admin/language_settings/")
+        response = auth_client.get("/admin/language_settings/")
 
-            # Should render dashboard successfully
-            assert response.status_code == 200
+        # Should render dashboard successfully
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
@@ -58,7 +56,9 @@ class TestAddLanguageSetting:
     def test_add_language_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding language setting with valid data."""
 
-        with patch("src.main_app.admin.routes.language_settings.add_language_setting") as mock_add:
+        with patch(
+            "src.main_app.admin.routes.language_settings.LanguageSettingService.add_language_setting"
+        ) as mock_add:
             mock_add.return_value = MagicMock(lang_code="fr")
 
             response = auth_client.post(
@@ -102,7 +102,9 @@ class TestUpdateLanguageSetting:
     def test_update_language_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test updating language setting with valid data."""
 
-        with patch("src.main_app.admin.routes.language_settings.update_language_setting") as mock_update:
+        with patch(
+            "src.main_app.admin.routes.language_settings.LanguageSettingService.update_language_setting"
+        ) as mock_update:
             mock_update.return_value = MagicMock(lang_code="en")
 
             response = auth_client.post(
@@ -133,8 +135,8 @@ class TestDeleteLanguageSetting:
     def test_delete_language_setting_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting language setting with valid ID."""
 
-        with patch("src.main_app.admin.routes.language_settings.delete_language_setting") as mock_delete:
-            mock_delete.return_value = MagicMock(lang_code="deleted_lang")
+        with patch("src.main_app.admin.routes.language_settings.LanguageSettingService.delete") as mock_delete:
+            mock_delete.return_value = True
 
             response = auth_client.post(
                 "/admin/language_settings/1/delete",

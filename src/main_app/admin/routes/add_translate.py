@@ -7,8 +7,8 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content import list_categories
-from ...db.services.pages import add_translate_row_to_db
+from ...db.services.content import CategoryService
+from ...db.services.pages import PagesService
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,8 @@ class AddTranslateRoutes:
 
     def add_translate(self) -> str:
         """Render the translations add_translate dashboard."""
-        categories = list_categories()
+        category_service = CategoryService()
+        categories = category_service.list_categories()
         return render_template(
             "admins/add_translate.html",
             categories=categories,
@@ -46,6 +47,7 @@ class AddTranslateRoutes:
 
         texts: list[str] = []
         errors: list[str] = []
+        pages_service = PagesService()
 
         for i in range(len(titles)):
             mdtitle = titles[i].strip()
@@ -60,7 +62,7 @@ class AddTranslateRoutes:
                 continue
 
             try:
-                result = add_translate_row_to_db(
+                result = pages_service.add_translate_row_to_db(
                     title=mdtitle,
                     translate_type=translate_type,
                     cat=cat,

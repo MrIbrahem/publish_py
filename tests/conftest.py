@@ -118,6 +118,19 @@ def mock_client(mock_app: Flask) -> FlaskClient:
 
 
 @pytest.fixture
+def test_client(mock_app: Flask) -> FlaskClient:
+    """Create a test client for the app.
+
+    Args:
+        mock_app: The Flask application fixture.
+
+    Returns:
+        Test client for making HTTP requests.
+    """
+    return mock_app.test_client()
+
+
+@pytest.fixture
 def runner(mock_app):
     """Create a test CLI runner for the app.
 
@@ -198,8 +211,11 @@ def setup_db(mock_app: Flask):
     Creates all real tables (skipping views) and creates views manually.
     The Flask-SQLAlchemy session (db.session) is used throughout tests.
     """
+    from src.main_app.db import register_events
+
     with mock_app.app_context():
         sqlite_view_functions(_db)
+        register_events(_db.engine)
 
         create_tables(_db)
         create_views(_db)

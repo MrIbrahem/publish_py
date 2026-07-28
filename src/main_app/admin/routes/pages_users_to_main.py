@@ -10,9 +10,8 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content import list_langs
-from ...db.services.delete_service import delete_user_page_to_main
-from ...db.services.pages import add_translate_row_to_db, pages_users_to_main_service
+from ...db.services import PagesService, PagesUsersToMainPagesService
+from ...db.services.content import LangService
 from ...extensions import db
 
 logger = logging.getLogger(__name__)
@@ -39,6 +38,7 @@ class PagesUsersMainRoutes:
         """List user pages flagged for promotion to main pages."""
         lang = request.args.get("lang", "All")
 
+        pages_users_to_main_service = PagesUsersToMainPagesService()
         try:
             rows = pages_users_to_main_service.list_pending(lang=lang)
         except Exception:
@@ -49,7 +49,7 @@ class PagesUsersMainRoutes:
             "admins/pages_users_to_main.html",
             rows=rows,
             lang=lang,
-            languages=list_langs(),
+            languages=LangService().list_langs(),
         )
 
     def pages_users_to_main_fix_it(self) -> str:
@@ -58,7 +58,8 @@ class PagesUsersMainRoutes:
         new_user = (request.args.get("new_user") or "").strip()
         new_target = (request.args.get("new_target") or "").strip()
 
-        user_page = pages_users_to_main_service.get_user_page(page_id) if page_id > 0 else None
+        pum_service = PagesUsersToMainPagesService()
+        user_page = pum_service.get_user_page(page_id) if page_id > 0 else None
         title = user_page.title if user_page else ""
         lang = user_page.lang if user_page else ""
         old_target = user_page.target if user_page else ""
@@ -66,7 +67,7 @@ class PagesUsersMainRoutes:
 
         duplicate_page = None
         if title and lang:
-            duplicate_page = pages_users_to_main_service.check_main_page_exists(title, lang)
+            duplicate_page = pum_service.check_main_page_exists(title, lang)
 
         return render_template(
             "admins/pages_users_to_main_fix_it.html",
@@ -98,7 +99,8 @@ class PagesUsersMainRoutes:
             flash("All fields (title, lang, new_target, new_user, pupdate) are required.", "danger")
             return redirect_to
 
-        user_page = pages_users_to_main_service.get_user_page(page_id)
+        pum_service = PagesUsersToMainPagesService()
+        user_page = pum_service.get_user_page(page_id)
         if not user_page:
             flash(f"Page with id:({page_id}) not found.", "danger")
             return redirect_to
@@ -108,7 +110,8 @@ class PagesUsersMainRoutes:
         word = user_page.word or 0
 
         try:
-            added = add_translate_row_to_db(
+            pages_service = PagesService()
+            added = pages_service.add_translate_row_to_db(
                 title=title,
                 translate_type=translate_type,
                 cat=cat,
@@ -141,8 +144,9 @@ class PagesUsersMainRoutes:
 
         flash("Translations added successfully.", "success")
 
+        pages_users_to_main_service = PagesUsersToMainPagesService()
         try:
-            deleted = delete_user_page_to_main(page_id)
+            deleted = pages_users_to_main_service.delete_user_page_to_main(page_id)
         except Exception:
             logger.exception("delete_user_page failed for id=%r", page_id)
             deleted = False

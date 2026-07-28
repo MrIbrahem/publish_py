@@ -1,8 +1,6 @@
-from src.main_app.db.services.delete_service import (
-    delete_user_token,
-)
 from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
+    UserTokenService,
     create_user_token,
     get_authenticated_user_token,
     get_user_token,
@@ -31,7 +29,7 @@ def test_upsert_get_delete_user_token() -> None:
     token_record = get_user_token(user.user_id)
 
     # Test delete token only
-    delete_user_token(user.user_id)
+    UserTokenService().delete(user.user_id)
     assert get_user_token(user.user_id) is None
 
 

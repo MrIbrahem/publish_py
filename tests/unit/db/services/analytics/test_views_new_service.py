@@ -2,6 +2,7 @@ import pytest
 
 from src.main_app.db.models import ViewsNewRecord
 from src.main_app.db.services.analytics.views_new_service import (
+    ViewsNewService,
     add_or_update_views_new,
     add_views_new,
     get_total_views_for_target,
@@ -12,55 +13,59 @@ from src.main_app.db.services.analytics.views_new_service import (
     list_views_new,
     update_views_new,
 )
-from src.main_app.db.services.delete_service import (
-    delete_views_new,
-)
 
 
-def test_views_new_workflow():
-    # Test add
-    v = add_views_new("Dengue_fever", "en", 2023, 1500000)
-    assert v.target == "Dengue_fever"
-    assert v.views == 1500000
-
-    # Test get
-    v2 = get_views_new(v.id)
-    assert v2.target == "Dengue_fever"
-
-    # Test get by target, lang, year
-    v3 = get_views_by_target_lang_year("Dengue_fever", "en", 2023)
-    assert v3.id == v.id
-
-    # Test list
-    all_v = list_views_new()
-    assert any(x.target == "Dengue_fever" for x in all_v)
-
-    # Test list by target/lang
-    by_target = list_views_by_target("Dengue_fever")
-    assert len(by_target) >= 1
-    by_lang = list_views_by_lang("en")
-    assert len(by_lang) >= 1
-
-    # Test update
-    updated = update_views_new(v.id, views=1600000)
-    assert updated.views == 1600000
-
-    # Test total views
-    total = get_total_views_for_target("Dengue_fever")
-    assert total == 1600000
-
-    # Test add_or_update
-    v4 = add_or_update_views_new("Dengue_fever", "en", 2023, 1700000)
-    assert v4.views == 1700000
-
-    # Test delete
-    deleted = delete_views_new(v.id)
-    assert deleted is True
-    assert get_views_new(v.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = ViewsNewService()
 
 
-class TestListViewsNew:
-    """Tests for list_views_new function."""
+class TestViewsNewService(TestSetup):
+    """Tests for ViewsNewService class."""
+
+    def test_views_new_workflow(self):
+        # Test add
+        v = add_views_new("Dengue_fever", "en", 2023, 1500000)
+        assert v.target == "Dengue_fever"
+        assert v.views == 1500000
+
+        # Test get
+        v2 = get_views_new(v.id)
+        assert v2 is not None
+        assert v2.target == "Dengue_fever"
+
+        # Test get by target, lang, year
+        v3 = get_views_by_target_lang_year("Dengue_fever", "en", 2023)
+        assert v3 is not None
+        assert v3.id == v.id
+
+        # Test list
+        all_v = list_views_new()
+        assert any(x.target == "Dengue_fever" for x in all_v)
+
+        # Test list by target/lang
+        by_target = list_views_by_target("Dengue_fever")
+        assert len(by_target) >= 1
+        by_lang = list_views_by_lang("en")
+        assert len(by_lang) >= 1
+
+        # Test update
+        updated = update_views_new(v.id, views=1600000)
+        assert updated.views == 1600000
+
+        # Test total views
+        total = get_total_views_for_target("Dengue_fever")
+        assert total == 1600000
+
+        # Test add_or_update
+        v4 = add_or_update_views_new("Dengue_fever", "en", 2023, 1700000)
+        assert v4.views == 1700000
+
+        # Test delete
+        deleted = ViewsNewService().delete(v.id)
+        assert deleted is True
+        assert get_views_new(v.id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
@@ -70,7 +75,7 @@ class TestListViewsNew:
         assert len(result) >= 2
 
 
-class TestListViewsByTarget:
+class TestListViewsByTarget(TestSetup):
     """Tests for list_views_by_target function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -83,7 +88,7 @@ class TestListViewsByTarget:
         assert all(r.target == "Tuberculosis" for r in result)
 
 
-class TestListViewsByLang:
+class TestListViewsByLang(TestSetup):
     """Tests for list_views_by_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -95,7 +100,7 @@ class TestListViewsByLang:
         assert result[0].lang == "fr"
 
 
-class TestGetViewsNew:
+class TestGetViewsNew(TestSetup):
     """Tests for get_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -109,13 +114,14 @@ class TestGetViewsNew:
         assert get_views_new(9999) is None
 
 
-class TestGetViewsByTargetLangYear:
+class TestGetViewsByTargetLangYear(TestSetup):
     """Tests for get_views_by_target_lang_year function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by target, lang, and year."""
         add_views_new("Measles", "en", 2023)
         result = get_views_by_target_lang_year("Measles", "en", 2023)
+        assert result is not None
         assert result.target == "Measles"
         assert result.year == 2023
 
@@ -123,7 +129,7 @@ class TestGetViewsByTargetLangYear:
         assert get_views_by_target_lang_year("Ghost", "en", 2023) is None
 
 
-class TestAddViewsNew:
+class TestAddViewsNew(TestSetup):
     """Tests for add_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -144,7 +150,7 @@ class TestAddViewsNew:
             add_views_new("T", " ", 2023)
 
 
-class TestAddOrUpdateViewsNew:
+class TestAddOrUpdateViewsNew(TestSetup):
     """Tests for add_or_update_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -161,7 +167,7 @@ class TestAddOrUpdateViewsNew:
             add_or_update_views_new("T", " ", 2023)
 
 
-class TestUpdateViewsNew:
+class TestUpdateViewsNew(TestSetup):
     """Tests for update_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -180,21 +186,21 @@ class TestUpdateViewsNew:
             update_views_new(9999, views=10)
 
 
-class TestDeleteViewsNew:
+class TestDeleteViewsNew(TestSetup):
     """Tests for delete_views_new function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         v = add_views_new("Asthma", "en", 2023)
-        deleted = delete_views_new(v.id)
+        deleted = ViewsNewService().delete(v.id)
         assert deleted is True
         assert get_views_new(v.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_views_new(9999) is False
+        assert ViewsNewService().delete(9999) is False
 
 
-class TestGetTotalViewsForTarget:
+class TestGetTotalViewsForTarget(TestSetup):
     """Tests for get_total_views_for_target function."""
 
     def test_returns_sum_of_views(self, monkeypatch):

@@ -8,9 +8,7 @@ from typing import Any
 
 from ....config import settings
 from ....db.models import LanguageSettingRecord
-from ....db.services.config import get_language_setting_by_code
-from ....db.services.reports import add_report
-from ....db.services.users import get_user_token_by_username
+from ....db.services import LanguageSettingService, ReportService, UserTokenService
 from ....shared.clients import (
     get_revid,
     get_revid_db,
@@ -39,7 +37,8 @@ def load_language_settings(lang: str) -> LanguageSettingRecord:
     Returns:
         LanguageSettingRecord object
     """
-    return get_language_setting_by_code(lang) or LanguageSettingRecord()
+    service = LanguageSettingService()
+    return service.get_language_setting_by_code(lang) or LanguageSettingRecord()
 
 
 def _get_revid(sourcetitle) -> str:
@@ -130,7 +129,8 @@ def _retry_with_fallback_user(
     logger.debug(f"get_csrftoken failed for user: {user}, retrying with {fallback_user}")
 
     # Retry with fallback user credentials
-    fallback_token = get_user_token_by_username(fallback_user)
+    token_service = UserTokenService()
+    fallback_token = token_service.get_user_token_by_username(fallback_user)
 
     if fallback_token is not None:
         fallback_access_key, fallback_access_secret = fallback_token.decrypted()
@@ -202,7 +202,8 @@ def _handle_successful_edit(
         to_do(tab3, file_name)
 
         # Insert to reports
-        add_report(
+        report_service = ReportService()
+        report_service.add_report(
             title=title,
             user=user,
             lang=lang,
@@ -336,7 +337,8 @@ def _process_edit(
     tab["result_to_cx"] = editit
     to_do(tab, to_do_file)
 
-    add_report(
+    report_service = ReportService()
+    report_service.add_report(
         title=title,
         user=user,
         lang=lang,
@@ -367,7 +369,8 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
     tab["result_to_cx"] = editit
     to_do(tab, "noaccess")
 
-    add_report(
+    report_service = ReportService()
+    report_service.add_report(
         title=tab["title"],
         user=user,
         lang=tab["lang"],

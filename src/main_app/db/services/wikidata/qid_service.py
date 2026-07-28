@@ -12,8 +12,6 @@ from .qid_shared_service import BaseQidService
 
 logger = logging.getLogger(__name__)
 
-ServiceRecord = QidRecord
-
 
 class QidService(BaseQidService):
     """Service class for managing QID records."""

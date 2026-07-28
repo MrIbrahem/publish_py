@@ -3,10 +3,8 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import PageRecord
-from src.main_app.db.services.delete_service import (
-    delete_page,
-)
 from src.main_app.db.services.pages.page_service import (
+    PagesService,
     add_page,
     count_translated,
     get_by_id,
@@ -35,6 +33,7 @@ def test_page_workflow(sqlite_db):
     assert any(x.title == "COVID-19 pandemic" for x in list_pages())
 
     updated = update_page(p.id, "COVID-19", "COVID-19.html")
+    assert updated is not None
     assert updated.title == "COVID-19"
 
     orm_p = sqlite_db.session.get(PageRecord, p.id)
@@ -55,7 +54,7 @@ def test_page_workflow(sqlite_db):
     )
     assert success is True
 
-    delete_page(p.id)
+    PagesService().delete(p.id)
     assert not any(x.id == p.id for x in list_pages())
 
 
@@ -103,6 +102,7 @@ class TestUpdatePage:
         """Test that function updates the record."""
         p = add_page("Sociology", "lead", "Social", "en", "TestUser", "Sociology.html")
         updated = update_page(p.id, "Social Science", "Social_Science.html")
+        assert updated is not None
         assert updated.title == "Social Science"
         assert updated.target == "Social_Science.html"
 
@@ -113,11 +113,11 @@ class TestDeletePage:
     def test_deletes_the_record(self, monkeypatch):
         """Test that function deletes the record."""
         p = add_page("Economics", "lead", "Social", "en", "TestUser", "Economics.html")
-        delete_page(p.id)
+        PagesService().delete(p.id)
         assert not any(x.id == p.id for x in list_pages())
 
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        assert delete_page(9999) is False
+        assert PagesService().delete(9999) is False
 
 
 class TestInsertPageTarget:

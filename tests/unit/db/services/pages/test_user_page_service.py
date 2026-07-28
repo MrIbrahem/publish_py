@@ -3,10 +3,8 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserPageRecord
-from src.main_app.db.services.delete_service import (
-    delete_user_page,
-)
 from src.main_app.db.services.pages.user_page_service import (
+    UserPagesService,
     add_user_page,
     count_translated,
     get_by_id,
@@ -54,7 +52,7 @@ def test_user_page_workflow(sqlite_db) -> None:
     )
 
     assert success is True
-    delete_user_page(p.id)
+    UserPagesService().delete(p.id)
 
     assert not any(x.id == p.id for x in list_user_pages())
 
@@ -104,11 +102,11 @@ class TestDeleteUserPage:
 
     def test_deletes_record(self, monkeypatch):
         p = add_user_page("Pediatrics", "lead", "Medicine", "en", "TestUser", "Pediatrics.html")
-        delete_user_page(p.id)
+        UserPagesService().delete(p.id)
         assert not any(x.id == p.id for x in list_user_pages())
 
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        assert delete_user_page(9999) is False
+        assert UserPagesService().delete(9999) is False
 
 
 class TestInsertUserPageTarget:

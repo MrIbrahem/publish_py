@@ -2,14 +2,12 @@ import pytest
 
 from src.main_app.db.models import CategoryRecord
 from src.main_app.db.services.content.category_service import (
+    CategoryService,
     add_category,
     get_camp_to_cats,
     get_campaign_category,
     list_categories,
     update_category,
-)
-from src.main_app.db.services.delete_service import (
-    delete_category,
 )
 
 
@@ -17,7 +15,10 @@ def test_category_workflow() -> None:
     c = add_category("Medicine", "Medicine Content", "Health_Campaign", "Anatomy", 1, 1)
     assert c.category == "Medicine"
 
-    assert get_campaign_category("Health_Campaign").category == "Medicine"
+    a1 = get_campaign_category("Health_Campaign")
+    assert a1 is not None
+    assert a1.category == "Medicine"
+
     assert any(x.category == "Medicine" for x in list_categories())
 
     assert get_camp_to_cats()["Health_Campaign"] == "Medicine"
@@ -28,9 +29,12 @@ def test_category_workflow() -> None:
         campaign="Science_Campaign",
     )
     assert updated.category == "Medical_Science"
-    assert get_campaign_category("Science_Campaign").category == "Medical_Science"
 
-    delete_category(c.id)
+    a2 = get_campaign_category("Science_Campaign")
+    assert a2 is not None
+    assert a2.category == "Medical_Science"
+
+    CategoryService().delete(c.id)
     assert get_campaign_category("Science_Campaign") is None
 
 
@@ -107,11 +111,11 @@ class TestDeleteCategory:
     def test_deletes_category(self, monkeypatch):
         """Test that delete_category calls store delete."""
         cat = add_category("Pathology", campaign="Disease_Study")
-        delete_category(cat.id)
+        CategoryService().delete(cat.id)
         assert not any(c.id == cat.id for c in list_categories())
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_category(9999) is False
+        assert CategoryService().delete(9999) is False
 
 
 class TestUpdateCategory:

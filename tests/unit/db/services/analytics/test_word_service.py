@@ -2,6 +2,7 @@ import pytest
 
 from src.main_app.db.models import WordRecord
 from src.main_app.db.services.analytics.word_service import (
+    WordService,
     add_or_update_word,
     add_word,
     get_word,
@@ -10,50 +11,54 @@ from src.main_app.db.services.analytics.word_service import (
     list_words,
     update_word,
 )
-from src.main_app.db.services.delete_service import (
-    delete_word,
-)
 
 
-def test_word_workflow():
-    # Test add
-    w = add_word("Human anatomy", 500, 5000)
-    assert w.w_title == "Human anatomy"
-    assert w.w_lead_words == 500
-
-    # Test get
-    w2 = get_word(w.w_id)
-    assert w2.w_title == "Human anatomy"
-
-    # Test get by title
-    w3 = get_word_by_title("Human anatomy")
-    assert w3.w_id == w.w_id
-
-    # Test get_word_counts_for_title
-    lead, all_words = get_word_counts_for_title("Human anatomy")
-    assert lead == 500
-    assert all_words == 5000
-
-    # Test list
-    all_w = list_words()
-    assert any(x.w_title == "Human anatomy" for x in all_w)
-
-    # Test update
-    updated = update_word(w.w_id, w_lead_words=600)
-    assert updated.w_lead_words == 600
-
-    # Test add_or_update
-    w4 = add_or_update_word("Human anatomy", 700, 6000)
-    assert w4.w_lead_words == 700
-
-    # Test delete
-    deleted = delete_word(w.w_id)
-    assert deleted is True
-    assert get_word(w.w_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = WordService()
 
 
-class TestListWords:
-    """Tests for list_words function."""
+class TestWordService(TestSetup):
+    """Tests for WordService class."""
+
+    def test_word_workflow(self):
+        # Test add
+        w = add_word("Human anatomy", 500, 5000)
+        assert w.w_title == "Human anatomy"
+        assert w.w_lead_words == 500
+
+        # Test get
+        w2 = get_word(w.w_id)
+        assert w2 is not None
+        assert w2.w_title == "Human anatomy"
+
+        # Test get by title
+        w3 = get_word_by_title("Human anatomy")
+        assert w3 is not None
+        assert w3.w_id == w.w_id
+
+        # Test get_word_counts_for_title
+        lead, all_words = get_word_counts_for_title("Human anatomy")
+        assert lead == 500
+        assert all_words == 5000
+
+        # Test list
+        all_w = list_words()
+        assert any(x.w_title == "Human anatomy" for x in all_w)
+
+        # Test update
+        updated = update_word(w.w_id, w_lead_words=600)
+        assert updated.w_lead_words == 600
+
+        # Test add_or_update
+        w4 = add_or_update_word("Human anatomy", 700, 6000)
+        assert w4.w_lead_words == 700
+
+        # Test delete
+        deleted = WordService().delete(w.w_id)
+        assert deleted is True
+        assert get_word(w.w_id) is None
 
     def test_returns_list_of_words(self, monkeypatch):
         """Test that function returns list from store."""
@@ -63,7 +68,7 @@ class TestListWords:
         assert len(result) >= 2
 
 
-class TestGetWord:
+class TestGetWord(TestSetup):
     """Tests for get_word function."""
 
     def test_delegates_to_store_fetch_by_id(self, monkeypatch):
@@ -78,20 +83,21 @@ class TestGetWord:
         assert get_word(77777) is None
 
 
-class TestGetWordByTitle:
+class TestGetWordByTitle(TestSetup):
     """Tests for get_word_by_title function."""
 
     def test_delegates_to_store_fetch_by_title(self, monkeypatch):
         """Test that function returns record by title."""
         add_word("DNA replication")
         result = get_word_by_title("DNA replication")
+        assert result is not None
         assert result.w_title == "DNA replication"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert get_word_by_title("Ghost") is None
 
 
-class TestAddWord:
+class TestAddWord(TestSetup):
     """Tests for add_word function."""
 
     def test_delegates_to_store_add(self, monkeypatch):
@@ -115,7 +121,7 @@ class TestAddWord:
             add_word("")
 
 
-class TestAddOrUpdateWord:
+class TestAddOrUpdateWord(TestSetup):
     """Tests for add_or_update_word function."""
 
     def test_delegates_to_store_add_or_update(self, monkeypatch):
@@ -130,7 +136,7 @@ class TestAddOrUpdateWord:
             add_or_update_word("  ")
 
 
-class TestUpdateWord:
+class TestUpdateWord(TestSetup):
     """Tests for update_word function."""
 
     def test_delegates_to_store_update(self, monkeypatch):
@@ -149,21 +155,21 @@ class TestUpdateWord:
             update_word(9999, w_lead_words=10)
 
 
-class TestDeleteWord:
+class TestDeleteWord(TestSetup):
     """Tests for delete_word function."""
 
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function deletes the record."""
         w = add_word("T-cell")
-        deleted = delete_word(w.w_id)
+        deleted = WordService().delete(w.w_id)
         assert deleted is True
         assert get_word(w.w_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_word(9999) is False
+        assert WordService().delete(9999) is False
 
 
-class TestGetWordCountsForTitle:
+class TestGetWordCountsForTitle(TestSetup):
     """Tests for get_word_counts_for_title function."""
 
     def test_returns_counts_when_record_exists(self, monkeypatch):

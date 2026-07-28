@@ -12,279 +12,296 @@ from ....extensions import db
 from ...models import CategoryRecord, PageRecord, UserRecord
 
 
-def get_pages_years(
-    user: str | None = None,
-    lang: str | None = None,
-) -> list[int]:
-    """
-    SELECT DISTINCT YEAR(pupdate) AS year FROM pages WHERE pupdate <> ''
-    """
-    query = db.session.query(func.year(PageRecord.pupdate).label("year")).filter(PageRecord.pupdate != "")
-    if user is not None:
-        query = query.filter(PageRecord.user == user)
+class LeaderboardService:
 
-    if lang is not None:
-        query = query.filter(PageRecord.lang == lang)
+    def __init__(self):
+        self.session = db.session
 
-    rows = query.distinct().all()
-    years: list[int] = [row.year for row in rows if row.year is not None]
-    years.sort(reverse=True)
-    return years
-
-
-def get_months_of_pages_years(year: int) -> list[int]:
-    """
-    SELECT DISTINCT MONTH(pupdate) AS month FROM pages
-    WHERE pupdate <> ''
-    AND YEAR(pupdate) = :year
-    """
-    rows = (
-        db.session.query(
-            func.month(PageRecord.pupdate).label("month"),
-        )
-        .filter(PageRecord.pupdate != "")
-        .filter(func.year(PageRecord.pupdate) == year)
-        .distinct()
-        .all()
-    )
-    months: list[int] = [row.month for row in rows if row.month is not None]
-    months.sort(reverse=True)
-    return months
-
-
-def list_of_users_by_translations_count() -> dict[str, int]:
-    """
-    Get a dictionary of users and their translation counts.
-
-    Returns:
-        Dictionary mapping username to count of published translations,
-        ordered by count descending.
-    """
-    result: dict[str, int] = {}
-    # Query: SELECT user, COUNT(target) as count FROM pages WHERE target != '' GROUP BY user ORDER BY count DESC
-    rows = (
-        db.session.query(PageRecord.user, func.count(PageRecord.target).label("count"))
-        .filter(PageRecord.target != "")
-        .filter(PageRecord.target.isnot(None))
-        .group_by(PageRecord.user)
-        .order_by(db.func.count(PageRecord.target).desc())
-        .all()
-    )
-    for user, count in rows:
+    def get_pages_years(
+        self,
+        user: str | None = None,
+        lang: str | None = None,
+    ) -> list[int]:
+        """
+        SELECT DISTINCT YEAR(pupdate) AS year FROM pages WHERE pupdate <> ''
+        """
+        query = self.session.query(func.year(PageRecord.pupdate).label("year")).filter(PageRecord.pupdate != "")
         if user is not None:
-            result[user] = count
-    return result
+            query = query.filter(PageRecord.user == user)
 
+        if lang is not None:
+            query = query.filter(PageRecord.lang == lang)
 
-def get_pages(
-    year: int | None = None,
-    user: str | None = None,
-    lang: str | None = None,
-) -> list[dict]:
-    """
-    Return pages with views, optionally filtered by year, user, and language.
+        rows = query.distinct().all()
+        years: list[int] = [row.year for row in rows if row.year is not None]
+        years.sort(reverse=True)
+        return years
 
-    SELECT DISTINCT
-        p.title, p.word, p.translate_type, p.cat, p.lang,
-        p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
-        v.views
-    FROM pages p
-    LEFT JOIN views_new_all v ON p.target = v.target AND p.lang = v.lang
-    [WHERE conditions by year/user/lang]
-    """
-    conditions: list[str] = []
-    params: dict[str, object] = {}
+    def get_months_of_pages_years(self, year: int) -> list[int]:
+        """
+        SELECT DISTINCT MONTH(pupdate) AS month FROM pages
+        WHERE pupdate <> ''
+        AND YEAR(pupdate) = :year
+        """
+        rows = (
+            self.session.query(
+                func.month(PageRecord.pupdate).label("month"),
+            )
+            .filter(PageRecord.pupdate != "")
+            .filter(func.year(PageRecord.pupdate) == year)
+            .distinct()
+            .all()
+        )
+        months: list[int] = [row.month for row in rows if row.month is not None]
+        months.sort(reverse=True)
+        return months
 
-    if lang is not None:
-        conditions.append("p.lang = :lang")
-        params["lang"] = lang
-    if user is not None:
-        conditions.append("p.user = :user")
-        params["user"] = user
-    if year is not None:
-        conditions.append(":year IN (YEAR(p.date), YEAR(p.pupdate), YEAR(p.add_date))")
-        params["year"] = year
+    def list_of_users_by_translations_count(self) -> dict[str, int]:
+        """
+        Get a dictionary of users and their translation counts.
 
-    where_clause = " AND ".join(conditions) if conditions else "1=1"
+        Returns:
+            Dictionary mapping username to count of published translations,
+            ordered by count descending.
+        """
+        result: dict[str, int] = {}
+        # Query: SELECT user, COUNT(target) as count FROM pages WHERE target != '' GROUP BY user ORDER BY count DESC
+        rows = (
+            self.session.query(PageRecord.user, func.count(PageRecord.target).label("count"))
+            .filter(PageRecord.target != "")
+            .filter(PageRecord.target.isnot(None))
+            .group_by(PageRecord.user)
+            .order_by(db.func.count(PageRecord.target).desc())
+            .all()
+        )
+        for user, count in rows:
+            if user is not None:
+                result[user] = count
+        return result
 
-    sql = text(
-        f"""
+    def get_pages(
+        self,
+        year: int | None = None,
+        user: str | None = None,
+        lang: str | None = None,
+    ) -> list[dict]:
+        """
+        Return pages with views, optionally filtered by year, user, and language.
+
         SELECT DISTINCT
             p.title, p.word, p.translate_type, p.cat, p.lang,
             p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
-            v.views, ca.campaign
+            v.views
         FROM pages p
-        LEFT JOIN views_new_all v
-            ON p.target = v.target AND p.lang = v.lang
-        LEFT JOIN categories ca
-            ON ca.category = p.cat
-        WHERE {where_clause}
-    """
-    )
+        LEFT JOIN views_new_all v ON p.target = v.target AND p.lang = v.lang
+        [WHERE conditions by year/user/lang]
+        """
+        conditions: list[str] = []
+        params: dict[str, object] = {}
 
-    rows = db.session.execute(sql, params).fetchall()
-    return [dict(row._mapping) for row in rows]
+        if lang is not None:
+            conditions.append("p.lang = :lang")
+            params["lang"] = lang
+        if user is not None:
+            conditions.append("p.user = :user")
+            params["user"] = user
+        if year is not None:
+            conditions.append(":year IN (YEAR(p.date), YEAR(p.pupdate), YEAR(p.add_date))")
+            params["year"] = year
 
+        where_clause = " AND ".join(conditions) if conditions else "1=1"
 
-def top_lang_of_user(username: str) -> dict[str, int]:
-    """
-    SELECT
-        p.user,
-        p.lang,
-        COUNT(p.target) AS cnt
-    FROM
-        pages p
-    WHERE
-        p.target != ''
-        AND p.target IS NOT NULL
-        AND p.user IN ('DaSupremo')
-    GROUP BY
-        p.user,
-        p.lang
-    result_example: { "user": "DaSupremo", "lang": "gpe", "cnt": 451 }
-    """
-    data = (
-        db.session.query(
-            PageRecord.user,
-            PageRecord.lang,
-            func.count(PageRecord.target).label("cnt"),
-        )
-        .filter(PageRecord.target != "", PageRecord.target.isnot(None))
-        .filter(PageRecord.user == username)
-        .group_by(PageRecord.user, PageRecord.lang)
-        .order_by(db.func.count(PageRecord.target).desc())
-        .all()
-    )
-    result = {row.lang: row.cnt for row in data}
-    return result
-
-
-def top_lang_of_users() -> list[dict[Any, Any]]:
-    """
-    SELECT
-        p.user,
-        p.lang,
-        COUNT(p.target) AS count
-    FROM
-        pages p
-    WHERE
-        p.target != ''
-        AND p.target IS NOT NULL
-    GROUP BY
-        p.user,
-        p.lang
-    result_example: { "user": "DaSupremo", "lang": "gpe", "count": 451 }
-    """
-    ranked = (
-        db.session.query(
-            PageRecord.user,
-            PageRecord.lang,
-            func.count(PageRecord.target).label("count"),
-            func.row_number()
-            .over(partition_by=PageRecord.user, order_by=func.count(PageRecord.target).desc())
-            .label("rn"),
-        )
-        .filter(PageRecord.target != "", PageRecord.target.isnot(None))
-        .group_by(PageRecord.user, PageRecord.lang)
-        .subquery()
-    )
-
-    data = (
-        db.session.query(ranked.c.user, ranked.c.lang, ranked.c.count)
-        .filter(ranked.c.rn == 1)
-        .order_by(desc(ranked.c.count))
-        .all()
-    )
-    result_list = [dict(x._mapping) for x in data]
-    return result_list
-
-
-def get_leaderboard_chart_data(
-    camp: str | None = None,
-    cat: str | None = None,
-    user_group: str | None = None,
-    year: int | None = None,
-    month: int | None = None,
-    lang: str | None = None,
-    user: str | None = None,
-) -> list[dict[str, Any]]:
-    """
-    Fetch aggregated counts of translations by month for the leaderboard chart.
-    """
-    if db.engine.name == "sqlite":
-        date_expr = func.strftime("%Y-%m", PageRecord.pupdate)
-    else:
-        date_expr = func.left(PageRecord.pupdate, 7)
-
-    query = db.session.query(date_expr.label("date"), func.count().label("count")).filter(
-        PageRecord.target.isnot(None), PageRecord.target != ""
-    )
-
-    if cat:
-        query = query.filter(PageRecord.cat == cat)
-    elif camp:
-        query = query.join(
-            CategoryRecord,
-            (PageRecord.cat == CategoryRecord.category) & (CategoryRecord.campaign == camp),
+        sql = text(
+            f"""
+            SELECT DISTINCT
+                p.title, p.word, p.translate_type, p.cat, p.lang,
+                p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
+                v.views, ca.campaign
+            FROM pages p
+            LEFT JOIN views_new_all v
+                ON p.target = v.target AND p.lang = v.lang
+            LEFT JOIN categories ca
+                ON ca.category = p.cat
+            WHERE {where_clause}
+        """
         )
 
-    if user_group:
-        query = query.join(
-            UserRecord,
-            (PageRecord.user == UserRecord.username) & (UserRecord.user_group == user_group),
+        rows = self.session.execute(sql, params).fetchall()
+        return [dict(row._mapping) for row in rows]
+
+    def top_lang_of_user(self, username: str) -> dict[str, int]:
+        """
+        SELECT
+            p.user,
+            p.lang,
+            COUNT(p.target) AS cnt
+        FROM
+            pages p
+        WHERE
+            p.target != ''
+            AND p.target IS NOT NULL
+            AND p.user IN ('DaSupremo')
+        GROUP BY
+            p.user,
+            p.lang
+        result_example: { "user": "DaSupremo", "lang": "gpe", "cnt": 451 }
+        """
+        data = (
+            self.session.query(
+                PageRecord.user,
+                PageRecord.lang,
+                func.count(PageRecord.target).label("cnt"),
+            )
+            .filter(PageRecord.target != "", PageRecord.target.isnot(None))
+            .filter(PageRecord.user == username)
+            .group_by(PageRecord.user, PageRecord.lang)
+            .order_by(db.func.count(PageRecord.target).desc())
+            .all()
+        )
+        result = {row.lang: row.cnt for row in data}
+        return result
+
+    def top_lang_of_users(
+        self,
+    ) -> list[dict[Any, Any]]:
+        """
+        SELECT
+            p.user,
+            p.lang,
+            COUNT(p.target) AS count
+        FROM
+            pages p
+        WHERE
+            p.target != ''
+            AND p.target IS NOT NULL
+        GROUP BY
+            p.user,
+            p.lang
+        result_example: { "user": "DaSupremo", "lang": "gpe", "count": 451 }
+        """
+        ranked = (
+            self.session.query(
+                PageRecord.user,
+                PageRecord.lang,
+                func.count(PageRecord.target).label("count"),
+                func.row_number()
+                .over(partition_by=PageRecord.user, order_by=func.count(PageRecord.target).desc())
+                .label("rn"),
+            )
+            .filter(PageRecord.target != "", PageRecord.target.isnot(None))
+            .group_by(PageRecord.user, PageRecord.lang)
+            .subquery()
         )
 
-    if year:
-        str_like = f"{year}-%"
-        if month:
-            str_like = f"{year}-{month:02d}%"
-        query = query.filter(PageRecord.pupdate.like(str_like))
+        data = (
+            self.session.query(ranked.c.user, ranked.c.lang, ranked.c.count)
+            .filter(ranked.c.rn == 1)
+            .order_by(desc(ranked.c.count))
+            .all()
+        )
+        result_list = [dict(x._mapping) for x in data]
+        return result_list
 
-    if lang:
-        query = query.filter(PageRecord.lang == lang)
+    def get_leaderboard_chart_data(
+        self,
+        camp: str | None = None,
+        cat: str | None = None,
+        user_group: str | None = None,
+        year: int | None = None,
+        month: int | None = None,
+        lang: str | None = None,
+        user: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        Fetch aggregated counts of translations by month for the leaderboard chart.
+        """
+        if db.engine.name == "sqlite":
+            date_expr = func.strftime("%Y-%m", PageRecord.pupdate)
+        else:
+            date_expr = func.left(PageRecord.pupdate, 7)
 
-    if user:
-        query = query.filter(PageRecord.user == user)
+        query = self.session.query(date_expr.label("date"), func.count().label("count")).filter(
+            PageRecord.target.isnot(None), PageRecord.target != ""
+        )
 
-    query = query.group_by(date_expr).order_by(date_expr)
+        if cat:
+            query = query.filter(PageRecord.cat == cat)
+        elif camp:
+            query = query.join(
+                CategoryRecord,
+                (PageRecord.cat == CategoryRecord.category) & (CategoryRecord.campaign == camp),
+            )
 
-    rows = query.all()
-    return [{"date": row.date, "count": row.count} for row in rows]
+        if user_group:
+            query = query.join(
+                UserRecord,
+                (PageRecord.user == UserRecord.username) & (UserRecord.user_group == user_group),
+            )
+
+        if year:
+            str_like = f"{year}-%"
+            if month:
+                str_like = f"{year}-{month:02d}%"
+            query = query.filter(PageRecord.pupdate.like(str_like))
+
+        if lang:
+            query = query.filter(PageRecord.lang == lang)
+
+        if user:
+            query = query.filter(PageRecord.user == user)
+
+        query = query.group_by(date_expr).order_by(date_expr)
+
+        rows = query.all()
+        return [{"date": row.date, "count": row.count} for row in rows]
+
+    def get_chart_data_formatted(
+        self,
+        camp: str | None = None,
+        cat: str | None = None,
+        user_group: str | None = None,
+        year: int | None = None,
+        month: int | None = None,
+        lang: str | None = None,
+        user: str | None = None,
+    ) -> dict[str, list]:
+        chart_data_raw = get_leaderboard_chart_data(
+            camp=camp,
+            cat=cat,
+            user_group=user_group,
+            year=year,
+            month=month,
+            lang=lang,
+            user=user,
+        )
+
+        chart_labels = [row["date"] for row in chart_data_raw]
+        chart_counts = [row["count"] for row in chart_data_raw]
+        chart_data = {
+            "labels": chart_labels,
+            "counts": chart_counts,
+        }
+        return chart_data
 
 
-def get_chart_data_formatted(
-    camp: str | None = None,
-    cat: str | None = None,
-    user_group: str | None = None,
-    year: int | None = None,
-    month: int | None = None,
-    lang: str | None = None,
-    user: str | None = None,
-) -> dict[str, list]:
-    chart_data_raw = get_leaderboard_chart_data(
-        camp=camp,
-        cat=cat,
-        user_group=user_group,
-        year=year,
-        month=month,
-        lang=lang,
-        user=user,
-    )
+_crud = LeaderboardService()
 
-    chart_labels = [row["date"] for row in chart_data_raw]
-    chart_counts = [row["count"] for row in chart_data_raw]
-    chart_data = {
-        "labels": chart_labels,
-        "counts": chart_counts,
-    }
-    return chart_data
-
+get_pages_years = _crud.get_pages_years
+get_months_of_pages_years = _crud.get_months_of_pages_years
+list_of_users_by_translations_count = _crud.list_of_users_by_translations_count
+get_pages = _crud.get_pages
+top_lang_of_users = _crud.top_lang_of_users
+top_lang_of_user = _crud.top_lang_of_user
+get_leaderboard_chart_data = _crud.get_leaderboard_chart_data
+get_chart_data_formatted = _crud.get_chart_data_formatted
 
 __all__ = [
+    "LeaderboardService",
     "get_pages_years",
     "get_months_of_pages_years",
     "list_of_users_by_translations_count",
     "get_pages",
+    "top_lang_of_users",
     "top_lang_of_user",
     "get_leaderboard_chart_data",
     "get_chart_data_formatted",

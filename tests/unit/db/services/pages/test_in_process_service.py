@@ -3,207 +3,206 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import InProcessRecord
-from src.main_app.db.services.delete_service import (
-    delete_in_process,
-)
 from src.main_app.db.services.pages.in_process_service import (
-    add_in_process,
-    delete_in_process_by_title_user_lang,
-    get_in_process,
-    get_in_process_by_title_user_lang,
-    is_in_process,
-    list_in_process,
-    list_in_process_by_lang,
-    list_in_process_by_user,
-    update_in_process,
+    InProcessService,
 )
-from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
 
-def test_in_process_workflow():
-    # Test add
-    ip = add_in_process("World Health Organization", "Public_Health_Expert", "ar", "Medicine", "lead", 2500)
-    assert ip.title == "World Health Organization"
-    assert ip.user == "Public_Health_Expert"
-
-    # Test get
-    ip2 = get_in_process(ip.id)
-    assert ip2.title == "World Health Organization"
-
-    # Test get by multiple keys
-    ip3 = get_in_process_by_title_user_lang("World Health Organization", "Public_Health_Expert", "ar")
-    assert ip3.id == ip.id
-
-    # Test list
-    all_ip = list_in_process()
-    assert any(x.title == "World Health Organization" for x in all_ip)
-
-    # Test list by user/lang
-    by_user = list_in_process_by_user("Public_Health_Expert")
-    assert len(by_user) >= 1
-    by_lang = list_in_process_by_lang("ar")
-    assert len(by_lang) >= 1
-
-    # Test is_in_process
-    assert is_in_process("World Health Organization", "Public_Health_Expert", "ar") is True
-
-    # Test update
-    updated = update_in_process(ip.id, word=3000)
-    assert updated.word == 3000
-
-    # Test delete by title/user/lang
-    success = delete_in_process_by_title_user_lang("World Health Organization", "Public_Health_Expert", "ar")
-    assert success is True
-    assert get_in_process(ip.id) is None
-
-    # Test delete by ID
-    ip_new = add_in_process("Common cold", "Medical_Student", "es")
-    deleted = delete_in_process(ip_new.id)
-    assert deleted is True
-    assert get_in_process(ip_new.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = InProcessService()
 
 
-class TestListInProcess:
-    """Tests for list_in_process function."""
+class TestInProcess(TestSetup):
+
+    def test_in_process_workflow(self):
+        # Test add
+        ip = self.service.add_in_process(
+            "World Health Organization", "Public_Health_Expert", "ar", "Medicine", "lead", 2500
+        )
+        assert ip.title == "World Health Organization"
+        assert ip.user == "Public_Health_Expert"
+
+        # Test get
+        ip2 = self.service.get_in_process(ip.id)
+        assert ip2 is not None
+        assert ip2.title == "World Health Organization"
+
+        # Test get by multiple keys
+        ip3 = self.service.get_in_process_by_title_user_lang("World Health Organization", "Public_Health_Expert", "ar")
+        assert ip3 is not None
+        assert ip3.id == ip.id
+
+        # Test list
+        all_ip = self.service.list_in_process()
+        assert any(x.title == "World Health Organization" for x in all_ip)
+
+        # Test list by user/lang
+        by_user = self.service.list_in_process_by_user("Public_Health_Expert")
+        assert len(by_user) >= 1
+        by_lang = self.service.list_in_process_by_lang("ar")
+        assert len(by_lang) >= 1
+
+        # Test self.service.is_in_process
+        assert self.service.is_in_process("World Health Organization", "Public_Health_Expert", "ar") is True
+
+        # Test update
+        updated = self.service.update_in_process(ip.id, word=3000)
+        assert updated.word == 3000
+
+        # Test delete by title/user/lang
+        success = InProcessService().delete_in_process_by_title_user_lang(
+            "World Health Organization", "Public_Health_Expert", "ar"
+        )
+        assert success is True
+        assert self.service.get_in_process(ip.id) is None
+
+        # Test delete by ID
+        ip_new = self.service.add_in_process("Common cold", "Medical_Student", "es")
+        deleted = InProcessService().delete(ip_new.id)
+        assert deleted is True
+        assert self.service.get_in_process(ip_new.id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
-        add_in_process("Fever", "User_One", "en")
-        add_in_process("Cough", "User_Two", "en")
-        result = list_in_process()
+        self.service.add_in_process("Fever", "User_One", "en")
+        self.service.add_in_process("Cough", "User_Two", "en")
+        result = self.service.list_in_process()
         assert len(result) >= 2
 
 
-class TestListInProcessByUser:
-    """Tests for list_in_process_by_user function."""
+class TestListInProcessByUser(TestSetup):
+    """Tests for self.service.list_in_process_by_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns records by user."""
-        add_in_process("Headache", "Brain_User", "en")
-        add_in_process("Migraine", "Other_User", "en")
-        result = list_in_process_by_user("Brain_User")
+        self.service.add_in_process("Headache", "Brain_User", "en")
+        self.service.add_in_process("Migraine", "Other_User", "en")
+        result = self.service.list_in_process_by_user("Brain_User")
         assert len(result) == 1
         assert result[0].user == "Brain_User"
 
 
-class TestListInProcessByLang:
-    """Tests for list_in_process_by_lang function."""
+class TestListInProcessByLang(TestSetup):
+    """Tests for self.service.list_in_process_by_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns records by language."""
-        add_in_process("Back pain", "User_A", "en")
-        add_in_process("Douleur dorsale", "User_A", "fr")
-        result = list_in_process_by_lang("fr")
+        self.service.add_in_process("Back pain", "User_A", "en")
+        self.service.add_in_process("Douleur dorsale", "User_A", "fr")
+        result = self.service.list_in_process_by_lang("fr")
         assert len(result) == 1
         assert result[0].lang == "fr"
 
 
-class TestGetInProcess:
-    """Tests for get_in_process function."""
+class TestGetInProcess(TestSetup):
+    """Tests for self.service.get_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by ID."""
-        ip = add_in_process("Sore throat", "User_B", "en")
-        result = get_in_process(ip.id)
+        ip = self.service.add_in_process("Sore throat", "User_B", "en")
+        result = self.service.get_in_process(ip.id)
         assert isinstance(result, InProcessRecord)
         assert result.title == "Sore throat"
 
     def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_in_process(9999) is None
+        assert self.service.get_in_process(9999) is None
 
 
-class TestGetInProcessByTitleUserLang:
-    """Tests for get_in_process_by_title_user_lang function."""
+class TestGetInProcessByTitleUserLang(TestSetup):
+    """Tests for self.service.get_in_process_by_title_user_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title, user, and language."""
-        add_in_process("Insomnia", "Sleepy_Editor", "en")
-        result = get_in_process_by_title_user_lang("Insomnia", "Sleepy_Editor", "en")
+        self.service.add_in_process("Insomnia", "Sleepy_Editor", "en")
+        result = self.service.get_in_process_by_title_user_lang("Insomnia", "Sleepy_Editor", "en")
+        assert result is not None
         assert result.title == "Insomnia"
 
     def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_in_process_by_title_user_lang("Ghost", "Ghost", "en") is None
+        assert self.service.get_in_process_by_title_user_lang("Ghost", "Ghost", "en") is None
 
 
-class TestAddInProcess:
-    """Tests for add_in_process function."""
+class TestAddInProcess(TestSetup):
+    """Tests for self.service.add_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = add_in_process("Nausea", "Stomach_Expert", "en", word=150)
+        record = self.service.add_in_process("Nausea", "Stomach_Expert", "en", word=150)
         assert record.title == "Nausea"
         assert record.word == 150
 
-    def test_raises_error_if_exists(self, monkeypatch):
+    def test_raises_error_if_exists(self, sqlite_db):
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):  # type: ignore
+        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)):  # type: ignore
             with pytest.raises(ValueError, match="already exists"):
-                add_in_process("Duplicate", "User", "en")
+                self.service.add_in_process("Duplicate", "User", "en")
 
     def test_raises_error_if_missing_required(self, monkeypatch):
         with pytest.raises(ValueError, match="Title is required"):
-            add_in_process("", "U", "L")
+            self.service.add_in_process("", "U", "L")
         with pytest.raises(ValueError, match="User is required"):
-            add_in_process("T", "", "L")
+            self.service.add_in_process("T", "", "L")
         with pytest.raises(ValueError, match="Language is required"):
-            add_in_process("T", "U", " ")
+            self.service.add_in_process("T", "U", " ")
 
 
-class TestUpdateInProcess:
-    """Tests for update_in_process function."""
+class TestUpdateInProcess(TestSetup):
+    """Tests for self.service.update_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
-        ip = add_in_process("Rash", "Skin_Expert", "en", word=100)
-        updated = update_in_process(ip.id, word=200)
+        ip = self.service.add_in_process("Rash", "Skin_Expert", "en", word=100)
+        updated = self.service.update_in_process(ip.id, word=200)
         assert updated.word == 200
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
-        ip = add_in_process("No_Change", "U", "en")
-        result = update_in_process(ip.id)
+        ip = self.service.add_in_process("No_Change", "U", "en")
+        result = self.service.update_in_process(ip.id)
         assert result.title == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
         with pytest.raises(ValueError, match="not found"):
-            update_in_process(9999, word=10)
+            self.service.update_in_process(9999, word=10)
 
 
-class TestDeleteInProcess:
+class TestDeleteInProcess(TestSetup):
     """Tests for delete_in_process function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
-        ip = add_in_process("Allergy", "Immune_Expert", "en")
-        deleted = delete_in_process(ip.id)
+        ip = self.service.add_in_process("Allergy", "Immune_Expert", "en")
+        deleted = InProcessService().delete(ip.id)
         assert deleted is True
-        assert get_in_process(ip.id) is None
+        assert self.service.get_in_process(ip.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_in_process(9999) is False
+        assert InProcessService().delete(9999) is False
 
 
-class TestDeleteInProcessByTitleUserLang:
+class TestDeleteInProcessByTitleUserLang(TestSetup):
     """Tests for delete_in_process_by_title_user_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes by composite key."""
-        add_in_process("Asthma", "Lung_Expert", "en")
-        success = delete_in_process_by_title_user_lang("Asthma", "Lung_Expert", "en")
+        self.service.add_in_process("Asthma", "Lung_Expert", "en")
+        success = InProcessService().delete_in_process_by_title_user_lang("Asthma", "Lung_Expert", "en")
         assert success is True
-        assert get_in_process_by_title_user_lang("Asthma", "Lung_Expert", "en") is None
+        assert self.service.get_in_process_by_title_user_lang("Asthma", "Lung_Expert", "en") is None
 
 
-class TestIsInProcess:
-    """Tests for is_in_process function."""
+class TestIsInProcess(TestSetup):
+    """Tests for self.service.is_in_process function."""
 
     def test_returns_true_when_record_exists(self, monkeypatch):
         """Test that function returns True when record found."""
-        add_in_process("Diabetes", "Endo_Expert", "en")
-        assert is_in_process("Diabetes", "Endo_Expert", "en") is True
+        self.service.add_in_process("Diabetes", "Endo_Expert", "en")
+        assert self.service.is_in_process("Diabetes", "Endo_Expert", "en") is True
 
     def test_returns_false_when_record_not_found(self, monkeypatch):
         """Test that function returns False when record not found."""
-        assert is_in_process("Ghost_Article", "Nonexistent_User", "en") is False
+        assert self.service.is_in_process("Ghost_Article", "Nonexistent_User", "en") is False

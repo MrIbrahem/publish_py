@@ -12,10 +12,7 @@ from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
 from ....config import settings
-from ....db.services.delete_service import delete_user_token
-from ....db.services.users import (
-    get_user_token_by_username,
-)
+from ....db.services.users import UserTokenService
 from ....shared.clients.oauth_client import get_cxtoken
 from ....shared.core.cors import check_cors
 from ....shared.schemas import CXTokenRequestSchema
@@ -32,7 +29,8 @@ def _format_user(user: str) -> str:
 
 def get_cxtoken_for_user_wiki(wiki, user):
     # Get access credentials from database
-    user_token = get_user_token_by_username(user)
+    token_service = UserTokenService()
+    user_token = token_service.get_user_token_by_username(user)
 
     if user_token is None:
         cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
@@ -52,7 +50,7 @@ def get_cxtoken_for_user_wiki(wiki, user):
     err = cxtoken.get("csrftoken_data", {}).get("error", {})
     if err:
         if err.get("code") == "mwoauth-invalid-authorization-invalid-user":
-            delete_user_token(user_token.user_id)
+            token_service.delete(user_token.user_id)
             cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
             return cxtoken, 403
         else:

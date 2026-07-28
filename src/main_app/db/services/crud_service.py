@@ -37,7 +37,7 @@ class CRUDService[ModelT]:
     # Read
     # ------------------------------------------------------------------ #
 
-    def get_record_by_id(self, pk: PKT) -> ModelT | None: # pyright: ignore[reportInvalidTypeVarUse]
+    def get_record_by_id(self, pk: PKT) -> ModelT | None:  # pyright: ignore[reportInvalidTypeVarUse]
         """Fetch a single row by primary key, or None if it doesn't exist."""
         try:
             return self.session.get(self.model, pk)
@@ -45,10 +45,10 @@ class CRUDService[ModelT]:
             logger.error("Error getting %s id=%s: %s", self.model_name, pk, exc)
             return None
 
-    def get(self, pk: PKT) -> ModelT | None:# pyright: ignore[reportInvalidTypeVarUse]
+    def get(self, pk: PKT) -> ModelT | None:  # pyright: ignore[reportInvalidTypeVarUse]
         return self.get_record_by_id(pk)
 
-    def get_or_404(self, pk: PKT, description: str | None = None) -> ModelT:# pyright: ignore[reportInvalidTypeVarUse]
+    def get_or_404(self, pk: PKT, description: str | None = None) -> ModelT:  # pyright: ignore[reportInvalidTypeVarUse]
         """Fetch a single row by primary key, or raise a 404."""
         instance = self.get_record_by_id(pk)
         if instance is None:
@@ -119,6 +119,22 @@ class CRUDService[ModelT]:
     # Write
     # ------------------------------------------------------------------ #
 
+    def add_record(self, instance: ModelT) -> ModelT:
+        """Instantiate the model with `fields` and persist it."""
+        try:
+            self.session.add(instance)
+        except Exception:
+            logger.error("Error adding %s", self.model_name)
+            raise
+
+        try:
+            self.commit()
+            self.session.refresh(instance)
+            return instance
+        except Exception:
+            logger.error("Error adding %s", self.model_name)
+            raise
+
     def create(self, **fields: Any) -> ModelT:
         """Instantiate the model with `fields` and persist it."""
         try:
@@ -151,7 +167,12 @@ class CRUDService[ModelT]:
 
         return instance
 
-    def update_by_id(self, pk: PKT, data: dict[str, Any], validate: bool = False) -> ModelT | None:# pyright: ignore[reportInvalidTypeVarUse]
+    def update_by_id(
+        self,
+        pk: PKT,  # pyright: ignore[reportInvalidTypeVarUse]
+        data: dict[str, Any],
+        validate: bool = False,
+    ) -> ModelT | None:
         """Set attributes on `instance` and persist the change."""
         record = self.get_record_by_id(pk)
         if record is None:
@@ -166,7 +187,7 @@ class CRUDService[ModelT]:
             logger.error("Error updating %s id=%s: %s", self.model_name, pk, exc)
             return None
 
-    def upsert(self, pk: PKT, **fields: Any) -> tuple[ModelT, bool]:# pyright: ignore[reportInvalidTypeVarUse]
+    def upsert(self, pk: PKT, **fields: Any) -> tuple[ModelT, bool]:  # pyright: ignore[reportInvalidTypeVarUse]
         """
         Update the row with primary key `pk` if it exists, else create it.
         Returns (instance, created).
@@ -196,7 +217,7 @@ class CRUDService[ModelT]:
             logger.error("Error bulk creating %s: %s", self.model_name, exc)
         return instances
 
-    def delete(self, pk: PKT) -> bool:# pyright: ignore[reportInvalidTypeVarUse]
+    def delete(self, pk: PKT) -> bool:  # pyright: ignore[reportInvalidTypeVarUse]
         """Delete a record by primary key.
 
         Args:
@@ -211,7 +232,6 @@ class CRUDService[ModelT]:
         record = self.get_record_by_id(pk)
         if record:
             return self.delete_record(record)
-
         return False
 
     def delete_record(self, record: ModelT) -> bool:
@@ -223,7 +243,7 @@ class CRUDService[ModelT]:
             logger.error(f"Error deleting {self.model_name} {e}")
             return False
 
-    def update_or_404(self, pk: PKT, **kwargs) -> ModelT:# pyright: ignore[reportInvalidTypeVarUse]
+    def update_or_404(self, pk: PKT, **kwargs) -> ModelT:  # pyright: ignore[reportInvalidTypeVarUse]
         """Update an assessment record."""
         orm_obj = self.get_record_by_id(pk)
         if not orm_obj:

@@ -228,7 +228,7 @@ class PagesService(CRUDService[PageRecord]):
                 return False
 
         found = (
-            db.session.query(PageRecord)
+            self.session.query(PageRecord)
             .filter(
                 PageRecord.title == title, PageRecord.lang == lang, PageRecord.user == user, PageRecord.target == target
             )

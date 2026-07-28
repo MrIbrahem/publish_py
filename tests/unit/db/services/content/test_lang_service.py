@@ -4,50 +4,55 @@ import pytest
 
 from src.main_app.db.models import LangRecord
 from src.main_app.db.services.content.lang_service import (
+    LangService,
     add_lang,
     add_or_update_lang,
     get_lang,
     get_lang_by_code,
     list_langs,
 )
-from src.main_app.db.services.delete_service import (
-    delete_lang,
-)
 from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
 
-def test_lang_workflow():
-    # Test add
-    added = add_lang("ar", "العربية", "Arabic")
-    assert added.code == "ar"
-    assert added.autonym == "العربية"
-
-    # Test get
-    l2 = get_lang(added.lang_id)
-    assert l2.code == "ar"
-
-    # Test get by code
-    l3 = get_lang_by_code("ar")
-    assert l3.lang_id == added.lang_id
-
-    # Test list
-    all_l = list_langs()
-    assert any(x.code == "ar" for x in all_l)
-
-    # Test add_or_update
-    l4 = add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
-    assert l4.name == "Modern Standard Arabic"
-
-    # Test delete
-    deleted = delete_lang(added.lang_id)
-    assert deleted is True
-    assert get_lang(added.lang_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = LangService()
 
 
-class TestListLangs:
-    """Tests for list_langs function."""
+class TestLangService(TestSetup):
+    """Tests for LangService class."""
+
+    def test_lang_workflow(self):
+        # Test add
+        added = add_lang("ar", "العربية", "Arabic")
+        assert added.code == "ar"
+        assert added.autonym == "العربية"
+
+        # Test get
+        l2 = get_lang(added.lang_id)
+        assert l2 is not None
+        assert l2.code == "ar"
+
+        # Test get by code
+        l3 = get_lang_by_code("ar")
+        assert l3 is not None
+        assert l3.lang_id == added.lang_id
+
+        # Test list
+        all_l = list_langs()
+        assert any(x.code == "ar" for x in all_l)
+
+        # Test add_or_update
+        l4 = add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
+        assert l4.name == "Modern Standard Arabic"
+
+        # Test delete
+        deleted = LangService().delete(added.lang_id)
+        assert deleted is True
+        assert get_lang(added.lang_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
@@ -57,7 +62,7 @@ class TestListLangs:
         assert len(result) >= 2
 
 
-class TestGetLang:
+class TestGetLang(TestSetup):
     """Tests for get_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -71,20 +76,21 @@ class TestGetLang:
         assert get_lang(9999) is None
 
 
-class TestGetLangByCode:
+class TestGetLangByCode(TestSetup):
     """Tests for get_lang_by_code function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by code."""
         add_lang("de", "Deutsch", "German")
         result = get_lang_by_code("de")
+        assert result is not None
         assert result.code == "de"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert get_lang_by_code("ghost") is None
 
 
-class TestAddLang:
+class TestAddLang(TestSetup):
     """Tests for add_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -97,7 +103,7 @@ class TestAddLang:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):  # type: ignore
             with pytest.raises(ValueError, match="already exists"):
                 add_lang("en", "En", "En")
 
@@ -120,7 +126,7 @@ class TestAddLang:
         assert record.redirects == []
 
 
-class TestAddOrUpdateLang:
+class TestAddOrUpdateLang(TestSetup):
     """Tests for add_or_update_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -142,8 +148,10 @@ class TestAddOrUpdateLang:
         # Update with new redirects
         new_redirects = ["spa", "es-ES", "es-MX"]
         record = add_or_update_lang("es", "Español", "Spanish", redirects=new_redirects)
-
+        assert record is not None
         assert record.redirects == new_redirects
+
+        assert isinstance(record.redirects, list)
         assert len(record.redirects) == 3
 
     def test_clear_redirects_on_update(self):
@@ -165,15 +173,15 @@ class TestAddOrUpdateLang:
         assert record.redirects == ["jpn"]
 
 
-class TestDeleteLang:
+class TestDeleteLang(TestSetup):
     """Tests for delete_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         added = add_lang("ru", "Русский", "Russian")
-        deleted = delete_lang(added.lang_id)
+        deleted = LangService().delete(added.lang_id)
         assert deleted is True
         assert get_lang(added.lang_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_lang(9999) is False
+        assert LangService().delete(9999) is False

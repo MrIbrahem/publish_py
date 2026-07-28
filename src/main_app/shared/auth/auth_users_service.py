@@ -6,12 +6,9 @@ import logging
 
 from ...db.models import UserRecord
 from ...db.services.users import (
-    create_user,
-    get_authenticated_user_token,
-    get_user_by_username,
-    get_user_token,
-    is_active_coordinator,
-    upsert_user_token,
+    AdminService,
+    UsersService,
+    UserTokenService,
 )
 from ..core.crypto import encrypt_value
 from .current_user import CurrentUser
@@ -19,9 +16,14 @@ from .current_user import CurrentUser
 logger = logging.getLogger(__name__)
 
 
-class AuthUserService:
-    @staticmethod
+class AuthUsersNewService:
+    def __init__(self) -> None:
+        self.users_service = UsersService()
+        self.token_service = UserTokenService()
+        self.admin_service = AdminService()
+
     def save_and_get_user(
+        self,
         username: str,
         access_key: str,
         access_secret: str,
@@ -34,13 +36,12 @@ class AuthUserService:
 
         try:
             # Ensure user identity row exists
-            user: UserRecord | None = get_user_by_username(username)
+            user: UserRecord | None = self.users_service.get_user_by_username(username)
 
             if not user:
-                user: UserRecord | None = create_user(username)
+                user: UserRecord | None = self.users_service.create_user(username)
 
-            if not user:
-                return None
+            # if not user: return None
 
             user_id: int = user.user_id
 
@@ -53,7 +54,7 @@ class AuthUserService:
             encrypted_secret = encrypt_value(access_secret)
 
             # 1. Update or insert into database via repository
-            upsert_user_token(
+            self.token_service.upsert_user_token(
                 user_id=user_id,
                 encrypted_token=encrypted_token,
                 encrypted_secret=encrypted_secret,
@@ -65,11 +66,11 @@ class AuthUserService:
 
         try:
             # 2. Get the fresh record
-            token = get_user_token(user_id)
+            token = self.token_service.get_user_token(user_id)
             if not token:
                 return None
 
-            is_active_admin = is_active_coordinator(username)
+            is_active_admin = self.admin_service.is_active_coordinator(username)
         except Exception as e:
             logger.exception("Failed to upsert or fetch user credentials: %s", e)
             return None
@@ -82,11 +83,10 @@ class AuthUserService:
             is_active_admin=is_active_admin,
         )
 
-    @staticmethod
-    def get_authenticated_user(user_id: int) -> CurrentUser | None:
+    def get_authenticated_user(self, user_id: int) -> CurrentUser | None:
         """Fetch the CurrentUser composite for session restoration."""
         try:
-            token = get_authenticated_user_token(user_id)
+            token = self.token_service.get_authenticated_user_token(user_id)
             if not token:
                 return None
             username = token.user.username
@@ -95,13 +95,28 @@ class AuthUserService:
                 username=username,
                 access_token=token.access_token,
                 access_secret=token.access_secret,
-                is_active_admin=is_active_coordinator(username),
+                is_active_admin=self.admin_service.is_active_coordinator(username),
             )
         except Exception as e:
             logger.error("Error loading user for ID %s: %s", user_id, e)
             return None
 
 
+class AuthUserService:
+    @staticmethod
+    def save_and_get_user(
+        username: str,
+        access_key: str,
+        access_secret: str,
+    ) -> CurrentUser | None:
+        return AuthUsersNewService().save_and_get_user(username, access_key, access_secret)
+
+    @staticmethod
+    def get_authenticated_user(user_id: int) -> CurrentUser | None:
+        return AuthUsersNewService().get_authenticated_user(user_id)
+
+
 __all__ = [
+    "AuthUsersNewService",
     "AuthUserService",
 ]

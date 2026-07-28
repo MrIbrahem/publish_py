@@ -2,10 +2,8 @@ import pytest
 
 from src.main_app.db.exceptions import UniqueError
 from src.main_app.db.models import PageRecord, QidRecord, TranslateTypeRecord
-from src.main_app.db.services.delete_service import (
-    delete_translate_type,
-)
 from src.main_app.db.services.pages.translate_type_service import (
+    TranslateTypeService,
     add_translate_type,
     can_translate_full,
     can_translate_lead,
@@ -19,47 +17,55 @@ from src.main_app.db.services.pages.translate_type_service import (
 )
 
 
-def test_translate_type_workflow():
-    # Test add
-    tt = add_translate_type("Medical history", 1, 0)
-    assert tt.tt_title == "Medical history"
-    assert tt.tt_lead == 1
-
-    # Test get
-    tt2 = get_translate_type(tt.tt_id)
-    assert tt2.tt_title == "Medical history"
-
-    # Test get by title
-    tt3 = get_translate_type_by_title("Medical history")
-    assert tt3.tt_id == tt.tt_id
-
-    # Test list
-    all_tt = list_translate_types()
-    assert any(x.tt_title == "Medical history" for x in all_tt)
-
-    # Test enabled lists
-    leads = list_lead_enabled_types()
-    assert any(x.tt_title == "Medical history" for x in leads)
-    fulls = list_full_enabled_types()
-    assert not any(x.tt_title == "Medical history" for x in fulls)
-
-    # Test can_translate
-    assert can_translate_lead("Medical history") is True
-    assert can_translate_full("Medical history") is False
-
-    # Test update
-    updated = update_translate_type(tt.tt_id, tt_full=1)
-    assert updated.tt_full == 1
-    assert can_translate_full("Medical history") is True
-
-    # Test delete
-    deleted = delete_translate_type(tt.tt_id)
-    assert deleted is True
-    assert get_translate_type(tt.tt_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = TranslateTypeService()
 
 
-class TestListTranslateTypes:
-    """Tests for list_translate_types function."""
+class TestTranslateTypeService(TestSetup):
+    """Tests for TranslateTypeService class."""
+
+    def test_translate_type_workflow(self):
+        # Test add
+        tt = add_translate_type("Medical history", 1, 0)
+        assert tt.tt_title == "Medical history"
+        assert tt.tt_lead == 1
+
+        # Test get
+        tt2 = get_translate_type(tt.tt_id)
+        assert tt2 is not None
+        assert tt2.tt_title == "Medical history"
+
+        # Test get by title
+        tt3 = get_translate_type_by_title("Medical history")
+        assert tt3 is not None
+        assert tt3.tt_id == tt.tt_id
+
+        # Test list
+        all_tt = list_translate_types()
+        assert any(x.tt_title == "Medical history" for x in all_tt)
+
+        # Test enabled lists
+        leads = list_lead_enabled_types()
+        assert any(x.tt_title == "Medical history" for x in leads)
+        fulls = list_full_enabled_types()
+        assert not any(x.tt_title == "Medical history" for x in fulls)
+
+        # Test can_translate
+        assert can_translate_lead("Medical history") is True
+        assert can_translate_full("Medical history") is False
+
+        # Test update
+        updated = update_translate_type(tt.tt_id, tt_full=1)
+        assert updated is not None
+        assert updated.tt_full == 1
+        assert can_translate_full("Medical history") is True
+
+        # Test delete
+        deleted = TranslateTypeService().delete(tt.tt_id)
+        assert deleted is True
+        assert get_translate_type(tt.tt_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
@@ -69,7 +75,7 @@ class TestListTranslateTypes:
         assert len(result) >= 2
 
 
-class TestListLeadEnabledTypes:
+class TestListLeadEnabledTypes(TestSetup):
     """Tests for list_lead_enabled_types function."""
 
     def test_returns_list_from_store(self, monkeypatch):
@@ -81,7 +87,7 @@ class TestListLeadEnabledTypes:
         assert result[0].tt_title == "Epidemiology study"
 
 
-class TestListFullEnabledTypes:
+class TestListFullEnabledTypes(TestSetup):
     """Tests for list_full_enabled_types function."""
 
     def test_returns_list_from_store(self, monkeypatch):
@@ -93,7 +99,7 @@ class TestListFullEnabledTypes:
         assert result[0].tt_title == "Systematic review"
 
 
-class TestGetTranslateType:
+class TestGetTranslateType(TestSetup):
     """Tests for get_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -107,20 +113,21 @@ class TestGetTranslateType:
         assert get_translate_type(9999) is None
 
 
-class TestGetTranslateTypeByTitle:
+class TestGetTranslateTypeByTitle(TestSetup):
     """Tests for get_translate_type_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function returns record by title."""
         add_translate_type("Diagnostic test")
         result = get_translate_type_by_title("Diagnostic test")
+        assert result is not None
         assert result.tt_title == "Diagnostic test"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert get_translate_type_by_title("Ghost") is None
 
 
-class TestAddTranslateType:
+class TestAddTranslateType(TestSetup):
     """Tests for add_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -139,36 +146,38 @@ class TestAddTranslateType:
             add_translate_type("")
 
 
-class TestUpdateTranslateType:
+class TestUpdateTranslateType(TestSetup):
     """Tests for update_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function updates and returns record."""
         tt = add_translate_type("Global health", 1, 0)
         updated = update_translate_type(tt.tt_id, tt_full=1)
+        assert updated is not None
         assert updated.tt_full == 1
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         tt = add_translate_type("No_Change")
         result = update_translate_type(tt.tt_id)
+        assert result is not None
         assert result.tt_title == "No_Change"
 
 
-class TestDeleteTranslateType:
+class TestDeleteTranslateType(TestSetup):
     """Tests for delete_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         tt = add_translate_type("Pathology report")
-        deleted = delete_translate_type(tt.tt_id)
+        deleted = TranslateTypeService().delete(tt.tt_id)
         assert deleted is True
         assert get_translate_type(tt.tt_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_translate_type(9999) is False
+        assert TranslateTypeService().delete(9999) is False
 
 
-class TestCanTranslateLead:
+class TestCanTranslateLead(TestSetup):
     """Tests for can_translate_lead function."""
 
     def test_returns_true_when_tt_lead_is_1(self, monkeypatch):
@@ -186,7 +195,7 @@ class TestCanTranslateLead:
         assert can_translate_lead("Unknown Title") is True
 
 
-class TestCanTranslateFull:
+class TestCanTranslateFull(TestSetup):
     """Tests for can_translate_full function."""
 
     def test_returns_true_when_tt_full_is_1(self, monkeypatch):
@@ -211,7 +220,7 @@ class TestCanTranslateFull:
 # ---------------------------------------------------------------------------
 
 
-class TestListTranslateTypesByCategory:
+class TestListTranslateTypesByCategory(TestSetup):
     """Tests for the ``cat`` filter on list_translate_types."""
 
     def test_returns_all_when_cat_is_default(self, monkeypatch):
@@ -260,7 +269,7 @@ class TestListTranslateTypesByCategory:
         assert result == []
 
 
-class TestListNewTitles:
+class TestListNewTitles(TestSetup):
     """Tests for list_new_titles."""
 
     def test_returns_qids_titles_not_in_translate_type(self, sqlite_db):

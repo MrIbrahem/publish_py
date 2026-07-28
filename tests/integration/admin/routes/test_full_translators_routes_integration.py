@@ -25,7 +25,9 @@ class TestFullTranslatorsDashboard:
 
     def test_full_translators_dashboard_lists_translators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that full translators dashboard lists translators."""
-        with patch("src.main_app.admin.routes.full_translators.list_full_translators") as mock_list:
+        with patch(
+            "src.main_app.admin.routes.full_translators.FullTranslatorService.list_full_translators"
+        ) as mock_list:
             mock_list.return_value = [
                 MagicMock(user="Translator1", is_active=True),
                 MagicMock(user="Translator2", is_active=False),
@@ -50,7 +52,7 @@ class TestAddFullTranslator:
 
     def test_add_full_translator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding full translator with valid data."""
-        with patch("src.main_app.admin.routes.full_translators.add_full_translator") as mock_add:
+        with patch("src.main_app.admin.routes.full_translators.FullTranslatorService.add_full_translator") as mock_add:
             mock_add.return_value = MagicMock(user="NewTranslator")
 
             response = auth_client.post(
@@ -87,8 +89,8 @@ class TestDeleteFullTranslator:
 
     def test_delete_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting full translator with valid ID."""
-        with patch("src.main_app.admin.routes.full_translators.delete_full_translator") as mock_delete:
-            mock_delete.return_value = MagicMock(user="DeletedTranslator")
+        with patch("src.main_app.admin.routes.full_translators.FullTranslatorService.delete") as mock_delete:
+            mock_delete.return_value = True
 
             response = auth_client.post(
                 "/admin/full_translators/1/delete",
@@ -119,8 +121,10 @@ class TestActivateDeactivateFullTranslator:
 
     def test_activate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating full translator with valid ID."""
-        with patch("src.main_app.admin.routes.full_translators.update_full_translator") as mock_update:
-            mock_update.return_value = MagicMock(username="ActivatedTranslator")
+        with patch(
+            "src.main_app.admin.routes.full_translators.FullTranslatorService.update_full_translator"
+        ) as mock_update:
+            mock_update.return_value = MagicMock(user="ActivatedTranslator", is_active=True)
 
             response = auth_client.post(
                 "/admin/full_translators/1/activate",
@@ -132,8 +136,10 @@ class TestActivateDeactivateFullTranslator:
 
     def test_deactivate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating full translator with valid ID."""
-        with patch("src.main_app.admin.routes.full_translators.update_full_translator") as mock_update:
-            mock_update.return_value = MagicMock(username="DeactivatedTranslator")
+        with patch(
+            "src.main_app.admin.routes.full_translators.FullTranslatorService.update_full_translator"
+        ) as mock_update:
+            mock_update.return_value = MagicMock(user="DeactivatedTranslator", is_active=False)
 
             response = auth_client.post(
                 "/admin/full_translators/1/deactivate",

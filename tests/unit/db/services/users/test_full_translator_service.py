@@ -1,10 +1,8 @@
 import pytest
 
 from src.main_app.db.models import FullTranslatorRecord
-from src.main_app.db.services.delete_service import (
-    delete_full_translator,
-)
 from src.main_app.db.services.users.full_translator_service import (
+    FullTranslatorService,
     add_full_translator,
     add_or_update_full_translator,
     get_full_translator,
@@ -16,46 +14,53 @@ from src.main_app.db.services.users.full_translator_service import (
 )
 
 
-def test_full_translator_workflow():
-    # Test add
-    ft = add_full_translator("Global_Translator", 1)
-    assert ft.user == "Global_Translator"
-    assert ft.is_active == 1
-
-    # Test get
-    ft2 = get_full_translator(ft.id)
-    assert ft2.user == "Global_Translator"
-
-    # Test get by user
-    ft3 = get_full_translator_by_user("Global_Translator")
-    assert ft3.id == ft.id
-
-    # Test list
-    all_ft = list_full_translators()
-    assert any(x.user == "Global_Translator" for x in all_ft)
-
-    # Test active
-    active = list_active_full_translators()
-    assert any(x.user == "Global_Translator" for x in active)
-
-    # Test update
-    updated = update_full_translator(ft.id, is_active=0)
-    assert updated.is_active == 0
-    assert is_full_translator("Global_Translator") is False
-
-    # Test add_or_update
-    ft4 = add_or_update_full_translator("Global_Translator", 1)
-    assert ft4.is_active == 1
-    assert is_full_translator("Global_Translator") is True
-
-    # Test delete
-    deleted = delete_full_translator(ft.id)
-    assert deleted is True
-    assert get_full_translator(ft.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = FullTranslatorService()
 
 
-class TestListFullTranslators:
-    """Tests for list_full_translators function."""
+class TestFullTranslatorService(TestSetup):
+    """Tests for FullTranslatorService class."""
+
+    def test_full_translator_workflow(self):
+        # Test add
+        ft = add_full_translator("Global_Translator", 1)
+        assert ft.user == "Global_Translator"
+        assert ft.is_active == 1
+
+        # Test get
+        ft2 = get_full_translator(ft.id)
+        assert ft2 is not None
+        assert ft2.user == "Global_Translator"
+
+        # Test get by user
+        ft3 = get_full_translator_by_user("Global_Translator")
+        assert ft3 is not None
+        assert ft3.id == ft.id
+
+        # Test list
+        all_ft = list_full_translators()
+        assert any(x.user == "Global_Translator" for x in all_ft)
+
+        # Test active
+        active = list_active_full_translators()
+        assert any(x.user == "Global_Translator" for x in active)
+
+        # Test update
+        updated = update_full_translator(ft.id, is_active=0)
+        assert updated.is_active == 0
+        assert is_full_translator("Global_Translator") is False
+
+        # Test add_or_update
+        ft4 = add_or_update_full_translator("Global_Translator", 1)
+        assert ft4.is_active == 1
+        assert is_full_translator("Global_Translator") is True
+
+        # Test delete
+        deleted = FullTranslatorService().delete(ft.id)
+        assert deleted is True
+        assert get_full_translator(ft.id) is None
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_full_translators returns all records."""
@@ -65,7 +70,7 @@ class TestListFullTranslators:
         assert len(result) >= 2
 
 
-class TestListActiveFullTranslators:
+class TestListActiveFullTranslators(TestSetup):
     """Tests for list_active_full_translators function."""
 
     def test_returns_active_records(self, monkeypatch):
@@ -77,7 +82,7 @@ class TestListActiveFullTranslators:
         assert active[0].user == "Active_Trans"
 
 
-class TestGetFullTranslator:
+class TestGetFullTranslator(TestSetup):
     """Tests for get_full_translator function."""
 
     def test_returns_translator_record(self, monkeypatch):
@@ -91,20 +96,21 @@ class TestGetFullTranslator:
         assert get_full_translator(9999) is None
 
 
-class TestGetFullTranslatorByUser:
+class TestGetFullTranslatorByUser(TestSetup):
     """Tests for get_full_translator_by_user function."""
 
     def test_returns_translator_by_user(self, monkeypatch):
         """Test that function returns translator by username."""
         add_full_translator("Polyglot_Wiki")
         result = get_full_translator_by_user("Polyglot_Wiki")
+        assert result is not None
         assert result.user == "Polyglot_Wiki"
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert get_full_translator_by_user("Ghost") is None
 
 
-class TestAddFullTranslator:
+class TestAddFullTranslator(TestSetup):
     """Tests for add_full_translator function."""
 
     def test_adds_translator_and_returns_record(self, monkeypatch):
@@ -122,7 +128,7 @@ class TestAddFullTranslator:
             add_full_translator("")
 
 
-class TestAddOrUpdateFullTranslator:
+class TestAddOrUpdateFullTranslator(TestSetup):
     """Tests for add_or_update_full_translator function."""
 
     def test_upserts_translator(self, monkeypatch):
@@ -137,7 +143,7 @@ class TestAddOrUpdateFullTranslator:
             add_or_update_full_translator(" ")
 
 
-class TestUpdateFullTranslator:
+class TestUpdateFullTranslator(TestSetup):
     """Tests for update_full_translator function."""
 
     def test_updates_translator_and_returns_record(self, monkeypatch):
@@ -156,21 +162,21 @@ class TestUpdateFullTranslator:
             update_full_translator(9999, is_active=0)
 
 
-class TestDeleteFullTranslator:
+class TestDeleteFullTranslator(TestSetup):
     """Tests for delete_full_translator function."""
 
     def test_deletes_translator(self, monkeypatch):
         """Test that delete_full_translator calls store delete."""
         ft = add_full_translator("Delete_Trans")
-        deleted = delete_full_translator(ft.id)
+        deleted = FullTranslatorService().delete(ft.id)
         assert deleted is True
         assert get_full_translator(ft.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_full_translator(9999) is False
+        assert FullTranslatorService().delete(9999) is False
 
 
-class TestIsFullTranslator:
+class TestIsFullTranslator(TestSetup):
     """Tests for is_full_translator function."""
 
     def test_returns_true_when_user_is_active_translator(self, monkeypatch):
