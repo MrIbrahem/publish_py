@@ -14,6 +14,11 @@ from src.main_app.db.services.analytics.views_new_service import (
     update_views_new,
 )
 
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = ViewsNewService()
+
 
 def test_views_new_workflow():
     # Test add
