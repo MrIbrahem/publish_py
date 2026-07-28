@@ -55,6 +55,7 @@ def format_values(records: list[SettingRecord]) -> dict[str, Any]:
 
     return data
 
+
 def list_settings() -> list[SettingRecord]:
     """Return all setting records."""
     orm_objs = db.session.query(SettingRecord).all()
