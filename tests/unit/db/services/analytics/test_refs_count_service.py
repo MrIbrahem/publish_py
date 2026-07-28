@@ -19,7 +19,7 @@ class TestSetup:
         self.service = RefsCountService()
 
 
-class TestRefsCountService:
+class TestRefsCountService(TestSetup):
     """Tests for RefsCountService class."""
 
     def test_refs_count_workflow(self):
@@ -66,7 +66,7 @@ class TestRefsCountService:
         assert len(result) >= 2
 
 
-class TestGetRefsCount:
+class TestGetRefsCount(TestSetup):
     """Tests for get_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -80,7 +80,7 @@ class TestGetRefsCount:
         assert get_refs_count(9999) is None
 
 
-class TestGetRefsCountByTitle:
+class TestGetRefsCountByTitle(TestSetup):
     """Tests for get_refs_count_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -93,7 +93,7 @@ class TestGetRefsCountByTitle:
         assert get_refs_count_by_title("Ghost") is None
 
 
-class TestAddRefsCount:
+class TestAddRefsCount(TestSetup):
     """Tests for add_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -113,7 +113,7 @@ class TestAddRefsCount:
             add_refs_count("")
 
 
-class TestAddOrUpdateRefsCount:
+class TestAddOrUpdateRefsCount(TestSetup):
     """Tests for add_or_update_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -129,7 +129,7 @@ class TestAddOrUpdateRefsCount:
             add_or_update_refs_count(" ")
 
 
-class TestUpdateRefsCount:
+class TestUpdateRefsCount(TestSetup):
     """Tests for update_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -148,7 +148,7 @@ class TestUpdateRefsCount:
             update_refs_count(9999, r_lead_refs=10)
 
 
-class TestDeleteRefsCount:
+class TestDeleteRefsCount(TestSetup):
     """Tests for delete_refs_count function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -162,7 +162,7 @@ class TestDeleteRefsCount:
         assert RefsCountService().delete(9999) is False
 
 
-class TestGetRefsCountsForTitle:
+class TestGetRefsCountsForTitle(TestSetup):
     """Tests for get_ref_counts_for_title function."""
 
     def test_returns_counts_when_record_exists(self, monkeypatch):

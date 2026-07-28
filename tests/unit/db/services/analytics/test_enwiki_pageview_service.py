@@ -19,7 +19,7 @@ class TestSetup:
         self.service = EnwikiPageviewService()
 
 
-class TestEnwikiPageviewService:
+class TestEnwikiPageviewService(TestSetup):
     """Tests for EnwikiPageviewService class."""
 
     def test_enwiki_pageview_workflow(self):
@@ -30,10 +30,12 @@ class TestEnwikiPageviewService:
 
         # Test get
         p2 = get_enwiki_pageview(p.id)
+        assert p2 is not None
         assert p2.title == "Anatomy"
 
         # Test get by title
         p3 = get_enwiki_pageview_by_title("Anatomy")
+        assert p3 is not None
         assert p3.id == p.id
 
         # Test list
@@ -65,7 +67,7 @@ class TestEnwikiPageviewService:
         assert len(result) >= 2
 
 
-class TestGetTopEnwikiPageviews:
+class TestGetTopEnwikiPageviews(TestSetup):
     """Tests for get_top_enwiki_pageviews function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -81,7 +83,7 @@ class TestGetTopEnwikiPageviews:
         get_top_enwiki_pageviews()
 
 
-class TestGetEnwikiPageview:
+class TestGetEnwikiPageview(TestSetup):
     """Tests for get_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -95,7 +97,7 @@ class TestGetEnwikiPageview:
         assert get_enwiki_pageview(9999) is None
 
 
-class TestGetEnwikiPageviewByTitle:
+class TestGetEnwikiPageviewByTitle(TestSetup):
     """Tests for get_enwiki_pageview_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -108,7 +110,7 @@ class TestGetEnwikiPageviewByTitle:
         assert get_enwiki_pageview_by_title("Ghost") is None
 
 
-class TestAddEnwikiPageview:
+class TestAddEnwikiPageview(TestSetup):
     """Tests for add_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -127,7 +129,7 @@ class TestAddEnwikiPageview:
             add_enwiki_pageview("")
 
 
-class TestAddOrUpdateEnwikiPageview:
+class TestAddOrUpdateEnwikiPageview(TestSetup):
     """Tests for add_or_update_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -142,7 +144,7 @@ class TestAddOrUpdateEnwikiPageview:
             add_or_update_enwiki_pageview("  ")
 
 
-class TestUpdateEnwikiPageview:
+class TestUpdateEnwikiPageview(TestSetup):
     """Tests for update_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -161,7 +163,7 @@ class TestUpdateEnwikiPageview:
             update_enwiki_pageview(9999, en_views=10)
 
 
-class TestDeleteEnwikiPageview:
+class TestDeleteEnwikiPageview(TestSetup):
     """Tests for delete_enwiki_pageview function."""
 
     def test_delegates_to_store(self, monkeypatch):

@@ -23,7 +23,7 @@ class TestSetup:
         self.service = UsersService()
 
 
-class TestUsersService:
+class TestUsersService(TestSetup):
     """Tests for UsersService class."""
 
     def test_user_workflow(self):
@@ -53,7 +53,7 @@ class TestUsersService:
         assert len(result) >= 2
 
 
-class TestListUsersByGroup:
+class TestListUsersByGroup(TestSetup):
     """Tests for list_users_by_group function."""
 
     def test_returns_list_from_store(self, monkeypatch):
@@ -65,7 +65,7 @@ class TestListUsersByGroup:
         assert result[0].username == "Expert1"
 
 
-class TestGetUser:
+class TestGetUser(TestSetup):
     """Tests for get_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -79,7 +79,7 @@ class TestGetUser:
         assert get_user(9999) is None
 
 
-class TestGetUserByUsername:
+class TestGetUserByUsername(TestSetup):
     """Tests for get_user_by_username function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -92,7 +92,7 @@ class TestGetUserByUsername:
         assert get_user_by_username("Ghost") is None
 
 
-class TestAddUser:
+class TestAddUser(TestSetup):
     """Tests for create_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -106,7 +106,7 @@ class TestAddUser:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)): # pyright: ignore[reportArgumentType]
             with pytest.raises(ValueError, match="already exists"):
                 create_user("Duplicate")
 
@@ -115,7 +115,7 @@ class TestAddUser:
             create_user("")
 
 
-class TestUpdateUser:
+class TestUpdateUser(TestSetup):
     """Tests for update_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -127,10 +127,11 @@ class TestUpdateUser:
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         u = create_user("No_Change")
         result = update_user_data(u.user_id)
+        assert result is not None
         assert result.username == "No_Change"
 
 
-class TestDeleteUser:
+class TestDeleteUser(TestSetup):
     """Tests for delete_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -144,7 +145,7 @@ class TestDeleteUser:
         assert UsersService().delete(9999) is False
 
 
-class TestUserExists:
+class TestUserExists(TestSetup):
     """Tests for user_exists function."""
 
     def test_returns_true_when_user_exists(self, monkeypatch):

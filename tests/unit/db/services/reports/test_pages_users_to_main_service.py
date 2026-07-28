@@ -95,7 +95,7 @@ class TestAddPagesUsersToMain:
     def test_raises_error_on_failure(self, sqlite_db):
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)): # type: ignore
             with pytest.raises(ValueError, match="Failed to add"):
                 add_pages_users_to_main(id=9999)
 

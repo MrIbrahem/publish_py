@@ -23,7 +23,7 @@ class TestSetup:
         self.service = TranslateTypeService()
 
 
-class TestTranslateTypeService:
+class TestTranslateTypeService(TestSetup):
     """Tests for TranslateTypeService class."""
 
     def test_translate_type_workflow(self):
@@ -72,7 +72,7 @@ class TestTranslateTypeService:
         assert len(result) >= 2
 
 
-class TestListLeadEnabledTypes:
+class TestListLeadEnabledTypes(TestSetup):
     """Tests for list_lead_enabled_types function."""
 
     def test_returns_list_from_store(self, monkeypatch):
@@ -84,7 +84,7 @@ class TestListLeadEnabledTypes:
         assert result[0].tt_title == "Epidemiology study"
 
 
-class TestListFullEnabledTypes:
+class TestListFullEnabledTypes(TestSetup):
     """Tests for list_full_enabled_types function."""
 
     def test_returns_list_from_store(self, monkeypatch):
@@ -96,7 +96,7 @@ class TestListFullEnabledTypes:
         assert result[0].tt_title == "Systematic review"
 
 
-class TestGetTranslateType:
+class TestGetTranslateType(TestSetup):
     """Tests for get_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -110,7 +110,7 @@ class TestGetTranslateType:
         assert get_translate_type(9999) is None
 
 
-class TestGetTranslateTypeByTitle:
+class TestGetTranslateTypeByTitle(TestSetup):
     """Tests for get_translate_type_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -123,7 +123,7 @@ class TestGetTranslateTypeByTitle:
         assert get_translate_type_by_title("Ghost") is None
 
 
-class TestAddTranslateType:
+class TestAddTranslateType(TestSetup):
     """Tests for add_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -142,7 +142,7 @@ class TestAddTranslateType:
             add_translate_type("")
 
 
-class TestUpdateTranslateType:
+class TestUpdateTranslateType(TestSetup):
     """Tests for update_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -157,7 +157,7 @@ class TestUpdateTranslateType:
         assert result.tt_title == "No_Change"
 
 
-class TestDeleteTranslateType:
+class TestDeleteTranslateType(TestSetup):
     """Tests for delete_translate_type function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -171,7 +171,7 @@ class TestDeleteTranslateType:
         assert TranslateTypeService().delete(9999) is False
 
 
-class TestCanTranslateLead:
+class TestCanTranslateLead(TestSetup):
     """Tests for can_translate_lead function."""
 
     def test_returns_true_when_tt_lead_is_1(self, monkeypatch):
@@ -189,7 +189,7 @@ class TestCanTranslateLead:
         assert can_translate_lead("Unknown Title") is True
 
 
-class TestCanTranslateFull:
+class TestCanTranslateFull(TestSetup):
     """Tests for can_translate_full function."""
 
     def test_returns_true_when_tt_full_is_1(self, monkeypatch):
@@ -214,7 +214,7 @@ class TestCanTranslateFull:
 # ---------------------------------------------------------------------------
 
 
-class TestListTranslateTypesByCategory:
+class TestListTranslateTypesByCategory(TestSetup):
     """Tests for the ``cat`` filter on list_translate_types."""
 
     def test_returns_all_when_cat_is_default(self, monkeypatch):
@@ -263,7 +263,7 @@ class TestListTranslateTypesByCategory:
         assert result == []
 
 
-class TestListNewTitles:
+class TestListNewTitles(TestSetup):
     """Tests for list_new_titles."""
 
     def test_returns_qids_titles_not_in_translate_type(self, sqlite_db):

@@ -20,7 +20,7 @@ class TestSetup:
         self.service = FullTranslatorService()
 
 
-class TestFullTranslatorService:
+class TestFullTranslatorService(TestSetup):
     """Tests for FullTranslatorService class."""
 
     def test_full_translator_workflow(self):
@@ -68,7 +68,7 @@ class TestFullTranslatorService:
         assert len(result) >= 2
 
 
-class TestListActiveFullTranslators:
+class TestListActiveFullTranslators(TestSetup):
     """Tests for list_active_full_translators function."""
 
     def test_returns_active_records(self, monkeypatch):
@@ -80,7 +80,7 @@ class TestListActiveFullTranslators:
         assert active[0].user == "Active_Trans"
 
 
-class TestGetFullTranslator:
+class TestGetFullTranslator(TestSetup):
     """Tests for get_full_translator function."""
 
     def test_returns_translator_record(self, monkeypatch):
@@ -94,7 +94,7 @@ class TestGetFullTranslator:
         assert get_full_translator(9999) is None
 
 
-class TestGetFullTranslatorByUser:
+class TestGetFullTranslatorByUser(TestSetup):
     """Tests for get_full_translator_by_user function."""
 
     def test_returns_translator_by_user(self, monkeypatch):
@@ -107,7 +107,7 @@ class TestGetFullTranslatorByUser:
         assert get_full_translator_by_user("Ghost") is None
 
 
-class TestAddFullTranslator:
+class TestAddFullTranslator(TestSetup):
     """Tests for add_full_translator function."""
 
     def test_adds_translator_and_returns_record(self, monkeypatch):
@@ -125,7 +125,7 @@ class TestAddFullTranslator:
             add_full_translator("")
 
 
-class TestAddOrUpdateFullTranslator:
+class TestAddOrUpdateFullTranslator(TestSetup):
     """Tests for add_or_update_full_translator function."""
 
     def test_upserts_translator(self, monkeypatch):
@@ -140,7 +140,7 @@ class TestAddOrUpdateFullTranslator:
             add_or_update_full_translator(" ")
 
 
-class TestUpdateFullTranslator:
+class TestUpdateFullTranslator(TestSetup):
     """Tests for update_full_translator function."""
 
     def test_updates_translator_and_returns_record(self, monkeypatch):
@@ -159,7 +159,7 @@ class TestUpdateFullTranslator:
             update_full_translator(9999, is_active=0)
 
 
-class TestDeleteFullTranslator:
+class TestDeleteFullTranslator(TestSetup):
     """Tests for delete_full_translator function."""
 
     def test_deletes_translator(self, monkeypatch):
@@ -173,7 +173,7 @@ class TestDeleteFullTranslator:
         assert FullTranslatorService().delete(9999) is False
 
 
-class TestIsFullTranslator:
+class TestIsFullTranslator(TestSetup):
     """Tests for is_full_translator function."""
 
     def test_returns_true_when_user_is_active_translator(self, monkeypatch):

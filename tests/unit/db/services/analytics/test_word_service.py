@@ -19,7 +19,7 @@ class TestSetup:
         self.service = WordService()
 
 
-class TestWordService:
+class TestWordService(TestSetup):
     """Tests for WordService class."""
 
     def test_word_workflow(self):
@@ -66,7 +66,7 @@ class TestWordService:
         assert len(result) >= 2
 
 
-class TestGetWord:
+class TestGetWord(TestSetup):
     """Tests for get_word function."""
 
     def test_delegates_to_store_fetch_by_id(self, monkeypatch):
@@ -81,7 +81,7 @@ class TestGetWord:
         assert get_word(77777) is None
 
 
-class TestGetWordByTitle:
+class TestGetWordByTitle(TestSetup):
     """Tests for get_word_by_title function."""
 
     def test_delegates_to_store_fetch_by_title(self, monkeypatch):
@@ -94,7 +94,7 @@ class TestGetWordByTitle:
         assert get_word_by_title("Ghost") is None
 
 
-class TestAddWord:
+class TestAddWord(TestSetup):
     """Tests for add_word function."""
 
     def test_delegates_to_store_add(self, monkeypatch):
@@ -118,7 +118,7 @@ class TestAddWord:
             add_word("")
 
 
-class TestAddOrUpdateWord:
+class TestAddOrUpdateWord(TestSetup):
     """Tests for add_or_update_word function."""
 
     def test_delegates_to_store_add_or_update(self, monkeypatch):
@@ -133,7 +133,7 @@ class TestAddOrUpdateWord:
             add_or_update_word("  ")
 
 
-class TestUpdateWord:
+class TestUpdateWord(TestSetup):
     """Tests for update_word function."""
 
     def test_delegates_to_store_update(self, monkeypatch):
@@ -152,7 +152,7 @@ class TestUpdateWord:
             update_word(9999, w_lead_words=10)
 
 
-class TestDeleteWord:
+class TestDeleteWord(TestSetup):
     """Tests for delete_word function."""
 
     def test_delegates_to_store_delete(self, monkeypatch):
@@ -166,7 +166,7 @@ class TestDeleteWord:
         assert WordService().delete(9999) is False
 
 
-class TestGetWordCountsForTitle:
+class TestGetWordCountsForTitle(TestSetup):
     """Tests for get_word_counts_for_title function."""
 
     def test_returns_counts_when_record_exists(self, monkeypatch):

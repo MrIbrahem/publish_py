@@ -18,7 +18,7 @@ class TestSetup:
         self.service = AssessmentService()
 
 
-class TestAssessmentService:
+class TestAssessmentService(TestSetup):
     """Tests for AssessmentService class."""
 
     def test_assessment_workflow(self):
@@ -62,7 +62,7 @@ class TestAssessmentService:
         assert len(result) >= 2
 
 
-class TestGetAssessment:
+class TestGetAssessment(TestSetup):
     """Tests for get_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -76,7 +76,7 @@ class TestGetAssessment:
         assert get_assessment(9999) is None
 
 
-class TestGetAssessmentByTitle:
+class TestGetAssessmentByTitle(TestSetup):
     """Tests for get_assessment_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -90,7 +90,7 @@ class TestGetAssessmentByTitle:
         assert get_assessment_by_title("Ghost") is None
 
 
-class TestAddAssessment:
+class TestAddAssessment(TestSetup):
     """Tests for add_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -109,7 +109,7 @@ class TestAddAssessment:
             add_assessment("")
 
 
-class TestAddOrUpdateAssessment:
+class TestAddOrUpdateAssessment(TestSetup):
     """Tests for add_or_update_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -124,7 +124,7 @@ class TestAddOrUpdateAssessment:
             add_or_update_assessment(" ")
 
 
-class TestUpdateAssessment:
+class TestUpdateAssessment(TestSetup):
     """Tests for update_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -143,7 +143,7 @@ class TestUpdateAssessment:
             update_assessment(9999, importance="High")
 
 
-class TestDeleteAssessment:
+class TestDeleteAssessment(TestSetup):
     """Tests for delete_assessment function."""
 
     def test_delegates_to_store(self, monkeypatch):

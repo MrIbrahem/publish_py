@@ -36,7 +36,7 @@ class LangRecord(db.Model):
     code: Mapped[str] = mapped_column(String(20), nullable=False)
     autonym: Mapped[str] = mapped_column(String(70), nullable=False)
     name: Mapped[str] = mapped_column(String(70), nullable=False)
-    redirects: Mapped[dict | list | None] = mapped_column(JSON, server_default=text("NULL"))
+    redirects: Mapped[list | None] = mapped_column(JSON, server_default=text("NULL"))
 
     def __init__(self, **kwargs: Any) -> None:
         for key, value in kwargs.items():

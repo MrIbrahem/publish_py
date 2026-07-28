@@ -17,7 +17,7 @@ class TestSetup:
         self.service = MdwikiRevidService()
 
 
-class TestMdwikiRevidService:
+class TestMdwikiRevidService(TestSetup):
     """Tests for MdwikiRevidService class."""
 
     def test_mdwiki_revid_workflow(self):
@@ -58,7 +58,7 @@ class TestMdwikiRevidService:
         assert len(result) >= 2
 
 
-class TestGetMdwikiRevidByTitle:
+class TestGetMdwikiRevidByTitle(TestSetup):
     """Tests for get_mdwiki_revid_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -71,7 +71,7 @@ class TestGetMdwikiRevidByTitle:
         assert get_mdwiki_revid_by_title("Ghost") is None
 
 
-class TestAddMdwikiRevid:
+class TestAddMdwikiRevid(TestSetup):
     """Tests for add_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -90,7 +90,7 @@ class TestAddMdwikiRevid:
             add_mdwiki_revid("", 123)
 
 
-class TestAddOrUpdateMdwikiRevid:
+class TestAddOrUpdateMdwikiRevid(TestSetup):
     """Tests for add_or_update_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -105,7 +105,7 @@ class TestAddOrUpdateMdwikiRevid:
             add_or_update_mdwiki_revid(" ", 123)
 
 
-class TestUpdateMdwikiRevid:
+class TestUpdateMdwikiRevid(TestSetup):
     """Tests for update_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -119,7 +119,7 @@ class TestUpdateMdwikiRevid:
             update_mdwiki_revid("Ghost", 123)
 
 
-class TestDeleteMdwikiRevid:
+class TestDeleteMdwikiRevid(TestSetup):
     """Tests for delete_mdwiki_revid function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -132,7 +132,7 @@ class TestDeleteMdwikiRevid:
         assert MdwikiRevidService().delete("Ghost") is False
 
 
-class TestGetRevidForTitle:
+class TestGetRevidForTitle(TestSetup):
     """Tests for get_revid_for_title function."""
 
     def test_returns_revid_when_record_exists(self, monkeypatch):

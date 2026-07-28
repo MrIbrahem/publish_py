@@ -22,7 +22,7 @@ class TestSetup:
         self.service = LangService()
 
 
-class TestLangService:
+class TestLangService(TestSetup):
     """Tests for LangService class."""
 
     def test_lang_workflow(self):
@@ -60,7 +60,7 @@ class TestLangService:
         assert len(result) >= 2
 
 
-class TestGetLang:
+class TestGetLang(TestSetup):
     """Tests for get_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -74,7 +74,7 @@ class TestGetLang:
         assert get_lang(9999) is None
 
 
-class TestGetLangByCode:
+class TestGetLangByCode(TestSetup):
     """Tests for get_lang_by_code function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -87,7 +87,7 @@ class TestGetLangByCode:
         assert get_lang_by_code("ghost") is None
 
 
-class TestAddLang:
+class TestAddLang(TestSetup):
     """Tests for add_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -100,7 +100,7 @@ class TestAddLang:
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)): # type: ignore
             with pytest.raises(ValueError, match="already exists"):
                 add_lang("en", "En", "En")
 
@@ -123,7 +123,7 @@ class TestAddLang:
         assert record.redirects == []
 
 
-class TestAddOrUpdateLang:
+class TestAddOrUpdateLang(TestSetup):
     """Tests for add_or_update_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -145,8 +145,10 @@ class TestAddOrUpdateLang:
         # Update with new redirects
         new_redirects = ["spa", "es-ES", "es-MX"]
         record = add_or_update_lang("es", "Español", "Spanish", redirects=new_redirects)
-
+        assert record is not None
         assert record.redirects == new_redirects
+
+        assert isinstance(record.redirects, list)
         assert len(record.redirects) == 3
 
     def test_clear_redirects_on_update(self):
@@ -168,7 +170,7 @@ class TestAddOrUpdateLang:
         assert record.redirects == ["jpn"]
 
 
-class TestDeleteLang:
+class TestDeleteLang(TestSetup):
     """Tests for delete_lang function."""
 
     def test_delegates_to_store(self, monkeypatch):

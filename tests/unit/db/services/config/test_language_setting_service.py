@@ -10,7 +10,7 @@ class TestSetup:
         self.service = LanguageSettingService()
 
 
-class TestLanguageSettingService:
+class TestLanguageSettingService(TestSetup):
     """Tests for LanguageSettingService class."""
 
     def test_language_setting_workflow(self):
@@ -55,7 +55,7 @@ class TestLanguageSettingService:
         assert len(result) >= 2
 
 
-class TestGetLanguageSetting:
+class TestGetLanguageSetting(TestSetup):
     """Tests for get_language_setting function."""
 
     def test_returns_setting_record(self, monkeypatch):
@@ -71,7 +71,7 @@ class TestGetLanguageSetting:
         assert service.get_language_setting(9999) is None
 
 
-class TestGetLanguageSettingByCode:
+class TestGetLanguageSettingByCode(TestSetup):
     """Tests for get_language_setting_by_code function."""
 
     def test_returns_setting_by_lang_code(self, monkeypatch):
@@ -86,7 +86,7 @@ class TestGetLanguageSettingByCode:
         assert service.get_language_setting_by_code("ghost") is None
 
 
-class TestAddLanguageSetting:
+class TestAddLanguageSetting(TestSetup):
     """Tests for add_language_setting function."""
 
     def test_adds_setting_and_returns_record(self, monkeypatch):
@@ -107,7 +107,7 @@ class TestAddLanguageSetting:
             service.add_language_setting("")
 
 
-class TestAddOrUpdateLanguageSetting:
+class TestAddOrUpdateLanguageSetting(TestSetup):
     """Tests for add_or_update_language_setting function."""
 
     def test_upserts_setting(self, monkeypatch):
@@ -124,7 +124,7 @@ class TestAddOrUpdateLanguageSetting:
             service.add_or_update_language_setting(" ")
 
 
-class TestUpdateLanguageSetting:
+class TestUpdateLanguageSetting(TestSetup):
     """Tests for update_language_setting function."""
 
     def test_updates_setting_and_returns_record(self, monkeypatch):
@@ -146,7 +146,7 @@ class TestUpdateLanguageSetting:
             service.update_language_setting(9999, move_dots=1)
 
 
-class TestDeleteLanguageSetting:
+class TestDeleteLanguageSetting(TestSetup):
     """Tests for delete function."""
 
     def test_deletes_setting(self, monkeypatch):

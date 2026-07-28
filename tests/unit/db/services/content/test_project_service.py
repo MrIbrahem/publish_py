@@ -17,7 +17,7 @@ class TestSetup:
         self.service = ProjectService()
 
 
-class TestProjectService:
+class TestProjectService(TestSetup):
     """Tests for ProjectService class."""
 
     def test_project_workflow(self):
@@ -54,7 +54,7 @@ class TestProjectService:
         assert len(result) >= 2
 
 
-class TestGetProject:
+class TestGetProject(TestSetup):
     """Tests for get_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -68,7 +68,7 @@ class TestGetProject:
         assert get_project(9999) is None
 
 
-class TestGetProjectByTitle:
+class TestGetProjectByTitle(TestSetup):
     """Tests for get_project_by_title function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -81,7 +81,7 @@ class TestGetProjectByTitle:
         assert get_project_by_title("Ghost") is None
 
 
-class TestAddProject:
+class TestAddProject(TestSetup):
     """Tests for add_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -99,7 +99,7 @@ class TestAddProject:
             add_project("")
 
 
-class TestUpdateProject:
+class TestUpdateProject(TestSetup):
     """Tests for update_project function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -113,7 +113,7 @@ class TestUpdateProject:
             update_project(9999, g_title="T")
 
 
-class TestDeleteProject:
+class TestDeleteProject(TestSetup):
     """Tests for delete_project function."""
 
     def test_delegates_to_store(self, monkeypatch):

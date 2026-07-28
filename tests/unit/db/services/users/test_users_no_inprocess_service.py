@@ -20,7 +20,7 @@ class TestSetup:
         self.service = UsersNoInprocessService()
 
 
-class TestUsersNoInprocessService:
+class TestUsersNoInprocessService(TestSetup):
     """Tests for UsersNoInprocessService class."""
 
     def test_users_no_inprocess_workflow(self):
@@ -68,7 +68,7 @@ class TestUsersNoInprocessService:
         assert len(result) >= 2
 
 
-class TestListActiveUsersNoInprocess:
+class TestListActiveUsersNoInprocess(TestSetup):
     """Tests for list_active_users_no_inprocess function."""
 
     def test_returns_list_from_store(self, monkeypatch):
@@ -80,7 +80,7 @@ class TestListActiveUsersNoInprocess:
         assert is_active[0].user == "Active_Wiki_User"
 
 
-class TestGetUsersNoInprocess:
+class TestGetUsersNoInprocess(TestSetup):
     """Tests for get_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -94,7 +94,7 @@ class TestGetUsersNoInprocess:
         assert get_users_no_inprocess(9999) is None
 
 
-class TestGetUsersNoInprocessByUser:
+class TestGetUsersNoInprocessByUser(TestSetup):
     """Tests for get_users_no_inprocess_by_user function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -107,7 +107,7 @@ class TestGetUsersNoInprocessByUser:
         assert get_users_no_inprocess_by_user("Ghost") is None
 
 
-class TestAddUsersNoInprocess:
+class TestAddUsersNoInprocess(TestSetup):
     """Tests for add_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -125,7 +125,7 @@ class TestAddUsersNoInprocess:
             add_users_no_inprocess("")
 
 
-class TestAddOrUpdateUsersNoInprocess:
+class TestAddOrUpdateUsersNoInprocess(TestSetup):
     """Tests for add_or_update_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -140,7 +140,7 @@ class TestAddOrUpdateUsersNoInprocess:
             add_or_update_users_no_inprocess(" ")
 
 
-class TestUpdateUsersNoInprocess:
+class TestUpdateUsersNoInprocess(TestSetup):
     """Tests for update_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -159,7 +159,7 @@ class TestUpdateUsersNoInprocess:
             update_users_no_inprocess(9999, is_active=0)
 
 
-class TestDeleteUsersNoInprocess:
+class TestDeleteUsersNoInprocess(TestSetup):
     """Tests for delete_users_no_inprocess function."""
 
     def test_delegates_to_store(self, monkeypatch):
@@ -173,7 +173,7 @@ class TestDeleteUsersNoInprocess:
         assert UsersNoInprocessService().delete(9999) is False
 
 
-class TestShouldHideFromInprocess:
+class TestShouldHideFromInprocess(TestSetup):
     """Tests for should_hide_from_inprocess function."""
 
     def test_returns_true_when_record_exists_and_active(self, monkeypatch):
