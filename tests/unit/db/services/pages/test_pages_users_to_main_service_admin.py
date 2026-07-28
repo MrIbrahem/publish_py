@@ -19,9 +19,6 @@ from src.main_app.db.models import (
 )
 from src.main_app.db.services.pages.pages_users_to_main_service import (
     PagesUsersToMainPagesService,
-    check_main_page_exists,
-    get_user_page,
-    list_pending,
 )
 from src.main_app.extensions import db
 
@@ -63,8 +60,14 @@ def _seed_pending(
     return user_page
 
 
-class TestListPending:
-    """Tests for list_pending."""
+
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = PagesUsersToMainPagesService()
+
+class TestListPending(TestSetup):
+    """Tests for self.service.list_pending."""
 
     def test_returns_joined_rows(self, sqlite_db):
         page = _seed_pending("Foo", "en")
@@ -72,7 +75,7 @@ class TestListPending:
         sqlite_db.session.add(QidRecord(title="Foo", qid="Q1"))
         sqlite_db.session.commit()
 
-        rows = list_pending(lang="All")
+        rows = self.service.list_pending(lang="All")
         assert len(rows) == 1
         row = rows[0]
         assert row["id"] == page.id
@@ -102,50 +105,50 @@ class TestListPending:
         _seed_pending("Has_override", "en")
         sqlite_db.session.commit()
 
-        titles = {r["title"] for r in list_pending(lang="All")}
+        titles = {r["title"] for r in self.service.list_pending(lang="All")}
         assert titles == {"Has_override"}
 
     def test_filters_by_lang(self):
         _seed_pending("English_one", "en")
         _seed_pending("French_one", "fr")
-        rows = list_pending(lang="fr")
+        rows = self.service.list_pending(lang="fr")
         assert {r["title"] for r in rows} == {"French_one"}
 
     def test_lang_all_returns_every_language(self):
         _seed_pending("English_one", "en")
         _seed_pending("French_one", "fr")
-        titles = {r["title"] for r in list_pending(lang="All")}
+        titles = {r["title"] for r in self.service.list_pending(lang="All")}
         assert titles == {"English_one", "French_one"}
 
     def test_qid_is_empty_string_when_no_match(self):
         _seed_pending("Without_qid", "en")  # no QidRecord seeded
-        rows = list_pending()
+        rows = self.service.list_pending()
         assert rows[0]["qid"] == ""
 
     def test_returns_empty_when_no_pending_rows(self):
-        assert list_pending() == []
+        assert self.service.list_pending() == []
 
 
-class TestGetUserPage:
-    """Tests for get_user_page."""
+class TestGetUserPage(TestSetup):
+    """Tests for self.service.get_user_page."""
 
     def test_returns_user_page_record(self):
         page = _seed_pending("Foo", "en")
-        result = get_user_page(page.id)
+        result = self.service.get_user_page(page.id)
         assert result is not None
         assert isinstance(result, UserPageRecord)
         assert result.title == "Foo"
 
     def test_returns_none_when_id_missing(self):
-        assert get_user_page(99999) is None
+        assert self.service.get_user_page(99999) is None
 
     def test_returns_none_when_id_is_falsy(self):
-        assert get_user_page(0) is None
-        assert get_user_page(None) is None  # type: ignore[arg-type]
+        assert self.service.get_user_page(0) is None
+        assert self.service.get_user_page(None) is None  # type: ignore[arg-type]
 
 
-class TestCheckMainPageExists:
-    """Tests for check_main_page_exists."""
+class TestCheckMainPageExists(TestSetup):
+    """Tests for self.service.check_main_page_exists."""
 
     def test_returns_record_when_main_page_with_target_exists(self, sqlite_db):
         sqlite_db.session.add(
@@ -159,7 +162,7 @@ class TestCheckMainPageExists:
             )
         )
         sqlite_db.session.commit()
-        result = check_main_page_exists("Foo", "en")
+        result = self.service.check_main_page_exists("Foo", "en")
         assert result is not None
         assert result.target == "real_target.html"
 
@@ -175,7 +178,7 @@ class TestCheckMainPageExists:
             )
         )
         sqlite_db.session.commit()
-        assert check_main_page_exists("Empty", "en") is None
+        assert self.service.check_main_page_exists("Empty", "en") is None
 
     def test_returns_none_when_target_is_null(self, sqlite_db):
         sqlite_db.session.add(
@@ -189,24 +192,24 @@ class TestCheckMainPageExists:
             )
         )
         sqlite_db.session.commit()
-        assert check_main_page_exists("Null_target", "en") is None
+        assert self.service.check_main_page_exists("Null_target", "en") is None
 
     def test_returns_none_when_no_match(self):
-        assert check_main_page_exists("Ghost", "en") is None
+        assert self.service.check_main_page_exists("Ghost", "en") is None
 
     def test_returns_none_when_lang_or_title_blank(self):
-        assert check_main_page_exists("", "en") is None
-        assert check_main_page_exists("Foo", "") is None
+        assert self.service.check_main_page_exists("", "en") is None
+        assert self.service.check_main_page_exists("Foo", "") is None
 
 
-class TestDeleteUserPage:
+class TestDeleteUserPage(TestSetup):
     """Tests for delete_user_page_to_main."""
 
     def test_removes_both_rows(self, sqlite_db):
         page = _seed_pending("Foo", "en")
         page_id = page.id
 
-        ok = PagesUsersToMainPagesService().delete(page_id)
+        ok = self.service.delete(page_id)
         assert ok is True
         assert sqlite_db.session.get(UserPageRecord, page_id) is None
         assert sqlite_db.session.get(PagesUsersToMainRecord, page_id) is None
@@ -226,16 +229,16 @@ class TestDeleteUserPage:
         sqlite_db.session.commit()
         page_id = page.id  # capture before delete; ORM proxy raises after.
 
-        ok = PagesUsersToMainPagesService().delete(page_id)
+        ok = self.service.delete(page_id)
         assert ok is True
         assert sqlite_db.session.get(UserPageRecord, page_id) is None
 
     def test_returns_false_when_id_is_falsy(self):
-        assert PagesUsersToMainPagesService().delete(0) is False
+        assert self.service.delete(0) is False
 
     def test_returns_false_and_rolls_back_on_db_error(self):
         with patch("src.main_app.db.services.pages.pages_users_to_main_service.db.session") as mock_session:
             mock_session.get.side_effect = Exception("boom")
-            ok = PagesUsersToMainPagesService().delete(1)
+            ok = self.service.delete(1)
             assert ok is False
             mock_session.rollback.assert_called_once()

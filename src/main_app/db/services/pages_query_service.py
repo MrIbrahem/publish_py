@@ -31,7 +31,7 @@ class PagesQueryService:
             LIMIT 100
         """
         query = (
-            db.session.query(
+            self.session.query(
                 UserPageRecord,
                 CategoryRecord.campaign.label("campaign"),
             )
@@ -67,14 +67,14 @@ class PagesQueryService:
             WHERE p.target != ''
         """
         views_subquery = (
-            db.session.query(ViewsNewAllRecord.views)
+            self.session.query(ViewsNewAllRecord.views)
             .filter(ViewsNewAllRecord.target == PageRecord.target)
             .filter(ViewsNewAllRecord.lang == PageRecord.lang)
             .correlate(PageRecord)
             .scalar_subquery()
         )
 
-        query = db.session.query(
+        query = self.session.query(
             PageRecord,
             views_subquery.label("views"),
         ).filter(PageRecord.target != "")

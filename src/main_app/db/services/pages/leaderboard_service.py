@@ -25,7 +25,7 @@ class LeaderboardService:
         """
         SELECT DISTINCT YEAR(pupdate) AS year FROM pages WHERE pupdate <> ''
         """
-        query = db.session.query(func.year(PageRecord.pupdate).label("year")).filter(PageRecord.pupdate != "")
+        query = self.session.query(func.year(PageRecord.pupdate).label("year")).filter(PageRecord.pupdate != "")
         if user is not None:
             query = query.filter(PageRecord.user == user)
 
@@ -44,7 +44,7 @@ class LeaderboardService:
         AND YEAR(pupdate) = :year
         """
         rows = (
-            db.session.query(
+            self.session.query(
                 func.month(PageRecord.pupdate).label("month"),
             )
             .filter(PageRecord.pupdate != "")
@@ -67,7 +67,7 @@ class LeaderboardService:
         result: dict[str, int] = {}
         # Query: SELECT user, COUNT(target) as count FROM pages WHERE target != '' GROUP BY user ORDER BY count DESC
         rows = (
-            db.session.query(PageRecord.user, func.count(PageRecord.target).label("count"))
+            self.session.query(PageRecord.user, func.count(PageRecord.target).label("count"))
             .filter(PageRecord.target != "")
             .filter(PageRecord.target.isnot(None))
             .group_by(PageRecord.user)
@@ -126,7 +126,7 @@ class LeaderboardService:
         """
         )
 
-        rows = db.session.execute(sql, params).fetchall()
+        rows = self.session.execute(sql, params).fetchall()
         return [dict(row._mapping) for row in rows]
 
     def top_lang_of_user(self, username: str) -> dict[str, int]:
@@ -147,7 +147,7 @@ class LeaderboardService:
         result_example: { "user": "DaSupremo", "lang": "gpe", "cnt": 451 }
         """
         data = (
-            db.session.query(
+            self.session.query(
                 PageRecord.user,
                 PageRecord.lang,
                 func.count(PageRecord.target).label("cnt"),
@@ -180,7 +180,7 @@ class LeaderboardService:
         result_example: { "user": "DaSupremo", "lang": "gpe", "count": 451 }
         """
         ranked = (
-            db.session.query(
+            self.session.query(
                 PageRecord.user,
                 PageRecord.lang,
                 func.count(PageRecord.target).label("count"),
@@ -194,7 +194,7 @@ class LeaderboardService:
         )
 
         data = (
-            db.session.query(ranked.c.user, ranked.c.lang, ranked.c.count)
+            self.session.query(ranked.c.user, ranked.c.lang, ranked.c.count)
             .filter(ranked.c.rn == 1)
             .order_by(desc(ranked.c.count))
             .all()
@@ -220,7 +220,7 @@ class LeaderboardService:
         else:
             date_expr = func.left(PageRecord.pupdate, 7)
 
-        query = db.session.query(date_expr.label("date"), func.count().label("count")).filter(
+        query = self.session.query(date_expr.label("date"), func.count().label("count")).filter(
             PageRecord.target.isnot(None), PageRecord.target != ""
         )
 

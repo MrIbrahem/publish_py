@@ -216,7 +216,6 @@ class CRUDService[ModelT]:
         record = self.get_record_by_id(pk)
         if record:
             return self.delete_record(record)
-
         return False
 
     def delete_record(self, record: ModelT) -> bool:

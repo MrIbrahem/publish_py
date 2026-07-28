@@ -94,14 +94,14 @@ class Results2026Service:
         """Return missing-target articles for ``lang`` in category ``cat``."""
         if not lang or not cat:
             return []
-        rows = db.session.execute(_MISSING_SQL, {"lang": lang, "cat": cat}).fetchall()
+        rows = self.session.execute(_MISSING_SQL, {"lang": lang, "cat": cat}).fetchall()
         return _rows_to_dicts(rows)
 
     def exists_by_lang_and_category(self, lang: str, cat: str) -> list[dict]:
         """Return already-translated articles for ``lang`` in category ``cat``."""
         if not lang or not cat:
             return []
-        rows = db.session.execute(_EXISTS_SQL, {"lang": lang, "cat": cat}).fetchall()
+        rows = self.session.execute(_EXISTS_SQL, {"lang": lang, "cat": cat}).fetchall()
         return _rows_to_dicts(rows)
 
 

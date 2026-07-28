@@ -40,7 +40,7 @@ class AllQidsService:
                 t.qid, q.title, t.code, t.target
         """
         )
-        rows = db.session.execute(sql, {"lang": lang}).fetchall()
+        rows = self.session.execute(sql, {"lang": lang}).fetchall()
         return [dict(row._mapping) for row in rows]
 
 

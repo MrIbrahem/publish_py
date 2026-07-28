@@ -85,7 +85,7 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
                     new_rows.append({"category": cat, "article_id": aid})
                     seen.add((cat, aid))
             if new_rows:
-                db.session.execute(
+                self.session.execute(
                     text(
                         """
                         INSERT INTO category_members (category, article_id)
@@ -94,13 +94,13 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
                     ),
                     new_rows,
                 )
-                db.session.commit()
+                self.session.commit()
                 logger.info("Inserted %s new category_member rows", len(new_rows))
             else:
                 logger.info("No new category_member rows to insert")
         except Exception:
             logger.exception("Failed to sync category members")
-            db.session.rollback()
+            self.session.rollback()
             raise
 
 
