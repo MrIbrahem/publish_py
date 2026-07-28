@@ -6,7 +6,6 @@ import pytest
 from src.main_app.db.exceptions import DuplicateRecordError
 from src.main_app.db.models import AdminUserRecord
 from src.main_app.db.services.users.admin_service import (
-    active_coordinators,
     add_coordinator,
     delete_coordinator,
     get_coordinator_by_id,

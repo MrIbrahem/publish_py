@@ -7,7 +7,7 @@ from ..delete_service import (
     delete_users_no_inprocess,
 )
 from .admin_service import (
-    active_coordinators,
+    AdminService,
     add_coordinator,
     delete_coordinator,
     get_coordinator_by_id,
@@ -25,7 +25,8 @@ from .full_translator_service import (
     list_full_translators,
     update_full_translator,
 )
-from .user_service import (
+from .users_service import (
+    UsersService,
     create_user,
     get_user,
     get_user_by_username,
@@ -37,6 +38,7 @@ from .user_service import (
     users_search,
 )
 from .user_token_service import (
+    UserTokenService,
     get_authenticated_user_token,
     get_user_token,
     get_user_token_by_username,
@@ -54,8 +56,13 @@ from .users_no_inprocess_service import (
 )
 
 __all__ = [
+    # classes
+    "AdminService",
+    "UsersService",
+    "UserTokenService",
+
+    # functions
     "list_coordinators",
-    "active_coordinators",
     "get_coordinator_by_id",
     "add_coordinator",
     "delete_coordinator",

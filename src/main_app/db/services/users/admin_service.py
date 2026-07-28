@@ -11,107 +11,115 @@ import logging
 from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
-from ...exceptions import DuplicateUserError, UserNotFoundError
+from ...exceptions import DuplicateRecordError, UserNotFoundError
 from ...models import AdminUserRecord
 from ..crud_service import CRUDService
-from ..delete_service import delete_record_by_pk
-from ..utils import db_guard_rollback
 
 logger = logging.getLogger(__name__)
 
-
-class AdminUserService(CRUDService[AdminUserRecord]):
-    model = AdminUserRecord
-
-    def __init__(self):
+class AdminService(CRUDService[AdminUserRecord]):
+    def __init__(self) -> None:
         super().__init__(db.session, AdminUserRecord)
 
+    def is_active_coordinator(self, username: str) -> bool:
+        """Check whether a single username is an active coordinator."""
+        try:
+            record = (
+                self.session.query(AdminUserRecord)
+                .filter(AdminUserRecord.username == username, AdminUserRecord.is_active)
+                .first()
+            )
+            return record is not None
+        except Exception:
+            logger.exception("Failed to check coordinator status")
+        return False
 
-admin_crud = AdminUserService()
+    def list_coordinators(self) -> list[AdminUserRecord]:
+        return self.list_all()
 
-# ── SELECT ───────────────────────────────────────────────
+    def get_coordinator_by_id(self, coordinator_id: int) -> AdminUserRecord:
+        """
+        Get a coordinator by ID.
+        """
+        record = self.get_record_by_id(coordinator_id)
 
+        if not record:
+            raise LookupError(f"Coordinator id {coordinator_id} was not found")
+        return record
 
-def active_coordinators() -> list[str]:
-    """Return usernames of all active coordinators."""
-    records = admin_crud.list(
-        filters={"is_active": 1},
-        order_by=[AdminUserRecord.id],
-    )
-    return [r.username for r in records]
+    def add_coordinator(self, username: str) -> AdminUserRecord:
+        if not username or not username.strip():
+            raise ValueError("Username is required")
+        username = username.strip()
 
+        """Add a coordinator."""
+        record = self.session.query(AdminUserRecord).filter(AdminUserRecord.username == username).first()
+        if record:
+            # This assumes a UNIQUE constraint on the username column
+            raise DuplicateRecordError(f"Coordinator '{username}' already exists") from None
+
+        record = AdminUserRecord(username=username, is_active=True)
+        self.session.add(record)
+        try:
+            self.session.commit()
+        except IntegrityError as exc:
+            self.session.rollback()
+            error_message = str(exc).lower()
+            if "foreign key constraint" in error_message:
+                raise UserNotFoundError(f"User '{username}' does not exist") from exc
+
+            if "Duplicate entry" in str(exc.orig) or "UNIQUE constraint failed" in str(exc.orig):
+                raise DuplicateRecordError(f"Coordinator '{username}' already exists") from exc
+
+            raise
+        self.session.refresh(record)
+        return record
+
+    def set_coordinator_active(self, coordinator_id: int, is_active: bool) -> AdminUserRecord | None:
+        """Toggle coordinator activity."""
+        # record = get_coordinator_by_id(coordinator_id)
+        record = self.get_record_by_id(coordinator_id)
+        if not record:
+            return None
+
+        try:
+            record.is_active = is_active
+            self.session.commit()
+            self.session.refresh(record)
+            return record
+        except Exception:
+            self.session.rollback()
+            return None
+
+admin_crud = AdminService()
 
 def is_active_coordinator(username: str) -> bool:
-    """Check whether a single username is an active coordinator."""
-    try:
-        record = admin_crud.get_by(username=username, is_active=True)
-        return record is not None
-    except Exception:
-        logger.exception("Failed to check coordinator status")
-    return False
+    return admin_crud.is_active_coordinator(username=username)
 
 
 def list_coordinators() -> list[AdminUserRecord]:
-    """
-    Return all coordinators from the database.
-
-    Returns a list of records, or an empty list on failure.
-    """
-    return list(admin_crud.list())
+    return admin_crud.list_coordinators()
 
 
 def get_coordinator_by_id(coordinator_id: int) -> AdminUserRecord | None:
-    """
-    Get a coordinator by ID.
-    """
-    record = admin_crud.get(coordinator_id)
-    if not record:
-        logger.warning(f"Coordinator record with ID {coordinator_id} not found")
-        return None
-    return record
-
-
-# ── INSERT, UPDATE, SET ──────────────────────────────────
-
+    return admin_crud.get_coordinator_by_id(coordinator_id)
 
 def add_coordinator(username: str) -> AdminUserRecord:
-    """Add a coordinator."""
-    username = username.strip()
-    if not username:
-        raise ValueError("Username is required")
-
-    record = admin_crud.get_by(username=username)
-    if record:
-        # This assumes a UNIQUE constraint on the username column
-        raise DuplicateUserError(f"Coordinator '{username}' already exists") from None
-
-    try:
-        return admin_crud.create(username=username, is_active=True)
-    except IntegrityError as exc:
-        if "a foreign key constraint fails" in str(exc):
-            raise UserNotFoundError(f"User '{username}' does not exist") from exc
-        raise
+    return admin_crud.add_coordinator(username=username)
 
 
-@db_guard_rollback
 def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRecord | None:
-    """Toggle coordinator activity."""
-    try:
-        return admin_crud.update(coordinator_id, is_active=is_active)
-    except ValueError:
-        return None
+    return admin_crud.set_coordinator_active(coordinator_id=coordinator_id, is_active=is_active)
 
 
 def delete_coordinator(coordinator_id: int) -> bool:
-    deleted = delete_record_by_pk(AdminUserRecord, coordinator_id)
-    return deleted
-
+    return admin_crud.delete(coordinator_id)
 
 __all__ = [
     "list_coordinators",
-    "active_coordinators",
     "get_coordinator_by_id",
     "add_coordinator",
     "is_active_coordinator",
     "set_coordinator_active",
+    "AdminService",
 ]

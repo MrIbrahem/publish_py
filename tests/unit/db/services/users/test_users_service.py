@@ -6,7 +6,7 @@ from src.main_app.db.models import UserRecord
 from src.main_app.db.services.delete_service import (
     delete_user,
 )
-from src.main_app.db.services.users.user_service import (
+from src.main_app.db.services.users.users_service import (
     create_user,
     get_user,
     get_user_by_username,
