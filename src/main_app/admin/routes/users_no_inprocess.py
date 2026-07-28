@@ -14,12 +14,8 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.users import (
-    add_users_no_inprocess,
-    delete_users_no_inprocess,
-    list_users_no_inprocess,
-    update_users_no_inprocess,
-)
+from ...db.services.users import UsersNoInprocessService
+from ...db.services.delete_service import delete_users_no_inprocess
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -27,8 +23,8 @@ logger = logging.getLogger(__name__)
 
 def _users_no_inprocess_dashboard():
     """Render the users not in process management dashboard."""
-
-    users = list_users_no_inprocess()
+    service = UsersNoInprocessService()
+    users = service.list_users_no_inprocess()
     total = len(users)
     is_active = sum(1 for u in users if u.is_active)
 
@@ -50,7 +46,8 @@ def _add_user_no_inprocess() -> ResponseReturnValue:
         return redirect(url_for("admin.users_no_inprocess.dashboard"))
 
     try:
-        record = add_users_no_inprocess(username)
+        service = UsersNoInprocessService()
+        record = service.add_users_no_inprocess(username)
     except ValueError as exc:
         logger.exception("Unable to add user")
         flash(str(exc), "warning")
@@ -67,7 +64,8 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
     """Shared helper to update record active status."""
     action = "activate" if is_active else "deactivate"
     try:
-        record = update_users_no_inprocess(record_id, is_active=is_active)
+        service = UsersNoInprocessService()
+        record = service.update_users_no_inprocess(record_id, is_active=is_active)
     except LookupError as exc:
         logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")

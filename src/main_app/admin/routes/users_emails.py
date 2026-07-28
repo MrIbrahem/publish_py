@@ -17,13 +17,8 @@ from flask.typing import ResponseReturnValue
 from ...db.models import ProjectRecord, UserRecord
 from ...db.services.content import list_projects
 from ...db.services.pages import list_of_users_by_translations_count
-from ...db.services.users import (
-    create_user,
-    delete_user,
-    get_user,
-    list_users,
-    update_user,
-)
+from ...db.services.users import UsersService
+from ...db.services.delete_service import delete_user
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -45,7 +40,8 @@ def _dashboard():
 
     projects: list[ProjectRecord] = list_projects()
 
-    users: list[UserRecord] = list_users()
+    service = UsersService()
+    users: list[UserRecord] = service.list_users()
     total = len(users)
 
     project_name = request.args.get("project", "").strip()
@@ -86,7 +82,8 @@ def _add_user() -> ResponseReturnValue:
         return redirect(url_for("admin.users_emails.dashboard"))
 
     try:
-        record = create_user(
+        service = UsersService()
+        record = service.create_user(
             username=username,
             email=email,
             wiki=wiki,
@@ -116,7 +113,8 @@ def _update_record(user_id: int) -> ResponseReturnValue:
         return redirect(url_for("admin.users_emails.dashboard"))
 
     try:
-        record = update_user(
+        service = UsersService()
+        record = service.update_user(
             user_id=user_id,
             username=username,
             email=email,
@@ -179,7 +177,8 @@ class UsersEmails:
         return _update_record(record_id)
 
     def edit(self, record_id: int) -> ResponseReturnValue:
-        user = get_user(record_id)
+        service = UsersService()
+        user = service.get_user(record_id)
         if not user:
             flash(f"User with ID {record_id} not found.", "danger")
             return redirect(url_for("admin.users_emails.dashboard"))

@@ -6,12 +6,9 @@ import logging
 
 from ...db.models import UserRecord
 from ...db.services.users import (
-    create_user,
-    get_authenticated_user_token,
-    get_user_by_username,
-    get_user_token,
-    is_active_coordinator,
-    upsert_user_token,
+    UsersService,
+    UserTokenService,
+    AdminService,
 )
 from ..core.crypto import encrypt_value
 from .current_user import CurrentUser
@@ -32,12 +29,16 @@ class AuthUserService:
             logger.warning("OAuth callback received an empty username")
             return None
 
+        users_service = UsersService()
+        token_service = UserTokenService()
+        admin_service = AdminService()
+
         try:
             # Ensure user identity row exists
-            user: UserRecord | None = get_user_by_username(username)
+            user: UserRecord | None = users_service.get_user_by_username(username)
 
             if not user:
-                user: UserRecord | None = create_user(username)
+                user: UserRecord | None = users_service.create_user(username)
 
             if not user:
                 return None
@@ -53,7 +54,7 @@ class AuthUserService:
             encrypted_secret = encrypt_value(access_secret)
 
             # 1. Update or insert into database via repository
-            upsert_user_token(
+            token_service.upsert_user_token(
                 user_id=user_id,
                 encrypted_token=encrypted_token,
                 encrypted_secret=encrypted_secret,
@@ -65,11 +66,11 @@ class AuthUserService:
 
         try:
             # 2. Get the fresh record
-            token = get_user_token(user_id)
+            token = token_service.get_user_token(user_id)
             if not token:
                 return None
 
-            is_active_admin = is_active_coordinator(username)
+            is_active_admin = admin_service.is_active_coordinator(username)
         except Exception as e:
             logger.exception("Failed to upsert or fetch user credentials: %s", e)
             return None
@@ -85,8 +86,10 @@ class AuthUserService:
     @staticmethod
     def get_authenticated_user(user_id: int) -> CurrentUser | None:
         """Fetch the CurrentUser composite for session restoration."""
+        token_service = UserTokenService()
+        admin_service = AdminService()
         try:
-            token = get_authenticated_user_token(user_id)
+            token = token_service.get_authenticated_user_token(user_id)
             if not token:
                 return None
             username = token.user.username
@@ -95,7 +98,7 @@ class AuthUserService:
                 username=username,
                 access_token=token.access_token,
                 access_secret=token.access_secret,
-                is_active_admin=is_active_coordinator(username),
+                is_active_admin=admin_service.is_active_coordinator(username),
             )
         except Exception as e:
             logger.error("Error loading user for ID %s: %s", user_id, e)

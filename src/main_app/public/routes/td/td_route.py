@@ -16,7 +16,7 @@ from flask import (
     request,
 )
 
-from ....db.services.config import get_all_settings_ready
+from ....db.services.config import SettingsService
 from ....db.services.content import get_lang_by_code, list_categories, list_langs
 from ....db.services.pages import (
     count_category_members,
@@ -88,7 +88,7 @@ def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) 
             return val.lower() in ("1", "true", "yes", "on")
         return bool(val)
 
-    all_settings = get_all_settings_ready()
+    all_settings = SettingsService().get_all_settings_ready()
     show_translation_button = to_bool(all_settings.get("translation_button_in_progress_table", False))
     allow_type_of_translate = to_bool(all_settings.get("allow_type_of_translate", False))
     show_exists_table = to_bool(all_settings.get("show_exists_table", False))

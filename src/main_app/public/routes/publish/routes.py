@@ -10,7 +10,7 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
-from ....db.services.users import get_user_token_by_username
+from ....db.services.users import UserTokenService
 from ....shared.core.cors import check_cors, validate_access
 from ....shared.schemas import PublishRequestSchema
 from ....shared.utils.helpers.format import format_title, format_user
@@ -63,7 +63,8 @@ def _handle_form(request_data) -> Response:
     }
 
     # Get access credentials
-    user_token = get_user_token_by_username(user)
+    token_service = UserTokenService()
+    user_token = token_service.get_user_token_by_username(user)
 
     if user_token is None:
         response = jsonify(_handle_no_access(tab))

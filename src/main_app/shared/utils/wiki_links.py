@@ -25,7 +25,7 @@ from __future__ import annotations
 from html import escape
 from urllib.parse import quote, urlencode
 
-from ...db.services.config import get_setting_by_key
+from ...db.services.config import SettingsService
 
 # Mirrors PHP make_ContentTranslation_url's default. The setting key
 # `use_mdwikicx` (read by `_get_endpoint`) flips this to mdwikicx.
@@ -135,8 +135,8 @@ def _get_endpoint_like_php() -> str:
     """
     # Imported lazily to avoid pulling Flask-SQLAlchemy at import time.
     try:
-
-        record = get_setting_by_key("use_mdwikicx")
+        service = SettingsService()
+        record = service.get_setting_by_key("use_mdwikicx")
     except Exception:
         return _DEFAULT_ENDPOINT
 
