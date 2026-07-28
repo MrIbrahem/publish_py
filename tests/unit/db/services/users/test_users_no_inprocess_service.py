@@ -14,46 +14,51 @@ from src.main_app.db.services.users.users_no_inprocess_service import (
 )
 
 
-def test_users_no_inprocess_workflow():
-    # Test add
-    rec = add_users_no_inprocess("User_1", 1)
-    assert rec.user == "User_1"
-    assert rec.is_active == 1
-
-    # Test get
-    rec2 = get_users_no_inprocess(rec.id)
-    assert rec2.user == "User_1"
-
-    # Test get by user
-    rec3 = get_users_no_inprocess_by_user("User_1")
-    assert rec3.id == rec.id
-
-    # Test list
-    all_rec = list_users_no_inprocess()
-    assert any(x.user == "User_1" for x in all_rec)
-
-    # Test is_active
-    is_active = list_active_users_no_inprocess()
-    assert any(x.user == "User_1" for x in is_active)
-
-    # Test update
-    updated = update_users_no_inprocess(rec.id, is_active=0)
-    assert updated.is_active == 0
-    assert should_hide_from_inprocess("User_1") is False
-
-    # Test add_or_update
-    rec4 = add_or_update_users_no_inprocess("User_1", 1)
-    assert rec4.is_active == 1
-    assert should_hide_from_inprocess("User_1") is True
-
-    # Test delete
-    deleted = UsersNoInprocessService().delete(rec.id)
-    assert deleted is True
-    assert get_users_no_inprocess(rec.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = UsersNoInprocessService()
 
 
-class TestListUsersNoInprocess:
-    """Tests for list_users_no_inprocess function."""
+class TestUsersNoInprocessService:
+    """Tests for UsersNoInprocessService class."""
+
+    def test_users_no_inprocess_workflow(self):
+        # Test add
+        rec = add_users_no_inprocess("User_1", 1)
+        assert rec.user == "User_1"
+        assert rec.is_active == 1
+
+        # Test get
+        rec2 = get_users_no_inprocess(rec.id)
+        assert rec2.user == "User_1"
+
+        # Test get by user
+        rec3 = get_users_no_inprocess_by_user("User_1")
+        assert rec3.id == rec.id
+
+        # Test list
+        all_rec = list_users_no_inprocess()
+        assert any(x.user == "User_1" for x in all_rec)
+
+        # Test is_active
+        is_active = list_active_users_no_inprocess()
+        assert any(x.user == "User_1" for x in is_active)
+
+        # Test update
+        updated = update_users_no_inprocess(rec.id, is_active=0)
+        assert updated.is_active == 0
+        assert should_hide_from_inprocess("User_1") is False
+
+        # Test add_or_update
+        rec4 = add_or_update_users_no_inprocess("User_1", 1)
+        assert rec4.is_active == 1
+        assert should_hide_from_inprocess("User_1") is True
+
+        # Test delete
+        deleted = UsersNoInprocessService().delete(rec.id)
+        assert deleted is True
+        assert get_users_no_inprocess(rec.id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns all records."""

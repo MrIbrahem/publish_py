@@ -14,46 +14,51 @@ from src.main_app.db.services.users.full_translator_service import (
 )
 
 
-def test_full_translator_workflow():
-    # Test add
-    ft = add_full_translator("Global_Translator", 1)
-    assert ft.user == "Global_Translator"
-    assert ft.is_active == 1
-
-    # Test get
-    ft2 = get_full_translator(ft.id)
-    assert ft2.user == "Global_Translator"
-
-    # Test get by user
-    ft3 = get_full_translator_by_user("Global_Translator")
-    assert ft3.id == ft.id
-
-    # Test list
-    all_ft = list_full_translators()
-    assert any(x.user == "Global_Translator" for x in all_ft)
-
-    # Test active
-    active = list_active_full_translators()
-    assert any(x.user == "Global_Translator" for x in active)
-
-    # Test update
-    updated = update_full_translator(ft.id, is_active=0)
-    assert updated.is_active == 0
-    assert is_full_translator("Global_Translator") is False
-
-    # Test add_or_update
-    ft4 = add_or_update_full_translator("Global_Translator", 1)
-    assert ft4.is_active == 1
-    assert is_full_translator("Global_Translator") is True
-
-    # Test delete
-    deleted = FullTranslatorService().delete(ft.id)
-    assert deleted is True
-    assert get_full_translator(ft.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = FullTranslatorService()
 
 
-class TestListFullTranslators:
-    """Tests for list_full_translators function."""
+class TestFullTranslatorService:
+    """Tests for FullTranslatorService class."""
+
+    def test_full_translator_workflow(self):
+        # Test add
+        ft = add_full_translator("Global_Translator", 1)
+        assert ft.user == "Global_Translator"
+        assert ft.is_active == 1
+
+        # Test get
+        ft2 = get_full_translator(ft.id)
+        assert ft2.user == "Global_Translator"
+
+        # Test get by user
+        ft3 = get_full_translator_by_user("Global_Translator")
+        assert ft3.id == ft.id
+
+        # Test list
+        all_ft = list_full_translators()
+        assert any(x.user == "Global_Translator" for x in all_ft)
+
+        # Test active
+        active = list_active_full_translators()
+        assert any(x.user == "Global_Translator" for x in active)
+
+        # Test update
+        updated = update_full_translator(ft.id, is_active=0)
+        assert updated.is_active == 0
+        assert is_full_translator("Global_Translator") is False
+
+        # Test add_or_update
+        ft4 = add_or_update_full_translator("Global_Translator", 1)
+        assert ft4.is_active == 1
+        assert is_full_translator("Global_Translator") is True
+
+        # Test delete
+        deleted = FullTranslatorService().delete(ft.id)
+        assert deleted is True
+        assert get_full_translator(ft.id) is None
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_full_translators returns all records."""

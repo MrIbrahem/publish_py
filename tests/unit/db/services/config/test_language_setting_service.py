@@ -4,42 +4,47 @@ from src.main_app.db.models import LanguageSettingRecord
 from src.main_app.db.services.config import LanguageSettingService
 
 
-def test_language_setting_workflow():
-    service = LanguageSettingService()
-    # Test add
-    ls = service.add_language_setting("ar", 1, 0, 1)
-    assert ls.lang_code == "ar"
-    assert ls.move_dots == 1
-
-    # Test get
-    ls2 = service.get_language_setting(ls.id)
-    assert ls2.lang_code == "ar"
-
-    # Test get by code
-    ls3 = service.get_language_setting_by_code("ar")
-    assert ls3.id == ls.id
-
-    # Test list
-    all_ls = service.list_language_settings()
-    assert any(x.lang_code == "ar" for x in all_ls)
-
-    # Test update
-    updated = service.update_language_setting(ls.id, move_dots=0)
-    assert updated.move_dots == 0
-
-    # Test add_or_update
-    ls4 = service.add_or_update_language_setting("en", 1, 1, 1)
-    assert ls4.move_dots == 1
-    assert ls4.expend == 1
-
-    # Test delete
-    deleted = service.delete(ls.id)
-    assert deleted is True
-    assert service.get_language_setting(ls.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = LanguageSettingService()
 
 
-class TestListLanguageSettings:
-    """Tests for list_language_settings function."""
+class TestLanguageSettingService:
+    """Tests for LanguageSettingService class."""
+
+    def test_language_setting_workflow(self):
+        service = LanguageSettingService()
+        # Test add
+        ls = service.add_language_setting("ar", 1, 0, 1)
+        assert ls.lang_code == "ar"
+        assert ls.move_dots == 1
+
+        # Test get
+        ls2 = service.get_language_setting(ls.id)
+        assert ls2.lang_code == "ar"
+
+        # Test get by code
+        ls3 = service.get_language_setting_by_code("ar")
+        assert ls3.id == ls.id
+
+        # Test list
+        all_ls = service.list_language_settings()
+        assert any(x.lang_code == "ar" for x in all_ls)
+
+        # Test update
+        updated = service.update_language_setting(ls.id, move_dots=0)
+        assert updated.move_dots == 0
+
+        # Test add_or_update
+        ls4 = service.add_or_update_language_setting("en", 1, 1, 1)
+        assert ls4.move_dots == 1
+        assert ls4.expend == 1
+
+        # Test delete
+        deleted = service.delete(ls.id)
+        assert deleted is True
+        assert service.get_language_setting(ls.id) is None
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_language_settings returns all records."""

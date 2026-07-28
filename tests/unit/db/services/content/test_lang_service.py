@@ -16,36 +16,41 @@ from src.main_app.extensions import db
 pytestmark = pytest.mark.unit
 
 
-def test_lang_workflow():
-    # Test add
-    added = add_lang("ar", "العربية", "Arabic")
-    assert added.code == "ar"
-    assert added.autonym == "العربية"
-
-    # Test get
-    l2 = get_lang(added.lang_id)
-    assert l2.code == "ar"
-
-    # Test get by code
-    l3 = get_lang_by_code("ar")
-    assert l3.lang_id == added.lang_id
-
-    # Test list
-    all_l = list_langs()
-    assert any(x.code == "ar" for x in all_l)
-
-    # Test add_or_update
-    l4 = add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
-    assert l4.name == "Modern Standard Arabic"
-
-    # Test delete
-    deleted = LangService().delete(added.lang_id)
-    assert deleted is True
-    assert get_lang(added.lang_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = LangService()
 
 
-class TestListLangs:
-    """Tests for list_langs function."""
+class TestLangService:
+    """Tests for LangService class."""
+
+    def test_lang_workflow(self):
+        # Test add
+        added = add_lang("ar", "العربية", "Arabic")
+        assert added.code == "ar"
+        assert added.autonym == "العربية"
+
+        # Test get
+        l2 = get_lang(added.lang_id)
+        assert l2.code == "ar"
+
+        # Test get by code
+        l3 = get_lang_by_code("ar")
+        assert l3.lang_id == added.lang_id
+
+        # Test list
+        all_l = list_langs()
+        assert any(x.code == "ar" for x in all_l)
+
+        # Test add_or_update
+        l4 = add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
+        assert l4.name == "Modern Standard Arabic"
+
+        # Test delete
+        deleted = LangService().delete(added.lang_id)
+        assert deleted is True
+        assert get_lang(added.lang_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""

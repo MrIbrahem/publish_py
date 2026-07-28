@@ -17,28 +17,33 @@ from src.main_app.db.services.users.users_service import (
 pytestmark = pytest.mark.unit
 
 
-def test_user_workflow():
-    u = create_user("Wiki_User", email="jh@example.com", wiki="enwiki", user_group="Editor")
-    assert u.username == "Wiki_User"
-
-    assert get_user(u.user_id).username == "Wiki_User"
-    assert get_user_by_username("Wiki_User").user_id == u.user_id
-
-    assert any(x.username == "Wiki_User" for x in list_users())
-    assert any(x.username == "Wiki_User" for x in list_users_by_group("Editor"))
-
-    updated = update_user_data(u.user_id, email="jh_new@example.com")
-    assert updated.email == "jh_new@example.com"
-
-    assert user_exists("Wiki_User") is True
-
-    deleted = UsersService().delete(u.user_id)
-    assert deleted is True
-    assert get_user(u.user_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = UsersService()
 
 
-class TestListUsers:
-    """Tests for list_users function."""
+class TestUsersService:
+    """Tests for UsersService class."""
+
+    def test_user_workflow(self):
+        u = create_user("Wiki_User", email="jh@example.com", wiki="enwiki", user_group="Editor")
+        assert u.username == "Wiki_User"
+
+        assert get_user(u.user_id).username == "Wiki_User"
+        assert get_user_by_username("Wiki_User").user_id == u.user_id
+
+        assert any(x.username == "Wiki_User" for x in list_users())
+        assert any(x.username == "Wiki_User" for x in list_users_by_group("Editor"))
+
+        updated = update_user_data(u.user_id, email="jh_new@example.com")
+        assert updated.email == "jh_new@example.com"
+
+        assert user_exists("Wiki_User") is True
+
+        deleted = UsersService().delete(u.user_id)
+        assert deleted is True
+        assert get_user(u.user_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""

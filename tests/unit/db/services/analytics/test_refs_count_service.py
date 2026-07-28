@@ -13,45 +13,50 @@ from src.main_app.db.services.analytics.refs_count_service import (
 )
 
 
-def test_refs_count_workflow():
-    # Test add
-    r = add_refs_count("Aspirin", 15, 120)
-    assert r.r_title == "Aspirin"
-    assert r.r_lead_refs == 15
-
-    # Test get
-    r2 = get_refs_count(r.r_id)
-    assert r2.r_title == "Aspirin"
-
-    # Test get by title
-    r3 = get_refs_count_by_title("Aspirin")
-    assert r3.r_id == r.r_id
-
-    # Test get_ref_counts_for_title
-    lead, all_refs = get_ref_counts_for_title("Aspirin")
-    assert lead == 15
-    assert all_refs == 120
-
-    # Test list
-    all_r = list_refs_counts()
-    assert any(x.r_title == "Aspirin" for x in all_r)
-
-    # Test update
-    updated = update_refs_count(r.r_id, r_lead_refs=20)
-    assert updated.r_lead_refs == 20
-
-    # Test add_or_update
-    r4 = add_or_update_refs_count("Aspirin", 25, 150)
-    assert r4.r_lead_refs == 25
-
-    # Test delete
-    deleted = RefsCountService().delete(r.r_id)
-    assert deleted is True
-    assert get_refs_count(r.r_id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = RefsCountService()
 
 
-class TestListRefsCounts:
-    """Tests for list_refs_counts function."""
+class TestRefsCountService:
+    """Tests for RefsCountService class."""
+
+    def test_refs_count_workflow(self):
+        # Test add
+        r = add_refs_count("Aspirin", 15, 120)
+        assert r.r_title == "Aspirin"
+        assert r.r_lead_refs == 15
+
+        # Test get
+        r2 = get_refs_count(r.r_id)
+        assert r2.r_title == "Aspirin"
+
+        # Test get by title
+        r3 = get_refs_count_by_title("Aspirin")
+        assert r3.r_id == r.r_id
+
+        # Test get_ref_counts_for_title
+        lead, all_refs = get_ref_counts_for_title("Aspirin")
+        assert lead == 15
+        assert all_refs == 120
+
+        # Test list
+        all_r = list_refs_counts()
+        assert any(x.r_title == "Aspirin" for x in all_r)
+
+        # Test update
+        updated = update_refs_count(r.r_id, r_lead_refs=20)
+        assert updated.r_lead_refs == 20
+
+        # Test add_or_update
+        r4 = add_or_update_refs_count("Aspirin", 25, 150)
+        assert r4.r_lead_refs == 25
+
+        # Test delete
+        deleted = RefsCountService().delete(r.r_id)
+        assert deleted is True
+        assert get_refs_count(r.r_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""

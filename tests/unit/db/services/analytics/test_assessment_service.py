@@ -12,42 +12,47 @@ from src.main_app.db.services.analytics.assessment_service import (
 )
 
 
-def test_assessment_workflow():
-    # Test add
-    a = add_assessment("Diabetes mellitus", "High")
-    assert a.title == "Diabetes mellitus"
-    assert a.importance == "High"
-
-    # Test get
-    a2 = get_assessment(a.id)
-    assert a2 is not None
-    assert a2.title == "Diabetes mellitus"
-
-    # Test get by title
-    a3 = get_assessment_by_title("Diabetes mellitus")
-    assert a3 is not None
-    assert a3.id == a.id
-
-    # Test list
-    all_a = list_assessments()
-    assert any(x.title == "Diabetes mellitus" for x in all_a)
-
-    # Test update
-    updated = update_assessment(a.id, importance="Top")
-    assert updated.importance == "Top"
-
-    # Test add_or_update
-    a4 = add_or_update_assessment("Diabetes mellitus", "Mid")
-    assert a4.importance == "Mid"
-
-    # Test delete
-    deleted = AssessmentService().delete(a.id)
-    assert deleted is True
-    assert get_assessment(a.id) is None
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = AssessmentService()
 
 
-class TestListAssessments:
-    """Tests for list_assessments function."""
+class TestAssessmentService:
+    """Tests for AssessmentService class."""
+
+    def test_assessment_workflow(self):
+        # Test add
+        a = add_assessment("Diabetes mellitus", "High")
+        assert a.title == "Diabetes mellitus"
+        assert a.importance == "High"
+
+        # Test get
+        a2 = get_assessment(a.id)
+        assert a2 is not None
+        assert a2.title == "Diabetes mellitus"
+
+        # Test get by title
+        a3 = get_assessment_by_title("Diabetes mellitus")
+        assert a3 is not None
+        assert a3.id == a.id
+
+        # Test list
+        all_a = list_assessments()
+        assert any(x.title == "Diabetes mellitus" for x in all_a)
+
+        # Test update
+        updated = update_assessment(a.id, importance="Top")
+        assert updated.importance == "Top"
+
+        # Test add_or_update
+        a4 = add_or_update_assessment("Diabetes mellitus", "Mid")
+        assert a4.importance == "Mid"
+
+        # Test delete
+        deleted = AssessmentService().delete(a.id)
+        assert deleted is True
+        assert get_assessment(a.id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
