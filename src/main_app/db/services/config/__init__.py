@@ -1,10 +1,5 @@
 """Config db services."""
 
-from ..delete_service import (
-    delete_language_setting,
-    delete_setting,
-    delete_setting_by_key,
-)
 from .language_setting_service import (
     LanguageSettingService,
     add_language_setting,
@@ -35,13 +30,10 @@ __all__ = [
     "add_language_setting",
     "add_or_update_language_setting",
     "update_language_setting",
-    "delete_language_setting",
     "get_all_settings_raw",
     "list_settings",
     "get_setting_by_id",
     "get_setting_by_key",
     "create_setting",
-    "delete_setting",
-    "delete_setting_by_key",
     "update_setting",
 ]

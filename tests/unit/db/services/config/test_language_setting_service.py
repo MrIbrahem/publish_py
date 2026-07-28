@@ -142,10 +142,10 @@ class TestUpdateLanguageSetting:
 
 
 class TestDeleteLanguageSetting:
-    """Tests for delete_language_setting function."""
+    """Tests for delete function."""
 
     def test_deletes_setting(self, monkeypatch):
-        """Test that delete_language_setting calls store delete."""
+        """Test that delete calls store delete."""
         service = LanguageSettingService()
         ls = service.add_language_setting("de")
         deleted = service.delete(ls.id)

@@ -16,8 +16,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content import CategoryService
-from ...db.services.delete_service import delete_category
+from ...db.services import CategoryService
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -99,8 +98,9 @@ def _update_category(
 def _delete_category(record_id: int) -> None:
     """Remove a category record entirely."""
 
+    category_service = CategoryService()
     try:
-        record = delete_category(record_id)
+        record = category_service.delete(record_id)
         if not record:
             raise ValueError("Category not found")
     except ValueError as exc:

@@ -1,13 +1,5 @@
 """Analytics db services."""
 
-from ..delete_service import (
-    delete_assessment,
-    delete_enwiki_pageview,
-    delete_mdwiki_revid,
-    delete_refs_count,
-    delete_views_new,
-    delete_word,
-)
 from .assessment_service import (
     AssessmentService,
     add_assessment,
@@ -82,7 +74,6 @@ __all__ = [
     "add_assessment",
     "add_or_update_assessment",
     "update_assessment",
-    "delete_assessment",
     "list_enwiki_pageviews",
     "get_top_enwiki_pageviews",
     "get_enwiki_pageview",
@@ -90,13 +81,11 @@ __all__ = [
     "add_enwiki_pageview",
     "add_or_update_enwiki_pageview",
     "update_enwiki_pageview",
-    "delete_enwiki_pageview",
     "list_mdwiki_revids",
     "get_mdwiki_revid_by_title",
     "add_mdwiki_revid",
     "add_or_update_mdwiki_revid",
     "update_mdwiki_revid",
-    "delete_mdwiki_revid",
     "get_revid_for_title",
     "list_refs_counts",
     "get_refs_count",
@@ -104,7 +93,6 @@ __all__ = [
     "add_refs_count",
     "add_or_update_refs_count",
     "update_refs_count",
-    "delete_refs_count",
     "get_ref_counts_for_title",
     "list_views_new",
     "list_views_by_target",
@@ -114,7 +102,6 @@ __all__ = [
     "add_views_new",
     "add_or_update_views_new",
     "update_views_new",
-    "delete_views_new",
     "get_total_views_for_target",
     "list_words",
     "get_word",
@@ -122,6 +109,5 @@ __all__ = [
     "add_word",
     "add_or_update_word",
     "update_word",
-    "delete_word",
     "get_word_counts_for_title",
 ]

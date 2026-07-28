@@ -1,10 +1,5 @@
 """Content db services."""
 
-from ..delete_service import (
-    delete_category,
-    delete_lang,
-    delete_project,
-)
 from .category_service import (
     CategoryService,
     add_category,
@@ -37,7 +32,6 @@ __all__ = [
     "ProjectService",
     "add_category",
     "update_category",
-    "delete_category",
     "get_campaign_category",
     "list_categories",
     "get_camp_to_cats",
@@ -46,12 +40,10 @@ __all__ = [
     "get_lang_by_code",
     "add_lang",
     "add_or_update_lang",
-    "delete_lang",
     "list_projects",
     "get_project",
     "get_project_by_title",
     "add_project",
     "update_project",
     "update_project_title",
-    "delete_project",
 ]

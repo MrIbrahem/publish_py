@@ -2,6 +2,7 @@ import pytest
 
 from src.main_app.db.models import WordRecord
 from src.main_app.db.services.analytics.word_service import (
+    WordService,
     add_or_update_word,
     add_word,
     get_word,
@@ -10,10 +11,6 @@ from src.main_app.db.services.analytics.word_service import (
     list_words,
     update_word,
 )
-from src.main_app.db.services.delete_service import (
-    delete_word,
-)
-
 
 def test_word_workflow():
     # Test add
@@ -47,7 +44,7 @@ def test_word_workflow():
     assert w4.w_lead_words == 700
 
     # Test delete
-    deleted = delete_word(w.w_id)
+    deleted = WordService().delete(w.w_id)
     assert deleted is True
     assert get_word(w.w_id) is None
 
@@ -155,12 +152,12 @@ class TestDeleteWord:
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that function deletes the record."""
         w = add_word("T-cell")
-        deleted = delete_word(w.w_id)
+        deleted = WordService().delete(w.w_id)
         assert deleted is True
         assert get_word(w.w_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_word(9999) is False
+        assert WordService().delete(9999) is False
 
 
 class TestGetWordCountsForTitle:

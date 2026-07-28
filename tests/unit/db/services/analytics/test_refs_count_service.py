@@ -2,6 +2,7 @@ import pytest
 
 from src.main_app.db.models import RefsCountRecord
 from src.main_app.db.services.analytics.refs_count_service import (
+    RefsCountService,
     add_or_update_refs_count,
     add_refs_count,
     get_ref_counts_for_title,
@@ -10,10 +11,6 @@ from src.main_app.db.services.analytics.refs_count_service import (
     list_refs_counts,
     update_refs_count,
 )
-from src.main_app.db.services.delete_service import (
-    delete_refs_count,
-)
-
 
 def test_refs_count_workflow():
     # Test add
@@ -47,7 +44,7 @@ def test_refs_count_workflow():
     assert r4.r_lead_refs == 25
 
     # Test delete
-    deleted = delete_refs_count(r.r_id)
+    deleted = RefsCountService().delete(r.r_id)
     assert deleted is True
     assert get_refs_count(r.r_id) is None
 
@@ -151,12 +148,12 @@ class TestDeleteRefsCount:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         r = add_refs_count("Diazepam")
-        deleted = delete_refs_count(r.r_id)
+        deleted = RefsCountService().delete(r.r_id)
         assert deleted is True
         assert get_refs_count(r.r_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_refs_count(9999) is False
+        assert RefsCountService().delete(9999) is False
 
 
 class TestGetRefsCountsForTitle:

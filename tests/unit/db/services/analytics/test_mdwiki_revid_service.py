@@ -1,6 +1,7 @@
 import pytest
 
 from src.main_app.db.services.analytics.mdwiki_revid_service import (
+    MdwikiRevidService,
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
     get_mdwiki_revid_by_title,
@@ -8,10 +9,6 @@ from src.main_app.db.services.analytics.mdwiki_revid_service import (
     list_mdwiki_revids,
     update_mdwiki_revid,
 )
-from src.main_app.db.services.delete_service import (
-    delete_mdwiki_revid,
-)
-
 
 def test_mdwiki_revid_workflow():
     # Test add
@@ -40,7 +37,7 @@ def test_mdwiki_revid_workflow():
     assert r3.revid == 9999999
 
     # Test delete
-    delete_mdwiki_revid("Cell biology")
+    MdwikiRevidService().delete("Cell biology")
     assert get_mdwiki_revid_by_title("Cell biology") is None
 
 
@@ -122,11 +119,11 @@ class TestDeleteMdwikiRevid:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         add_mdwiki_revid("Ibuprofen", 9090909)
-        delete_mdwiki_revid("Ibuprofen")
+        MdwikiRevidService().delete("Ibuprofen")
         assert get_mdwiki_revid_by_title("Ibuprofen") is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_mdwiki_revid("Ghost") is False
+        assert MdwikiRevidService().delete("Ghost") is False
 
 
 class TestGetRevidForTitle:

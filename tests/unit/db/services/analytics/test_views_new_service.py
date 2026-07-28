@@ -2,6 +2,7 @@ import pytest
 
 from src.main_app.db.models import ViewsNewRecord
 from src.main_app.db.services.analytics.views_new_service import (
+    ViewsNewService,
     add_or_update_views_new,
     add_views_new,
     get_total_views_for_target,
@@ -12,10 +13,6 @@ from src.main_app.db.services.analytics.views_new_service import (
     list_views_new,
     update_views_new,
 )
-from src.main_app.db.services.delete_service import (
-    delete_views_new,
-)
-
 
 def test_views_new_workflow():
     # Test add
@@ -54,7 +51,7 @@ def test_views_new_workflow():
     assert v4.views == 1700000
 
     # Test delete
-    deleted = delete_views_new(v.id)
+    deleted = ViewsNewService().delete(v.id)
     assert deleted is True
     assert get_views_new(v.id) is None
 
@@ -186,12 +183,12 @@ class TestDeleteViewsNew:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         v = add_views_new("Asthma", "en", 2023)
-        deleted = delete_views_new(v.id)
+        deleted = ViewsNewService().delete(v.id)
         assert deleted is True
         assert get_views_new(v.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_views_new(9999) is False
+        assert ViewsNewService().delete(9999) is False
 
 
 class TestGetTotalViewsForTarget:

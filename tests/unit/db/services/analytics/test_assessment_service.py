@@ -8,11 +8,8 @@ from src.main_app.db.services.analytics.assessment_service import (
     get_assessment_by_title,
     list_assessments,
     update_assessment,
-)
-from src.main_app.db.services.delete_service import (
     delete_assessment,
 )
-
 
 def test_assessment_workflow():
     # Test add

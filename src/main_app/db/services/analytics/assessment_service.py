@@ -68,6 +68,9 @@ class AssessmentService(CRUDService[AssessmentRecord]):
         """Update an assessment record."""
         return self.update_or_404(assessment_id, **kwargs)
 
+    def delete_assessment(self, assessment_id: int) -> bool:
+        """Delete an assessment record."""
+        return self.delete(assessment_id)
 
 _crud = AssessmentService()
 list_assessments = _crud.list_assessments
@@ -76,6 +79,7 @@ get_assessment_by_title = _crud.get_assessment_by_title
 add_assessment = _crud.add_assessment
 add_or_update_assessment = _crud.add_or_update_assessment
 update_assessment = _crud.update_assessment
+delete_assessment = _crud.delete_assessment
 
 __all__ = [
     "list_assessments",
