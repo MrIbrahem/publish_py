@@ -91,7 +91,7 @@ class TestAddPage:
 
         with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
             with patch.object(_crud, "session", mock_session):
-                mock_session.commit.side_effect = IntegrityError(None, None, None) # type: ignore
+                mock_session.commit.side_effect = IntegrityError(None, None, None)  # type: ignore
                 with pytest.raises(ValueError, match="already exists"):
                     add_page("Duplicate", "lead", "Test", "en", "TestUser", "t1.html")
 

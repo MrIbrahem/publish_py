@@ -35,7 +35,6 @@ def csrf_app(sqlite_db) -> Flask:
     )
     mock_app.url_map.strict_slashes = False
 
-
     sqlite_db.init_app(mock_app)
 
     with mock_app.app_context():

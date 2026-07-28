@@ -222,6 +222,7 @@ def setup_db(mock_app: Flask):
         real_tables = [t for t in _db.metadata.tables.values() if not t.info.get("is_view")]
         _db.metadata.drop_all(_db.engine, tables=real_tables)
 
+
 @pytest.fixture
 def sqlite_db():
     yield _db

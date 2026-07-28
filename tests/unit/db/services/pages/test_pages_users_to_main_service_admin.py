@@ -213,7 +213,7 @@ class TestDeleteUserPage:
         assert sqlite_db.session.get(UserPageRecord, page_id) is None
         assert sqlite_db.session.get(PagesUsersToMainRecord, page_id) is None
 
-    def test_returns_true_when_user_page_only(self,sqlite_db):
+    def test_returns_true_when_user_page_only(self, sqlite_db):
         # PHP path: even if only the pages_users row is present, the deletion
         # should succeed (both queries are issued, idempotent).
         page = UserPageRecord(

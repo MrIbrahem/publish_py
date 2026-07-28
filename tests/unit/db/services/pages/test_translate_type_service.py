@@ -18,6 +18,7 @@ from src.main_app.db.services.pages.translate_type_service import (
     update_translate_type,
 )
 
+
 def test_translate_type_workflow():
     # Test add
     tt = add_translate_type("Medical history", 1, 0)
