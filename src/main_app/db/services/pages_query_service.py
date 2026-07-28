@@ -13,84 +13,94 @@ from ..models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllReco
 logger = logging.getLogger(__name__)
 
 
-def list_pages_users(limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
-    """
-    Return pages_users records with joined category campaign data.
+class PagesQueryService:
+    def __init__(self) -> None:
+        self.session = db.session
 
-    Query:
-        SELECT title, word, translate_type, cat, lang, user, target, date,
-               pupdate, add_date, deleted, mdwiki_revid, campaign
-        FROM pages_users p
-        LEFT JOIN categories ca ON p.cat = ca.category
-        WHERE (target != '' AND target IS NOT NULL)
-        ORDER BY pupdate DESC
-        LIMIT 100
-    """
-    query = (
-        db.session.query(
-            UserPageRecord,
-            CategoryRecord.campaign.label("campaign"),
+
+    def list_pages_users(self, limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
+        """
+        Return pages_users records with joined category campaign data.
+
+        Query:
+            SELECT title, word, translate_type, cat, lang, user, target, date,
+                pupdate, add_date, deleted, mdwiki_revid, campaign
+            FROM pages_users p
+            LEFT JOIN categories ca ON p.cat = ca.category
+            WHERE (target != '' AND target IS NOT NULL)
+            ORDER BY pupdate DESC
+            LIMIT 100
+        """
+        query = (
+            db.session.query(
+                UserPageRecord,
+                CategoryRecord.campaign.label("campaign"),
+            )
+            .outerjoin(CategoryRecord, UserPageRecord.cat == CategoryRecord.category)
+            .filter(UserPageRecord.target != "")
+            .filter(UserPageRecord.target.is_not(None))
         )
-        .outerjoin(CategoryRecord, UserPageRecord.cat == CategoryRecord.category)
-        .filter(UserPageRecord.target != "")
-        .filter(UserPageRecord.target.is_not(None))
-    )
 
-    if lang and lang.lower() != "all":
-        query = query.filter(UserPageRecord.lang == lang)
+        if lang and lang.lower() != "all":
+            query = query.filter(UserPageRecord.lang == lang)
 
-    results = query.order_by(UserPageRecord.pupdate.desc()).limit(limit).all()
+        results = query.order_by(UserPageRecord.pupdate.desc()).limit(limit).all()
 
-    return [
-        {
-            **row[0].to_dict(),
-            "campaign": row[1] if row[1] else row[0].cat,
-        }
-        for row in results
-    ]
+        return [
+            {
+                **row[0].to_dict(),
+                "campaign": row[1] if row[1] else row[0].cat,
+            }
+            for row in results
+        ]
 
 
-def list_pages_with_views(limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
-    """
-    Return pages records with views from views_new_all.
+    def list_pages_with_views(self, limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
+        """
+        Return pages records with views from views_new_all.
 
-    Query:
-        SELECT DISTINCT p.id, p.title, p.word, p.translate_type, p.cat, p.lang,
-               p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
-               p.mdwiki_revid,
-               (SELECT v.views FROM views_new_all v
-                WHERE p.target = v.target AND p.lang = v.lang) as views
-        FROM pages p
-        WHERE p.target != ''
-    """
-    views_subquery = (
-        db.session.query(ViewsNewAllRecord.views)
-        .filter(ViewsNewAllRecord.target == PageRecord.target)
-        .filter(ViewsNewAllRecord.lang == PageRecord.lang)
-        .correlate(PageRecord)
-        .scalar_subquery()
-    )
+        Query:
+            SELECT DISTINCT p.id, p.title, p.word, p.translate_type, p.cat, p.lang,
+                p.user, p.target, p.date, p.pupdate, p.add_date, p.deleted,
+                p.mdwiki_revid,
+                (SELECT v.views FROM views_new_all v
+                    WHERE p.target = v.target AND p.lang = v.lang) as views
+            FROM pages p
+            WHERE p.target != ''
+        """
+        views_subquery = (
+            db.session.query(ViewsNewAllRecord.views)
+            .filter(ViewsNewAllRecord.target == PageRecord.target)
+            .filter(ViewsNewAllRecord.lang == PageRecord.lang)
+            .correlate(PageRecord)
+            .scalar_subquery()
+        )
 
-    query = db.session.query(
-        PageRecord,
-        views_subquery.label("views"),
-    ).filter(PageRecord.target != "")
+        query = db.session.query(
+            PageRecord,
+            views_subquery.label("views"),
+        ).filter(PageRecord.target != "")
 
-    if lang and lang.lower() != "all":
-        query = query.filter(PageRecord.lang == lang)
+        if lang and lang.lower() != "all":
+            query = query.filter(PageRecord.lang == lang)
 
-    results = query.distinct().order_by(PageRecord.pupdate.desc()).limit(limit).all()
+        results = query.distinct().order_by(PageRecord.pupdate.desc()).limit(limit).all()
 
-    return [
-        {
-            **row[0].to_dict(),
-            "views": row[1],
-        }
-        for row in results
-    ]
+        return [
+            {
+                **row[0].to_dict(),
+                "views": row[1],
+            }
+            for row in results
+        ]
 
+
+_crud = PagesQueryService()
+list_pages_users = _crud.list_pages_users
+list_pages_with_views = _crud.list_pages_with_views
 
 __all__ = [
+    "PagesQueryService",
     "list_pages_users",
     "list_pages_with_views",
 ]

@@ -14,7 +14,6 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.delete_service import delete_full_translator
 from ...db.services.users import FullTranslatorService
 from ..decorators import admin_required
 
@@ -84,7 +83,8 @@ def _delete_full_translator(translator_id: int) -> ResponseReturnValue:
     """Remove a full translator entirely."""
 
     try:
-        record = delete_full_translator(translator_id)
+        service = FullTranslatorService()
+        record = service.delete(translator_id)
         if not record:
             raise ValueError(f"Unable to delete full translator with ID {translator_id}")
     except ValueError as exc:

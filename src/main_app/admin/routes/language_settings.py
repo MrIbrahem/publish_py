@@ -16,7 +16,6 @@ from flask.typing import ResponseReturnValue
 
 from ...db.services.config import LanguageSettingService
 from ...db.services.content import LangService
-from ...db.services.delete_service import delete_language_setting
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -99,7 +98,8 @@ def _delete_language_setting(setting_id: int) -> ResponseReturnValue:
     """Remove a language setting record entirely."""
 
     try:
-        record = delete_language_setting(setting_id)
+        service = LanguageSettingService()
+        record = service.delete(setting_id)
         if not record:
             raise ValueError(f"Unable to delete setting with ID {setting_id}")
     except ValueError as exc:

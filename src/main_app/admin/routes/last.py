@@ -9,8 +9,8 @@ from typing import Any
 
 from flask import render_template
 
-from ...db.services.content import CategoryService, LangService
-from ...db.services.pages_query_service import list_pages_users, list_pages_with_views
+from ...db.services import CategoryService, LangService
+from ...db.services import PagesQueryService
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +39,11 @@ def last_translations_dashboard(
         lang = "All"
 
     # Fetch data based on table type
+    service = PagesQueryService()
     if last_table == "pages":
-        rows = list_pages_with_views(limit=100, lang=lang)
+        rows = service.list_pages_with_views(limit=100, lang=lang)
     else:
-        rows = list_pages_users(limit=100, lang=lang)
+        rows = service.list_pages_users(limit=100, lang=lang)
 
     category_service = CategoryService()
     camps = category_service.get_camp_to_cats()

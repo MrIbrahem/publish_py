@@ -17,7 +17,6 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ...db.services.content import ProjectService
-from ...db.services.delete_service import delete_project
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -78,18 +77,18 @@ def _update_project(record_id: int, g_title: str) -> None:
 def _delete_project(record_id: int) -> None:
     """Remove a project record entirely."""
 
-    try:
-        record = delete_project(record_id)
-        if not record:
-            raise ValueError(f"Unable to delete project with ID {record_id}")
-    except ValueError as exc:
-        logger.exception("Unable to delete project")
-        flash(str(exc), "warning")
-    except Exception:
-        logger.exception("Unable to delete project.")
-        flash("Unable to delete project. Please try again.", "danger")
-    else:
+    project_service = ProjectService()
+    record = project_service.get_record_by_id(record_id)
+    if not record:
+        logger.error(f"Unable to find project with ID {record_id}")
+        flash(f"Unable to find project with ID {record_id}", "warning")
+        return
+
+    deleted = project_service.delete_record(record)
+    if deleted:
         flash(f"project for '{record_id}' removed.", "success")
+    else:
+        logger.exception(f"Unable to delete project with ID {record_id}")
 
 
 class ProjectsDashboard:

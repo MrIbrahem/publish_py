@@ -11,8 +11,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
 from ...db.services.content import LangService
-from ...db.services.delete_service import delete_user_page_to_main
-from ...db.services.pages import PagesService, PagesUsersToMainPagesService
+from ...db.services import PagesService, PagesUsersToMainPagesService
 from ...extensions import db
 
 logger = logging.getLogger(__name__)
@@ -39,8 +38,8 @@ class PagesUsersMainRoutes:
         """List user pages flagged for promotion to main pages."""
         lang = request.args.get("lang", "All")
 
+        pages_users_to_main_service = PagesUsersToMainPagesService()
         try:
-            pages_users_to_main_service = PagesUsersToMainPagesService()
             rows = pages_users_to_main_service.list_pending(lang=lang)
         except Exception:
             logger.exception("Failed to list pages_users_to_main lang=%r", lang)
@@ -145,8 +144,9 @@ class PagesUsersMainRoutes:
 
         flash("Translations added successfully.", "success")
 
+        pages_users_to_main_service = PagesUsersToMainPagesService()
         try:
-            deleted = delete_user_page_to_main(page_id)
+            deleted = pages_users_to_main_service.delete_user_page_to_main(page_id)
         except Exception:
             logger.exception("delete_user_page failed for id=%r", page_id)
             deleted = False

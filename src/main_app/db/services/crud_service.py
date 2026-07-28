@@ -152,8 +152,11 @@ class CRUDService[ModelT]:
         return instance
 
     def update_by_id(
-        self, pk: PKT, data: dict[str, Any], validate: bool = False
-    ) -> ModelT | None:  # pyright: ignore[reportInvalidTypeVarUse]
+        self,
+        pk: PKT,  # pyright: ignore[reportInvalidTypeVarUse]
+        data: dict[str, Any],
+        validate: bool = False,
+    ) -> ModelT | None:
         """Set attributes on `instance` and persist the change."""
         record = self.get_record_by_id(pk)
         if record is None:

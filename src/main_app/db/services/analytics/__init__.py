@@ -9,6 +9,7 @@ from ..delete_service import (
     delete_word,
 )
 from .assessment_service import (
+    AssessmentService,
     add_assessment,
     add_or_update_assessment,
     get_assessment,
@@ -17,6 +18,7 @@ from .assessment_service import (
     update_assessment,
 )
 from .enwiki_pageview_service import (
+    EnwikiPageviewService,
     add_enwiki_pageview,
     add_or_update_enwiki_pageview,
     get_enwiki_pageview,
@@ -26,6 +28,7 @@ from .enwiki_pageview_service import (
     update_enwiki_pageview,
 )
 from .mdwiki_revid_service import (
+    MdwikiRevidService,
     add_mdwiki_revid,
     add_or_update_mdwiki_revid,
     get_mdwiki_revid_by_title,
@@ -34,6 +37,7 @@ from .mdwiki_revid_service import (
     update_mdwiki_revid,
 )
 from .refs_count_service import (
+    RefsCountService,
     add_or_update_refs_count,
     add_refs_count,
     get_ref_counts_for_title,
@@ -43,6 +47,7 @@ from .refs_count_service import (
     update_refs_count,
 )
 from .views_new_service import (
+    ViewsNewService,
     add_or_update_views_new,
     add_views_new,
     get_total_views_for_target,
@@ -54,6 +59,7 @@ from .views_new_service import (
     update_views_new,
 )
 from .word_service import (
+    WordService,
     add_or_update_word,
     add_word,
     get_word,
@@ -64,6 +70,12 @@ from .word_service import (
 )
 
 __all__ = [
+    "MdwikiRevidService",
+    "EnwikiPageviewService",
+    "AssessmentService",
+    "RefsCountService",
+    "ViewsNewService",
+    "WordService",
     "list_assessments",
     "get_assessment",
     "get_assessment_by_title",

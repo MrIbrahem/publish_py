@@ -20,6 +20,7 @@ from .in_process_service import (
     update_in_process,
 )
 from .leaderboard_service import (
+    LeaderboardService,
     get_chart_data_formatted,
     get_leaderboard_chart_data,
     get_months_of_pages_years,
@@ -82,6 +83,7 @@ from .user_page_service import (
 )
 
 __all__ = [
+    "LeaderboardService",
     "PagesService",
     "PagesUsersToMainPagesService",
     "TranslateTypeService",

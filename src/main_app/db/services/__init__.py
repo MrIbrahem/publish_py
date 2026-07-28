@@ -2,6 +2,14 @@
 Shared db services, used in both admin and public blueprints
 """
 
+from .analytics import (
+    AssessmentService,
+    EnwikiPageviewService,
+    MdwikiRevidService,
+    RefsCountService,
+    ViewsNewService,
+    WordService,
+)
 from .config import (
     LanguageSettingService,
     SettingsService,
@@ -13,6 +21,7 @@ from .content import (
 )
 from .pages import (
     InProcessService,
+    LeaderboardService,
     PagesService,
     PagesUsersToMainPagesService,
     TranslateTypeService,
@@ -34,7 +43,19 @@ from .wikidata import (
     QidService,
 )
 
+from .pages_query_service import (
+    PagesQueryService,
+)
+
 __all__ = [
+    "PagesQueryService",
+    "LeaderboardService",
+    "MdwikiRevidService",
+    "EnwikiPageviewService",
+    "AssessmentService",
+    "RefsCountService",
+    "ViewsNewService",
+    "WordService",
     "FullTranslatorService",
     "UsersNoInprocessService",
     "PagesService",
