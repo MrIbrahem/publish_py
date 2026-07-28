@@ -66,10 +66,14 @@ def add_or_update_assessment(title: str, importance: str | None = None) -> Asses
     if not title:
         raise ValueError("Title is required")
 
-    return assessment_crud.upsert(keys={"title": title}, importance=importance)
+    instance, is_new = assessment_crud.upsert_by(
+        keys={"title": title},
+        importance=importance,
+    )
+    return instance
 
 
-def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
+def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord | None:
     """Update an assessment record."""
     if not kwargs:
         orm_obj = assessment_crud.get(assessment_id)
@@ -78,7 +82,7 @@ def update_assessment(assessment_id: int, **kwargs) -> AssessmentRecord:
         return orm_obj
 
     try:
-        return assessment_crud.update(assessment_id, **kwargs)
+        return assessment_crud.update_by_id(assessment_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"Assessment record with ID {assessment_id} not found") from exc
 

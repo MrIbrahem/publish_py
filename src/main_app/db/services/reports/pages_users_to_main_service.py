@@ -56,7 +56,7 @@ def add_pages_users_to_main(
         raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
 
 
-def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainRecord:
+def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainRecord | None:
     """Update a pages_users_to_main record."""
     if not kwargs:
         orm_obj = pages_users_to_main_crud.get(record_id)
@@ -65,7 +65,7 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
         return orm_obj
 
     try:
-        return pages_users_to_main_crud.update(record_id, **kwargs)
+        return pages_users_to_main_crud.update_by_id(record_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"PagesUsersToMain record with ID {record_id} not found") from exc
 

@@ -36,11 +36,7 @@ def list_words() -> list[WordRecord]:
 
 def get_word(word_id: int) -> WordRecord | None:
     """Get a word record by ID."""
-    orm_obj = word_crud.get(word_id)
-    if not orm_obj:
-        logger.warning(f"Word record with ID {word_id} not found")
-        return None
-    return orm_obj
+    return word_crud.get(word_id)
 
 
 def get_word_by_title(title: str) -> WordRecord | None:
@@ -73,15 +69,23 @@ def add_or_update_word(
     w_title = w_title.strip()
     if not w_title:
         raise ValueError("Title is required")
+    record = word_crud.get_by(w_title=w_title)
 
-    return word_crud.upsert(
-        keys={"w_title": w_title},
-        w_lead_words=w_lead_words,
-        w_all_words=w_all_words,
-    )
+    if record:
+        return word_crud.update(
+            record,
+            w_lead_words=w_lead_words,
+            w_all_words=w_all_words,
+        )
+    else:
+        return word_crud.create(
+            w_title=w_title,
+            w_lead_words=w_lead_words,
+            w_all_words=w_all_words,
+        )
 
 
-def update_word(word_id: int, **kwargs) -> WordRecord:
+def update_word(word_id: int, **kwargs) -> WordRecord | None:
     """Update a word record."""
     if not kwargs:
         orm_obj = word_crud.get(word_id)
@@ -90,7 +94,7 @@ def update_word(word_id: int, **kwargs) -> WordRecord:
         return orm_obj
 
     try:
-        return word_crud.update(word_id, **kwargs)
+        return word_crud.update_by_id(word_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"Word record with ID {word_id} not found") from exc
 

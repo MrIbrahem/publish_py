@@ -46,7 +46,7 @@ def add_category(
     orm_obj = category_crud.get_by(category=category)
     if orm_obj:
         orm_obj = category_crud.update(
-            orm_obj.id,
+            orm_obj,
             campaign=campaign or "",
             display=display or "",
             category2=category2,
@@ -64,9 +64,9 @@ def add_category(
     if is_default:
         # set this category as default by unsetting default flag on all other categories
         set_default_category(db.session)
-        orm_obj = category_crud.update(orm_obj.id, is_default=1)
+        orm_obj = category_crud.update(orm_obj, is_default=1)
     else:
-        orm_obj = category_crud.update(orm_obj.id, is_default=0)
+        orm_obj = category_crud.update(orm_obj, is_default=0)
 
     return orm_obj
 
@@ -81,9 +81,13 @@ def update_category(
     is_default: int = 0,
 ) -> CategoryRecord:
     """Update category."""
+    record = category_crud.get_record_by_id(category_id)
+    if not record:
+        raise ValueError(f"Category with ID {category_id} not found")
+
     try:
-        orm_obj = category_crud.update(
-            category_id,
+        record = category_crud.update(
+            record,
             category=category,
             campaign=campaign,
             display=display or "",
@@ -96,11 +100,11 @@ def update_category(
     if is_default:
         # set this category as default by unsetting default flag on all other categories
         set_default_category(db.session)
-        orm_obj = category_crud.update(orm_obj.id, is_default=1)
+        category_crud.update(record, is_default=1)
     else:
-        orm_obj = category_crud.update(orm_obj.id, is_default=0)
+        category_crud.update(record, is_default=0)
 
-    return orm_obj
+    return record
 
 
 def get_campaign_category(campaign: str) -> CategoryRecord | None:

@@ -81,15 +81,24 @@ def add_or_update_language_setting(
     if not lang_code:
         raise ValueError("Language code is required")
 
-    return language_setting_crud.upsert(
-        keys={"lang_code": lang_code},
-        move_dots=move_dots,
-        expend=expend,
-        add_en_lang=add_en_lang,
-    )
+    record = language_setting_crud.get_by(lang_code=lang_code)
+    if record:
+        return language_setting_crud.update(
+            record,
+            move_dots=move_dots,
+            expend=expend,
+            add_en_lang=add_en_lang,
+        )
+    else:
+        return language_setting_crud.create(
+            lang_code=lang_code,
+            move_dots=move_dots,
+            expend=expend,
+            add_en_lang=add_en_lang,
+        )
 
 
-def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
+def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord | None:
     """Update a language setting record."""
     if not kwargs:
         orm_obj = language_setting_crud.get(setting_id)
@@ -98,7 +107,7 @@ def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
         return orm_obj
 
     try:
-        return language_setting_crud.update(setting_id, **kwargs)
+        return language_setting_crud.update_by_id(setting_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"Language setting record with ID {setting_id} not found") from exc
 

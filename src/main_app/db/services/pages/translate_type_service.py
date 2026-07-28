@@ -106,7 +106,7 @@ def update_translate_type(
     tt_title: str | None = None,
     tt_lead: int | None = None,
     tt_full: int | None = None,
-) -> TranslateTypeRecord:
+) -> TranslateTypeRecord | None:
     """Update a translate_type record."""
     kwargs = {}
     if tt_title:
@@ -120,7 +120,7 @@ def update_translate_type(
         kwargs["tt_full"] = int(tt_full)
 
     try:
-        return translate_type_crud.update(tt_id, **kwargs)
+        return translate_type_crud.update_by_id(tt_id, **kwargs)
     except IntegrityError:
         raise UniqueError(title=tt_title) from None
     except ValueError as exc:

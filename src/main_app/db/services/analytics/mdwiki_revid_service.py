@@ -51,21 +51,28 @@ def add_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
         raise ValueError(f"MDWiki revid for '{title}' already exists") from None
 
 
-def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
+def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord | None:
     """Add or update an mdwiki_revid record."""
     title = title.strip()
     if not title:
         raise ValueError("Title is required")
 
-    return mdwiki_revid_crud.upsert(keys={"title": title}, revid=revid)
+    record = mdwiki_revid_crud.get_by(title=title)
+    if record:
+        return mdwiki_revid_crud.update(record, revid=revid)
+
+    return mdwiki_revid_crud.create(title=title, revid=revid)
 
 
-def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
+def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord | None:
     """Update an mdwiki_revid record."""
+    record = mdwiki_revid_crud.get_by(title=title)
+    if not record:
+        raise ValueError(f"MDWiki revid record for '{title}' not found")
     try:
-        return mdwiki_revid_crud.update(title, revid=revid)
-    except ValueError as exc:
-        raise ValueError(f"MDWiki revid record for '{title}' not found") from exc
+        return mdwiki_revid_crud.update(record, revid=revid)
+    except Exception as e:
+        raise ValueError(f"Failed to update MDWiki revid record for '{title}': {e}") from e
 
 
 def get_revid_for_title(title: str) -> int | None:

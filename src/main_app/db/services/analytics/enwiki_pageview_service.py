@@ -71,10 +71,14 @@ def add_or_update_enwiki_pageview(title: str, en_views: int | None = 0) -> Enwik
     if not title:
         raise ValueError("Title is required")
 
-    return enwiki_pageview_crud.upsert(keys={"title": title}, en_views=en_views)
+    instance, is_new = enwiki_pageview_crud.upsert_by(
+        keys={"title": title},
+        en_views=en_views,
+    )
+    return instance
 
 
-def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
+def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord | None:
     """Update an enwiki pageview record."""
     if not kwargs:
         orm_obj = enwiki_pageview_crud.get(pageview_id)
@@ -83,7 +87,7 @@ def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
         return orm_obj
 
     try:
-        return enwiki_pageview_crud.update(pageview_id, **kwargs)
+        return enwiki_pageview_crud.update_by_id(pageview_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found") from exc
 

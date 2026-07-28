@@ -74,14 +74,28 @@ def add_or_update_refs_count(
     if not r_title:
         raise ValueError("Title is required")
 
-    return refs_count_crud.upsert(
+    instance, is_new = refs_count_crud.upsert_by(
         keys={"r_title": r_title},
         r_lead_refs=r_lead_refs,
         r_all_refs=r_all_refs,
     )
 
+    record = refs_count_crud.get_by(r_title=r_title)
+    if record:
+        return refs_count_crud.update(
+            record,
+            r_lead_refs=r_lead_refs,
+            r_all_refs=r_all_refs,
+        )
+    else:
+        return refs_count_crud.create(
+            r_title=r_title,
+            r_lead_refs=r_lead_refs,
+            r_all_refs=r_all_refs,
+        )
 
-def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
+
+def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord | None:
     """Update a refs_count record."""
     if not kwargs:
         orm_obj = refs_count_crud.get(refs_id)
@@ -90,7 +104,7 @@ def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord:
         return orm_obj
 
     try:
-        return refs_count_crud.update(refs_id, **kwargs)
+        return refs_count_crud.update_by_id(refs_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"RefsCount record with ID {refs_id} not found") from exc
 

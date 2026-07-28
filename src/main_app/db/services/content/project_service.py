@@ -60,7 +60,7 @@ def add_project(g_title: str) -> ProjectRecord:
         raise ValueError(f"Project '{g_title}' already exists") from None
 
 
-def update_project(project_id: int, **kwargs) -> ProjectRecord:
+def update_project(project_id: int, **kwargs) -> ProjectRecord | None:
     """Update a project record."""
     if not kwargs:
         orm_obj = project_crud.get(project_id)
@@ -82,7 +82,7 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord:
             normalized_kwargs[key] = value
 
     try:
-        return project_crud.update(project_id, **normalized_kwargs)
+        return project_crud.update_by_id(project_id, **normalized_kwargs)
     except ValueError as exc:
         raise ValueError(f"Project record with ID {project_id} not found") from exc
 
@@ -94,7 +94,7 @@ def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
         raise ValueError("Project title is required")
 
     try:
-        return project_crud.update(project_id, g_title=g_title)
+        return project_crud.update_by_id(project_id, g_title=g_title)
     except ValueError as exc:
         raise ValueError(f"Project record with ID {project_id} not found") from exc
 

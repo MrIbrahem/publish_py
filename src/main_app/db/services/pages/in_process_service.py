@@ -103,7 +103,7 @@ def add_in_process(
         raise ValueError(f"In-process record for '{title}' by '{user}' in '{lang}' already exists") from None
 
 
-def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
+def update_in_process(process_id: int, **kwargs) -> InProcessRecord | None:
     """Update an in_process record."""
     if not kwargs:
         orm_obj = in_process_crud.get(process_id)
@@ -112,7 +112,7 @@ def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
         return orm_obj
 
     try:
-        return in_process_crud.update(process_id, **kwargs)
+        return in_process_crud.update_by_id(process_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"In-process record with ID {process_id} not found") from exc
 

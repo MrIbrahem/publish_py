@@ -136,7 +136,7 @@ def update_user_page(
 ) -> UserPageRecord:
     """Update page."""
     try:
-        return user_pages_crud.update(page_id, title=title, target=target, **kwargs)
+        return user_pages_crud.update_by_id(page_id, title=title, target=target, **kwargs)
     except ValueError as exc:
         raise LookupError(f"Page id {page_id} was not found") from exc
 
@@ -147,7 +147,7 @@ def set_user_page_target(
 ) -> bool:
     """ """
     try:
-        user_pages_crud.update(record.id, target=target, pupdate=datetime.now().strftime("%Y-%m-%d"))
+        user_pages_crud.update(record, target=target, pupdate=datetime.now().strftime("%Y-%m-%d"))
         return True
     except Exception:
         logger.exception("Failed to update page target")

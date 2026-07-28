@@ -76,10 +76,14 @@ def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoIn
     if not user:
         raise ValueError("User is required")
 
-    return users_no_inprocess_crud.upsert(keys={"user": user}, is_active=is_active)
+    record = users_no_inprocess_crud.get_by(user=user)
+    if record:
+        return users_no_inprocess_crud.update(record, is_active=is_active)
+    else:
+        return users_no_inprocess_crud.create(user=user, is_active=is_active)
 
 
-def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecord:
+def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecord | None:
     """Update a users_no_inprocess record."""
     if not kwargs:
         orm_obj = users_no_inprocess_crud.get(record_id)
@@ -88,7 +92,7 @@ def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecor
         return orm_obj
 
     try:
-        return users_no_inprocess_crud.update(record_id, **kwargs)
+        return users_no_inprocess_crud.update_by_id(record_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"UsersNoInprocess record with ID {record_id} not found") from exc
 

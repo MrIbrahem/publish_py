@@ -107,13 +107,22 @@ def add_or_update_views_new(
     if not lang:
         raise ValueError("Language is required")
 
-    return views_new_crud.upsert(
-        keys={"target": target, "lang": lang, "year": year},
-        views=views,
-    )
+    record = views_new_crud.get_by(target=target, lang=lang, year=year)
+    if record:
+        return views_new_crud.update(
+            record,
+            views=views,
+        )
+    else:
+        return views_new_crud.create(
+            target=target,
+            lang=lang,
+            year=year,
+            views=views,
+        )
 
 
-def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
+def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord | None:
     """Update a views_new record."""
     if not kwargs:
         orm_obj = views_new_crud.get(view_id)
@@ -122,7 +131,7 @@ def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord:
         return orm_obj
 
     try:
-        return views_new_crud.update(view_id, **kwargs)
+        return views_new_crud.update_by_id(view_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"ViewsNew record with ID {view_id} not found") from exc
 

@@ -76,13 +76,13 @@ def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslat
     if not user:
         raise ValueError("User is required")
 
-    return full_translator_crud.upsert(
-        keys={"user": user},
-        is_active=is_active,
-    )
+    record = full_translator_crud.get_by(user=user)
+    if record:
+        return full_translator_crud.update(record, is_active=is_active)
+    else:
+        return full_translator_crud.create(user=user, is_active=is_active)
 
-
-def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord:
+def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord | None:
     """Update a full translator record."""
     if not kwargs:
         orm_obj = full_translator_crud.get(translator_id)
@@ -91,7 +91,7 @@ def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord
         return orm_obj
 
     try:
-        return full_translator_crud.update(translator_id, **kwargs)
+        return full_translator_crud.update_by_id(translator_id, **kwargs)
     except ValueError as exc:
         raise ValueError(f"Full translator record with ID {translator_id} not found") from exc
 

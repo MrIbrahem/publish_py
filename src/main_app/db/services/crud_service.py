@@ -176,6 +176,17 @@ class CRUDService[ModelT]:
             return self.update(instance, **fields), False
         return self.create(**fields), True
 
+    def upsert_by(self, keys: dict[str, Any], **fields: Any) -> tuple[ModelT, bool]:
+        """
+        Update the row with primary key `pk` if it exists, else create it.
+        Returns (instance, created).
+        """
+        instance = self.get_by(**keys)
+        if instance is not None:
+            return self.update(instance, **fields), False
+        data = {**keys, **fields}
+        return self.create(**data), True
+
     def bulk_create(self, items: Iterable[dict[str, Any]]) -> Sequence[ModelT]:
         instances = [self.model(**fields) for fields in items]
         self.session.add_all(instances)
