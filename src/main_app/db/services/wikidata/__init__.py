@@ -5,6 +5,7 @@ from ..delete_service import (
     delete_qid_other,
 )
 from .allqid_service import (
+    AllQidsService,
     list_targets_by_lang,
 )
 from .qid_others_service import (
@@ -15,6 +16,7 @@ from .qid_service import (
 )
 
 __all__ = [
+    "AllQidsService",
     "QidService",
     "QidOthersService",
     "list_targets_by_lang",

@@ -53,6 +53,7 @@ from .pages_users_to_main_service import (
     list_pending,
 )
 from .results_2026_service import (
+    Results2026Service,
     exists_by_lang_and_category,
     missing_by_lang_and_category,
 )
@@ -83,6 +84,7 @@ from .user_page_service import (
 )
 
 __all__ = [
+    "Results2026Service",
     "LeaderboardService",
     "PagesService",
     "PagesUsersToMainPagesService",

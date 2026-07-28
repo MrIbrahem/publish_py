@@ -20,6 +20,7 @@ from .content import (
     ProjectService,
 )
 from .pages import (
+    Results2026Service,
     InProcessService,
     LeaderboardService,
     PagesService,
@@ -40,6 +41,7 @@ from .users import (
 )
 from .wikidata import (
     QidOthersService,
+    AllQidsService,
     QidService,
 )
 
@@ -48,6 +50,8 @@ from .pages_query_service import (
 )
 
 __all__ = [
+    "Results2026Service",
+    "AllQidsService",
     "PagesQueryService",
     "LeaderboardService",
     "MdwikiRevidService",
