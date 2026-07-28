@@ -335,7 +335,93 @@ Important constraints:
 * Pay special attention to functions that may have the same name across different service modules.
 
 ---
+### Service Instance Reuse
 
+When refactoring callers, choose the service instantiation pattern based on how the service is used.
+
+#### If multiple methods from the same service are used inside a class
+
+Prefer creating one service instance and storing it on `self`:
+
+```python
+class SomeClass:
+    def __init__(self):
+        self.language_setting_service = LanguageSettingService()
+
+    def process_setting(self, setting_id):
+        setting = self.language_setting_service.get_language_setting(setting_id)
+        return setting
+
+    def get_settings(self):
+        return self.language_setting_service.list_language_settings()
+```
+
+Do **not** repeatedly instantiate the same service in every method:
+
+```python
+class SomeClass:
+    def process_setting(self, setting_id):
+        service = LanguageSettingService()
+        return service.get_language_setting(setting_id)
+
+    def get_settings(self):
+        service = LanguageSettingService()
+        return service.list_language_settings()
+```
+
+If the class already has an appropriate constructor, add the service instance there.
+
+Use a clear and descriptive attribute name based on the service:
+
+```python
+self.language_setting_service = LanguageSettingService()
+self.users_service = UsersService()
+self.pages_service = PagesService()
+self.project_service = ProjectService()
+```
+
+Then reuse that instance throughout the class.
+
+#### If only one service method is used
+
+A local instance may be sufficient:
+
+```python
+def get_setting(self, setting_id):
+    service = LanguageSettingService()
+    return service.get_language_setting(setting_id)
+```
+
+However, if the service is already available through dependency injection or an existing class attribute, reuse the existing instance instead of creating another one.
+
+#### If several services are used
+
+Keep each service as a separate clearly named instance:
+
+```python
+class SomeClass:
+    def __init__(self):
+        self.users_service = UsersService()
+        self.pages_service = PagesService()
+        self.project_service = ProjectService()
+```
+
+Use these instances consistently throughout the class.
+
+#### Important
+
+Before introducing `self.some_service = SomeService()`, inspect the existing class architecture and follow its established dependency injection and initialization patterns.
+
+Do not blindly add services to `__init__` if the class is instantiated in a way that would break existing callers. Preserve compatibility and existing lifecycle/session behavior.
+
+The refactoring should prioritize:
+
+1. Reuse an existing service instance if one already exists.
+2. If multiple methods from the same service are used by a class, create one `self.<service_name>` instance and reuse it.
+3. If only one method is used in a single function, a local service instance is acceptable.
+4. Follow existing dependency injection patterns when available.
+5. Avoid repeatedly creating the same service instance unnecessarily.
+6. 
 # Validation Requirements
 
 After completing the refactor:
