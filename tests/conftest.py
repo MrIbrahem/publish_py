@@ -116,6 +116,18 @@ def mock_client(mock_app: Flask) -> FlaskClient:
     """
     return mock_app.test_client()
 
+@pytest.fixture
+def test_client(mock_app: Flask) -> FlaskClient:
+    """Create a test client for the app.
+
+    Args:
+        mock_app: The Flask application fixture.
+
+    Returns:
+        Test client for making HTTP requests.
+    """
+    return mock_app.test_client()
+
 
 @pytest.fixture
 def runner(mock_app):
