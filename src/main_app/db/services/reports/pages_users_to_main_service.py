@@ -29,8 +29,7 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
             )
         )
 
-
-    def get_pages_users_to_main(self,record_id: int) -> PagesUsersToMainRecord | None:
+    def get_pages_users_to_main(self, record_id: int) -> PagesUsersToMainRecord | None:
         """Get a pages_users_to_main record by ID."""
         orm_obj = self.get(record_id)
         if not orm_obj:
@@ -38,8 +37,8 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
             return None
         return orm_obj
 
-
-    def add_pages_users_to_main(self,
+    def add_pages_users_to_main(
+        self,
         id: int | None = None,
         new_target: str = "",
         new_user: str = "",
@@ -51,8 +50,7 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
         except IntegrityError as e:
             raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
 
-
-    def update_pages_users_to_main(self,record_id: int, **kwargs) -> PagesUsersToMainRecord | None:
+    def update_pages_users_to_main(self, record_id: int, **kwargs) -> PagesUsersToMainRecord | None:
         """Update a pages_users_to_main record."""
         return self.update_or_404(record_id, **kwargs)
 

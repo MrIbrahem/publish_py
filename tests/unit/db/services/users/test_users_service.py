@@ -127,6 +127,7 @@ class TestUpdateUser:
         result = update_user_data(u.user_id)
         assert result.username == "No_Change"
 
+
 class TestDeleteUser:
     """Tests for delete_user function."""
 

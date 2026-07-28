@@ -32,8 +32,7 @@ class UserPagesService(CRUDService[UserPageRecord]):
             )
         )
 
-
-    def list_translated(self,lang: str = "All", limit: int = 500, offset: int = 0) -> list[UserPageRecord]:
+    def list_translated(self, lang: str = "All", limit: int = 500, offset: int = 0) -> list[UserPageRecord]:
         """Return translated user pages (target not empty) optionally filtered by language."""
         query = self.session.query(UserPageRecord).filter(
             UserPageRecord.target.isnot(None), UserPageRecord.target != ""
@@ -42,8 +41,7 @@ class UserPagesService(CRUDService[UserPageRecord]):
             query = query.filter(UserPageRecord.lang == lang)
         return query.order_by(UserPageRecord.id.desc()).limit(limit).offset(offset).all()
 
-
-    def count_translated(self,lang: str = "All") -> int:
+    def count_translated(self, lang: str = "All") -> int:
         """Return total count of translated user pages, optionally filtered by language."""
         query = self.session.query(func.count(UserPageRecord.id)).filter(
             UserPageRecord.target.isnot(None), UserPageRecord.target != ""
@@ -52,18 +50,16 @@ class UserPagesService(CRUDService[UserPageRecord]):
             query = query.filter(UserPageRecord.lang == lang)
         return int(query.scalar() or 0)
 
-
-    def get_by_id(self,page_id: int) -> UserPageRecord | None:
+    def get_by_id(self, page_id: int) -> UserPageRecord | None:
         """Return a single user page row by id, or None when missing."""
         return self.get(page_id)
 
-
-    def get_user_page_by_id(self,page_id: int) -> UserPageRecord | None:
+    def get_user_page_by_id(self, page_id: int) -> UserPageRecord | None:
         """Return a single user page row by id, or None when missing."""
         return self.get(page_id)
 
-
-    def add_user_page(self,
+    def add_user_page(
+        self,
         sourcetitle: str,
         translate_type: str,
         cat: str,
@@ -95,8 +91,8 @@ class UserPagesService(CRUDService[UserPageRecord]):
             logger.error(f"Failed to add page: {e}")
             raise
 
-
-    def insert_user_page_target(self,
+    def insert_user_page_target(
+        self,
         sourcetitle: str,
         translate_type: str,
         cat: str,
@@ -123,8 +119,8 @@ class UserPagesService(CRUDService[UserPageRecord]):
             logger.error(f"Failed to insert user page target: {e}")
             return False
 
-
-    def update_user_page(self,
+    def update_user_page(
+        self,
         page_id: int,
         title: str,
         target: str,
@@ -137,8 +133,8 @@ class UserPagesService(CRUDService[UserPageRecord]):
         except ValueError as exc:
             raise LookupError(f"Page id {page_id} was not found") from exc
 
-
-    def set_user_page_target(self,
+    def set_user_page_target(
+        self,
         record: UserPageRecord,
         target: str,
     ) -> bool:
@@ -150,8 +146,8 @@ class UserPagesService(CRUDService[UserPageRecord]):
             logger.exception("Failed to update page target")
             return False
 
-
-    def find_user_page_record(self,
+    def find_user_page_record(
+        self,
         title: str,
         lang: str,
         user: str,
@@ -160,7 +156,6 @@ class UserPagesService(CRUDService[UserPageRecord]):
         Check if record exists
         """
         return self.get_by(title=title, lang=lang, user=user)
-
 
 
 _crud = UserPagesService()

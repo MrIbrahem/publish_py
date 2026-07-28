@@ -107,6 +107,7 @@ class TestUpdatePage:
         assert updated.title == "Social Science"
         assert updated.target == "Social_Science.html"
 
+
 class TestDeletePage:
     """Tests for delete_page function."""
 

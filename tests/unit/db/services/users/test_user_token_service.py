@@ -129,7 +129,6 @@ class TestCreateUserToken:
         assert result.access_secret == b"secret"
 
 
-
 class TestUpsertUserToken:
     """Tests for upsert_user_token."""
 

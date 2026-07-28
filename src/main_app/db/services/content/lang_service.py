@@ -21,7 +21,9 @@ class LangService(CRUDService[LangRecord]):
     def __init__(self):
         super().__init__(db.session, LangRecord)
 
-    def list_langs(self,) -> list[LangRecord]:
+    def list_langs(
+        self,
+    ) -> list[LangRecord]:
         """Return all language records."""
         return list(
             self.list(
@@ -29,8 +31,7 @@ class LangService(CRUDService[LangRecord]):
             )
         )
 
-
-    def get_lang(self,lang_id: int) -> LangRecord | None:
+    def get_lang(self, lang_id: int) -> LangRecord | None:
         """Get a language record by ID."""
         orm_obj = self.get(lang_id)
         if not orm_obj:
@@ -38,13 +39,12 @@ class LangService(CRUDService[LangRecord]):
             return None
         return orm_obj
 
-
-    def get_lang_by_code(self,code: str) -> LangRecord | None:
+    def get_lang_by_code(self, code: str) -> LangRecord | None:
         """Get a language record by code."""
         return self.get_by(code=code)
 
-
-    def add_lang(self,
+    def add_lang(
+        self,
         code: str,
         autonym: str,
         name: str,
@@ -60,8 +60,8 @@ class LangService(CRUDService[LangRecord]):
         except IntegrityError:
             raise ValueError(f"Language '{code}' already exists") from None
 
-
-    def add_or_update_lang(self,
+    def add_or_update_lang(
+        self,
         code: str,
         autonym: str,
         name: str,

@@ -21,7 +21,6 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
     def __init__(self):
         super().__init__(db.session, MdwikiRevidRecord)
 
-
     def list_mdwiki_revids(self) -> list[MdwikiRevidRecord]:
         """Return all mdwiki_revid records."""
         return list(
@@ -30,11 +29,9 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
             )
         )
 
-
     def get_mdwiki_revid_by_title(self, title: str) -> MdwikiRevidRecord | None:
         """Get an mdwiki_revid record by title."""
         return self.get(title)
-
 
     def add_mdwiki_revid(self, title: str, revid: int) -> MdwikiRevidRecord:
         """Add a new mdwiki_revid record."""
@@ -46,7 +43,6 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
             return self.create(title=title, revid=revid)
         except IntegrityError:
             raise ValueError(f"MDWiki revid for '{title}' already exists") from None
-
 
     def add_or_update_mdwiki_revid(self, title: str, revid: int) -> MdwikiRevidRecord | None:
         """Add or update an mdwiki_revid record."""
@@ -60,7 +56,6 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
         )
         return instance
 
-
     def update_mdwiki_revid(self, title: str, revid: int) -> MdwikiRevidRecord | None:
         """Update an mdwiki_revid record."""
         record = self.get_by(title=title)
@@ -71,12 +66,10 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
         except Exception as e:
             raise ValueError(f"Failed to update MDWiki revid record for '{title}': {e}") from e
 
-
     def get_revid_for_title(self, title: str) -> int | None:
         """Get the revision ID for a title."""
         record = self.get_mdwiki_revid_by_title(title)
         return record.revid if record else None
-
 
 
 mdwiki_revid_crud = MdwikiRevidService()

@@ -22,8 +22,9 @@ class ReportService(CRUDService[ReportRecord]):
     def __init__(self):
         super().__init__(db.session, ReportRecord)
 
-
-    def list_reports(self,) -> list[ReportRecord]:
+    def list_reports(
+        self,
+    ) -> list[ReportRecord]:
         """Return all report records."""
         return list(
             self.list(
@@ -31,8 +32,8 @@ class ReportService(CRUDService[ReportRecord]):
             )
         )
 
-
-    def add_report(self,
+    def add_report(
+        self,
         title: str,
         user: str,
         lang: str,
@@ -51,8 +52,8 @@ class ReportService(CRUDService[ReportRecord]):
             date=func.now(),
         )
 
-
-    def query_reports_with_filters(self,
+    def query_reports_with_filters(
+        self,
         filters: dict[str, Any],
         select_fields: list[str] | None = None,
         limit: int | None = None,
@@ -116,6 +117,7 @@ class ReportService(CRUDService[ReportRecord]):
         orm_objs = query.all()
 
         return orm_objs
+
 
 _crud = ReportService()
 list_reports = _crud.list_reports

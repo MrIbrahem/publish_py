@@ -29,7 +29,6 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
             )
         )
 
-
     def list_active_full_translators(self) -> list[FullTranslatorRecord]:
         """Return all is_active full translator records."""
         return list(
@@ -39,7 +38,6 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
             )
         )
 
-
     def get_full_translator(self, translator_id: int) -> FullTranslatorRecord | None:
         """Get a full translator record by ID."""
         orm_obj = self.get(translator_id)
@@ -48,11 +46,9 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
             return None
         return orm_obj
 
-
     def get_full_translator_by_user(self, user: str) -> FullTranslatorRecord | None:
         """Get a full translator record by username."""
         return self.get_by(user=user)
-
 
     def add_full_translator(self, user: str, is_active: int = 1) -> FullTranslatorRecord:
         """Add a new full translator record."""
@@ -64,7 +60,6 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
             return self.create(user=user, is_active=is_active)
         except IntegrityError:
             raise ValueError(f"Full translator '{user}' already exists") from None
-
 
     def add_or_update_full_translator(self, user: str, is_active: int = 1) -> FullTranslatorRecord:
         """Add or update a full translator record."""
@@ -78,11 +73,9 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
         )
         return instance
 
-
     def update_full_translator(self, translator_id: int, **kwargs) -> FullTranslatorRecord | None:
         """Update a full translator record."""
         return self.update_or_404(translator_id, **kwargs)
-
 
     def is_full_translator(self, user: str) -> bool:
         """Check if a user is a full translator."""
@@ -90,10 +83,9 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
         return record is not None and record.is_active == 1
 
 
-
 _crud = FullTranslatorService()
 
-list_full_translators= _crud.list_full_translators
+list_full_translators = _crud.list_full_translators
 list_active_full_translators = _crud.list_active_full_translators
 get_full_translator = _crud.get_full_translator
 get_full_translator_by_user = _crud.get_full_translator_by_user

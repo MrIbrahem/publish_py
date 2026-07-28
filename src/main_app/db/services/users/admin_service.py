@@ -92,7 +92,7 @@ class AdminService(CRUDService[AdminUserRecord]):
             self.session.rollback()
             return None
 
-    def delete_coordinator(self,coordinator_id: int) -> bool:
+    def delete_coordinator(self, coordinator_id: int) -> bool:
         return self.delete(coordinator_id)
 
 
