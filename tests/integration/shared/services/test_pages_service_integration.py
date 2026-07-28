@@ -18,10 +18,6 @@ These tests complement the unit tests by verifying the service-to-DB integration
 
 from src.main_app.db.services.pages.page_service import (
     PagesService,
-    add_page,
-    insert_page_target,
-    list_pages,
-    update_page,
 )
 
 
@@ -30,22 +26,26 @@ class TestPagesServiceIntegration:
 
     def test_full_page_lifecycle(self):
         """Test complete CRUD lifecycle through service layer."""
-        result = add_page("TestPage", "lead", "Test", "en", "TestUser", "TestFile")
+        page_service = PagesService()
+
+        result = page_service.add_page("TestPage", "lead", "Test", "en", "TestUser", "TestFile")
         assert result.title == "TestPage"
 
-        pages = list_pages()
+        pages = page_service.list_pages()
         assert len(pages) == 1
         assert pages[0].title == "TestPage"
 
-        result = update_page(result.id, "UpdatedPage", "UpdatedFile")
+        result = page_service.update_page(result.id, "UpdatedPage", "UpdatedFile")
         assert result.title == "UpdatedPage"
 
-        deleted = PagesService().delete(result.id)
+        deleted = page_service.delete(result.id)
         assert deleted is True
 
     def test_insert_page_target_integration(self):
         """Test insert_page_target through service layer."""
-        result = insert_page_target(
+        page_service = PagesService()
+
+        result = page_service.insert_page_target(
             sourcetitle="SourceTitle",
             translate_type="Lead",
             cat="Category:Health",
@@ -64,7 +64,9 @@ class TestPagesServiceErrorHandling:
 
     def test_insert_page_target_error_propagation(self):
         """Test that errors from DB are returned through service."""
-        result = insert_page_target(
+        page_service = PagesService()
+
+        result = page_service.insert_page_target(
             sourcetitle="Source",
             translate_type="Lead",
             cat="Category",
