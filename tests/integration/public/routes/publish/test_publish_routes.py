@@ -34,7 +34,7 @@ def mock_user_token():
     _mock.decrypted.return_value = ("access_key", "access_secret")
 
     with patch(
-        "src.main_app.public.routes.publish.routes.get_user_token_by_username",
+        "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
         return_value=_mock,
     ) as mock_get_token:
         yield mock_get_token
@@ -81,7 +81,7 @@ class TestPublishPost:
         """Test that missing user token returns 403."""
 
         with patch(
-            "src.main_app.public.routes.publish.routes.get_user_token_by_username",
+            "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
             return_value=None,
         ):
 

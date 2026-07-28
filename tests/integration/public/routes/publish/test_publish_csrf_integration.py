@@ -64,8 +64,10 @@ class TestPublishEndpointWithDenyCSRF:
     def test_cors_validation_still_works(self, mock_is_denied, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
         with (
-            patch("src.main_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
-            patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
+            patch(
+                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username"
+            ) as mock_get_token,
+            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
             mock_load_reports_db_instance = MagicMock()
@@ -97,9 +99,11 @@ class TestPublishEndpointWithCSRF2:
     def test_no_access_returns_403_with_csrf_enabled(self, mock_is_allowed, csrf_client):
         """Test that no access error returns 403 even with CSRF enabled."""
         with (
-            patch("src.main_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token,
+            patch(
+                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username"
+            ) as mock_get_token,
             patch("src.main_app.public.routes.publish.worker.to_do") as _mock_to_do,
-            patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
+            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_load_reports_db,
         ):
             mock_get_token.return_value = None
 
@@ -130,7 +134,7 @@ class BasePublishTest:
 
     @pytest.fixture(autouse=True)
     def mock_get_campaign_category(self, mocker):
-        with patch("src.main_app.public.routes.publish.to_db.get_campaign_category") as mocked:
+        with patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category") as mocked:
             mocked.return_value = None
             yield mocked
 
@@ -142,7 +146,9 @@ class BasePublishTest:
 
     @pytest.fixture(autouse=True)
     def mock_token(self):
-        with patch("src.main_app.public.routes.publish.routes.get_user_token_by_username") as mock_get_token:
+        with patch(
+            "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username"
+        ) as mock_get_token:
             token = MagicMock()
             token.decrypted.return_value = ("access_key", "access_secret")
             mock_get_token.return_value = token
@@ -159,12 +165,14 @@ class BasePublishTest:
             patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.main_app.public.routes.publish.worker.add_report") as mock_load_reports_db,
+            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_load_reports_db,
             patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
             patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
             patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page") as mock_user_find_exists,
-            patch("src.main_app.public.routes.publish.to_db.insert_page_target") as mock_insert_page,
-            patch("src.main_app.public.routes.publish.to_db.insert_user_page_target") as mock_insert_user_page,
+            patch("src.main_app.public.routes.publish.to_db.PagesService.insert_page_target") as mock_insert_page,
+            patch(
+                "src.main_app.public.routes.publish.to_db.UserPagesService.insert_user_page_target"
+            ) as mock_insert_user_page,
         ):
             # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
@@ -359,7 +367,7 @@ class TestComplexWorkflows(BasePublishTest):
             self.mock_get_token.side_effect = get_token_side_effect
 
             with patch(
-                "src.main_app.public.routes.publish.worker.get_user_token_by_username",
+                "src.main_app.public.routes.publish.worker.UserTokenService.get_user_token_by_username",
                 side_effect=get_token_side_effect,
             ):
                 response = self._post(csrf_client, self._default_payload())

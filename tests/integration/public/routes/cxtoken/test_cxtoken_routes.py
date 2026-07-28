@@ -68,7 +68,9 @@ class TestCxTokenGet:
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+            with patch(
+                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
+            ) as mock_get_token:
                 mock_get_token.return_value = None
 
                 response = mock_client.get("/cxtoken/?wiki=en&user=TestUser")
@@ -85,7 +87,9 @@ class TestCxTokenGet:
             mock_user_token = MagicMock()
             mock_user_token.decrypted.return_value = ("access_key", "access_secret")
 
-            with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+            with patch(
+                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
+            ) as mock_get_token:
                 mock_get_token.return_value = mock_user_token
 
                 with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
@@ -127,7 +131,9 @@ class TestCxTokenUserFormatting:
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+            with patch(
+                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
+            ) as mock_get_token:
                 mock_get_token.return_value = None
 
                 with patch("src.main_app.public.routes.cxtoken.routes._format_user") as mock_format:
@@ -146,7 +152,9 @@ class TestCxTokenUserFormatting:
             with patch("src.main_app.public.routes.cxtoken.routes.settings") as mock_settings:
                 mock_settings.users.special_users = {"SpecialUser": "MappedUser"}
 
-                with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+                with patch(
+                    "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
+                ) as mock_get_token:
                     mock_get_token.return_value = None
 
                     mock_client.get("/cxtoken/?wiki=en&user=SpecialUser")
