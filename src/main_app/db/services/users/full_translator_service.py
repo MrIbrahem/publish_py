@@ -24,15 +24,21 @@ full_translator_crud = FullTranslatorService(db.session)
 
 def list_full_translators() -> list[FullTranslatorRecord]:
     """Return all full translator records."""
-    return list(full_translator_crud.list(order_by=[FullTranslatorRecord.id.asc()],))
+    return list(
+        full_translator_crud.list(
+            order_by=[FullTranslatorRecord.id.asc()],
+        )
+    )
 
 
 def list_active_full_translators() -> list[FullTranslatorRecord]:
     """Return all is_active full translator records."""
     return list(
         full_translator_crud.list(
-            filters={"is_active": 1}, order_by=[FullTranslatorRecord.id.asc()],)
-                )
+            filters={"is_active": 1},
+            order_by=[FullTranslatorRecord.id.asc()],
+        )
+    )
 
 
 def get_full_translator(translator_id: int) -> FullTranslatorRecord | None:
@@ -68,8 +74,9 @@ def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslat
         raise ValueError("User is required")
 
     return full_translator_crud.upsert(
-        keys={"user": user}, is_active=is_active,
-                                       )
+        keys={"user": user},
+        is_active=is_active,
+    )
 
 
 def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord:

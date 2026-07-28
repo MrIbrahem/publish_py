@@ -11,9 +11,17 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import SettingRecord
+from ..crud_service import CRUDService
 from ..utils import db_guard
 
 logger = logging.getLogger(__name__)
+
+
+class SettingService(CRUDService[SettingRecord, int]):
+    model = SettingRecord
+
+
+setting_crud = SettingService(db.session)
 
 
 def _serialize_value(value: Any, value_type: str) -> str | None:
@@ -29,11 +37,21 @@ def _serialize_value(value: Any, value_type: str) -> str | None:
     return str(value)
 
 
-def format_values(records: list[SettingRecord]) -> dict[str, Any]:
-    """Fetch all settings parsed into their respective Python types."""
-    data: dict[str, Any] = {}
+def list_settings() -> list[SettingRecord]:
+    """Return all setting records."""
+    return list(setting_crud.list())
 
-    for x in records:
+
+def get_all_settings_raw() -> list[dict[str, Any]]:
+    """Fetch a setting by key."""
+    return [x.to_dict() for x in list_settings()]
+
+
+def get_all_settings_ready() -> dict[str, Any]:
+    """Fetch all settings parsed into their respective Python types."""
+    records: dict[str, Any] = {}
+
+    for x in list_settings():
         val = None
         if x.value_type == "boolean":
             val = x.value == "true"
@@ -46,40 +64,24 @@ def format_values(records: list[SettingRecord]) -> dict[str, Any]:
                 except (ValueError, TypeError):
                     val = None
         elif x.value_type == "string":
-            val = None if x.value is None else str(x.value)
+            val = str(x.value)
 
         if val is None:
             logger.warning("Could not parse setting %s with value %s", x.key, x.value)
 
-        data[x.key] = val
+        records[x.key] = val
 
-    return data
-
-
-def list_settings() -> list[SettingRecord]:
-    """Return all setting records."""
-    orm_objs = db.session.query(SettingRecord).all()
-    return orm_objs
-
-
-def get_all_settings_raw() -> list[dict[str, Any]]:
-    """Fetch a setting by key."""
-    return [x.to_dict() for x in list_settings()]
-
-
-def get_all_settings_ready() -> dict[str, Any]:
-    """Fetch all settings parsed into their respective Python types."""
-    return format_values(list_settings())
+    return records
 
 
 def get_setting_by_key(key: str) -> SettingRecord | None:
     """Fetch a setting by key."""
-    return db.session.query(SettingRecord).filter(SettingRecord.key == key).first()
+    return setting_crud.get_by(key=key)
 
 
 def get_setting_by_id(setting_id: int) -> SettingRecord | None:
     """Get a setting record by ID."""
-    orm_obj = db.session.get(SettingRecord, setting_id)
+    orm_obj = setting_crud.get(setting_id)
     if not orm_obj:
         logger.warning(f"Setting record with ID {setting_id} not found")
         return None
@@ -96,17 +98,18 @@ def update_setting(
     """
     Update an existing setting.
     """
-    setting = db.session.query(SettingRecord).filter(SettingRecord.key == key).first()
+    setting = setting_crud.get_by(key=key)
     if not setting:
         return False
 
     if not value_type:
         value_type = setting.value_type
 
-    setting.value = _serialize_value(value, value_type)
+    kwargs = {"value": _serialize_value(value, value_type)}
     if title:
-        setting.title = title
-    db.session.commit()
+        kwargs["title"] = title
+
+    setting_crud.update(setting.id, **kwargs)
     return True
 
 
@@ -133,21 +136,17 @@ def create_setting(
 
     value = value or default_value_types.get(value_type, "")
 
-    orm_obj = SettingRecord(
-        key=key,
-        title=title,
-        value_type=value_type,
-        value=str(value) if value is not None else None,
-    )
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        setting_crud.create(
+            key=key,
+            title=title,
+            value_type=value_type,
+            value=str(value) if value is not None else None,
+        )
         return True
     except IntegrityError:
-        db.session.rollback()
         return False
     except Exception:
-        db.session.rollback()
         return False
 
 

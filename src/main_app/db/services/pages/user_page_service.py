@@ -13,19 +13,32 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import UserPageRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class UserPagesService(CRUDService[UserPageRecord, int]):
+    model = UserPageRecord
+
+
+user_pages_crud = UserPagesService(db.session)
+
+
 def list_user_pages() -> list[UserPageRecord]:
     """Return all pages_users."""
-    orm_objs = db.session.query(UserPageRecord).order_by(UserPageRecord.id.asc()).all()
-    return orm_objs
+    return list(
+        user_pages_crud.list(
+            order_by=[UserPageRecord.id.asc()],
+        )
+    )
 
 
 def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> list[UserPageRecord]:
     """Return translated user pages (target not empty) optionally filtered by language."""
-    query = db.session.query(UserPageRecord).filter(UserPageRecord.target.isnot(None), UserPageRecord.target != "")
+    query = user_pages_crud.session.query(UserPageRecord).filter(
+        UserPageRecord.target.isnot(None), UserPageRecord.target != ""
+    )
     if lang and lang.lower() != "all":
         query = query.filter(UserPageRecord.lang == lang)
     return query.order_by(UserPageRecord.id.desc()).limit(limit).offset(offset).all()
@@ -33,7 +46,7 @@ def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> lis
 
 def count_translated(lang: str = "All") -> int:
     """Return total count of translated user pages, optionally filtered by language."""
-    query = db.session.query(func.count(UserPageRecord.id)).filter(
+    query = user_pages_crud.session.query(func.count(UserPageRecord.id)).filter(
         UserPageRecord.target.isnot(None), UserPageRecord.target != ""
     )
     if lang and lang.lower() != "all":
@@ -43,12 +56,12 @@ def count_translated(lang: str = "All") -> int:
 
 def get_by_id(page_id: int) -> UserPageRecord | None:
     """Return a single user page row by id, or None when missing."""
-    return db.session.get(UserPageRecord, page_id)
+    return user_pages_crud.get(page_id)
 
 
 def get_user_page_by_id(page_id: int) -> UserPageRecord | None:
     """Return a single user page row by id, or None when missing."""
-    return db.session.get(UserPageRecord, page_id)
+    return user_pages_crud.get(page_id)
 
 
 def add_user_page(
@@ -64,29 +77,23 @@ def add_user_page(
     """Insert a page target record."""
     if not sourcetitle:
         raise ValueError("Title is required")
-    orm_obj = UserPageRecord(
-        title=sourcetitle,
-        word=word,
-        translate_type=translate_type,
-        cat=cat,
-        lang=lang,
-        user=user,
-        pupdate=func.current_date(),
-        target=target,
-        mdwiki_revid=mdwiki_revid,
-    )
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
-        db.session.refresh(orm_obj)
-        return orm_obj
+        return user_pages_crud.create(
+            title=sourcetitle,
+            word=word,
+            translate_type=translate_type,
+            cat=cat,
+            lang=lang,
+            user=user,
+            pupdate=func.current_date(),
+            target=target,
+            mdwiki_revid=mdwiki_revid,
+        )
     except IntegrityError as e:
         logger.error(f"Failed to add page (integrity error): {e}")
-        db.session.rollback()
         raise ValueError(f"Page with title '{sourcetitle}' already exists") from e
     except Exception as e:
         logger.error(f"Failed to add page: {e}")
-        db.session.rollback()
         raise
 
 
@@ -125,25 +132,10 @@ def update_user_page(
     **kwargs: Any,
 ) -> UserPageRecord:
     """Update page."""
-    orm_obj = db.session.get(UserPageRecord, page_id)
-    if not orm_obj:
-        raise LookupError(f"Page id {page_id} was not found")
-
-    orm_obj.title = title
-    orm_obj.target = target
-
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
     try:
-        db.session.commit()
-        db.session.refresh(orm_obj)
-    except Exception:
-        logger.exception("Failed to update user page")
-        db.session.rollback()
-        raise
-    return orm_obj
+        return user_pages_crud.update(page_id, title=title, target=target, **kwargs)
+    except ValueError as exc:
+        raise LookupError(f"Page id {page_id} was not found") from exc
 
 
 def set_user_page_target(
@@ -151,17 +143,12 @@ def set_user_page_target(
     target: str,
 ) -> bool:
     """ """
-    record.target = target
-    record.pupdate = datetime.now().strftime("%Y-%m-%d")
-
     try:
-        db.session.commit()
+        user_pages_crud.update(record.id, target=target, pupdate=datetime.now().strftime("%Y-%m-%d"))
+        return True
     except Exception:
         logger.exception("Failed to update page target")
-        db.session.rollback()
         return False
-
-    return True
 
 
 def find_user_page_record(
@@ -172,18 +159,7 @@ def find_user_page_record(
     """
     Check if record exists
     """
-
-    # Check existence
-    orm_obj = (
-        db.session.query(UserPageRecord)
-        .filter(
-            UserPageRecord.title == title,
-            UserPageRecord.lang == lang,
-            UserPageRecord.user == user,
-        )
-        .first()
-    )
-    return orm_obj
+    return user_pages_crud.get_by(title=title, lang=lang, user=user)
 
 
 __all__ = [

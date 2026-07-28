@@ -25,7 +25,11 @@ user_crud = UserService(db.session)
 
 def list_users() -> list[UserRecord]:
     """Return all user records."""
-    return list(user_crud.list(order_by=[UserRecord.user_id.asc()]))
+    return list(
+        user_crud.list(
+            order_by=[UserRecord.user_id.asc()],
+        )
+    )
 
 
 def users_search(userlike: str | None) -> list[str]:
@@ -47,10 +51,10 @@ def list_users_by_group(user_group: str) -> list[UserRecord]:
     """Return user records by group."""
     return list(
         user_crud.list(
-        filters={"user_group": user_group},
-        order_by=[UserRecord.user_id.asc()],
+            filters={"user_group": user_group},
+            order_by=[UserRecord.user_id.asc()],
         )
-        )
+    )
 
 
 def get_user(user_id: int) -> UserRecord | None:

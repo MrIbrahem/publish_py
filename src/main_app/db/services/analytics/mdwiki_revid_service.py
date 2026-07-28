@@ -10,22 +10,30 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import MdwikiRevidRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class MdwikiRevidService(CRUDService[MdwikiRevidRecord, str]):
+    model = MdwikiRevidRecord
+
+
+mdwiki_revid_crud = MdwikiRevidService(db.session)
+
+
 def list_mdwiki_revids() -> list[MdwikiRevidRecord]:
     """Return all mdwiki_revid records."""
-    orm_objs = db.session.query(MdwikiRevidRecord).order_by(MdwikiRevidRecord.title.asc()).all()
-    return orm_objs
+    return list(
+        mdwiki_revid_crud.list(
+            order_by=[MdwikiRevidRecord.title.asc()],
+        )
+    )
 
 
 def get_mdwiki_revid_by_title(title: str) -> MdwikiRevidRecord | None:
     """Get an mdwiki_revid record by title."""
-    orm_obj = db.session.get(MdwikiRevidRecord, title)
-    if not orm_obj:
-        return None
-    return orm_obj
+    return mdwiki_revid_crud.get(title)
 
 
 def add_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
@@ -34,16 +42,10 @@ def add_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
     if not title:
         raise ValueError("Title is required")
 
-    orm_obj = MdwikiRevidRecord(title=title, revid=revid)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return mdwiki_revid_crud.create(title=title, revid=revid)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"MDWiki revid for '{title}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
@@ -52,28 +54,15 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
     if not title:
         raise ValueError("Title is required")
 
-    orm_obj = db.session.get(MdwikiRevidRecord, title)
-    if orm_obj:
-        orm_obj.revid = revid
-    else:
-        orm_obj = MdwikiRevidRecord(title=title, revid=revid)
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    return mdwiki_revid_crud.upsert(keys={"title": title}, revid=revid)
 
 
 def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord:
     """Update an mdwiki_revid record."""
-    orm_obj = db.session.get(MdwikiRevidRecord, title)
-    if not orm_obj:
-        raise ValueError(f"MDWiki revid record for '{title}' not found")
-
-    orm_obj.revid = revid
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return mdwiki_revid_crud.update(title, revid=revid)
+    except ValueError as exc:
+        raise ValueError(f"MDWiki revid record for '{title}' not found") from exc
 
 
 def get_revid_for_title(title: str) -> int | None:

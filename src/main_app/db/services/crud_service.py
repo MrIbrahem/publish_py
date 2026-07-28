@@ -13,21 +13,17 @@ ModelT = TypeVar("ModelT")
 PKT = TypeVar("PKT")
 
 
-class CRUDService[ModelT, PKT]:
+class CRUDService[ModelT]:
     """
     Generic CRUD service wrapping a single SQLAlchemy model.
-
-    Subclass and set `model` to the mapped class. The generic parameters
-    let type checkers know exactly what type `get`, `create`, etc. return:
-
-        class UserService(CRUDService[User, int]):
-            model = User
     """
 
     model: type[ModelT]
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session, model: type[ModelT]) -> None:
         self.session = session
+        self.model = model
+        self.model_name = getattr(self.model, "__name__", None)
 
     def _base_select(self):
         """Return the base SELECT statement for the model."""

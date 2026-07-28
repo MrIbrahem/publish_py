@@ -24,12 +24,21 @@ users_no_inprocess_crud = UsersNoInprocessService(db.session)
 
 def list_users_no_inprocess() -> list[UsersNoInprocessRecord]:
     """Return all users_no_inprocess records."""
-    return list(users_no_inprocess_crud.list(order_by=[UsersNoInprocessRecord.id.asc()]))
+    return list(
+        users_no_inprocess_crud.list(
+            order_by=[UsersNoInprocessRecord.id.asc()],
+        )
+    )
 
 
 def list_active_users_no_inprocess() -> list[UsersNoInprocessRecord]:
     """Return all is_active users_no_inprocess records."""
-    return list(users_no_inprocess_crud.list(filters={"is_active": 1}, order_by=[UsersNoInprocessRecord.id.asc()]))
+    return list(
+        users_no_inprocess_crud.list(
+            filters={"is_active": 1},
+            order_by=[UsersNoInprocessRecord.id.asc()],
+        )
+    )
 
 
 def get_users_no_inprocess(record_id: int) -> UsersNoInprocessRecord | None:

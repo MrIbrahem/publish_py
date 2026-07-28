@@ -31,7 +31,10 @@ admin_crud = AdminUserService(db.session)
 
 def active_coordinators() -> list[str]:
     """Return usernames of all active coordinators."""
-    records = admin_crud.list(filters={"is_active": 1}, order_by=[AdminUserRecord.id],)
+    records = admin_crud.list(
+        filters={"is_active": 1},
+        order_by=[AdminUserRecord.id],
+    )
     return [r.username for r in records]
 
 

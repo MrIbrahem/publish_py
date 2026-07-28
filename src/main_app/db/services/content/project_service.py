@@ -10,19 +10,30 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import ProjectRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class ProjectService(CRUDService[ProjectRecord, int]):
+    model = ProjectRecord
+
+
+project_crud = ProjectService(db.session)
+
+
 def list_projects() -> list[ProjectRecord]:
     """Return all project records."""
-    orm_objs = db.session.query(ProjectRecord).order_by(ProjectRecord.g_title.asc()).all()
-    return orm_objs
+    return list(
+        project_crud.list(
+            order_by=[ProjectRecord.g_title.asc()],
+        )
+    )
 
 
 def get_project(project_id: int) -> ProjectRecord | None:
     """Get a project record by ID."""
-    orm_obj = db.session.get(ProjectRecord, project_id)
+    orm_obj = project_crud.get(project_id)
     if not orm_obj:
         logger.warning(f"Project record with ID {project_id} not found")
         return None
@@ -31,10 +42,7 @@ def get_project(project_id: int) -> ProjectRecord | None:
 
 def get_project_by_title(title: str) -> ProjectRecord | None:
     """Get a project record by title."""
-    orm_obj = db.session.query(ProjectRecord).filter(ProjectRecord.g_title == title).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return project_crud.get_by(g_title=title)
 
 
 def add_project(g_title: str) -> ProjectRecord:
@@ -43,61 +51,49 @@ def add_project(g_title: str) -> ProjectRecord:
     if not g_title:
         raise ValueError("Project title is required")
 
-    orm_obj = ProjectRecord(g_title=g_title)
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return project_crud.create(g_title=g_title)
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"Project '{g_title}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def update_project(project_id: int, **kwargs) -> ProjectRecord:
     """Update a project record."""
-    orm_obj = db.session.get(ProjectRecord, project_id)
-    if not orm_obj:
-        raise ValueError(f"Project record with ID {project_id} not found")
-
     if not kwargs:
+        orm_obj = project_crud.get(project_id)
+        if not orm_obj:
+            raise ValueError(f"Project record with ID {project_id} not found")
         return orm_obj
 
+    # Apply the same title validation/normalization as add_project()
+    normalized_kwargs = {}
     for key, value in kwargs.items():
-        if not hasattr(orm_obj, key):
-            continue
-        # Apply the same title validation/normalization as add_project()
         if key in ("title", "g_title"):
             if not isinstance(value, str):
                 raise ValueError("Project title must be a string")
             stripped = value.strip()
             if not stripped:
                 raise ValueError("Project title is required")
-            setattr(orm_obj, key, stripped)
+            normalized_kwargs[key] = stripped
         else:
-            setattr(orm_obj, key, value)
+            normalized_kwargs[key] = value
 
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return project_crud.update(project_id, **normalized_kwargs)
+    except ValueError as exc:
+        raise ValueError(f"Project record with ID {project_id} not found") from exc
 
 
 def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
     """Update a project record."""
-    orm_obj = db.session.get(ProjectRecord, project_id)
-    if not orm_obj:
-        raise ValueError(f"Project record with ID {project_id} not found")
-
     g_title = g_title.strip() if isinstance(g_title, str) else g_title
     if not g_title:
         raise ValueError("Project title is required")
 
-    orm_obj.g_title = g_title
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return project_crud.update(project_id, g_title=g_title)
+    except ValueError as exc:
+        raise ValueError(f"Project record with ID {project_id} not found") from exc
 
 
 __all__ = [

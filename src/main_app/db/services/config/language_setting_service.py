@@ -10,19 +10,30 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import LanguageSettingRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class LanguageSettingService(CRUDService[LanguageSettingRecord, int]):
+    model = LanguageSettingRecord
+
+
+language_setting_crud = LanguageSettingService(db.session)
+
+
 def list_language_settings() -> list[LanguageSettingRecord]:
     """Return all language setting records."""
-    orm_objs = db.session.query(LanguageSettingRecord).order_by(LanguageSettingRecord.id.asc()).all()
-    return orm_objs
+    return list(
+        language_setting_crud.list(
+            order_by=[LanguageSettingRecord.id.asc()],
+        )
+    )
 
 
 def get_language_setting(setting_id: int) -> LanguageSettingRecord | None:
     """Get a language setting record by ID."""
-    orm_obj = db.session.get(LanguageSettingRecord, setting_id)
+    orm_obj = language_setting_crud.get(setting_id)
     if not orm_obj:
         logger.warning(f"Language setting record with ID {setting_id} not found")
         return None
@@ -31,10 +42,7 @@ def get_language_setting(setting_id: int) -> LanguageSettingRecord | None:
 
 def get_language_setting_by_code(lang_code: str) -> LanguageSettingRecord | None:
     """Get a language setting record by language code."""
-    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
-    if not orm_obj:
-        return None
-    return orm_obj
+    return language_setting_crud.get_by(lang_code=lang_code)
 
 
 def add_language_setting(
@@ -48,21 +56,15 @@ def add_language_setting(
     if not lang_code:
         raise ValueError("Language code is required")
 
-    orm_obj = LanguageSettingRecord(
-        lang_code=lang_code,
-        move_dots=move_dots,
-        expend=expend,
-        add_en_lang=add_en_lang,
-    )
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return language_setting_crud.create(
+            lang_code=lang_code,
+            move_dots=move_dots,
+            expend=expend,
+            add_en_lang=add_en_lang,
+        )
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"Language setting for '{lang_code}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def add_or_update_language_setting(
@@ -76,41 +78,26 @@ def add_or_update_language_setting(
     if not lang_code:
         raise ValueError("Language code is required")
 
-    orm_obj = db.session.query(LanguageSettingRecord).filter(LanguageSettingRecord.lang_code == lang_code).first()
-    if orm_obj:
-        orm_obj.move_dots = move_dots
-        orm_obj.expend = expend
-        orm_obj.add_en_lang = add_en_lang
-    else:
-        orm_obj = LanguageSettingRecord(
-            lang_code=lang_code,
-            move_dots=move_dots,
-            expend=expend,
-            add_en_lang=add_en_lang,
-        )
-        db.session.add(orm_obj)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    return language_setting_crud.upsert(
+        keys={"lang_code": lang_code},
+        move_dots=move_dots,
+        expend=expend,
+        add_en_lang=add_en_lang,
+    )
 
 
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord:
     """Update a language setting record."""
-    orm_obj = db.session.get(LanguageSettingRecord, setting_id)
-    if not orm_obj:
-        raise ValueError(f"Language setting record with ID {setting_id} not found")
-
     if not kwargs:
+        orm_obj = language_setting_crud.get(setting_id)
+        if not orm_obj:
+            raise ValueError(f"Language setting record with ID {setting_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
-    return orm_obj
+    try:
+        return language_setting_crud.update(setting_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"Language setting record with ID {setting_id} not found") from exc
 
 
 __all__ = [

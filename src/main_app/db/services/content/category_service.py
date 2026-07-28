@@ -11,15 +11,20 @@ from sqlalchemy.orm import Session
 
 from ....extensions import db
 from ...models import CategoryRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class CategoryService(CRUDService[CategoryRecord, int]):
+    model = CategoryRecord
+
+
+category_crud = CategoryService(db.session)
+
+
 def set_default_category(session: Session | Any) -> None:
     session.query(CategoryRecord).update({CategoryRecord.is_default: 0})
-    # orm_obj.is_default = 1
-    # session.commit()
-    # session.refresh(orm_obj)
 
 
 def add_category(
@@ -35,31 +40,30 @@ def add_category(
     # fallback display to campaign name if display name is not provided
     display = display or campaign
 
-    orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.category == category).first()
+    orm_obj = category_crud.get_by(category=category)
     if orm_obj:
-        orm_obj.campaign = campaign or ""
-        orm_obj.display = display or ""
-        orm_obj.category2 = category2
-        orm_obj.depth = depth
+        orm_obj = category_crud.update(
+            orm_obj.id,
+            campaign=campaign or "",
+            display=display or "",
+            category2=category2,
+            depth=depth,
+        )
     else:
-        orm_obj = CategoryRecord(
+        orm_obj = category_crud.create(
             category=category,
             campaign=campaign,
             display=display,
             category2=category2,
             depth=depth,
         )
-        db.session.add(orm_obj)
 
     if is_default:
         # set this category as default by unsetting default flag on all other categories
         set_default_category(db.session)
-        orm_obj.is_default = 1
+        orm_obj = category_crud.update(orm_obj.id, is_default=1)
     else:
-        orm_obj.is_default = 0
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
+        orm_obj = category_crud.update(orm_obj.id, is_default=0)
 
     return orm_obj
 
@@ -74,34 +78,31 @@ def update_category(
     is_default: int = 0,
 ) -> CategoryRecord:
     """Update category."""
-    orm_obj = db.session.get(CategoryRecord, category_id)
-    if not orm_obj:
-        raise ValueError(f"Category with ID {category_id} not found")
-
-    orm_obj.category = category
-    orm_obj.campaign = campaign
-    orm_obj.display = display or ""
-
-    orm_obj.category2 = category2 or ""
-
-    orm_obj.depth = int(depth)
+    try:
+        orm_obj = category_crud.update(
+            category_id,
+            category=category,
+            campaign=campaign,
+            display=display or "",
+            category2=category2 or "",
+            depth=int(depth),
+        )
+    except ValueError as exc:
+        raise ValueError(f"Category with ID {category_id} not found") from exc
 
     if is_default:
         # set this category as default by unsetting default flag on all other categories
         set_default_category(db.session)
-        orm_obj.is_default = 1
+        orm_obj = category_crud.update(orm_obj.id, is_default=1)
     else:
-        orm_obj.is_default = 0
-
-    db.session.commit()
-    db.session.refresh(orm_obj)
+        orm_obj = category_crud.update(orm_obj.id, is_default=0)
 
     return orm_obj
 
 
 def get_campaign_category(campaign: str) -> CategoryRecord | None:
     """Get the category for a campaign."""
-    orm_obj = db.session.query(CategoryRecord).filter(CategoryRecord.campaign == campaign).first()
+    orm_obj = category_crud.get_by(campaign=campaign)
     if not orm_obj:
         logger.warning(f"Campaign {campaign} not found")
         return None
@@ -110,8 +111,11 @@ def get_campaign_category(campaign: str) -> CategoryRecord | None:
 
 def list_categories() -> list[CategoryRecord]:
     """Return all categories."""
-    orm_objs = db.session.query(CategoryRecord).order_by(CategoryRecord.id.asc()).all()
-    return orm_objs
+    return list(
+        category_crud.list(
+            order_by=[CategoryRecord.id.asc()],
+        )
+    )
 
 
 def get_camp_to_cats() -> dict[str, str]:

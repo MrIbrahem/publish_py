@@ -21,8 +21,8 @@ from sqlalchemy.orm import Session, aliased
 
 from ....extensions import db
 from ...models import QidOthersRecord, QidRecord
-from ..delete_service import delete_record_by_pk
 from ..crud_service import CRUDService
+from ..delete_service import delete_record_by_pk
 
 logger = logging.getLogger(__name__)
 

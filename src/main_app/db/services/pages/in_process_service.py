@@ -11,35 +11,50 @@ from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
 from ...models import InProcessRecord
+from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
 
+class InProcessService(CRUDService[InProcessRecord, int]):
+    model = InProcessRecord
+
+
+in_process_crud = InProcessService(db.session)
+
+
 def list_in_process() -> list[InProcessRecord]:
     """Return all in_process records."""
-    orm_objs = db.session.query(InProcessRecord).order_by(InProcessRecord.id.asc()).all()
-    return orm_objs
+    return list(
+        in_process_crud.list(
+            order_by=[InProcessRecord.id.asc()],
+        )
+    )
 
 
 def list_in_process_by_user(user: str) -> list[InProcessRecord]:
     """Return in_process records for a specific user."""
-    orm_objs = (
-        db.session.query(InProcessRecord).filter(InProcessRecord.user == user).order_by(InProcessRecord.id.asc()).all()
+    return list(
+        in_process_crud.list(
+            filters={"user": user},
+            order_by=[InProcessRecord.id.asc()],
+        )
     )
-    return orm_objs
 
 
 def list_in_process_by_lang(lang: str) -> list[InProcessRecord]:
     """Return in_process records for a specific language."""
-    orm_objs = (
-        db.session.query(InProcessRecord).filter(InProcessRecord.lang == lang).order_by(InProcessRecord.id.asc()).all()
+    return list(
+        in_process_crud.list(
+            filters={"lang": lang},
+            order_by=[InProcessRecord.id.asc()],
+        )
     )
-    return orm_objs
 
 
 def get_in_process(process_id: int) -> InProcessRecord | None:
     """Get an in_process record by ID."""
-    orm_obj = db.session.get(InProcessRecord, process_id)
+    orm_obj = in_process_crud.get(process_id)
     if not orm_obj:
         logger.warning(f"In-process record with ID {process_id} not found")
         return None
@@ -48,16 +63,7 @@ def get_in_process(process_id: int) -> InProcessRecord | None:
 
 def get_in_process_by_title_user_lang(title: str, user: str, lang: str) -> InProcessRecord | None:
     """Get an in_process record by title, user, and language."""
-    orm_obj = (
-        db.session.query(InProcessRecord)
-        .filter(InProcessRecord.title == title)
-        .filter(InProcessRecord.user == user)
-        .filter(InProcessRecord.lang == lang)
-        .first()
-    )
-    if not orm_obj:
-        return None
-    return orm_obj
+    return in_process_crud.get_by(title=title, user=user, lang=lang)
 
 
 def add_in_process(
@@ -80,63 +86,40 @@ def add_in_process(
     if not lang:
         raise ValueError("Language is required")
 
-    orm_obj = InProcessRecord(
-        title=title,
-        user=user,
-        lang=lang,
-        cat=cat,
-        translate_type=translate_type,
-        word=word,
-        add_date=func.now(),
-    )
-    db.session.add(orm_obj)
     try:
-        db.session.commit()
+        return in_process_crud.create(
+            title=title,
+            user=user,
+            lang=lang,
+            cat=cat,
+            translate_type=translate_type,
+            word=word,
+            add_date=func.now(),
+        )
     except IntegrityError:
-        db.session.rollback()
         raise ValueError(f"In-process record for '{title}' by '{user}' in '{lang}' already exists") from None
-
-    db.session.refresh(orm_obj)
-    return orm_obj
 
 
 def update_in_process(process_id: int, **kwargs) -> InProcessRecord:
     """Update an in_process record."""
-    orm_obj = db.session.get(InProcessRecord, process_id)
-    if not orm_obj:
-        raise ValueError(f"In-process record with ID {process_id} not found")
-
     if not kwargs:
+        orm_obj = in_process_crud.get(process_id)
+        if not orm_obj:
+            raise ValueError(f"In-process record with ID {process_id} not found")
         return orm_obj
 
-    for key, value in kwargs.items():
-        if hasattr(orm_obj, key):
-            setattr(orm_obj, key, value)
-
     try:
-        db.session.commit()
-        db.session.refresh(orm_obj)
-    except Exception:
-        db.session.rollback()
-        raise
-    return orm_obj
+        return in_process_crud.update(process_id, **kwargs)
+    except ValueError as exc:
+        raise ValueError(f"In-process record with ID {process_id} not found") from exc
 
 
 def delete_in_process_by_title_user_lang(title: str, user: str, lang: str) -> bool:
     """Delete an in_process record by title, user, and language."""
-    result = (
-        db.session.query(InProcessRecord)
-        .filter(InProcessRecord.title == title)
-        .filter(InProcessRecord.user == user)
-        .filter(InProcessRecord.lang == lang)
-        .delete()
-    )
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
-    return result > 0
+    record = in_process_crud.get_by(title=title, user=user, lang=lang)
+    if not record:
+        return False
+    return in_process_crud.delete(record.id)
 
 
 def is_in_process(title: str, user: str, lang: str) -> bool:
@@ -148,7 +131,7 @@ def is_in_process(title: str, user: str, lang: str) -> bool:
 def get_in_process_counts_by_user() -> list[dict]:
     """Get count of in-process translations per user, sorted by count descending."""
     results = (
-        db.session.query(
+        in_process_crud.session.query(
             InProcessRecord.user,
             db.func.count(InProcessRecord.id).label("article_count"),
         )
