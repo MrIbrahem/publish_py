@@ -103,6 +103,7 @@ get_coordinator_by_id = _crud.get_coordinator_by_id
 add_coordinator = _crud.add_coordinator
 is_active_coordinator = _crud.is_active_coordinator
 set_coordinator_active = _crud.set_coordinator_active
+delete_coordinator = _crud.delete_coordinator
 
 __all__ = [
     "list_coordinators",
@@ -110,5 +111,6 @@ __all__ = [
     "add_coordinator",
     "is_active_coordinator",
     "set_coordinator_active",
+    "delete_coordinator",
     "AdminService",
 ]

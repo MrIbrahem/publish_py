@@ -29,7 +29,6 @@ class AssessmentService(CRUDService[AssessmentRecord]):
             )
         )
 
-
     def get_assessment(self, assessment_id: int) -> AssessmentRecord | None:
         """Get an assessment record by ID."""
         orm_obj = self.get(assessment_id)
@@ -38,11 +37,9 @@ class AssessmentService(CRUDService[AssessmentRecord]):
             return None
         return orm_obj
 
-
     def get_assessment_by_title(self, title: str) -> AssessmentRecord | None:
         """Get an assessment record by title."""
         return self.get_by(title=title)
-
 
     def add_assessment(self, title: str, importance: str | None = None) -> AssessmentRecord:
         """Add a new assessment record."""
@@ -54,7 +51,6 @@ class AssessmentService(CRUDService[AssessmentRecord]):
             return self.create(title=title, importance=importance)
         except IntegrityError:
             raise ValueError(f"Assessment for '{title}' already exists") from None
-
 
     def add_or_update_assessment(self, title: str, importance: str | None = None) -> AssessmentRecord:
         """Add or update an assessment record."""
@@ -68,21 +64,18 @@ class AssessmentService(CRUDService[AssessmentRecord]):
         )
         return instance
 
-
     def update_assessment(self, assessment_id: int, **kwargs) -> AssessmentRecord | None:
         """Update an assessment record."""
         return self.update_or_404(assessment_id, **kwargs)
 
 
-
-assessment_crud = AssessmentService()
-
-list_assessments = assessment_crud.list_assessments
-get_assessment = assessment_crud.get_assessment
-get_assessment_by_title = assessment_crud.get_assessment_by_title
-add_assessment = assessment_crud.add_assessment
-add_or_update_assessment = assessment_crud.add_or_update_assessment
-update_assessment = assessment_crud.update_assessment
+_crud = AssessmentService()
+list_assessments = _crud.list_assessments
+get_assessment = _crud.get_assessment
+get_assessment_by_title = _crud.get_assessment_by_title
+add_assessment = _crud.add_assessment
+add_or_update_assessment = _crud.add_or_update_assessment
+update_assessment = _crud.update_assessment
 
 __all__ = [
     "list_assessments",
