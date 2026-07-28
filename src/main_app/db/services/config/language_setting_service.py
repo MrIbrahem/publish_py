@@ -81,21 +81,13 @@ def add_or_update_language_setting(
     if not lang_code:
         raise ValueError("Language code is required")
 
-    record = language_setting_crud.get_by(lang_code=lang_code)
-    if record:
-        return language_setting_crud.update(
-            record,
-            move_dots=move_dots,
-            expend=expend,
-            add_en_lang=add_en_lang,
-        )
-    else:
-        return language_setting_crud.create(
-            lang_code=lang_code,
-            move_dots=move_dots,
-            expend=expend,
-            add_en_lang=add_en_lang,
-        )
+    instance, is_new = language_setting_crud.upsert_by(
+        keys={"lang_code": lang_code},
+        move_dots=move_dots,
+        expend=expend,
+        add_en_lang=add_en_lang,
+    )
+    return instance
 
 
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord | None:

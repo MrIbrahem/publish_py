@@ -69,20 +69,13 @@ def add_or_update_word(
     w_title = w_title.strip()
     if not w_title:
         raise ValueError("Title is required")
-    record = word_crud.get_by(w_title=w_title)
 
-    if record:
-        return word_crud.update(
-            record,
+    instance, is_new = word_crud.upsert_by(
+        keys={"w_title": w_title},
             w_lead_words=w_lead_words,
             w_all_words=w_all_words,
-        )
-    else:
-        return word_crud.create(
-            w_title=w_title,
-            w_lead_words=w_lead_words,
-            w_all_words=w_all_words,
-        )
+    )
+    return instance
 
 
 def update_word(word_id: int, **kwargs) -> WordRecord | None:

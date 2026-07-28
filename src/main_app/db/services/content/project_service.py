@@ -87,14 +87,15 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord | None:
         raise ValueError(f"Project record with ID {project_id} not found") from exc
 
 
-def update_project_title(project_id: int, g_title: str) -> ProjectRecord:
+def update_project_title(project_id: int, g_title: str) -> ProjectRecord | None:
     """Update a project record."""
     g_title = g_title.strip() if isinstance(g_title, str) else g_title
     if not g_title:
         raise ValueError("Project title is required")
 
     try:
-        return project_crud.update_by_id(project_id, g_title=g_title)
+        data = {"g_title": g_title}
+        return project_crud.update_by_id(project_id, data)
     except ValueError as exc:
         raise ValueError(f"Project record with ID {project_id} not found") from exc
 

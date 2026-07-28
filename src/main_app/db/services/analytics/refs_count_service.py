@@ -79,20 +79,7 @@ def add_or_update_refs_count(
         r_lead_refs=r_lead_refs,
         r_all_refs=r_all_refs,
     )
-
-    record = refs_count_crud.get_by(r_title=r_title)
-    if record:
-        return refs_count_crud.update(
-            record,
-            r_lead_refs=r_lead_refs,
-            r_all_refs=r_all_refs,
-        )
-    else:
-        return refs_count_crud.create(
-            r_title=r_title,
-            r_lead_refs=r_lead_refs,
-            r_all_refs=r_all_refs,
-        )
+    return instance
 
 
 def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord | None:

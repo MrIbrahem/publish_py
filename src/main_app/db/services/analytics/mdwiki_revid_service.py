@@ -57,12 +57,11 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord | No
     if not title:
         raise ValueError("Title is required")
 
-    record = mdwiki_revid_crud.get_by(title=title)
-    if record:
-        return mdwiki_revid_crud.update(record, revid=revid)
-
-    return mdwiki_revid_crud.create(title=title, revid=revid)
-
+    instance, is_new = mdwiki_revid_crud.upsert_by(
+        keys={"title": title},
+        revid=revid,
+    )
+    return instance
 
 def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord | None:
     """Update an mdwiki_revid record."""

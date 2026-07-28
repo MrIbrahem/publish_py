@@ -43,23 +43,13 @@ def add_category(
     # fallback display to campaign name if display name is not provided
     display = display or campaign
 
-    orm_obj = category_crud.get_by(category=category)
-    if orm_obj:
-        orm_obj = category_crud.update(
-            orm_obj,
-            campaign=campaign or "",
-            display=display or "",
-            category2=category2,
-            depth=depth,
-        )
-    else:
-        orm_obj = category_crud.create(
-            category=category,
+    orm_obj, is_new = category_crud.upsert_by(
+        keys={"category": category},
             campaign=campaign,
             display=display,
             category2=category2,
             depth=depth,
-        )
+    )
 
     if is_default:
         # set this category as default by unsetting default flag on all other categories

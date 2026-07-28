@@ -76,21 +76,13 @@ def add_or_update_lang(
     if not code:
         raise ValueError("Language code is required")
 
-    record = lang_crud.get_by(code=code)
-    if record:
-        return lang_crud.update(
-            record,
-            autonym=autonym,
-            name=name,
-            redirects=redirects,
-        )
-    else:
-        return lang_crud.create(
-            code=code,
-            autonym=autonym,
-            name=name,
-            redirects=redirects,
-        )
+    instance, is_new = lang_crud.upsert_by(
+        keys={"code": code},
+        autonym=autonym,
+        name=name,
+        redirects=redirects,
+    )
+    return instance
 
 
 __all__ = [

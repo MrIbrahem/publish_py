@@ -76,11 +76,11 @@ def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoIn
     if not user:
         raise ValueError("User is required")
 
-    record = users_no_inprocess_crud.get_by(user=user)
-    if record:
-        return users_no_inprocess_crud.update(record, is_active=is_active)
-    else:
-        return users_no_inprocess_crud.create(user=user, is_active=is_active)
+    instance, is_new = users_no_inprocess_crud.upsert_by(
+        keys={"user": user},
+        is_active=is_active,
+    )
+    return instance
 
 
 def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecord | None:

@@ -76,11 +76,12 @@ def add_or_update_full_translator(user: str, is_active: int = 1) -> FullTranslat
     if not user:
         raise ValueError("User is required")
 
-    record = full_translator_crud.get_by(user=user)
-    if record:
-        return full_translator_crud.update(record, is_active=is_active)
-    else:
-        return full_translator_crud.create(user=user, is_active=is_active)
+    instance, is_new = full_translator_crud.upsert_by(
+        keys={"user": user},
+        is_active=is_active,
+    )
+    return instance
+
 
 def update_full_translator(translator_id: int, **kwargs) -> FullTranslatorRecord | None:
     """Update a full translator record."""
