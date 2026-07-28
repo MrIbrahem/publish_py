@@ -283,7 +283,7 @@ class TestListNewTitles:
     def test_returns_empty_when_qids_table_empty(self, sqlite_db):
         assert list_new_titles() == []
 
-    def test_returns_distinct_titles(self, monkeypatch):
+    def test_returns_distinct_titles(self, sqlite_db):
         # Two qids share the same title (allowed only across qids vs qids_others;
         # within qids the title is unique). Use a single row but verify DISTINCT
         # behaviour on the SELECT side by ensuring we do not return duplicates.
