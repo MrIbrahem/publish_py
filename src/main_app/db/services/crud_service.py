@@ -28,7 +28,7 @@ class CRUDService[ModelT]:
 
     model: type[ModelT]
 
-    def __init__(self, session: Session, model: type[ModelT]) -> None:
+    def __init__(self, session: Session | Any, model: type[ModelT]) -> None:
         self.session = session
         self.model = model
         self.model_name = getattr(self.model, "__name__", None)

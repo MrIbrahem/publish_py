@@ -15,7 +15,6 @@ from src.main_app.db.services.users.users_service import (
     update_user_data,
     user_exists,
 )
-from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
@@ -99,12 +98,12 @@ class TestAddUser:
         assert record.username == "New_Researcher"
         assert record.email == "research@wiki.org"
 
-    def test_raises_error_if_exists(self, monkeypatch):
+    def test_raises_error_if_exists(self, sqlite_db):
         # User table in models.py doesn't have UNIQUE on username.
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)):
             with pytest.raises(ValueError, match="already exists"):
                 create_user("Duplicate")
 

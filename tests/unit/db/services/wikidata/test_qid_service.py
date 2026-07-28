@@ -10,7 +10,6 @@ from src.main_app.db.models import QidRecord
 from src.main_app.db.services.wikidata.qid_service import (
     QidService,
 )
-from src.main_app.extensions import db as _db
 
 pytestmark = pytest.mark.unit
 
@@ -19,8 +18,9 @@ class TestSetup:
     """Tests for `QidService` class."""
 
     @pytest.fixture(autouse=True)
-    def setup(self):
+    def setup(self, sqlite_db):
         self.service = QidService()
+        self.sqlite_db = sqlite_db
 
     def _add_with_empty_qid(self, title: str) -> QidRecord:
         """
@@ -30,7 +30,7 @@ class TestSetup:
         assert record is not None
 
         record.qid = ""
-        _db.session.commit()
+        self.sqlite_db.session.commit()
         return record  # type: ignore
 
 
@@ -253,21 +253,21 @@ class TestInsert(TestSetup):
         rows = self.service.list_records()
         assert any(r.title == "Brand_new" and r.qid == "Q300" for r in rows)
 
-    def test_fills_empty_qid_for_existing_title(self, monkeypatch):
+    def test_fills_empty_qid_for_existing_title(self, sqlite_db):
         # Mirrors PHP "fill empty qid" follow-up after the INSERT-WHERE-NOT-EXISTS.
         record = self._add_with_empty_qid("Will_be_filled")
         ok = self.service.insert("Will_be_filled", "Q301")
         assert ok is True
-        _db.session.refresh(record)
+        sqlite_db.session.refresh(record)
         assert record.qid == "Q301"
 
-    def test_does_not_overwrite_existing_non_empty_qid(self, monkeypatch):
+    def test_does_not_overwrite_existing_non_empty_qid(self, sqlite_db):
         record = self.service.add_or_update("Already_set", "Q302")
         assert record is not None
 
         ok = self.service.insert("Already_set", "Q303")
         assert ok is True  # PHP returns success even when no-op.
-        _db.session.refresh(record)
+        sqlite_db.session.refresh(record)
         assert record.qid == "Q302"  # not overwritten
 
     def test_returns_false_when_title_or_qid_blank(self, monkeypatch):
@@ -287,14 +287,14 @@ class TestInsert(TestSetup):
 class TestUpdate(TestSetup):
     """Tests for the update_record helper used by the admin/qids POST handler."""
 
-    def test_updates_existing_row(self, monkeypatch):
+    def test_updates_existing_row(self, sqlite_db):
         record = self.service.add_or_update("Old_title", "Q400")
         assert record is not None
 
         ok = self.service.update_record(record.id, "New_title", "Q401")
         assert ok is True
 
-        _db.session.refresh(record)
+        sqlite_db.session.refresh(record)
         assert record.title == "New_title"
         assert record.qid == "Q401"
 

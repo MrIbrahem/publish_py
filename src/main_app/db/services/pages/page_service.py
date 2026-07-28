@@ -238,6 +238,7 @@ class PagesService(CRUDService[PageRecord]):
 
 
 _crud = PagesService()
+
 list_translated = _crud.list_translated
 count_translated = _crud.count_translated
 get_by_id = _crud.get_by_id

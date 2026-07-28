@@ -13,7 +13,7 @@ from flask.app import Flask
 
 
 @pytest.fixture
-def csrf_app() -> Flask:
+def csrf_app(sqlite_db) -> Flask:
     """Create a Flask mock_app with CSRF protection enabled (like Production)."""
     import os
 
@@ -35,13 +35,12 @@ def csrf_app() -> Flask:
     )
     mock_app.url_map.strict_slashes = False
 
-    from src.main_app.extensions import db
 
-    db.init_app(mock_app)
+    sqlite_db.init_app(mock_app)
 
     with mock_app.app_context():
-        real_tables = [t for t in db.metadata.tables.values() if not t.info.get("is_view")]
-        db.metadata.create_all(db.engine, tables=real_tables)
+        real_tables = [t for t in sqlite_db.metadata.tables.values() if not t.info.get("is_view")]
+        sqlite_db.metadata.create_all(sqlite_db.engine, tables=real_tables)
 
     csrf = CSRFProtect(mock_app)
     from src.main_app.public.routes.publish.routes import PublishRoutes

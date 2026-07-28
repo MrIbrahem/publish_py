@@ -15,6 +15,7 @@ Each table-specific service module should only need to:
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session, aliased
@@ -197,7 +198,7 @@ class BaseQidService(CRUDService[ServiceRecord]):
                 super().__init__(QidRecord, db.session)
     """
 
-    def __init__(self, model: type[ServiceRecord], session: Session) -> None:
+    def __init__(self, model: type[ServiceRecord], session: Session | Any) -> None:
         super().__init__(session, model)
         self.model = model
 

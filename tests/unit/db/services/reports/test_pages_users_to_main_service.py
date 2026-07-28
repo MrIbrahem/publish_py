@@ -12,16 +12,15 @@ from src.main_app.db.services.reports.pages_users_to_main_service import (
     list_pages_users_to_main,
     update_pages_users_to_main,
 )
-from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
 
-def test_pages_users_to_main_workflow():
+def test_pages_users_to_main_workflow(sqlite_db):
     from sqlalchemy import text
 
-    db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
-    db.session.commit()
+    sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
+    sqlite_db.session.commit()
 
     # Test add
     p = add_pages_users_to_main(id=1, new_target="Hépatite B", new_user="French_Editor", new_qid="Q181056")
@@ -49,12 +48,12 @@ def test_pages_users_to_main_workflow():
 class TestListPagesUsersToMain:
     """Tests for list_pages_users_to_main function."""
 
-    def test_returns_list_from_store(self, monkeypatch):
+    def test_returns_list_from_store(self, sqlite_db):
         """Test that function returns list from store."""
         from sqlalchemy import text
 
-        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (10, 'Malaria'), (20, 'Cholera')"))
-        db.session.commit()
+        sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (10, 'Malaria'), (20, 'Cholera')"))
+        sqlite_db.session.commit()
 
         add_pages_users_to_main(id=10, new_target="Paludisme")
         add_pages_users_to_main(id=20, new_target="Choléra")
@@ -65,12 +64,12 @@ class TestListPagesUsersToMain:
 class TestGetPagesUsersToMain:
     """Tests for get_pages_users_to_main function."""
 
-    def test_delegates_to_store(self, monkeypatch):
+    def test_delegates_to_store(self, sqlite_db):
         """Test that function returns record by ID."""
         from sqlalchemy import text
 
-        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (30, 'Dengue fever')"))
-        db.session.commit()
+        sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (30, 'Dengue fever')"))
+        sqlite_db.session.commit()
 
         add_pages_users_to_main(id=30, new_target="Dengue")
         result = get_pages_users_to_main(30)
@@ -84,21 +83,21 @@ class TestGetPagesUsersToMain:
 class TestAddPagesUsersToMain:
     """Tests for add_pages_users_to_main function."""
 
-    def test_delegates_to_store(self, monkeypatch):
+    def test_delegates_to_store(self, sqlite_db):
         """Test that function adds and returns record."""
         from sqlalchemy import text
 
-        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (40, 'Yellow fever')"))
-        db.session.commit()
+        sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (40, 'Yellow fever')"))
+        sqlite_db.session.commit()
 
         record = add_pages_users_to_main(id=40, new_target="Fièvre jaune")
         assert record.id == 40
         assert record.new_target == "Fièvre jaune"
 
-    def test_raises_error_on_failure(self, monkeypatch):
+    def test_raises_error_on_failure(self, sqlite_db):
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):
+        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)):
             with pytest.raises(ValueError, match="Failed to add"):
                 add_pages_users_to_main(id=9999)
 
@@ -106,22 +105,22 @@ class TestAddPagesUsersToMain:
 class TestUpdatePagesUsersToMain:
     """Tests for update_pages_users_to_main function."""
 
-    def test_delegates_to_store(self, monkeypatch):
+    def test_delegates_to_store(self, sqlite_db):
         """Test that function updates and returns record."""
         from sqlalchemy import text
 
-        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (50, 'Zika virus')"))
-        db.session.commit()
+        sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (50, 'Zika virus')"))
+        sqlite_db.session.commit()
 
         add_pages_users_to_main(id=50, new_target="Virus Zika")
         updated = update_pages_users_to_main(50, new_target="Zika")
         assert updated.new_target == "Zika"
 
-    def test_returns_record_if_no_kwargs(self, monkeypatch):
+    def test_returns_record_if_no_kwargs(self, sqlite_db):
         from sqlalchemy import text
 
-        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (51, 'T')"))
-        db.session.commit()
+        sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (51, 'T')"))
+        sqlite_db.session.commit()
         add_pages_users_to_main(id=51)
         result = update_pages_users_to_main(51)
         assert result.id == 51
@@ -134,12 +133,12 @@ class TestUpdatePagesUsersToMain:
 class TestDeletePagesUsersToMain:
     """Tests for delete_pages_users_to_main function."""
 
-    def test_delegates_to_store(self, monkeypatch):
+    def test_delegates_to_store(self, sqlite_db):
         """Test that function deletes the record."""
         from sqlalchemy import text
 
-        db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (60, 'Ebola virus')"))
-        db.session.commit()
+        sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (60, 'Ebola virus')"))
+        sqlite_db.session.commit()
 
         add_pages_users_to_main(id=60, new_target="Ebola")
         deleted = delete_pages_users_to_main(60)

@@ -1,15 +1,14 @@
 import pytest
 
-from src.main_app.db.models import ReportRecord
-from src.main_app.db.services.delete_service import (
+from src.main_app.sqlite_db.models import ReportRecord
+from src.main_app.sqlite_db.services.delete_service import (
     delete_report,
 )
-from src.main_app.db.services.reports.report_service import (
+from src.main_app.sqlite_db.services.reports.report_service import (
     add_report,
     list_reports,
     query_reports_with_filters,
 )
-from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
@@ -83,10 +82,10 @@ class TestQueryReportsWithFilters:
         results = query_reports_with_filters({}, limit=1)
         assert len(results) == 1
 
-    def test_filters_by_year_month(self):
+    def test_filters_by_year_month(self, sqlite_db):
         from datetime import datetime
 
-        db.session.add(
+        sqlite_db.session.add(
             ReportRecord(
                 title="Old Report",
                 user="U",
@@ -97,7 +96,7 @@ class TestQueryReportsWithFilters:
                 date=datetime(2020, 5, 1),
             )
         )
-        db.session.commit()
+        sqlite_db.session.commit()
 
         results = query_reports_with_filters({"year": 2020, "month": 5})
         assert len(results) == 1
@@ -108,10 +107,10 @@ class TestQueryReportsWithFilters:
         results = query_reports_with_filters({"title": "not_empty"})
         assert len(results) >= 1
 
-    def test_filters_empty(self):
+    def test_filters_empty(self, sqlite_db):
         # We can't easily add a report with empty title via service because it's not handled there,
         # but we can via manual insert.
-        db.session.add(ReportRecord(title="", user="U", lang="en", sourcetitle="S", result="ok", data="{}"))
-        db.session.commit()
+        sqlite_db.session.add(ReportRecord(title="", user="U", lang="en", sourcetitle="S", result="ok", data="{}"))
+        sqlite_db.session.commit()
         results = query_reports_with_filters({"title": "empty"})
         assert len(results) >= 1

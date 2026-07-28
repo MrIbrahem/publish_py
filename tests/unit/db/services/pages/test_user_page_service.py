@@ -15,12 +15,11 @@ from src.main_app.db.services.pages.user_page_service import (
     list_user_pages,
     update_user_page,
 )
-from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
 
-def test_user_page_workflow() -> None:
+def test_user_page_workflow(sqlite_db) -> None:
     p = add_user_page(
         sourcetitle="Influenza",
         translate_type="lead",
@@ -37,11 +36,11 @@ def test_user_page_workflow() -> None:
     updated = update_user_page(p.id, "Flu", "Flu.html")
     assert updated.title == "Flu"
 
-    orm_p = db.session.query(UserPageRecord).filter(UserPageRecord.id == p.id).first()
+    orm_p = sqlite_db.session.query(UserPageRecord).filter(UserPageRecord.id == p.id).first()
     orm_p.lang = "es"
     orm_p.user = "Spanish_Editor"
     orm_p.target = ""
-    db.session.commit()
+    sqlite_db.session.commit()
 
     success = insert_user_page_target(
         sourcetitle="Malaria",
@@ -120,8 +119,8 @@ class TestInsertUserPageTarget:
         assert success is True
         assert any(p.title == "Pathology" for p in list_user_pages())
 
-    def test_handles_exception(self, monkeypatch):
-        with patch.object(db.session, "commit", side_effect=Exception("DB Error")):
+    def test_handles_exception(self, sqlite_db):
+        with patch.object(sqlite_db.session, "commit", side_effect=Exception("DB Error")):
 
             success = insert_user_page_target("Error_Page", "t", "c", "l", "u", "t")
             assert success is False
@@ -149,13 +148,13 @@ def _make_user_page(title: str, lang: str, target: str, user: str = "u") -> User
 class TestListTranslatedUserPages:
     """Tests for list_translated on pages_users."""
 
-    def test_excludes_rows_with_empty_or_null_target(self, monkeypatch):
+    def test_excludes_rows_with_empty_or_null_target(self, sqlite_db):
         _make_user_page("Has_target", "en", "T.html")
         empty = _make_user_page("Empty_target", "en", "x")
         empty.target = ""
         null = _make_user_page("Null_target", "en", "x")
         null.target = None
-        db.session.commit()
+        sqlite_db.session.commit()
 
         titles = {p.title for p in list_translated(lang="All")}
         assert "Has_target" in titles
@@ -180,11 +179,11 @@ class TestListTranslatedUserPages:
 class TestCountTranslatedUserPages:
     """Tests for count_translated on pages_users."""
 
-    def test_counts_only_rows_with_target(self, monkeypatch):
+    def test_counts_only_rows_with_target(self, sqlite_db):
         _make_user_page("With_target", "en", "X.html")
         empty = _make_user_page("Empty", "en", "x")
         empty.target = ""
-        db.session.commit()
+        sqlite_db.session.commit()
         assert count_translated(lang="All") == 1
 
     def test_counts_filtered_by_lang(self, monkeypatch):

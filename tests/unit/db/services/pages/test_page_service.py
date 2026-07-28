@@ -15,12 +15,11 @@ from src.main_app.db.services.pages.page_service import (
     list_translated,
     update_page,
 )
-from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
 
 
-def test_page_workflow():
+def test_page_workflow(sqlite_db):
     p = add_page(
         sourcetitle="COVID-19 pandemic",
         translate_type="lead",
@@ -38,11 +37,11 @@ def test_page_workflow():
     updated = update_page(p.id, "COVID-19", "COVID-19.html")
     assert updated.title == "COVID-19"
 
-    orm_p = db.session.get(PageRecord, p.id)
+    orm_p = sqlite_db.session.get(PageRecord, p.id)
     orm_p.lang = "en"
     orm_p.user = "WikiUser"
     orm_p.target = ""
-    db.session.commit()
+    sqlite_db.session.commit()
 
     success = insert_page_target(
         sourcetitle="Black Death",
@@ -88,11 +87,11 @@ class TestAddPage:
     def test_raises_error_if_exists(self, monkeypatch):
         from sqlalchemy.exc import IntegrityError
 
-        from src.main_app.db.services.pages.page_service import pages_crud
+        from src.main_app.db.services.pages.page_service import _crud
 
         with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
-            with patch.object(pages_crud, "session", mock_session):
-                mock_session.commit.side_effect = IntegrityError(None, None, None)
+            with patch.object(_crud, "session", mock_session):
+                mock_session.commit.side_effect = IntegrityError(None, None, None) # type: ignore
                 with pytest.raises(ValueError, match="already exists"):
                     add_page("Duplicate", "lead", "Test", "en", "TestUser", "t1.html")
 
@@ -150,10 +149,10 @@ class TestInsertPageTarget:
         assert p.word == 1200
 
     def test_handles_exception(self, monkeypatch):
-        from src.main_app.db.services.pages.page_service import pages_crud
+        from src.main_app.db.services.pages.page_service import _crud
 
         with patch("src.main_app.db.services.pages.page_service.db.session") as mock_session:
-            with patch.object(pages_crud, "session", mock_session):
+            with patch.object(_crud, "session", mock_session):
                 mock_session.commit.side_effect = Exception("DB Error")
 
                 success = insert_page_target("Error", "t", "c", "l", "u", "t")
@@ -182,7 +181,7 @@ def _make_page(title: str, lang: str, target: str, user: str = "u") -> PageRecor
 class TestListTranslated:
     """Tests for list_translated."""
 
-    def test_excludes_rows_with_empty_or_null_target(self, monkeypatch):
+    def test_excludes_rows_with_empty_or_null_target(self, sqlite_db):
         _make_page("Has_target", "en", "T1.html")
         # Empty target row
         empty = _make_page("Empty_target", "en", "x")
@@ -190,7 +189,7 @@ class TestListTranslated:
         # NULL target row
         null = _make_page("Null_target", "en", "x")
         null.target = None
-        db.session.commit()
+        sqlite_db.session.commit()
 
         rows = list_translated(lang="All")
         titles = {p.title for p in rows}
@@ -231,11 +230,11 @@ class TestListTranslated:
 class TestCountTranslated:
     """Tests for count_translated."""
 
-    def test_counts_only_rows_with_target(self, monkeypatch):
+    def test_counts_only_rows_with_target(self, sqlite_db):
         _make_page("With_target", "en", "X.html")
         empty = _make_page("Empty", "en", "x")
         empty.target = ""
-        db.session.commit()
+        sqlite_db.session.commit()
 
         assert count_translated(lang="All") == 1
 
