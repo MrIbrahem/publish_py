@@ -10,45 +10,45 @@ from src.main_app.db.services.analytics.mdwiki_revid_service import (
     update_mdwiki_revid,
 )
 
+
 class TestSetup:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.service = MdwikiRevidService()
 
 
-def test_mdwiki_revid_workflow():
-    # Test add
-    r = add_mdwiki_revid("Cell biology", 1234567)
-    assert r.title == "Cell biology"
-    assert r.revid == 1234567
+class TestMdwikiRevidService:
+    """Tests for MdwikiRevidService class."""
 
-    # Test get by title
-    r2 = get_mdwiki_revid_by_title("Cell biology")
-    assert r2.revid == 1234567
+    def test_mdwiki_revid_workflow(self):
+        # Test add
+        r = add_mdwiki_revid("Cell biology", 1234567)
+        assert r.title == "Cell biology"
+        assert r.revid == 1234567
 
-    # Test get_revid_for_title
-    revid = get_revid_for_title("Cell biology")
-    assert revid == 1234567
+        # Test get by title
+        r2 = get_mdwiki_revid_by_title("Cell biology")
+        assert r2.revid == 1234567
 
-    # Test list
-    all_r = list_mdwiki_revids()
-    assert any(x.title == "Cell biology" for x in all_r)
+        # Test get_revid_for_title
+        revid = get_revid_for_title("Cell biology")
+        assert revid == 1234567
 
-    # Test update
-    updated = update_mdwiki_revid("Cell biology", 7654321)
-    assert updated.revid == 7654321
+        # Test list
+        all_r = list_mdwiki_revids()
+        assert any(x.title == "Cell biology" for x in all_r)
 
-    # Test add_or_update
-    r3 = add_or_update_mdwiki_revid("Cell biology", 9999999)
-    assert r3.revid == 9999999
+        # Test update
+        updated = update_mdwiki_revid("Cell biology", 7654321)
+        assert updated.revid == 7654321
 
-    # Test delete
-    MdwikiRevidService().delete("Cell biology")
-    assert get_mdwiki_revid_by_title("Cell biology") is None
+        # Test add_or_update
+        r3 = add_or_update_mdwiki_revid("Cell biology", 9999999)
+        assert r3.revid == 9999999
 
-
-class TestListMdwikiRevids:
-    """Tests for list_mdwiki_revids function."""
+        # Test delete
+        MdwikiRevidService().delete("Cell biology")
+        assert get_mdwiki_revid_by_title("Cell biology") is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""

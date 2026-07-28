@@ -12,6 +12,7 @@ from src.main_app.db.services.analytics.word_service import (
     update_word,
 )
 
+
 class TestSetup:
     @pytest.fixture(autouse=True)
     def setup(self):

@@ -12,50 +12,50 @@ from src.main_app.db.services.analytics.enwiki_pageview_service import (
     update_enwiki_pageview,
 )
 
+
 class TestSetup:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.service = EnwikiPageviewService()
 
 
-def test_enwiki_pageview_workflow():
-    # Test add
-    p = add_enwiki_pageview("Anatomy", 5000)
-    assert p.title == "Anatomy"
-    assert p.en_views == 5000
+class TestEnwikiPageviewService:
+    """Tests for EnwikiPageviewService class."""
 
-    # Test get
-    p2 = get_enwiki_pageview(p.id)
-    assert p2.title == "Anatomy"
+    def test_enwiki_pageview_workflow(self):
+        # Test add
+        p = add_enwiki_pageview("Anatomy", 5000)
+        assert p.title == "Anatomy"
+        assert p.en_views == 5000
 
-    # Test get by title
-    p3 = get_enwiki_pageview_by_title("Anatomy")
-    assert p3.id == p.id
+        # Test get
+        p2 = get_enwiki_pageview(p.id)
+        assert p2.title == "Anatomy"
 
-    # Test list
-    all_p = list_enwiki_pageviews()
-    assert any(x.title == "Anatomy" for x in all_p)
+        # Test get by title
+        p3 = get_enwiki_pageview_by_title("Anatomy")
+        assert p3.id == p.id
 
-    # Test top views
-    top = get_top_enwiki_pageviews(1)
-    assert top[0].title == "Anatomy"
+        # Test list
+        all_p = list_enwiki_pageviews()
+        assert any(x.title == "Anatomy" for x in all_p)
 
-    # Test update
-    updated = update_enwiki_pageview(p.id, en_views=7500)
-    assert updated.en_views == 7500
+        # Test top views
+        top = get_top_enwiki_pageviews(1)
+        assert top[0].title == "Anatomy"
 
-    # Test add_or_update
-    p4 = add_or_update_enwiki_pageview("Anatomy", 10000)
-    assert p4.en_views == 10000
+        # Test update
+        updated = update_enwiki_pageview(p.id, en_views=7500)
+        assert updated.en_views == 7500
 
-    # Test delete
-    deleted = EnwikiPageviewService().delete(p.id)
-    assert deleted is True
-    assert get_enwiki_pageview(p.id) is None
+        # Test add_or_update
+        p4 = add_or_update_enwiki_pageview("Anatomy", 10000)
+        assert p4.en_views == 10000
 
-
-class TestListEnwikiPageviews:
-    """Tests for list_enwiki_pageviews function."""
+        # Test delete
+        deleted = EnwikiPageviewService().delete(p.id)
+        assert deleted is True
+        assert get_enwiki_pageview(p.id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
         """Test that function returns list from store."""
