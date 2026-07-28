@@ -7,6 +7,7 @@ from src.main_app.db.services.reports.report_service import (
 
 pytestmark = pytest.mark.unit
 
+
 class TestReportService:
 
     def test_report_workflow(self):
@@ -18,7 +19,6 @@ class TestReportService:
         assert len(service.query_reports_with_filters(filters)) >= 1
         service.delete(r.id)
         assert not any(x.id == r.id for x in service.list_reports())
-
 
     def test_returns_all_reports(self):
         service = ReportService()
