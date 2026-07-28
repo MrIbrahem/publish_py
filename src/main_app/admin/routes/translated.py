@@ -14,13 +14,7 @@ from flask import Blueprint, abort, flash, redirect, render_template, request, u
 from flask.typing import ResponseReturnValue
 
 from ...db.services.content import list_langs
-from ...db.services.pages import (
-    count_translated,
-    delete_page,
-    get_page_by_id,
-    list_translated,
-    update_page,
-)
+from ...db.services import UserPagesService, PagesService
 from ...extensions import db
 
 logger = logging.getLogger(__name__)
@@ -36,6 +30,8 @@ def _safe_int(value: str | None, default: int) -> int:
 class TranslatedRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.pages_service = PagesService()
+        self.user_pages_service = UserPagesService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -51,8 +47,8 @@ class TranslatedRoutes:
         offset = (page - 1) * limit
 
         try:
-            rows = list_translated(lang=lang, limit=limit, offset=offset)
-            total_count = count_translated(lang=lang)
+            rows = self.user_pages_service.list_translated(lang=lang, limit=limit, offset=offset)
+            total_count = self.user_pages_service.count_translated(lang=lang)
         except Exception:
             logger.exception("Failed to list translated pages lang=%r", lang)
             rows, total_count = [], 0
@@ -77,7 +73,7 @@ class TranslatedRoutes:
         if page_id <= 0:
             abort(400, description="id is required")
 
-        row = get_page_by_id(page_id)
+        row = self.pages_service.get_page_by_id(page_id)
         if not row:
             abort(404)
 
@@ -94,10 +90,9 @@ class TranslatedRoutes:
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")
             return redirect(url_for("admin.edit_done"))
-
         if "delete" in request.form:
             try:
-                delete_page(page_id)
+                self.pages_service.delete_page(page_id)
                 flash(f"Page id {page_id} deleted.", "success")
             except Exception:
                 logger.exception("Failed to delete page id=%r", page_id)
@@ -115,7 +110,7 @@ class TranslatedRoutes:
             return redirect(url_for("admin.translated.edit", id=page_id))
 
         try:
-            row = update_page(
+            row = self.pages_service.update_page(
                 page_id=page_id,
                 title=title,
                 target=target,

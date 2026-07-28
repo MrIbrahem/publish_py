@@ -24,7 +24,7 @@ from mwoauth import RequestToken
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from ...config import settings
-from ...db.services.users import delete_user_token
+from ...db.services.users import UserTokenService
 from ...shared.auth.auth_service import (
     OAuthCallbackError,
     complete_oauth_callback,
@@ -223,7 +223,7 @@ class AuthRoutes:
         # delete user token if possible
         if isinstance(user_id, int):
             try:
-                delete_user_token(user_id)
+                UserTokenService().delete(user_id)
                 flash("You have been logged out successfully.", "info")
                 logger.info("User token deleted for user_id: %s", user_id)
             except Exception:
