@@ -8,7 +8,9 @@ from typing import Any
 
 from ....config import settings
 from ....db.models import LanguageSettingRecord
-from ....db.services import LanguageSettingService, ReportService, UserTokenService
+from ....db.services import (
+    LanguageSettingService, ReportService, UserTokenService, MdwikiRevidService,
+)
 from ....shared.clients import (
     get_revid,
     get_revid_db,
@@ -41,7 +43,13 @@ def load_language_settings(lang: str) -> LanguageSettingRecord:
     return service.get_language_setting_by_code(lang) or LanguageSettingRecord()
 
 
-def _get_revid(sourcetitle) -> str:
+def _get_revid(sourcetitle) -> str | int:
+    service = MdwikiRevidService()
+    # title is the primary_key for MdwikiRevidRecord
+    mdwiki_revid_record = service.get_record_by_id(sourcetitle)
+    if mdwiki_revid_record:
+        return mdwiki_revid_record.revid
+
     revid = get_revid(sourcetitle)
 
     if not revid:

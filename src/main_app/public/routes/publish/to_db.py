@@ -44,7 +44,7 @@ def add_to_db(
     wd_result: dict[str, Any],
     campaign: str,
     sourcetitle: str,
-    mdwiki_revid: str,
+    mdwiki_revid: str | int,
     translate_type: str = "lead",
     words: int = 0,
 ) -> dict[str, Any]:

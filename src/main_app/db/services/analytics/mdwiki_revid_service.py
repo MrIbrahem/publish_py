@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
+    """
+    title is the primary_key for MdwikiRevidRecord
+    """
     model = MdwikiRevidRecord
 
     def __init__(self):
