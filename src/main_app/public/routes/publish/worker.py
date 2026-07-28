@@ -9,7 +9,7 @@ from typing import Any
 from ....config import settings
 from ....db.models import LanguageSettingRecord
 from ....db.services.config import LanguageSettingService
-from ....db.services.reports import add_report
+from ....db.services.reports import ReportService
 from ....db.services.users import UserTokenService
 from ....shared.clients import (
     get_revid,
@@ -204,7 +204,8 @@ def _handle_successful_edit(
         to_do(tab3, file_name)
 
         # Insert to reports
-        add_report(
+        report_service = ReportService()
+        report_service.add_report(
             title=title,
             user=user,
             lang=lang,
@@ -338,7 +339,8 @@ def _process_edit(
     tab["result_to_cx"] = editit
     to_do(tab, to_do_file)
 
-    add_report(
+    report_service = ReportService()
+    report_service.add_report(
         title=title,
         user=user,
         lang=lang,
@@ -369,7 +371,8 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
     tab["result_to_cx"] = editit
     to_do(tab, "noaccess")
 
-    add_report(
+    report_service = ReportService()
+    report_service.add_report(
         title=tab["title"],
         user=user,
         lang=tab["lang"],

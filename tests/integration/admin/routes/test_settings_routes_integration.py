@@ -26,12 +26,8 @@ class TestSettingsDashboard:
     def test_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
         """Test that settings dashboard lists settings."""
 
-        with patch("src.main_app.db.services.config.settings_service.list_settings") as mock_list:
-            mock_setting = MagicMock()
-            mock_setting.key = "test_setting"
-            mock_setting.value_type = "boolean"
-            mock_setting.to_dict.return_value = {"value": True}
-            mock_list.return_value = [mock_setting]
+        with patch("src.main_app.admin.routes.settings.SettingsService.get_all_settings_raw") as mock_list:
+            mock_list.return_value = [{"key": "test_setting", "value_type": "boolean", "value": True, "title": "Test Title"}]
 
             response = auth_client.get("/admin/settings/")
 
@@ -56,7 +52,7 @@ class TestCreateSetting:
     def test_create_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test creating setting with valid data."""
 
-        with patch("src.main_app.db.services.config.settings_service.create_setting") as mock_add:
+        with patch("src.main_app.admin.routes.settings.SettingsService.create_setting") as mock_add:
             mock_add.return_value = MagicMock(key="new_setting")
 
             response = auth_client.post(
@@ -104,13 +100,12 @@ class TestUpdateSetting:
     def test_update_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test updating setting with valid data."""
 
-        mock_setting = MagicMock()
-        mock_setting.key = "test_setting"
-        mock_setting.value_type = "boolean"
-        mock_setting.id = 1
+        mock_setting = {"key": "test_setting", "value_type": "boolean", "value": True, "title": "Test Title"}
 
-        with patch("src.main_app.db.services.config.settings_service.list_settings") as mock_list:
+        with patch("src.main_app.admin.routes.settings.SettingsService.get_all_settings_raw") as mock_list, \
+             patch("src.main_app.admin.routes.settings.SettingsService.update_setting") as mock_update:
             mock_list.return_value = [mock_setting]
+            mock_update.return_value = True
 
             response = auth_client.post(
                 "/admin/settings/update",
@@ -123,13 +118,12 @@ class TestUpdateSetting:
 
     def test_delete_setting_via_update(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting setting via update form."""
-        mock_setting = MagicMock()
-        mock_setting.key = "test_setting"
-        mock_setting.value_type = "boolean"
-        mock_setting.id = 1
+        mock_setting = {"key": "test_setting", "value_type": "boolean", "value": True, "title": "Test Title"}
 
-        with patch("src.main_app.db.services.config.settings_service.list_settings") as mock_list:
+        with patch("src.main_app.admin.routes.settings.SettingsService.get_all_settings_raw") as mock_list, \
+             patch("src.main_app.admin.routes.settings.SettingsService.delete_setting_by_key") as mock_delete:
             mock_list.return_value = [mock_setting]
+            mock_delete.return_value = True
 
             response = auth_client.post(
                 "/admin/settings/update",

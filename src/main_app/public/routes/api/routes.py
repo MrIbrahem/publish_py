@@ -13,11 +13,11 @@ from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
 from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
-from ....db.services.content import list_categories, list_langs
-from ....db.services.pages import get_in_process_counts_by_user, list_of_users_by_translations_count, top_lang_of_users
+from ....db.services.content import CategoryService, LangService
+from ....db.services.pages import InProcessService, list_of_users_by_translations_count, top_lang_of_users
 from ....db.services.pages_query_service import list_pages_users, list_pages_with_views
-from ....db.services.reports import query_reports_with_filters
-from ....db.services.users import users_search
+from ....db.services.reports import ReportService
+from ....db.services.users import UsersService
 from ....extensions import db
 from ....shared.core.cors import check_cors
 from ....shared.schemas import PublishReportsQuerySchema
@@ -69,7 +69,8 @@ def get_publish_reports() -> tuple[Response, int] | Response:
 
     try:
         # Query database
-        records: list[ReportRecord] = query_reports_with_filters(filters, select_fields, limit)
+        service = ReportService()
+        records: list[ReportRecord] = service.query_reports_with_filters(filters, select_fields, limit)
 
     except Exception:
         logger.exception("Error fetching publish_reports")
@@ -221,7 +222,8 @@ def get_in_process_total() -> tuple[Response, int] | Response:
         JSON response with user counts
     """
     try:
-        data = get_in_process_counts_by_user()
+        service = InProcessService()
+        data = service.get_in_process_counts_by_user()
 
     except Exception:
         logger.exception("Error fetching in_process_total data")
@@ -302,7 +304,8 @@ def get_categories() -> tuple[Response, int] | Response:
     Handle categories API requests. Returns all category records.
     """
     try:
-        records = list_categories()
+        category_service = CategoryService()
+        records = category_service.list_categories()
     except Exception:
         logger.exception("Error fetching categories data")
         return jsonify({"error": "An internal error occurred while fetching categories data"}), 500
@@ -367,7 +370,8 @@ def get_langs() -> tuple[Response, int] | Response:
     Handle langs API requests. Returns all language records.
     """
     try:
-        records = list_langs()
+        lang_service = LangService()
+        records = lang_service.list_langs()
     except Exception:
         logger.exception("Error fetching langs data")
         return jsonify({"error": "An internal error occurred while fetching langs data"}), 500
@@ -390,7 +394,8 @@ def get_users() -> tuple[Response, int] | Response:
         return jsonify({"error": "Query parameter 'userlike' is required"}), 400
 
     try:
-        records = users_search(userlike)
+        service = UsersService()
+        records = service.users_search(userlike)
     except Exception:
         logger.exception("Error fetching users data")
         return jsonify({"error": "An internal error occurred while fetching users data"}), 500

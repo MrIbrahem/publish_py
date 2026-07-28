@@ -61,7 +61,7 @@ class TestCheckCorsOnCxtokenGet:
         """GET from allowed origin passes CORS check and reaches handler."""
         with (
             patch(
-                "src.main_app.public.routes.cxtoken.routes.get_user_token_by_username",
+                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username",
                 return_value=None,
             ),
         ):
@@ -84,7 +84,7 @@ class TestCheckCorsOnCxtokenGet:
     def test_get_allowed_origin_returns_cxtoken(self, mock_is_allowed_medwiki, mock_client):
         """GET from allowed origin returns cxtoken on success."""
         with (
-            patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username") as mock_get_token,
             patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
             mock_token = MagicMock()
@@ -137,7 +137,7 @@ class TestCxtokenCorsOnIntegration:
     def test_get_same_origin_passes_real_cors(self, mock_app, mock_client):
         """GET from same origin passes real CORS check."""
         with patch(
-            "src.main_app.public.routes.cxtoken.routes.get_user_token_by_username",
+            "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username",
             return_value=None,
         ):
             response = mock_client.get(

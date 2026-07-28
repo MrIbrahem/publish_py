@@ -106,10 +106,10 @@ class TestValidateAccessOnPublish:
         """POST from allowed origin passes CORS and reaches handler logic."""
         with (
             patch(
-                "src.main_app.public.routes.publish.routes.get_user_token_by_username",
+                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.main_app.public.routes.publish.worker.add_report") as mock_reports_db,
+            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_reports_db,
         ):
             mock_reports_db.return_value = None
 
@@ -136,10 +136,10 @@ class TestValidateAccessOnPublish:
         with (
             patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value="evil.com"),
             patch(
-                "src.main_app.public.routes.publish.routes.get_user_token_by_username",
+                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.main_app.public.routes.publish.worker.add_report") as mock_reports_db,
+            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_reports_db,
         ):
             mock_reports_db.return_value = None
 
@@ -167,10 +167,10 @@ class TestValidateAccessOnPublish:
         with (
             patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),
             patch(
-                "src.main_app.public.routes.publish.routes.get_user_token_by_username",
+                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
                 return_value=None,
             ),
-            patch("src.main_app.public.routes.publish.worker.add_report") as mock_reports_db,
+            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_reports_db,
         ):
             mock_reports_db.return_value = None
 

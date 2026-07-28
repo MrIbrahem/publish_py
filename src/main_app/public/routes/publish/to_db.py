@@ -5,15 +5,8 @@ import logging
 from typing import Any
 
 from ....db.models import PageRecord, UserPageRecord
-from ....db.services.content import get_campaign_category
-from ....db.services.pages import (
-    find_page_record,
-    find_user_page_record,
-    insert_page_target,
-    insert_user_page_target,
-    set_page_target,
-    set_user_page_target,
-)
+from ....db.services.content import CategoryService
+from ....db.services.pages import PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +17,10 @@ def find_exists_or_update_page(
     user: str,
     target: str,
 ) -> bool:
-    orm_obj: PageRecord | None = find_page_record(sourcetitle, lang, user)
+    service = PagesService()
+    orm_obj: PageRecord | None = service.find_page_record(sourcetitle, lang, user)
     if orm_obj:
-        return set_page_target(orm_obj, target)
+        return service.set_page_target(orm_obj, target)
     return False
 
 
@@ -36,9 +30,10 @@ def find_exists_or_update_user_page(
     user: str,
     target: str,
 ) -> bool:
-    orm_obj: UserPageRecord | None = find_user_page_record(sourcetitle, lang, user)
+    service = UserPagesService()
+    orm_obj: UserPageRecord | None = service.find_user_page_record(sourcetitle, lang, user)
     if orm_obj:
-        return set_user_page_target(orm_obj, target)
+        return service.set_user_page_target(orm_obj, target)
     return False
 
 
@@ -71,7 +66,8 @@ def add_to_db(
     """
     # Get category from campaign using database lookup
     # This mirrors the PHP retrieveCampaignCategories() function
-    cat_object = get_campaign_category(campaign)
+    category_service = CategoryService()
+    cat_object = category_service.get_campaign_category(campaign)
     cat = cat_object.category if cat_object else ""
 
     # Check if abuse filter warning was triggered
@@ -117,7 +113,8 @@ def add_to_db(
 
     if to_users_table:
         # Insert new record
-        add_done = insert_user_page_target(
+        service = UserPagesService()
+        add_done = service.insert_user_page_target(
             sourcetitle=sourcetitle,
             translate_type=translate_type,
             cat=cat,
@@ -129,7 +126,8 @@ def add_to_db(
         )
     else:
         # Insert new record
-        add_done = insert_page_target(
+        service = PagesService()
+        add_done = service.insert_page_target(
             sourcetitle=sourcetitle,
             translate_type=translate_type,
             cat=cat,

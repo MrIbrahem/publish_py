@@ -19,10 +19,10 @@ import logging
 from typing import Any
 
 from ....db.services.pages import (
+    InProcessService,
+    PagesService,
+    TranslateTypeService,
     exists_by_lang_and_category,
-    list_in_process_by_lang,
-    list_pages_by_lang_cat,
-    list_translate_types,
     missing_by_lang_and_category,
 )
 from ....shared.utils.wiki_links import (
@@ -38,7 +38,8 @@ logger = logging.getLogger(__name__)
 
 def _get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str, dict]:
     """Mirror of PHP ``getinprocess_n($missing, $code)``."""
-    records = list_in_process_by_lang(code)
+    service = InProcessService()
+    records = service.list_in_process_by_lang(code)
     result: dict[str, dict] = {}
     for r in records:
         if r.title not in missing_titles:
@@ -69,7 +70,8 @@ def _load_translate_type_sets() -> tuple[set[str], set[str]]:
     nolead: set[str] = set()
     full: set[str] = set()
     try:
-        rows = list_translate_types()
+        service = TranslateTypeService()
+        rows = service.list_translate_types()
     except Exception:
         logger.exception("Failed to load translate_type rows")
         return nolead, full
@@ -555,7 +557,8 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
       - ``missing``   is a list[missing row dict] (in DB order)
     """
     # logic from results_2026/get_results_2026.php — exists_via_td
-    exists_via_td_rows = list_pages_by_lang_cat(code, cat)
+    pages_service = PagesService()
+    exists_via_td_rows = pages_service.list_pages_by_lang_cat(code, cat)
     exists_via_td = {p.title: p for p in exists_via_td_rows}
 
     items_missing = missing_by_lang_and_category(code, cat)
@@ -582,7 +585,7 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
         "len_inprocess": len(inprocess),
         "len_missing": len(items_missing),
         "len_exists": len(items_exists),
-        "total": len(items_exists) + len(items_missing) + len(inprocess),
+        "total": len(items_exists) + len(missing) + len(inprocess),
     }
     # Match PHP ksort($items_exists)
     items_exists = dict(sorted(items_exists.items()))

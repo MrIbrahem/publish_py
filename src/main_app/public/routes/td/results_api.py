@@ -7,8 +7,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....db.services.content import get_camp_to_cats
-from ....db.services.pages import list_in_process_by_lang, list_pages_by_lang_cat
+from ....db.services.content import CategoryService
+from ....db.services.pages import InProcessService, PagesService
 from ....db.services.wikidata import list_targets_by_lang
 from ....shared.clients import get_mdwiki_cat_members
 
@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 def _resolve_campaign_to_category(camp: str) -> str:
-    cats = get_camp_to_cats()
+    category_service = CategoryService()
+    cats = category_service.get_camp_to_cats()
     return cats.get(camp, camp)
 
 
@@ -27,7 +28,8 @@ def _get_cat_exists_and_missing(
     code: str,
 ) -> tuple[dict, list]:
     if not pages_by_title:
-        pages_by_title = {p.title: p for p in list_pages_by_lang_cat(code, cat)}
+        pages_service = PagesService()
+        pages_by_title = {p.title: p for p in pages_service.list_pages_by_lang_cat(code, cat)}
 
     members = get_mdwiki_cat_members(cat, depth, use_cache=True)
     member_set = set(members)
@@ -73,7 +75,8 @@ def _exists_expends(
 
 
 def _get_inprocess_for_titles(missing: list[str], code: str) -> dict[str, dict]:
-    records = list_in_process_by_lang(code)
+    service = InProcessService()
+    records = service.list_in_process_by_lang(code)
 
     missing_set = set(missing)
     return {
@@ -128,7 +131,8 @@ def results_api_result(
 
     cat = _resolve_campaign_to_category(camp)
 
-    pages = list_pages_by_lang_cat(code, cat)
+    pages_service = PagesService()
+    pages = pages_service.list_pages_by_lang_cat(code, cat)
     pages_by_title = {p.title: p for p in pages}
 
     items_exists, items_missing = _get_cat_exists_and_missing(pages_by_title, cat, depth_int, code)

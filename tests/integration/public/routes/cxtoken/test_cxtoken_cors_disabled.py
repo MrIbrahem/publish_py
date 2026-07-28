@@ -41,7 +41,7 @@ class TestCxtokenEndpoint:
 
     def test_cors_not_allowed_without_origin(self, mock_client):
         """Test that requests without allowed origin are rejected."""
-        with patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token:
+        with patch("src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username") as mock_get_token:
             mock_get_token.return_value = None
             response = mock_client.get(
                 "/cxtoken?wiki=en&user=TestUser",
@@ -81,7 +81,7 @@ class TestCxtokenEndpoint:
 
     def test_returns_no_access_when_user_not_found(self, mock_client):
         """Test that no access error is returned when user not found in DB."""
-        with (patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,):
+        with (patch("src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username") as mock_get_token,):
             mock_get_token.return_value = None
 
             response = mock_client.get("/cxtoken?wiki=en&user=UnknownUser")
@@ -103,7 +103,7 @@ class TestCxtokenEndpoint:
     def test_returns_cxtoken_on_success(self, mock_client):
         """Test that cxtoken is returned on success."""
         with (
-            patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username") as mock_get_token,
             patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
         ):
             # Mock user token
@@ -135,9 +135,9 @@ class TestCxtokenEndpoint:
     def test_deletes_access_on_invalid_authorization(self, mock_client):
         """Test that access is deleted on invalid authorization error."""
         with (
-            patch("src.main_app.public.routes.cxtoken.routes.get_user_token_by_username") as mock_get_token,
+            patch("src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username") as mock_get_token,
             patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
-            patch("src.main_app.public.routes.cxtoken.routes.delete_user_token") as mock_delete,
+            patch("src.main_app.public.routes.cxtoken.routes.UserTokenService.delete") as mock_delete,
         ):
             # Mock user token
             mock_token = MagicMock()
