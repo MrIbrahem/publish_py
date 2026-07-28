@@ -27,10 +27,12 @@ class TestProjectService(TestSetup):
 
         # Test get
         p2 = get_project(p.g_id)
+        assert p2 is not None
         assert p2.g_title == "WikiProject Medicine"
 
         # Test get by title
         p3 = get_project_by_title("WikiProject Medicine")
+        assert p3 is not None
         assert p3.g_id == p.g_id
 
         # Test list
@@ -75,6 +77,7 @@ class TestGetProjectByTitle(TestSetup):
         """Test that function returns record by title."""
         add_project("WikiProject Physiology")
         result = get_project_by_title("WikiProject Physiology")
+        assert result is not None
         assert result.g_title == "WikiProject Physiology"
 
     def test_returns_none_when_not_found(self, monkeypatch):

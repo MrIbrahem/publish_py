@@ -32,10 +32,12 @@ class TestViewsNewService(TestSetup):
 
         # Test get
         v2 = get_views_new(v.id)
+        assert v2 is not None
         assert v2.target == "Dengue_fever"
 
         # Test get by target, lang, year
         v3 = get_views_by_target_lang_year("Dengue_fever", "en", 2023)
+        assert v3 is not None
         assert v3.id == v.id
 
         # Test list
@@ -119,6 +121,7 @@ class TestGetViewsByTargetLangYear(TestSetup):
         """Test that function returns record by target, lang, and year."""
         add_views_new("Measles", "en", 2023)
         result = get_views_by_target_lang_year("Measles", "en", 2023)
+        assert result is not None
         assert result.target == "Measles"
         assert result.year == 2023
 

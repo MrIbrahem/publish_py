@@ -28,6 +28,7 @@ class TestMdwikiRevidService(TestSetup):
 
         # Test get by title
         r2 = get_mdwiki_revid_by_title("Cell biology")
+        assert r2 is not None
         assert r2.revid == 1234567
 
         # Test get_revid_for_title
@@ -40,10 +41,12 @@ class TestMdwikiRevidService(TestSetup):
 
         # Test update
         updated = update_mdwiki_revid("Cell biology", 7654321)
+        assert updated is not None
         assert updated.revid == 7654321
 
         # Test add_or_update
         r3 = add_or_update_mdwiki_revid("Cell biology", 9999999)
+        assert r3 is not None
         assert r3.revid == 9999999
 
         # Test delete
@@ -65,6 +68,7 @@ class TestGetMdwikiRevidByTitle(TestSetup):
         """Test that function returns record by title."""
         add_mdwiki_revid("Aspirin", 3030303)
         result = get_mdwiki_revid_by_title("Aspirin")
+        assert result is not None
         assert result.revid == 3030303
 
     def test_returns_none_when_not_found(self, monkeypatch):
@@ -97,6 +101,7 @@ class TestAddOrUpdateMdwikiRevid(TestSetup):
         """Test that function upserts record."""
         add_mdwiki_revid("Insulin", 5050505)
         record = add_or_update_mdwiki_revid("Insulin", 6060606)
+        assert record is not None
         assert record.revid == 6060606
         assert len(list_mdwiki_revids()) == 1
 
@@ -112,6 +117,7 @@ class TestUpdateMdwikiRevid(TestSetup):
         """Test that function updates and returns record."""
         add_mdwiki_revid("Paracetamol", 7070707)
         updated = update_mdwiki_revid("Paracetamol", 8080808)
+        assert updated is not None
         assert updated.revid == 8080808
 
     def test_raises_error_if_not_found(self, monkeypatch):

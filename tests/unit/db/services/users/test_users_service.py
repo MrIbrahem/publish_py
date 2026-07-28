@@ -30,13 +30,18 @@ class TestUsersService(TestSetup):
         u = create_user("Wiki_User", email="jh@example.com", wiki="enwiki", user_group="Editor")
         assert u.username == "Wiki_User"
 
-        assert get_user(u.user_id).username == "Wiki_User"
-        assert get_user_by_username("Wiki_User").user_id == u.user_id
+        _user = get_user(u.user_id)
+        assert _user is not None
+        assert _user.username == "Wiki_User"
+        _by_name = get_user_by_username("Wiki_User")
+        assert _by_name is not None
+        assert _by_name.user_id == u.user_id
 
         assert any(x.username == "Wiki_User" for x in list_users())
         assert any(x.username == "Wiki_User" for x in list_users_by_group("Editor"))
 
         updated = update_user_data(u.user_id, email="jh_new@example.com")
+        assert updated is not None
         assert updated.email == "jh_new@example.com"
 
         assert user_exists("Wiki_User") is True
@@ -86,6 +91,7 @@ class TestGetUserByUsername(TestSetup):
         """Test that function returns record by username."""
         create_user("Linguist_Specialist")
         result = get_user_by_username("Linguist_Specialist")
+        assert result is not None
         assert result.username == "Linguist_Specialist"
 
     def test_returns_none_when_not_found(self, monkeypatch):
@@ -122,6 +128,7 @@ class TestUpdateUser(TestSetup):
         """Test that function updates and returns record."""
         u = create_user("Bureaucrat1", email="old_email")
         updated = update_user_data(u.user_id, email="new_email")
+        assert updated is not None
         assert updated.email == "new_email"
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):

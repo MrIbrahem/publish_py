@@ -31,10 +31,12 @@ class TestFullTranslatorService(TestSetup):
 
         # Test get
         ft2 = get_full_translator(ft.id)
+        assert ft2 is not None
         assert ft2.user == "Global_Translator"
 
         # Test get by user
         ft3 = get_full_translator_by_user("Global_Translator")
+        assert ft3 is not None
         assert ft3.id == ft.id
 
         # Test list
@@ -101,6 +103,7 @@ class TestGetFullTranslatorByUser(TestSetup):
         """Test that function returns translator by username."""
         add_full_translator("Polyglot_Wiki")
         result = get_full_translator_by_user("Polyglot_Wiki")
+        assert result is not None
         assert result.user == "Polyglot_Wiki"
 
     def test_returns_none_when_not_found(self, monkeypatch):

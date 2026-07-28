@@ -22,10 +22,12 @@ class TestLanguageSettingService(TestSetup):
 
         # Test get
         ls2 = service.get_language_setting(ls.id)
+        assert ls2 is not None
         assert ls2.lang_code == "ar"
 
         # Test get by code
         ls3 = service.get_language_setting_by_code("ar")
+        assert ls3 is not None
         assert ls3.id == ls.id
 
         # Test list
@@ -79,6 +81,7 @@ class TestGetLanguageSettingByCode(TestSetup):
         service = LanguageSettingService()
         service.add_language_setting("hi")
         result = service.get_language_setting_by_code("hi")
+        assert result is not None
         assert result.lang_code == "hi"
 
     def test_returns_none_when_not_found(self, monkeypatch):

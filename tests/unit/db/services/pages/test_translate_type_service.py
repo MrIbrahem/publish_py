@@ -34,10 +34,12 @@ class TestTranslateTypeService(TestSetup):
 
         # Test get
         tt2 = get_translate_type(tt.tt_id)
+        assert tt2 is not None
         assert tt2.tt_title == "Medical history"
 
         # Test get by title
         tt3 = get_translate_type_by_title("Medical history")
+        assert tt3 is not None
         assert tt3.tt_id == tt.tt_id
 
         # Test list
@@ -56,6 +58,7 @@ class TestTranslateTypeService(TestSetup):
 
         # Test update
         updated = update_translate_type(tt.tt_id, tt_full=1)
+        assert updated is not None
         assert updated.tt_full == 1
         assert can_translate_full("Medical history") is True
 
@@ -117,6 +120,7 @@ class TestGetTranslateTypeByTitle(TestSetup):
         """Test that function returns record by title."""
         add_translate_type("Diagnostic test")
         result = get_translate_type_by_title("Diagnostic test")
+        assert result is not None
         assert result.tt_title == "Diagnostic test"
 
     def test_returns_none_when_not_found(self, monkeypatch):
@@ -149,11 +153,13 @@ class TestUpdateTranslateType(TestSetup):
         """Test that function updates and returns record."""
         tt = add_translate_type("Global health", 1, 0)
         updated = update_translate_type(tt.tt_id, tt_full=1)
+        assert updated is not None
         assert updated.tt_full == 1
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
         tt = add_translate_type("No_Change")
         result = update_translate_type(tt.tt_id)
+        assert result is not None
         assert result.tt_title == "No_Change"
 
 

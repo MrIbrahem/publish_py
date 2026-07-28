@@ -27,6 +27,7 @@ def test_pages_users_to_main_workflow(sqlite_db):
 
     # Test get
     p2 = get_pages_users_to_main(1)
+    assert p2 is not None
     assert p2.new_target == "Hépatite B"
 
     # Test list

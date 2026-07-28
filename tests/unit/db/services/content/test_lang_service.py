@@ -33,10 +33,12 @@ class TestLangService(TestSetup):
 
         # Test get
         l2 = get_lang(added.lang_id)
+        assert l2 is not None
         assert l2.code == "ar"
 
         # Test get by code
         l3 = get_lang_by_code("ar")
+        assert l3 is not None
         assert l3.lang_id == added.lang_id
 
         # Test list
@@ -81,6 +83,7 @@ class TestGetLangByCode(TestSetup):
         """Test that function returns record by code."""
         add_lang("de", "Deutsch", "German")
         result = get_lang_by_code("de")
+        assert result is not None
         assert result.code == "de"
 
     def test_returns_none_when_not_found(self, monkeypatch):

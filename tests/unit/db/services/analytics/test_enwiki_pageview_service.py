@@ -104,6 +104,7 @@ class TestGetEnwikiPageviewByTitle(TestSetup):
         """Test that function returns record by title."""
         add_enwiki_pageview("Microbiology")
         result = get_enwiki_pageview_by_title("Microbiology")
+        assert result is not None
         assert result.title == "Microbiology"
 
     def test_returns_none_when_not_found(self, monkeypatch):

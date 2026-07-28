@@ -30,10 +30,12 @@ class TestRefsCountService(TestSetup):
 
         # Test get
         r2 = get_refs_count(r.r_id)
+        assert r2 is not None
         assert r2.r_title == "Aspirin"
 
         # Test get by title
         r3 = get_refs_count_by_title("Aspirin")
+        assert r3 is not None
         assert r3.r_id == r.r_id
 
         # Test get_ref_counts_for_title
@@ -87,6 +89,7 @@ class TestGetRefsCountByTitle(TestSetup):
         """Test that function returns record by title."""
         add_refs_count("Penicillin")
         result = get_refs_count_by_title("Penicillin")
+        assert result is not None
         assert result.r_title == "Penicillin"
 
     def test_returns_none_when_not_found(self, monkeypatch):

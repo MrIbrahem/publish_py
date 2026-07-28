@@ -30,10 +30,12 @@ class TestWordService(TestSetup):
 
         # Test get
         w2 = get_word(w.w_id)
+        assert w2 is not None
         assert w2.w_title == "Human anatomy"
 
         # Test get by title
         w3 = get_word_by_title("Human anatomy")
+        assert w3 is not None
         assert w3.w_id == w.w_id
 
         # Test get_word_counts_for_title
@@ -88,6 +90,7 @@ class TestGetWordByTitle(TestSetup):
         """Test that function returns record by title."""
         add_word("DNA replication")
         result = get_word_by_title("DNA replication")
+        assert result is not None
         assert result.w_title == "DNA replication"
 
     def test_returns_none_when_not_found(self, monkeypatch):

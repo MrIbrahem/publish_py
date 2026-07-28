@@ -31,10 +31,12 @@ class TestUsersNoInprocessService(TestSetup):
 
         # Test get
         rec2 = get_users_no_inprocess(rec.id)
+        assert rec2 is not None
         assert rec2.user == "User_1"
 
         # Test get by user
         rec3 = get_users_no_inprocess_by_user("User_1")
+        assert rec3 is not None
         assert rec3.id == rec.id
 
         # Test list
@@ -101,6 +103,7 @@ class TestGetUsersNoInprocessByUser(TestSetup):
         """Test that function returns record by username."""
         add_users_no_inprocess("Medical_Librarian")
         result = get_users_no_inprocess_by_user("Medical_Librarian")
+        assert result is not None
         assert result.user == "Medical_Librarian"
 
     def test_returns_none_when_not_found(self, monkeypatch):
