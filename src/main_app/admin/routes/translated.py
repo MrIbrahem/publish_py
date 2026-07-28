@@ -13,8 +13,8 @@ import logging
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
+from ...db.services import PagesService, UserPagesService
 from ...db.services.content import list_langs
-from ...db.services import UserPagesService, PagesService
 from ...extensions import db
 
 logger = logging.getLogger(__name__)
@@ -92,7 +92,7 @@ class TranslatedRoutes:
             return redirect(url_for("admin.edit_done"))
         if "delete" in request.form:
             try:
-                self.pages_service.delete_page(page_id)
+                self.pages_service.delete(page_id)
                 flash(f"Page id {page_id} deleted.", "success")
             except Exception:
                 logger.exception("Failed to delete page id=%r", page_id)

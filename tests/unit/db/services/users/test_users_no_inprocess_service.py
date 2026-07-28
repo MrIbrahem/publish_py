@@ -1,10 +1,8 @@
 import pytest
 
 from src.main_app.db.models import UsersNoInprocessRecord
-from src.main_app.db.services.delete_service import (
-    delete_users_no_inprocess,
-)
 from src.main_app.db.services.users.users_no_inprocess_service import (
+    UsersNoInprocessService,
     add_or_update_users_no_inprocess,
     add_users_no_inprocess,
     get_users_no_inprocess,
@@ -49,7 +47,7 @@ def test_users_no_inprocess_workflow():
     assert should_hide_from_inprocess("User_1") is True
 
     # Test delete
-    deleted = delete_users_no_inprocess(rec.id)
+    deleted = UsersNoInprocessService().delete(rec.id)
     assert deleted is True
     assert get_users_no_inprocess(rec.id) is None
 
@@ -162,12 +160,12 @@ class TestDeleteUsersNoInprocess:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         rec = add_users_no_inprocess("To_Delete")
-        deleted = delete_users_no_inprocess(rec.id)
+        deleted = UsersNoInprocessService().delete(rec.id)
         assert deleted is True
         assert get_users_no_inprocess(rec.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_users_no_inprocess(9999) is False
+        assert UsersNoInprocessService().delete(9999) is False
 
 
 class TestShouldHideFromInprocess:

@@ -3,10 +3,8 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import PagesUsersToMainRecord
-from src.main_app.db.services.delete_service import (
-    delete_pages_users_to_main,
-)
 from src.main_app.db.services.reports.pages_users_to_main_service import (
+    PagesUsersToMainService,
     add_pages_users_to_main,
     get_pages_users_to_main,
     list_pages_users_to_main,
@@ -40,7 +38,7 @@ def test_pages_users_to_main_workflow(sqlite_db):
     assert updated.new_target == "Hépatite B (maladie)"
 
     # Test delete
-    deleted = delete_pages_users_to_main(1)
+    deleted = PagesUsersToMainService().delete(1)
     assert deleted is True
     assert get_pages_users_to_main(1) is None
 
@@ -141,9 +139,9 @@ class TestDeletePagesUsersToMain:
         sqlite_db.session.commit()
 
         add_pages_users_to_main(id=60, new_target="Ebola")
-        deleted = delete_pages_users_to_main(60)
+        deleted = PagesUsersToMainService().delete(60)
         assert deleted is True
         assert get_pages_users_to_main(60) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_pages_users_to_main(9999) is False
+        assert PagesUsersToMainService().delete(9999) is False

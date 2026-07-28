@@ -3,10 +3,8 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import UserRecord
-from src.main_app.db.services.delete_service import (
-    delete_user,
-)
 from src.main_app.db.services.users.users_service import (
+    UsersService,
     create_user,
     get_user,
     get_user_by_username,
@@ -34,7 +32,7 @@ def test_user_workflow():
 
     assert user_exists("Wiki_User") is True
 
-    deleted = delete_user(u.user_id)
+    deleted = UsersService().delete(u.user_id)
     assert deleted is True
     assert get_user(u.user_id) is None
 
@@ -133,12 +131,12 @@ class TestDeleteUser:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         u = create_user("Temporary_Account")
-        deleted = delete_user(u.user_id)
+        deleted = UsersService().delete(u.user_id)
         assert deleted is True
         assert get_user(u.user_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_user(9999) is False
+        assert UsersService().delete(9999) is False
 
 
 class TestUserExists:

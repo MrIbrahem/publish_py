@@ -1,10 +1,8 @@
 import pytest
 
 from src.main_app.db.models import FullTranslatorRecord
-from src.main_app.db.services.delete_service import (
-    delete_full_translator,
-)
 from src.main_app.db.services.users.full_translator_service import (
+    FullTranslatorService,
     add_full_translator,
     add_or_update_full_translator,
     get_full_translator,
@@ -49,7 +47,7 @@ def test_full_translator_workflow():
     assert is_full_translator("Global_Translator") is True
 
     # Test delete
-    deleted = delete_full_translator(ft.id)
+    deleted = FullTranslatorService().delete(ft.id)
     assert deleted is True
     assert get_full_translator(ft.id) is None
 
@@ -162,12 +160,12 @@ class TestDeleteFullTranslator:
     def test_deletes_translator(self, monkeypatch):
         """Test that delete_full_translator calls store delete."""
         ft = add_full_translator("Delete_Trans")
-        deleted = delete_full_translator(ft.id)
+        deleted = FullTranslatorService().delete(ft.id)
         assert deleted is True
         assert get_full_translator(ft.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_full_translator(9999) is False
+        assert FullTranslatorService().delete(9999) is False
 
 
 class TestIsFullTranslator:

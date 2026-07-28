@@ -2,10 +2,8 @@ import pytest
 
 from src.main_app.db.exceptions import UniqueError
 from src.main_app.db.models import PageRecord, QidRecord, TranslateTypeRecord
-from src.main_app.db.services.delete_service import (
-    delete_translate_type,
-)
 from src.main_app.db.services.pages.translate_type_service import (
+    TranslateTypeService,
     add_translate_type,
     can_translate_full,
     can_translate_lead,
@@ -53,7 +51,7 @@ def test_translate_type_workflow():
     assert can_translate_full("Medical history") is True
 
     # Test delete
-    deleted = delete_translate_type(tt.tt_id)
+    deleted = TranslateTypeService().delete(tt.tt_id)
     assert deleted is True
     assert get_translate_type(tt.tt_id) is None
 
@@ -160,12 +158,12 @@ class TestDeleteTranslateType:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         tt = add_translate_type("Pathology report")
-        deleted = delete_translate_type(tt.tt_id)
+        deleted = TranslateTypeService().delete(tt.tt_id)
         assert deleted is True
         assert get_translate_type(tt.tt_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_translate_type(9999) is False
+        assert TranslateTypeService().delete(9999) is False
 
 
 class TestCanTranslateLead:

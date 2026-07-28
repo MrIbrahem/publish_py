@@ -2,9 +2,9 @@ import pytest
 
 from src.main_app.db.models import AssessmentRecord
 from src.main_app.db.services.analytics.assessment_service import (
+    AssessmentService,
     add_assessment,
     add_or_update_assessment,
-    delete_assessment,
     get_assessment,
     get_assessment_by_title,
     list_assessments,
@@ -20,10 +20,12 @@ def test_assessment_workflow():
 
     # Test get
     a2 = get_assessment(a.id)
+    assert a2 is not None
     assert a2.title == "Diabetes mellitus"
 
     # Test get by title
     a3 = get_assessment_by_title("Diabetes mellitus")
+    assert a3 is not None
     assert a3.id == a.id
 
     # Test list
@@ -39,7 +41,7 @@ def test_assessment_workflow():
     assert a4.importance == "Mid"
 
     # Test delete
-    deleted = delete_assessment(a.id)
+    deleted = AssessmentService().delete(a.id)
     assert deleted is True
     assert get_assessment(a.id) is None
 
@@ -76,6 +78,7 @@ class TestGetAssessmentByTitle:
         """Test that function returns record by title."""
         add_assessment("Stroke")
         result = get_assessment_by_title("Stroke")
+        assert result is not None
         assert result.title == "Stroke"
 
     def test_returns_none_when_not_found(self, monkeypatch):
@@ -141,9 +144,9 @@ class TestDeleteAssessment:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         a = add_assessment("Measles")
-        deleted = delete_assessment(a.id)
+        deleted = AssessmentService().delete(a.id)
         assert deleted is True
         assert get_assessment(a.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_assessment(9999) is False
+        assert AssessmentService().delete(9999) is False

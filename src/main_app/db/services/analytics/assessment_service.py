@@ -80,7 +80,6 @@ get_assessment_by_title = _crud.get_assessment_by_title
 add_assessment = _crud.add_assessment
 add_or_update_assessment = _crud.add_or_update_assessment
 update_assessment = _crud.update_assessment
-delete_assessment = _crud.delete_assessment
 
 __all__ = [
     "list_assessments",

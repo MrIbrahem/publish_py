@@ -33,6 +33,7 @@ def test_page_workflow(sqlite_db):
     assert any(x.title == "COVID-19 pandemic" for x in list_pages())
 
     updated = update_page(p.id, "COVID-19", "COVID-19.html")
+    assert updated is not None
     assert updated.title == "COVID-19"
 
     orm_p = sqlite_db.session.get(PageRecord, p.id)
@@ -101,6 +102,7 @@ class TestUpdatePage:
         """Test that function updates the record."""
         p = add_page("Sociology", "lead", "Social", "en", "TestUser", "Sociology.html")
         updated = update_page(p.id, "Social Science", "Social_Science.html")
+        assert updated is not None
         assert updated.title == "Social Science"
         assert updated.target == "Social_Science.html"
 

@@ -15,7 +15,10 @@ def test_category_workflow() -> None:
     c = add_category("Medicine", "Medicine Content", "Health_Campaign", "Anatomy", 1, 1)
     assert c.category == "Medicine"
 
-    assert get_campaign_category("Health_Campaign").category == "Medicine"
+    a1 = get_campaign_category("Health_Campaign")
+    assert a1 is not None
+    assert a1.category == "Medicine"
+
     assert any(x.category == "Medicine" for x in list_categories())
 
     assert get_camp_to_cats()["Health_Campaign"] == "Medicine"
@@ -26,7 +29,10 @@ def test_category_workflow() -> None:
         campaign="Science_Campaign",
     )
     assert updated.category == "Medical_Science"
-    assert get_campaign_category("Science_Campaign").category == "Medical_Science"
+
+    a2 = get_campaign_category("Science_Campaign")
+    assert a2 is not None
+    assert a2.category == "Medical_Science"
 
     CategoryService().delete(c.id)
     assert get_campaign_category("Science_Campaign") is None
