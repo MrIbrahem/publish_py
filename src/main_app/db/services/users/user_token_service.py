@@ -12,10 +12,11 @@ from sqlalchemy.orm import Session, joinedload
 
 from ....extensions import db
 from ....shared.core.crypto import encrypt_value
-from ...models import UserTokenRecord, UserRecord
+from ...models import UserRecord, UserTokenRecord
 from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
+
 
 def _get_user_token_by_username(username: str, session: Session | Any) -> UserTokenRecord | None:
     try:
@@ -28,6 +29,7 @@ def _get_user_token_by_username(username: str, session: Session | Any) -> UserTo
     except Exception as exc:
         logger.error("Error getting token by username %s: %s", username, exc)
         return None
+
 
 class UserTokenService(CRUDService[UserTokenRecord]):
     def __init__(self) -> None:
@@ -127,6 +129,7 @@ class UserTokenService(CRUDService[UserTokenRecord]):
 
     def get_user_token_by_username(self, username: str) -> UserTokenRecord | None:
         return _get_user_token_by_username(username, self.session)
+
 
 _crud = UserTokenService()
 

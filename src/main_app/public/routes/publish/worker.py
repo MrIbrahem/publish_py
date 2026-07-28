@@ -32,6 +32,7 @@ from .to_db import add_to_db
 
 logger = logging.getLogger(__name__)
 
+
 def load_language_settings(lang: str) -> LanguageSettingRecord:
     """Load language settings for the given language.
 
@@ -162,6 +163,7 @@ def _retry_with_fallback_user(
         logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
 
     return link_result
+
 
 def _handle_successful_edit(
     sourcetitle: str,
