@@ -261,7 +261,6 @@ def get_chart_data_formatted(
     lang: str | None = None,
     user: str | None = None,
 ) -> dict[str, list]:
-
     chart_data_raw = get_leaderboard_chart_data(
         camp=camp,
         cat=cat,

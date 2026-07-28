@@ -91,7 +91,6 @@ class UserTokenService(CRUDService[UserTokenRecord]):
             "rotated_at": now,
         }
         try:
-
             self.update(orm_obj, **data)
             return orm_obj
         except Exception as exc:

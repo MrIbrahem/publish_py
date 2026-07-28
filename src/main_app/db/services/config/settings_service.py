@@ -148,55 +148,23 @@ class SettingsService(CRUDService[SettingRecord]):
         return self.delete_record(record)
 
 
-setting_crud = SettingsService()
-
-
-def list_settings() -> list[SettingRecord]:
-    return setting_crud.list_settings()
-
-
-def get_all_settings_raw() -> list[dict[str, Any]]:
-    return setting_crud.get_all_settings_raw()
-
-
-def get_all_settings_ready() -> dict[str, Any]:
-    return setting_crud.get_all_settings_ready()
-
-
-def get_setting_by_key(key: str) -> SettingRecord | None:
-    return setting_crud.get_setting_by_key(key)
-
-
-def get_setting_by_id(setting_id: int) -> SettingRecord | None:
-    return setting_crud.get_setting_by_id(setting_id)
-
-
-def update_setting(
-    key: str,
-    value: Any,
-    value_type: str = "string",
-    title: str | None = None,
-) -> bool:
-    return setting_crud.update_setting(key, value, value_type, title)
-
-
-def create_setting(
-    key: str,
-    title: str,
-    value_type: str = "boolean",
-    value: Any | None = None,
-) -> SettingRecord | None:
-    return setting_crud.create_setting(key, title, value_type, value)
-
+_crud = SettingsService()
+list_settings = _crud.list_settings
+get_all_settings_raw = _crud.get_all_settings_raw
+get_all_settings_ready = _crud.get_all_settings_ready
+get_setting_by_key = _crud.get_setting_by_key
+get_setting_by_id = _crud.get_setting_by_id
+update_setting = _crud.update_setting
+create_setting = _crud.create_setting
+delete_setting_by_key = _crud.delete_setting_by_key
 
 __all__ = [
-    "SettingsService",
     "list_settings",
     "get_setting_by_id",
     "get_setting_by_key",
     "get_all_settings_raw",
+    "get_all_settings_ready",
     "update_setting",
     "create_setting",
-    "list_settings",
-    "get_all_settings_ready",
+    "delete_setting_by_key",
 ]

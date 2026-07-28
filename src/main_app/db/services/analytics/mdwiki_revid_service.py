@@ -72,14 +72,13 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
         return record.revid if record else None
 
 
-mdwiki_revid_crud = MdwikiRevidService()
-
-list_mdwiki_revids = mdwiki_revid_crud.list_mdwiki_revids
-get_mdwiki_revid_by_title = mdwiki_revid_crud.get_mdwiki_revid_by_title
-add_mdwiki_revid = mdwiki_revid_crud.add_mdwiki_revid
-add_or_update_mdwiki_revid = mdwiki_revid_crud.add_or_update_mdwiki_revid
-update_mdwiki_revid = mdwiki_revid_crud.update_mdwiki_revid
-get_revid_for_title = mdwiki_revid_crud.get_revid_for_title
+_crud = MdwikiRevidService()
+list_mdwiki_revids = _crud.list_mdwiki_revids
+get_mdwiki_revid_by_title = _crud.get_mdwiki_revid_by_title
+add_mdwiki_revid = _crud.add_mdwiki_revid
+add_or_update_mdwiki_revid = _crud.add_or_update_mdwiki_revid
+update_mdwiki_revid = _crud.update_mdwiki_revid
+get_revid_for_title = _crud.get_revid_for_title
 
 __all__ = [
     "list_mdwiki_revids",

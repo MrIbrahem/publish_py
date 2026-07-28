@@ -21,97 +21,96 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
     def __init__(self):
         super().__init__(db.session, CategoryMemberRecord)
 
+    def get_all_category_members(self) -> dict[str, list[str]]:
+        """Return {category: [article_id, ...]} mapping.
 
-category_member_crud = CategoryMemberService()
+        Mirrors old ``sql_for_mdwiki.get_db_category_members()``.
+        """
+        data: dict[str, list[str]] = {}
 
+        rows = self.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all()
+        for category, article_id in rows:
+            data.setdefault(category, []).append(article_id)
+        return data
 
-def get_all_category_members() -> dict[str, list[str]]:
-    """Return {category: [article_id, ...]} mapping.
+    def list_distinct_article_ids(self) -> list[str]:
+        """Return distinct article_id values from category_members.
 
-    Mirrors old ``sql_for_mdwiki.get_db_category_members()``.
-    """
-    data: dict[str, list[str]] = {}
+        Mirrors old ``select DISTINCT article_id from category_members``.
+        """
 
-    rows = category_member_crud.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all()
-    for category, article_id in rows:
-        data.setdefault(category, []).append(article_id)
-    return data
+        rows = self.session.query(CategoryMemberRecord.article_id).distinct().all()
+        return [row.article_id for row in rows]
 
+    def count_by_category(self, category: str) -> int:
+        """Return the number of members in *category*."""
 
-def list_distinct_article_ids() -> list[str]:
-    """Return distinct article_id values from category_members.
+        return self.count(filters={"category": category})
 
-    Mirrors old ``select DISTINCT article_id from category_members``.
-    """
+    def get_members_by_category(self, category: str) -> list[CategoryMemberRecord]:
+        """Return all member records for *category*."""
 
-    rows = category_member_crud.session.query(CategoryMemberRecord.article_id).distinct().all()
-    return [row.article_id for row in rows]
+        return list(self.list(filters={"category": category}))
 
+    def add_category_member(self, category: str, article_id: str) -> bool:
+        """Insert a single category member row. Returns True on success."""
 
-def count_by_category(category: str) -> int:
-    """Return the number of members in *category*."""
-
-    return category_member_crud.count(filters={"category": category})
-
-
-def get_members_by_category(category: str) -> list[CategoryMemberRecord]:
-    """Return all member records for *category*."""
-
-    return list(category_member_crud.list(filters={"category": category}))
-
-
-def add_category_member(category: str, article_id: str) -> bool:
-    """Insert a single category member row. Returns True on success."""
-
-    try:
-        existing = category_member_crud.get_by(category=category, article_id=article_id)
-        if existing:
+        try:
+            existing = self.get_by(category=category, article_id=article_id)
+            if existing:
+                return True
+            self.create(category=category, article_id=article_id)
             return True
-        category_member_crud.create(category=category, article_id=article_id)
-        return True
-    except Exception:
-        logger.exception("Failed to add category member %s / %s", category, article_id)
-        return False
+        except Exception:
+            logger.exception("Failed to add category member %s / %s", category, article_id)
+            return False
 
+    def batch_sync_category_members(self, data: list[dict]) -> None:
+        """Insert only new category_member rows, skipping existing ones.
 
-def batch_sync_category_members(data: list[dict]) -> None:
-    """Insert only new category_member rows, skipping existing ones.
+        Accepts a list of dicts with keys ``category`` and ``article_id``.
+        Mirrors the diff-and-insert pattern from ``all_articles.py``.
+        """
 
-    Accepts a list of dicts with keys ``category`` and ``article_id``.
-    Mirrors the diff-and-insert pattern from ``all_articles.py``.
-    """
-
-    try:
-        existing_rows = set(
-            category_member_crud.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all()
-        )
-        new_rows = []
-        seen = set()
-        for row in data:
-            cat = row.get("category", "")
-            aid = row.get("article_id", "")
-            if cat and aid and (cat, aid) not in existing_rows and (cat, aid) not in seen:
-                new_rows.append({"category": cat, "article_id": aid})
-                seen.add((cat, aid))
-        if new_rows:
-            db.session.execute(
-                text(
-                    """
-                    INSERT INTO category_members (category, article_id)
-                    VALUES (:category, :article_id)
-                """
-                ),
-                new_rows,
+        try:
+            existing_rows = set(
+                self.session.query(CategoryMemberRecord.category, CategoryMemberRecord.article_id).all()
             )
-            db.session.commit()
-            logger.info("Inserted %s new category_member rows", len(new_rows))
-        else:
-            logger.info("No new category_member rows to insert")
-    except Exception:
-        logger.exception("Failed to sync category members")
-        db.session.rollback()
-        raise
+            new_rows = []
+            seen = set()
+            for row in data:
+                cat = row.get("category", "")
+                aid = row.get("article_id", "")
+                if cat and aid and (cat, aid) not in existing_rows and (cat, aid) not in seen:
+                    new_rows.append({"category": cat, "article_id": aid})
+                    seen.add((cat, aid))
+            if new_rows:
+                db.session.execute(
+                    text(
+                        """
+                        INSERT INTO category_members (category, article_id)
+                        VALUES (:category, :article_id)
+                    """
+                    ),
+                    new_rows,
+                )
+                db.session.commit()
+                logger.info("Inserted %s new category_member rows", len(new_rows))
+            else:
+                logger.info("No new category_member rows to insert")
+        except Exception:
+            logger.exception("Failed to sync category members")
+            db.session.rollback()
+            raise
 
+
+_crud = CategoryMemberService()
+get_all_category_members = _crud.get_all_category_members
+list_distinct_article_ids = _crud.list_distinct_article_ids
+count_by_category = _crud.count_by_category
+get_members_by_category = _crud.get_members_by_category
+add_category_member = _crud.add_category_member
+batch_sync_category_members = _crud.batch_sync_category_members
 
 __all__ = [
     "get_all_category_members",
