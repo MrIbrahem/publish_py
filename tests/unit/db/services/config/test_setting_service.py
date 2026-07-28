@@ -1,6 +1,5 @@
 import pytest
 
-# from src.main_app.db.models import SettingRecord
 from src.main_app.db.models import SettingRecord
 from src.main_app.db.services.config.settings_service import (
     create_setting,
@@ -79,7 +78,8 @@ class TestAddSetting:
     def test_adds_setting_and_returns_record(self, monkeypatch):
         """Test that create_setting adds and returns the record."""
         record = create_setting("debug_logging", "Enable Debug Logs", "boolean", "True")
-        assert record is True
+        assert record is not None
+        assert record.title == "Enable Debug Logs"
 
     def test_raises_error_if_exists(self, monkeypatch):
         created = create_setting("K1", "T1")
