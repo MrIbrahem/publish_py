@@ -20,13 +20,16 @@ from .content import (
     ProjectService,
 )
 from .pages import (
-    Results2026Service,
     InProcessService,
     LeaderboardService,
     PagesService,
     PagesUsersToMainPagesService,
+    Results2026Service,
     TranslateTypeService,
     UserPagesService,
+)
+from .pages_query_service import (
+    PagesQueryService,
 )
 from .reports import (
     PagesUsersToMainService,
@@ -40,13 +43,9 @@ from .users import (
     UserTokenService,
 )
 from .wikidata import (
-    QidOthersService,
     AllQidsService,
+    QidOthersService,
     QidService,
-)
-
-from .pages_query_service import (
-    PagesQueryService,
 )
 
 __all__ = [

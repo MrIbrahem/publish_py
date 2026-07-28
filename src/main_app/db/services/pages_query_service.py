@@ -17,7 +17,6 @@ class PagesQueryService:
     def __init__(self) -> None:
         self.session = db.session
 
-
     def list_pages_users(self, limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
         """
         Return pages_users records with joined category campaign data.
@@ -53,7 +52,6 @@ class PagesQueryService:
             }
             for row in results
         ]
-
 
     def list_pages_with_views(self, limit: int = 100, lang: str = "") -> list[dict[str, Any]]:
         """

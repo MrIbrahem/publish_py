@@ -11,18 +11,23 @@ from typing import Any
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
-from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
-from ....db.services import CategoryService, LangService, InProcessService, LeaderboardService
-from ....db.services import PagesQueryService
-from ....db.services import ReportService
-from ....db.services import UsersService
 
+from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
+from ....db.services import (
+    CategoryService,
+    InProcessService,
+    LangService,
+    LeaderboardService,
+    PagesQueryService,
+    ReportService,
+    UsersService,
+)
 from ....extensions import db
 from ....shared.core.cors import check_cors
 from ....shared.schemas import PublishReportsQuerySchema
 from ....shared.utils.web_utils import parse_select_fields
-from .top_stats_routes import get_top_langs, get_top_users
 from .form_utils import FormData, get_form
+from .top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
 

@@ -15,9 +15,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ...db.models import ProjectRecord, UserRecord
-from ...db.services import ProjectService
-from ...db.services import LeaderboardService
-from ...db.services import UsersService
+from ...db.services import LeaderboardService, ProjectService, UsersService
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -34,7 +32,11 @@ def filter_users(users: list[UserRecord], project_name: str):
     return users
 
 
-def _dashboard(users: list[UserRecord], users_counts: dict[str, int], projects: list[ProjectRecord],):
+def _dashboard(
+    users: list[UserRecord],
+    users_counts: dict[str, int],
+    projects: list[ProjectRecord],
+):
     """Render the users not in process management dashboard."""
 
     total = len(users)

@@ -12,9 +12,7 @@ from flask import (
     request,
 )
 
-from ...db.services import ViewsNewService
-from ...db.services import PagesService, UserPagesService
-from ...db.services import UsersService
+from ...db.services import PagesService, UserPagesService, UsersService, ViewsNewService
 from ...public.auth.utils import load_user
 from ...public.routes.td.results_api import results_api_result
 from ..decorators import admin_required

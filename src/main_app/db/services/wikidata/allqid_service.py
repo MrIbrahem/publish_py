@@ -21,7 +21,7 @@ class AllQidsService:
     def list_targets_by_lang(self, lang: str) -> list[dict]:
         """ """
         sql = text(
-        """
+            """
             SELECT
                 t.qid AS qid,
                 q.title AS title,

@@ -83,7 +83,7 @@ class AuthUsersNewService:
             is_active_admin=is_active_admin,
         )
 
-    def get_authenticated_user(self,user_id: int) -> CurrentUser | None:
+    def get_authenticated_user(self, user_id: int) -> CurrentUser | None:
         """Fetch the CurrentUser composite for session restoration."""
         try:
             token = self.token_service.get_authenticated_user_token(user_id)

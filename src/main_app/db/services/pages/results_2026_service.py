@@ -84,6 +84,7 @@ _EXISTS_SQL = text(
 def _rows_to_dicts(rows: list[Any] | Any) -> list[dict]:
     return [dict(row._mapping) for row in rows]
 
+
 class Results2026Service:
 
     def __init__(self):
@@ -96,13 +97,13 @@ class Results2026Service:
         rows = db.session.execute(_MISSING_SQL, {"lang": lang, "cat": cat}).fetchall()
         return _rows_to_dicts(rows)
 
-
     def exists_by_lang_and_category(self, lang: str, cat: str) -> list[dict]:
         """Return already-translated articles for ``lang`` in category ``cat``."""
         if not lang or not cat:
             return []
         rows = db.session.execute(_EXISTS_SQL, {"lang": lang, "cat": cat}).fetchall()
         return _rows_to_dicts(rows)
+
 
 _crud = Results2026Service()
 missing_by_lang_and_category = _crud.missing_by_lang_and_category

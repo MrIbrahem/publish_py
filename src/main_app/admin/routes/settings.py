@@ -77,7 +77,6 @@ class SettingsRoutes:
             flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
         return redirect(url_for("admin.settings.dashboard"))
 
-
     def settings_update_form(self, request_form) -> tuple[list[str], list[str]]:
         all_settings = self.settings_service.get_all_settings_raw()
         failed_keys: list[str] = []

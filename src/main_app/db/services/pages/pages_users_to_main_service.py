@@ -99,7 +99,6 @@ class PagesUsersToMainPagesService(CRUDService[PagesUsersToMainRecord]):
             .first()
         )
 
-
     def delete_user_page_to_main(self, page_id: int) -> bool:
         """Delete the row from both ``pages_users_to_main`` and ``pages_users``.
 

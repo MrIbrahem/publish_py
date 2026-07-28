@@ -8,9 +8,7 @@ from typing import Any
 
 from ....config import settings
 from ....db.models import LanguageSettingRecord
-from ....db.services import LanguageSettingService
-from ....db.services import ReportService
-from ....db.services import UserTokenService
+from ....db.services import LanguageSettingService, ReportService, UserTokenService
 from ....shared.clients import (
     get_revid,
     get_revid_db,

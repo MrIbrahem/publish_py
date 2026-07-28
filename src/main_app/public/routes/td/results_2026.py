@@ -21,8 +21,8 @@ from typing import Any
 from ....db.services import (
     InProcessService,
     PagesService,
-    TranslateTypeService,
     Results2026Service,
+    TranslateTypeService,
 )
 from ....shared.utils.wiki_links import (
     content_translation_url,
