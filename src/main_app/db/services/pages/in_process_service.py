@@ -94,7 +94,7 @@ class InProcessService(CRUDService[InProcessRecord]):
         except IntegrityError:
             raise ValueError(f"In-process record for '{title}' by '{user}' in '{lang}' already exists") from None
 
-    def update_in_process(self, process_id: int, **kwargs) -> InProcessRecord | None:
+    def update_in_process(self, process_id: int, **kwargs) -> InProcessRecord:
         """Update an in_process record."""
         return self.update_or_404(process_id, **kwargs)
 

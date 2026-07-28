@@ -73,7 +73,7 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
         )
         return instance
 
-    def update_full_translator(self, translator_id: int, **kwargs) -> FullTranslatorRecord | None:
+    def update_full_translator(self, translator_id: int, **kwargs) -> FullTranslatorRecord:
         """Update a full translator record."""
         return self.update_or_404(translator_id, **kwargs)
 

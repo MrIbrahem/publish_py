@@ -64,7 +64,7 @@ class AssessmentService(CRUDService[AssessmentRecord]):
         )
         return instance
 
-    def update_assessment(self, assessment_id: int, **kwargs) -> AssessmentRecord | None:
+    def update_assessment(self, assessment_id: int, **kwargs) -> AssessmentRecord:
         """Update an assessment record."""
         return self.update_or_404(assessment_id, **kwargs)
 

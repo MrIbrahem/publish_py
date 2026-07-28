@@ -73,7 +73,7 @@ class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord]):
         )
         return instance
 
-    def update_users_no_inprocess(self, record_id: int, **kwargs) -> UsersNoInprocessRecord | None:
+    def update_users_no_inprocess(self, record_id: int, **kwargs) -> UsersNoInprocessRecord:
         """Update a users_no_inprocess record."""
         return self.update_or_404(record_id, **kwargs)
 

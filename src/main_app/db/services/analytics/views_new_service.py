@@ -105,7 +105,7 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
         )
         return instance
 
-    def update_views_new(self, view_id: int, **kwargs) -> ViewsNewRecord | None:
+    def update_views_new(self, view_id: int, **kwargs) -> ViewsNewRecord:
         """Update a views_new record."""
         return self.update_or_404(view_id, **kwargs)
 

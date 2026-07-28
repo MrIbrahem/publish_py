@@ -50,7 +50,7 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
         except IntegrityError as e:
             raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
 
-    def update_pages_users_to_main(self, record_id: int, **kwargs) -> PagesUsersToMainRecord | None:
+    def update_pages_users_to_main(self, record_id: int, **kwargs) -> PagesUsersToMainRecord:
         """Update a pages_users_to_main record."""
         return self.update_or_404(record_id, **kwargs)
 

@@ -52,7 +52,7 @@ class ProjectService(CRUDService[ProjectRecord]):
         except IntegrityError:
             raise ValueError(f"Project '{g_title}' already exists") from None
 
-    def update_project(self, project_id: int, **kwargs) -> ProjectRecord | None:
+    def update_project(self, project_id: int, **kwargs) -> ProjectRecord:
         """Update a project record."""
         # Apply the same title validation/normalization as add_project()
         normalized_kwargs = {}
@@ -69,15 +69,18 @@ class ProjectService(CRUDService[ProjectRecord]):
 
         return self.update_or_404(project_id, **normalized_kwargs)
 
-    def update_project_title(self, project_id: int, g_title: str) -> ProjectRecord | None:
+    def update_project_title(self, project_id: int, g_title: str) -> ProjectRecord:
         """Update a project record."""
         g_title = g_title.strip() if isinstance(g_title, str) else g_title
         if not g_title:
             raise ValueError("Project title is required")
 
+        record = self.get_record_by_id(project_id)
+        if record is None:
+            raise ValueError(f"Project record with ID {project_id} not found")
         try:
             data = {"g_title": g_title}
-            return self.update_by_id(project_id, data)
+            return self.update(record, **data)
         except ValueError as exc:
             raise ValueError(f"Project record with ID {project_id} not found") from exc
 

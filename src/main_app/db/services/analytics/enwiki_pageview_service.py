@@ -68,7 +68,7 @@ class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
         )
         return instance
 
-    def update_enwiki_pageview(self, pageview_id: int, **kwargs) -> EnwikiPageviewRecord | None:
+    def update_enwiki_pageview(self, pageview_id: int, **kwargs) -> EnwikiPageviewRecord:
         """Update an enwiki pageview record."""
         return self.update_or_404(pageview_id, **kwargs)
 

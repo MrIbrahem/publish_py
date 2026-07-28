@@ -83,7 +83,7 @@ class LanguageSettingService(CRUDService[LanguageSettingRecord]):
         )
         return instance
 
-    def update_language_setting(self, setting_id: int, **kwargs) -> LanguageSettingRecord | None:
+    def update_language_setting(self, setting_id: int, **kwargs) -> LanguageSettingRecord:
         """Update a language setting record."""
         return self.update_or_404(setting_id, **kwargs)
 

@@ -75,7 +75,7 @@ class RefsCountService(CRUDService[RefsCountRecord]):
         )
         return instance
 
-    def update_refs_count(self, refs_id: int, **kwargs) -> RefsCountRecord | None:
+    def update_refs_count(self, refs_id: int, **kwargs) -> RefsCountRecord:
         """Update a refs_count record."""
         return self.update_or_404(refs_id, **kwargs)
 

@@ -57,7 +57,7 @@ class UsersService(CRUDService[UserRecord]):
         email: str = "",
         wiki: str = "",
         user_group: str = "Uncategorized",
-    ) -> UserRecord | None:
+    ) -> UserRecord:
         """Update a user record."""
 
         username = username.strip()
@@ -69,11 +69,12 @@ class UsersService(CRUDService[UserRecord]):
             "wiki": wiki,
             "user_group": user_group,
         }
+        record = self.get_record_by_id(user_id)
+        if record is None:
+            raise ValueError(f"User record with ID {user_id} not found")
+
         try:
-            return self.update_by_id(
-                user_id,
-                data,
-            )
+            return self.update( record, **data )
         except ValueError as exc:
             raise ValueError(f"User record with ID {user_id} not found") from exc
 
