@@ -71,7 +71,7 @@ class WordService(CRUDService[WordRecord]):
         )
         return instance
 
-    def update_word(self, word_id: int, **kwargs) -> WordRecord :
+    def update_word(self, word_id: int, **kwargs) -> WordRecord:
         """Update a word record."""
         return self.update_or_404(word_id, **kwargs)
 

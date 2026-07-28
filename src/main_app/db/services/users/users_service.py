@@ -74,7 +74,7 @@ class UsersService(CRUDService[UserRecord]):
             raise ValueError(f"User record with ID {user_id} not found")
 
         try:
-            return self.update( record, **data )
+            return self.update(record, **data)
         except ValueError as exc:
             raise ValueError(f"User record with ID {user_id} not found") from exc
 
