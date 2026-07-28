@@ -24,147 +24,157 @@ class UserPagesService(CRUDService[UserPageRecord]):
     def __init__(self):
         super().__init__(db.session, UserPageRecord)
 
-
-user_pages_crud = UserPagesService()
-
-
-def list_user_pages() -> list[UserPageRecord]:
-    """Return all pages_users."""
-    return list(
-        user_pages_crud.list(
-            order_by=[UserPageRecord.id.asc()],
+    def list_user_pages(self) -> list[UserPageRecord]:
+        """Return all pages_users."""
+        return list(
+            self.list(
+                order_by=[UserPageRecord.id.asc()],
+            )
         )
-    )
 
 
-def list_translated(lang: str = "All", limit: int = 500, offset: int = 0) -> list[UserPageRecord]:
-    """Return translated user pages (target not empty) optionally filtered by language."""
-    query = user_pages_crud.session.query(UserPageRecord).filter(
-        UserPageRecord.target.isnot(None), UserPageRecord.target != ""
-    )
-    if lang and lang.lower() != "all":
-        query = query.filter(UserPageRecord.lang == lang)
-    return query.order_by(UserPageRecord.id.desc()).limit(limit).offset(offset).all()
-
-
-def count_translated(lang: str = "All") -> int:
-    """Return total count of translated user pages, optionally filtered by language."""
-    query = user_pages_crud.session.query(func.count(UserPageRecord.id)).filter(
-        UserPageRecord.target.isnot(None), UserPageRecord.target != ""
-    )
-    if lang and lang.lower() != "all":
-        query = query.filter(UserPageRecord.lang == lang)
-    return int(query.scalar() or 0)
-
-
-def get_by_id(page_id: int) -> UserPageRecord | None:
-    """Return a single user page row by id, or None when missing."""
-    return user_pages_crud.get(page_id)
-
-
-def get_user_page_by_id(page_id: int) -> UserPageRecord | None:
-    """Return a single user page row by id, or None when missing."""
-    return user_pages_crud.get(page_id)
-
-
-def add_user_page(
-    sourcetitle: str,
-    translate_type: str,
-    cat: str,
-    lang: str,
-    user: str,
-    target: str,
-    mdwiki_revid: int | None = None,
-    word: int = 0,
-) -> UserPageRecord:
-    """Insert a page target record."""
-    if not sourcetitle:
-        raise ValueError("Title is required")
-    try:
-        return user_pages_crud.create(
-            title=sourcetitle,
-            word=word,
-            translate_type=translate_type,
-            cat=cat,
-            lang=lang,
-            user=user,
-            pupdate=func.current_date(),
-            target=target,
-            mdwiki_revid=mdwiki_revid,
+    def list_translated(self,lang: str = "All", limit: int = 500, offset: int = 0) -> list[UserPageRecord]:
+        """Return translated user pages (target not empty) optionally filtered by language."""
+        query = self.session.query(UserPageRecord).filter(
+            UserPageRecord.target.isnot(None), UserPageRecord.target != ""
         )
-    except IntegrityError as e:
-        logger.error(f"Failed to add page (integrity error): {e}")
-        raise ValueError(f"Page with title '{sourcetitle}' already exists") from e
-    except Exception as e:
-        logger.error(f"Failed to add page: {e}")
-        raise
+        if lang and lang.lower() != "all":
+            query = query.filter(UserPageRecord.lang == lang)
+        return query.order_by(UserPageRecord.id.desc()).limit(limit).offset(offset).all()
 
 
-def insert_user_page_target(
-    sourcetitle: str,
-    translate_type: str,
-    cat: str,
-    lang: str,
-    user: str,
-    target: str,
-    mdwiki_revid: int | None = None,
-    word: int = 0,
-) -> bool:
-    """Insert a user page target record and return success status."""
-    try:
-        add_user_page(
-            sourcetitle=sourcetitle,
-            translate_type=translate_type,
-            cat=cat,
-            lang=lang,
-            user=user,
-            target=target,
-            mdwiki_revid=mdwiki_revid,
-            word=word,
+    def count_translated(self,lang: str = "All") -> int:
+        """Return total count of translated user pages, optionally filtered by language."""
+        query = self.session.query(func.count(UserPageRecord.id)).filter(
+            UserPageRecord.target.isnot(None), UserPageRecord.target != ""
         )
-        return True
-    except Exception as e:
-        logger.error(f"Failed to insert user page target: {e}")
-        return False
+        if lang and lang.lower() != "all":
+            query = query.filter(UserPageRecord.lang == lang)
+        return int(query.scalar() or 0)
 
 
-def update_user_page(
-    page_id: int,
-    title: str,
-    target: str,
-    **kwargs: Any,
-) -> UserPageRecord | None:
-    """Update page."""
-    try:
-        data = {"title": title, "target": target, **kwargs}
-        return user_pages_crud.update_by_id(page_id, data)
-    except ValueError as exc:
-        raise LookupError(f"Page id {page_id} was not found") from exc
+    def get_by_id(self,page_id: int) -> UserPageRecord | None:
+        """Return a single user page row by id, or None when missing."""
+        return self.get(page_id)
 
 
-def set_user_page_target(
-    record: UserPageRecord,
-    target: str,
-) -> bool:
-    """ """
-    try:
-        user_pages_crud.update(record, target=target, pupdate=datetime.now().strftime("%Y-%m-%d"))
-        return True
-    except Exception:
-        logger.exception("Failed to update page target")
-        return False
+    def get_user_page_by_id(self,page_id: int) -> UserPageRecord | None:
+        """Return a single user page row by id, or None when missing."""
+        return self.get(page_id)
 
 
-def find_user_page_record(
-    title: str,
-    lang: str,
-    user: str,
-) -> UserPageRecord | None:
-    """
-    Check if record exists
-    """
-    return user_pages_crud.get_by(title=title, lang=lang, user=user)
+    def add_user_page(self,
+        sourcetitle: str,
+        translate_type: str,
+        cat: str,
+        lang: str,
+        user: str,
+        target: str,
+        mdwiki_revid: int | None = None,
+        word: int = 0,
+    ) -> UserPageRecord:
+        """Insert a page target record."""
+        if not sourcetitle:
+            raise ValueError("Title is required")
+        try:
+            return self.create(
+                title=sourcetitle,
+                word=word,
+                translate_type=translate_type,
+                cat=cat,
+                lang=lang,
+                user=user,
+                pupdate=func.current_date(),
+                target=target,
+                mdwiki_revid=mdwiki_revid,
+            )
+        except IntegrityError as e:
+            logger.error(f"Failed to add page (integrity error): {e}")
+            raise ValueError(f"Page with title '{sourcetitle}' already exists") from e
+        except Exception as e:
+            logger.error(f"Failed to add page: {e}")
+            raise
 
+
+    def insert_user_page_target(self,
+        sourcetitle: str,
+        translate_type: str,
+        cat: str,
+        lang: str,
+        user: str,
+        target: str,
+        mdwiki_revid: int | None = None,
+        word: int = 0,
+    ) -> bool:
+        """Insert a user page target record and return success status."""
+        try:
+            self.add_user_page(
+                sourcetitle=sourcetitle,
+                translate_type=translate_type,
+                cat=cat,
+                lang=lang,
+                user=user,
+                target=target,
+                mdwiki_revid=mdwiki_revid,
+                word=word,
+            )
+            return True
+        except Exception as e:
+            logger.error(f"Failed to insert user page target: {e}")
+            return False
+
+
+    def update_user_page(self,
+        page_id: int,
+        title: str,
+        target: str,
+        **kwargs: Any,
+    ) -> UserPageRecord | None:
+        """Update page."""
+        try:
+            data = {"title": title, "target": target, **kwargs}
+            return self.update_by_id(page_id, data)
+        except ValueError as exc:
+            raise LookupError(f"Page id {page_id} was not found") from exc
+
+
+    def set_user_page_target(self,
+        record: UserPageRecord,
+        target: str,
+    ) -> bool:
+        """ """
+        try:
+            self.update(record, target=target, pupdate=datetime.now().strftime("%Y-%m-%d"))
+            return True
+        except Exception:
+            logger.exception("Failed to update page target")
+            return False
+
+
+    def find_user_page_record(self,
+        title: str,
+        lang: str,
+        user: str,
+    ) -> UserPageRecord | None:
+        """
+        Check if record exists
+        """
+        return self.get_by(title=title, lang=lang, user=user)
+
+
+
+_crud = UserPagesService()
+
+set_user_page_target = _crud.set_user_page_target
+find_user_page_record = _crud.find_user_page_record
+list_user_pages = _crud.list_user_pages
+list_translated = _crud.list_translated
+count_translated = _crud.count_translated
+get_by_id = _crud.get_by_id
+get_user_page_by_id = _crud.get_user_page_by_id
+add_user_page = _crud.add_user_page
+update_user_page = _crud.update_user_page
+insert_user_page_target = _crud.insert_user_page_target
 
 __all__ = [
     "set_user_page_target",

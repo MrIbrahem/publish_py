@@ -43,7 +43,7 @@ class UsersService(CRUDService[UserRecord]):
             raise ValueError("Username is required")
 
         try:
-            return user_crud.create(
+            return self.create(
                 username=username,
                 **data,
             )
@@ -70,7 +70,7 @@ class UsersService(CRUDService[UserRecord]):
             "user_group": user_group,
         }
         try:
-            return user_crud.update_by_id(
+            return self.update_by_id(
                 user_id,
                 data,
             )
@@ -101,64 +101,31 @@ class UsersService(CRUDService[UserRecord]):
         )
 
 
+    def update_user_data(self,
+        user_id: int,
+        **kwargs,
+    ) -> UserRecord | None:
+        return self.update_by_id(user_id, kwargs)
+
+
+    def user_exists(self, username: str) -> bool:
+        """Check if a user exists."""
+        record = self.get_user_by_username(username)
+        return record is not None
+
+
+
 user_crud = UsersService()
 
-
-def list_users() -> list[UserRecord]:
-    return user_crud.list_users()
-
-
-def users_search(userlike: str | None) -> list[str]:
-    return user_crud.users_search(userlike)
-
-
-def list_users_by_group(user_group: str) -> list[UserRecord]:
-    return user_crud.list_users_by_group(user_group)
-
-
-def get_user(user_id: int) -> UserRecord | None:
-    return user_crud.get_user(user_id)
-
-
-def get_user_by_username(username: str) -> UserRecord | None:
-    return user_crud.get_user_by_username(username)
-
-
-def create_user(
-    username: str,
-    email: str = "",
-    wiki: str = "",
-    user_group: str = "Uncategorized",
-) -> UserRecord:
-    return user_crud.create_user(
-        username,
-        email=email,
-        wiki=wiki,
-        user_group=user_group,
-    )
-
-
-def update_user(
-    user_id: int,
-    username: str,
-    email: str = "",
-    wiki: str = "",
-    user_group: str = "Uncategorized",
-) -> UserRecord | None:
-    return user_crud.update_user(user_id, username, email, wiki, user_group)
-
-
-def update_user_data(
-    user_id: int,
-    **kwargs,
-) -> UserRecord | None:
-    return user_crud.update_by_id(user_id, kwargs)
-
-
-def user_exists(username: str) -> bool:
-    """Check if a user exists."""
-    record = user_crud.get_user_by_username(username)
-    return record is not None
+list_users=user_crud.list_users
+list_users_by_group=user_crud.list_users_by_group
+get_user=user_crud.get_user
+get_user_by_username=user_crud.get_user_by_username
+create_user=user_crud.create_user
+update_user=user_crud.update_user
+update_user_data=user_crud.update_user_data
+user_exists=user_crud.user_exists
+users_search=user_crud.users_search
 
 
 __all__ = [

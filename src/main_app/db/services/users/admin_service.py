@@ -92,33 +92,17 @@ class AdminService(CRUDService[AdminUserRecord]):
             self.session.rollback()
             return None
 
-
-admin_crud = AdminService()
-
-
-def is_active_coordinator(username: str) -> bool:
-    return admin_crud.is_active_coordinator(username=username)
+    def delete_coordinator(self,coordinator_id: int) -> bool:
+        return self.delete(coordinator_id)
 
 
-def list_coordinators() -> list[AdminUserRecord]:
-    return admin_crud.list_coordinators()
+_crud = AdminService()
 
-
-def get_coordinator_by_id(coordinator_id: int) -> AdminUserRecord | None:
-    return admin_crud.get_coordinator_by_id(coordinator_id)
-
-
-def add_coordinator(username: str) -> AdminUserRecord:
-    return admin_crud.add_coordinator(username=username)
-
-
-def set_coordinator_active(coordinator_id: int, is_active: bool) -> AdminUserRecord | None:
-    return admin_crud.set_coordinator_active(coordinator_id=coordinator_id, is_active=is_active)
-
-
-def delete_coordinator(coordinator_id: int) -> bool:
-    return admin_crud.delete(coordinator_id)
-
+list_coordinators = _crud.list_coordinators
+get_coordinator_by_id = _crud.get_coordinator_by_id
+add_coordinator = _crud.add_coordinator
+is_active_coordinator = _crud.is_active_coordinator
+set_coordinator_active = _crud.set_coordinator_active
 
 __all__ = [
     "list_coordinators",

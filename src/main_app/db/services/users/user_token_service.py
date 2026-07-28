@@ -115,16 +115,16 @@ class UserTokenService(CRUDService[UserTokenRecord]):
             return self.create_user_token(user_id, encrypted_token, encrypted_secret)
 
     def get_user_token_by_username(self, username: str) -> UserTokenRecord | None:
-        return user_token_crud.get_by(user=username)
+        return _crud.get_by(user=username)
 
 
-user_token_crud = UserTokenService()
+_crud = UserTokenService()
 
-get_authenticated_user_token = user_token_crud.get_authenticated_user_token
-get_user_token = user_token_crud.get_user_token
-upsert_user_token = user_token_crud.upsert_user_token
-create_user_token = user_token_crud.create_user_token
-get_user_token_by_username = user_token_crud.get_user_token_by_username
+get_authenticated_user_token = _crud.get_authenticated_user_token
+get_user_token = _crud.get_user_token
+upsert_user_token = _crud.upsert_user_token
+create_user_token = _crud.create_user_token
+get_user_token_by_username = _crud.get_user_token_by_username
 
 __all__ = [
     "UserTokenService",

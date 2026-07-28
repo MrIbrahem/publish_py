@@ -21,44 +21,47 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
     def __init__(self):
         super().__init__(db.session, PagesUsersToMainRecord)
 
-
-pages_users_to_main_crud = PagesUsersToMainService()
-
-
-def list_pages_users_to_main() -> list[PagesUsersToMainRecord]:
-    """Return all pages_users_to_main records."""
-    return list(
-        pages_users_to_main_crud.list(
-            order_by=[PagesUsersToMainRecord.id.asc()],
+    def list_pages_users_to_main(self) -> list[PagesUsersToMainRecord]:
+        """Return all pages_users_to_main records."""
+        return list(
+            self.list(
+                order_by=[PagesUsersToMainRecord.id.asc()],
+            )
         )
-    )
 
 
-def get_pages_users_to_main(record_id: int) -> PagesUsersToMainRecord | None:
-    """Get a pages_users_to_main record by ID."""
-    orm_obj = pages_users_to_main_crud.get(record_id)
-    if not orm_obj:
-        logger.warning(f"PagesUsersToMain record with ID {record_id} not found")
-        return None
-    return orm_obj
+    def get_pages_users_to_main(self,record_id: int) -> PagesUsersToMainRecord | None:
+        """Get a pages_users_to_main record by ID."""
+        orm_obj = self.get(record_id)
+        if not orm_obj:
+            logger.warning(f"PagesUsersToMain record with ID {record_id} not found")
+            return None
+        return orm_obj
 
 
-def add_pages_users_to_main(
-    id: int | None = None,
-    new_target: str = "",
-    new_user: str = "",
-    new_qid: str = "",
-) -> PagesUsersToMainRecord:
-    """Add a new pages_users_to_main record."""
-    try:
-        return pages_users_to_main_crud.create(id=id, new_target=new_target, new_user=new_user, new_qid=new_qid)
-    except IntegrityError as e:
-        raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
+    def add_pages_users_to_main(self,
+        id: int | None = None,
+        new_target: str = "",
+        new_user: str = "",
+        new_qid: str = "",
+    ) -> PagesUsersToMainRecord:
+        """Add a new pages_users_to_main record."""
+        try:
+            return self.create(id=id, new_target=new_target, new_user=new_user, new_qid=new_qid)
+        except IntegrityError as e:
+            raise ValueError(f"Failed to add pages_users_to_main record: {e}") from None
 
 
-def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainRecord | None:
-    """Update a pages_users_to_main record."""
-    return pages_users_to_main_crud.update_or_404(record_id, **kwargs)
+    def update_pages_users_to_main(self,record_id: int, **kwargs) -> PagesUsersToMainRecord | None:
+        """Update a pages_users_to_main record."""
+        return self.update_or_404(record_id, **kwargs)
+
+
+_curd = PagesUsersToMainService()
+list_pages_users_to_main = _curd.list_pages_users_to_main
+get_pages_users_to_main = _curd.get_pages_users_to_main
+add_pages_users_to_main = _curd.add_pages_users_to_main
+update_pages_users_to_main = _curd.update_pages_users_to_main
 
 
 __all__ = [
