@@ -29,6 +29,32 @@ def _serialize_value(value: Any, value_type: str) -> str | None:
     return str(value)
 
 
+def format_values(records: list[SettingRecord]) -> dict[str, Any]:
+    """Fetch all settings parsed into their respective Python types."""
+    data: dict[str, Any] = {}
+
+    for x in records:
+        val = None
+        if x.value_type == "boolean":
+            val = x.value == "true"
+        elif x.value_type == "integer":
+            if isinstance(x.value, int):
+                val = x.value
+            else:
+                try:
+                    val = int(x.value)  # type: ignore
+                except (ValueError, TypeError):
+                    val = None
+        elif x.value_type == "string":
+            val = None if x.value is None else str(x.value)
+
+        if val is None:
+            logger.warning("Could not parse setting %s with value %s", x.key, x.value)
+
+        data[x.key] = val
+
+    return data
+
 def list_settings() -> list[SettingRecord]:
     """Return all setting records."""
     orm_objs = db.session.query(SettingRecord).all()
@@ -42,29 +68,7 @@ def get_all_settings_raw() -> list[dict[str, Any]]:
 
 def get_all_settings_ready() -> dict[str, Any]:
     """Fetch all settings parsed into their respective Python types."""
-    records: dict[str, Any] = {}
-
-    for x in list_settings():
-        val = None
-        if x.value_type == "boolean":
-            val = x.value == "true"
-        elif x.value_type == "integer":
-            if isinstance(x.value, int):
-                val = x.value
-            else:
-                try:
-                    val = int(x.value)  # type: ignore
-                except (ValueError, TypeError):
-                    val = None
-        elif x.value_type == "string":
-            val = str(x.value)
-
-        if val is None:
-            logger.warning("Could not parse setting %s with value %s", x.key, x.value)
-
-        records[x.key] = val
-
-    return records
+    return format_values(list_settings())
 
 
 def get_setting_by_key(key: str) -> SettingRecord | None:
