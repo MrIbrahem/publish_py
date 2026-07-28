@@ -84,16 +84,7 @@ def add_or_update_refs_count(
 
 def update_refs_count(refs_id: int, **kwargs) -> RefsCountRecord | None:
     """Update a refs_count record."""
-    if not kwargs:
-        orm_obj = refs_count_crud.get(refs_id)
-        if not orm_obj:
-            raise ValueError(f"RefsCount record with ID {refs_id} not found")
-        return orm_obj
-
-    try:
-        return refs_count_crud.update_by_id(refs_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"RefsCount record with ID {refs_id} not found") from exc
+    return refs_count_crud.update_or_404(refs_id, **kwargs)
 
 
 def get_ref_counts_for_title(title: str) -> tuple[int | None, int | None]:

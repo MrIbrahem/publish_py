@@ -223,6 +223,17 @@ class CRUDService[ModelT]:
             logger.error(f"Error deleting {self.model_name} {e}")
             return False
 
+    def update_or_404(self, pk: PKT, **kwargs) -> ModelT | None:
+        """Update an assessment record."""
+        orm_obj = self.get_record_by_id(pk)
+        if not orm_obj:
+            raise ValueError(f"Record with ID {pk} not found")
+
+        if not kwargs:
+            return orm_obj
+
+        return self.update(orm_obj, **kwargs)
+
     # ------------------------------------------------------------------ #
     # Internals
     # ------------------------------------------------------------------ #

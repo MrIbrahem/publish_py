@@ -120,7 +120,7 @@ def update_translate_type(
         kwargs["tt_full"] = int(tt_full)
 
     try:
-        return translate_type_crud.update_by_id(tt_id, **kwargs)
+        return translate_type_crud.update_by_id(tt_id, kwargs)
     except IntegrityError:
         raise UniqueError(title=tt_title) from None
     except ValueError as exc:

@@ -80,16 +80,7 @@ def add_or_update_word(
 
 def update_word(word_id: int, **kwargs) -> WordRecord | None:
     """Update a word record."""
-    if not kwargs:
-        orm_obj = word_crud.get(word_id)
-        if not orm_obj:
-            raise ValueError(f"Word record with ID {word_id} not found")
-        return orm_obj
-
-    try:
-        return word_crud.update_by_id(word_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"Word record with ID {word_id} not found") from exc
+    return word_crud.update_or_404(word_id, **kwargs)
 
 
 def get_word_counts_for_title(title: str) -> tuple[int | None, int | None]:

@@ -85,16 +85,7 @@ def add_or_update_users_no_inprocess(user: str, is_active: int = 1) -> UsersNoIn
 
 def update_users_no_inprocess(record_id: int, **kwargs) -> UsersNoInprocessRecord | None:
     """Update a users_no_inprocess record."""
-    if not kwargs:
-        orm_obj = users_no_inprocess_crud.get(record_id)
-        if not orm_obj:
-            raise ValueError(f"UsersNoInprocess record with ID {record_id} not found")
-        return orm_obj
-
-    try:
-        return users_no_inprocess_crud.update_by_id(record_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"UsersNoInprocess record with ID {record_id} not found") from exc
+    return users_no_inprocess_crud.update_or_404(record_id, **kwargs)
 
 
 def should_hide_from_inprocess(user: str) -> bool:

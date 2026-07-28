@@ -80,16 +80,7 @@ def add_or_update_enwiki_pageview(title: str, en_views: int | None = 0) -> Enwik
 
 def update_enwiki_pageview(pageview_id: int, **kwargs) -> EnwikiPageviewRecord | None:
     """Update an enwiki pageview record."""
-    if not kwargs:
-        orm_obj = enwiki_pageview_crud.get(pageview_id)
-        if not orm_obj:
-            raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found")
-        return orm_obj
-
-    try:
-        return enwiki_pageview_crud.update_by_id(pageview_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"Enwiki pageview record with ID {pageview_id} not found") from exc
+    return enwiki_pageview_crud.update_or_404(pageview_id, **kwargs)
 
 
 __all__ = [

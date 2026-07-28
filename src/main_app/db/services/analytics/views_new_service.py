@@ -116,16 +116,7 @@ def add_or_update_views_new(
 
 def update_views_new(view_id: int, **kwargs) -> ViewsNewRecord | None:
     """Update a views_new record."""
-    if not kwargs:
-        orm_obj = views_new_crud.get(view_id)
-        if not orm_obj:
-            raise ValueError(f"ViewsNew record with ID {view_id} not found")
-        return orm_obj
-
-    try:
-        return views_new_crud.update_by_id(view_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"ViewsNew record with ID {view_id} not found") from exc
+    return views_new_crud.update_or_404(view_id, **kwargs)
 
 
 def get_total_views_for_target(

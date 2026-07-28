@@ -58,17 +58,7 @@ def add_pages_users_to_main(
 
 def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainRecord | None:
     """Update a pages_users_to_main record."""
-    if not kwargs:
-        orm_obj = pages_users_to_main_crud.get(record_id)
-        if not orm_obj:
-            raise ValueError(f"PagesUsersToMain record with ID {record_id} not found")
-        return orm_obj
-
-    try:
-        return pages_users_to_main_crud.update_by_id(record_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"PagesUsersToMain record with ID {record_id} not found") from exc
-
+    return pages_users_to_main_crud.update_or_404(record_id, **kwargs)
 
 __all__ = [
     "list_pages_users_to_main",

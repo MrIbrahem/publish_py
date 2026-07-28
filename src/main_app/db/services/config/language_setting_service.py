@@ -92,16 +92,7 @@ def add_or_update_language_setting(
 
 def update_language_setting(setting_id: int, **kwargs) -> LanguageSettingRecord | None:
     """Update a language setting record."""
-    if not kwargs:
-        orm_obj = language_setting_crud.get(setting_id)
-        if not orm_obj:
-            raise ValueError(f"Language setting record with ID {setting_id} not found")
-        return orm_obj
-
-    try:
-        return language_setting_crud.update_by_id(setting_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"Language setting record with ID {setting_id} not found") from exc
+    return language_setting_crud.update_or_404(setting_id, **kwargs)
 
 
 __all__ = [

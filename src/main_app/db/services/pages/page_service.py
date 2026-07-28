@@ -140,7 +140,8 @@ def update_page(
 ) -> PageRecord | None:
     """Update page."""
     try:
-        return pages_crud.update_by_id(page_id, title=title, target=target, **kwargs)
+        data = {"title": title, "target": target, **kwargs}
+        return pages_crud.update_by_id(page_id, data)
     except ValueError as exc:
         raise LookupError(f"Page id {page_id} was not found") from exc
 

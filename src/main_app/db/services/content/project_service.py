@@ -62,12 +62,6 @@ def add_project(g_title: str) -> ProjectRecord:
 
 def update_project(project_id: int, **kwargs) -> ProjectRecord | None:
     """Update a project record."""
-    if not kwargs:
-        orm_obj = project_crud.get(project_id)
-        if not orm_obj:
-            raise ValueError(f"Project record with ID {project_id} not found")
-        return orm_obj
-
     # Apply the same title validation/normalization as add_project()
     normalized_kwargs = {}
     for key, value in kwargs.items():
@@ -81,10 +75,7 @@ def update_project(project_id: int, **kwargs) -> ProjectRecord | None:
         else:
             normalized_kwargs[key] = value
 
-    try:
-        return project_crud.update_by_id(project_id, **normalized_kwargs)
-    except ValueError as exc:
-        raise ValueError(f"Project record with ID {project_id} not found") from exc
+    return project_crud.update_or_404(project_id, **normalized_kwargs)
 
 
 def update_project_title(project_id: int, g_title: str) -> ProjectRecord | None:

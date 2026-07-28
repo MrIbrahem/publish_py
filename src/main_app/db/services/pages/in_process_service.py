@@ -105,16 +105,7 @@ def add_in_process(
 
 def update_in_process(process_id: int, **kwargs) -> InProcessRecord | None:
     """Update an in_process record."""
-    if not kwargs:
-        orm_obj = in_process_crud.get(process_id)
-        if not orm_obj:
-            raise ValueError(f"In-process record with ID {process_id} not found")
-        return orm_obj
-
-    try:
-        return in_process_crud.update_by_id(process_id, **kwargs)
-    except ValueError as exc:
-        raise ValueError(f"In-process record with ID {process_id} not found") from exc
+    return in_process_crud.update_or_404(process_id, **kwargs)
 
 
 def delete_in_process_by_title_user_lang(title: str, user: str, lang: str) -> bool:
