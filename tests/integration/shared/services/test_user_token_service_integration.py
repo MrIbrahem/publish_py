@@ -9,7 +9,7 @@ from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
     get_user_token,
     get_user_token_by_username,
-    upsert_user_token,
+    upsert_user_token_str,
 )
 
 
@@ -20,7 +20,7 @@ class TestUserServiceIntegration:
         """Test complete CRUD lifecycle through service layer."""
         user = create_user("TestUser")
         user_id = user.user_id
-        upsert_user_token(
+        upsert_user_token_str(
             user_id=user_id,
             access_key="test_key",
             access_secret="test_secret",
@@ -39,7 +39,7 @@ class TestUserServiceIntegration:
         """Test username-based operations integrate correctly."""
         user = create_user("TestUser")
         user_id = user.user_id
-        upsert_user_token(
+        upsert_user_token_str(
             user_id=user_id,
             access_key="test_key",
             access_secret="test_secret",

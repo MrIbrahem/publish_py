@@ -60,6 +60,7 @@ def update_pages_users_to_main(record_id: int, **kwargs) -> PagesUsersToMainReco
     """Update a pages_users_to_main record."""
     return pages_users_to_main_crud.update_or_404(record_id, **kwargs)
 
+
 __all__ = [
     "list_pages_users_to_main",
     "get_pages_users_to_main",

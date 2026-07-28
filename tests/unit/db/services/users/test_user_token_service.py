@@ -8,18 +8,18 @@ from src.main_app.db.services.delete_service import (
 )
 from src.main_app.db.services.users import create_user
 from src.main_app.db.services.users.user_token_service import (
-    create_user_token,
+    create_user_token_str,
     get_authenticated_user_token,
     get_user_token,
-    update_user_token,
-    upsert_user_token,
+    update_user_token_str,
+    upsert_user_token_str,
 )
 
 
 def test_delete_user_cascades(mock_app: Flask) -> None:
     with mock_app.app_context():
         user = create_user("svc_dave")
-        upsert_user_token(user_id=user.user_id, access_key="k", access_secret="s")
+        upsert_user_token_str(user_id=user.user_id, access_key="k", access_secret="s")
         assert get_user_token(user.user_id) is not None
 
 
@@ -27,7 +27,7 @@ def test_upsert_get_delete_user_token(mock_app: Flask) -> None:
     with mock_app.app_context():
         # Test insert
         user = create_user("svc_eve")
-        upsert_user_token(user_id=user.user_id, access_key="key", access_secret="secret")
+        upsert_user_token_str(user_id=user.user_id, access_key="key", access_secret="secret")
 
         token_record = get_user_token(user.user_id)
         assert token_record is not None
@@ -35,7 +35,7 @@ def test_upsert_get_delete_user_token(mock_app: Flask) -> None:
         assert token_record.access_secret is not None
 
         # Test update
-        upsert_user_token(user_id=user.user_id, access_key="new_key", access_secret="new_secret")
+        upsert_user_token_str(user_id=user.user_id, access_key="new_key", access_secret="new_secret")
         token_record = get_user_token(user.user_id)
 
         # Test delete token only
@@ -209,7 +209,7 @@ class TestGetUserToken:
 
 
 class TestCreateUserToken:
-    """Tests for create_user_token."""
+    """Tests for create_user_token_str."""
 
     def test_creates_and_returns_record(self, monkeypatch):
         """Test creates a new UserTokenRecord and returns it."""
@@ -220,7 +220,7 @@ class TestCreateUserToken:
             lambda x: b"enc_" + x.encode(),
         )
 
-        result = create_user_token(1, "key", "secret")
+        result = create_user_token_str(1, "key", "secret")
 
         assert result.user_id == 1
         assert result.access_token == b"enc_key"
@@ -231,7 +231,7 @@ class TestCreateUserToken:
 
 
 class TestUpdateUserToken:
-    """Tests for update_user_token."""
+    """Tests for update_user_token_str."""
 
     def test_updates_existing_token(self, monkeypatch):
         """Test updates fields on an existing token record."""
@@ -244,7 +244,7 @@ class TestUpdateUserToken:
         mock_record = MagicMock(spec=UserTokenRecord)
         mock_db.session.query.return_value.filter.return_value.first.return_value = mock_record
 
-        result = update_user_token(1, "new_key", "new_secret")
+        result = update_user_token_str(1, "new_key", "new_secret")
 
         assert result == mock_record
         assert result.access_token == b"enc_new_key"
@@ -258,16 +258,16 @@ class TestUpdateUserToken:
         monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
         mock_db.session.query.return_value.filter.return_value.first.return_value = None
 
-        result = update_user_token(999, "key", "secret")
+        result = update_user_token_str(999, "key", "secret")
 
         assert result is None
 
 
 class TestUpsertUserToken:
-    """Tests for upsert_user_token."""
+    """Tests for upsert_user_token_str."""
 
     def test_calls_create_when_no_existing_token(self, monkeypatch):
-        """Test calls create_user_token when no existing token is found."""
+        """Test calls create_user_token_str when no existing token is found."""
         mock_db = MagicMock()
         monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
         monkeypatch.setattr(
@@ -276,14 +276,14 @@ class TestUpsertUserToken:
         )
         mock_db.session.query.return_value.filter.return_value.first.return_value = None
 
-        result = upsert_user_token(1, "key", "secret")
+        result = upsert_user_token_str(1, "key", "secret")
 
         assert result.user_id == 1
         assert result.access_token == b"enc_key"
         assert result.access_secret == b"enc_secret"
 
     def test_calls_update_when_token_exists(self, monkeypatch):
-        """Test calls update_user_token when an existing token is found."""
+        """Test calls update_user_token_str when an existing token is found."""
         mock_db = MagicMock()
         monkeypatch.setattr("src.main_app.db.services.users.user_token_service.db", mock_db)
         monkeypatch.setattr(
@@ -293,7 +293,7 @@ class TestUpsertUserToken:
         mock_record = MagicMock(spec=UserTokenRecord)
         mock_db.session.query.return_value.filter.return_value.first.return_value = mock_record
 
-        result = upsert_user_token(1, "new_key", "new_secret")
+        result = upsert_user_token_str(1, "new_key", "new_secret")
 
         assert result == mock_record
         assert result.access_token == b"enc_new_key"
