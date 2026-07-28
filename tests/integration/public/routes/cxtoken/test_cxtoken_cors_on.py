@@ -4,13 +4,14 @@ with CORS_ENABLED (CORS_DISABLED=False).
 """
 
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from flask import Blueprint, Flask
 from flask.testing import FlaskClient
 
 from src.main_app.config import TestingConfig
+from src.main_app.db.services import UsersService, UserTokenService
 
 ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
@@ -59,20 +60,14 @@ class TestCheckCorsOnCxtokenGet:
 
     def test_get_allowed_origin_proceeds(self, mock_is_allowed_medwiki, mock_client):
         """GET from allowed origin passes CORS check and reaches handler."""
-        with (
-            patch(
-                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username",
-                return_value=None,
-            ),
-        ):
-            response = mock_client.get(
-                "/cxtoken?wiki=en&user=UnknownUser",
-                headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "no access"
-            assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
+        response = mock_client.get(
+            "/cxtoken?wiki=en&user=UnknownUser",
+            headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "no access"
+        assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
 
     def test_get_no_origin_returns_403(self, mock_is_denied, mock_client):
         """GET with no Origin header returns 403."""
@@ -83,19 +78,19 @@ class TestCheckCorsOnCxtokenGet:
 
     def test_get_allowed_origin_returns_cxtoken(self, mock_is_allowed_medwiki, mock_client):
         """GET from allowed origin returns cxtoken on success."""
-        with (
-            patch(
-                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
-            ) as mock_get_token,
-            patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken,
-        ):
-            mock_token = MagicMock()
-            mock_token.decrypted.return_value = ("access_key", "access_secret")
-            mock_get_token.return_value = mock_token
+        users_service = UsersService()
+        user = users_service.create_user("CorsTokenUser")
+
+        token_service = UserTokenService()
+        encrypted_token = token_service.encrypt_value("test_access_token")
+        encrypted_secret = token_service.encrypt_value("test_access_secret")
+        token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+
+        with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
             mock_get_cxtoken.return_value = {"cxtoken": "test_cx_token_123"}
 
             response = mock_client.get(
-                "/cxtoken?wiki=en&user=TestUser",
+                "/cxtoken?wiki=en&user=CorsTokenUser",
                 headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
             )
             assert response.status_code == 200
@@ -138,18 +133,14 @@ class TestCxtokenCorsOnIntegration:
 
     def test_get_same_origin_passes_real_cors(self, mock_app, mock_client):
         """GET from same origin passes real CORS check."""
-        with patch(
-            "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username",
-            return_value=None,
-        ):
-            response = mock_client.get(
-                "/cxtoken?wiki=en&user=UnknownUser",
-                base_url=f"https://{ALLOWED_DOMAIN}",
-                headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "no access"
+        response = mock_client.get(
+            "/cxtoken?wiki=en&user=UnknownUser",
+            base_url=f"https://{ALLOWED_DOMAIN}",
+            headers={"Origin": f"https://{ALLOWED_DOMAIN}"},
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "no access"
 
     def test_get_disallowed_origin_blocked_real_cors(self, mock_app, mock_client):
         """GET from disallowed origin is blocked by real CORS check."""

@@ -4,10 +4,12 @@ Integration tests for src/main_app/public/routes/cxtoken/routes.py module.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from flask.testing import FlaskClient
+
+from src.main_app.db.services import UsersService, UserTokenService
 
 
 @pytest.mark.integration
@@ -68,39 +70,34 @@ class TestCxTokenGet:
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch(
-                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
-            ) as mock_get_token:
-                mock_get_token.return_value = None
+            response = mock_client.get("/cxtoken/?wiki=en&user=NonExistentUser")
 
-                response = mock_client.get("/cxtoken/?wiki=en&user=TestUser")
-
-                assert response.status_code == 403
-                data = response.get_json()
-                assert "error" in data
+            assert response.status_code == 403
+            data = response.get_json()
+            assert "error" in data
 
     def test_valid_request_returns_cxtoken(self, mock_client: FlaskClient):
         """Test that valid request returns cxtoken."""
+        users_service = UsersService()
+        user = users_service.create_user("TokenUser")
+
+        token_service = UserTokenService()
+        encrypted_token = token_service.encrypt_value("test_access_token")
+        encrypted_secret = token_service.encrypt_value("test_access_secret")
+        token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            mock_user_token = MagicMock()
-            mock_user_token.decrypted.return_value = ("access_key", "access_secret")
+            with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
+                mock_get_cxtoken.return_value = {"csrftoken": "test_token_123"}
 
-            with patch(
-                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
-            ) as mock_get_token:
-                mock_get_token.return_value = mock_user_token
+                with patch("src.main_app.public.routes.cxtoken.routes.store_jwt"):
+                    response = mock_client.get("/cxtoken/?wiki=en&user=TokenUser")
 
-                with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
-                    mock_get_cxtoken.return_value = {"csrftoken": "test_token_123"}
-
-                    with patch("src.main_app.public.routes.cxtoken.routes.store_jwt"):
-                        response = mock_client.get("/cxtoken/?wiki=en&user=TestUser")
-
-                        assert response.status_code == 200
-                        data = response.get_json()
-                        assert "csrftoken" in data
+                    assert response.status_code == 200
+                    data = response.get_json()
+                    assert "csrftoken" in data
 
 
 @pytest.mark.integration
@@ -131,18 +128,12 @@ class TestCxTokenUserFormatting:
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch(
-                "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
-            ) as mock_get_token:
-                mock_get_token.return_value = None
+            with patch("src.main_app.public.routes.cxtoken.routes._format_user") as mock_format:
+                mock_format.return_value = "Test User"
 
-                with patch("src.main_app.public.routes.cxtoken.routes._format_user") as mock_format:
-                    mock_format.return_value = "Test User"
+                mock_client.get("/cxtoken/?wiki=en&user=Test_User")
 
-                    mock_client.get("/cxtoken/?wiki=en&user=Test_User")
-
-                    # Check that formatting was called
-                    mock_format.assert_called()
+                mock_format.assert_called()
 
     def test_special_users_mapping_applied(self, mock_client: FlaskClient):
         """Test that special user mappings are applied."""
@@ -152,14 +143,7 @@ class TestCxTokenUserFormatting:
             with patch("src.main_app.public.routes.cxtoken.routes.settings") as mock_settings:
                 mock_settings.users.special_users = {"SpecialUser": "MappedUser"}
 
-                with patch(
-                    "src.main_app.public.routes.cxtoken.routes.UserTokenService.get_user_token_by_username"
-                ) as mock_get_token:
-                    mock_get_token.return_value = None
-
-                    mock_client.get("/cxtoken/?wiki=en&user=SpecialUser")
-
-                    # The formatted user should be "MappedUser" after applying special_users mapping
+                mock_client.get("/cxtoken/?wiki=en&user=SpecialUser")
 
 
 class TestCxtokenRouteIntegration:
@@ -169,7 +153,6 @@ class TestCxtokenRouteIntegration:
         """Test that cxtoken route requires authentication."""
         response = mock_client.get("/cxtoken?wiki=arwiki")
 
-        # Should redirect to login or return 400 (bad request)
         assert response.status_code == 400
 
     def test_cxtoken_rejects_missing_user_param(self, mock_client):
