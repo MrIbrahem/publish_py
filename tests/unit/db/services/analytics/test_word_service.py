@@ -19,45 +19,44 @@ class TestSetup:
         self.service = WordService()
 
 
-def test_word_workflow():
-    # Test add
-    w = add_word("Human anatomy", 500, 5000)
-    assert w.w_title == "Human anatomy"
-    assert w.w_lead_words == 500
+class TestWordService:
+    """Tests for WordService class."""
 
-    # Test get
-    w2 = get_word(w.w_id)
-    assert w2.w_title == "Human anatomy"
+    def test_word_workflow(self):
+        # Test add
+        w = add_word("Human anatomy", 500, 5000)
+        assert w.w_title == "Human anatomy"
+        assert w.w_lead_words == 500
 
-    # Test get by title
-    w3 = get_word_by_title("Human anatomy")
-    assert w3.w_id == w.w_id
+        # Test get
+        w2 = get_word(w.w_id)
+        assert w2.w_title == "Human anatomy"
 
-    # Test get_word_counts_for_title
-    lead, all_words = get_word_counts_for_title("Human anatomy")
-    assert lead == 500
-    assert all_words == 5000
+        # Test get by title
+        w3 = get_word_by_title("Human anatomy")
+        assert w3.w_id == w.w_id
 
-    # Test list
-    all_w = list_words()
-    assert any(x.w_title == "Human anatomy" for x in all_w)
+        # Test get_word_counts_for_title
+        lead, all_words = get_word_counts_for_title("Human anatomy")
+        assert lead == 500
+        assert all_words == 5000
 
-    # Test update
-    updated = update_word(w.w_id, w_lead_words=600)
-    assert updated.w_lead_words == 600
+        # Test list
+        all_w = list_words()
+        assert any(x.w_title == "Human anatomy" for x in all_w)
 
-    # Test add_or_update
-    w4 = add_or_update_word("Human anatomy", 700, 6000)
-    assert w4.w_lead_words == 700
+        # Test update
+        updated = update_word(w.w_id, w_lead_words=600)
+        assert updated.w_lead_words == 600
 
-    # Test delete
-    deleted = WordService().delete(w.w_id)
-    assert deleted is True
-    assert get_word(w.w_id) is None
+        # Test add_or_update
+        w4 = add_or_update_word("Human anatomy", 700, 6000)
+        assert w4.w_lead_words == 700
 
-
-class TestListWords:
-    """Tests for list_words function."""
+        # Test delete
+        deleted = WordService().delete(w.w_id)
+        assert deleted is True
+        assert get_word(w.w_id) is None
 
     def test_returns_list_of_words(self, monkeypatch):
         """Test that function returns list from store."""
