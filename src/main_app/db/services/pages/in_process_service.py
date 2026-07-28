@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class InProcessService(CRUDService[InProcessRecord]):
     model = InProcessRecord
+
     def __init__(self):
         super().__init__(db.session, InProcessRecord)
 

@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class ProjectService(CRUDService[ProjectRecord]):
     model = ProjectRecord
+
     def __init__(self):
         super().__init__(db.session, ProjectRecord)
 

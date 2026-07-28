@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord]):
     model = UsersNoInprocessRecord
+
     def __init__(self):
         super().__init__(db.session, UsersNoInprocessRecord)
 

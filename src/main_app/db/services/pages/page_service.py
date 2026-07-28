@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 class PagesService(CRUDService[PageRecord]):
     model = PageRecord
+
     def __init__(self):
         super().__init__(db.session, PageRecord)
 

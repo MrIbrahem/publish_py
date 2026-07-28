@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 class UserPagesService(CRUDService[UserPageRecord]):
     model = UserPageRecord
+
     def __init__(self):
         super().__init__(db.session, UserPageRecord)
 

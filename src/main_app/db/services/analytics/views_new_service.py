@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class ViewsNewService(CRUDService[ViewsNewRecord]):
     model = ViewsNewRecord
+
     def __init__(self):
         super().__init__(db.session, ViewsNewRecord)
 

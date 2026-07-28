@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class MdwikiRevidService(CRUDService[MdwikiRevidRecord, str]):
     model = MdwikiRevidRecord
+
     def __init__(self):
         super().__init__(db.session, MdwikiRevidRecord)
 

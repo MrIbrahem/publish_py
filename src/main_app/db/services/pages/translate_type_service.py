@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class TranslateTypeService(CRUDService[TranslateTypeRecord]):
     model = TranslateTypeRecord
+
     def __init__(self):
         super().__init__(db.session, TranslateTypeRecord)
 

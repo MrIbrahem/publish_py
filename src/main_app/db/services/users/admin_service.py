@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 class AdminUserService(CRUDService[AdminUserRecord]):
     model = AdminUserRecord
+
     def __init__(self):
         super().__init__(db.session, AdminUserRecord)
 

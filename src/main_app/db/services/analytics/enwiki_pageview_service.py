@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
     model = EnwikiPageviewRecord
+
     def __init__(self):
         super().__init__(db.session, EnwikiPageviewRecord)
 

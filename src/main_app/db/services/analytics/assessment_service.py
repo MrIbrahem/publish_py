@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class AssessmentService(CRUDService[AssessmentRecord]):
     model = AssessmentRecord
+
     def __init__(self):
         super().__init__(db.session, AssessmentRecord)
 

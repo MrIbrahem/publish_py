@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class LanguageSettingService(CRUDService[LanguageSettingRecord]):
     model = LanguageSettingRecord
+
     def __init__(self):
         super().__init__(db.session, LanguageSettingRecord)
 

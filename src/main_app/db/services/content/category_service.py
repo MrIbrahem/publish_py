@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class CategoryService(CRUDService[CategoryRecord]):
     model = CategoryRecord
+
     def __init__(self):
         super().__init__(db.session, CategoryRecord)
 

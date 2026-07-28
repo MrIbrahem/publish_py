@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
     model = PagesUsersToMainRecord
+
     def __init__(self):
         super().__init__(db.session, PagesUsersToMainRecord)
 

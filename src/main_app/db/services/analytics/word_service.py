@@ -17,8 +17,10 @@ logger = logging.getLogger(__name__)
 
 class WordService(CRUDService[WordRecord]):
     model = WordRecord
+
     def __init__(self):
         super().__init__(db.session, WordRecord)
+
 
 word_crud = WordService()
 

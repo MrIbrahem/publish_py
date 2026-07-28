@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class SettingService(CRUDService[SettingRecord]):
     model = SettingRecord
+
     def __init__(self):
         super().__init__(db.session, SettingRecord)
 

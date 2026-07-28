@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class ReportService(CRUDService[ReportRecord]):
     model = ReportRecord
+
     def __init__(self):
         super().__init__(db.session, ReportRecord)
 

@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class RefsCountService(CRUDService[RefsCountRecord]):
     model = RefsCountRecord
+
     def __init__(self):
         super().__init__(db.session, RefsCountRecord)
 
