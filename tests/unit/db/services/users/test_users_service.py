@@ -21,7 +21,7 @@ pytestmark = pytest.mark.unit
 
 
 def test_user_workflow():
-    u = create_user("Wiki_User", "jh@example.com", "enwiki", "Editor")
+    u = create_user("Wiki_User", email="jh@example.com", wiki="enwiki", user_group="Editor")
     assert u.username == "Wiki_User"
 
     assert get_user(u.user_id).username == "Wiki_User"
@@ -95,7 +95,7 @@ class TestAddUser:
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that function adds and returns record."""
-        record = create_user("New_Researcher", "research@wiki.org", "enwiki", "Researcher")
+        record = create_user("New_Researcher", email="research@wiki.org", wiki="enwiki", user_group="Researcher")
         assert record.username == "New_Researcher"
         assert record.email == "research@wiki.org"
 

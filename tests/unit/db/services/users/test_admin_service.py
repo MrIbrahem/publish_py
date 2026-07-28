@@ -26,8 +26,8 @@ class TestGetCoordinatorById:
     def test_not_found_raises(self):
         mock_db = MagicMock()
         mock_db.session.query.return_value.filter.return_value.first.return_value = None
-        from src.main_app.db.services.users.admin_service import admin_crud
+        from src.main_app.db.services.users.admin_service import _crud
 
-        with patch.object(admin_crud, "session", mock_db.session):
+        with patch.object(_crud, "session", mock_db.session):
             with patch("src.main_app.db.services.users.admin_service.db", mock_db):
                 assert get_coordinator_by_id(999) is not None
