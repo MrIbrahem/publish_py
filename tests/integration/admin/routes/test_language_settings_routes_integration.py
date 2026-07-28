@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from flask.testing import FlaskClient
 
-from src.main_app.db.services import LanguageSettingService, LangService
+from src.main_app.db.services import LangService, LanguageSettingService
 
 
 @pytest.mark.integration
@@ -33,12 +33,8 @@ class TestLanguageSettingsDashboard:
         langs_service.add_lang("ar", "Arabic", "Arabic")
 
         lang_setting_service = LanguageSettingService()
-        lang_setting_service.add_language_setting(
-            lang_code="en", move_dots=1, expend=0, add_en_lang=1
-        )
-        lang_setting_service.add_language_setting(
-            lang_code="ar", move_dots=0, expend=1, add_en_lang=0
-        )
+        lang_setting_service.add_language_setting(lang_code="en", move_dots=1, expend=0, add_en_lang=1)
+        lang_setting_service.add_language_setting(lang_code="ar", move_dots=0, expend=1, add_en_lang=0)
 
         response = auth_client.get("/admin/language_settings/")
 

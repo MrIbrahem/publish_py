@@ -103,7 +103,7 @@ class TestAddLang(TestSetup):
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)): # type: ignore
+        with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):  # type: ignore
             with pytest.raises(ValueError, match="already exists"):
                 add_lang("en", "En", "En")
 

@@ -112,7 +112,9 @@ class TestAddUser(TestSetup):
         # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
-        with patch.object(sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)): # pyright: ignore[reportArgumentType]
+        with patch.object(
+            sqlite_db.session, "commit", side_effect=IntegrityError(None, None, None)
+        ):  # pyright: ignore[reportArgumentType]
             with pytest.raises(ValueError, match="already exists"):
                 create_user("Duplicate")
 

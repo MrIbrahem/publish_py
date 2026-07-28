@@ -116,6 +116,7 @@ def mock_client(mock_app: Flask) -> FlaskClient:
     """
     return mock_app.test_client()
 
+
 @pytest.fixture
 def test_client(mock_app: Flask) -> FlaskClient:
     """Create a test client for the app.
@@ -211,6 +212,7 @@ def setup_db(mock_app: Flask):
     The Flask-SQLAlchemy session (db.session) is used throughout tests.
     """
     from src.main_app.db import register_events
+
     with mock_app.app_context():
         sqlite_view_functions(_db)
         register_events(_db.engine)
