@@ -12,6 +12,7 @@ from src.main_app.db.services.analytics.word_service import (
     update_word,
 )
 
+
 def test_word_workflow():
     # Test add
     w = add_word("Human anatomy", 500, 5000)

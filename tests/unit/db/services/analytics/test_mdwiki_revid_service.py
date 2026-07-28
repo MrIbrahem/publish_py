@@ -10,6 +10,7 @@ from src.main_app.db.services.analytics.mdwiki_revid_service import (
     update_mdwiki_revid,
 )
 
+
 def test_mdwiki_revid_workflow():
     # Test add
     r = add_mdwiki_revid("Cell biology", 1234567)

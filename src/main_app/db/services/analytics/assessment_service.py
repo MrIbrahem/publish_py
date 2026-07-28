@@ -72,6 +72,7 @@ class AssessmentService(CRUDService[AssessmentRecord]):
         """Delete an assessment record."""
         return self.delete(assessment_id)
 
+
 _crud = AssessmentService()
 list_assessments = _crud.list_assessments
 get_assessment = _crud.get_assessment

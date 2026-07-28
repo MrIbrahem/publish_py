@@ -12,6 +12,7 @@ from src.main_app.db.services.analytics.refs_count_service import (
     update_refs_count,
 )
 
+
 def test_refs_count_workflow():
     # Test add
     r = add_refs_count("Aspirin", 15, 120)

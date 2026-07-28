@@ -14,6 +14,7 @@ from src.main_app.db.services.analytics.views_new_service import (
     update_views_new,
 )
 
+
 def test_views_new_workflow():
     # Test add
     v = add_views_new("Dengue_fever", "en", 2023, 1500000)

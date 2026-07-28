@@ -11,6 +11,8 @@ from src.main_app.db.services.analytics.enwiki_pageview_service import (
     list_enwiki_pageviews,
     update_enwiki_pageview,
 )
+
+
 def test_enwiki_pageview_workflow():
     # Test add
     p = add_enwiki_pageview("Anatomy", 5000)

@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import InProcessRecord
-
 from src.main_app.db.services.pages.in_process_service import (
     InProcessService,
     add_in_process,
