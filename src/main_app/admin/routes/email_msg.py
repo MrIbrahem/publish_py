@@ -12,9 +12,9 @@ from flask import (
     request,
 )
 
-from ...db.services.analytics import get_total_views_for_target
-from ...db.services.pages import get_page_by_id, get_user_page_by_id
-from ...db.services.users import get_user_by_username
+from ...db.services.analytics.views_new_service import ViewsNewService
+from ...db.services.pages import PagesService, UserPagesService
+from ...db.services.users import UsersService
 from ...public.auth.utils import load_user
 from ...public.routes.td.results_api import results_api_result
 from ..decorators import admin_required
@@ -54,7 +54,8 @@ def make_sugustion(langcode: str | None, title: str | None) -> str | None:
 
 
 def get_user_email(username: str) -> str | None:
-    user_record = get_user_by_username(username)
+    users_service = UsersService()
+    user_record = users_service.get_user_by_username(username)
     user_email = user_record.email if user_record else None
     return user_email
 
@@ -70,16 +71,18 @@ def get_currect_user_email() -> str | None:
 
 def get_page_data(last_table: str, id: int) -> dict[str, str | Any]:
     if last_table == "pages":
-        page_record = get_page_by_id(id)
+        pages_service = PagesService()
+        page_record = pages_service.get_page_by_id(id)
     else:
-        page_record = get_user_page_by_id(id)
+        user_pages_service = UserPagesService()
+        page_record = user_pages_service.get_user_page_by_id(id)
     # user=row.user, lang=row.lang, target=row.target, date=row.pupdate, title=row.title
     page_data = page_record.to_dict() if page_record else {}
     target = page_data.get("target")
     lang = page_data.get("lang")
 
     if page_data and target and not page_data.get("views"):
-        page_data["views"] = get_total_views_for_target(target, lang)
+        page_data["views"] = ViewsNewService().get_total_views_for_target(target, lang)
 
     return page_data
 

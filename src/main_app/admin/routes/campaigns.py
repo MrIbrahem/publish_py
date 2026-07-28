@@ -16,12 +16,8 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content import (
-    add_category,
-    delete_category,
-    list_categories,
-    update_category,
-)
+from ...db.services.content import CategoryService
+from ...db.services.delete_service import delete_category
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -30,7 +26,8 @@ logger = logging.getLogger(__name__)
 def _campaigns_dashboard():
     """Render the campaigns management dashboard."""
 
-    campaigns = list_categories()
+    category_service = CategoryService()
+    campaigns = category_service.list_categories()
 
     return render_template(
         "admins/campaigns.html",
@@ -51,7 +48,8 @@ def _add_campaign_and_category() -> ResponseReturnValue:
         return redirect(url_for("admin.campaigns.dashboard"))
 
     try:
-        add_category(
+        category_service = CategoryService()
+        category_service.add_category(
             category=category,
             campaign=campaign,
         )
@@ -78,7 +76,8 @@ def _update_category(
 ) -> None:
     """Update an existing category record."""
     try:
-        record = update_category(
+        category_service = CategoryService()
+        record = category_service.update_category(
             category_id=category_id,
             category=category,
             campaign=campaign,

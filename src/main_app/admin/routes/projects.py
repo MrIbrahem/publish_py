@@ -16,12 +16,8 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.content import (
-    add_project,
-    delete_project,
-    list_projects,
-    update_project_title,
-)
+from ...db.services.content import ProjectService
+from ...db.services.delete_service import delete_project
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -30,7 +26,8 @@ logger = logging.getLogger(__name__)
 def _projects_dashboard():
     """Render the projects management dashboard."""
 
-    projects = list_projects()
+    project_service = ProjectService()
+    projects = project_service.list_projects()
 
     return render_template(
         "admins/projects.html",
@@ -46,7 +43,8 @@ def _add_project() -> ResponseReturnValue:
         return redirect(url_for("admin.projects.dashboard"))
 
     try:
-        add_project(
+        project_service = ProjectService()
+        project_service.add_project(
             g_title=g_title,
         )
     except ValueError as exc:
@@ -65,7 +63,8 @@ def _update_project(record_id: int, g_title: str) -> None:
     """Update an existing project record."""
 
     try:
-        record = update_project_title(record_id, g_title)
+        project_service = ProjectService()
+        record = project_service.update_project_title(record_id, g_title)
     except ValueError as exc:
         logger.exception("Unable to update project")
         flash(str(exc), "warning")

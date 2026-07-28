@@ -14,13 +14,9 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.config import (
-    add_language_setting,
-    delete_language_setting,
-    list_language_settings,
-    update_language_setting,
-)
-from ...db.services.content import list_langs
+from ...db.services.config import LanguageSettingService
+from ...db.services.content import LangService
+from ...db.services.delete_service import delete_language_setting
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -29,9 +25,11 @@ logger = logging.getLogger(__name__)
 def _language_settings_dashboard():
     """Render the language settings management dashboard."""
 
-    settings = list_language_settings()
+    lang_setting_service = LanguageSettingService()
+    lang_service = LangService()
+    settings = lang_setting_service.list_language_settings()
     # Also get all available languages for the "Add" dropdown
-    languages = list_langs()
+    languages = lang_service.list_langs()
 
     return render_template(
         "admins/language_settings.html",
@@ -53,7 +51,8 @@ def _add_language_setting() -> ResponseReturnValue:
     add_en_lang = 1 if request.form.get("add_en_lang") == "1" else 0
 
     try:
-        add_language_setting(
+        lang_setting_service = LanguageSettingService()
+        lang_setting_service.add_language_setting(
             lang_code=lang_code,
             move_dots=move_dots,
             expend=expend,
@@ -82,7 +81,8 @@ def _update_language_setting(setting_id: int) -> ResponseReturnValue:
     }
 
     try:
-        record = update_language_setting(setting_id, **kwargs)
+        lang_setting_service = LanguageSettingService()
+        record = lang_setting_service.update_language_setting(setting_id, **kwargs)
     except ValueError as exc:
         logger.exception("Unable to update language setting")
         flash(str(exc), "warning")

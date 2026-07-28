@@ -7,12 +7,8 @@ from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from ...db.services.config import (
-    create_setting,
-    delete_setting_by_key,
-    get_all_settings_raw,
-    update_setting,
-)
+from ...db.services.config import SettingsService
+from ...db.services.delete_service import delete_setting_by_key
 from ..decorators import admin_required
 
 
@@ -30,7 +26,8 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
 
 
 def settings_update_form(request_form) -> tuple[list[str], list[str]]:
-    all_settings = get_all_settings_raw()
+    settings_service = SettingsService()
+    all_settings = settings_service.get_all_settings_raw()
     failed_keys: list[str] = []
     deleted_keys: list[str] = []
 
@@ -60,7 +57,7 @@ def settings_update_form(request_form) -> tuple[list[str], list[str]]:
             failed_keys.append(key)
             continue
 
-        if not update_setting(key, value, v_type):
+        if not settings_service.update_setting(key, value, v_type):
             failed_keys.append(key)
 
     return failed_keys, deleted_keys
@@ -77,7 +74,8 @@ class SettingsRoutes:
         self.bp.post("/update")(admin_required(self.update))
 
     def dashboard(self):
-        settings_list = get_all_settings_raw()
+        settings_service = SettingsService()
+        settings_list = settings_service.get_all_settings_raw()
         return render_template(
             "admins/settings.html",
             settings_list=settings_list,
@@ -96,7 +94,8 @@ class SettingsRoutes:
             return redirect(url_for("admin.settings.dashboard"))
 
         if key and title:
-            success = create_setting(key, title, value_type)
+            settings_service = SettingsService()
+            success = settings_service.create_setting(key, title, value_type)
             if success:
                 flash("Setting created successfully.", "success")
             else:

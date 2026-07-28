@@ -14,12 +14,8 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services.users import (
-    add_full_translator,
-    delete_full_translator,
-    list_full_translators,
-    update_full_translator,
-)
+from ...db.services.delete_service import delete_full_translator
+from ...db.services.users import FullTranslatorService
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -28,7 +24,8 @@ logger = logging.getLogger(__name__)
 def _full_translators_dashboard():
     """Render the full translator management dashboard."""
 
-    translators = list_full_translators()
+    ft_service = FullTranslatorService()
+    translators = ft_service.list_full_translators()
     total = len(translators)
     is_active = sum(1 for tr in translators if tr.is_active)
 
@@ -50,7 +47,8 @@ def _add_full_translator() -> ResponseReturnValue:
         return redirect(url_for("admin.full_translators.dashboard"))
 
     try:
-        record = add_full_translator(username)
+        ft_service = FullTranslatorService()
+        record = ft_service.add_full_translator(username)
     except ValueError as exc:
         logger.exception("Unable to add full translator")
         flash(str(exc), "warning")
@@ -67,7 +65,8 @@ def _set_record_active_status(record_id: int, is_active: bool) -> ResponseReturn
     """Shared helper to update record active status."""
     action = "activate" if is_active else "deactivate"
     try:
-        record = update_full_translator(record_id, is_active=is_active)
+        ft_service = FullTranslatorService()
+        record = ft_service.update_full_translator(record_id, is_active=is_active)
     except LookupError as exc:
         logger.exception(f"Unable to {action} coordinator.")
         flash(str(exc), "warning")
