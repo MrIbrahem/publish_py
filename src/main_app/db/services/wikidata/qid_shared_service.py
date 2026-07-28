@@ -23,7 +23,6 @@ from sqlalchemy.orm import Session, aliased
 from ....extensions import db
 from ...models import QidOthersRecord, QidRecord
 from ..crud_service import CRUDService
-from ..delete_service import delete_record_by_pk
 
 logger = logging.getLogger(__name__)
 
@@ -290,12 +289,8 @@ class BaseQidService(CRUDService[ServiceRecord]):
             logger.exception("Failed to update qid id=%r: %s", qid_id, e)
             return False
 
-    def delete(self, qid_id: int) -> bool:
-        try:
-            return delete_record_by_pk(self.model, qid_id)
-        except Exception as e:
-            logger.exception("Failed to delete qid id=%r: %s", qid_id, e)
-            return False
+    def delete_qid(self, qid_id: int) -> bool:
+        return self.delete(qid_id)
 
 
 __all__ = [

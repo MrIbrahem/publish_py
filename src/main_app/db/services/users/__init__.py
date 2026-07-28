@@ -1,15 +1,8 @@
 """Users db services."""
 
-from ..delete_service import (
-    delete_full_translator,
-    delete_user,
-    delete_user_token,
-    delete_users_no_inprocess,
-)
 from .admin_service import (
     AdminService,
     add_coordinator,
-    delete_coordinator,
     get_coordinator_by_id,
     is_active_coordinator,
     list_coordinators,
@@ -68,7 +61,6 @@ __all__ = [
     "list_coordinators",
     "get_coordinator_by_id",
     "add_coordinator",
-    "delete_coordinator",
     "is_active_coordinator",
     "set_coordinator_active",
     "list_full_translators",
@@ -78,7 +70,6 @@ __all__ = [
     "add_full_translator",
     "add_or_update_full_translator",
     "update_full_translator",
-    "delete_full_translator",
     "is_full_translator",
     "list_users",
     "list_users_by_group",
@@ -87,12 +78,10 @@ __all__ = [
     "create_user",
     "update_user",
     "update_user_data",
-    "delete_user",
     "user_exists",
     "users_search",
     "upsert_user_token",
     "get_user_token",
-    "delete_user_token",
     "get_user_token_by_username",
     "get_authenticated_user_token",
     "list_users_no_inprocess",
@@ -102,6 +91,5 @@ __all__ = [
     "add_users_no_inprocess",
     "add_or_update_users_no_inprocess",
     "update_users_no_inprocess",
-    "delete_users_no_inprocess",
     "should_hide_from_inprocess",
 ]

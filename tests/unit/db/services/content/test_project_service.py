@@ -2,14 +2,12 @@ import pytest
 
 from src.main_app.db.models import ProjectRecord
 from src.main_app.db.services.content.project_service import (
+    ProjectService,
     add_project,
     get_project,
     get_project_by_title,
     list_projects,
     update_project,
-)
-from src.main_app.db.services.delete_service import (
-    delete_project,
 )
 
 
@@ -35,7 +33,7 @@ def test_project_workflow():
     assert updated.g_title == "WP:MED"
 
     # Test delete
-    deleted = delete_project(p.g_id)
+    deleted = ProjectService().delete(p.g_id)
     assert deleted is True
     assert get_project(p.g_id) is None
 
@@ -116,9 +114,9 @@ class TestDeleteProject:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         p = add_project("WikiProject Temporary")
-        deleted = delete_project(p.g_id)
+        deleted = ProjectService().delete(p.g_id)
         assert deleted is True
         assert get_project(p.g_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_project(9999) is False
+        assert ProjectService().delete(9999) is False

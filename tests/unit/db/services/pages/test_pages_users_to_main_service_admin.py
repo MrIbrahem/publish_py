@@ -17,10 +17,8 @@ from src.main_app.db.models import (
     QidRecord,
     UserPageRecord,
 )
-from src.main_app.db.services.delete_service import (
-    delete_user_page_to_main,
-)
 from src.main_app.db.services.pages.pages_users_to_main_service import (
+    PagesUsersToMainPagesService,
     check_main_page_exists,
     get_user_page,
     list_pending,
@@ -208,7 +206,7 @@ class TestDeleteUserPage:
         page = _seed_pending("Foo", "en")
         page_id = page.id
 
-        ok = delete_user_page_to_main(page_id)
+        ok = PagesUsersToMainPagesService().delete(page_id)
         assert ok is True
         assert sqlite_db.session.get(UserPageRecord, page_id) is None
         assert sqlite_db.session.get(PagesUsersToMainRecord, page_id) is None
@@ -228,16 +226,16 @@ class TestDeleteUserPage:
         sqlite_db.session.commit()
         page_id = page.id  # capture before delete; ORM proxy raises after.
 
-        ok = delete_user_page_to_main(page_id)
+        ok = PagesUsersToMainPagesService().delete(page_id)
         assert ok is True
         assert sqlite_db.session.get(UserPageRecord, page_id) is None
 
     def test_returns_false_when_id_is_falsy(self):
-        assert delete_user_page_to_main(0) is False
+        assert PagesUsersToMainPagesService().delete(0) is False
 
     def test_returns_false_and_rolls_back_on_db_error(self):
-        with patch("src.main_app.db.services.delete_service.db.session") as mock_session:
+        with patch("src.main_app.db.services.pages.pages_users_to_main_service.db.session") as mock_session:
             mock_session.get.side_effect = Exception("boom")
-            ok = delete_user_page_to_main(1)
+            ok = PagesUsersToMainPagesService().delete(1)
             assert ok is False
             mock_session.rollback.assert_called_once()

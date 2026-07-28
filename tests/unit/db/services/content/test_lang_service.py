@@ -4,14 +4,12 @@ import pytest
 
 from src.main_app.db.models import LangRecord
 from src.main_app.db.services.content.lang_service import (
+    LangService,
     add_lang,
     add_or_update_lang,
     get_lang,
     get_lang_by_code,
     list_langs,
-)
-from src.main_app.db.services.delete_service import (
-    delete_lang,
 )
 from src.main_app.extensions import db
 
@@ -41,7 +39,7 @@ def test_lang_workflow():
     assert l4.name == "Modern Standard Arabic"
 
     # Test delete
-    deleted = delete_lang(added.lang_id)
+    deleted = LangService().delete(added.lang_id)
     assert deleted is True
     assert get_lang(added.lang_id) is None
 
@@ -171,9 +169,9 @@ class TestDeleteLang:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         added = add_lang("ru", "Русский", "Russian")
-        deleted = delete_lang(added.lang_id)
+        deleted = LangService().delete(added.lang_id)
         assert deleted is True
         assert get_lang(added.lang_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_lang(9999) is False
+        assert LangService().delete(9999) is False

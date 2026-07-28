@@ -1,9 +1,5 @@
 """Reports db services."""
 
-from ..delete_service import (
-    delete_pages_users_to_main,
-    delete_report,
-)
 from .pages_users_to_main_service import (
     PagesUsersToMainService,
     add_pages_users_to_main,
@@ -25,9 +21,7 @@ __all__ = [
     "get_pages_users_to_main",
     "add_pages_users_to_main",
     "update_pages_users_to_main",
-    "delete_pages_users_to_main",
     "list_reports",
     "add_report",
-    "delete_report",
     "query_reports_with_filters",
 ]

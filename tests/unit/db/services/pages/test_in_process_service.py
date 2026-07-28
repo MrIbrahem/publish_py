@@ -3,10 +3,9 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import InProcessRecord
-from src.main_app.db.services.delete_service import (
-    delete_in_process,
-)
+
 from src.main_app.db.services.pages.in_process_service import (
+    InProcessService,
     add_in_process,
     delete_in_process_by_title_user_lang,
     get_in_process,
@@ -60,7 +59,7 @@ def test_in_process_workflow():
 
     # Test delete by ID
     ip_new = add_in_process("Common cold", "Medical_Student", "es")
-    deleted = delete_in_process(ip_new.id)
+    deleted = InProcessService().delete(ip_new.id)
     assert deleted is True
     assert get_in_process(ip_new.id) is None
 
@@ -177,12 +176,12 @@ class TestDeleteInProcess:
     def test_delegates_to_store(self, monkeypatch):
         """Test that function deletes the record."""
         ip = add_in_process("Allergy", "Immune_Expert", "en")
-        deleted = delete_in_process(ip.id)
+        deleted = InProcessService().delete(ip.id)
         assert deleted is True
         assert get_in_process(ip.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert delete_in_process(9999) is False
+        assert InProcessService().delete(9999) is False
 
 
 class TestDeleteInProcessByTitleUserLang:
