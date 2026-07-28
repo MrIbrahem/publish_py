@@ -18,7 +18,6 @@ from ...db.models import ProjectRecord, UserRecord
 from ...db.services.content import list_projects
 from ...db.services.pages import list_of_users_by_translations_count
 from ...db.services.users import UsersService
-from ...db.services.delete_service import delete_user
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -137,7 +136,8 @@ def _delete_user(record_id: int) -> ResponseReturnValue:
     """Remove a user not in process record entirely."""
 
     try:
-        record = delete_user(record_id)
+        service = UsersService()
+        record = service.delete(record_id)
         if not record:
             raise ValueError(f"Unable to delete user with ID {record_id}")
     except ValueError as exc:

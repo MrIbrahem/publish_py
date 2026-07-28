@@ -15,7 +15,6 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from ...db.services.users import UsersNoInprocessService
-from ...db.services.delete_service import delete_users_no_inprocess
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -83,7 +82,8 @@ def _delete_user_no_inprocess(record_id: int) -> ResponseReturnValue:
     """Remove a user not in process record entirely."""
 
     try:
-        record = delete_users_no_inprocess(record_id)
+        service = UsersNoInprocessService()
+        record = service.delete(record_id)
         if not record:
             raise ValueError(f"Unable to delete user with ID {record_id}")
     except ValueError as exc:
