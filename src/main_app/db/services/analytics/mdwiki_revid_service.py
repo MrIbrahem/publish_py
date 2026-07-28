@@ -63,6 +63,7 @@ def add_or_update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord | No
     )
     return instance
 
+
 def update_mdwiki_revid(title: str, revid: int) -> MdwikiRevidRecord | None:
     """Update an mdwiki_revid record."""
     record = mdwiki_revid_crud.get_by(title=title)

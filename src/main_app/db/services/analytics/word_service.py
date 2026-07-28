@@ -72,8 +72,8 @@ def add_or_update_word(
 
     instance, is_new = word_crud.upsert_by(
         keys={"w_title": w_title},
-            w_lead_words=w_lead_words,
-            w_all_words=w_all_words,
+        w_lead_words=w_lead_words,
+        w_all_words=w_all_words,
     )
     return instance
 

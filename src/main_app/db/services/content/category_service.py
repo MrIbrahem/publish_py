@@ -45,10 +45,10 @@ def add_category(
 
     orm_obj, is_new = category_crud.upsert_by(
         keys={"category": category},
-            campaign=campaign,
-            display=display,
-            category2=category2,
-            depth=depth,
+        campaign=campaign,
+        display=display,
+        category2=category2,
+        depth=depth,
     )
 
     if is_default:
