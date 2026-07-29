@@ -23,15 +23,13 @@ class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
 
     def list_enwiki_pageviews(self) -> list[EnwikiPageviewRecord]:
         """Return all enwiki pageview records."""
-        return list(
-            self.list(
-                order_by=[EnwikiPageviewRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[EnwikiPageviewRecord.id.asc()],
         )
 
     def get_top_enwiki_pageviews(self, limit: int = 100) -> list[EnwikiPageviewRecord]:
         """Return top enwiki pageview records by view count."""
-        return list(self.list(order_by=[EnwikiPageviewRecord.en_views.desc()], limit=limit))
+        return self.list(order_by=[EnwikiPageviewRecord.en_views.desc()], limit=limit)
 
     def get_enwiki_pageview(self, pageview_id: int) -> EnwikiPageviewRecord | None:
         """Get an enwiki pageview record by ID."""
@@ -73,21 +71,6 @@ class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
         return self.update_or_404(pageview_id, **kwargs)
 
 
-_crud = EnwikiPageviewService()
-list_enwiki_pageviews = _crud.list_enwiki_pageviews
-get_top_enwiki_pageviews = _crud.get_top_enwiki_pageviews
-get_enwiki_pageview = _crud.get_enwiki_pageview
-get_enwiki_pageview_by_title = _crud.get_enwiki_pageview_by_title
-add_enwiki_pageview = _crud.add_enwiki_pageview
-add_or_update_enwiki_pageview = _crud.add_or_update_enwiki_pageview
-update_enwiki_pageview = _crud.update_enwiki_pageview
-
 __all__ = [
-    "list_enwiki_pageviews",
-    "get_top_enwiki_pageviews",
-    "get_enwiki_pageview",
-    "get_enwiki_pageview_by_title",
-    "add_enwiki_pageview",
-    "add_or_update_enwiki_pageview",
-    "update_enwiki_pageview",
+    "EnwikiPageviewService",
 ]

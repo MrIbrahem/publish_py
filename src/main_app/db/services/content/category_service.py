@@ -104,10 +104,8 @@ class CategoryService(CRUDService[CategoryRecord]):
 
     def list_categories(self) -> list[CategoryRecord]:
         """Return all categories."""
-        return list(
-            self.list(
-                order_by=[CategoryRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[CategoryRecord.id.asc()],
         )
 
     def get_camp_to_cats(self) -> dict[str, str]:
@@ -119,17 +117,6 @@ class CategoryService(CRUDService[CategoryRecord]):
         return camp_to_cats
 
 
-_crud = CategoryService()
-add_category = _crud.add_category
-update_category = _crud.update_category
-get_campaign_category = _crud.get_campaign_category
-list_categories = _crud.list_categories
-get_camp_to_cats = _crud.get_camp_to_cats
-
 __all__ = [
-    "add_category",
-    "update_category",
-    "get_campaign_category",
-    "list_categories",
-    "get_camp_to_cats",
+    "CategoryService",
 ]

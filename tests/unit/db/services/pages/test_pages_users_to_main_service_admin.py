@@ -226,14 +226,14 @@ class TestDeleteUserPage(TestSetup):
         )
         self.service.add_record(record)
 
-        ok = self.service.delete(page_id)
+        ok = self.service.delete_user_page_to_main(page_id)
 
         assert ok is True
 
         assert self.service.get_record_by_id(page_id) is None
 
         # TODO: need to check that the page record is deleted
-        # assert self.user_pages_service.get_record_by_id(page_id) is None
+        assert self.user_pages_service.get_record_by_id(page_id) is None
 
     def test_returns_true_when_user_page_only(self, sqlite_db):
         # PHP path: even if only the pages_users row is present, the deletion

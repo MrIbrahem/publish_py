@@ -23,10 +23,8 @@ class AssessmentService(CRUDService[AssessmentRecord]):
 
     def list_assessments(self) -> list[AssessmentRecord]:
         """Return all assessment records."""
-        return list(
-            self.list(
-                order_by=[AssessmentRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[AssessmentRecord.id.asc()],
         )
 
     def get_assessment(self, assessment_id: int) -> AssessmentRecord | None:
@@ -73,19 +71,6 @@ class AssessmentService(CRUDService[AssessmentRecord]):
         return self.delete(assessment_id)
 
 
-_crud = AssessmentService()
-list_assessments = _crud.list_assessments
-get_assessment = _crud.get_assessment
-get_assessment_by_title = _crud.get_assessment_by_title
-add_assessment = _crud.add_assessment
-add_or_update_assessment = _crud.add_or_update_assessment
-update_assessment = _crud.update_assessment
-
 __all__ = [
-    "list_assessments",
-    "get_assessment",
-    "get_assessment_by_title",
-    "add_assessment",
-    "add_or_update_assessment",
-    "update_assessment",
+    "AssessmentService",
 ]

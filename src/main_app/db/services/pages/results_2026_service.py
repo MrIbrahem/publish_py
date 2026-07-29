@@ -105,11 +105,6 @@ class Results2026Service:
         return _rows_to_dicts(rows)
 
 
-_crud = Results2026Service()
-missing_by_lang_and_category = _crud.missing_by_lang_and_category
-exists_by_lang_and_category = _crud.exists_by_lang_and_category
-
 __all__ = [
-    "missing_by_lang_and_category",
-    "exists_by_lang_and_category",
+    "Results2026Service",
 ]

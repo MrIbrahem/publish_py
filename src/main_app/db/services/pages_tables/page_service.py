@@ -5,20 +5,22 @@ SQLAlchemy-based service for managing pages and page targets.
 from __future__ import annotations
 
 import logging
-from sqlalchemy import func, or_
 
-from .pages_shared_service import BasePagesService
+from sqlalchemy import func, or_
 
 from ....extensions import db
 from ...models import PageRecord
-from ..analytics.word_service import get_word_counts_for_title
+from ..analytics import WordService
+from .pages_shared_service import BasePagesService
 
 logger = logging.getLogger(__name__)
 
 ModelT = PageRecord
 
+
 class PagesService(BasePagesService):
     def __init__(self):
+        self.word_service = WordService()
         super().__init__(PageRecord, db.session)
 
     def add_translate_row_to_db(
@@ -41,7 +43,7 @@ class PagesService(BasePagesService):
         cat = cat or "RTT"
 
         if word == 0:
-            lead_words, all_words = get_word_counts_for_title(title)
+            lead_words, all_words = self.word_service.get_word_counts_for_title(title)
             if translate_type == "all":
                 word = all_words or 0
             else:
@@ -64,6 +66,7 @@ class PagesService(BasePagesService):
                 {self.model.target: target, self.model.pupdate: pupdate, "word": word},
                 synchronize_session=False,
             )
+            self.session.commit()
         except Exception:
             logger.exception("Failed to update existing page target")
             self.session.rollback()

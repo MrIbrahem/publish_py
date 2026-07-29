@@ -24,28 +24,22 @@ class InProcessService(CRUDService[InProcessRecord]):
 
     def list_in_process(self) -> list[InProcessRecord]:
         """Return all in_process records."""
-        return list(
-            self.list(
-                order_by=[InProcessRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[InProcessRecord.id.asc()],
         )
 
     def list_in_process_by_user(self, user: str) -> list[InProcessRecord]:
         """Return in_process records for a specific user."""
-        return list(
-            self.list(
-                filters={"user": user},
-                order_by=[InProcessRecord.id.asc()],
-            )
+        return self.list(
+            filters={"user": user},
+            order_by=[InProcessRecord.id.asc()],
         )
 
     def list_in_process_by_lang(self, lang: str) -> list[InProcessRecord]:
         """Return in_process records for a specific language."""
-        return list(
-            self.list(
-                filters={"lang": lang},
-                order_by=[InProcessRecord.id.asc()],
-            )
+        return self.list(
+            filters={"lang": lang},
+            order_by=[InProcessRecord.id.asc()],
         )
 
     def get_in_process(self, process_id: int) -> InProcessRecord | None:
@@ -124,27 +118,6 @@ class InProcessService(CRUDService[InProcessRecord]):
         return [{"user": row.user, "article_count": row.article_count} for row in results]
 
 
-_crud = InProcessService()
-list_in_process = _crud.list_in_process
-list_in_process_by_user = _crud.list_in_process_by_user
-list_in_process_by_lang = _crud.list_in_process_by_lang
-get_in_process = _crud.get_in_process
-get_in_process_by_title_user_lang = _crud.get_in_process_by_title_user_lang
-add_in_process = _crud.add_in_process
-update_in_process = _crud.update_in_process
-delete_in_process_by_title_user_lang = _crud.delete_in_process_by_title_user_lang
-is_in_process = _crud.is_in_process
-get_in_process_counts_by_user = _crud.get_in_process_counts_by_user
-
 __all__ = [
-    "list_in_process",
-    "list_in_process_by_user",
-    "list_in_process_by_lang",
-    "get_in_process",
-    "get_in_process_by_title_user_lang",
-    "add_in_process",
-    "update_in_process",
-    "delete_in_process_by_title_user_lang",
-    "is_in_process",
-    "get_in_process_counts_by_user",
+    "InProcessService",
 ]

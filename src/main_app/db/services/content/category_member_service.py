@@ -50,7 +50,7 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
     def get_members_by_category(self, category: str) -> list[CategoryMemberRecord]:
         """Return all member records for *category*."""
 
-        return list(self.list(filters={"category": category}))
+        return self.list(filters={"category": category})
 
     def add_category_member(self, category: str, article_id: str) -> bool:
         """Insert a single category member row. Returns True on success."""
@@ -104,19 +104,6 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
             raise
 
 
-_crud = CategoryMemberService()
-get_all_category_members = _crud.get_all_category_members
-list_distinct_article_ids = _crud.list_distinct_article_ids
-count_by_category = _crud.count_by_category
-get_members_by_category = _crud.get_members_by_category
-add_category_member = _crud.add_category_member
-batch_sync_category_members = _crud.batch_sync_category_members
-
 __all__ = [
-    "get_all_category_members",
-    "list_distinct_article_ids",
-    "count_by_category",
-    "get_members_by_category",
-    "add_category_member",
-    "batch_sync_category_members",
+    "CategoryMemberService",
 ]

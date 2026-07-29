@@ -2,8 +2,6 @@
 Unit tests for the ``qid_service`` admin helpers.
 """
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from src.main_app.db.models import QidRecord

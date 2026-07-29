@@ -23,19 +23,15 @@ class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord]):
 
     def list_users_no_inprocess(self) -> list[UsersNoInprocessRecord]:
         """Return all users_no_inprocess records."""
-        return list(
-            self.list(
-                order_by=[UsersNoInprocessRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[UsersNoInprocessRecord.id.asc()],
         )
 
     def list_active_users_no_inprocess(self) -> list[UsersNoInprocessRecord]:
         """Return all is_active users_no_inprocess records."""
-        return list(
-            self.list(
-                filters={"is_active": 1},
-                order_by=[UsersNoInprocessRecord.id.asc()],
-            )
+        return self.list(
+            filters={"is_active": 1},
+            order_by=[UsersNoInprocessRecord.id.asc()],
         )
 
     def get_users_no_inprocess(self, record_id: int) -> UsersNoInprocessRecord | None:
@@ -83,24 +79,6 @@ class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord]):
         return record is not None and record.is_active == 1
 
 
-_crud = UsersNoInprocessService()
-
-list_users_no_inprocess = _crud.list_users_no_inprocess
-list_active_users_no_inprocess = _crud.list_active_users_no_inprocess
-get_users_no_inprocess = _crud.get_users_no_inprocess
-get_users_no_inprocess_by_user = _crud.get_users_no_inprocess_by_user
-add_users_no_inprocess = _crud.add_users_no_inprocess
-add_or_update_users_no_inprocess = _crud.add_or_update_users_no_inprocess
-update_users_no_inprocess = _crud.update_users_no_inprocess
-should_hide_from_inprocess = _crud.should_hide_from_inprocess
-
 __all__ = [
-    "list_users_no_inprocess",
-    "list_active_users_no_inprocess",
-    "get_users_no_inprocess",
-    "get_users_no_inprocess_by_user",
-    "add_users_no_inprocess",
-    "add_or_update_users_no_inprocess",
-    "update_users_no_inprocess",
-    "should_hide_from_inprocess",
+    "UsersNoInprocessService",
 ]

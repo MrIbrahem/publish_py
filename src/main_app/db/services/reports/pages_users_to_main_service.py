@@ -23,10 +23,8 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
 
     def list_pages_users_to_main(self) -> list[PagesUsersToMainRecord]:
         """Return all pages_users_to_main records."""
-        return list(
-            self.list(
-                order_by=[PagesUsersToMainRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[PagesUsersToMainRecord.id.asc()],
         )
 
     def get_pages_users_to_main(self, record_id: int) -> PagesUsersToMainRecord | None:
@@ -55,16 +53,6 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
         return self.update_or_404(record_id, **kwargs)
 
 
-_crud = PagesUsersToMainService()
-list_pages_users_to_main = _crud.list_pages_users_to_main
-get_pages_users_to_main = _crud.get_pages_users_to_main
-add_pages_users_to_main = _crud.add_pages_users_to_main
-update_pages_users_to_main = _crud.update_pages_users_to_main
-
-
 __all__ = [
-    "list_pages_users_to_main",
-    "get_pages_users_to_main",
-    "add_pages_users_to_main",
-    "update_pages_users_to_main",
+    "PagesUsersToMainService",
 ]

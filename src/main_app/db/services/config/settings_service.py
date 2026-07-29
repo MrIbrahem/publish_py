@@ -148,23 +148,6 @@ class SettingsService(CRUDService[SettingRecord]):
         return self.delete_record(record)
 
 
-_crud = SettingsService()
-list_settings = _crud.list_settings
-get_all_settings_raw = _crud.get_all_settings_raw
-get_all_settings_ready = _crud.get_all_settings_ready
-get_setting_by_key = _crud.get_setting_by_key
-get_setting_by_id = _crud.get_setting_by_id
-update_setting = _crud.update_setting
-create_setting = _crud.create_setting
-delete_setting_by_key = _crud.delete_setting_by_key
-
 __all__ = [
-    "list_settings",
-    "get_setting_by_id",
-    "get_setting_by_key",
-    "get_all_settings_raw",
-    "get_all_settings_ready",
-    "update_setting",
-    "create_setting",
-    "delete_setting_by_key",
+    "SettingsService",
 ]

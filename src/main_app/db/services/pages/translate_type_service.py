@@ -47,20 +47,16 @@ class TranslateTypeService(CRUDService[TranslateTypeRecord]):
 
     def list_lead_enabled_types(self) -> list[TranslateTypeRecord]:
         """Return translate_type records with lead enabled."""
-        return list(
-            self.list(
-                filters={"tt_lead": 1},
-                order_by=[TranslateTypeRecord.tt_id.asc()],
-            )
+        return self.list(
+            filters={"tt_lead": 1},
+            order_by=[TranslateTypeRecord.tt_id.asc()],
         )
 
     def list_full_enabled_types(self) -> list[TranslateTypeRecord]:
         """Return translate_type records with full enabled."""
-        return list(
-            self.list(
-                filters={"tt_full": 1},
-                order_by=[TranslateTypeRecord.tt_id.asc()],
-            )
+        return self.list(
+            filters={"tt_full": 1},
+            order_by=[TranslateTypeRecord.tt_id.asc()],
         )
 
     def get_translate_type(self, tt_id: int) -> TranslateTypeRecord | None:
@@ -128,27 +124,6 @@ class TranslateTypeService(CRUDService[TranslateTypeRecord]):
         return record.tt_full == 1 if record else False
 
 
-_crud = TranslateTypeService()
-list_translate_types = _crud.list_translate_types
-list_new_titles = _crud.list_new_titles
-list_lead_enabled_types = _crud.list_lead_enabled_types
-list_full_enabled_types = _crud.list_full_enabled_types
-get_translate_type = _crud.get_translate_type
-get_translate_type_by_title = _crud.get_translate_type_by_title
-add_translate_type = _crud.add_translate_type
-update_translate_type = _crud.update_translate_type
-can_translate_lead = _crud.can_translate_lead
-can_translate_full = _crud.can_translate_full
-
 __all__ = [
-    "list_translate_types",
-    "list_new_titles",
-    "list_lead_enabled_types",
-    "list_full_enabled_types",
-    "get_translate_type",
-    "get_translate_type_by_title",
-    "add_translate_type",
-    "update_translate_type",
-    "can_translate_lead",
-    "can_translate_full",
+    "TranslateTypeService",
 ]

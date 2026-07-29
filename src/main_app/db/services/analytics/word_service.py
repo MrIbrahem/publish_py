@@ -23,10 +23,8 @@ class WordService(CRUDService[WordRecord]):
 
     def list_words(self) -> list[WordRecord]:
         """Return all word records."""
-        return list(
-            self.list(
-                order_by=[WordRecord.w_id.asc()],
-            )
+        return self.list_all(
+            order_by=[WordRecord.w_id.asc()],
         )
 
     def get_word(self, word_id: int) -> WordRecord | None:
@@ -83,21 +81,6 @@ class WordService(CRUDService[WordRecord]):
         return None, None
 
 
-_crud = WordService()
-list_words = _crud.list_words
-get_word = _crud.get_word
-get_word_by_title = _crud.get_word_by_title
-add_word = _crud.add_word
-add_or_update_word = _crud.add_or_update_word
-update_word = _crud.update_word
-get_word_counts_for_title = _crud.get_word_counts_for_title
-
 __all__ = [
-    "list_words",
-    "get_word",
-    "get_word_by_title",
-    "add_word",
-    "add_or_update_word",
-    "update_word",
-    "get_word_counts_for_title",
+    "WordService",
 ]

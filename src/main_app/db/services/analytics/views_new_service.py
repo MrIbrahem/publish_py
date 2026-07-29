@@ -23,10 +23,8 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
 
     def list_views_new(self) -> list[ViewsNewRecord]:
         """Return all views_new records."""
-        return list(
-            self.list(
-                order_by=[ViewsNewRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[ViewsNewRecord.id.asc()],
         )
 
     def list_views_by_target(self, target: str, lang: str | None = None) -> list[ViewsNewRecord]:
@@ -34,20 +32,16 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
         filters = {"target": target}
         if lang:
             filters["lang"] = lang
-        return list(
-            self.list(
-                filters=filters,
-                order_by=[ViewsNewRecord.year.desc()],
-            )
+        return self.list(
+            filters=filters,
+            order_by=[ViewsNewRecord.year.desc()],
         )
 
     def list_views_by_lang(self, lang: str) -> list[ViewsNewRecord]:
         """Return views_new records for a specific language."""
-        return list(
-            self.list(
-                filters={"lang": lang},
-                order_by=[ViewsNewRecord.id.asc()],
-            )
+        return self.list(
+            filters={"lang": lang},
+            order_by=[ViewsNewRecord.id.asc()],
         )
 
     def get_views_new(self, view_id: int) -> ViewsNewRecord | None:
@@ -119,25 +113,6 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
         return sum(r.views or 0 for r in records)
 
 
-_crud = ViewsNewService()
-list_views_new = _crud.list_views_new
-list_views_by_target = _crud.list_views_by_target
-list_views_by_lang = _crud.list_views_by_lang
-get_views_new = _crud.get_views_new
-get_views_by_target_lang_year = _crud.get_views_by_target_lang_year
-add_views_new = _crud.add_views_new
-add_or_update_views_new = _crud.add_or_update_views_new
-update_views_new = _crud.update_views_new
-get_total_views_for_target = _crud.get_total_views_for_target
-
 __all__ = [
-    "list_views_new",
-    "list_views_by_target",
-    "list_views_by_lang",
-    "get_views_new",
-    "get_views_by_target_lang_year",
-    "add_views_new",
-    "add_or_update_views_new",
-    "update_views_new",
-    "get_total_views_for_target",
+    "ViewsNewService",
 ]

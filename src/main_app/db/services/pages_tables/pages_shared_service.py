@@ -38,15 +38,13 @@ class BasePagesService(CRUDService[ModelT]):
 
     def list_pages(self) -> list[ModelT]:
         """Return all pages."""
-        return list(
-            self.list(
-                order_by=[self.model.id.asc()],
-            )
+        return self.list_all(
+            order_by=[self.model.id.asc()],
         )
 
     def list_pages_by_lang_cat(self, lang: str, cat: str) -> list[ModelT]:
         """Return pages filtered by language and category."""
-        return list(self.list(filters={"lang": lang, "cat": cat}))
+        return self.list(filters={"lang": lang, "cat": cat})
 
     def list_translated(self, lang: str = "All", limit: int = 500, offset: int = 0) -> list[ModelT]:
         """Return translated pages (target not empty) optionally filtered by language."""
@@ -144,11 +142,11 @@ class BasePagesService(CRUDService[ModelT]):
         **kwargs: Any,
     ) -> ModelT | None:
         """Update page."""
-        try:
-            data = {"title": title, "target": target, **kwargs}
-            return self.update_by_id(page_id, data)
-        except ValueError as exc:
-            raise LookupError(f"Page id {page_id} was not found") from exc
+        data = {"title": title, "target": target, **kwargs}
+        record = self.update_by_id(page_id, data)
+        if record is None:
+            raise LookupError(f"Page id {page_id} was not found")
+        return record
 
     def update_row_by_id(
         self,

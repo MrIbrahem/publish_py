@@ -1,17 +1,8 @@
 import pytest
 
+from src.main_app.db.exceptions import RecordNotFoundError
 from src.main_app.db.models import FullTranslatorRecord
-from src.main_app.db.services.users.full_translator_service import (
-    FullTranslatorService,
-    add_full_translator,
-    add_or_update_full_translator,
-    get_full_translator,
-    get_full_translator_by_user,
-    is_full_translator,
-    list_active_full_translators,
-    list_full_translators,
-    update_full_translator,
-)
+from src.main_app.db.services.users.full_translator_service import FullTranslatorService
 
 
 class TestSetup:
@@ -25,172 +16,170 @@ class TestFullTranslatorService(TestSetup):
 
     def test_full_translator_workflow(self):
         # Test add
-        ft = add_full_translator("Global_Translator", 1)
+        ft = self.service.add_full_translator("Global_Translator", 1)
         assert ft.user == "Global_Translator"
         assert ft.is_active == 1
 
         # Test get
-        ft2 = get_full_translator(ft.id)
+        ft2 = self.service.get_full_translator(ft.id)
         assert ft2 is not None
         assert ft2.user == "Global_Translator"
 
         # Test get by user
-        ft3 = get_full_translator_by_user("Global_Translator")
+        ft3 = self.service.get_full_translator_by_user("Global_Translator")
         assert ft3 is not None
         assert ft3.id == ft.id
 
         # Test list
-        all_ft = list_full_translators()
+        all_ft = self.service.list_full_translators()
         assert any(x.user == "Global_Translator" for x in all_ft)
 
         # Test active
-        active = list_active_full_translators()
+        active = self.service.list_active_full_translators()
         assert any(x.user == "Global_Translator" for x in active)
 
         # Test update
-        updated = update_full_translator(ft.id, is_active=0)
+        updated = self.service.update_full_translator(ft.id, is_active=0)
         assert updated.is_active == 0
-        assert is_full_translator("Global_Translator") is False
+        assert self.service.is_full_translator("Global_Translator") is False
 
         # Test add_or_update
-        ft4 = add_or_update_full_translator("Global_Translator", 1)
+        ft4 = self.service.add_or_update_full_translator("Global_Translator", 1)
         assert ft4.is_active == 1
-        assert is_full_translator("Global_Translator") is True
+        assert self.service.is_full_translator("Global_Translator") is True
 
         # Test delete
-        deleted = FullTranslatorService().delete(ft.id)
+        deleted = self.service.delete(ft.id)
         assert deleted is True
-        assert get_full_translator(ft.id) is None
+        assert self.service.get_full_translator(ft.id) is None
 
     def test_returns_list_of_records(self, monkeypatch):
         """Test that list_full_translators returns all records."""
-        add_full_translator("Translator_Alpha")
-        add_full_translator("Translator_Beta")
-        result = list_full_translators()
+        self.service.add_full_translator("Translator_Alpha")
+        self.service.add_full_translator("Translator_Beta")
+        result = self.service.list_full_translators()
         assert len(result) >= 2
 
 
 class TestListActiveFullTranslators(TestSetup):
-    """Tests for list_active_full_translators function."""
+    """Tests for list_active_full_translators method."""
 
     def test_returns_active_records(self, monkeypatch):
         """Test that list_active_full_translators returns active records."""
-        add_full_translator("Active_Trans", is_active=1)
-        add_full_translator("Inactive_Trans", is_active=0)
-        active = list_active_full_translators()
+        self.service.add_full_translator("Active_Trans", is_active=1)
+        self.service.add_full_translator("Inactive_Trans", is_active=0)
+        active = self.service.list_active_full_translators()
         assert len(active) == 1
         assert active[0].user == "Active_Trans"
 
 
 class TestGetFullTranslator(TestSetup):
-    """Tests for get_full_translator function."""
+    """Tests for get_full_translator method."""
 
     def test_returns_translator_record(self, monkeypatch):
-        """Test that function returns a FullTranslatorRecord."""
-        ft = add_full_translator("Expert_Linguist")
-        result = get_full_translator(ft.id)
+        """Test that method returns a FullTranslatorRecord."""
+        ft = self.service.add_full_translator("Expert_Linguist")
+        result = self.service.get_full_translator(ft.id)
         assert isinstance(result, FullTranslatorRecord)
         assert result.user == "Expert_Linguist"
 
     def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_full_translator(9999) is None
+        assert self.service.get_full_translator(9999) is None
 
 
 class TestGetFullTranslatorByUser(TestSetup):
-    """Tests for get_full_translator_by_user function."""
+    """Tests for get_full_translator_by_user method."""
 
     def test_returns_translator_by_user(self, monkeypatch):
-        """Test that function returns translator by username."""
-        add_full_translator("Polyglot_Wiki")
-        result = get_full_translator_by_user("Polyglot_Wiki")
+        """Test that method returns translator by username."""
+        self.service.add_full_translator("Polyglot_Wiki")
+        result = self.service.get_full_translator_by_user("Polyglot_Wiki")
         assert result is not None
         assert result.user == "Polyglot_Wiki"
 
     def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_full_translator_by_user("Ghost") is None
+        assert self.service.get_full_translator_by_user("Ghost") is None
 
 
 class TestAddFullTranslator(TestSetup):
-    """Tests for add_full_translator function."""
+    """Tests for add_full_translator method."""
 
     def test_adds_translator_and_returns_record(self, monkeypatch):
         """Test that add_full_translator adds and returns the record."""
-        record = add_full_translator("New_Translator")
+        record = self.service.add_full_translator("New_Translator")
         assert record.user == "New_Translator"
 
     def test_raises_error_if_exists(self, monkeypatch):
-        add_full_translator("Duplicate")
+        self.service.add_full_translator("Duplicate")
         with pytest.raises(ValueError, match="already exists"):
-            add_full_translator("Duplicate")
+            self.service.add_full_translator("Duplicate")
 
     def test_raises_error_if_no_user(self, monkeypatch):
         with pytest.raises(ValueError, match="User is required"):
-            add_full_translator("")
+            self.service.add_full_translator("")
 
 
 class TestAddOrUpdateFullTranslator(TestSetup):
-    """Tests for add_or_update_full_translator function."""
+    """Tests for add_or_update_full_translator method."""
 
     def test_upserts_translator(self, monkeypatch):
         """Test that add_or_update_full_translator upserts the record."""
-        add_full_translator("Sync_Trans", is_active=1)
-        record = add_or_update_full_translator("Sync_Trans", is_active=0)
+        self.service.add_full_translator("Sync_Trans", is_active=1)
+        record = self.service.add_or_update_full_translator("Sync_Trans", is_active=0)
         assert record.is_active == 0
-        assert len(list_full_translators()) == 1
+        assert len(self.service.list_full_translators()) == 1
 
     def test_raises_error_if_no_user(self, monkeypatch):
         with pytest.raises(ValueError, match="User is required"):
-            add_or_update_full_translator(" ")
+            self.service.add_or_update_full_translator(" ")
 
 
 class TestUpdateFullTranslator(TestSetup):
-    """Tests for update_full_translator function."""
+    """Tests for update_full_translator method."""
 
     def test_updates_translator_and_returns_record(self, monkeypatch):
         """Test that update_full_translator updates and returns the record."""
-        ft = add_full_translator("Update_Trans", is_active=1)
-        updated = update_full_translator(ft.id, is_active=0)
+        ft = self.service.add_full_translator("Update_Trans", is_active=1)
+        updated = self.service.update_full_translator(ft.id, is_active=0)
         assert updated.is_active == 0
 
     def test_returns_record_if_no_kwargs(self, monkeypatch):
-        ft = add_full_translator("No_Change")
-        result = update_full_translator(ft.id)
+        ft = self.service.add_full_translator("No_Change")
+        result = self.service.update_full_translator(ft.id)
         assert result.user == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        from src.main_app.db.exceptions import RecordNotFoundError
-
         with pytest.raises(RecordNotFoundError, match="not found"):
-            update_full_translator(9999, is_active=0)
+            self.service.update_full_translator(9999, is_active=0)
 
 
 class TestDeleteFullTranslator(TestSetup):
-    """Tests for delete_full_translator function."""
+    """Tests for delete_full_translator method."""
 
     def test_deletes_translator(self, monkeypatch):
-        """Test that delete_full_translator calls store delete."""
-        ft = add_full_translator("Delete_Trans")
-        deleted = FullTranslatorService().delete(ft.id)
+        """Test that delete method deletes the record."""
+        ft = self.service.add_full_translator("Delete_Trans")
+        deleted = self.service.delete(ft.id)
         assert deleted is True
-        assert get_full_translator(ft.id) is None
+        assert self.service.get_full_translator(ft.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert FullTranslatorService().delete(9999) is False
+        assert self.service.delete(9999) is False
 
 
 class TestIsFullTranslator(TestSetup):
-    """Tests for is_full_translator function."""
+    """Tests for is_full_translator method."""
 
     def test_returns_true_when_user_is_active_translator(self, monkeypatch):
         """Test that is_full_translator returns True for active translator."""
-        add_full_translator("Active_Polyglot", is_active=1)
-        assert is_full_translator("Active_Polyglot") is True
+        self.service.add_full_translator("Active_Polyglot", is_active=1)
+        assert self.service.is_full_translator("Active_Polyglot") is True
 
     def test_returns_false_when_user_not_translator(self, monkeypatch):
         """Test that is_full_translator returns False when user not found."""
-        assert is_full_translator("Ghost_User") is False
+        assert self.service.is_full_translator("Ghost_User") is False
 
     def test_returns_false_when_translator_inactive(self, monkeypatch):
         """Test that is_full_translator returns False for inactive translator."""
-        add_full_translator("Inactive_Polyglot", is_active=0)
-        assert is_full_translator("Inactive_Polyglot") is False
+        self.service.add_full_translator("Inactive_Polyglot", is_active=0)
+        assert self.service.is_full_translator("Inactive_Polyglot") is False

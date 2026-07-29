@@ -119,7 +119,8 @@ class ProjectsDashboard:
         if deleted:
             flash(f"project for '{record_id}' removed.", "success")
         else:
-            logger.exception(f"Unable to delete project with ID {record_id}")
+            logger.error("Unable to delete project with ID %s", record_id)
+            flash(f"Unable to delete project with ID {record_id}", "danger")
 
 
 __all__ = [

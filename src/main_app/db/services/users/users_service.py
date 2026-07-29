@@ -94,11 +94,9 @@ class UsersService(CRUDService[UserRecord]):
 
     def list_users_by_group(self, user_group: str) -> list[UserRecord]:
         """Return user records by group."""
-        return list(
-            self.list(
-                filters={"user_group": user_group},
-                order_by=[UserRecord.user_id.asc()],
-            )
+        return self.list(
+            filters={"user_group": user_group},
+            order_by=[UserRecord.user_id.asc()],
         )
 
     def update_user_data(
@@ -114,28 +112,6 @@ class UsersService(CRUDService[UserRecord]):
         return record is not None
 
 
-_crud = UsersService()
-
-list_users = _crud.list_users
-list_users_by_group = _crud.list_users_by_group
-get_user = _crud.get_user
-get_user_by_username = _crud.get_user_by_username
-create_user = _crud.create_user
-update_user = _crud.update_user
-update_user_data = _crud.update_user_data
-user_exists = _crud.user_exists
-users_search = _crud.users_search
-
-
 __all__ = [
     "UsersService",
-    "list_users",
-    "list_users_by_group",
-    "get_user",
-    "get_user_by_username",
-    "create_user",
-    "update_user",
-    "update_user_data",
-    "user_exists",
-    "users_search",
 ]

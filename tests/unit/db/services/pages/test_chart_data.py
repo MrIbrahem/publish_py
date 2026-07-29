@@ -1,11 +1,12 @@
 from flask.app import Flask
 
 from src.main_app.db.models import CategoryRecord, PageRecord, UserRecord
-from src.main_app.db.services.pages import get_leaderboard_chart_data
+from src.main_app.db.services.pages import LeaderboardService
 from src.main_app.extensions import db
 
 
 def test_get_leaderboard_chart_data(mock_app: Flask):
+    service = LeaderboardService()
     with mock_app.app_context():
         # Setup test data
         u1 = UserRecord(username="user1", user_group="group1")
@@ -21,30 +22,30 @@ def test_get_leaderboard_chart_data(mock_app: Flask):
         db.session.commit()
 
         # Test basic retrieval
-        data = get_leaderboard_chart_data()
+        data = service.get_leaderboard_chart_data()
         assert len(data) == 2
         assert data[0] == {"date": "2023-01", "count": 2}
         assert data[1] == {"date": "2023-02", "count": 1}
 
         # Test filter by user
-        data = get_leaderboard_chart_data(user="user1")
+        data = service.get_leaderboard_chart_data(user="user1")
         assert len(data) == 2
 
-        data = get_leaderboard_chart_data(user="nonexistent")
+        data = service.get_leaderboard_chart_data(user="nonexistent")
         assert len(data) == 0
 
         # Test filter by lang
-        data = get_leaderboard_chart_data(lang="en")
+        data = service.get_leaderboard_chart_data(lang="en")
         assert len(data) == 2
 
         # Test filter by camp
-        data = get_leaderboard_chart_data(camp="camp1")
+        data = service.get_leaderboard_chart_data(camp="camp1")
         assert len(data) == 2
 
         # Test filter by year
-        data = get_leaderboard_chart_data(year=2023)
+        data = service.get_leaderboard_chart_data(year=2023)
         assert len(data) == 2
 
         # Test filter by year
-        data = get_leaderboard_chart_data(year=2022)
+        data = service.get_leaderboard_chart_data(year=2022)
         assert len(data) == 0

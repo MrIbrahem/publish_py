@@ -3,14 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from src.main_app.db.models import LangRecord
-from src.main_app.db.services.content.lang_service import (
-    LangService,
-    add_lang,
-    add_or_update_lang,
-    get_lang,
-    get_lang_by_code,
-    list_langs,
-)
+from src.main_app.db.services.content.lang_service import LangService
 from src.main_app.extensions import db
 
 pytestmark = pytest.mark.unit
@@ -27,94 +20,92 @@ class TestLangService(TestSetup):
 
     def test_lang_workflow(self):
         # Test add
-        added = add_lang("ar", "العربية", "Arabic")
+        added = self.service.add_lang("ar", "العربية", "Arabic")
         assert added.code == "ar"
         assert added.autonym == "العربية"
 
         # Test get
-        l2 = get_lang(added.lang_id)
+        l2 = self.service.get_lang(added.lang_id)
         assert l2 is not None
         assert l2.code == "ar"
 
         # Test get by code
-        l3 = get_lang_by_code("ar")
+        l3 = self.service.get_lang_by_code("ar")
         assert l3 is not None
         assert l3.lang_id == added.lang_id
 
         # Test list
-        all_l = list_langs()
+        all_l = self.service.list_langs()
         assert any(x.code == "ar" for x in all_l)
 
         # Test add_or_update
-        l4 = add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
+        l4 = self.service.add_or_update_lang("ar", "العربية", "Modern Standard Arabic")
         assert l4.name == "Modern Standard Arabic"
 
         # Test delete
-        deleted = LangService().delete(added.lang_id)
+        deleted = self.service.delete(added.lang_id)
         assert deleted is True
-        assert get_lang(added.lang_id) is None
+        assert self.service.get_lang(added.lang_id) is None
 
     def test_returns_list_from_store(self, monkeypatch):
-        """Test that function returns list from store."""
-        add_lang("en", "English", "English")
-        add_lang("fr", "Français", "French")
-        result = list_langs()
+        """Test that method returns list from store."""
+        self.service.add_lang("en", "English", "English")
+        self.service.add_lang("fr", "Français", "French")
+        result = self.service.list_langs()
         assert len(result) >= 2
 
 
 class TestGetLang(TestSetup):
-    """Tests for get_lang function."""
+    """Tests for get_lang method."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function returns record by ID."""
-        added = add_lang("es", "Español", "Spanish")
-        result = get_lang(added.lang_id)
+        """Test that method returns record by ID."""
+        added = self.service.add_lang("es", "Español", "Spanish")
+        result = self.service.get_lang(added.lang_id)
         assert isinstance(result, LangRecord)
         assert result.code == "es"
 
     def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_lang(9999) is None
+        assert self.service.get_lang(9999) is None
 
 
 class TestGetLangByCode(TestSetup):
-    """Tests for get_lang_by_code function."""
+    """Tests for get_lang_by_code method."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function returns record by code."""
-        add_lang("de", "Deutsch", "German")
-        result = get_lang_by_code("de")
+        """Test that method returns record by code."""
+        self.service.add_lang("de", "Deutsch", "German")
+        result = self.service.get_lang_by_code("de")
         assert result is not None
         assert result.code == "de"
 
     def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_lang_by_code("ghost") is None
+        assert self.service.get_lang_by_code("ghost") is None
 
 
 class TestAddLang(TestSetup):
-    """Tests for add_lang function."""
+    """Tests for add_lang method."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function adds and returns record."""
-        record = add_lang("it", "Italiano", "Italian")
+        """Test that method adds and returns record."""
+        record = self.service.add_lang("it", "Italiano", "Italian")
         assert record.code == "it"
 
     def test_raises_error_if_exists(self, monkeypatch):
-        # Lang table in models.py doesn't have UNIQUE on code.
-        # But service expects it.
         from sqlalchemy.exc import IntegrityError
 
         with patch.object(db.session, "commit", side_effect=IntegrityError(None, None, None)):  # type: ignore
             with pytest.raises(ValueError, match="already exists"):
-                add_lang("en", "En", "En")
+                self.service.add_lang("en", "En", "En")
 
     def test_raises_error_if_no_code(self, monkeypatch):
         with pytest.raises(ValueError, match="Language code is required"):
-            add_lang("", "Autonym", "Name")
+            self.service.add_lang("", "Autonym", "Name")
 
     def test_add_lang_with_redirects(self):
         """Test adding a new language with a list of redirects."""
         redirects = ["ara", "ar-SA"]
-        record = add_lang("ar", "العربية", "Arabic", redirects=redirects)
+        record = self.service.add_lang("ar", "العربية", "Arabic", redirects=redirects)
 
         assert record.code == "ar"
         assert record.redirects == redirects
@@ -122,32 +113,30 @@ class TestAddLang(TestSetup):
 
     def test_add_lang_with_empty_redirects(self):
         """Test adding a language with an empty list for redirects."""
-        record = add_lang("fr", "Français", "French", redirects=[])
+        record = self.service.add_lang("fr", "Français", "French", redirects=[])
         assert record.redirects == []
 
 
 class TestAddOrUpdateLang(TestSetup):
-    """Tests for add_or_update_lang function."""
+    """Tests for add_or_update_lang method."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function upserts record."""
-        add_lang("pt", "Português", "Portuguese")
-        record = add_or_update_lang("pt", "Português", "Portuguese (Brazil)")
+        """Test that method upserts record."""
+        self.service.add_lang("pt", "Português", "Portuguese")
+        record = self.service.add_or_update_lang("pt", "Português", "Portuguese (Brazil)")
         assert record.name == "Portuguese (Brazil)"
-        assert len(list_langs()) == 1
+        assert len(self.service.list_langs()) == 1
 
     def test_raises_error_if_no_code(self, monkeypatch):
         with pytest.raises(ValueError, match="Language code is required"):
-            add_or_update_lang(" ", "A", "N")
+            self.service.add_or_update_lang(" ", "A", "N")
 
     def test_update_existing_redirects(self):
         """Test updating redirects for an existing language record."""
-        # Initial creation
-        add_lang("es", "Español", "Spanish", redirects=["spa"])
+        self.service.add_lang("es", "Español", "Spanish", redirects=["spa"])
 
-        # Update with new redirects
         new_redirects = ["spa", "es-ES", "es-MX"]
-        record = add_or_update_lang("es", "Español", "Spanish", redirects=new_redirects)
+        record = self.service.add_or_update_lang("es", "Español", "Spanish", redirects=new_redirects)
         assert record is not None
         assert record.redirects == new_redirects
 
@@ -156,32 +145,30 @@ class TestAddOrUpdateLang(TestSetup):
 
     def test_clear_redirects_on_update(self):
         """Test clearing redirects (setting to None) on an existing record."""
-        # Initial creation with redirects
-        add_lang("de", "Deutsch", "German", redirects=["ger", "deu"])
+        self.service.add_lang("de", "Deutsch", "German", redirects=["ger", "deu"])
 
-        # Update setting redirects to None
-        record = add_or_update_lang("de", "Deutsch", "German", redirects=[])
+        record = self.service.add_or_update_lang("de", "Deutsch", "German", redirects=[])
 
         assert record.redirects == []
 
     def test_add_new_with_redirects_via_upsert(self):
         """Test that add_or_update_lang inserts redirects correctly for new records."""
         redirects = ["jpn"]
-        record = add_or_update_lang("ja", "日本語", "Japanese", redirects=redirects)
+        record = self.service.add_or_update_lang("ja", "日本語", "Japanese", redirects=redirects)
 
         assert record.code == "ja"
         assert record.redirects == ["jpn"]
 
 
 class TestDeleteLang(TestSetup):
-    """Tests for delete_lang function."""
+    """Tests for delete_lang method."""
 
     def test_delegates_to_store(self, monkeypatch):
-        """Test that function deletes the record."""
-        added = add_lang("ru", "Русский", "Russian")
-        deleted = LangService().delete(added.lang_id)
+        """Test that method deletes the record."""
+        added = self.service.add_lang("ru", "Русский", "Russian")
+        deleted = self.service.delete(added.lang_id)
         assert deleted is True
-        assert get_lang(added.lang_id) is None
+        assert self.service.get_lang(added.lang_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert LangService().delete(9999) is False
+        assert self.service.delete(9999) is False
