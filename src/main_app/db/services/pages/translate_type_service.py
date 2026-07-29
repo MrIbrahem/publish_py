@@ -47,20 +47,16 @@ class TranslateTypeService(CRUDService[TranslateTypeRecord]):
 
     def list_lead_enabled_types(self) -> list[TranslateTypeRecord]:
         """Return translate_type records with lead enabled."""
-        return list(
-            self.list(
-                filters={"tt_lead": 1},
-                order_by=[TranslateTypeRecord.tt_id.asc()],
-            )
+        return self.list(
+            filters={"tt_lead": 1},
+            order_by=[TranslateTypeRecord.tt_id.asc()],
         )
 
     def list_full_enabled_types(self) -> list[TranslateTypeRecord]:
         """Return translate_type records with full enabled."""
-        return list(
-            self.list(
-                filters={"tt_full": 1},
-                order_by=[TranslateTypeRecord.tt_id.asc()],
-            )
+        return self.list(
+            filters={"tt_full": 1},
+            order_by=[TranslateTypeRecord.tt_id.asc()],
         )
 
     def get_translate_type(self, tt_id: int) -> TranslateTypeRecord | None:

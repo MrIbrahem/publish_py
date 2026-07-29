@@ -50,7 +50,7 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
     def get_members_by_category(self, category: str) -> list[CategoryMemberRecord]:
         """Return all member records for *category*."""
 
-        return list(self.list(filters={"category": category}))
+        return self.list(filters={"category": category})
 
     def add_category_member(self, category: str, article_id: str) -> bool:
         """Insert a single category member row. Returns True on success."""

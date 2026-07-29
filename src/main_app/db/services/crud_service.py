@@ -57,7 +57,10 @@ class CRUDService[ModelT]:
             logger.error("Error getting %s by filters: %s", self.model_name, exc)
             return None
 
-    def list_all(self, order_by: Iterable[Any] | None = None,) -> list[ModelT]:
+    def list_all(
+        self,
+        order_by: Iterable[Any] | None = None,
+    ) -> list[ModelT]:
         try:
             stmt = self.session.query(self.model)
 
@@ -76,7 +79,7 @@ class CRUDService[ModelT]:
         order_by: Iterable[Any] | None = None,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> Sequence[ModelT]:
+    ) -> list[ModelT]:
         """
         Fetch multiple rows.
 
@@ -94,7 +97,8 @@ class CRUDService[ModelT]:
                 stmt = stmt.limit(limit)
             if offset is not None:
                 stmt = stmt.offset(offset)
-            return self.session.execute(stmt).scalars().all()
+            result = self.session.execute(stmt).scalars().all()
+            return list(result)
         except Exception as exc:
             logger.error("Error listing %s records: %s", self.model_name, exc)
             return []

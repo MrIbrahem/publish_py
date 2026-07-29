@@ -23,19 +23,15 @@ class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord]):
 
     def list_users_no_inprocess(self) -> list[UsersNoInprocessRecord]:
         """Return all users_no_inprocess records."""
-        return list(
-            self.list(
-                order_by=[UsersNoInprocessRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[UsersNoInprocessRecord.id.asc()],
         )
 
     def list_active_users_no_inprocess(self) -> list[UsersNoInprocessRecord]:
         """Return all is_active users_no_inprocess records."""
-        return list(
-            self.list(
-                filters={"is_active": 1},
-                order_by=[UsersNoInprocessRecord.id.asc()],
-            )
+        return self.list(
+            filters={"is_active": 1},
+            order_by=[UsersNoInprocessRecord.id.asc()],
         )
 
     def get_users_no_inprocess(self, record_id: int) -> UsersNoInprocessRecord | None:

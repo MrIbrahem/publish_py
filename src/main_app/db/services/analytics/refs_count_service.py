@@ -23,10 +23,8 @@ class RefsCountService(CRUDService[RefsCountRecord]):
 
     def list_refs_counts(self) -> list[RefsCountRecord]:
         """Return all refs_count records."""
-        return list(
-            self.list(
-                order_by=[RefsCountRecord.r_id.asc()],
-            )
+        return self.list_all(
+            order_by=[RefsCountRecord.r_id.asc()],
         )
 
     def get_refs_count(self, refs_id: int) -> RefsCountRecord | None:

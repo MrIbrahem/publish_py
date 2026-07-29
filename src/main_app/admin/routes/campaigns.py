@@ -107,7 +107,6 @@ class CampaignsDashboard:
 
         return redirect(url_for("admin.campaigns.dashboard"))
 
-
     def _update_category(
         self,
         category_id: int,

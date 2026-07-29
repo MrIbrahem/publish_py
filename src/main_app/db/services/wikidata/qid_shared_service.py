@@ -62,9 +62,7 @@ class BaseQidService(CRUDService[ServiceRecord]):
     def list_empty_records(self) -> list[ServiceRecord]:
         try:
             base = self.session.query(self.model)
-            rows = (
-                base.filter(or_(self.model.qid.is_(None), self.model.qid == "")).order_by(self.model.id.asc()).all()
-            )
+            rows = base.filter(or_(self.model.qid.is_(None), self.model.qid == "")).order_by(self.model.id.asc()).all()
             return rows
         except Exception as e:
             logger.exception("Failed to list records: %s", e)

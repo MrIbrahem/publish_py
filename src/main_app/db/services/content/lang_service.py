@@ -25,10 +25,8 @@ class LangService(CRUDService[LangRecord]):
         self,
     ) -> list[LangRecord]:
         """Return all language records."""
-        return list(
-            self.list(
-                order_by=[LangRecord.lang_id.asc()],
-            )
+        return self.list_all(
+            order_by=[LangRecord.lang_id.asc()],
         )
 
     def get_lang(self, lang_id: int) -> LangRecord | None:

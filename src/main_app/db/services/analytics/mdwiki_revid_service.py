@@ -28,10 +28,8 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
 
     def list_mdwiki_revids(self) -> list[MdwikiRevidRecord]:
         """Return all mdwiki_revid records."""
-        return list(
-            self.list(
-                order_by=[MdwikiRevidRecord.title.asc()],
-            )
+        return self.list_all(
+            order_by=[MdwikiRevidRecord.title.asc()],
         )
 
     def get_mdwiki_revid_by_title(self, title: str) -> MdwikiRevidRecord | None:

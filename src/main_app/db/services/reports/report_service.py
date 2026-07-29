@@ -26,10 +26,8 @@ class ReportService(CRUDService[ReportRecord]):
         self,
     ) -> list[ReportRecord]:
         """Return all report records."""
-        return list(
-            self.list(
-                order_by=[ReportRecord.id.desc()],
-            )
+        return self.list_all(
+            order_by=[ReportRecord.id.desc()],
         )
 
     def add_report(

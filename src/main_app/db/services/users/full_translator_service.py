@@ -23,19 +23,15 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
 
     def list_full_translators(self) -> list[FullTranslatorRecord]:
         """Return all full translator records."""
-        return list(
-            self.list(
-                order_by=[FullTranslatorRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[FullTranslatorRecord.id.asc()],
         )
 
     def list_active_full_translators(self) -> list[FullTranslatorRecord]:
         """Return all is_active full translator records."""
-        return list(
-            self.list(
-                filters={"is_active": 1},
-                order_by=[FullTranslatorRecord.id.asc()],
-            )
+        return self.list(
+            filters={"is_active": 1},
+            order_by=[FullTranslatorRecord.id.asc()],
         )
 
     def get_full_translator(self, translator_id: int) -> FullTranslatorRecord | None:

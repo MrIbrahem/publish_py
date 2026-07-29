@@ -104,10 +104,8 @@ class CategoryService(CRUDService[CategoryRecord]):
 
     def list_categories(self) -> list[CategoryRecord]:
         """Return all categories."""
-        return list(
-            self.list(
-                order_by=[CategoryRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[CategoryRecord.id.asc()],
         )
 
     def get_camp_to_cats(self) -> dict[str, str]:

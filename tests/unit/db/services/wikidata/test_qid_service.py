@@ -2,7 +2,6 @@
 Unit tests for the ``qid_service`` admin helpers.
 """
 
-
 import pytest
 
 from src.main_app.db.models import QidRecord

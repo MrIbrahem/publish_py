@@ -23,10 +23,8 @@ class LanguageSettingService(CRUDService[LanguageSettingRecord]):
 
     def list_language_settings(self) -> list[LanguageSettingRecord]:
         """Return all language setting records."""
-        return list(
-            self.list(
-                order_by=[LanguageSettingRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[LanguageSettingRecord.id.asc()],
         )
 
     def get_language_setting(self, setting_id: int) -> LanguageSettingRecord | None:

@@ -29,7 +29,7 @@ class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
 
     def get_top_enwiki_pageviews(self, limit: int = 100) -> list[EnwikiPageviewRecord]:
         """Return top enwiki pageview records by view count."""
-        return list(self.list(order_by=[EnwikiPageviewRecord.en_views.desc()], limit=limit))
+        return self.list(order_by=[EnwikiPageviewRecord.en_views.desc()], limit=limit)
 
     def get_enwiki_pageview(self, pageview_id: int) -> EnwikiPageviewRecord | None:
         """Get an enwiki pageview record by ID."""

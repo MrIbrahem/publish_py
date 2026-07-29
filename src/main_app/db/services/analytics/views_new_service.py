@@ -23,10 +23,8 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
 
     def list_views_new(self) -> list[ViewsNewRecord]:
         """Return all views_new records."""
-        return list(
-            self.list(
-                order_by=[ViewsNewRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[ViewsNewRecord.id.asc()],
         )
 
     def list_views_by_target(self, target: str, lang: str | None = None) -> list[ViewsNewRecord]:
@@ -34,20 +32,16 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
         filters = {"target": target}
         if lang:
             filters["lang"] = lang
-        return list(
-            self.list(
-                filters=filters,
-                order_by=[ViewsNewRecord.year.desc()],
-            )
+        return self.list(
+            filters=filters,
+            order_by=[ViewsNewRecord.year.desc()],
         )
 
     def list_views_by_lang(self, lang: str) -> list[ViewsNewRecord]:
         """Return views_new records for a specific language."""
-        return list(
-            self.list(
-                filters={"lang": lang},
-                order_by=[ViewsNewRecord.id.asc()],
-            )
+        return self.list(
+            filters={"lang": lang},
+            order_by=[ViewsNewRecord.id.asc()],
         )
 
     def get_views_new(self, view_id: int) -> ViewsNewRecord | None:

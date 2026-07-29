@@ -94,11 +94,9 @@ class UsersService(CRUDService[UserRecord]):
 
     def list_users_by_group(self, user_group: str) -> list[UserRecord]:
         """Return user records by group."""
-        return list(
-            self.list(
-                filters={"user_group": user_group},
-                order_by=[UserRecord.user_id.asc()],
-            )
+        return self.list(
+            filters={"user_group": user_group},
+            order_by=[UserRecord.user_id.asc()],
         )
 
     def update_user_data(

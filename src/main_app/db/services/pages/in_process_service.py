@@ -24,28 +24,22 @@ class InProcessService(CRUDService[InProcessRecord]):
 
     def list_in_process(self) -> list[InProcessRecord]:
         """Return all in_process records."""
-        return list(
-            self.list(
-                order_by=[InProcessRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[InProcessRecord.id.asc()],
         )
 
     def list_in_process_by_user(self, user: str) -> list[InProcessRecord]:
         """Return in_process records for a specific user."""
-        return list(
-            self.list(
-                filters={"user": user},
-                order_by=[InProcessRecord.id.asc()],
-            )
+        return self.list(
+            filters={"user": user},
+            order_by=[InProcessRecord.id.asc()],
         )
 
     def list_in_process_by_lang(self, lang: str) -> list[InProcessRecord]:
         """Return in_process records for a specific language."""
-        return list(
-            self.list(
-                filters={"lang": lang},
-                order_by=[InProcessRecord.id.asc()],
-            )
+        return self.list(
+            filters={"lang": lang},
+            order_by=[InProcessRecord.id.asc()],
         )
 
     def get_in_process(self, process_id: int) -> InProcessRecord | None:
