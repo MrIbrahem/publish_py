@@ -31,15 +31,6 @@ from .missing_stats_service import (
 )
 from .page_service import (
     PagesService,
-    add_page,
-    add_translate_row_to_db,
-    find_page_record,
-    get_page_by_id,
-    insert_page_target,
-    list_pages,
-    list_pages_by_lang_cat,
-    set_page_target,
-    update_page,
 )
 from .pages_users_to_main_service import (
     PagesUsersToMainPagesService,
@@ -67,15 +58,6 @@ from .translate_type_service import (
 )
 from .user_page_service import (
     UserPagesService,
-    add_user_page,
-    count_translated,
-    find_user_page_record,
-    get_user_page_by_id,
-    insert_user_page_target,
-    list_translated,
-    list_user_pages,
-    set_user_page_target,
-    update_user_page,
 )
 
 __all__ = [
@@ -107,14 +89,6 @@ __all__ = [
     "get_leaderboard_chart_data",
     "count_category_members",
     "statics_by_category",
-    "list_pages",
-    "list_pages_by_lang_cat",
-    "set_page_target",
-    "find_page_record",
-    "add_page",
-    "update_page",
-    "insert_page_target",
-    "add_translate_row_to_db",
     "list_pending",
     "get_user_page",
     "check_main_page_exists",
@@ -130,14 +104,4 @@ __all__ = [
     "update_translate_type",
     "can_translate_lead",
     "can_translate_full",
-    "list_user_pages",
-    "list_translated",
-    "count_translated",
-    "add_user_page",
-    "update_user_page",
-    "insert_user_page_target",
-    "set_user_page_target",
-    "find_user_page_record",
-    "get_page_by_id",
-    "get_user_page_by_id",
 ]

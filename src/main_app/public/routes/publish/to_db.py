@@ -19,7 +19,7 @@ def find_exists_or_update_page(
     service = PagesService()
     orm_obj: PageRecord | None = service.find_page_record(sourcetitle, lang, user)
     if orm_obj:
-        return service.set_page_target(orm_obj, target)
+        return service.set_target(orm_obj, target)
     return False
 
 
@@ -29,10 +29,10 @@ def find_exists_or_update_user_page(
     user: str,
     target: str,
 ) -> bool:
-    service = UserPagesService()
-    orm_obj: UserPageRecord | None = service.find_user_page_record(sourcetitle, lang, user)
+    user_service = UserPagesService()
+    orm_obj: UserPageRecord | None = user_service.find_page_record(sourcetitle, lang, user)
     if orm_obj:
-        return service.set_user_page_target(orm_obj, target)
+        return user_service.set_target(orm_obj, target)
     return False
 
 
@@ -113,7 +113,7 @@ def add_to_db(
     if to_users_table:
         # Insert new record
         service = UserPagesService()
-        add_done = service.insert_user_page_target(
+        add_done = service.insert_page_target(
             sourcetitle=sourcetitle,
             translate_type=translate_type,
             cat=cat,

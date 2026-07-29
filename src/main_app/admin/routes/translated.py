@@ -1,9 +1,8 @@
 """Admin routes for translated main pages (``pages`` table).
 
-Mirrors the PHP under ``coordinator/admin/translated/*.php`` for ``table=pages``:
-- ``index.php`` -> ``GET /``
-- ``edit_page.php`` GET -> ``GET /edit``
-- ``edit_page.php`` POST -> ``POST /edit``
+The 2 files following is the same, but:
+- translated_users.py targets ``pages_users`` table.
+- translated.py targets ``pages`` table.
 """
 
 from __future__ import annotations
@@ -13,7 +12,7 @@ import logging
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services import LangService, PagesService, UserPagesService
+from ...db.services import LangService, PagesService
 from ...extensions import db
 
 logger = logging.getLogger(__name__)
@@ -29,9 +28,10 @@ def _safe_int(value: str | None, default: int) -> int:
 class TranslatedRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
-        self.pages_service = PagesService()
-        self.user_pages_service = UserPagesService()
+        self.service = PagesService()
         self.lang_service = LangService()
+        self.endpoint_name = "translated"
+        self.table_label = "Main"
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -40,21 +40,20 @@ class TranslatedRoutes:
         self.bp.route("/edit", methods=["POST"])(self.edit_post)
 
     def index(self) -> str:
-        """List translated main pages with pagination."""
+        """List translated pages with pagination."""
         lang = request.args.get("lang", "All")
         page = max(_safe_int(request.args.get("page"), 1), 1)
         limit = max(_safe_int(request.args.get("limit"), 500), 1)
         offset = (page - 1) * limit
 
         try:
-            rows = self.user_pages_service.list_translated(lang=lang, limit=limit, offset=offset)
-            total_count = self.user_pages_service.count_translated(lang=lang)
+            rows = self.service.list_translated(lang=lang, limit=limit, offset=offset)
+            total_count = self.service.count_translated(lang=lang)
         except Exception:
             logger.exception("Failed to list translated pages lang=%r", lang)
             rows, total_count = [], 0
 
-        lang_service = self.lang_service
-        langs = lang_service.list_langs()
+        langs = self.lang_service.list_langs()
 
         return render_template(
             "admins/translated/index.html",
@@ -64,42 +63,43 @@ class TranslatedRoutes:
             page=page,
             limit=limit,
             languages=langs,
-            table_label="Main",
-            endpoint="admin.translated.index",
-            edit_endpoint="admin.translated.edit",
-            edit_post_endpoint="admin.translated.edit_post",
+            table_label=self.table_label,
+            endpoint=f"admin.{self.endpoint_name}.index",
+            edit_endpoint=f"admin.{self.endpoint_name}.edit",
+            edit_post_endpoint=f"admin.{self.endpoint_name}.edit_post",
         )
 
     def edit(self) -> str:
-        """Render the edit popup for a single ``pages`` row."""
+        """Render the edit popup for a single row."""
         page_id = _safe_int(request.args.get("id"), 0)
         if page_id <= 0:
             abort(400, description="id is required")
 
-        row = self.pages_service.get_page_by_id(page_id)
+        row = self.service.get(page_id)
         if not row:
             abort(404)
 
         return render_template(
             "admins/translated/edit.html",
             row=row,
-            post_endpoint="admin.translated.edit_post",
+            post_endpoint=f"admin.{self.endpoint_name}.edit_post",
         )
 
     def edit_post(self) -> ResponseReturnValue:
-        """Update or delete a single ``pages`` row from the popup form."""
+        """Update or delete a single row from the popup form."""
         page_id = _safe_int(request.form.get("id"), 0)
 
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")
             return redirect(url_for("admin.edit_done"))
+
         if "delete" in request.form:
             try:
-                self.pages_service.delete(page_id)
-                flash(f"Page id {page_id} deleted.", "success")
+                self.service.delete(page_id)
+                flash(f"{self.table_label} page id {page_id} deleted.", "success")
             except Exception:
-                logger.exception("Failed to delete page id=%r", page_id)
-                flash(f"Failed to delete page id {page_id}.", "danger")
+                logger.exception("Failed to delete {self.table_label} page id=%r", page_id)
+                flash(f"Failed to delete {self.table_label} page id {page_id}.", "danger")
             return redirect(url_for("admin.edit_done"))
 
         title = (request.form.get("title") or "").strip()
@@ -110,10 +110,10 @@ class TranslatedRoutes:
 
         if not title or not target or not lang or not user or not pupdate:
             flash("All fields (title, target, lang, user, pupdate) are required.", "danger")
-            return redirect(url_for("admin.translated.edit", id=page_id))
+            return redirect(url_for(f"admin.{self.endpoint_name}.edit", id=page_id))
 
         try:
-            row = self.pages_service.update_page(
+            row = self.service.update_page(
                 page_id=page_id,
                 title=title,
                 target=target,

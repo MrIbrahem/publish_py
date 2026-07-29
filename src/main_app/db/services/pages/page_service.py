@@ -1,5 +1,11 @@
 """
 SQLAlchemy-based service for managing pages and page targets.
+
+The 2 files following is the same, but:
+- user_page_service.py targets ``pages_users`` table.
+- page_service.py targets ``pages`` table.
+
+TODO: use pages_shared_service.py
 """
 
 from __future__ import annotations
@@ -18,48 +24,50 @@ from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
+ServiceRecord = PageRecord
 
-class PagesService(CRUDService[PageRecord]):
-    model = PageRecord
+
+class PagesService(CRUDService[ServiceRecord]):
+    model = ServiceRecord
 
     def __init__(self):
-        super().__init__(db.session, PageRecord)
+        super().__init__(db.session, ServiceRecord)
 
-    def list_translated(self, lang: str = "All", limit: int = 500, offset: int = 0) -> list[PageRecord]:
-        """Return translated pages (target not empty) optionally filtered by language."""
-        query = self.session.query(PageRecord).filter(PageRecord.target.isnot(None), PageRecord.target != "")
-        if lang and lang.lower() != "all":
-            query = query.filter(PageRecord.lang == lang)
-        return query.order_by(PageRecord.id.desc()).limit(limit).offset(offset).all()
-
-    def count_translated(self, lang: str = "All") -> int:
-        """Return total count of translated pages, optionally filtered by language."""
-        query = self.session.query(func.count(PageRecord.id)).filter(
-            PageRecord.target.isnot(None), PageRecord.target != ""
-        )
-        if lang and lang.lower() != "all":
-            query = query.filter(PageRecord.lang == lang)
-        return int(query.scalar() or 0)
-
-    def get_by_id(self, page_id: int) -> PageRecord | None:
-        """Return a single page row by id, or None when missing."""
-        return self.get(page_id)
-
-    def get_page_by_id(self, page_id: int) -> PageRecord | None:
-        """Return a single page row by id, or None when missing."""
-        return self.get(page_id)
-
-    def list_pages(self) -> list[PageRecord]:
+    def list_pages(self) -> list[ServiceRecord]:
         """Return all pages."""
         return list(
             self.list(
-                order_by=[PageRecord.id.asc()],
+                order_by=[ServiceRecord.id.asc()],
             )
         )
 
-    def list_pages_by_lang_cat(self, lang: str, cat: str) -> list[PageRecord]:
+    def list_pages_by_lang_cat(self, lang: str, cat: str) -> list[ServiceRecord]:
         """Return pages filtered by language and category."""
         return list(self.list(filters={"lang": lang, "cat": cat}))
+
+    def list_translated(self, lang: str = "All", limit: int = 500, offset: int = 0) -> list[ServiceRecord]:
+        """Return translated pages (target not empty) optionally filtered by language."""
+        query = self.session.query(ServiceRecord).filter(ServiceRecord.target.isnot(None), ServiceRecord.target != "")
+        if lang and lang.lower() != "all":
+            query = query.filter(ServiceRecord.lang == lang)
+        return query.order_by(ServiceRecord.id.desc()).limit(limit).offset(offset).all()
+
+    def count_translated(self, lang: str = "All") -> int:
+        """Return total count of translated pages, optionally filtered by language."""
+        query = self.session.query(func.count(ServiceRecord.id)).filter(
+            ServiceRecord.target.isnot(None), ServiceRecord.target != ""
+        )
+        if lang and lang.lower() != "all":
+            query = query.filter(ServiceRecord.lang == lang)
+        return int(query.scalar() or 0)
+
+    def get_by_id(self, page_id: int) -> ServiceRecord | None:
+        """Return a single page row by id, or None when missing."""
+        return self.get(page_id)
+
+    def get_page_by_id(self, page_id: int) -> ServiceRecord | None:
+        """Return a single page row by id, or None when missing."""
+        return self.get(page_id)
 
     def add_page(
         self,
@@ -71,7 +79,7 @@ class PagesService(CRUDService[PageRecord]):
         target: str,
         mdwiki_revid: int | None = None,
         word: int = 0,
-    ) -> PageRecord:
+    ) -> ServiceRecord:
         """Add a page and return the created record."""
         if not sourcetitle:
             raise ValueError("Title is required")
@@ -128,7 +136,7 @@ class PagesService(CRUDService[PageRecord]):
         title: str,
         target: str,
         **kwargs: Any,
-    ) -> PageRecord | None:
+    ) -> ServiceRecord | None:
         """Update page."""
         try:
             data = {"title": title, "target": target, **kwargs}
@@ -136,9 +144,19 @@ class PagesService(CRUDService[PageRecord]):
         except ValueError as exc:
             raise LookupError(f"Page id {page_id} was not found") from exc
 
-    def set_page_target(
+    def update_row_by_id(
         self,
-        record: PageRecord,
+        page_id: int,
+        title: str,
+        target: str,
+        **kwargs: Any,
+    ) -> ServiceRecord | None:
+        """Update page."""
+        return self.update_page(page_id, title, target, **kwargs)
+
+    def set_target(
+        self,
+        record: ServiceRecord,
         target: str,
     ) -> bool:
         """ """
@@ -154,7 +172,7 @@ class PagesService(CRUDService[PageRecord]):
         title: str,
         lang: str,
         user: str,
-    ) -> PageRecord | None:
+    ) -> ServiceRecord | None:
         """
         Check if record exists
         """
@@ -194,13 +212,13 @@ class PagesService(CRUDService[PageRecord]):
         pupdate = pupdate.replace("_", " ")
 
         try:
-            self.session.query(PageRecord).filter(
-                PageRecord.user == user,
-                PageRecord.title == title,
-                PageRecord.lang == lang,
-                or_(PageRecord.target == "", PageRecord.target.is_(None)),
+            self.session.query(ServiceRecord).filter(
+                ServiceRecord.user == user,
+                ServiceRecord.title == title,
+                ServiceRecord.lang == lang,
+                or_(ServiceRecord.target == "", ServiceRecord.target.is_(None)),
             ).update(
-                {PageRecord.target: target, PageRecord.pupdate: pupdate, "word": word},
+                {ServiceRecord.target: target, ServiceRecord.pupdate: pupdate, "word": word},
                 synchronize_session=False,
             )
         except Exception:
@@ -228,38 +246,18 @@ class PagesService(CRUDService[PageRecord]):
                 return False
 
         found = (
-            self.session.query(PageRecord)
+            self.session.query(ServiceRecord)
             .filter(
-                PageRecord.title == title, PageRecord.lang == lang, PageRecord.user == user, PageRecord.target == target
+                ServiceRecord.title == title,
+                ServiceRecord.lang == lang,
+                ServiceRecord.user == user,
+                ServiceRecord.target == target,
             )
             .first()
         )
         return found is not None
 
 
-_crud = PagesService()
-
-list_translated = _crud.list_translated
-count_translated = _crud.count_translated
-get_by_id = _crud.get_by_id
-get_page_by_id = _crud.get_page_by_id
-list_pages = _crud.list_pages
-list_pages_by_lang_cat = _crud.list_pages_by_lang_cat
-add_page = _crud.add_page
-insert_page_target = _crud.insert_page_target
-update_page = _crud.update_page
-set_page_target = _crud.set_page_target
-find_page_record = _crud.find_page_record
-add_translate_row_to_db = _crud.add_translate_row_to_db
-
 __all__ = [
-    "get_page_by_id",
-    "set_page_target",
-    "find_page_record",
-    "list_pages",
-    "list_pages_by_lang_cat",
-    "add_page",
-    "update_page",
-    "insert_page_target",
-    "add_translate_row_to_db",
+    "PagesService",
 ]

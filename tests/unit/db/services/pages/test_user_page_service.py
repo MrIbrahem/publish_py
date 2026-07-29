@@ -1,206 +1,240 @@
-from unittest.mock import patch
-
 import pytest
 
 from src.main_app.db.models import UserPageRecord
-from src.main_app.db.services.pages.user_page_service import (
+from src.main_app.db.services import (
     UserPagesService,
-    add_user_page,
-    count_translated,
-    get_by_id,
-    insert_user_page_target,
-    list_translated,
-    list_user_pages,
-    update_user_page,
 )
 
 pytestmark = pytest.mark.unit
 
 
-def test_user_page_workflow(sqlite_db) -> None:
-    p = add_user_page(
-        sourcetitle="Influenza",
-        translate_type="lead",
-        cat="History",
-        lang="de",
-        user="user1",
-        target="Influenza.html",
-        mdwiki_revid=5875,
-        word=45,
-    )
-    assert p.title == "Influenza"
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = UserPagesService()
 
-    assert any(x.title == "Influenza" for x in list_user_pages())
-    updated = update_user_page(p.id, "Flu", "Flu.html")
-    assert updated.title == "Flu"
-
-    orm_p = sqlite_db.session.query(UserPageRecord).filter(UserPageRecord.id == p.id).first()
-    orm_p.lang = "es"
-    orm_p.user = "Spanish_Editor"
-    orm_p.target = ""
-    sqlite_db.session.commit()
-
-    success = insert_user_page_target(
-        sourcetitle="Malaria",
-        translate_type="lead",
-        cat="Medicine",
-        lang="fr",
-        user="French_Wiki",
-        target="Paludisme.html",
-        mdwiki_revid=220,
-        word=3000,
-    )
-
-    assert success is True
-    UserPagesService().delete(p.id)
-
-    assert not any(x.id == p.id for x in list_user_pages())
+    def _make_page(self, title: str, lang: str, target: str, user: str = "u") -> UserPageRecord:
+        return self.service.add_page(
+            sourcetitle=title,
+            translate_type="lead",
+            cat="RTT",
+            lang=lang,
+            user=user,
+            target=target,
+        )
 
 
-class TestListUserPages:
-    """Tests for list_user_pages function."""
+class TestPagesAndUserPagesService(TestSetup):
+    """Tests for PagesService/UserPagesService class."""
+
+    def test_page_workflow(self, sqlite_db):
+        p = self.service.add_page(
+            sourcetitle="COVID-19 pandemic",
+            translate_type="lead",
+            cat="History",
+            lang="fr",
+            user="Historian",
+            target="COVID-19_pandemic.html",
+            mdwiki_revid=4444,
+            word=52,
+        )
+        assert p.title == "COVID-19 pandemic"
+
+        assert any(x.title == "COVID-19 pandemic" for x in self.service.list_pages())
+
+        updated = self.service.update_page(p.id, "COVID-19", "COVID-19.html")
+        assert updated is not None
+        assert updated.title == "COVID-19"
+
+        orm_p = self.service.get(p.id)
+        assert orm_p is not None
+        orm_p.lang = "en"
+        orm_p.user = "WikiUser"
+        orm_p.target = ""
+        sqlite_db.session.commit()
+
+        success = self.service.insert_page_target(
+            sourcetitle="Black Death",
+            translate_type="lead",
+            cat="History",
+            lang="fr",
+            user="Historian",
+            target="Peste_noire.html",
+            mdwiki_revid=525252,
+            word=5000,
+        )
+        assert success is True
+
+        self.service.delete(p.id)
+        assert not any(x.id == p.id for x in self.service.list_pages())
 
     def test_returns_list_of_pages(self, monkeypatch):
-        add_user_page("Anatomy", "lead", "Medicine", "en", "TestUser", "Anatomy.html")
-        add_user_page("Physiology", "lead", "Medicine", "en", "TestUser", "Physiology.html")
-        result = list_user_pages()
+        """Test that function returns list from store."""
+        self.service.add_page("Evolution", "lead", "Biology", "en", "TestUser", "Evolution.html")
+        self.service.add_page("Genetics", "lead", "Biology", "en", "TestUser", "Genetics.html")
+        result = self.service.list_pages()
         assert len(result) >= 2
+        assert any(p.title == "Evolution" for p in result)
 
 
-class TestAddUserPage:
-    """Tests for add_user_page function."""
+class TestAddPage(TestSetup):
+    """Tests for add_page function."""
 
     def test_adds_page(self, monkeypatch):
-        record = add_user_page("Neurology", "lead", "Medicine", "en", "TestUser", "Neurology.html")
-        assert record.title == "Neurology"
-
-    def test_raises_error_if_exists(self, monkeypatch):
-        # We need a real uniqueness constraint in the database for this to fail.
-        # Let's check if the model has one. It doesn't seem to have a UNIQUE constraint on title.
-        # Wait, the service uses session.commit() and catches IntegrityError.
-        # But UserPageRecord only has id as primary key.
-        # If there's no unique constraint on title, it won't raise IntegrityError.
-        # Let's check PageRecord too.
-        pass
+        """Test that function adds a page."""
+        record = self.service.add_page(
+            "Quantum mechanics", "lead", "Physics", "en", "TestUser", "Quantum_mechanics.html"
+        )
+        assert record.title == "Quantum mechanics"
+        assert record.target == "Quantum_mechanics.html"
 
     def test_raises_error_if_no_title(self, monkeypatch):
         with pytest.raises(ValueError, match="Title is required"):
-            add_user_page("", "lead", "Test", "en", "TestUser", "test.html")
+            self.service.add_page("", "lead", "Test", "en", "TestUser", "test.html")
 
 
-class TestUpdateUserPage:
-    """Tests for update_user_page function."""
+class TestUpdatePage(TestSetup):
+    """Tests for update_page function."""
 
-    def test_updates_record(self, monkeypatch):
-        p = add_user_page("Surgery", "lead", "Medicine", "en", "TestUser", "Surgery.html")
-        updated = update_user_page(p.id, "Plastic Surgery", "Plastic.html")
-        assert updated.title == "Plastic Surgery"
+    def test_updates_the_record(self, monkeypatch):
+        """Test that function updates the record."""
+        p = self.service.add_page("Sociology", "lead", "Social", "en", "TestUser", "Sociology.html")
+        updated = self.service.update_page(p.id, "Social Science", "Social_Science.html")
+        assert updated is not None
+        assert updated.title == "Social Science"
+        assert updated.target == "Social_Science.html"
 
 
-class TestDeleteUserPage:
-    """Tests for delete_user_page function."""
+class TestDeletePage(TestSetup):
+    """Tests for delete_page function."""
 
-    def test_deletes_record(self, monkeypatch):
-        p = add_user_page("Pediatrics", "lead", "Medicine", "en", "TestUser", "Pediatrics.html")
-        UserPagesService().delete(p.id)
-        assert not any(x.id == p.id for x in list_user_pages())
+    def test_deletes_the_record(self, monkeypatch):
+        """Test that function deletes the record."""
+        p = self.service.add_page("Economics", "lead", "Social", "en", "TestUser", "Economics.html")
+        self.service.delete(p.id)
+        assert not any(x.id == p.id for x in self.service.list_pages())
 
     def test_raises_lookup_error_if_not_found(self, monkeypatch):
-        assert UserPagesService().delete(9999) is False
+        assert self.service.delete(9999) is False
 
 
-class TestInsertUserPageTarget:
-    """Tests for insert_user_page_target function."""
+class TestInsertPageTarget(TestSetup):
+    """Tests for insert_page_target function."""
 
     def test_inserts_correctly(self, monkeypatch):
-        success = insert_user_page_target("Pathology", "type", "Science", "de", "German_Wiki", "Pathologie.html")
+        """Test that function inserts correctly."""
+        success = self.service.insert_page_target(
+            "Global warming", "type", "Climate", "en", "Climatologist", "Global_warming_target.html"
+        )
         assert success is True
-        assert any(p.title == "Pathology" for p in list_user_pages())
+        assert any(p.title == "Global warming" for p in self.service.list_pages())
 
-    def test_handles_exception(self, sqlite_db):
-        with patch.object(sqlite_db.session, "commit", side_effect=Exception("DB Error")):
-
-            success = insert_user_page_target("Error_Page", "t", "c", "l", "u", "t")
-            assert success is False
+    def test_passes_optional_params(self, monkeypatch):
+        """Test that optional parameters are passed correctly."""
+        success = self.service.insert_page_target(
+            "Astrophysics",
+            "type",
+            "Science",
+            "en",
+            "Astronomer",
+            "Astrophysics_target.html",
+            mdwiki_revid=987654,
+            word=1200,
+        )
+        assert success is True
+        p = next(p for p in self.service.list_pages() if p.title == "Astrophysics")
+        assert p.mdwiki_revid == 987654
+        assert p.word == 1200
 
 
 # ---------------------------------------------------------------------------
-# Tests for new service functions added with admin/translated_users work:
-#   - list_translated(lang, limit, offset)
-#   - count_translated(lang)
-#   - get_by_id(page_id)
+# Tests for new service functions added with the admin/translated work:
+#   - self.service.list_translated(lang, limit, offset)
+#   - self.service.count_translated(lang)
+#   - self.service.get_by_id(page_id)
 # ---------------------------------------------------------------------------
 
 
-def _make_user_page(title: str, lang: str, target: str, user: str = "u") -> UserPageRecord:
-    return add_user_page(
-        sourcetitle=title,
-        translate_type="lead",
-        cat="RTT",
-        lang=lang,
-        user=user,
-        target=target,
-    )
-
-
-class TestListTranslatedUserPages:
-    """Tests for list_translated on pages_users."""
+class TestListTranslated(TestSetup):
+    """Tests for list_translated."""
 
     def test_excludes_rows_with_empty_or_null_target(self, sqlite_db):
-        _make_user_page("Has_target", "en", "T.html")
-        empty = _make_user_page("Empty_target", "en", "x")
+        self._make_page("Has_target", "en", "T1.html")
+        # Empty target row
+        empty = self._make_page("Empty_target", "en", "x")
         empty.target = ""
-        null = _make_user_page("Null_target", "en", "x")
+        # NULL target row
+        null = self._make_page("Null_target", "en", "x")
         null.target = None
         sqlite_db.session.commit()
 
-        titles = {p.title for p in list_translated(lang="All")}
+        rows = self.service.list_translated(lang="All")
+        titles = {p.title for p in rows}
         assert "Has_target" in titles
         assert "Empty_target" not in titles
         assert "Null_target" not in titles
 
     def test_filters_by_lang(self, monkeypatch):
-        _make_user_page("En_user_page", "en", "E.html")
-        _make_user_page("De_user_page", "de", "D.html")
-        rows = list_translated(lang="de")
-        assert {p.title for p in rows} == {"De_user_page"}
+        self._make_page("English_page", "en", "E.html")
+        self._make_page("French_page", "fr", "F.html")
+        rows = self.service.list_translated(lang="fr")
+        titles = {p.title for p in rows}
+        assert titles == {"French_page"}
+
+    def test_lang_all_returns_every_language(self, monkeypatch):
+        self._make_page("English_page", "en", "E.html")
+        self._make_page("French_page", "fr", "F.html")
+        rows = self.service.list_translated(lang="All")
+        titles = {p.title for p in rows}
+        assert titles == {"English_page", "French_page"}
 
     def test_respects_limit_and_offset(self, monkeypatch):
-        for i in range(4):
-            _make_user_page(f"UP_{i}", "en", f"U_{i}.html")
-        first = list_translated(lang="en", limit=2, offset=0)
-        second = list_translated(lang="en", limit=2, offset=2)
-        assert len(first) == 2 and len(second) == 2
-        assert {p.id for p in first}.isdisjoint({p.id for p in second})
+        for i in range(5):
+            self._make_page(f"Page_{i}", "en", f"T_{i}.html")
+        rows = self.service.list_translated(lang="en", limit=2, offset=0)
+        assert len(rows) == 2
+        rows_offset = self.service.list_translated(lang="en", limit=2, offset=2)
+        assert len(rows_offset) == 2
+        # Offset should yield a different set.
+        first_ids = {p.id for p in rows}
+        offset_ids = {p.id for p in rows_offset}
+        assert first_ids.isdisjoint(offset_ids)
+
+    def test_returns_empty_when_no_translated_rows(self, monkeypatch):
+        assert self.service.list_translated(lang="All") == []
 
 
-class TestCountTranslatedUserPages:
-    """Tests for count_translated on pages_users."""
+class TestCountTranslated(TestSetup):
+    """Tests for count_translated."""
 
     def test_counts_only_rows_with_target(self, sqlite_db):
-        _make_user_page("With_target", "en", "X.html")
-        empty = _make_user_page("Empty", "en", "x")
+        self._make_page("With_target", "en", "X.html")
+        empty = self._make_page("Empty", "en", "x")
         empty.target = ""
         sqlite_db.session.commit()
-        assert count_translated(lang="All") == 1
+
+        assert self.service.count_translated(lang="All") == 1
 
     def test_counts_filtered_by_lang(self, monkeypatch):
-        _make_user_page("U_en1", "en", "U1.html")
-        _make_user_page("U_en2", "en", "U2.html")
-        _make_user_page("U_de", "de", "D.html")
-        assert count_translated(lang="en") == 2
-        assert count_translated(lang="de") == 1
-        assert count_translated(lang="All") == 3
+        self._make_page("En1", "en", "E1.html")
+        self._make_page("En2", "en", "E2.html")
+        self._make_page("Fr1", "fr", "F1.html")
+        assert self.service.count_translated(lang="en") == 2
+        assert self.service.count_translated(lang="fr") == 1
+        assert self.service.count_translated(lang="All") == 3
+
+    def test_returns_zero_when_no_rows(self, monkeypatch):
+        assert self.service.count_translated(lang="All") == 0
 
 
-class TestGetByIdUserPage:
-    """Tests for get_by_id on pages_users."""
+class TestGetById(TestSetup):
+    """Tests for get_by_id."""
 
     def test_returns_record_when_found(self, monkeypatch):
-        p = _make_user_page("Findable_user", "en", "F.html")
-        result = get_by_id(p.id)
+        p = self._make_page("Findable", "en", "F.html")
+        result = self.service.get_by_id(p.id)
         assert result is not None
-        assert result.title == "Findable_user"
+        assert result.title == "Findable"
 
     def test_returns_none_when_not_found(self, monkeypatch):
-        assert get_by_id(99999) is None
+        assert self.service.get_by_id(99999) is None

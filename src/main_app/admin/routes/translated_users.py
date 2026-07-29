@@ -1,6 +1,8 @@
 """Admin routes for translated user pages (``pages_users`` table).
 
-Same shape as ``translated.py`` but targets ``pages_users``.
+The 2 files following is the same, but:
+- translated_users.py targets ``pages_users`` table.
+- translated.py targets ``pages`` table.
 """
 
 from __future__ import annotations
@@ -26,8 +28,10 @@ def _safe_int(value: str | None, default: int) -> int:
 class TranslatedUsersRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.service = UserPagesService()
         self.lang_service = LangService()
-        self.user_pages_service = UserPagesService()
+        self.endpoint_name = "translated_users"
+        self.table_label = "User"
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -36,17 +40,17 @@ class TranslatedUsersRoutes:
         self.bp.route("/edit", methods=["POST"])(self.edit_post)
 
     def index(self) -> str:
-        """List translated user pages with pagination."""
+        """List translated pages with pagination."""
         lang = request.args.get("lang", "All")
         page = max(_safe_int(request.args.get("page"), 1), 1)
         limit = max(_safe_int(request.args.get("limit"), 500), 1)
         offset = (page - 1) * limit
 
         try:
-            rows = self.user_pages_service.list_translated(lang=lang, limit=limit, offset=offset)
-            total_count = self.user_pages_service.count_translated(lang=lang)
+            rows = self.service.list_translated(lang=lang, limit=limit, offset=offset)
+            total_count = self.service.count_translated(lang=lang)
         except Exception:
-            logger.exception("Failed to list translated user pages lang=%r", lang)
+            logger.exception("Failed to list translated pages lang=%r", lang)
             rows, total_count = [], 0
 
         langs = self.lang_service.list_langs()
@@ -59,30 +63,30 @@ class TranslatedUsersRoutes:
             page=page,
             limit=limit,
             languages=langs,
-            table_label="User",
-            endpoint="admin.translated_users.index",
-            edit_endpoint="admin.translated_users.edit",
-            edit_post_endpoint="admin.translated_users.edit_post",
+            table_label=self.table_label,
+            endpoint=f"admin.{self.endpoint_name}.index",
+            edit_endpoint=f"admin.{self.endpoint_name}.edit",
+            edit_post_endpoint=f"admin.{self.endpoint_name}.edit_post",
         )
 
     def edit(self) -> str:
-        """Render the edit popup for a single ``pages_users`` row."""
+        """Render the edit popup for a single row."""
         page_id = _safe_int(request.args.get("id"), 0)
         if page_id <= 0:
             abort(400, description="id is required")
 
-        row = self.user_pages_service.get_user_page_by_id(page_id)
+        row = self.service.get(page_id)
         if not row:
             abort(404)
 
         return render_template(
             "admins/translated/edit.html",
             row=row,
-            post_endpoint="admin.translated_users.edit_post",
+            post_endpoint=f"admin.{self.endpoint_name}.edit_post",
         )
 
     def edit_post(self) -> ResponseReturnValue:
-        """Update or delete a single ``pages_users`` row."""
+        """Update or delete a single row from the popup form."""
         page_id = _safe_int(request.form.get("id"), 0)
 
         if page_id <= 0:
@@ -91,11 +95,11 @@ class TranslatedUsersRoutes:
 
         if "delete" in request.form:
             try:
-                self.user_pages_service.delete(page_id)
-                flash(f"User page id {page_id} deleted.", "success")
+                self.service.delete(page_id)
+                flash(f"{self.table_label} page id {page_id} deleted.", "success")
             except Exception:
-                logger.exception("Failed to delete user page id=%r", page_id)
-                flash(f"Failed to delete user page id {page_id}.", "danger")
+                logger.exception(f"Failed to delete {self.table_label} page id=%r", page_id)
+                flash(f"Failed to delete {self.table_label} page id {page_id}.", "danger")
             return redirect(url_for("admin.edit_done"))
 
         title = (request.form.get("title") or "").strip()
@@ -106,24 +110,24 @@ class TranslatedUsersRoutes:
 
         if not title or not target or not lang or not user or not pupdate:
             flash("All fields (title, target, lang, user, pupdate) are required.", "danger")
-            return redirect(url_for("admin.translated_users.edit", id=page_id))
+            return redirect(url_for(f"admin.{self.endpoint_name}.edit", id=page_id))
 
         try:
-            row = self.user_pages_service.update_user_page(
+            row = self.service.update_page(
                 page_id=page_id,
                 title=title,
                 target=target,
                 lang=lang,
                 user=user,
             )
-            # pupdate is a separate column not handled by update_user_page's positional args
+            # pupdate is a separate column not handled by update_page's positional args
             if row is not None:
                 row.pupdate = pupdate
                 db.session.commit()
-            flash(f"User page id {page_id} updated.", "success")
+            flash(f"{self.table_label} page id {page_id} updated.", "success")
         except Exception:
-            logger.exception("Failed to update user page id=%r", page_id)
-            flash(f"Failed to update user page id {page_id}.", "danger")
+            logger.exception(f"Failed to update {self.table_label} page id=%r", page_id)
+            flash(f"Failed to update {self.table_label} page id {page_id}.", "danger")
 
         return redirect(url_for("admin.edit_done"))
 
