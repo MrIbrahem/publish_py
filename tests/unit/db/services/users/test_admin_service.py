@@ -1,4 +1,3 @@
-# ruff: noqa: F401
 from unittest.mock import patch
 
 import pytest
