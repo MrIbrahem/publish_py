@@ -1,6 +1,8 @@
 """Revision ID lookup service.
 
 Mirrors: php_src/bots/revids_bot.php
+
+TODO: This file need to be deleted, insted use database table "mdwiki_revids" and mdwiki_revid_service.py
 """
 
 import json

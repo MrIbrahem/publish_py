@@ -9,7 +9,7 @@ from flask.typing import ResponseReturnValue
 from werkzeug.wrappers.response import Response
 
 from ....db.models import QidOthersRecord, QidRecord
-from ....db.services.wikidata import QidOthersService, QidService
+from ....db.services import QidOthersService, QidService
 
 logger = logging.getLogger(__name__)
 

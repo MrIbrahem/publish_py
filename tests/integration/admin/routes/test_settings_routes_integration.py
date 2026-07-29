@@ -6,10 +6,10 @@ TODO: should mock admin_required decorator
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 from flask.testing import FlaskClient
+
+from src.main_app.db.services import SettingsService
 
 
 @pytest.mark.integration
@@ -25,16 +25,13 @@ class TestSettingsDashboard:
 
     def test_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
         """Test that settings dashboard lists settings."""
+        settings_service = SettingsService()
+        settings_service.create_setting("test_setting", "Test Title", "boolean")
 
-        with patch("src.main_app.admin.routes.settings.SettingsService.get_all_settings_raw") as mock_list:
-            mock_list.return_value = [
-                {"key": "test_setting", "value_type": "boolean", "value": True, "title": "Test Title"}
-            ]
+        response = auth_client.get("/admin/settings/")
 
-            response = auth_client.get("/admin/settings/")
-
-            # Should render dashboard successfully
-            assert response.status_code == 200
+        # Should render dashboard successfully
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
@@ -53,22 +50,18 @@ class TestCreateSetting:
 
     def test_create_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test creating setting with valid data."""
+        response = auth_client.post(
+            "/admin/settings/create",
+            data={
+                "key": "new_setting",
+                "title": "New Setting",
+                "value_type": "boolean",
+            },
+            follow_redirects=False,
+        )
 
-        with patch("src.main_app.admin.routes.settings.SettingsService.create_setting") as mock_add:
-            mock_add.return_value = MagicMock(key="new_setting")
-
-            response = auth_client.post(
-                "/admin/settings/create",
-                data={
-                    "key": "new_setting",
-                    "title": "New Setting",
-                    "value_type": "boolean",
-                },
-                follow_redirects=False,
-            )
-
-            assert response.status_code == 302
-            assert response.location == "/admin/settings/"
+        assert response.status_code == 302
+        assert response.location == "/admin/settings/"
 
     def test_create_setting_invalid_key_format(self, mock_admin_required, auth_client: FlaskClient):
         """Test that creating setting with invalid key format fails."""
@@ -101,41 +94,28 @@ class TestUpdateSetting:
 
     def test_update_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test updating setting with valid data."""
+        settings_service = SettingsService()
+        settings_service.create_setting("test_setting", "Test Title", "boolean")
 
-        mock_setting = {"key": "test_setting", "value_type": "boolean", "value": True, "title": "Test Title"}
+        response = auth_client.post(
+            "/admin/settings/update",
+            data={"setting_test_setting": "on"},
+            follow_redirects=False,
+        )
 
-        with (
-            patch("src.main_app.admin.routes.settings.SettingsService.get_all_settings_raw") as mock_list,
-            patch("src.main_app.admin.routes.settings.SettingsService.update_setting") as mock_update,
-        ):
-            mock_list.return_value = [mock_setting]
-            mock_update.return_value = True
-
-            response = auth_client.post(
-                "/admin/settings/update",
-                data={"setting_test_setting": "on"},
-                follow_redirects=False,
-            )
-
-            assert response.status_code == 302
-            assert response.location == "/admin/settings/"
+        assert response.status_code == 302
+        assert response.location == "/admin/settings/"
 
     def test_delete_setting_via_update(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting setting via update form."""
-        mock_setting = {"key": "test_setting", "value_type": "boolean", "value": True, "title": "Test Title"}
+        settings_service = SettingsService()
+        settings_service.create_setting("test_setting", "Test Title", "boolean")
 
-        with (
-            patch("src.main_app.admin.routes.settings.SettingsService.get_all_settings_raw") as mock_list,
-            patch("src.main_app.admin.routes.settings.SettingsService.delete_setting_by_key") as mock_delete,
-        ):
-            mock_list.return_value = [mock_setting]
-            mock_delete.return_value = True
+        response = auth_client.post(
+            "/admin/settings/update",
+            data={"delete_test_setting": "on"},
+            follow_redirects=False,
+        )
 
-            response = auth_client.post(
-                "/admin/settings/update",
-                data={"delete_test_setting": "on"},
-                follow_redirects=False,
-            )
-
-            assert response.status_code == 302
-            assert response.location == "/admin/settings/"
+        assert response.status_code == 302
+        assert response.location == "/admin/settings/"

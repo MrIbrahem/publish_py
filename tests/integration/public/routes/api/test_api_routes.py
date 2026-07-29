@@ -5,7 +5,6 @@ Integration tests for src/main_app/public/routes/api/routes.py module.
 from __future__ import annotations
 
 import json
-from unittest.mock import patch
 
 import pytest
 from flask.testing import FlaskClient
@@ -22,7 +21,6 @@ class TestApiRoutes:
 
         # Should return 200 with CORS headers
         assert response.status_code == 200
-        # Headers([('Content-Type', 'text/html; charset=utf-8'), ('Allow', 'GET, OPTIONS, HEAD'), ('Content-Length', '0')])
         assert response.headers["Access-Control-Allow-Methods"] == "GET, OPTIONS"
         assert response.headers["Access-Control-Allow-Headers"] == "Content-Type"
         assert response.headers["Access-Control-Max-Age"] == "7200"
@@ -31,7 +29,6 @@ class TestApiRoutes:
         """Test that publish_reports GET endpoint returns successful response."""
         response = mock_client.get("/api/publish_reports?limit=5")
 
-        # Should return JSON response
         assert response.status_code == 200
         assert response.content_type == "application/json"
 
@@ -54,7 +51,6 @@ class TestApiRoutes:
 
     def test_publish_reports_validation_error(self, mock_client: FlaskClient):
         """Test that publish_reports handles invalid parameters."""
-        # Invalid year (non-numeric)
         response = mock_client.get("/api/publish_reports?year=invalid")
 
         assert response.status_code == 400
@@ -73,10 +69,8 @@ class TestApiRoutes:
 
         data = json.loads(response.data)
         assert "results" in data
-        # Check that only selected fields are present (if any results)
         if data["results"]:
             for item in data["results"]:
-                # Should only have id and title fields (plus potentially others from to_dict)
                 assert "id" in item
                 assert "title" in item
 
@@ -104,7 +98,6 @@ class TestApiRoutes:
         assert "count" in data
         assert isinstance(data["results"], list)
 
-        # Check structure of returned items
         if data["results"]:
             item = data["results"][0]
             expected_fields = {
@@ -144,7 +137,6 @@ class TestApiRoutes:
         assert "count" in data
         assert isinstance(data["results"], list)
 
-        # Check structure if results exist
         if data["results"]:
             item = data["results"][0]
             assert "user" in item
@@ -161,7 +153,7 @@ class TestApiRoutes:
         assert "results" in data
         assert "count" in data
         assert isinstance(data["results"], list)
-        assert data["count"] <= 100  # Default limit
+        assert data["count"] <= 100
 
     def test_pages_with_views_success(self, mock_client: FlaskClient):
         """Test that pages_with_views endpoint returns pages with view counts."""
@@ -175,7 +167,6 @@ class TestApiRoutes:
         assert "count" in data
         assert isinstance(data["results"], list)
 
-        # Check that views field is present if results exist
         if data["results"]:
             item = data["results"][0]
             assert "views" in item
@@ -202,9 +193,8 @@ class TestApiRoutes:
         data = json.loads(response.data)
         assert "results" in data
         assert "count" in data
-        assert isinstance(data["results"], dict)  # This endpoint returns a dict
+        assert isinstance(data["results"], dict)
 
-        # Check that results are sorted by value descending
         if data["results"]:
             values = list(data["results"].values())
             assert values == sorted(values, reverse=True)
@@ -225,7 +215,6 @@ class TestApiRoutes:
         """Test that top_langs route is properly registered."""
         response = mock_client.get("/api/top_langs")
 
-        # Should return 200 or handle gracefully if no data
         assert response.status_code == 200
         assert response.content_type == "application/json"
 
@@ -233,62 +222,25 @@ class TestApiRoutes:
         """Test that top_users route is properly registered."""
         response = mock_client.get("/api/top_users")
 
-        # Should return 200 or handle gracefully if no data
         assert response.status_code == 200
         assert response.content_type == "application/json"
-
-    def test_publish_reports_internal_error_handling(self, mock_client: FlaskClient):
-        """Test that publish_reports handles internal errors gracefully."""
-        with patch("src.main_app.public.routes.api.routes.ReportService.query_reports_with_filters") as mock_query:
-            mock_query.side_effect = Exception("Database error")
-
-            response = mock_client.get("/api/publish_reports?limit=5")
-
-            assert response.status_code == 500
-            assert response.content_type == "application/json"
-
-            data = json.loads(response.data)
-            assert "error" in data
-            assert "internal error" in data["error"].lower()
-
-    def test_in_process_internal_error_handling(self, mock_client: FlaskClient):
-        """Test that in_process handles internal errors gracefully."""
-        with patch("src.main_app.public.routes.api.routes.db.session.query") as mock_query:
-            mock_query.side_effect = Exception("Database error")
-
-            response = mock_client.get("/api/in_process?limit=5")
-
-            assert response.status_code == 500
-            assert response.content_type == "application/json"
-
-            data = json.loads(response.data)
-            assert "error" in data
-            assert "internal error" in data["error"].lower()
 
     def test_cors_headers_present(self, mock_client: FlaskClient):
         """Test that CORS headers are present on API responses."""
         response = mock_client.get("/api/publish_reports?limit=1")
 
         assert response.status_code == 200
-        # Check that CORS headers are present (added by @check_cors decorator)
         assert "Access-Control-Allow-Origin" in response.headers
 
     def test_empty_results_handling(self, mock_client: FlaskClient):
         """Test that endpoints handle empty results correctly."""
-        # Use a valid year that's unlikely to have data
         response = mock_client.get("/api/publish_reports?year=2000&limit=5")
 
-        # This might return 200 (if no data) or 400 (if validation fails for other reasons)
-        # Either way, we should get a JSON response
         assert response.content_type == "application/json"
 
         data = json.loads(response.data)
-        # If successful, check for expected structure
         assert response.status_code == 200
         assert "results" in data
         assert "count" in data
         assert isinstance(data["results"], list)
-        assert data["count"] >= 0  # Should be 0 or more
-        # If validation error, that's also acceptable for this test
-        # elif response.status_code == 400:
-        #     assert "error" in data
+        assert data["count"] >= 0

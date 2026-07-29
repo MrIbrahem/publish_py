@@ -23,7 +23,6 @@ from .user_token_service import (
     UserTokenService,
     get_authenticated_user_token,
     get_user_token,
-    get_user_token_by_username,
     upsert_user_token,
 )
 from .users_no_inprocess_service import (
@@ -82,7 +81,6 @@ __all__ = [
     "users_search",
     "upsert_user_token",
     "get_user_token",
-    "get_user_token_by_username",
     "get_authenticated_user_token",
     "list_users_no_inprocess",
     "list_active_users_no_inprocess",

@@ -13,8 +13,7 @@ import logging
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services import PagesService, UserPagesService
-from ...db.services.content import list_langs
+from ...db.services import LangService, PagesService, UserPagesService
 from ...extensions import db
 
 logger = logging.getLogger(__name__)
@@ -53,6 +52,9 @@ class TranslatedRoutes:
             logger.exception("Failed to list translated pages lang=%r", lang)
             rows, total_count = [], 0
 
+        lang_service = LangService()
+        langs = lang_service.list_langs()
+
         return render_template(
             "admins/translated/index.html",
             rows=rows,
@@ -60,7 +62,7 @@ class TranslatedRoutes:
             lang=lang,
             page=page,
             limit=limit,
-            languages=list_langs(),
+            languages=langs,
             table_label="Main",
             endpoint="admin.translated.index",
             edit_endpoint="admin.translated.edit",

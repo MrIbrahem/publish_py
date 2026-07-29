@@ -25,7 +25,7 @@ class UserNotFoundError(LookupError):
 
 
 class DuplicateRecordError(Exception):
-    """Raised when attempting to create a user or coordinator that already exists."""
+    """Raised when attempting to create duplicate record."""
 
 
 class InsufficientDatabaseConfigError(RuntimeError):
@@ -34,12 +34,21 @@ class InsufficientDatabaseConfigError(RuntimeError):
         super().__init__(msg)
 
 
+class CRUDError(Exception):
+    """Base error for CRUD service failures."""
+
+
+class RecordNotFoundError(LookupError):
+    """Raised when a record not found."""
+
+
 __all__ = [
+    "CRUDError",
+    "RecordNotFoundError",
     "UniqueError",
+    "DuplicateRecordError",
     "DatabaseInitError",
     "MaxUserConnectionsError",
     "UserNotFoundError",
-    "DuplicateRecordError",
-    "DuplicateRecordError",
     "InsufficientDatabaseConfigError",
 ]

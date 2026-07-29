@@ -5,8 +5,7 @@ import logging
 from typing import Any
 
 from ....db.models import PageRecord, UserPageRecord
-from ....db.services.content import CategoryService
-from ....db.services.pages import PagesService, UserPagesService
+from ....db.services import CategoryService, PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +43,7 @@ def add_to_db(
     wd_result: dict[str, Any],
     campaign: str,
     sourcetitle: str,
-    mdwiki_revid: str,
+    mdwiki_revid: str | int,
     translate_type: str = "lead",
     words: int = 0,
 ) -> dict[str, Any]:

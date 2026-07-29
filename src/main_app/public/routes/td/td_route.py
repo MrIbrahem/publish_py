@@ -16,13 +16,13 @@ from flask import (
     request,
 )
 
-from ....db.services.config import SettingsService
-from ....db.services.content import get_lang_by_code, list_categories, list_langs
-from ....db.services.pages import (
-    count_category_members,
-    statics_by_category,
+from ....db.services import (
+    CategoryService,
+    FullTranslatorService,
+    LangService,
+    MissingStatsService,
+    SettingsService,
 )
-from ....db.services.users import is_full_translator
 from ....public.auth.utils import load_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result
@@ -46,74 +46,15 @@ def _as_bool(raw: str) -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _parse_request_args(camps_data: dict[str, dict], cats_data: dict[str, str]) -> dict[str, Any]:
-    """Mirror of src/backend/loaders/load_request.php — load_request().
-
-    Returns a dict with the resolved request parameters. ``code_lang_name``
-    is empty when the code is unknown; the route uses this to decide
-    whether to render the results card.
-    """
-    code = _normalize_arg("code")
-    camp = _normalize_arg("camp")
-    cat = _normalize_arg("cat")
-    tra_type = _normalize_arg("type")
-
-    filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
-
-    code_lang_name = ""
-
-    if code:
-        lang_record = get_lang_by_code(code)
-        if lang_record is None:
-            flash(f"code ({code}) not valid wiki.", "danger")
-            code = ""
-        else:
-            code_lang_name = lang_record.name or lang_record.autonym or ""
-
-    # logic from load_request.php — cross-resolve cat <-> camp.
-    if not cat and camp:
-        cat = camps_data.get(camp, {}).get("category", "") or cat
-    if cat and not camp:
-        camp = cats_data.get(cat, "") or camp
-
-    # logic from load_request.php — validate camp against the input list.
-    if camp and camp not in camps_data:
-        flash(f"camp ({camp}) not valid.", "danger")
-        camp = ""
-
-    # logic from load_request.php — force "lead" when whole-article translate is disabled.
-
-    def to_bool(val: Any) -> bool:
-        if isinstance(val, str):
-            return val.lower() in ("1", "true", "yes", "on")
-        return bool(val)
-
-    all_settings = SettingsService().get_all_settings_ready()
-    show_translation_button = to_bool(all_settings.get("translation_button_in_progress_table", False))
-    allow_type_of_translate = to_bool(all_settings.get("allow_type_of_translate", False))
-    show_exists_table = to_bool(all_settings.get("show_exists_table", False))
-
-    if not allow_type_of_translate:
-        tra_type = "lead"
-
-    return {
-        "code": code,
-        "code_lang_name": code_lang_name,
-        "camp": camp,
-        "cat": cat,
-        "tra_type": tra_type,
-        "settings": {
-            "filter_sparql": filter_sparql,
-            "show_exists_table": show_exists_table,
-            "allow_type_of_translate": allow_type_of_translate,
-            "show_translation_button": show_translation_button,
-        },
-    }
-
-
 class TDRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.full_service = FullTranslatorService()
+        self.missing_service = MissingStatsService()
+        self.settings_service = SettingsService()
+        self.lang_service = LangService()
+        self.category_service = CategoryService()
+
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -150,11 +91,11 @@ class TDRoutes:
             }
         )
 
-    def table(self):
+    def table(self) -> str:
         # Form data — unchanged from the previous index() implementation.
         try:
-            langs = [x.to_dict() for x in list_langs()]
-            campaigns_records = list_categories()
+            langs = [x.to_dict() for x in self.lang_service.list_langs()]
+            campaigns_records = self.category_service.list_categories()
             campaigns = [x.to_dict() for x in campaigns_records]
         except Exception:
             logger.exception("Failed to load languages/campaigns for index page")
@@ -162,16 +103,12 @@ class TDRoutes:
             langs = []
             campaigns = []
 
-        # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
-        camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
-        cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
-
-        parsed = _parse_request_args(camps_data, cats_data)
+        parsed = self._parse_request_args(campaigns)
 
         # Identity / coordinator / full-translator flags — mirrors src/index.php.
         user = load_user()
         user_coord = bool(user and user.is_active_admin)
-        full_tr_user = bool(user and is_full_translator(user.username))
+        full_tr_user = bool(user and self.full_service.is_full_translator(user.username))
 
         parsed_settings = parsed["settings"]
 
@@ -217,8 +154,8 @@ class TDRoutes:
     def index(self):
         # Form data — unchanged from the previous index() implementation.
         try:
-            langs = [x.to_dict() for x in list_langs()]
-            campaigns_records = list_categories()
+            langs = [x.to_dict() for x in self.lang_service.list_langs()]
+            campaigns_records = self.category_service.list_categories()
             campaigns = [x.to_dict() for x in campaigns_records]
         except Exception:
             logger.exception("Failed to load languages/campaigns for index page")
@@ -226,11 +163,7 @@ class TDRoutes:
             langs = []
             campaigns = []
 
-        # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
-        camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
-        cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
-
-        parsed = _parse_request_args(camps_data, cats_data)
+        parsed = self._parse_request_args(campaigns)
 
         return render_template(
             "td/index.html",
@@ -249,14 +182,14 @@ class TDRoutes:
         category = request.args.get("cat") or "RTT"
 
         try:
-            stats = statics_by_category(category)
+            stats = self.missing_service.statics_by_category(category)
         except Exception:
             logger.exception("statics_by_category failed for cat=%r", category)
             flash("Failed to load missing statistics — please try again.", "danger")
             stats = []
 
         try:
-            total = count_category_members(category)
+            total = self.missing_service.count_category_members(category)
         except Exception:
             logger.exception("count_category_members failed for cat=%r", category)
             total = 0
@@ -264,7 +197,7 @@ class TDRoutes:
         # PHP merges per-language stats with the langs lookup (autonym + name).
         langs_lookup: dict[str, dict] = {}
         try:
-            for lang in list_langs():
+            for lang in self.lang_service.list_langs():
                 data = lang.to_dict()
                 code = data.get("code")
                 if code:
@@ -299,6 +232,76 @@ class TDRoutes:
             total=total,
             rows=rows,
         )
+
+    def _parse_request_args(self, campaigns: list[dict]) -> dict[str, Any]:
+        """Mirror of src/backend/loaders/load_request.php — load_request().
+
+        Returns a dict with the resolved request parameters. ``code_lang_name``
+        is empty when the code is unknown; the route uses this to decide
+        whether to render the results card.
+        """
+
+        # Lookup tables used by request parsing (PHP $camps_data and $cats_data).
+        camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
+        cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
+
+        code = _normalize_arg("code")
+        camp = _normalize_arg("camp")
+        cat = _normalize_arg("cat")
+        tra_type = _normalize_arg("type")
+
+        filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
+
+        code_lang_name = ""
+
+        if code:
+            lang_record = self.lang_service.get_lang_by_code(code)
+            if lang_record is None:
+                flash(f"code ({code}) not valid wiki.", "danger")
+                code = ""
+            else:
+                code_lang_name = lang_record.name or lang_record.autonym or ""
+
+        # logic from load_request.php — cross-resolve cat <-> camp.
+        if not cat and camp:
+            cat = camps_data.get(camp, {}).get("category", "") or cat
+        if cat and not camp:
+            camp = cats_data.get(cat, "") or camp
+
+        # logic from load_request.php — validate camp against the input list.
+        if camp and camp not in camps_data:
+            flash(f"camp ({camp}) not valid.", "danger")
+            camp = ""
+
+        # logic from load_request.php — force "lead" when whole-article translate is disabled.
+
+        def to_bool(val: Any) -> bool:
+            if isinstance(val, str):
+                return val.lower() in ("1", "true", "yes", "on")
+            return bool(val)
+
+        all_settings = self.settings_service.get_all_settings_ready()
+
+        show_translation_button = to_bool(all_settings.get("translation_button_in_progress_table", False))
+        allow_type_of_translate = to_bool(all_settings.get("allow_type_of_translate", False))
+        show_exists_table = to_bool(all_settings.get("show_exists_table", False))
+
+        if not allow_type_of_translate:
+            tra_type = "lead"
+
+        return {
+            "code": code,
+            "code_lang_name": code_lang_name,
+            "camp": camp,
+            "cat": cat,
+            "tra_type": tra_type,
+            "settings": {
+                "filter_sparql": filter_sparql,
+                "show_exists_table": show_exists_table,
+                "allow_type_of_translate": allow_type_of_translate,
+                "show_translation_button": show_translation_button,
+            },
+        }
 
 
 __all__ = [

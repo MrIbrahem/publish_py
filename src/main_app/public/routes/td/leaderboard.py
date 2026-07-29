@@ -13,15 +13,7 @@ from flask import (
     request,
 )
 
-from ....db.services.content import get_camp_to_cats, list_projects
-from ....db.services.pages import (
-    get_chart_data_formatted,
-    get_months_of_pages_years,
-    get_pages,
-    get_pages_years,
-    top_lang_of_user,
-    top_lang_of_users,
-)
+from ....db.services import CategoryService, LeaderboardService, ProjectService
 from ..api.top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
@@ -30,6 +22,9 @@ logger = logging.getLogger(__name__)
 class LeaderBoardRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.category_service = CategoryService()
+        self.project_service = ProjectService()
+        self.lederboard_service = LeaderboardService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -42,7 +37,7 @@ class LeaderBoardRoutes:
         year = request.args.get("year", type=int)
         # month = request.args.get("month", type=int)
         camp = request.args.get("camp", type=str)
-        campaign_to_cats = get_camp_to_cats()
+        campaign_to_cats = self.category_service.get_camp_to_cats()
 
         form_data = self.load_form_data(list(campaign_to_cats.keys()), year)
 
@@ -71,7 +66,7 @@ class LeaderBoardRoutes:
         year = request.args.get("year", type=int)
         # month = request.args.get("month", type=int)
         camp = request.args.get("camp", type=str)
-        campaign_to_cats = get_camp_to_cats()
+        campaign_to_cats = self.category_service.get_camp_to_cats()
 
         form_data = self.load_form_data(list(campaign_to_cats.keys()), year)
 
@@ -91,7 +86,7 @@ class LeaderBoardRoutes:
 
         if users_data.get("results"):
             # {row["user"]: {"lang": row["lang"], "count": row["count"]} for row in result_list}
-            users_top_langs: list[dict[Any, Any]] = top_lang_of_users()
+            users_top_langs: list[dict[Any, Any]] = self.lederboard_service.top_lang_of_users()
             result["users_top_langs"] = {row["user"]: row for row in users_top_langs}
 
         users_total = users_data.get("count") or 0
@@ -111,9 +106,9 @@ class LeaderBoardRoutes:
 
     def langs(self, lang_code: str) -> str:
         selected_year = request.args.get("year", type=int)
-        lang_years: list[int] = get_pages_years(lang=lang_code)
+        lang_years: list[int] = self.lederboard_service.get_pages_years(lang=lang_code)
 
-        lang_pages = get_pages(
+        lang_pages = self.lederboard_service.get_pages(
             year=selected_year,
             lang=lang_code,
         )
@@ -121,7 +116,7 @@ class LeaderBoardRoutes:
         words_total = sum(int(page["word"]) for page in lang_pages if page.get("word"))
         pageviews_total = sum(int(page["views"]) for page in lang_pages if page.get("views"))
 
-        chart_data = get_chart_data_formatted(
+        chart_data = self.lederboard_service.get_chart_data_formatted(
             lang=lang_code,
             year=selected_year,
         )
@@ -145,10 +140,10 @@ class LeaderBoardRoutes:
         selected_year = request.args.get("year", type=int)
         selected_lang = request.args.get("lang", type=str)
 
-        user_years: list[int] = get_pages_years(user=username)
-        user_langs = top_lang_of_user(username)
+        user_years: list[int] = self.lederboard_service.get_pages_years(user=username)
+        user_langs = self.lederboard_service.top_lang_of_user(username)
 
-        user_pages = get_pages(
+        user_pages = self.lederboard_service.get_pages(
             user=username,
             year=selected_year,
             lang=selected_lang,
@@ -156,7 +151,7 @@ class LeaderBoardRoutes:
         words_total = sum(page["word"] for page in user_pages if page.get("word"))
         pageviews_total = sum(page["views"] for page in user_pages if page.get("views"))
 
-        chart_data = get_chart_data_formatted(
+        chart_data = self.lederboard_service.get_chart_data_formatted(
             user=username,
             year=selected_year,
             lang=selected_lang,
@@ -184,7 +179,7 @@ class LeaderBoardRoutes:
 
     def load_chart_data(self, cat, year, camp):
         user_group = request.args.get("user_group", type=str)
-        chart_data = get_chart_data_formatted(
+        chart_data = self.lederboard_service.get_chart_data_formatted(
             camp=camp if camp != "all" else None,
             cat=cat,
             user_group=user_group if user_group != "all" else None,
@@ -195,9 +190,11 @@ class LeaderBoardRoutes:
         return chart_data
 
     def load_form_data(self, campaigns: list[str], year: int | None) -> dict[str, Any]:
-        years: list[int] = get_pages_years()
-        months: list[int] = get_months_of_pages_years(year) if year else []
-        user_groups = [x.g_title for x in list_projects()]
+        years: list[int] = self.lederboard_service.get_pages_years()
+        months: list[int] = self.lederboard_service.get_months_of_pages_years(year) if year else []
+
+        projects = self.project_service.list_projects()
+        user_groups = [x.g_title for x in projects]
 
         form_data = {
             "campaigns": campaigns,

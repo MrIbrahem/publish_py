@@ -44,9 +44,6 @@ class AllQidsService:
         return [dict(row._mapping) for row in rows]
 
 
-list_targets_by_lang = AllQidsService().list_targets_by_lang
-
 __all__ = [
     "AllQidsService",
-    "list_targets_by_lang",
 ]

@@ -6,10 +6,10 @@ TODO: should mock admin_required decorator
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 from flask.testing import FlaskClient
+
+from src.main_app.db.services import FullTranslatorService
 
 
 @pytest.mark.integration
@@ -25,18 +25,14 @@ class TestFullTranslatorsDashboard:
 
     def test_full_translators_dashboard_lists_translators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that full translators dashboard lists translators."""
-        with patch(
-            "src.main_app.admin.routes.full_translators.FullTranslatorService.list_full_translators"
-        ) as mock_list:
-            mock_list.return_value = [
-                MagicMock(user="Translator1", is_active=True),
-                MagicMock(user="Translator2", is_active=False),
-            ]
+        ft_service = FullTranslatorService()
+        ft_service.add_full_translator("Translator1", is_active=1)
+        ft_service.add_full_translator("Translator2", is_active=0)
 
-            response = auth_client.get("/admin/full_translators/")
+        response = auth_client.get("/admin/full_translators/")
 
-            # Should render dashboard successfully
-            assert response.status_code == 200
+        # Should render dashboard successfully
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
@@ -52,17 +48,14 @@ class TestAddFullTranslator:
 
     def test_add_full_translator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding full translator with valid data."""
-        with patch("src.main_app.admin.routes.full_translators.FullTranslatorService.add_full_translator") as mock_add:
-            mock_add.return_value = MagicMock(user="NewTranslator")
+        response = auth_client.post(
+            "/admin/full_translators/add",
+            data={"username": "NewTranslator"},
+            follow_redirects=False,
+        )
 
-            response = auth_client.post(
-                "/admin/full_translators/add",
-                data={"username": "NewTranslator"},
-                follow_redirects=False,
-            )
-
-            assert response.status_code == 302
-            assert response.location == "/admin/full_translators/"
+        assert response.status_code == 302
+        assert response.location == "/admin/full_translators/"
 
     def test_add_full_translator_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding full translator without username fails."""
@@ -89,16 +82,16 @@ class TestDeleteFullTranslator:
 
     def test_delete_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting full translator with valid ID."""
-        with patch("src.main_app.admin.routes.full_translators.FullTranslatorService.delete") as mock_delete:
-            mock_delete.return_value = True
+        ft_service = FullTranslatorService()
+        record = ft_service.add_full_translator("ToDeleteTranslator")
 
-            response = auth_client.post(
-                "/admin/full_translators/1/delete",
-                follow_redirects=False,
-            )
+        response = auth_client.post(
+            f"/admin/full_translators/{record.id}/delete",
+            follow_redirects=False,
+        )
 
-            assert response.status_code == 302
-            assert response.location == "/admin/full_translators/"
+        assert response.status_code == 302
+        assert response.location == "/admin/full_translators/"
 
 
 @pytest.mark.integration
@@ -121,30 +114,26 @@ class TestActivateDeactivateFullTranslator:
 
     def test_activate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating full translator with valid ID."""
-        with patch(
-            "src.main_app.admin.routes.full_translators.FullTranslatorService.update_full_translator"
-        ) as mock_update:
-            mock_update.return_value = MagicMock(user="ActivatedTranslator", is_active=True)
+        ft_service = FullTranslatorService()
+        record = ft_service.add_full_translator("ActivateTranslator", is_active=0)
 
-            response = auth_client.post(
-                "/admin/full_translators/1/activate",
-                follow_redirects=False,
-            )
+        response = auth_client.post(
+            f"/admin/full_translators/{record.id}/activate",
+            follow_redirects=False,
+        )
 
-            assert response.status_code == 302
-            assert response.location == "/admin/full_translators/"
+        assert response.status_code == 302
+        assert response.location == "/admin/full_translators/"
 
     def test_deactivate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating full translator with valid ID."""
-        with patch(
-            "src.main_app.admin.routes.full_translators.FullTranslatorService.update_full_translator"
-        ) as mock_update:
-            mock_update.return_value = MagicMock(user="DeactivatedTranslator", is_active=False)
+        ft_service = FullTranslatorService()
+        record = ft_service.add_full_translator("DeactivateTranslator", is_active=1)
 
-            response = auth_client.post(
-                "/admin/full_translators/1/deactivate",
-                follow_redirects=False,
-            )
+        response = auth_client.post(
+            f"/admin/full_translators/{record.id}/deactivate",
+            follow_redirects=False,
+        )
 
-            assert response.status_code == 302
-            assert response.location == "/admin/full_translators/"
+        assert response.status_code == 302
+        assert response.location == "/admin/full_translators/"

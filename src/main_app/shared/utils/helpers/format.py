@@ -56,7 +56,7 @@ def determine_hashtag(title: str, user: str) -> str:
     return hashtag
 
 
-def make_summary(revid: str, sourcetitle: str, target_lang: str, hashtag: str = "#mdwikicx") -> str:
+def make_summary(revid: str | int, sourcetitle: str, target_lang: str, hashtag: str = "#mdwikicx") -> str:
     """Generate edit summary for translation.
 
     Args:
@@ -68,4 +68,5 @@ def make_summary(revid: str, sourcetitle: str, target_lang: str, hashtag: str = 
     Returns:
         Edit summary string
     """
+    revid = str(revid)
     return f"Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{target_lang} {hashtag}"

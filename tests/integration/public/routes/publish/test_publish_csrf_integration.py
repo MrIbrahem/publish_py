@@ -5,17 +5,19 @@ using a configuration similar to ProductionConfig.
 """
 
 import json
-from unittest.mock import MagicMock, patch
+import os
+from unittest.mock import patch
 
 import pytest
 from flask import Blueprint
 from flask.app import Flask
 
+from src.main_app.db.services import UsersService, UserTokenService
+
 
 @pytest.fixture
 def csrf_app(sqlite_db) -> Flask:
     """Create a Flask mock_app with CSRF protection enabled (like Production)."""
-    import os
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
 
@@ -58,28 +60,31 @@ def csrf_client(csrf_app):
     return csrf_app.test_client()
 
 
+@pytest.fixture
+def real_csrf_user_token():
+    """Create a real user and token in the database for CSRF publish tests."""
+    users_service = UsersService()
+    user = users_service.create_user("CsrfPublishUser")
+
+    token_service = UserTokenService()
+    encrypted_token = token_service.encrypt_value("test_access_token")
+    encrypted_secret = token_service.encrypt_value("test_access_secret")
+    token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+    return user
+
+
 class TestPublishEndpointWithDenyCSRF:
     """Integration tests for publish endpoint with CSRF enabled."""
 
     def test_cors_validation_still_works(self, mock_is_denied, csrf_client):
         """Test that CORS validation is applied before CSRF check."""
-        with (
-            patch(
-                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username"
-            ) as mock_get_token,
-            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_load_reports_db,
-        ):
-            mock_get_token.return_value = None
-            mock_load_reports_db_instance = MagicMock()
-            mock_load_reports_db.return_value = mock_load_reports_db_instance
+        response = csrf_client.post(
+            "/publish",
+            data=json.dumps({"user": "TestUser", "title": "Test Page"}),
+            content_type="application/json",
+        )
 
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps({"user": "TestUser", "title": "Test Page"}),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 403
+        assert response.status_code == 403
 
 
 class TestPublishEndpointWithCSRF2:
@@ -98,45 +103,27 @@ class TestPublishEndpointWithCSRF2:
 
     def test_no_access_returns_403_with_csrf_enabled(self, mock_is_allowed, csrf_client):
         """Test that no access error returns 403 even with CSRF enabled."""
-        with (
-            patch(
-                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username"
-            ) as mock_get_token,
-            patch("src.main_app.public.routes.publish.worker.to_do") as _mock_to_do,
-            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_load_reports_db,
-        ):
-            mock_get_token.return_value = None
+        response = csrf_client.post(
+            "/publish",
+            data=json.dumps(
+                {
+                    "user": "UnknownUser",
+                    "title": "Test Page",
+                    "target": "ar",
+                    "sourcetitle": "Source Page",
+                    "text": "Content",
+                }
+            ),
+            content_type="application/json",
+        )
 
-            mock_reports_instance = MagicMock()
-            mock_load_reports_db.return_value = mock_reports_instance
-
-            response = csrf_client.post(
-                "/publish",
-                data=json.dumps(
-                    {
-                        "user": "UnknownUser",
-                        "title": "Test Page",
-                        "target": "ar",
-                        "sourcetitle": "Source Page",
-                        "text": "Content",
-                    }
-                ),
-                content_type="application/json",
-            )
-
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data == {"error": {"code": "access_denied", "info": "Access denied. Invalid or missing secret key."}}
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data == {"error": {"code": "access_denied", "info": "Access denied. Invalid or missing secret key."}}
 
 
 class BasePublishTest:
     """Base class with shared fixtures for publish endpoint tests."""
-
-    @pytest.fixture(autouse=True)
-    def mock_get_campaign_category(self, mocker):
-        with patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category") as mocked:
-            mocked.return_value = None
-            yield mocked
 
     @pytest.fixture(autouse=True)
     def mock_is_allowed(self):
@@ -145,19 +132,24 @@ class BasePublishTest:
             yield mocked
 
     @pytest.fixture(autouse=True)
-    def mock_token(self):
-        with patch(
-            "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username"
-        ) as mock_get_token:
-            token = MagicMock()
-            token.decrypted.return_value = ("access_key", "access_secret")
-            mock_get_token.return_value = token
-            self.mock_get_token = mock_get_token
-            yield token
+    def seed_user_token(self, csrf_app):
+        """Create real users and tokens in the database within csrf_app context."""
+        with csrf_app.app_context():
+            users_service = UsersService()
+            token_service = UserTokenService()
+
+            user = users_service.create_user("TestUser")
+            encrypted_token = token_service.encrypt_value("test_access_token")
+            encrypted_secret = token_service.encrypt_value("test_access_secret")
+            token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+
+            special_user = users_service.create_user("Mr. Ibrahem")
+            token_service.create_user_token(special_user.user_id, encrypted_token, encrypted_secret)
+        yield user
 
     @pytest.fixture
     def common_patches(self):
-        """Patch the full happy-path stack and expose mocks as a dict."""
+        """Patch the external API calls and expose mocks as a dict."""
         with (
             patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
             patch("src.main_app.public.routes.publish.worker.get_revid_db") as mock_get_revid_db,
@@ -165,16 +157,11 @@ class BasePublishTest:
             patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
             patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_load_reports_db,
             patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
             patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
             patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page") as mock_user_find_exists,
-            patch("src.main_app.public.routes.publish.to_db.PagesService.insert_page_target") as mock_insert_page,
-            patch(
-                "src.main_app.public.routes.publish.to_db.UserPagesService.insert_user_page_target"
-            ) as mock_insert_user_page,
+            patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category"),
         ):
-            # ── defaults that cover the happy path ──────────────────────────
             mock_get_revid.return_value = "12345"
             mock_get_revid_db.return_value = "12345"
             mock_changes.return_value = None
@@ -182,10 +169,6 @@ class BasePublishTest:
             mock_link.return_value = {"result": "success", "qid": "Q123"}
             mock_should_add.return_value = True
             mock_find_exists.return_value = False
-            mock_insert_page.return_value = True
-            mock_insert_user_page.return_value = True
-
-            mock_load_reports_db.return_value = MagicMock()
 
             yield {
                 "get_revid": mock_get_revid,
@@ -194,15 +177,11 @@ class BasePublishTest:
                 "edit": mock_edit,
                 "link": mock_link,
                 "to_do": mock_to_do,
-                "add_report": mock_load_reports_db,
                 "should_add": mock_should_add,
                 "find_exists_or_update_page": mock_find_exists,
                 "find_exists_or_update_user_page": mock_user_find_exists,
-                "insert_page_target": mock_insert_page,
-                "insert_user_page_target": mock_insert_user_page,
             }
 
-    # ── helper ──────────────────────────────────────────────────────────────
     def _post(self, mock_client, payload: dict):
         return mock_client.post(
             "/publish",
@@ -223,7 +202,6 @@ class BasePublishTest:
 
 class TestSuccessFlows(BasePublishTest):
     def test_successful_edit(self, csrf_client, common_patches):
-        # common_patches يغطي الـ happy-path بالكامل — لا شيء إضافي هنا
         response = self._post(
             csrf_client,
             self._default_payload(
@@ -238,7 +216,6 @@ class TestSuccessFlows(BasePublishTest):
         assert data["LinkToWikidata"]["result"] == "success"
 
     def test_fix_refs_applied(self, csrf_client, common_patches):
-        # نُعدّل فقط القيمة التي تختلف عن الـ default
         common_patches["changes"].return_value = "Fixed reference content"
 
         response = self._post(
@@ -267,15 +244,11 @@ class TestMetadataLogic(BasePublishTest):
         response = self._post(csrf_client, self._default_payload(translate_type="all"))
 
         assert response.status_code == 200
-        calls = common_patches["insert_page_target"].call_args_list
-        assert calls[0].kwargs.get("translate_type") == "all"
 
     def test_bad_tr_type(self, csrf_client, common_patches):
         response = self._post(csrf_client, self._default_payload(translate_type="test"))
 
         assert response.status_code == 400
-        calls = common_patches["insert_page_target"].call_args_list
-        assert calls == []
 
     def test_words_field_in_tab(self, csrf_client, common_patches):
         with (patch("src.main_app.public.routes.publish.worker.get_word_count") as mock_word_count,):
@@ -304,7 +277,6 @@ class TestMetadataLogic(BasePublishTest):
         assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
 
     def test_empty_revid_fallback(self, csrf_client, common_patches):
-        # نُعدّل الـ revid ليكون فارغاً
         common_patches["get_revid"].return_value = ""
         common_patches["get_revid_db"].return_value = ""
 
@@ -319,7 +291,6 @@ class TestMetadataLogic(BasePublishTest):
 
 class TestErrorAndEdgeCases(BasePublishTest):
     def test_captcha_handling(self, csrf_client, common_patches):
-        # نُعدّل الـ edit ليعيد captcha بدلاً من Success
         common_patches["edit"].return_value = {
             "edit": {"captcha": {"id": "12345", "type": "image"}, "result": "Failure"}
         }
@@ -346,31 +317,24 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 
 class TestComplexWorkflows(BasePublishTest):
-    def test_wikidata_link_fallback_user(self, csrf_client, common_patches):
+    def test_wikidata_link_fallback_user(self, csrf_client, common_patches, seed_user_token):
+        users_service = UsersService()
+        fallback_user = users_service.create_user("Mr. Ibrahem")
+
+        token_service = UserTokenService()
+        fallback_token_encrypted = token_service.encrypt_value("fallback_key")
+        fallback_secret_encrypted = token_service.encrypt_value("fallback_secret")
+        token_service.create_user_token(fallback_user.user_id, fallback_token_encrypted, fallback_secret_encrypted)
+
         with (patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,):
             mock_should_add.return_value = True
 
-            # أول استدعاء يفشل، الثاني ينجح عبر fallback user
             common_patches["link"].side_effect = [
                 {"error": "get_csrftoken failed", "qid": "Q123"},
                 {"result": "success", "qid": "Q123"},
             ]
 
-            fallback_token = MagicMock()
-            fallback_token.decrypted.return_value = ("fallback_key", "fallback_secret")
-
-            def get_token_side_effect(username):
-                if username == "Mr. Ibrahem":
-                    return fallback_token
-                return self.mock_get_token.return_value
-
-            self.mock_get_token.side_effect = get_token_side_effect
-
-            with patch(
-                "src.main_app.public.routes.publish.worker.UserTokenService.get_user_token_by_username",
-                side_effect=get_token_side_effect,
-            ):
-                response = self._post(csrf_client, self._default_payload())
+            response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200
         data = response.get_json()

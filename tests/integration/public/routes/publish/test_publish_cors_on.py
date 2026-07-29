@@ -4,6 +4,7 @@ with CORS_ENABLED (CORS_DISABLED=False).
 """
 
 import json
+import os
 from unittest.mock import patch
 
 import pytest
@@ -18,7 +19,6 @@ ALLOWED_DOMAIN = "medwiki.toolforge.org"
 @pytest.fixture
 def mock_app(sqlite_db) -> Flask:
     """Create a test Flask application with CORS enabled."""
-    import os
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", f"{ALLOWED_DOMAIN},mdwikicx.toolforge.org")
 
@@ -104,45 +104,27 @@ class TestValidateAccessOnPublish:
 
     def test_post_allowed_origin_proceeds_past_cors(self, mock_is_allowed_medwiki, mock_client):
         """POST from allowed origin passes CORS and reaches handler logic."""
-        with (
-            patch(
-                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
-                return_value=None,
+        response = mock_client.post(
+            "/publish/",
+            data=json.dumps(
+                {
+                    "user": "UnknownUser",
+                    "title": "Test Page",
+                    "target": "en",
+                    "sourcetitle": "Source",
+                    "text": "Content",
+                }
             ),
-            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_reports_db,
-        ):
-            mock_reports_db.return_value = None
-
-            response = mock_client.post(
-                "/publish/",
-                data=json.dumps(
-                    {
-                        "user": "UnknownUser",
-                        "title": "Test Page",
-                        "target": "en",
-                        "sourcetitle": "Source",
-                        "text": "Content",
-                    }
-                ),
-                content_type="application/json",
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "noaccess"
-            assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
+            content_type="application/json",
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "noaccess"
+        assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
 
     def test_post_with_valid_secret_key_bypasses_cors(self, mock_is_denied, mock_client):
         """POST with valid secret key bypasses CORS even from disallowed origin."""
-        with (
-            patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value="evil.com"),
-            patch(
-                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
-                return_value=None,
-            ),
-            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_reports_db,
-        ):
-            mock_reports_db.return_value = None
-
+        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value="evil.com"),):
             response = mock_client.post(
                 "/publish/",
                 headers={"X-Secret-Key": "test-secret"},
@@ -164,16 +146,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_allowed_origin_with_invalid_secret_key(self, mock_is_allowed_medwiki, mock_client):
         """POST from allowed origin succeeds even if secret key is invalid."""
-        with (
-            patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),
-            patch(
-                "src.main_app.public.routes.publish.routes.UserTokenService.get_user_token_by_username",
-                return_value=None,
-            ),
-            patch("src.main_app.public.routes.publish.worker.ReportService.add_report") as mock_reports_db,
-        ):
-            mock_reports_db.return_value = None
-
+        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),):
             response = mock_client.post(
                 "/publish/",
                 data=json.dumps(

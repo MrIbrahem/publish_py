@@ -6,10 +6,10 @@ TODO: should mock admin_required decorator
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 from flask.testing import FlaskClient
+
+from src.main_app.db.services import AdminService, UsersService
 
 
 @pytest.mark.integration
@@ -25,16 +25,18 @@ class TestCoordinatorsDashboard:
 
     def test_coordinators_dashboard_lists_coordinators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that coordinators dashboard lists coordinators."""
-        with patch("src.main_app.admin.routes.coordinators.AdminService.list_coordinators") as mock_list:
-            mock_list.return_value = [
-                MagicMock(username="Coordinator1", is_active=True),
-                MagicMock(username="Coordinator2", is_active=False),
-            ]
+        users_service = UsersService()
+        users_service.create_user("Coordinator1")
+        users_service.create_user("Coordinator2")
 
-            response = auth_client.get("/admin/coordinators/")
+        admin_service = AdminService()
+        admin_service.add_coordinator("Coordinator1")
+        admin_service.add_coordinator("Coordinator2")
 
-            # Should render dashboard successfully
-            assert response.status_code == 200
+        response = auth_client.get("/admin/coordinators/")
+
+        # Should render dashboard successfully
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
@@ -50,18 +52,18 @@ class TestAddCoordinator:
 
     def test_add_coordinator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding coordinator with valid data."""
-        with patch("src.main_app.admin.routes.coordinators.AdminService.add_coordinator") as mock_add:
-            mock_add.return_value = MagicMock(username="NewCoordinator")
+        users_service = UsersService()
+        users_service.create_user("NewCoordinator")
 
-            response = auth_client.post(
-                "/admin/coordinators/add",
-                data={"username": "NewCoordinator"},
-                follow_redirects=False,
-            )
+        response = auth_client.post(
+            "/admin/coordinators/add",
+            data={"username": "NewCoordinator"},
+            follow_redirects=False,
+        )
 
-            # Should redirect after successful add
-            assert response.status_code == 302
-            assert response.location == "/admin/coordinators/"
+        # Should redirect after successful add
+        assert response.status_code == 302
+        assert response.location == "/admin/coordinators/"
 
     def test_add_coordinator_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding coordinator without username fails."""
@@ -89,20 +91,19 @@ class TestDeleteCoordinator:
 
     def test_delete_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting coordinator with valid ID."""
-        with (
-            patch("src.main_app.admin.routes.coordinators.AdminService.delete_coordinator") as mock_delete,
-            patch("src.main_app.admin.routes.coordinators.AdminService.get_coordinator_by_id") as mock_get,
-        ):
-            mock_delete.return_value = True
-            mock_get.return_value = MagicMock(username="DeletedCoordinator")
+        users_service = UsersService()
+        users_service.create_user("DeletedCoordinator")
 
-            response = auth_client.post(
-                "/admin/coordinators/1/delete",
-                follow_redirects=False,
-            )
+        admin_service = AdminService()
+        record = admin_service.add_coordinator("DeletedCoordinator")
 
-            assert response.status_code == 302
-            assert response.location == "/admin/coordinators/"
+        response = auth_client.post(
+            f"/admin/coordinators/{record.id}/delete",
+            follow_redirects=False,
+        )
+
+        assert response.status_code == 302
+        assert response.location == "/admin/coordinators/"
 
 
 @pytest.mark.integration
@@ -125,26 +126,33 @@ class TestActivateDeactivateCoordinator:
 
     def test_activate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating coordinator with valid ID."""
-        with patch("src.main_app.admin.routes.coordinators.AdminService.set_coordinator_active") as mock_set:
-            mock_set.return_value = MagicMock(username="ActivatedCoordinator", is_active=True)
+        users_service = UsersService()
+        users_service.create_user("ActivateCoordinator")
 
-            response = auth_client.post(
-                "/admin/coordinators/1/activate",
-                follow_redirects=False,
-            )
+        admin_service = AdminService()
+        record = admin_service.add_coordinator("ActivateCoordinator")
+        admin_service.set_coordinator_active(record.id, is_active=False)
 
-            assert response.status_code == 302
-            assert response.location == "/admin/coordinators/"
+        response = auth_client.post(
+            f"/admin/coordinators/{record.id}/activate",
+            follow_redirects=False,
+        )
+
+        assert response.status_code == 302
+        assert response.location == "/admin/coordinators/"
 
     def test_deactivate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating coordinator with valid ID."""
-        with patch("src.main_app.admin.routes.coordinators.AdminService.set_coordinator_active") as mock_set:
-            mock_set.return_value = MagicMock(username="DeactivatedCoordinator", is_active=False)
+        users_service = UsersService()
+        users_service.create_user("DeactivateCoordinator")
 
-            response = auth_client.post(
-                "/admin/coordinators/1/deactivate",
-                follow_redirects=False,
-            )
+        admin_service = AdminService()
+        record = admin_service.add_coordinator("DeactivateCoordinator")
 
-            assert response.status_code == 302
-            assert response.location == "/admin/coordinators/"
+        response = auth_client.post(
+            f"/admin/coordinators/{record.id}/deactivate",
+            follow_redirects=False,
+        )
+
+        assert response.status_code == 302
+        assert response.location == "/admin/coordinators/"

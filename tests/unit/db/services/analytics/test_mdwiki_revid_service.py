@@ -121,7 +121,9 @@ class TestUpdateMdwikiRevid(TestSetup):
         assert updated.revid == 8080808
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        from src.main_app.db.exceptions import RecordNotFoundError
+
+        with pytest.raises(RecordNotFoundError, match="not found"):
             update_mdwiki_revid("Ghost", 123)
 
 

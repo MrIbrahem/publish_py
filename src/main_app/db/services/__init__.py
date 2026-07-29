@@ -22,6 +22,7 @@ from .content import (
 from .pages import (
     InProcessService,
     LeaderboardService,
+    MissingStatsService,
     PagesService,
     PagesUsersToMainPagesService,
     Results2026Service,
@@ -72,7 +73,7 @@ __all__ = [
     "PagesUsersToMainService",
     "QidService",
     "QidOthersService",
-    "InProcessService",
+    "MissingStatsService",
     "CategoryService",
     "AdminService",
     "UsersService",

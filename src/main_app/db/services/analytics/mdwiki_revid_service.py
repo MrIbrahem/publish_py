@@ -9,6 +9,7 @@ import logging
 from sqlalchemy.exc import IntegrityError
 
 from ....extensions import db
+from ...exceptions import RecordNotFoundError
 from ...models import MdwikiRevidRecord
 from ..crud_service import CRUDService
 
@@ -16,6 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
+    """
+    title is the primary_key for MdwikiRevidRecord
+    """
+
     model = MdwikiRevidRecord
 
     def __init__(self):
@@ -60,7 +65,7 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
         """Update an mdwiki_revid record."""
         record = self.get_by(title=title)
         if not record:
-            raise ValueError(f"MDWiki revid record for '{title}' not found")
+            raise RecordNotFoundError(f"MDWiki revid record for '{title}' not found")
         try:
             return self.update(record, revid=revid)
         except Exception as e:

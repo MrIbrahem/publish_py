@@ -7,6 +7,7 @@ Mirrors: php_src/text_change.php
 
 import os
 import sys
+from typing import Any
 
 DoChangesToText1 = None
 fix_one_page = None
@@ -22,7 +23,7 @@ except ImportError:
 
 
 def do_changes_to_text_with_settings(
-    text: str,
+    text: str | Any,
     title: str,
     lang: str,
     source_title: str = "",
@@ -57,7 +58,7 @@ def do_changes_to_text_with_settings(
 def do_changes_to_text(
     sourcetitle: str,
     title: str,
-    text: str,
+    text: str | Any,
     lang: str,
     mdwiki_revid: str,
 ) -> str:

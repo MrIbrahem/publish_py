@@ -147,7 +147,9 @@ class TestUpdateRefsCount(TestSetup):
         assert result.r_title == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        from src.main_app.db.exceptions import RecordNotFoundError
+
+        with pytest.raises(RecordNotFoundError, match="not found"):
             update_refs_count(9999, r_lead_refs=10)
 
 
