@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
+from src.main_app.db.exceptions import RecordNotFoundError
 from src.main_app.db.models import InProcessRecord
 from src.main_app.db.services.pages.in_process_service import (
     InProcessService,
@@ -166,7 +167,7 @@ class TestUpdateInProcess(TestSetup):
         assert result.title == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(RecordNotFoundError, match="not found"):
             self.service.update_in_process(9999, word=10)
 
 

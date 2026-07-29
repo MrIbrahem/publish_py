@@ -158,7 +158,9 @@ class TestUpdateFullTranslator(TestSetup):
         assert result.user == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        from src.main_app.db.exceptions import RecordNotFoundError
+
+        with pytest.raises(RecordNotFoundError, match="not found"):
             update_full_translator(9999, is_active=0)
 
 

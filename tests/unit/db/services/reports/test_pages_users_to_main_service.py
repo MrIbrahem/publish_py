@@ -125,7 +125,9 @@ class TestUpdatePagesUsersToMain:
         assert result.id == 51
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        from src.main_app.db.exceptions import RecordNotFoundError
+
+        with pytest.raises(RecordNotFoundError, match="not found"):
             update_pages_users_to_main(9999, new_target="T")
 
 

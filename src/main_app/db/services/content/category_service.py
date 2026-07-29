@@ -10,6 +10,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from ....extensions import db
+from ...exceptions import RecordNotFoundError
 from ...models import CategoryRecord
 from ..crud_service import CRUDService
 
@@ -70,7 +71,7 @@ class CategoryService(CRUDService[CategoryRecord]):
         """Update category."""
         record = self.get_record_by_id(category_id)
         if not record:
-            raise ValueError(f"Category with ID {category_id} not found")
+            raise RecordNotFoundError(f"Category with ID {category_id} not found")
 
         try:
             record = self.update(
@@ -82,7 +83,7 @@ class CategoryService(CRUDService[CategoryRecord]):
                 depth=int(depth),
             )
         except ValueError as exc:
-            raise ValueError(f"Category with ID {category_id} not found") from exc
+            raise ValueError(f"Error updating category: {exc}") from exc
 
         if is_default:
             # set this category as default by unsetting default flag on all other categories

@@ -151,7 +151,9 @@ class TestUpdateWord(TestSetup):
         assert result.w_title == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        from src.main_app.db.exceptions import RecordNotFoundError
+
+        with pytest.raises(RecordNotFoundError, match="not found"):
             update_word(9999, w_lead_words=10)
 
 

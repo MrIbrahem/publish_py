@@ -129,7 +129,9 @@ class TestUpdateCategory:
         assert updated.campaign == "Metabolism_Campaign"
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        from src.main_app.db.exceptions import RecordNotFoundError
+
+        with pytest.raises(RecordNotFoundError, match="not found"):
             update_category(9999, "Title", "File")
 
 

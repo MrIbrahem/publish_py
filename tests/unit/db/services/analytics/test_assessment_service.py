@@ -1,5 +1,6 @@
 import pytest
 
+from src.main_app.db.exceptions import RecordNotFoundError
 from src.main_app.db.models import AssessmentRecord
 from src.main_app.db.services.analytics.assessment_service import (
     AssessmentService,
@@ -139,7 +140,7 @@ class TestUpdateAssessment(TestSetup):
         assert result.title == "No_Change"
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(RecordNotFoundError, match="not found"):
             update_assessment(9999, importance="High")
 
 

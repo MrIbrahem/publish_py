@@ -1,5 +1,6 @@
 import pytest
 
+from src.main_app.db.exceptions import RecordNotFoundError
 from src.main_app.db.models import LanguageSettingRecord
 from src.main_app.db.services.config import LanguageSettingService
 
@@ -145,7 +146,7 @@ class TestUpdateLanguageSetting(TestSetup):
 
     def test_raises_error_if_not_found(self, monkeypatch):
         service = LanguageSettingService()
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(RecordNotFoundError, match="not found"):
             service.update_language_setting(9999, move_dots=1)
 
 
