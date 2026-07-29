@@ -169,7 +169,7 @@ class QidsSharedModel:
             return edit_redirect_to
 
         try:
-            ok = self.service.update(qid_id, title, qid)
+            ok = self.service.update_qid(qid_id, title, qid)
         except Exception:
             logger.exception("Failed to save row id=%r title=%r qid=%r", qid_id, title, qid)
             ok = False

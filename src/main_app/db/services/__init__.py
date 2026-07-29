@@ -23,14 +23,12 @@ from .pages import (
     InProcessService,
     LeaderboardService,
     MissingStatsService,
+    PagesQueryService,
     PagesService,
     PagesUsersToMainPagesService,
     Results2026Service,
     TranslateTypeService,
     UserPagesService,
-)
-from .pages_query_service import (
-    PagesQueryService,
 )
 from .reports import (
     PagesUsersToMainService,

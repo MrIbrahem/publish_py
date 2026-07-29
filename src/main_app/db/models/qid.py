@@ -84,10 +84,10 @@ class QidOthersRecord(db.Model):
 
     def validate(self):
         # Validate that required fields are not empty
-        if not self.title:
+        if not self.title or not self.title.strip():
             raise ValueError("Title cannot be empty")
 
-        if not self.qid:
+        if not self.qid or not self.qid.strip():
             raise ValueError("QID cannot be empty")
 
         # Validate QID format (should start with Q followed by digits)

@@ -32,6 +32,7 @@ from .missing_stats_service import (
 from .page_service import (
     PagesService,
 )
+from .pages_query_service import PagesQueryService
 from .pages_users_to_main_service import (
     PagesUsersToMainPagesService,
     check_main_page_exists,
@@ -56,11 +57,10 @@ from .translate_type_service import (
     list_translate_types,
     update_translate_type,
 )
-from .user_page_service import (
-    UserPagesService,
-)
+from .user_page_service import UserPagesService
 
 __all__ = [
+    "PagesQueryService",
     "Results2026Service",
     "MissingStatsService",
     "LeaderboardService",
