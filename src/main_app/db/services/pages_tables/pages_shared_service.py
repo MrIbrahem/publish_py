@@ -142,11 +142,11 @@ class BasePagesService(CRUDService[ModelT]):
         **kwargs: Any,
     ) -> ModelT | None:
         """Update page."""
-        try:
-            data = {"title": title, "target": target, **kwargs}
-            return self.update_by_id(page_id, data)
-        except ValueError as exc:
-            raise LookupError(f"Page id {page_id} was not found") from exc
+        data = {"title": title, "target": target, **kwargs}
+        record = self.update_by_id(page_id, data)
+        if record is None:
+            raise LookupError(f"Page id {page_id} was not found")
+        return record
 
     def update_row_by_id(
         self,

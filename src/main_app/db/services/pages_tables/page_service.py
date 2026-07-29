@@ -66,6 +66,7 @@ class PagesService(BasePagesService):
                 {self.model.target: target, self.model.pupdate: pupdate, "word": word},
                 synchronize_session=False,
             )
+            self.session.commit()
         except Exception:
             logger.exception("Failed to update existing page target")
             self.session.rollback()
