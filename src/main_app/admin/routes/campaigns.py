@@ -22,100 +22,10 @@ from ..decorators import admin_required
 logger = logging.getLogger(__name__)
 
 
-def _campaigns_dashboard():
-    """Render the campaigns management dashboard."""
-
-    category_service = CategoryService()
-    campaigns = category_service.list_categories()
-
-    return render_template(
-        "admins/campaigns.html",
-        campaigns=campaigns,
-    )
-
-
-def _add_campaign_and_category() -> ResponseReturnValue:
-    """Create a new category record."""
-    category = request.form.get("category", "").strip()
-    campaign = request.form.get("campaign", "").strip()
-    if not category:
-        flash("Category is required.", "danger")
-        return redirect(url_for("admin.campaigns.dashboard"))
-
-    if not campaign:
-        flash("Campaign is required.", "danger")
-        return redirect(url_for("admin.campaigns.dashboard"))
-
-    try:
-        category_service = CategoryService()
-        category_service.add_category(
-            category=category,
-            campaign=campaign,
-        )
-    except ValueError as exc:
-        logger.exception("Unable to add category")
-        flash(str(exc), "warning")
-    except Exception:
-        logger.exception("Unable to add category.")
-        flash("Unable to add category. Please try again.", "danger")
-    else:
-        flash(f"category for '{category}' added.", "success")
-
-    return redirect(url_for("admin.campaigns.dashboard"))
-
-
-def _update_category(
-    category_id: int,
-    category: str,
-    campaign: str,
-    display: str | None = "",
-    category2: str | None = "",
-    depth: int | str = 0,
-    is_default: int = 0,
-) -> None:
-    """Update an existing category record."""
-    try:
-        category_service = CategoryService()
-        record = category_service.update_category(
-            category_id=category_id,
-            category=category,
-            campaign=campaign,
-            display=display,
-            category2=category2,
-            depth=depth,
-            is_default=is_default,
-        )
-    except ValueError as exc:
-        logger.exception("Unable to update category")
-        flash(str(exc), "warning")
-    except Exception:
-        logger.exception("Unable to update category.")
-        flash("Unable to update category. Please try again.", "danger")
-    else:
-        flash(f"category for '{record.category}' updated.", "success")
-
-
-def _delete_category(record_id: int) -> None:
-    """Remove a category record entirely."""
-
-    category_service = CategoryService()
-    try:
-        record = category_service.delete(record_id)
-        if not record:
-            raise ValueError("Category not found")
-    except ValueError as exc:
-        logger.exception("Unable to delete category")
-        flash(str(exc), "warning")
-    except Exception:
-        logger.exception("Unable to delete category.")
-        flash("Unable to delete category. Please try again.", "danger")
-    else:
-        flash(f"category for '{record_id}' removed.", "success")
-
-
 class CampaignsDashboard:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.category_service = CategoryService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -124,10 +34,10 @@ class CampaignsDashboard:
         self.bp.post("/update")(admin_required(self.update))
 
     def dashboard(self):
-        return _campaigns_dashboard()
+        return self._campaigns_dashboard()
 
     def add_record(self) -> ResponseReturnValue:
-        return _add_campaign_and_category()
+        return self._add_campaign_and_category()
 
     def update(self) -> ResponseReturnValue:
         default_cat = request.form.get("default_cat")
@@ -150,9 +60,9 @@ class CampaignsDashboard:
             is_deleted = str(record_id) in deletes
 
             if is_deleted:
-                _delete_category(record_id)
+                self._delete_category(record_id)
             elif category:
-                _update_category(
+                self._update_category(
                     category_id=record_id,
                     category=category,
                     campaign=campaign,
@@ -163,6 +73,92 @@ class CampaignsDashboard:
                 )
 
         return redirect(url_for("admin.campaigns.dashboard"))
+
+    def _campaigns_dashboard(self):
+        """Render the campaigns management dashboard."""
+
+        campaigns = self.category_service.list_categories()
+
+        return render_template(
+            "admins/campaigns.html",
+            campaigns=campaigns,
+        )
+
+    def _add_campaign_and_category(self) -> ResponseReturnValue:
+        """Create a new category record."""
+        category = request.form.get("category", "").strip()
+        campaign = request.form.get("campaign", "").strip()
+        if not category:
+            flash("Category is required.", "danger")
+            return redirect(url_for("admin.campaigns.dashboard"))
+
+        if not campaign:
+            flash("Campaign is required.", "danger")
+            return redirect(url_for("admin.campaigns.dashboard"))
+
+        try:
+
+            self.category_service.add_category(
+                category=category,
+                campaign=campaign,
+            )
+        except ValueError as exc:
+            logger.exception("Unable to add category")
+            flash(str(exc), "warning")
+        except Exception:
+            logger.exception("Unable to add category.")
+            flash("Unable to add category. Please try again.", "danger")
+        else:
+            flash(f"category for '{category}' added.", "success")
+
+        return redirect(url_for("admin.campaigns.dashboard"))
+
+    def _update_category(
+        self,
+        category_id: int,
+        category: str,
+        campaign: str,
+        display: str | None = "",
+        category2: str | None = "",
+        depth: int | str = 0,
+        is_default: int = 0,
+    ) -> None:
+        """Update an existing category record."""
+        try:
+
+            record = self.category_service.update_category(
+                category_id=category_id,
+                category=category,
+                campaign=campaign,
+                display=display,
+                category2=category2,
+                depth=depth,
+                is_default=is_default,
+            )
+        except ValueError as exc:
+            logger.exception("Unable to update category")
+            flash(str(exc), "warning")
+        except Exception:
+            logger.exception("Unable to update category.")
+            flash("Unable to update category. Please try again.", "danger")
+        else:
+            flash(f"category for '{record.category}' updated.", "success")
+
+    def _delete_category(self, record_id: int) -> None:
+        """Remove a category record entirely."""
+
+        try:
+            record = self.category_service.delete(record_id)
+            if not record:
+                raise ValueError("Category not found")
+        except ValueError as exc:
+            logger.exception("Unable to delete category")
+            flash(str(exc), "warning")
+        except Exception:
+            logger.exception("Unable to delete category.")
+            flash("Unable to delete category. Please try again.", "danger")
+        else:
+            flash(f"category for '{record_id}' removed.", "success")
 
 
 __all__ = [

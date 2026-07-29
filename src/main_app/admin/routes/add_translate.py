@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 class AddTranslateRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.category_service = CategoryService()
+        self.pages_service = PagesService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -23,8 +25,7 @@ class AddTranslateRoutes:
 
     def add_translate(self) -> str:
         """Render the translations add_translate dashboard."""
-        category_service = CategoryService()
-        categories = category_service.list_categories()
+        categories = self.category_service.list_categories()
         return render_template(
             "admins/add_translate.html",
             categories=categories,
@@ -46,7 +47,6 @@ class AddTranslateRoutes:
 
         texts: list[str] = []
         errors: list[str] = []
-        pages_service = PagesService()
 
         for i in range(len(titles)):
             mdtitle = titles[i].strip()
@@ -61,7 +61,7 @@ class AddTranslateRoutes:
                 continue
 
             try:
-                result = pages_service.add_translate_row_to_db(
+                result = self.pages_service.add_translate_row_to_db(
                     title=mdtitle,
                     translate_type=translate_type,
                     cat=cat,

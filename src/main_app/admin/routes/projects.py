@@ -58,7 +58,6 @@ class ProjectsDashboard:
 
         return redirect(url_for("admin.projects.dashboard"))
 
-
     def _projects_dashboard(self):
         """Render the projects management dashboard."""
 
@@ -68,7 +67,6 @@ class ProjectsDashboard:
             "admins/projects.html",
             projects=projects,
         )
-
 
     def _add_project(self) -> ResponseReturnValue:
         """Create a new project record."""
@@ -93,7 +91,6 @@ class ProjectsDashboard:
 
         return redirect(url_for("admin.projects.dashboard"))
 
-
     def _update_project(self, record_id: int, g_title: str) -> None:
         """Update an existing project record."""
 
@@ -109,10 +106,8 @@ class ProjectsDashboard:
         else:
             flash(f"project for '{record.g_title}' updated.", "success")
 
-
     def _delete_project(self, record_id: int) -> None:
         """Remove a project record entirely."""
-
 
         record = self.project_service.get_record_by_id(record_id)
         if not record:

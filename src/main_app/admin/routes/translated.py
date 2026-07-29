@@ -31,6 +31,7 @@ class TranslatedRoutes:
         self.bp = bp
         self.pages_service = PagesService()
         self.user_pages_service = UserPagesService()
+        self.lang_service = LangService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -52,7 +53,7 @@ class TranslatedRoutes:
             logger.exception("Failed to list translated pages lang=%r", lang)
             rows, total_count = [], 0
 
-        lang_service = LangService()
+        lang_service = self.lang_service
         langs = lang_service.list_langs()
 
         return render_template(

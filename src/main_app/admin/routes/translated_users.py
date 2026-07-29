@@ -26,6 +26,7 @@ def _safe_int(value: str | None, default: int) -> int:
 class TranslatedUsersRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.lang_service = LangService()
         self.user_pages_service = UserPagesService()
         self._setup_routes()
 
@@ -48,7 +49,7 @@ class TranslatedUsersRoutes:
             logger.exception("Failed to list translated user pages lang=%r", lang)
             rows, total_count = [], 0
 
-        langs = LangService().list_langs()
+        langs = self.lang_service.list_langs()
 
         return render_template(
             "admins/translated/index.html",
