@@ -14,7 +14,13 @@ from src.main_app.db.services.reports.pages_users_to_main_service import (
 pytestmark = pytest.mark.unit
 
 
-class TestPagesUsersToMainService:
+class TestSetup:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.service = PagesUsersToMainService()
+
+
+class TestPagesUsersToMainService(TestSetup):
 
     def test_pages_users_to_main_workflow(self, sqlite_db):
         from sqlalchemy import text
@@ -46,7 +52,7 @@ class TestPagesUsersToMainService:
         assert get_pages_users_to_main(1) is None
 
 
-class TestListPagesUsersToMain:
+class TestListPagesUsersToMain(TestSetup):
     """Tests for list_pages_users_to_main function."""
 
     def test_returns_list_from_store(self, sqlite_db):
@@ -62,7 +68,7 @@ class TestListPagesUsersToMain:
         assert len(result) >= 2
 
 
-class TestGetPagesUsersToMain:
+class TestGetPagesUsersToMain(TestSetup):
     """Tests for get_pages_users_to_main function."""
 
     def test_delegates_to_store(self, sqlite_db):
@@ -81,7 +87,7 @@ class TestGetPagesUsersToMain:
         assert get_pages_users_to_main(9999) is None
 
 
-class TestAddPagesUsersToMain:
+class TestAddPagesUsersToMain(TestSetup):
     """Tests for add_pages_users_to_main function."""
 
     def test_delegates_to_store(self, sqlite_db):
@@ -103,7 +109,7 @@ class TestAddPagesUsersToMain:
                 add_pages_users_to_main(id=9999)
 
 
-class TestUpdatePagesUsersToMain:
+class TestUpdatePagesUsersToMain(TestSetup):
     """Tests for update_pages_users_to_main function."""
 
     def test_delegates_to_store(self, sqlite_db):
@@ -133,7 +139,7 @@ class TestUpdatePagesUsersToMain:
             update_pages_users_to_main(9999, new_target="T")
 
 
-class TestDeletePagesUsersToMain:
+class TestDeletePagesUsersToMain(TestSetup):
     """Tests for delete_pages_users_to_main function."""
 
     def test_delegates_to_store(self, sqlite_db):
