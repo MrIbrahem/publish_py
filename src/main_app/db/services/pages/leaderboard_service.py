@@ -265,7 +265,7 @@ class LeaderboardService:
         lang: str | None = None,
         user: str | None = None,
     ) -> dict[str, list]:
-        chart_data_raw = get_leaderboard_chart_data(
+        chart_data_raw = self.get_leaderboard_chart_data(
             camp=camp,
             cat=cat,
             user_group=user_group,
@@ -283,26 +283,6 @@ class LeaderboardService:
         }
         return chart_data
 
-
-_crud = LeaderboardService()
-
-get_pages_years = _crud.get_pages_years
-get_months_of_pages_years = _crud.get_months_of_pages_years
-list_of_users_by_translations_count = _crud.list_of_users_by_translations_count
-get_pages = _crud.get_pages
-top_lang_of_users = _crud.top_lang_of_users
-top_lang_of_user = _crud.top_lang_of_user
-get_leaderboard_chart_data = _crud.get_leaderboard_chart_data
-get_chart_data_formatted = _crud.get_chart_data_formatted
-
 __all__ = [
     "LeaderboardService",
-    "get_pages_years",
-    "get_months_of_pages_years",
-    "list_of_users_by_translations_count",
-    "get_pages",
-    "top_lang_of_users",
-    "top_lang_of_user",
-    "get_leaderboard_chart_data",
-    "get_chart_data_formatted",
 ]

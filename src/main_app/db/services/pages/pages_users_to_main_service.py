@@ -126,17 +126,6 @@ class PagesUsersToMainPagesService(CRUDService[PagesUsersToMainRecord]):
         in_to_main = self.session.get(PagesUsersToMainRecord, page_id)
         return in_users is None and in_to_main is None
 
-
-_crud = PagesUsersToMainPagesService()
-list_pending = _crud.list_pending
-get_user_page = _crud.get_user_page
-check_main_page_exists = _crud.check_main_page_exists
-delete_user_page_to_main = _crud.delete_user_page_to_main
-
 __all__ = [
     "PagesUsersToMainPagesService",
-    "list_pending",
-    "get_user_page",
-    "check_main_page_exists",
-    "delete_user_page_to_main",
 ]

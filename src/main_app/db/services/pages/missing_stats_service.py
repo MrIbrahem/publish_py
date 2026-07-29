@@ -74,13 +74,6 @@ class MissingStatsService:
         rows = db.session.execute(_STATS_BY_CATEGORY_SQL, {"cat": cat}).fetchall()
         return [dict(row._mapping) for row in rows]
 
-
-_crud = MissingStatsService()
-count_category_members = _crud.count_category_members
-statics_by_category = _crud.statics_by_category
-
 __all__ = [
     "MissingStatsService",
-    "count_category_members",
-    "statics_by_category",
 ]

@@ -123,28 +123,6 @@ class InProcessService(CRUDService[InProcessRecord]):
         )
         return [{"user": row.user, "article_count": row.article_count} for row in results]
 
-
-_crud = InProcessService()
-list_in_process = _crud.list_in_process
-list_in_process_by_user = _crud.list_in_process_by_user
-list_in_process_by_lang = _crud.list_in_process_by_lang
-get_in_process = _crud.get_in_process
-get_in_process_by_title_user_lang = _crud.get_in_process_by_title_user_lang
-add_in_process = _crud.add_in_process
-update_in_process = _crud.update_in_process
-delete_in_process_by_title_user_lang = _crud.delete_in_process_by_title_user_lang
-is_in_process = _crud.is_in_process
-get_in_process_counts_by_user = _crud.get_in_process_counts_by_user
-
 __all__ = [
-    "list_in_process",
-    "list_in_process_by_user",
-    "list_in_process_by_lang",
-    "get_in_process",
-    "get_in_process_by_title_user_lang",
-    "add_in_process",
-    "update_in_process",
-    "delete_in_process_by_title_user_lang",
-    "is_in_process",
-    "get_in_process_counts_by_user",
+    "InProcessService",
 ]
