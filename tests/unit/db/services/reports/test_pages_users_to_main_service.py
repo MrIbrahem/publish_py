@@ -14,34 +14,36 @@ from src.main_app.db.services.reports.pages_users_to_main_service import (
 pytestmark = pytest.mark.unit
 
 
-def test_pages_users_to_main_workflow(sqlite_db):
-    from sqlalchemy import text
+class TestPagesUsersToMainService:
 
-    sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
-    sqlite_db.session.commit()
+    def test_pages_users_to_main_workflow(self, sqlite_db):
+        from sqlalchemy import text
 
-    # Test add
-    p = add_pages_users_to_main(id=1, new_target="Hépatite B", new_user="French_Editor", new_qid="Q181056")
-    assert p.id == 1
-    assert p.new_target == "Hépatite B"
+        sqlite_db.session.execute(text("INSERT INTO pages_users (id, title) VALUES (1, 'Hepatitis B')"))
+        sqlite_db.session.commit()
 
-    # Test get
-    p2 = get_pages_users_to_main(1)
-    assert p2 is not None
-    assert p2.new_target == "Hépatite B"
+        # Test add
+        p = add_pages_users_to_main(id=1, new_target="Hépatite B", new_user="French_Editor", new_qid="Q181056")
+        assert p.id == 1
+        assert p.new_target == "Hépatite B"
 
-    # Test list
-    all_p = list_pages_users_to_main()
-    assert any(x.id == 1 for x in all_p)
+        # Test get
+        p2 = get_pages_users_to_main(1)
+        assert p2 is not None
+        assert p2.new_target == "Hépatite B"
 
-    # Test update
-    updated = update_pages_users_to_main(1, new_target="Hépatite B (maladie)")
-    assert updated.new_target == "Hépatite B (maladie)"
+        # Test list
+        all_p = list_pages_users_to_main()
+        assert any(x.id == 1 for x in all_p)
 
-    # Test delete
-    deleted = PagesUsersToMainService().delete(1)
-    assert deleted is True
-    assert get_pages_users_to_main(1) is None
+        # Test update
+        updated = update_pages_users_to_main(1, new_target="Hépatite B (maladie)")
+        assert updated.new_target == "Hépatite B (maladie)"
+
+        # Test delete
+        deleted = PagesUsersToMainService().delete(1)
+        assert deleted is True
+        assert get_pages_users_to_main(1) is None
 
 
 class TestListPagesUsersToMain:
