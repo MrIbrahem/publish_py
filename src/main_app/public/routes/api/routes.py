@@ -473,28 +473,29 @@ class ApiRoutes:
             return jsonify({"error": "An internal error occurred"}), 500
         return jsonify(data)
 
-    def leaderboard_status(self) -> Response:
+    def leaderboard_status(self) -> tuple[Response, int] | Response:
         """
         Handle leaderboard API requests.
         /api/status?camp=Video&user_group=WIKI&year=2025&month=02&cat=RTTVideo
         """
         form: FormData = get_form(request.args)
-
-        data = self.leaderboard_service.get_leaderboard_chart_data(
-            camp=form.camp,
-            cat=form.cat,
-            user_group=form.user_group,
-            year=form.year,
-            month=form.month,
-            lang=form.lang,
-            user=form.user,
-        )
-
+        try:
+            data = self.leaderboard_service.get_leaderboard_chart_data(
+                camp=form.camp,
+                cat=form.cat,
+                user_group=form.user_group,
+                year=form.year,
+                month=form.month,
+                lang=form.lang,
+                user=form.user,
+            )
+        except Exception:
+            logger.exception("Error fetching leaderboard status data")
+            return jsonify({"error": "An internal error occurred"}), 500
         response_data = {
             "results": data,
             "count": len(data),
         }
-
         return jsonify(response_data)
 
 
