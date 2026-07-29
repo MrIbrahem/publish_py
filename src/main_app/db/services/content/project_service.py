@@ -84,20 +84,6 @@ class ProjectService(CRUDService[ProjectRecord]):
         except ValueError as exc:
             raise ValueError(f"Project record with ID {project_id} not found") from exc
 
-
-_crud = ProjectService()
-list_projects = _crud.list_projects
-get_project = _crud.get_project
-get_project_by_title = _crud.get_project_by_title
-add_project = _crud.add_project
-update_project = _crud.update_project
-update_project_title = _crud.update_project_title
-
 __all__ = [
-    "list_projects",
-    "get_project",
-    "get_project_by_title",
-    "add_project",
-    "update_project",
-    "update_project_title",
+    "ProjectService",
 ]

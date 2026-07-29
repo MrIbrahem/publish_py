@@ -87,20 +87,6 @@ class LanguageSettingService(CRUDService[LanguageSettingRecord]):
         """Update a language setting record."""
         return self.update_or_404(setting_id, **kwargs)
 
-
-_crud = LanguageSettingService()
-list_language_settings = _crud.list_language_settings
-get_language_setting = _crud.get_language_setting
-get_language_setting_by_code = _crud.get_language_setting_by_code
-add_language_setting = _crud.add_language_setting
-add_or_update_language_setting = _crud.add_or_update_language_setting
-update_language_setting = _crud.update_language_setting
-
 __all__ = [
-    "list_language_settings",
-    "get_language_setting",
-    "get_language_setting_by_code",
-    "add_language_setting",
-    "add_or_update_language_setting",
-    "update_language_setting",
+    "LanguageSettingService",
 ]

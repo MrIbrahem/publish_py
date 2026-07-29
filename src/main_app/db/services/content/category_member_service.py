@@ -103,20 +103,6 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
             self.session.rollback()
             raise
 
-
-_crud = CategoryMemberService()
-get_all_category_members = _crud.get_all_category_members
-list_distinct_article_ids = _crud.list_distinct_article_ids
-count_by_category = _crud.count_by_category
-get_members_by_category = _crud.get_members_by_category
-add_category_member = _crud.add_category_member
-batch_sync_category_members = _crud.batch_sync_category_members
-
 __all__ = [
-    "get_all_category_members",
-    "list_distinct_article_ids",
-    "count_by_category",
-    "get_members_by_category",
-    "add_category_member",
-    "batch_sync_category_members",
+    "CategoryMemberService",
 ]

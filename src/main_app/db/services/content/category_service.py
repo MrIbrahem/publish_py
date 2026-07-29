@@ -118,18 +118,6 @@ class CategoryService(CRUDService[CategoryRecord]):
         }
         return camp_to_cats
 
-
-_crud = CategoryService()
-add_category = _crud.add_category
-update_category = _crud.update_category
-get_campaign_category = _crud.get_campaign_category
-list_categories = _crud.list_categories
-get_camp_to_cats = _crud.get_camp_to_cats
-
 __all__ = [
-    "add_category",
-    "update_category",
-    "get_campaign_category",
-    "list_categories",
-    "get_camp_to_cats",
+    "CategoryService",
 ]
