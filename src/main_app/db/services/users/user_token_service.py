@@ -130,17 +130,6 @@ class UserTokenService(CRUDService[UserTokenRecord]):
     def get_user_token_by_username(self, username: str) -> UserTokenRecord | None:
         return _get_user_token_by_username(username, self.session)
 
-
-_crud = UserTokenService()
-
-get_authenticated_user_token = _crud.get_authenticated_user_token
-get_user_token = _crud.get_user_token
-upsert_user_token = _crud.upsert_user_token
-create_user_token = _crud.create_user_token
-
-
 __all__ = [
     "UserTokenService",
-    "upsert_user_token",
-    "get_user_token",
 ]

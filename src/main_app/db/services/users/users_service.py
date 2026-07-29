@@ -113,29 +113,6 @@ class UsersService(CRUDService[UserRecord]):
         record = self.get_user_by_username(username)
         return record is not None
 
-
-_crud = UsersService()
-
-list_users = _crud.list_users
-list_users_by_group = _crud.list_users_by_group
-get_user = _crud.get_user
-get_user_by_username = _crud.get_user_by_username
-create_user = _crud.create_user
-update_user = _crud.update_user
-update_user_data = _crud.update_user_data
-user_exists = _crud.user_exists
-users_search = _crud.users_search
-
-
 __all__ = [
     "UsersService",
-    "list_users",
-    "list_users_by_group",
-    "get_user",
-    "get_user_by_username",
-    "create_user",
-    "update_user",
-    "update_user_data",
-    "user_exists",
-    "users_search",
 ]

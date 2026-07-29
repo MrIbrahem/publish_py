@@ -82,25 +82,6 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
         record = self.get_full_translator_by_user(user)
         return record is not None and record.is_active == 1
 
-
-_crud = FullTranslatorService()
-
-list_full_translators = _crud.list_full_translators
-list_active_full_translators = _crud.list_active_full_translators
-get_full_translator = _crud.get_full_translator
-get_full_translator_by_user = _crud.get_full_translator_by_user
-add_full_translator = _crud.add_full_translator
-add_or_update_full_translator = _crud.add_or_update_full_translator
-update_full_translator = _crud.update_full_translator
-is_full_translator = _crud.is_full_translator
-
 __all__ = [
-    "list_full_translators",
-    "list_active_full_translators",
-    "get_full_translator",
-    "get_full_translator_by_user",
-    "add_full_translator",
-    "add_or_update_full_translator",
-    "update_full_translator",
-    "is_full_translator",
+    "FullTranslatorService",
 ]
