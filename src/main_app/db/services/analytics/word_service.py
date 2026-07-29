@@ -82,22 +82,6 @@ class WordService(CRUDService[WordRecord]):
             return record.w_lead_words, record.w_all_words
         return None, None
 
-
-_crud = WordService()
-list_words = _crud.list_words
-get_word = _crud.get_word
-get_word_by_title = _crud.get_word_by_title
-add_word = _crud.add_word
-add_or_update_word = _crud.add_or_update_word
-update_word = _crud.update_word
-get_word_counts_for_title = _crud.get_word_counts_for_title
-
 __all__ = [
-    "list_words",
-    "get_word",
-    "get_word_by_title",
-    "add_word",
-    "add_or_update_word",
-    "update_word",
-    "get_word_counts_for_title",
+    "WordService",
 ]

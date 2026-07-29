@@ -86,22 +86,6 @@ class RefsCountService(CRUDService[RefsCountRecord]):
             return record.r_lead_refs, record.r_all_refs
         return None, None
 
-
-_crud = RefsCountService()
-list_refs_counts = _crud.list_refs_counts
-get_refs_count = _crud.get_refs_count
-get_refs_count_by_title = _crud.get_refs_count_by_title
-add_refs_count = _crud.add_refs_count
-add_or_update_refs_count = _crud.add_or_update_refs_count
-update_refs_count = _crud.update_refs_count
-get_ref_counts_for_title = _crud.get_ref_counts_for_title
-
 __all__ = [
-    "list_refs_counts",
-    "get_refs_count",
-    "get_refs_count_by_title",
-    "add_refs_count",
-    "add_or_update_refs_count",
-    "update_refs_count",
-    "get_ref_counts_for_title",
+    "RefsCountService",
 ]

@@ -118,26 +118,6 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
         records = self.list_views_by_target(target, lang)
         return sum(r.views or 0 for r in records)
 
-
-_crud = ViewsNewService()
-list_views_new = _crud.list_views_new
-list_views_by_target = _crud.list_views_by_target
-list_views_by_lang = _crud.list_views_by_lang
-get_views_new = _crud.get_views_new
-get_views_by_target_lang_year = _crud.get_views_by_target_lang_year
-add_views_new = _crud.add_views_new
-add_or_update_views_new = _crud.add_or_update_views_new
-update_views_new = _crud.update_views_new
-get_total_views_for_target = _crud.get_total_views_for_target
-
 __all__ = [
-    "list_views_new",
-    "list_views_by_target",
-    "list_views_by_lang",
-    "get_views_new",
-    "get_views_by_target_lang_year",
-    "add_views_new",
-    "add_or_update_views_new",
-    "update_views_new",
-    "get_total_views_for_target",
+    "ViewsNewService",
 ]
