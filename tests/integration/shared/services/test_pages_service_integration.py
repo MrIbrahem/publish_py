@@ -16,7 +16,7 @@ The actual DB operations are mocked to avoid requiring a real database.
 These tests complement the unit tests by verifying the service-to-DB integration.
 """
 
-from src.main_app.db.services.pages.page_service import (
+from src.main_app.db.services.pages_tables.page_service import (
     PagesService,
 )
 
@@ -36,6 +36,7 @@ class TestPagesServiceIntegration:
         assert pages[0].title == "TestPage"
 
         result = page_service.update_page(result.id, "UpdatedPage", "UpdatedFile")
+        assert result is not None
         assert result.title == "UpdatedPage"
 
         deleted = page_service.delete(result.id)
