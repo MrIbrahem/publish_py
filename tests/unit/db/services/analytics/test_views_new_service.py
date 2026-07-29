@@ -53,7 +53,7 @@ class TestViewsNewService(TestSetup):
         assert v4.views == 1700000
 
         # Test delete
-        deleted = self.service.delete_views_new(v.id)
+        deleted = self.service.delete(v.id)
         assert deleted is True
         assert self.service.get_views_new(v.id) is None
 
@@ -187,7 +187,7 @@ class TestDeleteViewsNew(TestSetup):
         assert self.service.get_views_new(v.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert self.service.delete_views_new(9999) is False
+        assert self.service.delete(9999) is False
 
 
 class TestGetTotalViewsForTarget(TestSetup):

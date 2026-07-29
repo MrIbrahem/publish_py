@@ -11,7 +11,7 @@ from .pages_shared_service import BasePagesService
 
 from ....extensions import db
 from ...models import PageRecord
-from ..analytics.word_service import get_word_counts_for_title
+from ..analytics import WordService
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,7 @@ ModelT = PageRecord
 
 class PagesService(BasePagesService):
     def __init__(self):
+        self.word_service = WordService()
         super().__init__(PageRecord, db.session)
 
     def add_translate_row_to_db(
@@ -41,7 +42,7 @@ class PagesService(BasePagesService):
         cat = cat or "RTT"
 
         if word == 0:
-            lead_words, all_words = get_word_counts_for_title(title)
+            lead_words, all_words = self.word_service.get_word_counts_for_title(title)
             if translate_type == "all":
                 word = all_words or 0
             else:

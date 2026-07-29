@@ -48,7 +48,7 @@ class TestWordService(TestSetup):
         assert w4.w_lead_words == 700
 
         # Test delete
-        deleted = self.service.delete_word(w.w_id)
+        deleted = self.service.delete(w.w_id)
         assert deleted is True
         assert self.service.get_word(w.w_id) is None
 
@@ -153,12 +153,12 @@ class TestDeleteWord(TestSetup):
     def test_delegates_to_store_delete(self, monkeypatch):
         """Test that method deletes the record."""
         w = self.service.add_word("T-cell")
-        deleted = self.service.delete_word(w.w_id)
+        deleted = self.service.delete(w.w_id)
         assert deleted is True
         assert self.service.get_word(w.w_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert self.service.delete_word(9999) is False
+        assert self.service.delete(9999) is False
 
 
 class TestGetWordCountsForTitle(TestSetup):

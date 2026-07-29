@@ -47,7 +47,7 @@ class TestEnwikiPageviewService(TestSetup):
         assert p4.en_views == 10000
 
         # Test delete
-        deleted = self.service.delete_enwiki_pageview(p.id)
+        deleted = self.service.delete(p.id)
         assert deleted is True
         assert self.service.get_enwiki_pageview(p.id) is None
 
@@ -162,9 +162,9 @@ class TestDeleteEnwikiPageview(TestSetup):
     def test_delegates_to_store(self, monkeypatch):
         """Test that method deletes the record."""
         p = self.service.add_enwiki_pageview("Pathology")
-        deleted = self.service.delete_enwiki_pageview(p.id)
+        deleted = self.service.delete(p.id)
         assert deleted is True
         assert self.service.get_enwiki_pageview(p.id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert self.service.delete_enwiki_pageview(9999) is False
+        assert self.service.delete(9999) is False

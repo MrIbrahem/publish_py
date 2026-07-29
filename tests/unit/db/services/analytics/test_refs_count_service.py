@@ -48,7 +48,7 @@ class TestRefsCountService(TestSetup):
         assert r4.r_lead_refs == 25
 
         # Test delete
-        deleted = self.service.delete_refs_count(r.r_id)
+        deleted = self.service.delete(r.r_id)
         assert deleted is True
         assert self.service.get_refs_count(r.r_id) is None
 
@@ -154,7 +154,7 @@ class TestDeleteRefsCount(TestSetup):
         assert self.service.get_refs_count(r.r_id) is None
 
     def test_raises_error_if_not_found(self, monkeypatch):
-        assert self.service.delete_refs_count(9999) is False
+        assert self.service.delete(9999) is False
 
 
 class TestGetRefsCountsForTitle(TestSetup):
