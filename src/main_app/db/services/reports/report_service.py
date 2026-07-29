@@ -118,15 +118,6 @@ class ReportService(CRUDService[ReportRecord]):
 
         return orm_objs
 
-
-_crud = ReportService()
-list_reports = _crud.list_reports
-add_report = _crud.add_report
-query_reports_with_filters = _crud.query_reports_with_filters
-
-
 __all__ = [
-    "list_reports",
-    "add_report",
-    "query_reports_with_filters",
+    "ReportService",
 ]
