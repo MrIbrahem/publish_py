@@ -141,13 +141,12 @@ def _retry_with_fallback_user(
 
     # Retry with fallback user credentials
     token_service = UserTokenService()
-    fallback_token = token_service.get_user_token_by_username(user)
+    fallback_token = token_service.get_user_token_by_username(fallback_user)
 
     if fallback_token is None:
         return {}
 
     fallback_access_key, fallback_access_secret = fallback_token.decrypted()
-
     link_result = link_to_wikidata(
         sourcetitle,
         lang,
@@ -161,7 +160,6 @@ def _retry_with_fallback_user(
         link_result["fallback_user"] = fallback_user
         link_result["original_user"] = user
         logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
-
     return link_result
 
 
