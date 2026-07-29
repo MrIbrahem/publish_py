@@ -21,7 +21,8 @@ ModelT = TypeVar("ModelT", bound=UserPageRecord | PageRecord)
 
 
 class BasePagesService(CRUDService[ModelT]):
-    """Generic service class for managing pages_users/pages records.
+    """
+    Generic service class for managing pages_users/pages records.
 
     Subclasses (or direct instances) are bound to a specific ORM
     model, e.g.::

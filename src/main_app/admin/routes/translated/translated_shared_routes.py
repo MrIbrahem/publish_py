@@ -1,19 +1,16 @@
-"""Admin routes for translated user pages (``pages_users`` table).
-
-The 2 files following is the same, but:
-- translated_users.py targets ``pages_users`` table.
-- translated.py targets ``pages`` table.
+"""
+Admin shared routes for translated pages from (``pages``/``pages_users`` table).
 """
 
 from __future__ import annotations
 
 import logging
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ...db.services import LangService, UserPagesService
-from ...extensions import db
+from ....db.services import LangService, PagesService, UserPagesService
+from ....extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -25,19 +22,42 @@ def _safe_int(value: str | None, default: int) -> int:
         return default
 
 
-class TranslatedUsersRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self.service = UserPagesService()
-        self.lang_service = LangService()
-        self.endpoint_name = "translated_users"
-        self.table_label = "User"
-        self._setup_routes()
+class SharedTranslatedRoutes:
+    """
+    Generic service class for pages_users/pages routes.
 
-    def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.index)
-        self.bp.route("/edit", methods=["GET"])(self.edit)
-        self.bp.route("/edit", methods=["POST"])(self.edit_post)
+    usage, e.g.::
+        class TranslatedUsersRoutes(SharedTranslatedRoutes):
+            def __init__(self, bp: Blueprint) -> None:
+                self.bp = bp
+                super().__init__(
+                    service_name="pages_users",
+                    endpoint_name="translated_users",
+                    table_label="User",
+                )
+                self._setup_routes()
+
+        class TranslatedRoutes(SharedTranslatedRoutes):
+            def __init__(self, bp: Blueprint) -> None:
+                self.bp = bp
+                super().__init__(
+                    service_name="pages",
+                    endpoint_name="translated",
+                    table_label="Main",
+                )
+                self._setup_routes()
+
+    """
+
+    def __init__(self, service_name: str, endpoint_name: str, table_label: str) -> None:
+        if service_name == "pages":
+            self.service = PagesService()
+        elif service_name == "pages_users":
+            self.service = UserPagesService()
+
+        self.lang_service = LangService()
+        self.endpoint_name = endpoint_name
+        self.table_label = table_label
 
     def index(self) -> str:
         """List translated pages with pagination."""
@@ -133,5 +153,5 @@ class TranslatedUsersRoutes:
 
 
 __all__ = [
-    "TranslatedUsersRoutes",
+    "SharedTranslatedRoutes",
 ]

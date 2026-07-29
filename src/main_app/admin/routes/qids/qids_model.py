@@ -49,7 +49,7 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
     return True
 
 
-class QidsModel:
+class QidsSharedModel:
     def __init__(
         self,
         endpoint: str,
@@ -221,3 +221,8 @@ class QidsModel:
         flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
 
         return edit_redirect_to
+
+
+__all__ = [
+    "QidsSharedModel",
+]

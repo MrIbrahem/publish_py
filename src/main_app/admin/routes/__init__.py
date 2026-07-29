@@ -15,8 +15,8 @@ from .qids.qids import QidsRoutes
 from .qids.qids_others import QidsOthersRoutes
 from .settings import SettingsRoutes
 from .stat import StaticsRoutes
-from .translated import TranslatedRoutes
-from .translated_users import TranslatedUsersRoutes
+from .translated.translated_main import TranslatedRoutes
+from .translated.translated_users import TranslatedUsersRoutes
 from .tt import TranslateTypeRoutes
 from .users_emails import UsersEmails
 from .users_no_inprocess import UsersNoInprocess
