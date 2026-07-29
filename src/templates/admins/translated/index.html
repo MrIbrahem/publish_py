@@ -67,7 +67,7 @@
         </div>
     </div>
     <div class="card-body">
-        <table class="table table-sm table-striped table_responsive table_text_left" id="pages_table"
+        <table class="table table-sm table-striped table_text_left" id="pages_table"
             style="font-size:90%;">
             <thead>
                 <tr>
@@ -140,6 +140,11 @@
                 [50, 100, 150],
                 [50, 100, 150]
             ],
+            searching: false,
+            responsive: {
+                details: true
+                // display: $.fn.dataTable.Responsive.display.modal()
+            }
             // scrollY: 800
         });
     });
