@@ -73,7 +73,7 @@ def get_page_data(last_table: str, id: int) -> dict[str, str | Any]:
         page_record = pages_service.get_page_by_id(id)
     else:
         user_pages_service = UserPagesService()
-        page_record = user_pages_service.get_user_page_by_id(id)
+        page_record = user_pages_service.get_page_by_id(id)
     # user=row.user, lang=row.lang, target=row.target, date=row.pupdate, title=row.title
     page_data = page_record.to_dict() if page_record else {}
     target = page_data.get("target")

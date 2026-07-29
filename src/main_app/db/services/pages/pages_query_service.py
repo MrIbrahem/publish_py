@@ -7,8 +7,13 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ...extensions import db
-from ..models import CategoryRecord, PageRecord, UserPageRecord, ViewsNewAllRecord
+from ....extensions import db
+from ...models import (
+    CategoryRecord,
+    PageRecord,
+    UserPageRecord,
+    ViewsNewAllRecord,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -93,12 +98,6 @@ class PagesQueryService:
         ]
 
 
-_crud = PagesQueryService()
-list_pages_users = _crud.list_pages_users
-list_pages_with_views = _crud.list_pages_with_views
-
 __all__ = [
     "PagesQueryService",
-    "list_pages_users",
-    "list_pages_with_views",
 ]

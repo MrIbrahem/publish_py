@@ -49,7 +49,7 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
     return True
 
 
-class QidsModel:
+class QidsSharedModel:
     def __init__(
         self,
         endpoint: str,
@@ -169,7 +169,7 @@ class QidsModel:
             return edit_redirect_to
 
         try:
-            ok = self.service.update(qid_id, title, qid)
+            ok = self.service.update_qid(qid_id, title, qid)
         except Exception:
             logger.exception("Failed to save row id=%r title=%r qid=%r", qid_id, title, qid)
             ok = False
@@ -221,3 +221,8 @@ class QidsModel:
         flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
 
         return edit_redirect_to
+
+
+__all__ = [
+    "QidsSharedModel",
+]

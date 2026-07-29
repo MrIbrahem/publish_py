@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def get_record_by_title(title: str) -> QidRecord | None:
     """Retrieve the record for a given page title."""
-    return QidService().get_record_by_title(title=title)  # type: ignore
+    return QidService().get_by_title(title=title)  # type: ignore
 
 
 def get_qid_for_mdtitle(title: str) -> str | None:

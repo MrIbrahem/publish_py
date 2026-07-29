@@ -11,12 +11,12 @@ import logging
 from flask import Blueprint
 
 from ....db.services import QidOthersService
-from .qids_model import QidsModel
+from .qids_model import QidsSharedModel
 
 logger = logging.getLogger(__name__)
 
 
-class QidsOthersRoutes(QidsModel):
+class QidsOthersRoutes(QidsSharedModel):
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
         super().__init__(

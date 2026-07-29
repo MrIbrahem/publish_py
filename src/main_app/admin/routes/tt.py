@@ -24,6 +24,7 @@ class TranslateTypeRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
         self.translate_type_service = TranslateTypeService()
+        self.category_service = CategoryService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -43,8 +44,7 @@ class TranslateTypeRoutes:
         except Exception:
             logger.exception("Failed to load translate_type rows for cat=%r", cat)
 
-        category_service = CategoryService()
-        categories = category_service.list_categories()
+        categories = self.category_service.list_categories()
 
         return render_template(
             "admins/tt/index.html",

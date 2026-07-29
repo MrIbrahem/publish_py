@@ -19,18 +19,18 @@ from .content import (
     LangService,
     ProjectService,
 )
+from .pages_tables import (
+    PagesService,
+    UserPagesService,
+)
 from .pages import (
     InProcessService,
     LeaderboardService,
     MissingStatsService,
-    PagesService,
+    PagesQueryService,
     PagesUsersToMainPagesService,
     Results2026Service,
     TranslateTypeService,
-    UserPagesService,
-)
-from .pages_query_service import (
-    PagesQueryService,
 )
 from .reports import (
     PagesUsersToMainService,
