@@ -118,6 +118,7 @@ class ReportService(CRUDService[ReportRecord]):
 
         return orm_objs
 
+
 __all__ = [
     "ReportService",
 ]

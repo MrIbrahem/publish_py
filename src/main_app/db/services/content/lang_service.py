@@ -80,6 +80,7 @@ class LangService(CRUDService[LangRecord]):
         )
         return instance
 
+
 __all__ = [
     "LangService",
 ]

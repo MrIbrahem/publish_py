@@ -95,6 +95,7 @@ class AdminService(CRUDService[AdminUserRecord]):
     def delete_coordinator(self, coordinator_id: int) -> bool:
         return self.delete(coordinator_id)
 
+
 __all__ = [
     "AdminService",
 ]

@@ -123,6 +123,7 @@ class InProcessService(CRUDService[InProcessRecord]):
         )
         return [{"user": row.user, "article_count": row.article_count} for row in results]
 
+
 __all__ = [
     "InProcessService",
 ]

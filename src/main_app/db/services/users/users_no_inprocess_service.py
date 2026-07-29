@@ -82,6 +82,7 @@ class UsersNoInprocessService(CRUDService[UsersNoInprocessRecord]):
         record = self.get_users_no_inprocess_by_user(user)
         return record is not None and record.is_active == 1
 
+
 __all__ = [
     "UsersNoInprocessService",
 ]

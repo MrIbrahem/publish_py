@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 ServiceRecord = QidRecord | QidOthersRecord
 
+
 def validate_or_raise(title: str, qid: str) -> None:
     # Validate that required fields are not empty
     if not title or not title.strip():

@@ -82,6 +82,7 @@ class WordService(CRUDService[WordRecord]):
             return record.w_lead_words, record.w_all_words
         return None, None
 
+
 __all__ = [
     "WordService",
 ]

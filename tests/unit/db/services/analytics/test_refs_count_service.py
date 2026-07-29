@@ -149,7 +149,7 @@ class TestDeleteRefsCount(TestSetup):
     def test_delegates_to_store(self, monkeypatch):
         """Test that method deletes the record."""
         r = self.service.add_refs_count("Diazepam")
-        deleted = self.service.delete_refs_count(r.r_id)
+        deleted = self.service.delete(r.r_id)
         assert deleted is True
         assert self.service.get_refs_count(r.r_id) is None
 

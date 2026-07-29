@@ -104,6 +104,7 @@ class Results2026Service:
         rows = self.session.execute(_EXISTS_SQL, {"lang": lang, "cat": cat}).fetchall()
         return _rows_to_dicts(rows)
 
+
 __all__ = [
     "Results2026Service",
 ]

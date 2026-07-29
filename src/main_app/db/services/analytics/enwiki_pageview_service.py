@@ -72,6 +72,7 @@ class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
         """Update an enwiki pageview record."""
         return self.update_or_404(pageview_id, **kwargs)
 
+
 __all__ = [
     "EnwikiPageviewService",
 ]

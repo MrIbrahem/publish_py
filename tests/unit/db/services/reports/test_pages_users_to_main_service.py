@@ -23,7 +23,9 @@ class TestPagesUsersToMainService(TestSetup):
         sqlite_db.session.commit()
 
         # Test add
-        p = self.service.add_pages_users_to_main(id=1, new_target="Hépatite B", new_user="French_Editor", new_qid="Q181056")
+        p = self.service.add_pages_users_to_main(
+            id=1, new_target="Hépatite B", new_user="French_Editor", new_qid="Q181056"
+        )
         assert p.id == 1
         assert p.new_target == "Hépatite B"
 

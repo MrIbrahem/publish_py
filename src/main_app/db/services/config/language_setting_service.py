@@ -87,6 +87,7 @@ class LanguageSettingService(CRUDService[LanguageSettingRecord]):
         """Update a language setting record."""
         return self.update_or_404(setting_id, **kwargs)
 
+
 __all__ = [
     "LanguageSettingService",
 ]

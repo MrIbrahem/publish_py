@@ -5,17 +5,18 @@ SQLAlchemy-based service for managing pages and page targets.
 from __future__ import annotations
 
 import logging
-from sqlalchemy import func, or_
 
-from .pages_shared_service import BasePagesService
+from sqlalchemy import func, or_
 
 from ....extensions import db
 from ...models import PageRecord
 from ..analytics import WordService
+from .pages_shared_service import BasePagesService
 
 logger = logging.getLogger(__name__)
 
 ModelT = PageRecord
+
 
 class PagesService(BasePagesService):
     def __init__(self):

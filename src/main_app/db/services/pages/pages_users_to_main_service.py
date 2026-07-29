@@ -126,6 +126,7 @@ class PagesUsersToMainPagesService(CRUDService[PagesUsersToMainRecord]):
         in_to_main = self.session.get(PagesUsersToMainRecord, page_id)
         return in_users is None and in_to_main is None
 
+
 __all__ = [
     "PagesUsersToMainPagesService",
 ]

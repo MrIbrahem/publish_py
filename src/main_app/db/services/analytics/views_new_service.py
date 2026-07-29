@@ -118,6 +118,7 @@ class ViewsNewService(CRUDService[ViewsNewRecord]):
         records = self.list_views_by_target(target, lang)
         return sum(r.views or 0 for r in records)
 
+
 __all__ = [
     "ViewsNewService",
 ]

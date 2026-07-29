@@ -72,6 +72,7 @@ class AssessmentService(CRUDService[AssessmentRecord]):
         """Delete an assessment record."""
         return self.delete(assessment_id)
 
+
 __all__ = [
     "AssessmentService",
 ]

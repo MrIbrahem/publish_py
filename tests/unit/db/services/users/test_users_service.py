@@ -94,7 +94,9 @@ class TestAddUser(TestSetup):
 
     def test_delegates_to_store(self, monkeypatch):
         """Test that method adds and returns record."""
-        record = self.service.create_user("New_Researcher", email="research@wiki.org", wiki="enwiki", user_group="Researcher")
+        record = self.service.create_user(
+            "New_Researcher", email="research@wiki.org", wiki="enwiki", user_group="Researcher"
+        )
         assert record.username == "New_Researcher"
         assert record.email == "research@wiki.org"
 
@@ -104,7 +106,7 @@ class TestAddUser(TestSetup):
         with patch.object(
             sqlite_db.session,
             "commit",
-            side_effect=IntegrityError(None, None, None), # pyright: ignore[reportArgumentType]
+            side_effect=IntegrityError(None, None, None),  # pyright: ignore[reportArgumentType]
         ):
             with pytest.raises(ValueError, match="already exists"):
                 self.service.create_user("Duplicate")

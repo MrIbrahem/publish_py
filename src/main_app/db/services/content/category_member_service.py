@@ -103,6 +103,7 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
             self.session.rollback()
             raise
 
+
 __all__ = [
     "CategoryMemberService",
 ]

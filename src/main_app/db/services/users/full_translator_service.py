@@ -82,6 +82,7 @@ class FullTranslatorService(CRUDService[FullTranslatorRecord]):
         record = self.get_full_translator_by_user(user)
         return record is not None and record.is_active == 1
 
+
 __all__ = [
     "FullTranslatorService",
 ]

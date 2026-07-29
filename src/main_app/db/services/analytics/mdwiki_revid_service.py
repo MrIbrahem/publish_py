@@ -76,6 +76,7 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
         record = self.get_mdwiki_revid_by_title(title)
         return record.revid if record else None
 
+
 __all__ = [
     "MdwikiRevidService",
 ]

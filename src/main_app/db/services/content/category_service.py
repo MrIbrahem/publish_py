@@ -118,6 +118,7 @@ class CategoryService(CRUDService[CategoryRecord]):
         }
         return camp_to_cats
 
+
 __all__ = [
     "CategoryService",
 ]

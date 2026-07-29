@@ -283,6 +283,7 @@ class LeaderboardService:
         }
         return chart_data
 
+
 __all__ = [
     "LeaderboardService",
 ]

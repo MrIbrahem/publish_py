@@ -84,6 +84,7 @@ class ProjectService(CRUDService[ProjectRecord]):
         except ValueError as exc:
             raise ValueError(f"Project record with ID {project_id} not found") from exc
 
+
 __all__ = [
     "ProjectService",
 ]

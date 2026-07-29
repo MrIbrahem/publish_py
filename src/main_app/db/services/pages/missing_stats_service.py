@@ -74,6 +74,7 @@ class MissingStatsService:
         rows = db.session.execute(_STATS_BY_CATEGORY_SQL, {"cat": cat}).fetchall()
         return [dict(row._mapping) for row in rows]
 
+
 __all__ = [
     "MissingStatsService",
 ]

@@ -54,6 +54,7 @@ class PagesUsersToMainService(CRUDService[PagesUsersToMainRecord]):
         """Update a pages_users_to_main record."""
         return self.update_or_404(record_id, **kwargs)
 
+
 __all__ = [
     "PagesUsersToMainService",
 ]

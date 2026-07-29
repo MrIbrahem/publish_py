@@ -127,6 +127,7 @@ class TranslateTypeService(CRUDService[TranslateTypeRecord]):
         record = self.get_translate_type_by_title(title)
         return record.tt_full == 1 if record else False
 
+
 __all__ = [
     "TranslateTypeService",
 ]

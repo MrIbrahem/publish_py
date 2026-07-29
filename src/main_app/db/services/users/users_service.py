@@ -113,6 +113,7 @@ class UsersService(CRUDService[UserRecord]):
         record = self.get_user_by_username(username)
         return record is not None
 
+
 __all__ = [
     "UsersService",
 ]

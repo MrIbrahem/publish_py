@@ -147,6 +147,7 @@ class SettingsService(CRUDService[SettingRecord]):
 
         return self.delete_record(record)
 
+
 __all__ = [
     "SettingsService",
 ]

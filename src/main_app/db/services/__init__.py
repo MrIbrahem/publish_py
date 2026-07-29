@@ -19,10 +19,6 @@ from .content import (
     LangService,
     ProjectService,
 )
-from .pages_tables import (
-    PagesService,
-    UserPagesService,
-)
 from .pages import (
     InProcessService,
     LeaderboardService,
@@ -31,6 +27,10 @@ from .pages import (
     PagesUsersToMainPagesService,
     Results2026Service,
     TranslateTypeService,
+)
+from .pages_tables import (
+    PagesService,
+    UserPagesService,
 )
 from .reports import (
     PagesUsersToMainService,

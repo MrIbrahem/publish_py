@@ -6,16 +6,17 @@ from __future__ import annotations
 
 import logging
 
-from .pages_shared_service import BasePagesService
-
 from ....extensions import db
 from ...models import UserPageRecord
+from .pages_shared_service import BasePagesService
 
 logger = logging.getLogger(__name__)
+
 
 class UserPagesService(BasePagesService):
     def __init__(self) -> None:
         super().__init__(UserPageRecord, db.session)
+
 
 __all__ = [
     "UserPagesService",

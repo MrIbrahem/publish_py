@@ -86,6 +86,7 @@ class RefsCountService(CRUDService[RefsCountRecord]):
             return record.r_lead_refs, record.r_all_refs
         return None, None
 
+
 __all__ = [
     "RefsCountService",
 ]

@@ -182,7 +182,7 @@ class TestDeleteViewsNew(TestSetup):
     def test_delegates_to_store(self, monkeypatch):
         """Test that method deletes the record."""
         v = self.service.add_views_new("Asthma", "en", 2023)
-        deleted = self.service.delete_views_new(v.id)
+        deleted = self.service.delete(v.id)
         assert deleted is True
         assert self.service.get_views_new(v.id) is None
 

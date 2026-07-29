@@ -125,7 +125,7 @@ class TestUpdateSetting(TestSetup):
 
         self.service.update(setting_record, value_type="integer")
 
-        result = self.service.update_setting(setting_record.key, 99, value_type=None) # type: ignore
+        result = self.service.update_setting(setting_record.key, 99, value_type=None)  # type: ignore
         assert result is not False
         assert setting_record.value == "99"
 
