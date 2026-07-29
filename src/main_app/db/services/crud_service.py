@@ -57,9 +57,14 @@ class CRUDService[ModelT]:
             logger.error("Error getting %s by filters: %s", self.model_name, exc)
             return None
 
-    def list_all(self) -> list[ModelT]:
+    def list_all(self, order_by: Iterable[Any] | None = None,) -> list[ModelT]:
         try:
-            return self.session.query(self.model).all()
+            stmt = self.session.query(self.model)
+
+            if order_by:
+                stmt = stmt.order_by(*order_by)
+
+            return list(stmt.all())
         except Exception as exc:
             logger.error("Error listing %s records: %s", self.model_name, exc)
             return []

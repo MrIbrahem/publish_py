@@ -23,11 +23,7 @@ class ProjectService(CRUDService[ProjectRecord]):
 
     def list_projects(self) -> list[ProjectRecord]:
         """Return all project records."""
-        return list(
-            self.list(
-                order_by=[ProjectRecord.g_title.asc()],
-            )
-        )
+        return self.list_all(order_by=[ProjectRecord.g_title.asc()])
 
     def get_project(self, project_id: int) -> ProjectRecord | None:
         """Get a project record by ID."""

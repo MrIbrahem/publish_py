@@ -34,10 +34,43 @@ class CampaignsDashboard:
         self.bp.post("/update")(admin_required(self.update))
 
     def dashboard(self):
-        return self._campaigns_dashboard()
+        """Render the campaigns management dashboard."""
+
+        campaigns = self.category_service.list_categories()
+
+        return render_template(
+            "admins/campaigns.html",
+            campaigns=campaigns,
+        )
 
     def add_record(self) -> ResponseReturnValue:
-        return self._add_campaign_and_category()
+        """Create a new category record."""
+        category = request.form.get("category", "").strip()
+        campaign = request.form.get("campaign", "").strip()
+        if not category:
+            flash("Category is required.", "danger")
+            return redirect(url_for("admin.campaigns.dashboard"))
+
+        if not campaign:
+            flash("Campaign is required.", "danger")
+            return redirect(url_for("admin.campaigns.dashboard"))
+
+        try:
+
+            self.category_service.add_category(
+                category=category,
+                campaign=campaign,
+            )
+        except ValueError as exc:
+            logger.exception("Unable to add category")
+            flash(str(exc), "warning")
+        except Exception:
+            logger.exception("Unable to add category.")
+            flash("Unable to add category. Please try again.", "danger")
+        else:
+            flash(f"category for '{category}' added.", "success")
+
+        return redirect(url_for("admin.campaigns.dashboard"))
 
     def update(self) -> ResponseReturnValue:
         default_cat = request.form.get("default_cat")
@@ -74,44 +107,6 @@ class CampaignsDashboard:
 
         return redirect(url_for("admin.campaigns.dashboard"))
 
-    def _campaigns_dashboard(self):
-        """Render the campaigns management dashboard."""
-
-        campaigns = self.category_service.list_categories()
-
-        return render_template(
-            "admins/campaigns.html",
-            campaigns=campaigns,
-        )
-
-    def _add_campaign_and_category(self) -> ResponseReturnValue:
-        """Create a new category record."""
-        category = request.form.get("category", "").strip()
-        campaign = request.form.get("campaign", "").strip()
-        if not category:
-            flash("Category is required.", "danger")
-            return redirect(url_for("admin.campaigns.dashboard"))
-
-        if not campaign:
-            flash("Campaign is required.", "danger")
-            return redirect(url_for("admin.campaigns.dashboard"))
-
-        try:
-
-            self.category_service.add_category(
-                category=category,
-                campaign=campaign,
-            )
-        except ValueError as exc:
-            logger.exception("Unable to add category")
-            flash(str(exc), "warning")
-        except Exception:
-            logger.exception("Unable to add category.")
-            flash("Unable to add category. Please try again.", "danger")
-        else:
-            flash(f"category for '{category}' added.", "success")
-
-        return redirect(url_for("admin.campaigns.dashboard"))
 
     def _update_category(
         self,

@@ -20,7 +20,6 @@ from typing import Any
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session, aliased
 
-from ....extensions import db
 from ...models import QidOthersRecord, QidRecord
 from ..crud_service import CRUDService
 
@@ -60,6 +59,41 @@ class BaseQidService(CRUDService[ServiceRecord]):
     # ───────────────────────────────────────────────────────────────
     # lists
 
+    def list_empty_records(self) -> list[ServiceRecord]:
+        try:
+            base = self.session.query(self.model)
+            rows = (
+                base.filter(or_(self.model.qid.is_(None), self.model.qid == "")).order_by(self.model.id.asc()).all()
+            )
+            return rows
+        except Exception as e:
+            logger.exception("Failed to list records: %s", e)
+            return []
+
+    def list_duplicate_records(self) -> list[ServiceRecord]:
+        try:
+            base = self.session.query(self.model)
+            other = aliased(self.model)
+            rows = (
+                base.join(
+                    other,
+                    and_(
+                        self.model.id != other.id,
+                        or_(
+                            self.model.qid == other.qid,
+                            self.model.title == other.title,
+                        ),
+                    ),
+                )
+                .order_by(self.model.id.asc())
+                .distinct()
+                .all()
+            )
+            return rows
+        except Exception as e:
+            logger.exception("Failed to list records: %s", e)
+            return []
+
     def list_records(self, dis: str = "all") -> list[ServiceRecord]:
         """
         Return records, optionally filtered by ``dis``.
@@ -68,45 +102,17 @@ class BaseQidService(CRUDService[ServiceRecord]):
         - ``"empty"``: rows where qid is NULL or empty string.
         - ``"duplicate"``: rows that share a title or qid with another row.
         """
-        try:
-            base = db.session.query(self.model)
-            if dis == "empty":
-                rows = (
-                    base.filter(or_(self.model.qid.is_(None), self.model.qid == "")).order_by(self.model.id.asc()).all()
-                )
-                return rows
-            if dis == "duplicate":
-                other = aliased(self.model)
-                rows = (
-                    base.join(
-                        other,
-                        and_(
-                            self.model.id != other.id,
-                            or_(
-                                self.model.qid == other.qid,
-                                self.model.title == other.title,
-                            ),
-                        ),
-                    )
-                    .order_by(self.model.id.asc())
-                    .distinct()
-                    .all()
-                )
-                return rows
-            # default: all
-            return base.order_by(self.model.id.asc()).all()
+        if dis == "empty":
+            return self.list_empty_records()
 
-        except Exception as e:
-            logger.exception("Failed to list records: %s", e)
-            return []
+        if dis == "duplicate":
+            return self.list_duplicate_records()
+
+        return self.list_all(order_by=[self.model.id.asc()])
 
     def list_qid_records(self) -> list[ServiceRecord]:
         """Return all QID records."""
-        try:
-            return db.session.query(self.model).order_by(self.model.id.asc()).all()
-        except Exception as e:
-            logger.exception("Failed to list qid records: %s", e)
-            return []
+        return self.list_all(order_by=[self.model.id.asc()])
 
     def get_title_to_qid(self) -> dict[str, str]:
         """Retrieve title to QID mapping from database."""

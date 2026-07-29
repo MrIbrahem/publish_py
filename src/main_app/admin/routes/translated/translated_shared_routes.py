@@ -10,7 +10,6 @@ from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
 from ....db.services import LangService, PagesService, UserPagesService
-from ....extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -114,13 +113,7 @@ class SharedTranslatedRoutes:
             return redirect(url_for("admin.edit_done"))
 
         if "delete" in request.form:
-            try:
-                self.service.delete(page_id)
-                flash(f"{self.table_label} page id {page_id} deleted.", "success")
-            except Exception:
-                logger.exception(f"Failed to delete {self.table_label} page id=%r", page_id)
-                flash(f"Failed to delete {self.table_label} page id {page_id}.", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return self._handle_delete(page_id)
 
         title = (request.form.get("title") or "").strip()
         target = (request.form.get("target") or "").strip()
@@ -133,21 +126,29 @@ class SharedTranslatedRoutes:
             return redirect(url_for(f"admin.{self.endpoint_name}.edit", id=page_id))
 
         try:
-            row = self.service.update_page(
+            self.service.update_page(
                 page_id=page_id,
                 title=title,
                 target=target,
                 lang=lang,
                 user=user,
+                pupdate=pupdate,
             )
-            # pupdate is a separate column not handled by update_page's positional args
-            if row is not None:
-                row.pupdate = pupdate
-                db.session.commit()
             flash(f"{self.table_label} page id {page_id} updated.", "success")
         except Exception:
             logger.exception(f"Failed to update {self.table_label} page id=%r", page_id)
             flash(f"Failed to update {self.table_label} page id {page_id}.", "danger")
+
+        return redirect(url_for("admin.edit_done"))
+
+    def _handle_delete(self, page_id: int) -> ResponseReturnValue:
+
+        deleted = self.service.delete(page_id)
+        if deleted is False:
+            flash(f"Failed to delete {self.table_label} page id {page_id}")
+            logger.error(f"Failed to delete {self.table_label} page id=%r", page_id)
+        else:
+            flash(f"{self.table_label} page id {page_id} deleted.", "success")
 
         return redirect(url_for("admin.edit_done"))
 

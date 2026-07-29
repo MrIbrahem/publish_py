@@ -61,7 +61,7 @@ class MissingStatsService:
         """
         if not cat:
             return 0
-        row = db.session.execute(_COUNT_MEMBERS_SQL, {"cat": cat}).fetchone()
+        row = self.session.execute(_COUNT_MEMBERS_SQL, {"cat": cat}).fetchone()
         if row is None:
             return 0
         members = row._mapping.get("members")
@@ -71,7 +71,7 @@ class MissingStatsService:
         """Return per-language counts of available titles for ``cat`` (PHP statics_by_category)."""
         if not cat:
             return []
-        rows = db.session.execute(_STATS_BY_CATEGORY_SQL, {"cat": cat}).fetchall()
+        rows = self.session.execute(_STATS_BY_CATEGORY_SQL, {"cat": cat}).fetchall()
         return [dict(row._mapping) for row in rows]
 
 

@@ -95,6 +95,7 @@ class PagesUsersMainRoutes:
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")
             return redirect_to
+
         if not title or not lang or not new_target or not new_user or not pupdate:
             flash("All fields (title, lang, new_target, new_user, pupdate) are required.", "danger")
             return redirect_to

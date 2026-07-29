@@ -23,10 +23,8 @@ class EnwikiPageviewService(CRUDService[EnwikiPageviewRecord]):
 
     def list_enwiki_pageviews(self) -> list[EnwikiPageviewRecord]:
         """Return all enwiki pageview records."""
-        return list(
-            self.list(
-                order_by=[EnwikiPageviewRecord.id.asc()],
-            )
+        return self.list_all(
+            order_by=[EnwikiPageviewRecord.id.asc()],
         )
 
     def get_top_enwiki_pageviews(self, limit: int = 100) -> list[EnwikiPageviewRecord]:
