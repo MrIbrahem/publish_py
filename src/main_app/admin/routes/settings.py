@@ -20,7 +20,7 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
         try:
             return int(raw_val), True
         except (TypeError, ValueError):
-            return 0, True
+            return 0, False
     else:
         return raw_val, True
 
