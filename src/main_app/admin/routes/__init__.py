@@ -7,6 +7,7 @@ from .add_translate import AddTranslateRoutes
 from .campaigns import CampaignsDashboard
 from .coordinators import CoordinatorsRoutes
 from .email_msg import EmailMsgRoutes
+from .errors_route import CheckErrorsRoutes
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .pages_users_to_main import PagesUsersMainRoutes
@@ -20,7 +21,6 @@ from .translated.translated_users import TranslatedUsersRoutes
 from .tt import TranslateTypeRoutes
 from .users_emails import UsersEmails
 from .users_no_inprocess import UsersNoInprocess
-from .errors_route import CheckErrorsRoutes
 
 
 @dataclass(frozen=True)

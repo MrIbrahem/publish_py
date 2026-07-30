@@ -351,13 +351,7 @@ def load_groups_menu() -> list[SidebarGroup]:
                 title="Categories",
                 icon="bi-tags",
             ),
-            SidebarItem(
-                id="errors",
-                admin=1,
-                href="errors",
-                title="App Errors",
-                icon="bi-exclamation-triangle"
-            ),
+            SidebarItem(id="errors", admin=1, href="errors", title="App Errors", icon="bi-exclamation-triangle"),
         ],
     )
 
