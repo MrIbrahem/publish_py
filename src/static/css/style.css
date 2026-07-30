@@ -89,3 +89,6 @@ a {
     display: inline-block;
     animation: spin 1s linear infinite;
 }
+.nowrap-text {
+    white-space: nowrap;
+}

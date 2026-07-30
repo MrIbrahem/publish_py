@@ -87,21 +87,13 @@ def _load_request_token(raw: Sequence[Any] | None) -> RequestToken:
 # ---------------------------------------------------------
 
 
-class AuthRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self._setup_routes()
+class AuthRoutesFuncs:
+    def __init__(self) -> None:
+        pass
 
-    def _setup_routes(self) -> None:
-
-        @self.bp.before_app_request
-        def before_request() -> None:
-            """Automatically load the user before any route is processed."""
-            load_logged_in_user()
-
-        self.bp.get("/login")(self.login)
-        self.bp.get("/callback")(self.callback)
-        self.bp.get("/logout")(self.logout)
+    def before_request(self) -> None:
+        """Automatically load the user before any route is processed."""
+        load_logged_in_user()
 
     def login(self) -> WerkzeugResponse:
         logger.info("OAuth login initiated, client: %s", _client_key())
@@ -237,6 +229,19 @@ class AuthRoutes:
 
         g._current_user = None
         return response
+
+
+class AuthRoutes(AuthRoutesFuncs):
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        # super.__init__()
+        self._setup_routes()
+
+    def _setup_routes(self) -> None:
+        self.bp.before_app_request(self.before_request)
+        self.bp.get("/login")(self.login)
+        self.bp.get("/callback")(self.callback)
+        self.bp.get("/logout")(self.logout)
 
 
 __all__ = [

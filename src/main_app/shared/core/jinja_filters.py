@@ -4,6 +4,7 @@ Flask application factory.
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import datetime
 
@@ -115,17 +116,28 @@ def check_active_route(route_name: str) -> str:
     return ""
 
 
-def is_job_running(job_status: str | None) -> bool:
-    if not job_status:
-        return False
-    return job_status.lower() in ["running", "pending"]
-
-
 def commas_filter(value: str) -> str:
     try:
         return f"{value:,}"
     except (ValueError, TypeError):
         return value
+
+
+def to_json_filter(value: object, indent: int = 2) -> str:
+    """Serialize a value for template display.
+    Args:
+        value: Value to serialize.
+        indent: JSON indentation width.
+    Returns:
+        UTF-8-preserving JSON text.
+    """
+    return json.dumps(value, ensure_ascii=False, indent=indent)
+
+
+def is_job_running(job_status: str | None) -> bool:
+    if not job_status:
+        return False
+    return job_status.lower() in ["running", "pending"]
 
 
 filters = {
@@ -137,6 +149,7 @@ filters = {
     "check_active_route": check_active_route,
     "is_job_running": is_job_running,
     "commas": commas_filter,
+    "to_json": to_json_filter,
 }
 
 __all__ = [

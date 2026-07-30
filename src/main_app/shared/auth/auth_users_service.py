@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class AuthUsersNewService:
     def __init__(self) -> None:
         self.users_service = UsersService()
-        self.token_service = UserTokenService()
+        self.user_token_service = UserTokenService()
         self.admin_service = AdminService()
 
     def save_and_get_user(
@@ -41,7 +41,8 @@ class AuthUsersNewService:
             if not user:
                 user: UserRecord | None = self.users_service.create_user(username)
 
-            # if not user: return None
+            if not user:
+                return None
 
             user_id: int = user.user_id
 
@@ -54,7 +55,7 @@ class AuthUsersNewService:
             encrypted_secret = encrypt_value(access_secret)
 
             # 1. Update or insert into database via repository
-            self.token_service.upsert_user_token(
+            self.user_token_service.upsert_user_token(
                 user_id=user_id,
                 encrypted_token=encrypted_token,
                 encrypted_secret=encrypted_secret,
@@ -66,7 +67,7 @@ class AuthUsersNewService:
 
         try:
             # 2. Get the fresh record
-            token = self.token_service.get_user_token(user_id)
+            token = self.user_token_service.get_user_token(user_id)
             if not token:
                 return None
 
@@ -86,7 +87,7 @@ class AuthUsersNewService:
     def get_authenticated_user(self, user_id: int) -> CurrentUser | None:
         """Fetch the CurrentUser composite for session restoration."""
         try:
-            token = self.token_service.get_authenticated_user_token(user_id)
+            token = self.user_token_service.get_authenticated_user_token(user_id)
             if not token:
                 return None
             username = token.user.username
