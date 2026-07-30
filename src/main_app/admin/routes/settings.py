@@ -46,7 +46,7 @@ class SettingsFuncs:
                 "Key must start with a lowercase letter and contain only lowercase letters, digits, and underscores.",
                 "danger",
             )
-            return redirect(url_for("admin.settings.dashboard"))
+            return redirect(url_for("adminpanel.settings.dashboard"))
 
         if key and title:
             success = self.service.create_setting(key, title, value_type)
@@ -57,7 +57,7 @@ class SettingsFuncs:
         else:
             flash("Key and Title are required.", "danger")
 
-        return redirect(url_for("admin.settings.dashboard"))
+        return redirect(url_for("adminpanel.settings.dashboard"))
 
     def update(self):
         failed_keys, deleted_keys = self.settings_update_form(request.form)
@@ -69,7 +69,7 @@ class SettingsFuncs:
             flash("Settings updated successfully.", "success")
         else:
             flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
-        return redirect(url_for("admin.settings.dashboard"))
+        return redirect(url_for("adminpanel.settings.dashboard"))
 
     def settings_update_form(self, request_form: ImmutableMultiDict) -> tuple[list[str], list[str]]:
         all_settings = self.service.get_all_settings_raw()

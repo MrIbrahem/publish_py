@@ -56,7 +56,7 @@ class ProjectsDashboard:
             elif g_title != g_title_original:
                 self._update_project(record_id, g_title)
 
-        return redirect(url_for("admin.projects.dashboard"))
+        return redirect(url_for("adminpanel.projects.dashboard"))
 
     def _projects_dashboard(self):
         """Render the projects management dashboard."""
@@ -73,7 +73,7 @@ class ProjectsDashboard:
         g_title = request.form.get("g_title", "").strip()
         if not g_title:
             flash("Title is required.", "danger")
-            return redirect(url_for("admin.projects.dashboard"))
+            return redirect(url_for("adminpanel.projects.dashboard"))
 
         try:
 
@@ -89,7 +89,7 @@ class ProjectsDashboard:
         else:
             flash(f"project for '{g_title}' added.", "success")
 
-        return redirect(url_for("admin.projects.dashboard"))
+        return redirect(url_for("adminpanel.projects.dashboard"))
 
     def _update_project(self, record_id: int, g_title: str) -> None:
         """Update an existing project record."""

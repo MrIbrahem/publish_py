@@ -20,22 +20,22 @@ class TestAdminIndex:
 
     def test_admin_index_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that admin index redirects to last dashboard."""
-        response = mock_client.get("/admin/")
+        response = mock_client.get("/adminpanel/")
 
         assert response.status_code == 302
-        assert response.location.endswith("/admin/last")
+        assert response.location.endswith("/adminpanel/last")
 
     def test_admin_index_renders_dashboard_no_follow_redirects(self, mock_admin_required, auth_client: FlaskClient):
         """Test that admin index renders dashboard."""
 
-        response = auth_client.get("/admin/")
+        response = auth_client.get("/adminpanel/")
 
         assert response.status_code == 302
-        assert response.location.endswith("/admin/last")
+        assert response.location.endswith("/adminpanel/last")
 
     def test_admin_index_renders_dashboard(self, mock_admin_required, auth_client: FlaskClient):
         """Test that admin index renders dashboard."""
-        response = auth_client.get("/admin/", follow_redirects=True)
+        response = auth_client.get("/adminpanel/", follow_redirects=True)
         assert response.status_code == 200
 
 
@@ -45,12 +45,12 @@ class TestAdminSidebar:
 
     def test_sidebar_injected_in_context(self, mock_admin_required, auth_client: FlaskClient):
         """Test that sidebar is injected in template context."""
-        response = auth_client.get("/admin/")
+        response = auth_client.get("/adminpanel/")
 
         # Context processor runs for every admin request, just verify response is successful
         # The sidebar is injected via @bp_admin.app_context_processor decorator
         assert response.status_code == 302
-        assert response.location.endswith("/admin/last")
+        assert response.location.endswith("/adminpanel/last")
 
 
 @pytest.mark.integration
@@ -60,32 +60,32 @@ class TestAdminBlueprints:
     def test_coordinators_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that coordinators routes are registered."""
         # Check that the coordinators route exists
-        response = mock_client.get("/admin/coordinators/")
+        response = mock_client.get("/adminpanel/coordinators/")
 
         # Route should exist and be accessible with mocked admin
         assert response.status_code == 200
 
     def test_full_translators_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that full translators routes are registered."""
-        response = mock_client.get("/admin/full_translators/")
+        response = mock_client.get("/adminpanel/full_translators/")
 
         assert response.status_code == 200
 
     def test_users_no_inprocess_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that users no inprocess routes are registered."""
-        response = mock_client.get("/admin/users_no_inprocess/")
+        response = mock_client.get("/adminpanel/users_no_inprocess/")
 
         assert response.status_code == 200
 
     def test_language_settings_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that language settings routes are registered."""
-        response = mock_client.get("/admin/language_settings/")
+        response = mock_client.get("/adminpanel/language_settings/")
 
         assert response.status_code == 200
 
     def test_settings_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that settings routes are registered."""
-        response = mock_client.get("/admin/settings/")
+        response = mock_client.get("/adminpanel/settings/")
 
         assert response.status_code == 200
 
@@ -96,7 +96,7 @@ class TestAdminRouteAccess:
 
     def test_anonymous_user_redirected(self, mock_client: FlaskClient):
         """Test that anonymous users are redirected from admin routes."""
-        response = mock_client.get("/admin/", follow_redirects=False)
+        response = mock_client.get("/adminpanel/", follow_redirects=False)
 
         # Should redirect to login
         assert response.status_code == 302
@@ -109,7 +109,7 @@ class TestAdminRouteAccess:
         mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
 
         with patch("src.main_app.admin.decorators.load_user", return_value=mock_user):
-            response = auth_client.get("/admin/", follow_redirects=False)
+            response = auth_client.get("/adminpanel/", follow_redirects=False)
 
             # Should return 403 Forbidden (not a redirect)
             assert response.status_code == 403
@@ -121,6 +121,6 @@ class TestAdminRouteAccess:
         mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
         with patch("src.main_app.admin.decorators.load_user", return_value=mock_user):
 
-            response = auth_client.get("/admin/", follow_redirects=False)
+            response = auth_client.get("/adminpanel/", follow_redirects=False)
             # Should return 403 Forbidden (not a redirect)
             assert response.status_code == 403

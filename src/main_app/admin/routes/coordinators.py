@@ -53,7 +53,7 @@ class CoordinatorsFuncs:
         username = request.form.get("username", "").strip()
         if not username:
             flash("Username is required to add a coordinator.", "danger")
-            return redirect(url_for("admin.coordinators.dashboard"))
+            return redirect(url_for("adminpanel.coordinators.dashboard"))
 
         try:
 
@@ -73,7 +73,7 @@ class CoordinatorsFuncs:
         else:
             flash(f"Coordinator '{record.username}' added.", "success")
 
-        return redirect(url_for("admin.coordinators.dashboard"))
+        return redirect(url_for("adminpanel.coordinators.dashboard"))
 
     def activate(self, coordinator_id: int) -> ResponseReturnValue:
         return self._set_record_active_status(coordinator_id, True)
@@ -99,7 +99,7 @@ class CoordinatorsFuncs:
         else:
             flash(f"Coordinator '{coordinator_id}' removed.", "success")
 
-        return redirect(url_for("admin.coordinators.dashboard"))
+        return redirect(url_for("adminpanel.coordinators.dashboard"))
 
     def _set_record_active_status(self, coordinator_id: int, is_active: bool) -> ResponseReturnValue:
         """Shared helper to update coordinator is_active status."""
@@ -117,7 +117,7 @@ class CoordinatorsFuncs:
             state = "activated" if record.is_active else "deactivated"
             flash(f"Coordinator '{record.username}' {state}.", "success")
 
-        return redirect(url_for("admin.coordinators.dashboard"))
+        return redirect(url_for("adminpanel.coordinators.dashboard"))
 
 
 class CoordinatorsRoutes(CoordinatorsFuncs):

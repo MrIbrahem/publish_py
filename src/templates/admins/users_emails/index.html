@@ -13,7 +13,7 @@
                 </span>
             </div>
             <div class="col-md-9">
-                <form method="get" action="{{ url_for('admin.users_emails.dashboard') }}">
+                <form method="get" action="{{ url_for('adminpanel.users_emails.dashboard') }}">
                     <div class="row">
                         <div class="col-md-5">
                             <div class="input-group">
@@ -46,7 +46,7 @@
     <div class="card-body">
         <div class="card mb-2 shadow-sm">
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.users_emails.add') }}" class="row g-2 align-items-end">
+                <form method="post" action="{{ url_for('adminpanel.users_emails.add') }}" class="row g-2 align-items-end">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="col-sm-8 col-md-6 col-lg-4">
                         <label class="form-label" for="new-username">Username</label>
@@ -96,7 +96,7 @@
                                 </td>
                                 <td>
                                     <a class="btn btn-outline-primary btn-sm"
-                                        pup-target="{{ url_for('admin.users_emails.edit', record_id = s.user_id) }}"
+                                        pup-target="{{ url_for('adminpanel.users_emails.edit', record_id = s.user_id) }}"
                                         onclick="pup_window_new(this)">
                                         Edit
                                     </a>

@@ -52,7 +52,7 @@ class LanguageSettings:
         lang_code = request.form.get("lang_code", "").strip()
         if not lang_code:
             flash("Language code is required.", "danger")
-            return redirect(url_for("admin.language_settings.dashboard"))
+            return redirect(url_for("adminpanel.language_settings.dashboard"))
 
         move_dots = 1 if request.form.get("move_dots") == "1" else 0
         expend = 1 if request.form.get("expend") == "1" else 0
@@ -75,7 +75,7 @@ class LanguageSettings:
         else:
             flash(f"Language setting for '{lang_code}' added.", "success")
 
-        return redirect(url_for("admin.language_settings.dashboard"))
+        return redirect(url_for("adminpanel.language_settings.dashboard"))
 
     def update(self, setting_id: int) -> ResponseReturnValue:
         """Update an existing language setting record."""
@@ -98,7 +98,7 @@ class LanguageSettings:
         else:
             flash(f"Language setting for '{record.lang_code}' updated.", "success")
 
-        return redirect(url_for("admin.language_settings.dashboard"))
+        return redirect(url_for("adminpanel.language_settings.dashboard"))
 
     def delete(self, setting_id: int) -> ResponseReturnValue:
         """Remove a language setting record entirely."""
@@ -116,7 +116,7 @@ class LanguageSettings:
         else:
             flash(f"Language setting for '{setting_id}' removed.", "success")
 
-        return redirect(url_for("admin.language_settings.dashboard"))
+        return redirect(url_for("adminpanel.language_settings.dashboard"))
 
 
 __all__ = [

@@ -62,7 +62,7 @@ class AdminPanel:
         self.bp.route("/categories", methods=["GET"])(admin_required(self.categories_dashboard_route))
 
     def index(self):
-        return redirect(url_for("admin.last_dashboard"))
+        return redirect(url_for("adminpanel.last_dashboard"))
 
     def last_dashboard(self) -> Response:
         # Get query parameters
@@ -71,9 +71,9 @@ class AdminPanel:
 
         # Validate last_table
         if last_table == "pages_users":
-            return redirect(url_for("admin.dashboard_pages_users", lang=lang))
+            return redirect(url_for("adminpanel.dashboard_pages_users", lang=lang))
         else:
-            return redirect(url_for("admin.dashboard_pages", lang=lang))
+            return redirect(url_for("adminpanel.dashboard_pages", lang=lang))
 
     def dashboard_pages(self, lang: str | None = None):
         return last_translations_dashboard("pages", lang)

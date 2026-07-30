@@ -53,7 +53,7 @@ class UsersNoInprocess:
         username = request.form.get("username", "").strip()
         if not username:
             flash("Username is required to add a user.", "danger")
-            return redirect(url_for("admin.users_no_inprocess.dashboard"))
+            return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
 
         try:
 
@@ -67,7 +67,7 @@ class UsersNoInprocess:
         else:
             flash(f"User '{record.user}' added to 'not in process' list.", "success")
 
-        return redirect(url_for("admin.users_no_inprocess.dashboard"))
+        return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
 
     def delete(self, record_id: int) -> ResponseReturnValue:
         """Remove a user not in process record entirely."""
@@ -86,7 +86,7 @@ class UsersNoInprocess:
         else:
             flash(f"User '{record_id}' removed from 'not in process' list.", "success")
 
-        return redirect(url_for("admin.users_no_inprocess.dashboard"))
+        return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
 
     def activate(self, record_id: int) -> ResponseReturnValue:
         return self._set_record_active_status(record_id, True)
@@ -110,7 +110,7 @@ class UsersNoInprocess:
             state = "activated" if record.is_active else "deactivated"
             flash(f"Record '{record.user}' {state}.", "success")
 
-        return redirect(url_for("admin.users_no_inprocess.dashboard"))
+        return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
 
 
 __all__ = [
