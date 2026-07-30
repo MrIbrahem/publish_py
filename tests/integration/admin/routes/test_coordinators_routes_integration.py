@@ -18,7 +18,7 @@ class TestCoordinatorsDashboard:
 
     def test_coordinators_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that coordinators dashboard requires admin access."""
-        response = mock_client.get("/admin/coordinators/")
+        response = mock_client.get("/adminpanel/coordinators/")
 
         # With mock_admin_required, should render successfully
         assert response.status_code == 200
@@ -33,7 +33,7 @@ class TestCoordinatorsDashboard:
         admin_service.add_coordinator("Coordinator1")
         admin_service.add_coordinator("Coordinator2")
 
-        response = auth_client.get("/admin/coordinators/")
+        response = auth_client.get("/adminpanel/coordinators/")
 
         # Should render dashboard successfully
         assert response.status_code == 200
@@ -45,10 +45,10 @@ class TestAddCoordinator:
 
     def test_add_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that adding coordinator requires admin access."""
-        response = mock_client.post("/admin/coordinators/add", data={"username": "NewCoordinator"})
+        response = mock_client.post("/adminpanel/coordinators/add", data={"username": "NewCoordinator"})
 
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
     def test_add_coordinator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding coordinator with valid data."""
@@ -56,26 +56,26 @@ class TestAddCoordinator:
         users_service.create_user("NewCoordinator")
 
         response = auth_client.post(
-            "/admin/coordinators/add",
+            "/adminpanel/coordinators/add",
             data={"username": "NewCoordinator"},
             follow_redirects=False,
         )
 
         # Should redirect after successful add
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
     def test_add_coordinator_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding coordinator without username fails."""
         response = auth_client.post(
-            "/admin/coordinators/add",
+            "/adminpanel/coordinators/add",
             data={"username": ""},
             follow_redirects=False,
         )
 
         # Should redirect with error
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
 
 @pytest.mark.integration
@@ -84,10 +84,10 @@ class TestDeleteCoordinator:
 
     def test_delete_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deleting coordinator requires admin access."""
-        response = mock_client.post("/admin/coordinators/1/delete")
+        response = mock_client.post("/adminpanel/coordinators/1/delete")
 
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
     def test_delete_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting coordinator with valid ID."""
@@ -98,12 +98,12 @@ class TestDeleteCoordinator:
         record = admin_service.add_coordinator("DeletedCoordinator")
 
         response = auth_client.post(
-            f"/admin/coordinators/{record.id}/delete",
+            f"/adminpanel/coordinators/{record.id}/delete",
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
 
 @pytest.mark.integration
@@ -112,17 +112,17 @@ class TestActivateDeactivateCoordinator:
 
     def test_activate_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that activating coordinator requires admin access."""
-        response = mock_client.post("/admin/coordinators/1/activate")
+        response = mock_client.post("/adminpanel/coordinators/1/activate")
 
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
     def test_deactivate_coordinator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deactivating coordinator requires admin access."""
-        response = mock_client.post("/admin/coordinators/1/deactivate")
+        response = mock_client.post("/adminpanel/coordinators/1/deactivate")
 
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
     def test_activate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating coordinator with valid ID."""
@@ -134,12 +134,12 @@ class TestActivateDeactivateCoordinator:
         admin_service.set_coordinator_active(record.id, is_active=False)
 
         response = auth_client.post(
-            f"/admin/coordinators/{record.id}/activate",
+            f"/adminpanel/coordinators/{record.id}/activate",
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"
 
     def test_deactivate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating coordinator with valid ID."""
@@ -150,9 +150,9 @@ class TestActivateDeactivateCoordinator:
         record = admin_service.add_coordinator("DeactivateCoordinator")
 
         response = auth_client.post(
-            f"/admin/coordinators/{record.id}/deactivate",
+            f"/adminpanel/coordinators/{record.id}/deactivate",
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/coordinators/"
+        assert response.location == "/adminpanel/coordinators/"

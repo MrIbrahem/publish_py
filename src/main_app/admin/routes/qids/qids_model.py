@@ -93,10 +93,10 @@ class QidsSharedModel:
             dis=dis,
             qid_table=self.endpoint,
             title_label=self.title_label,
-            index_endpoint=f"admin.{self.endpoint}.index",
-            edit_endpoint=f"admin.{self.endpoint}.edit",
-            post_endpoint=f"admin.{self.endpoint}.edit_post",
-            add_endpoint=f"admin.{self.endpoint}.add",
+            index_endpoint=f"adminpanel.{self.endpoint}.index",
+            edit_endpoint=f"adminpanel.{self.endpoint}.edit",
+            post_endpoint=f"adminpanel.{self.endpoint}.edit_post",
+            add_endpoint=f"adminpanel.{self.endpoint}.add",
         )
 
     def edit(self) -> Response | str:
@@ -107,12 +107,12 @@ class QidsSharedModel:
             qid_id = int(qid_id_raw)
         except (ValueError, TypeError):
             flash(f"Invalid ID: {qid_id_raw}", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         record: QidRecord | QidOthersRecord | None = self.service.get_by_id(qid_id)
         if not record:
             flash(f"Record not found. id={qid_id}", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         return render_template(
             "admins/qids/edit.html",
@@ -120,7 +120,7 @@ class QidsSharedModel:
             title=record.title,
             qid=record.qid,
             qid_table=self.endpoint,
-            post_endpoint=f"admin.{self.endpoint}.edit_post",
+            post_endpoint=f"adminpanel.{self.endpoint}.edit_post",
         )
 
     def add(self) -> str:
@@ -131,7 +131,7 @@ class QidsSharedModel:
             title="",
             qid="",
             qid_table=self.endpoint,
-            post_endpoint=f"admin.{self.endpoint}.add_post",
+            post_endpoint=f"adminpanel.{self.endpoint}.add_post",
         )
 
     def edit_post(self) -> ResponseReturnValue:
@@ -140,7 +140,7 @@ class QidsSharedModel:
         title = (request.form.get("title") or "").strip()
         qid = (request.form.get("qid") or "").strip()
 
-        edit_done_ep = redirect(url_for("admin.edit_done"))
+        edit_done_ep = redirect(url_for("adminpanel.edit_done"))
 
         qid_id: int | None = None
         try:
@@ -149,7 +149,7 @@ class QidsSharedModel:
             flash(f"Invalid id: {qid_id_raw}", "danger")
             return edit_done_ep
 
-        edit_redirect_to = redirect(url_for(f"admin.{self.endpoint}.edit", id=qid_id))
+        edit_redirect_to = redirect(url_for(f"adminpanel.{self.endpoint}.edit", id=qid_id))
 
         if not title:
             flash(f"Title is required. qid=({qid})", "danger")
@@ -187,9 +187,9 @@ class QidsSharedModel:
         title = (request.form.get("title") or "").strip()
         qid = (request.form.get("qid") or "").strip()
 
-        edit_done_ep = redirect(url_for("admin.edit_done"))
+        edit_done_ep = redirect(url_for("adminpanel.edit_done"))
 
-        edit_redirect_to = redirect(url_for(f"admin.{self.endpoint}.add"))
+        edit_redirect_to = redirect(url_for(f"adminpanel.{self.endpoint}.add"))
 
         if not title:
             flash(f"Title is required. qid=({qid})", "danger")

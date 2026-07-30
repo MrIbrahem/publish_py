@@ -49,11 +49,11 @@ class CampaignsDashboard:
         campaign = request.form.get("campaign", "").strip()
         if not category:
             flash("Category is required.", "danger")
-            return redirect(url_for("admin.campaigns.dashboard"))
+            return redirect(url_for("adminpanel.campaigns.dashboard"))
 
         if not campaign:
             flash("Campaign is required.", "danger")
-            return redirect(url_for("admin.campaigns.dashboard"))
+            return redirect(url_for("adminpanel.campaigns.dashboard"))
 
         try:
 
@@ -70,7 +70,7 @@ class CampaignsDashboard:
         else:
             flash(f"category for '{category}' added.", "success")
 
-        return redirect(url_for("admin.campaigns.dashboard"))
+        return redirect(url_for("adminpanel.campaigns.dashboard"))
 
     def update(self) -> ResponseReturnValue:
         default_cat = request.form.get("default_cat")
@@ -105,7 +105,7 @@ class CampaignsDashboard:
                     is_default=is_default,
                 )
 
-        return redirect(url_for("admin.campaigns.dashboard"))
+        return redirect(url_for("adminpanel.campaigns.dashboard"))
 
     def _update_category(
         self,

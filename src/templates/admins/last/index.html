@@ -7,7 +7,7 @@
 
 <div class="card">
     <div class="card-header">
-        <form method="get" action="{{ url_for('admin.last_dashboard') }}" class="row g-3 align-items-end">
+        <form method="get" action="{{ url_for('adminpanel.last_dashboard') }}" class="row g-3 align-items-end">
             <div class="col-md-4">
                 <h4 class="mb-0">Recent translations ({{ count }}):</h4>
             </div>
@@ -88,7 +88,7 @@
                         </td>
                         <td>
                             <a class="btn btn-outline-primary btn-sm"
-                                pup-target="{{ url_for('admin.email_msg.dashboard', user=row.user, id=row.id, last_table=last_table) }}"
+                                pup-target="{{ url_for('adminpanel.email_msg.dashboard', user=row.user, id=row.id, last_table=last_table) }}"
                                 onclick="pup_window_email(this)">
                                 @
                             </a>

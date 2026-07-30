@@ -90,7 +90,7 @@ class PagesUsersMainRoutes:
         new_user = (request.form.get("new_user") or "").strip()
         pupdate = (request.form.get("pupdate") or "").strip()
 
-        redirect_to = redirect(url_for("admin.pages_users_to_main.pages_users_to_main_index"))
+        redirect_to = redirect(url_for("adminpanel.pages_users_to_main.pages_users_to_main_index"))
 
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")

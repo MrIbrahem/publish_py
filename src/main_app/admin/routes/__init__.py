@@ -7,6 +7,7 @@ from .add_translate import AddTranslateRoutes
 from .campaigns import CampaignsDashboard
 from .coordinators import CoordinatorsRoutes
 from .email_msg import EmailMsgRoutes
+from .errors_route import CheckErrorsRoutes
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .pages_users_to_main import PagesUsersMainRoutes
@@ -48,6 +49,7 @@ ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
     AdminRouteModule(UsersNoInprocess, "users_no_inprocess", "/users_no_inprocess"),
     AdminRouteModule(QidsRoutes, "qids", "/qids"),
     AdminRouteModule(QidsOthersRoutes, "qids_others", "/qids_others"),
+    AdminRouteModule(route_cls=CheckErrorsRoutes, name="errors", url_prefix="/errors"),
 ]
 
 __all__ = [

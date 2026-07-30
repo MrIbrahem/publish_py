@@ -59,7 +59,7 @@ class TranslateTypeRoutes:
         tt_id_raw = request.args.get("id", "")
         if not tt_id_raw:
             flash("Invalid id.", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
         try:
             tt_id = int(tt_id_raw)
             translate_types = self.translate_type_service.get_translate_type(tt_id)
@@ -69,11 +69,11 @@ class TranslateTypeRoutes:
 
         if not translate_types:
             flash(f"Failed to load translate_type tt_id_raw={tt_id_raw}", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         return render_template(
             "admins/tt/edit.html",
-            post_endpoint="admin.tt.tt_edit_post",
+            post_endpoint="adminpanel.tt.tt_edit_post",
             id=translate_types.tt_id,
             title=translate_types.tt_title,
             lead=translate_types.tt_lead,
@@ -89,7 +89,7 @@ class TranslateTypeRoutes:
 
         if not title:
             flash("Title is required.", "danger")
-            return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
+            return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
 
         tt_id: int | None = None
         if tt_id_raw:
@@ -97,11 +97,11 @@ class TranslateTypeRoutes:
                 tt_id = int(tt_id_raw)
             except ValueError:
                 flash(f"Invalid id: {tt_id_raw}", "danger")
-                return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
+                return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
 
         if not tt_id:
             flash(f"Failed to load translate_type id={tt_id}", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         try:
             translate_types = self.translate_type_service.get_translate_type(tt_id)
@@ -111,14 +111,14 @@ class TranslateTypeRoutes:
 
         if not translate_types:
             flash(f"Failed to load translate_type id={tt_id}", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         try:
             result = self.translate_type_service.update_translate_type(tt_id, title, lead, full)
         except UniqueError:
             logger.warning("Failed to update translate_type, duplicate item with title=%r", title)
             flash(f"Failed, title: {title} is used in other item.", "danger")
-            return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
+            return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
 
         except Exception:
             logger.exception("Failed to upsert translate_type id=%r title=%r", tt_id, title)
@@ -126,15 +126,15 @@ class TranslateTypeRoutes:
 
         if result:
             flash(f"Translate type saved successfully, title: {title}.", "success")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         flash(f"Failed to save translate type, title: {title}.", "danger")
-        return redirect(url_for("admin.tt.tt_edit", id=tt_id_raw))
+        return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
 
     def add(self) -> str:
         return render_template(
             "admins/tt/edit.html",
-            post_endpoint="admin.tt.tt_add_post",
+            post_endpoint="adminpanel.tt.tt_add_post",
             id="",
             title="",
             lead=1,
@@ -150,24 +150,24 @@ class TranslateTypeRoutes:
 
         if not title:
             flash("Title is required.", "danger")
-            return redirect(url_for("admin.tt.add"))
+            return redirect(url_for("adminpanel.tt.add"))
 
         try:
             result = self.translate_type_service.add_translate_type(tt_title=title, tt_lead=lead, tt_full=full)
         except UniqueError:
             logger.warning("Failed to insert translate_type, duplicate item with title=%r", title)
             flash(f"Failed, title: {title} is used in other item.", "danger")
-            return redirect(url_for("admin.tt.add"))
+            return redirect(url_for("adminpanel.tt.add"))
         except Exception:
             logger.exception("Failed to insert translate_type title=%r", title)
             result = False
 
         if result:
             flash(f"Translate type saved successfully, title: {title}.", "success")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         flash(f"Failed to save translate type, title: {title}.", "danger")
-        return redirect(url_for("admin.tt.add"))
+        return redirect(url_for("adminpanel.tt.add"))
 
 
 __all__ = [

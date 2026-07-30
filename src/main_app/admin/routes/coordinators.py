@@ -22,26 +22,15 @@ from ..decorators import admin_required
 logger = logging.getLogger(__name__)
 
 
-class CoordinatorsRoutes:
-    """Jobs management routes."""
-
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self.service = AdminService()
-        self._setup_routes()
-
-    def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
-        self.bp.post("/add")(admin_required(self.add))
-        self.bp.post("/<int:coordinator_id>/activate")(admin_required(self.activate))
-        self.bp.post("/<int:coordinator_id>/deactivate")(admin_required(self.deactivate))
-        self.bp.post("/<int:coordinator_id>/delete")(admin_required(self.delete))
+class CoordinatorsFuncs:
+    def __init__(self) -> None:
+        self.admin_service = AdminService()
 
     def dashboard(self) -> str:
         """Render the coordinator management dashboard."""
         try:
 
-            coordinators = self.service.list_coordinators()
+            coordinators = self.admin_service.list_coordinators()
         except Exception as e:  # pragma: no cover - defensive guard
             logger.error(f"Unable to list coordinators: {e}")
             flash("Unable to list coordinators.", "danger")
@@ -64,11 +53,11 @@ class CoordinatorsRoutes:
         username = request.form.get("username", "").strip()
         if not username:
             flash("Username is required to add a coordinator.", "danger")
-            return redirect(url_for("admin.coordinators.dashboard"))
+            return redirect(url_for("adminpanel.coordinators.dashboard"))
 
         try:
 
-            record = self.service.add_coordinator(username)
+            record = self.admin_service.add_coordinator(username)
         except UserNotFoundError as exc:
             logger.error("UserNotFoundError: %s", exc)
             flash(f"User '{username}' does not exist", "warning")
@@ -84,16 +73,23 @@ class CoordinatorsRoutes:
         else:
             flash(f"Coordinator '{record.username}' added.", "success")
 
-        return redirect(url_for("admin.coordinators.dashboard"))
+        return redirect(url_for("adminpanel.coordinators.dashboard"))
+
+    def activate(self, coordinator_id: int) -> ResponseReturnValue:
+        return self._set_record_active_status(coordinator_id, True)
+
+    def deactivate(self, coordinator_id: int) -> ResponseReturnValue:
+        return self._set_record_active_status(coordinator_id, False)
 
     def delete(self, coordinator_id: int) -> ResponseReturnValue:
         """Remove a coordinator entirely."""
+
         try:
 
-            record = self.service.get_coordinator_by_id(coordinator_id)
+            record = self.admin_service.get_coordinator_by_id(coordinator_id)
             if record is None:
                 raise LookupError(f"Coordinator with id {coordinator_id} not found")
-            self.service.delete_coordinator(coordinator_id)
+            self.admin_service.delete(coordinator_id)
         except LookupError:
             logger.exception("Unable to delete coordinator.")
             flash(f"Coordinator id {coordinator_id} was not found", "warning")
@@ -103,18 +99,12 @@ class CoordinatorsRoutes:
         else:
             flash(f"Coordinator '{coordinator_id}' removed.", "success")
 
-        return redirect(url_for("admin.coordinators.dashboard"))
-
-    def activate(self, coordinator_id: int) -> ResponseReturnValue:
-        return self._set_record_active_status(coordinator_id, True)
-
-    def deactivate(self, coordinator_id: int) -> ResponseReturnValue:
-        return self._set_record_active_status(coordinator_id, False)
+        return redirect(url_for("adminpanel.coordinators.dashboard"))
 
     def _set_record_active_status(self, coordinator_id: int, is_active: bool) -> ResponseReturnValue:
         """Shared helper to update coordinator is_active status."""
         try:
-            record = self.service.set_coordinator_active(coordinator_id, is_active)
+            record = self.admin_service.set_coordinator_active(coordinator_id, is_active)
             if record is None:
                 raise LookupError(f"Coordinator with id {coordinator_id} not found")
         except LookupError:
@@ -127,7 +117,23 @@ class CoordinatorsRoutes:
             state = "activated" if record.is_active else "deactivated"
             flash(f"Coordinator '{record.username}' {state}.", "success")
 
-        return redirect(url_for("admin.coordinators.dashboard"))
+        return redirect(url_for("adminpanel.coordinators.dashboard"))
+
+
+class CoordinatorsRoutes(CoordinatorsFuncs):
+    """Jobs management routes."""
+
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        super().__init__()
+        self._setup_routes()
+
+    def _setup_routes(self) -> None:
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.route("/add", methods=["POST"])(admin_required(self.add))
+        self.bp.route("/<int:coordinator_id>/activate", methods=["POST"])(admin_required(self.activate))
+        self.bp.route("/<int:coordinator_id>/deactivate", methods=["POST"])(admin_required(self.deactivate))
+        self.bp.route("/<int:coordinator_id>/delete", methods=["POST"])(admin_required(self.delete))
 
 
 __all__ = [

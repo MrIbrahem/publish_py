@@ -41,8 +41,8 @@ def _safe_url_for(endpoint: str, fallback: str, **values) -> str:
 
 def generate_list_item(item: SidebarItem) -> str:
     """Generate HTML for a single navigation link."""
-    href_full = item.href if item.target else f"/admin/{item.href}"
-    if item.href.startswith("/admin/"):
+    href_full = item.href if item.target else f"/adminpanel/{item.href}"
+    if item.href.startswith("/adminpanel/"):
         href_full = item.href
 
     icon_tag = f"<i class='bi {item.icon} me-1'></i>" if item.icon else ""
@@ -351,6 +351,7 @@ def load_groups_menu() -> list[SidebarGroup]:
                 title="Categories",
                 icon="bi-tags",
             ),
+            SidebarItem(id="errors", admin=1, href="errors", title="App Errors", icon="bi-exclamation-triangle"),
         ],
     )
 

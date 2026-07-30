@@ -122,7 +122,7 @@ def msg_dashboard(
     id: int,
     user: str | None = None,
 ) -> str:
-    # http://127.0.0.1:5000/admin/email_msg?user=Mr.+Ibrahem&id=10653&last_table=pages
+    # http://127.0.0.1:5000/adminpanel/email_msg?user=Mr.+Ibrahem&id=10653&last_table=pages
 
     logger.info(f"user={user}, id={id}, last_table={last_table}")
     # Fetch data based on table type

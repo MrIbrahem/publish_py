@@ -5,7 +5,7 @@
 {% block contents %}
 <div class="card">
     <div class="card-header">
-        <form method="GET" action="{{ url_for('admin.pages_users_to_main.pages_users_to_main_index') }}"
+        <form method="GET" action="{{ url_for('adminpanel.pages_users_to_main.pages_users_to_main_index') }}"
             class="row g-3 align-items-end">
             <div class="col-md-7">
                 <h4 class="mb-0">Userpages need to be moved to main pages: ({{ rows|length }})</h4>
@@ -101,7 +101,7 @@
                     </td>
                     <td>
                         <a class="btn btn-outline-primary btn-sm"
-                            pup-target="{{ url_for('admin.pages_users_to_main.pages_users_to_main_fix_it', id=row.id, new_user=row.new_user, new_target=row.new_target) }}"
+                            pup-target="{{ url_for('adminpanel.pages_users_to_main.pages_users_to_main_fix_it', id=row.id, new_user=row.new_user, new_target=row.new_target) }}"
                             onclick="pup_window_new(this)">
                             <i class="bi bi-wrench"></i>
                         </a>

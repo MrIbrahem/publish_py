@@ -43,7 +43,7 @@ class AddTranslateRoutes:
 
         if not titles:
             flash("No translation data submitted.", "danger")
-            return redirect(url_for("admin.add.add_translate"))
+            return redirect(url_for("adminpanel.add.add_translate"))
 
         texts: list[str] = []
         errors: list[str] = []
@@ -84,7 +84,7 @@ class AddTranslateRoutes:
         for e in errors:
             flash(e, "danger")
 
-        return redirect(url_for("admin.add.add_translate"))
+        return redirect(url_for("adminpanel.add.add_translate"))
 
 
 __all__ = [

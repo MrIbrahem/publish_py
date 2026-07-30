@@ -18,7 +18,7 @@ class TestFullTranslatorsDashboard:
 
     def test_full_translators_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that full translators dashboard requires admin access."""
-        response = mock_client.get("/admin/full_translators/")
+        response = mock_client.get("/adminpanel/full_translators/")
 
         # With mock_admin_required, should render successfully
         assert response.status_code == 200
@@ -29,7 +29,7 @@ class TestFullTranslatorsDashboard:
         ft_service.add_full_translator("Translator1", is_active=1)
         ft_service.add_full_translator("Translator2", is_active=0)
 
-        response = auth_client.get("/admin/full_translators/")
+        response = auth_client.get("/adminpanel/full_translators/")
 
         # Should render dashboard successfully
         assert response.status_code == 200
@@ -41,32 +41,32 @@ class TestAddFullTranslator:
 
     def test_add_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that adding full translator requires admin access."""
-        response = mock_client.post("/admin/full_translators/add", data={"username": "NewTranslator"})
+        response = mock_client.post("/adminpanel/full_translators/add", data={"username": "NewTranslator"})
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
     def test_add_full_translator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding full translator with valid data."""
         response = auth_client.post(
-            "/admin/full_translators/add",
+            "/adminpanel/full_translators/add",
             data={"username": "NewTranslator"},
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
     def test_add_full_translator_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding full translator without username fails."""
         response = auth_client.post(
-            "/admin/full_translators/add",
+            "/adminpanel/full_translators/add",
             data={"username": ""},
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
 
 @pytest.mark.integration
@@ -75,10 +75,10 @@ class TestDeleteFullTranslator:
 
     def test_delete_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deleting full translator requires admin access."""
-        response = mock_client.post("/admin/full_translators/1/delete")
+        response = mock_client.post("/adminpanel/full_translators/1/delete")
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
     def test_delete_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting full translator with valid ID."""
@@ -86,12 +86,12 @@ class TestDeleteFullTranslator:
         record = ft_service.add_full_translator("ToDeleteTranslator")
 
         response = auth_client.post(
-            f"/admin/full_translators/{record.id}/delete",
+            f"/adminpanel/full_translators/{record.id}/delete",
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
 
 @pytest.mark.integration
@@ -100,17 +100,17 @@ class TestActivateDeactivateFullTranslator:
 
     def test_activate_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that activating full translator requires admin access."""
-        response = mock_client.post("/admin/full_translators/1/activate")
+        response = mock_client.post("/adminpanel/full_translators/1/activate")
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
     def test_deactivate_full_translator_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deactivating full translator requires admin access."""
-        response = mock_client.post("/admin/full_translators/1/deactivate")
+        response = mock_client.post("/adminpanel/full_translators/1/deactivate")
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
     def test_activate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating full translator with valid ID."""
@@ -118,12 +118,12 @@ class TestActivateDeactivateFullTranslator:
         record = ft_service.add_full_translator("ActivateTranslator", is_active=0)
 
         response = auth_client.post(
-            f"/admin/full_translators/{record.id}/activate",
+            f"/adminpanel/full_translators/{record.id}/activate",
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"
 
     def test_deactivate_full_translator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating full translator with valid ID."""
@@ -131,9 +131,9 @@ class TestActivateDeactivateFullTranslator:
         record = ft_service.add_full_translator("DeactivateTranslator", is_active=1)
 
         response = auth_client.post(
-            f"/admin/full_translators/{record.id}/deactivate",
+            f"/adminpanel/full_translators/{record.id}/deactivate",
             follow_redirects=False,
         )
 
         assert response.status_code == 302
-        assert response.location == "/admin/full_translators/"
+        assert response.location == "/adminpanel/full_translators/"

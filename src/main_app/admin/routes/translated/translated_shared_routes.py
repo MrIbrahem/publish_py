@@ -83,9 +83,9 @@ class SharedTranslatedRoutes:
             limit=limit,
             languages=langs,
             table_label=self.table_label,
-            endpoint=f"admin.{self.endpoint_name}.index",
-            edit_endpoint=f"admin.{self.endpoint_name}.edit",
-            edit_post_endpoint=f"admin.{self.endpoint_name}.edit_post",
+            endpoint=f"adminpanel.{self.endpoint_name}.index",
+            edit_endpoint=f"adminpanel.{self.endpoint_name}.edit",
+            edit_post_endpoint=f"adminpanel.{self.endpoint_name}.edit_post",
         )
 
     def edit(self) -> str:
@@ -101,7 +101,7 @@ class SharedTranslatedRoutes:
         return render_template(
             "admins/translated/edit.html",
             row=row,
-            post_endpoint=f"admin.{self.endpoint_name}.edit_post",
+            post_endpoint=f"adminpanel.{self.endpoint_name}.edit_post",
         )
 
     def edit_post(self) -> ResponseReturnValue:
@@ -110,7 +110,7 @@ class SharedTranslatedRoutes:
 
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")
-            return redirect(url_for("admin.edit_done"))
+            return redirect(url_for("adminpanel.edit_done"))
 
         if "delete" in request.form:
             return self._handle_delete(page_id)
@@ -123,7 +123,7 @@ class SharedTranslatedRoutes:
 
         if not title or not target or not lang or not user or not pupdate:
             flash("All fields (title, target, lang, user, pupdate) are required.", "danger")
-            return redirect(url_for(f"admin.{self.endpoint_name}.edit", id=page_id))
+            return redirect(url_for(f"adminpanel.{self.endpoint_name}.edit", id=page_id))
 
         try:
             self.service.update_page(
@@ -139,7 +139,7 @@ class SharedTranslatedRoutes:
             logger.exception(f"Failed to update {self.table_label} page id=%r", page_id)
             flash(f"Failed to update {self.table_label} page id {page_id}.", "danger")
 
-        return redirect(url_for("admin.edit_done"))
+        return redirect(url_for("adminpanel.edit_done"))
 
     def _handle_delete(self, page_id: int) -> ResponseReturnValue:
 
@@ -150,7 +150,7 @@ class SharedTranslatedRoutes:
         else:
             flash(f"{self.table_label} page id {page_id} deleted.", "success")
 
-        return redirect(url_for("admin.edit_done"))
+        return redirect(url_for("adminpanel.edit_done"))
 
 
 __all__ = [

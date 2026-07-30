@@ -5,7 +5,7 @@
 {% block contents %}
 <div class="card">
     <div class="card-header">
-        <form method="GET" action="{{ url_for('admin.tt.tt_index') }}" class="row g-3 align-items-end">
+        <form method="GET" action="{{ url_for('adminpanel.tt.tt_index') }}" class="row g-3 align-items-end">
             <div class="col-md-6">
                 <h4 class="mb-0">Translate Type ({{ translate_types|length }}):</h4>
             </div>
@@ -66,7 +66,7 @@
                     </td>
                     <td>
                         <a class="btn btn-outline-primary btn-sm"
-                            pup-target="{{ url_for('admin.tt.tt_edit', id=tt.tt_id) }}" onclick="pup_window_new(this)">
+                            pup-target="{{ url_for('adminpanel.tt.tt_edit', id=tt.tt_id) }}" onclick="pup_window_new(this)">
                             Edit
                         </a>
                     </td>
@@ -91,7 +91,7 @@
             {% for title in new_titles %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ title }}</span>
-                <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for('admin.tt.add', title=title) }}"
+                <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for('adminpanel.tt.add', title=title) }}"
                     onclick="pup_window_new(this)">
                     Add
                 </a>
@@ -104,7 +104,7 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for('admin.tt.add') }}"
+        <a class="btn btn-outline-primary btn-sm" pup-target="{{ url_for('adminpanel.tt.add') }}"
             onclick="pup_window_new(this)">
             Add one!
         </a>

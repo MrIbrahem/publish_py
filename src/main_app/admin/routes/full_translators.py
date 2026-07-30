@@ -53,7 +53,7 @@ class FullTranslators:
         username = request.form.get("username", "").strip()
         if not username:
             flash("Username is required to add a full translator.", "danger")
-            return redirect(url_for("admin.full_translators.dashboard"))
+            return redirect(url_for("adminpanel.full_translators.dashboard"))
 
         try:
 
@@ -67,7 +67,7 @@ class FullTranslators:
         else:
             flash(f"Full translator '{record.user}' added.", "success")
 
-        return redirect(url_for("admin.full_translators.dashboard"))
+        return redirect(url_for("adminpanel.full_translators.dashboard"))
 
     def delete(self, translator_id: int) -> ResponseReturnValue:
         """Remove a full translator entirely."""
@@ -85,7 +85,7 @@ class FullTranslators:
         else:
             flash(f"Full translator '{translator_id}' removed.", "success")
 
-        return redirect(url_for("admin.full_translators.dashboard"))
+        return redirect(url_for("adminpanel.full_translators.dashboard"))
 
     def activate(self, record_id: int) -> ResponseReturnValue:
         return self._set_record_active_status(record_id, True)
@@ -109,7 +109,7 @@ class FullTranslators:
             state = "activated" if record.is_active else "deactivated"
             flash(f"Record '{record.user}' {state}.", "success")
 
-        return redirect(url_for("admin.full_translators.dashboard"))
+        return redirect(url_for("adminpanel.full_translators.dashboard"))
 
 
 __all__ = [

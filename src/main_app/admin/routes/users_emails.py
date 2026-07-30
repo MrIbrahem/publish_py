@@ -83,7 +83,7 @@ class UsersEmails:
         user = self.user_service.get_user(record_id)
         if not user:
             flash(f"User with ID {record_id} not found.", "danger")
-            return redirect(url_for("admin.users_emails.dashboard"))
+            return redirect(url_for("adminpanel.users_emails.dashboard"))
         return render_template("admins/users_emails/edit.html", row=user)
 
     def add(self) -> ResponseReturnValue:
@@ -96,7 +96,7 @@ class UsersEmails:
 
         if not username:
             flash("Username is required to add a user.", "danger")
-            return redirect(url_for("admin.users_emails.dashboard"))
+            return redirect(url_for("adminpanel.users_emails.dashboard"))
 
         try:
             record = self.user_service.create_user(
@@ -114,7 +114,7 @@ class UsersEmails:
         else:
             flash(f"User '{record.username}' added to 'not in process' list.", "success")
 
-        return redirect(url_for("admin.users_emails.dashboard"))
+        return redirect(url_for("adminpanel.users_emails.dashboard"))
 
     def update(self, record_id: int) -> ResponseReturnValue:
         """update user data"""
@@ -125,7 +125,7 @@ class UsersEmails:
 
         if not username:
             flash("Username is required to add a user.", "danger")
-            return redirect(url_for("admin.users_emails.dashboard"))
+            return redirect(url_for("adminpanel.users_emails.dashboard"))
 
         try:
             record = self.user_service.update_user(
@@ -144,7 +144,7 @@ class UsersEmails:
         else:
             flash(f"User '{record.username}' updated", "success")
 
-        return redirect(url_for("admin.users_emails.dashboard"))
+        return redirect(url_for("adminpanel.users_emails.dashboard"))
 
     def delete(self, record_id: int) -> ResponseReturnValue:
         """Remove a user not in process record entirely."""
@@ -162,7 +162,7 @@ class UsersEmails:
         else:
             flash(f"User '{record_id}' deleted", "success")
 
-        return redirect(url_for("admin.users_emails.dashboard"))
+        return redirect(url_for("adminpanel.users_emails.dashboard"))
 
 
 __all__ = [
