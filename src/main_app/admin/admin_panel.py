@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from flask import (
     Blueprint,
@@ -31,11 +32,11 @@ class AdminPanel:
     def _setup_routes(self) -> None:
 
         @self.bp.app_context_processor
-        def inject_sidebar():
+        def inject_sidebar() -> dict[str, Any]:
             path_parts = request.path.strip("/").split("/")
             active_route = path_parts[1] if len(path_parts) > 1 else ""
-            # logger.debug(f"Injecting sidebar for path='{request.path}'")
-            sidebar_html = create_side(active_route=active_route)
+            # logger.debug(f"Injecting sidebar for path='{request.path}', {active_route=}")
+            sidebar_html = create_side(active_route=active_route, path=request.path)
             return {"sidebar": sidebar_html}
 
         self.bp.route("/", methods=["GET"])(admin_required(self.index))

@@ -20,6 +20,7 @@ from .translated.translated_users import TranslatedUsersRoutes
 from .tt import TranslateTypeRoutes
 from .users_emails import UsersEmails
 from .users_no_inprocess import UsersNoInprocess
+from .errors_route import CheckErrorsRoutes
 
 
 @dataclass(frozen=True)
@@ -48,6 +49,7 @@ ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
     AdminRouteModule(UsersNoInprocess, "users_no_inprocess", "/users_no_inprocess"),
     AdminRouteModule(QidsRoutes, "qids", "/qids"),
     AdminRouteModule(QidsOthersRoutes, "qids_others", "/qids_others"),
+    AdminRouteModule(route_cls=CheckErrorsRoutes, name="errors", url_prefix="/errors"),
 ]
 
 __all__ = [

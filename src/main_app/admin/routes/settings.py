@@ -6,6 +6,7 @@ import re
 from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
+from werkzeug.datastructures import ImmutableMultiDict
 
 from ...db.services import SettingsService
 from ..decorators import admin_required
@@ -24,19 +25,12 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
         return raw_val, True
 
 
-class SettingsRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self.settings_service = SettingsService()
-        self._setup_routes()
-
-    def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
-        self.bp.post("/create")(admin_required(self.create))
-        self.bp.post("/update")(admin_required(self.update))
+class SettingsFuncs:
+    def __init__(self) -> None:
+        self.service = SettingsService()
 
     def dashboard(self):
-        settings_list = self.settings_service.get_all_settings_raw()
+        settings_list = self.service.get_all_settings_raw()
         return render_template(
             "admins/settings.html",
             settings_list=settings_list,
@@ -55,7 +49,7 @@ class SettingsRoutes:
             return redirect(url_for("admin.settings.dashboard"))
 
         if key and title:
-            success = self.settings_service.create_setting(key, title, value_type)
+            success = self.service.create_setting(key, title, value_type)
             if success:
                 flash("Setting created successfully.", "success")
             else:
@@ -77,8 +71,8 @@ class SettingsRoutes:
             flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
         return redirect(url_for("admin.settings.dashboard"))
 
-    def settings_update_form(self, request_form) -> tuple[list[str], list[str]]:
-        all_settings = self.settings_service.get_all_settings_raw()
+    def settings_update_form(self, request_form: ImmutableMultiDict) -> tuple[list[str], list[str]]:
+        all_settings = self.service.get_all_settings_raw()
         failed_keys: list[str] = []
         deleted_keys: list[str] = []
 
@@ -90,7 +84,7 @@ class SettingsRoutes:
 
             # Check if marked for deletion
             if request_form.get(delete_key) == "on":
-                if self.settings_service.delete_setting_by_key(key):
+                if self.service.delete_setting_by_key(key):
                     deleted_keys.append(key)
                 else:
                     failed_keys.append(key)
@@ -108,11 +102,22 @@ class SettingsRoutes:
                 failed_keys.append(key)
                 continue
 
-            if not self.settings_service.update_setting(key, value, v_type):
+            if not self.service.update_setting(key, value, v_type):
                 failed_keys.append(key)
 
         return failed_keys, deleted_keys
 
+
+class SettingsRoutes(SettingsFuncs):
+    def __init__(self, bp: Blueprint) -> None:
+        self.bp = bp
+        super().__init__()
+        self._setup_routes()
+
+    def _setup_routes(self) -> None:
+        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
+        self.bp.post("/create")(admin_required(self.create))
+        self.bp.post("/update")(admin_required(self.update))
 
 __all__ = [
     "SettingsRoutes",
