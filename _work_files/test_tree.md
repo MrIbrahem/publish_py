@@ -3,13 +3,28 @@ tests/
 ├── integration/
 │   ├── admin/
 │   │   └── routes/
+│   │       ├── qids/
 │   │       ├── test_admin_routes_integration.py
 │   │       ├── test_coordinators_routes_integration.py
 │   │       ├── test_full_translators_routes_integration.py
 │   │       ├── test_language_settings_routes_integration.py
 │   │       ├── test_settings_routes_integration.py
 │   │       └── test_users_no_inprocess_routes_integration.py
+│   ├── main_app/
+│   │   ├── admin/
+│   │   │   └── routes/
+│   │   │       └── qids/
+│   │   └── public/
+│   │       ├── auth/
+│   │       └── routes/
+│   │           ├── api/
+│   │           ├── cxtoken/
+│   │           ├── main/
+│   │           ├── publish/
+│   │           ├── refs/
+│   │           └── td/
 │   ├── public/
+│   │   ├── auth/
 │   │   └── routes/
 │   │       ├── api/
 │   │       │   └── test_api_routes.py
@@ -26,8 +41,9 @@ tests/
 │   │       │   ├── test_publish_cors_on.py
 │   │       │   ├── test_publish_csrf_integration.py
 │   │       │   └── test_publish_routes.py
-│   │       └── refs/
-│   │           └── test_refs_routes.py
+│   │       ├── refs/
+│   │       │   └── test_refs_routes.py
+│   │       └── td/
 │   └── shared/
 │       ├── core/
 │       │   └── cors/
@@ -47,8 +63,9 @@ tests/
 │   │       └── test_users_no_inprocess_routes.py
 │   ├── app_routes/
 │   │   └── auth/
-│   │       ├── test_decorators.py
+│   │       ├── test_auth_utils.py
 │   │       └── test_identity.py
+│   ├── config/
 │   ├── db/
 │   │   ├── models/
 │   │   │   ├── analytics/
@@ -90,7 +107,7 @@ tests/
 │   │       │   └── test_word_service.py
 │   │       ├── config/
 │   │       │   ├── test_language_setting_service.py
-│   │       │   └── test_setting_service.py
+│   │       │   └── test_settings_service.py
 │   │       ├── content/
 │   │       │   ├── test_category_service.py
 │   │       │   ├── test_lang_service.py
@@ -108,26 +125,60 @@ tests/
 │   │       ├── users/
 │   │       │   ├── test_admin_service.py
 │   │       │   ├── test_full_translator_service.py
-│   │       │   ├── test_user_service.py
 │   │       │   ├── test_user_token_service.py
-│   │       │   └── test_users_no_inprocess_service.py
+│   │       │   ├── test_users_no_inprocess_service.py
+│   │       │   └── test_users_service.py
+│   │       ├── utils/
 │   │       └── wikidata/
 │   │           ├── test_allqid_service.py
 │   │           ├── test_qid_others_service.py
 │   │           └── test_qid_service.py
-│   ├── public/
-│   │   └── routes/
-│   │       ├── api/
+│   ├── extensions/
+│   ├── main_app/
+│   │   ├── admin/
+│   │   ├── config/
+│   │   ├── db/
+│   │   │   ├── models/
+│   │   │   └── services/
+│   │   │       ├── analytics/
+│   │   │       ├── config/
+│   │   │       ├── content/
+│   │   │       ├── pages/
+│   │   │       ├── reports/
+│   │   │       ├── users/
+│   │   │       ├── utils/
+│   │   │       └── wikidata/
+│   │   ├── extensions/
+│   │   ├── public/
+│   │   │   ├── auth/
+│   │   │   └── utils/
+│   │   └── shared/
 │   │       ├── auth/
-│   │       │   ├── test_mwoauth_handshake.py
-│   │       │   └── test_rate_limit.py
-│   │       ├── cxtoken/
-│   │       │   └── test_cxtoken_cache.py
-│   │       ├── main/
-│   │       ├── publish/
-│   │       │   └── test_publish_worker.py
-│   │       └── refs/
+│   │       ├── clients/
+│   │       ├── core/
+│   │       │   ├── cookies/
+│   │       │   └── cors/
+│   │       ├── schemas/
+│   │       └── utils/
+│   │           └── helpers/
+│   ├── public/
+│   │   ├── auth/
+│   │   ├── routes/
+│   │   │   ├── api/
+│   │   │   │   └── test_api_routes_unit.py
+│   │   │   ├── auth/
+│   │   │   │   ├── test_mwoauth_handshake.py
+│   │   │   │   └── test_rate_limit.py
+│   │   │   ├── cxtoken/
+│   │   │   │   └── test_cxtoken_cache.py
+│   │   │   ├── main/
+│   │   │   ├── publish/
+│   │   │   │   └── test_publish_worker.py
+│   │   │   └── refs/
+│   │   └── utils/
 │   └── shared/
+│       ├── auth/
+│       │   └── test_auth_service.py
 │       ├── clients/
 │       │   ├── test_mdwiki_api.py
 │       │   ├── test_mediawiki_api.py
@@ -147,6 +198,7 @@ tests/
 │       │   │   └── test_publish_secret_checks.py
 │       │   ├── test_crypto.py
 │       │   └── test_extensions.py
+│       ├── schemas/
 │       └── utils/
 │           ├── helpers/
 │           │   ├── test_files.py
@@ -157,6 +209,7 @@ tests/
 │           ├── test_decode_bytes.py
 │           └── test_web_utils.py
 ├── __init__.py
-└── conftest.py
+├── conftest.py
+└── README.md
 
 ```

@@ -8,6 +8,7 @@ import logging
 
 from flask import (
     Blueprint,
+    current_app,
     render_template,
     send_from_directory,
 )
@@ -37,7 +38,7 @@ class MainRoutes:
         )
 
     def favicon(self) -> Response:
-        return send_from_directory("static", "favicon.ico", mimetype="image/x-icon")
+        return send_from_directory(current_app.static_folder, "favicon.ico", mimetype="image/x-icon")
 
 
 __all__ = [

@@ -8,12 +8,18 @@ src/
 │   │   │   │   ├── qids.py
 │   │   │   │   ├── qids_model.py
 │   │   │   │   └── qids_others.py
+│   │   │   ├── translated/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── translated_main.py
+│   │   │   │   ├── translated_shared_routes.py
+│   │   │   │   └── translated_users.py
 │   │   │   ├── __init__.py
 │   │   │   ├── add_translate.py
 │   │   │   ├── campaigns.py
 │   │   │   ├── categories.py
 │   │   │   ├── coordinators.py
 │   │   │   ├── email_msg.py
+│   │   │   ├── errors_route.py
 │   │   │   ├── full_translators.py
 │   │   │   ├── language_settings.py
 │   │   │   ├── last.py
@@ -21,8 +27,6 @@ src/
 │   │   │   ├── projects.py
 │   │   │   ├── settings.py
 │   │   │   ├── stat.py
-│   │   │   ├── translated.py
-│   │   │   ├── translated_users.py
 │   │   │   ├── tt.py
 │   │   │   ├── users_emails.py
 │   │   │   └── users_no_inprocess.py
@@ -38,9 +42,10 @@ src/
 │   │   ├── main_settings.py
 │   │   └── README.md
 │   ├── db/
+│   │   ├── c/
+│   │   │   └── content/
 │   │   ├── models/
 │   │   │   ├── __init__.py
-│   │   │   ├── all_articles.py
 │   │   │   ├── category_members.py
 │   │   │   ├── dashboard.py
 │   │   │   ├── metrics.py
@@ -66,6 +71,7 @@ src/
 │   │   │   │   └── settings_service.py
 │   │   │   ├── content/
 │   │   │   │   ├── __init__.py
+│   │   │   │   ├── category_member_service.py
 │   │   │   │   ├── category_service.py
 │   │   │   │   ├── lang_service.py
 │   │   │   │   └── project_service.py
@@ -74,10 +80,14 @@ src/
 │   │   │   │   ├── in_process_service.py
 │   │   │   │   ├── leaderboard_service.py
 │   │   │   │   ├── missing_stats_service.py
-│   │   │   │   ├── page_service.py
+│   │   │   │   ├── pages_query_service.py
 │   │   │   │   ├── pages_users_to_main_service.py
 │   │   │   │   ├── results_2026_service.py
-│   │   │   │   ├── translate_type_service.py
+│   │   │   │   └── translate_type_service.py
+│   │   │   ├── pages_tables/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── page_service.py
+│   │   │   │   ├── pages_shared_service.py
 │   │   │   │   └── user_page_service.py
 │   │   │   ├── reports/
 │   │   │   │   ├── __init__.py
@@ -87,37 +97,42 @@ src/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── admin_service.py
 │   │   │   │   ├── full_translator_service.py
-│   │   │   │   ├── user_service.py
 │   │   │   │   ├── user_token_service.py
-│   │   │   │   └── users_no_inprocess_service.py
+│   │   │   │   ├── users_no_inprocess_service.py
+│   │   │   │   └── users_service.py
 │   │   │   ├── utils/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── db_guard_model.py
 │   │   │   │   └── retry_on_disconnect.py
 │   │   │   ├── wikidata/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── allqid_service.py
 │   │   │   │   ├── qid_others_service.py
-│   │   │   │   └── qid_service.py
+│   │   │   │   ├── qid_service.py
+│   │   │   │   └── qid_shared_service.py
 │   │   │   ├── __init__.py
-│   │   │   ├── _main_service.py
-│   │   │   ├── delete_service.py
-│   │   │   └── pages_query_service.py
+│   │   │   └── crud_service.py
 │   │   ├── __init__.py
+│   │   ├── create_helper.py
 │   │   ├── exceptions.py
 │   │   └── README.md
+│   ├── extensions/
+│   │   ├── __init__.py
+│   │   ├── _csrf.py
+│   │   ├── data_base.py
+│   │   └── db_types.py
 │   ├── public/
+│   │   ├── auth/
+│   │   │   ├── __init__.py
+│   │   │   ├── rate_limit.py
+│   │   │   ├── routes.py
+│   │   │   └── utils.py
 │   │   ├── routes/
 │   │   │   ├── api/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── form_utils.py
-│   │   │   │   ├── leaderboard.py
 │   │   │   │   ├── routes.py
 │   │   │   │   └── top_stats_routes.py
 │   │   │   ├── auth/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── rate_limit.py
-│   │   │   │   └── routes.py
 │   │   │   ├── cxtoken/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── cache.py
@@ -140,13 +155,17 @@ src/
 │   │   │   │   ├── results_api.py
 │   │   │   │   └── td_route.py
 │   │   │   └── __init__.py
+│   │   ├── utils/
+│   │   │   ├── __init__.py
+│   │   │   └── routes_utils.py
 │   │   ├── __init__.py
 │   │   └── README.md
 │   ├── shared/
 │   │   ├── auth/
 │   │   │   ├── __init__.py
-│   │   │   ├── decorators.py
-│   │   │   ├── identity.py
+│   │   │   ├── auth_service.py
+│   │   │   ├── auth_users_service.py
+│   │   │   ├── current_user.py
 │   │   │   └── mwoauth_handshake.py
 │   │   ├── clients/
 │   │   │   ├── __init__.py
@@ -166,9 +185,6 @@ src/
 │   │   │   │   ├── is_allowed_checker.py
 │   │   │   │   └── publish_secret_checks.py
 │   │   │   ├── extensions/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── _csrf.py
-│   │   │   │   └── data_base.py
 │   │   │   ├── __init__.py
 │   │   │   ├── crypto.py
 │   │   │   └── jinja_filters.py
@@ -188,6 +204,14 @@ src/
 │   │   ├── __init__.py
 │   │   └── README.md
 │   ├── __init__.py
+│   └── README.md
+├── results_api_php_code/
+│   ├── backend/
+│   │   ├── api_calls/
+│   │   ├── results/
+│   │   │   ├── new_way/
+│   │   │   └── sparql_bots/
+│   │   └── results_2026/
 │   └── README.md
 ├── static/
 │   ├── css/
@@ -213,8 +237,8 @@ src/
 │   │   ├── sidebar.js
 │   │   ├── td_autocomplete.js
 │   │   └── views_api.js
-│   ├── favicon.svg
-│   └── translate.svg
+│   ├── favicon.ico
+│   └── favicon.svg
 ├── templates/
 │   ├── admins/
 │   │   ├── email_msg/
