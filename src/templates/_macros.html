@@ -1,12 +1,23 @@
 {# Shared Jinja macros. #}
+
+{% macro summary_card_2(title, value, id="") %}
+<div class="card h-100 shadow-sm">
+    <div class="card-body">
+        <h2 class="h6 text-uppercase text-muted">{{ title }}</h2>
+        <p class="display-6 mb-0" {%if id%}id="{{ id }}" {%endif%}>{{ value }}</p>
+    </div>
+</div>
+{% endmacro %}
+{# Shared Jinja macros. #}
 {%- macro commons_file_link(filename, label="") -%}
 {% if filename %}
-<a href="https://commons.wikimedia.org/wiki/File:{{ filename | replace('File:', '') | replace(' ', '_') | urlencode }}"
-    target="_blank" rel="noopener noreferrer">
+{% set striped_name = filename | replace('File:', '') %}
+<a href="https://commons.wikimedia.org/wiki/File:{{ striped_name | replace(' ', '_') | urlencode }}" target="_blank"
+    rel="noopener noreferrer">
     {% if label %}
     {{ label }}
     {% else %}
-    File:{{ filename | replace('File:', '') }}
+    File:{{ striped_name }}
     {% endif %}
 </a>
 {% endif %}
