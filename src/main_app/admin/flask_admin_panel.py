@@ -179,9 +179,7 @@ def add_admin_dashboard(app: Flask, _db) -> None:
             icon_type=cat.icon_type,
             icon_value=cat.icon_value,
         )
-        views = [
-            WrapModelView(model, _db, category=cat.name) for model in cat.records
-        ]
+        views = [WrapModelView(model, _db, category=cat.name) for model in cat.records]
         admin.add_views(*views)
 
 
