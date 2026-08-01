@@ -50,10 +50,10 @@ class TestMainFavicon:
     """Integration tests for the favicon route."""
 
     def test_favicon_returns_200(self, mock_client: FlaskClient):
-        """Test that favicon route returns 200 or 404 if not present."""
+        """Test that favicon route returns 200."""
         response = mock_client.get("/favicon.ico")
 
-        assert response.status_code == 404
+        assert response.status_code == 200
 
     def test_favicon_returns_correct_mimetype(self, mock_client: FlaskClient):
         """Test that favicon returns correct mimetype."""
