@@ -38,7 +38,7 @@ class MainRoutes:
         )
 
     def favicon(self) -> Response:
-        return send_from_directory(current_app.static_folder, "favicon.ico", mimetype="image/x-icon")
+        return send_from_directory(current_app.static_folder, "favicon.ico", mimetype="image/x-icon")  # type: ignore
 
 
 __all__ = [
