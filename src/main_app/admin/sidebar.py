@@ -382,6 +382,7 @@ def load_groups_menu() -> list[SidebarGroup]:
                 target="_blank",
                 icon="bi-wrench",
             ),
+            SidebarItem(id="db_admin", admin=1, href="/adminpanel/db_admin", title="DB admin", icon="bi-database"),
         ],
     )
     new_menu = [
