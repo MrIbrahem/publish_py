@@ -2,7 +2,7 @@ import pytest
 
 from src.main_app.database.models import LanguageSettingRecord
 from src.main_app.database.services.config import LanguageSettingService
-from src.main_app.db.exceptions import RecordNotFoundError
+from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:

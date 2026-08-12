@@ -2,7 +2,7 @@ import pytest
 
 from src.main_app.database.models import AssessmentRecord
 from src.main_app.database.services.analytics.assessment_service import AssessmentService
-from src.main_app.db.exceptions import RecordNotFoundError
+from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:

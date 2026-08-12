@@ -2,7 +2,7 @@ import pytest
 
 from src.main_app.database.models import FullTranslatorRecord
 from src.main_app.database.services.users.full_translator_service import FullTranslatorService
-from src.main_app.db.exceptions import RecordNotFoundError
+from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:

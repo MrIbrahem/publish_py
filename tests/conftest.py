@@ -72,7 +72,7 @@ if sys:
 # Import after environment setup
 from src.main_app import AppFactory
 from src.main_app.config import TestingConfig
-from src.main_app.db.create_helper import create_tables, create_views
+from src.main_app.database.create_helper import create_tables, create_views
 from src.main_app.extensions import db as _db
 from src.main_app.shared.auth import CurrentUser
 
@@ -211,7 +211,7 @@ def setup_db(mock_app: Flask):
     Creates all real tables (skipping views) and creates views manually.
     The Flask-SQLAlchemy session (db.session) is used throughout tests.
     """
-    from src.main_app.db import register_events
+    from src.main_app.database import register_events
 
     with mock_app.app_context():
         register_events(_db.engine)
