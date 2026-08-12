@@ -238,7 +238,6 @@ class AuthRoutes(AuthRoutesFuncs):
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.before_app_request(self.before_request)
         self.bp.get("/login")(self.login)
         self.bp.get("/callback")(self.callback)
         self.bp.get("/logout")(self.logout)

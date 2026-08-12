@@ -11,7 +11,10 @@ from pathlib import Path
 import colorlog
 
 
-def prepare_log_file(log_file: str | None, project_logger: logging.Logger) -> Path | None:
+def prepare_log_file(
+    log_file: str | None,
+    project_logger: logging.Logger,
+) -> Path | None:
     """
     Prepare the log file path and create parent directories if needed.
     """
@@ -74,6 +77,7 @@ def setup_logging(
         return
 
     numeric_level = getattr(logging, level.upper(), logging.INFO) if isinstance(level, str) else level
+
     project_logger.setLevel(numeric_level)
     project_logger.propagate = False
 
@@ -112,7 +116,12 @@ def setup_logging(
     if error_log_file:
         error_log_file_path = prepare_log_file(error_log_file, project_logger)
         if error_log_file_path:
-            setup_file_handler(project_logger, error_log_file_path, logging.WARNING, daily_rotation=daily_rotation)
+            setup_file_handler(
+                project_logger,
+                error_log_file_path,
+                logging.WARNING,
+                daily_rotation=daily_rotation,
+            )
 
 
 def _daily_log_namer(default_name: str) -> str:
@@ -169,3 +178,13 @@ def configure_logging(
         use_colorlog=use_colorlog,
         daily_rotation=daily_rotation,
     )
+
+
+__all__ = [
+    "prepare_log_file",
+    "setup_file_handler",
+    "setup_logging",
+    "get_log_dir",
+    "configure_logging",
+]
+
