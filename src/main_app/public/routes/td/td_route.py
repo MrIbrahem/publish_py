@@ -16,7 +16,7 @@ from flask import (
     request,
 )
 
-from ....db.services import (
+from ....database.services import (
     CategoryService,
     FullTranslatorService,
     LangService,

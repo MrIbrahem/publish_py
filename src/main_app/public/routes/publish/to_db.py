@@ -4,8 +4,8 @@ import json
 import logging
 from typing import Any
 
-from ....db.models import PageRecord, UserPageRecord
-from ....db.services import CategoryService, PagesService, UserPagesService
+from ....database.models import PageRecord, UserPageRecord
+from ....database.services import CategoryService, PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 

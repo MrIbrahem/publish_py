@@ -12,7 +12,7 @@ import json
 import pytest
 from flask.testing import FlaskClient
 
-from src.main_app.db.services import (
+from src.main_app.database.services import (
     CategoryService,
     InProcessService,
     LangService,
@@ -79,7 +79,7 @@ def seed_in_process(seed_langs, seed_categories):
 @pytest.fixture
 def seed_pages(seed_categories, seed_langs):
     """Seed page records into the database."""
-    from src.main_app.db.models import PageRecord
+    from src.main_app.database.models import PageRecord
     from src.main_app.extensions import db
 
     page1 = PageRecord(
@@ -111,7 +111,7 @@ def seed_pages(seed_categories, seed_langs):
 @pytest.fixture
 def seed_user_pages(seed_pages, seed_categories):
     """Seed user page records into the database."""
-    from src.main_app.db.models import UserPageRecord
+    from src.main_app.database.models import UserPageRecord
     from src.main_app.extensions import db
 
     page = UserPageRecord(
@@ -132,7 +132,7 @@ def seed_user_pages(seed_pages, seed_categories):
 @pytest.fixture
 def seed_views(seed_pages):
     """Seed view records into the database."""
-    from src.main_app.db.models import ViewsNewRecord
+    from src.main_app.database.models import ViewsNewRecord
     from src.main_app.extensions import db
 
     view1 = ViewsNewRecord(

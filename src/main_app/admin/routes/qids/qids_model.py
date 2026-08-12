@@ -8,8 +8,8 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from werkzeug.wrappers.response import Response
 
-from ....db.models import QidOthersRecord, QidRecord
-from ....db.services import QidOthersService, QidService
+from ....database.models import QidOthersRecord, QidRecord
+from ....database.services import QidOthersService, QidService
 
 logger = logging.getLogger(__name__)
 

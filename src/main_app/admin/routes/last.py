@@ -9,7 +9,7 @@ from typing import Any
 
 from flask import render_template
 
-from ...db.services import CategoryService, LangService, PagesQueryService
+from ...database.services import CategoryService, LangService, PagesQueryService
 
 logger = logging.getLogger(__name__)
 

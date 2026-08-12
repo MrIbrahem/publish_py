@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....db.services import AllQidsService, CategoryService, InProcessService, PagesService
+from ....database.services import AllQidsService, CategoryService, InProcessService, PagesService
 from ....shared.clients import get_mdwiki_cat_members
 
 logger = logging.getLogger(__name__)

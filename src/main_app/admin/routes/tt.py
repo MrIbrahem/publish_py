@@ -14,7 +14,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from werkzeug.wrappers.response import Response
 
-from ...db.services import CategoryService, TranslateTypeService
+from ...database.services import CategoryService, TranslateTypeService
 from ...extensions import UniqueError
 
 logger = logging.getLogger(__name__)

@@ -11,7 +11,7 @@ import logging
 
 from flask import Blueprint, render_template
 
-from ...db.services import PagesService, UserPagesService
+from ...database.services import PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 

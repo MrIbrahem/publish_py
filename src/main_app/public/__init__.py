@@ -39,17 +39,21 @@ PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
 ]
 
 
-def register_blueprints(app: Flask) -> None:
-    for module in PUBLIC_ROUTE_MODULES:
-        bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
-        route_instance = module.route_cls(bp=bp, **module.extra_kwargs)
-        app.register_blueprint(route_instance.bp)
+class RouteRegistrar:
+    """Registers all route blueprints on a Flask app."""
 
-    publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
-    app.register_blueprint(publish_model.bp)
-    csrf_exempt(app, publish_model.bp)
+    @staticmethod
+    def register(app: Flask):
+        for module in PUBLIC_ROUTE_MODULES:
+            bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
+            route_instance = module.route_cls(bp=bp, **module.extra_kwargs)
+            app.register_blueprint(route_instance.bp)
+
+        publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
+        app.register_blueprint(publish_model.bp)
+        csrf_exempt(app, publish_model.bp)
 
 
 __all__ = [
-    "register_blueprints",
+    "RouteRegistrar",
 ]

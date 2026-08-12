@@ -3,43 +3,43 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..db.models.dashboard import (
+from ..database.models.dashboard import (
     CategoryRecord,
     ProjectRecord,
 )
-from ..db.models.metrics import (
+from ..database.models.metrics import (
     AssessmentRecord,
     RefsCountRecord,
     WordRecord,
 )
-from ..db.models.pages import (
+from ..database.models.pages import (
     InProcessRecord,
     PageRecord,
     PagesUsersToMainRecord,
     UserPageRecord,
 )
-from ..db.models.public import (
+from ..database.models.public import (
     LangRecord,
     MdwikiRevidRecord,
     TranslateTypeRecord,
 )
-from ..db.models.publish import ReportRecord
-from ..db.models.qid import (
+from ..database.models.publish import ReportRecord
+from ..database.models.qid import (
     AllQidsExistRecord,
     QidOthersRecord,
     QidRecord,
 )
-from ..db.models.setting import (
+from ..database.models.setting import (
     LanguageSettingRecord,
     SettingRecord,
 )
-from ..db.models.users import (
+from ..database.models.users import (
     AdminUserRecord,
     FullTranslatorRecord,
     UserRecord,
     UsersNoInprocessRecord,
 )
-from ..db.models.views import (
+from ..database.models.views import (
     EnwikiPageviewRecord,
     ViewsNewAllRecord,
     ViewsNewRecord,

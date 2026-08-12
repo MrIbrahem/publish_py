@@ -14,7 +14,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.services import LangService, LanguageSettingService
+from ...database.services import LangService, LanguageSettingService
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)

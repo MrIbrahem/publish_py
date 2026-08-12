@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from flask_migrate import Migrate
 
-from ..db.exceptions import UniqueError
+from ..database.exceptions import UniqueError
 from ._csrf import (
     csrf,
     csrf_exempt,

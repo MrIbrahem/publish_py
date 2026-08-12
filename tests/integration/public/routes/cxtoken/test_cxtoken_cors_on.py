@@ -11,7 +11,7 @@ from flask import Blueprint, Flask
 from flask.testing import FlaskClient
 
 from src.main_app.config import TestingConfig
-from src.main_app.db.services import UsersService, UserTokenService
+from src.main_app.database.services import UsersService, UserTokenService
 
 ALLOWED_DOMAIN = "medwiki.toolforge.org"
 

@@ -7,8 +7,8 @@ import logging
 from typing import Any
 
 from ....config import settings
-from ....db.models import LanguageSettingRecord
-from ....db.services import (
+from ....database.models import LanguageSettingRecord
+from ....database.services import (
     LanguageSettingService,
     MdwikiRevidService,
     ReportService,

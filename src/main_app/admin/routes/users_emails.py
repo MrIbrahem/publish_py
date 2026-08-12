@@ -14,8 +14,8 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
-from ...db.models import ProjectRecord, UserRecord
-from ...db.services import LeaderboardService, ProjectService, UsersService
+from ...database.models import ProjectRecord, UserRecord
+from ...database.services import LeaderboardService, ProjectService, UsersService
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
