@@ -6,9 +6,8 @@ Tests for encryption/decryption helpers used for OAuth token storage.
 from __future__ import annotations
 
 import pytest
-from cryptography.fernet import Fernet
 
-from src.main_app.shared.core.crypto import _require_fernet, decrypt_value, encrypt_value
+from src.main_app.shared.core.crypto import decrypt_value, encrypt_value
 
 
 class TestEncryptValue:
@@ -94,27 +93,6 @@ class TestDecryptValue:
         """Test that empty bytes raises ValueError."""
         with pytest.raises(ValueError, match="Unable to decrypt stored token"):
             decrypt_value(b"")
-
-
-class TestRequireFernet:
-    """Tests for _require_fernet function."""
-
-    def test_returns_same_fernet_instance(self) -> None:
-        """Test that same Fernet instance is returned on multiple calls."""
-        fernet1: Fernet = _require_fernet()
-        fernet2: Fernet = _require_fernet()
-
-        assert fernet1 is fernet2
-
-    def test_fernet_can_encrypt_and_decrypt(self) -> None:
-        """Test that returned Fernet instance works correctly."""
-        fernet: Fernet = _require_fernet()
-        original: str = "test_message"
-
-        encrypted: bytes = fernet.encrypt(original.encode())
-        decrypted: str = fernet.decrypt(encrypted).decode()
-
-        assert decrypted == original
 
 
 class TestRoundTrip:

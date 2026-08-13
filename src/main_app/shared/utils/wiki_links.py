@@ -25,7 +25,7 @@ from __future__ import annotations
 from html import escape
 from urllib.parse import quote, urlencode
 
-from ...db.services import SettingsService
+from ...database.services import SettingsService
 
 # Mirrors PHP make_ContentTranslation_url's default. The setting key
 # `use_mdwikicx` (read by `_get_endpoint`) flips this to mdwikicx.

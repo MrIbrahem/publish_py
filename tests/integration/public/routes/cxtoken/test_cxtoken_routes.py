@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 from flask.testing import FlaskClient
 
-from src.main_app.db.services import UsersService, UserTokenService
+from src.main_app.database.services import UsersService, UserTokenService
 
 
 @pytest.mark.integration

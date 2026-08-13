@@ -12,7 +12,7 @@ from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
 from ....config import settings
-from ....db.services import UserTokenService
+from ....database.services import UserTokenService
 from ....shared.clients.oauth_client import get_cxtoken
 from ....shared.core.cors import check_cors
 from ....shared.schemas import CXTokenRequestSchema

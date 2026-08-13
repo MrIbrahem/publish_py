@@ -14,7 +14,7 @@ from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
 from werkzeug.datastructures import MultiDict
 
-from ....db.models import (
+from ....database.models import (
     CategoryRecord,
     LangRecord,
     PageRecord,

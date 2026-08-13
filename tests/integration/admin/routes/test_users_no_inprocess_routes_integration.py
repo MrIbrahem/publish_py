@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 from flask.testing import FlaskClient
 
-from src.main_app.db.services import UsersNoInprocessService
+from src.main_app.database.services import UsersNoInprocessService
 
 
 @pytest.mark.integration

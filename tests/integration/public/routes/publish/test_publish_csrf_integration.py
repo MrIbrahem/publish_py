@@ -12,7 +12,7 @@ import pytest
 from flask import Blueprint
 from flask.app import Flask
 
-from src.main_app.db.services import UsersService, UserTokenService
+from src.main_app.database.services import UsersService, UserTokenService
 
 
 @pytest.fixture

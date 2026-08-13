@@ -8,8 +8,8 @@ import logging
 from typing import Any
 
 from ...config import settings
-from ...db.models import QidRecord
-from ...db.services import QidService
+from ...database.models import QidRecord
+from ...database.services import QidService
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)

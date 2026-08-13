@@ -16,7 +16,7 @@ The actual DB operations are mocked to avoid requiring a real database.
 These tests complement the unit tests by verifying the service-to-DB integration.
 """
 
-from src.main_app.db.services.pages_tables.page_service import (
+from src.main_app.database.services.pages_tables.page_service import (
     PagesService,
 )
 

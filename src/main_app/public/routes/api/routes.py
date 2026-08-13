@@ -12,8 +12,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
-from ....db.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
-from ....db.services import (
+from ....database.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
+from ....database.services import (
     CategoryService,
     InProcessService,
     LangService,

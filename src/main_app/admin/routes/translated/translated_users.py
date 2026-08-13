@@ -10,7 +10,7 @@ from flask import Blueprint
 
 from .translated_shared_routes import SharedTranslatedRoutes
 
-# from ...db.services import UserPagesService
+# from ...database.services import UserPagesService
 
 logger = logging.getLogger(__name__)
 

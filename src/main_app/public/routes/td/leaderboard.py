@@ -13,7 +13,7 @@ from flask import (
     request,
 )
 
-from ....db.services import CategoryService, LeaderboardService, ProjectService
+from ....database.services import CategoryService, LeaderboardService, ProjectService
 from ..api.top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)

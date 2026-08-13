@@ -24,7 +24,7 @@ from mwoauth import RequestToken
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from ...config import settings
-from ...db.services import UserTokenService
+from ...database.services import UserTokenService
 from ...shared.auth.auth_service import (
     OAuthCallbackError,
     complete_oauth_callback,
@@ -238,7 +238,6 @@ class AuthRoutes(AuthRoutesFuncs):
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.before_app_request(self.before_request)
         self.bp.get("/login")(self.login)
         self.bp.get("/callback")(self.callback)
         self.bp.get("/logout")(self.logout)

@@ -5,11 +5,14 @@ WSGI development entry point for the app.
 
 from __future__ import annotations
 import sys
+import os
 import logging
 import pymysql
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+os.environ["FLASK_ENV"] = "development"
 
 sys.path.insert(0, str(Path(__file__).parent))
 pymysql.install_as_MySQLdb()
@@ -22,15 +25,9 @@ try:
 except Exception:
     logging.warning(f"Failed to load .env file from {str(_env_file_path)}")
 
-# import app here
-from logger_config import configure_logging  # noqa: E402
+from main_app import AppFactory  # noqa: E402
 
-configure_logging(logging.DEBUG, use_colorlog=True)
-
-from main_app.config import DevelopmentConfig  # noqa: E402
-from main_app import create_app  # noqa: E402
-
-app = create_app(DevelopmentConfig)
+app = AppFactory.create()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

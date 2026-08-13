@@ -10,7 +10,7 @@ import logging
 
 from flask import Blueprint
 
-from ....db.services import QidOthersService
+from ....database.services import QidOthersService
 from .qids_model import QidsSharedModel
 
 logger = logging.getLogger(__name__)

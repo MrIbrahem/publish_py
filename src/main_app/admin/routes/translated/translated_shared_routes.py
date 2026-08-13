@@ -9,7 +9,7 @@ import logging
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
-from ....db.services import LangService, PagesService, UserPagesService
+from ....database.services import LangService, PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 

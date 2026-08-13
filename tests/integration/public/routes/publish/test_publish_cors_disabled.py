@@ -8,9 +8,9 @@ import pytest
 from flask import Flask
 from flask.testing import FlaskClient
 
-from src.main_app import create_app
+from src.main_app import AppFactory
 from src.main_app.config import TestingConfig
-from src.main_app.db.services import UsersService, UserTokenService
+from src.main_app.database.services import UsersService, UserTokenService
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def mock_app() -> Flask:
 
     os.environ.setdefault("CORS_ALLOWED_DOMAINS", "")
 
-    _app = create_app(TestingConfig)
+    _app = AppFactory.create(TestingConfig)
     _app.config.update({"CORS_DISABLED": True})
 
     return _app

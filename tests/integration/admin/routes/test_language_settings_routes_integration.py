@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 from flask.testing import FlaskClient
 
-from src.main_app.db.services import LangService, LanguageSettingService
+from src.main_app.database.services import LangService, LanguageSettingService
 
 
 @pytest.mark.integration
