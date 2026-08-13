@@ -48,6 +48,7 @@ class CurrentUser:
             # can_run_bg_jobs=token.user.can_run_bg_jobs,
         )
 
+
 __all__ = [
     "CurrentUser",
 ]
