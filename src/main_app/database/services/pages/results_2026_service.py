@@ -7,7 +7,7 @@ PHP source:
       - missing_by_lang_and_category($lang_code, $category)
       - exists_by_lang_and_category($lang_code, $category)
 
-The queries hit the shared MariaDB ``category_members`` table directly. That
+The queries hit the services MariaDB ``category_members`` table directly. That
 is a many-to-many membership table with ``UNIQUE(category, article_id)``,
 distinct from ``all_articles`` (which is ``UNIQUE(article_id)`` and stores
 each article's primary category only). The matching SQLAlchemy model is

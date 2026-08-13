@@ -20,7 +20,7 @@ from .extensions import migrate
 from .logger_config import configure_logging
 from .public import RouteRegistrar
 from .public.utils import context_data
-from .shared.core import CookieHeaderClient, filters
+from .services.core import CookieHeaderClient, filters
 
 logger = logging.getLogger(__name__)
 

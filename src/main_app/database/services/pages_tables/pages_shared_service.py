@@ -1,5 +1,5 @@
 """
-SQLAlchemy-based shared logic for managing pages_users/pages tables.
+SQLAlchemy-based services logic for managing pages_users/pages tables.
 """
 
 from __future__ import annotations

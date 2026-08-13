@@ -74,7 +74,7 @@ from src.main_app import AppFactory
 from src.main_app.config import TestingConfig
 from src.main_app.database.create_helper import create_tables, create_views
 from src.main_app.extensions import db as _db
-from src.main_app.shared.auth import CurrentUser
+from src.main_app.services.auth import CurrentUser
 
 
 @pytest.fixture(autouse=True)
@@ -167,28 +167,28 @@ def auth_client(mock_app):
 
 @pytest.fixture
 def mock_is_denied(mocker):
-    return mocker.patch("src.main_app.shared.core.cors.is_allowed", return_value=None)
+    return mocker.patch("src.main_app.services.core.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_is_allowed(mocker):
-    return mocker.patch("src.main_app.shared.core.cors.is_allowed", return_value=None)
+    return mocker.patch("src.main_app.services.core.cors.is_allowed", return_value=None)
 
 
 @pytest.fixture
 def mock_is_allowed_medwiki(mocker):
-    return mocker.patch("src.main_app.shared.core.cors.is_allowed", return_value="medwiki.toolforge.org")
+    return mocker.patch("src.main_app.services.core.cors.is_allowed", return_value="medwiki.toolforge.org")
 
 
 @pytest.fixture
 def mock_check_secret(mocker):
-    return mocker.patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None)
+    return mocker.patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=None)
 
 
 @pytest.fixture
 def mock_load_request(mocker):
     mock_req = MagicMock()
-    mocker.patch("src.main_app.shared.core.cors._load_request", return_value=mock_req)
+    mocker.patch("src.main_app.services.core.cors._load_request", return_value=mock_req)
     return mock_req
 
 

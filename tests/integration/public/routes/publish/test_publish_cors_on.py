@@ -91,7 +91,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_disallowed_origin_returns_403(self, mock_is_denied, mock_client):
         """POST from disallowed origin without secret key returns 403."""
-        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),):
+        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=None),):
             response = mock_client.post(
                 "/publish/",
                 data=json.dumps({"user": "TestUser", "title": "Test Page"}),
@@ -124,7 +124,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_with_valid_secret_key_bypasses_cors(self, mock_is_denied, mock_client):
         """POST with valid secret key bypasses CORS even from disallowed origin."""
-        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value="evil.com"),):
+        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value="evil.com"),):
             response = mock_client.post(
                 "/publish/",
                 headers={"X-Secret-Key": "test-secret"},
@@ -146,7 +146,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_allowed_origin_with_invalid_secret_key(self, mock_is_allowed_medwiki, mock_client):
         """POST from allowed origin succeeds even if secret key is invalid."""
-        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),):
+        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=None),):
             response = mock_client.post(
                 "/publish/",
                 data=json.dumps(
@@ -166,7 +166,7 @@ class TestValidateAccessOnPublish:
 
     def test_post_disallowed_origin_and_no_secret_key(self, mock_is_denied, mock_client):
         """POST from disallowed origin without secret key returns specific error info."""
-        with (patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=None),):
+        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=None),):
             response = mock_client.post(
                 "/publish/",
                 headers={"Origin": "https://evil.com"},

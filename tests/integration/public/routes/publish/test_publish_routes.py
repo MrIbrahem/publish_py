@@ -16,8 +16,8 @@ from src.main_app.database.services import UsersService, UserTokenService
 def mock_validate_access():
     """Bypass CORS/secret checks performed by `validate_access` at request time."""
     with (
-        patch("src.main_app.shared.core.cors.is_allowed", return_value="https://example.com"),
-        patch("src.main_app.shared.core.cors.check_publish_secret_code", return_value=True),
+        patch("src.main_app.services.core.cors.is_allowed", return_value="https://example.com"),
+        patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=True),
     ):
         yield
 
