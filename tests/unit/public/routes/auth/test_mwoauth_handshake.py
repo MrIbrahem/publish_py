@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.shared.auth.mwoauth_handshake import (
+from src.main_app.shared.auth.auth_service import (
     IDENTITY_ERROR_MESSAGE,
     OAuthIdentityError,
     complete_login,
