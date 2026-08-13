@@ -1,5 +1,5 @@
 """
-Application factory.
+Flask application factory.
 """
 
 from __future__ import annotations
@@ -23,7 +23,6 @@ from .public.utils import context_data
 from .shared.core import CookieHeaderClient, filters
 
 logger = logging.getLogger(__name__)
-
 
 class AppFactory:
     """Builds and configures the Flask application."""
@@ -55,7 +54,6 @@ class AppFactory:
             cls._register_routes(app)
         else:
             app.before_request(cls.db_error_fallback)
-
         return app
 
     @staticmethod
@@ -99,7 +97,7 @@ class AppFactory:
         return False
 
     @staticmethod
-    def _register_routes(app: Flask):
+    def _register_routes(app: Flask) -> None:
         RouteRegistrar.register(app)
         add_admin_dashboard(app, _db)
         register_bp_admin_blueprints(app)
