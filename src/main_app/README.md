@@ -113,7 +113,7 @@ Covers: 400, 401, 403, 404, 429, 500.
 
 ### Bugs
 
-> **Dead `g` attribute assignments**: In the auth logout handler, `g.current_user = None` and `g.is_authenticated = False` are set after `make_response()` is called. Since `g` is request-scoped and the response is already built, these assignments have no effect.
+> **Dead `g` attribute assignments**: In the auth logout handler, `g._current_user = None` and `g.is_authenticated = False` are set after `make_response()` is called. Since `g` is request-scoped and the response is already built, these assignments have no effect.
 
 ## Areas That Need Attention
 

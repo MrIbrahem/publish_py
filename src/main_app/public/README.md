@@ -159,7 +159,7 @@ GET /cxtoken/?wiki=...&user=...
 
 ### Bugs
 
-> **Dead `g` assignments in logout** (`auth/routes.py` lines 290-293): Setting `g.current_user = None` after `make_response()` has no effect.
+> **Dead `g` assignments in logout** (`auth/routes.py` lines 290-293): Setting `g._current_user = None` after `make_response()` has no effect.
 
 > **`validate_access` dead code** (`cors/__init__.py`): Second error branch is unreachable due to control flow.
 

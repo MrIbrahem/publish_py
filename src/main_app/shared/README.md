@@ -34,7 +34,7 @@ The `shared` package contains reusable infrastructure code shared across all blu
 /auth/login -> MediaWiki OAuth -> /auth/callback
   ├─ Store encrypted tokens in DB (user_tokens table)
   ├─ Set signed cookie (itsdangerous)
-  └─ Populate g.current_user
+  └─ Populate g._current_user
 
 Request -> current_user() resolution:
   ├─ Check g._current_user (per-request cache)
@@ -129,7 +129,7 @@ Two decorators in `shared/core/cors/`:
 
 > **Duplicate flash messages in logout** (`auth/routes.py`): The logout handler always calls `flash("Logout successful.", "success")` regardless of whether token deletion succeeded. Users who get "Error while clearing OAuth credentials" will also see "Logout successful".
 
-> **Dead `g` attribute assignments** (`auth/routes.py` lines 290-293): Setting `g.current_user = None` after `make_response()` has no effect -- `g` is request-scoped and the response is already built.
+> **Dead `g` attribute assignments** (`auth/routes.py` lines 290-293): Setting `g._current_user = None` after `make_response()` has no effect -- `g` is request-scoped and the response is already built.
 
 > **`validate_access` dead code** (`cors/__init__.py` lines 51-67): The second error response ("Requests are only allowed from authorized domains") is unreachable due to the control flow logic.
 
