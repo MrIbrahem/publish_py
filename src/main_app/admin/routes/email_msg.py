@@ -13,8 +13,8 @@ from flask import (
 )
 
 from ...database.services import PagesService, UserPagesService, UsersService, ViewsNewService
-from ...public.auth.utils import get_current_user
 from ...public.routes.td.results_api import results_api_result
+from ...shared.auth.utils import get_current_user
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)

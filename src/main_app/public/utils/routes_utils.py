@@ -4,7 +4,7 @@ import logging
 from datetime import date, timedelta
 from typing import Any
 
-from ..auth.utils import get_current_user
+from ...shared.auth.utils import get_current_user
 
 logger = logging.getLogger(__name__)
 

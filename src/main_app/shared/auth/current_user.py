@@ -10,6 +10,15 @@ from typing import Any
 from ...database.models import UserTokenRecord
 
 
+def parse_bool(value: str | int) -> bool:
+    """Parse boolean value from CSV string."""
+    if not value:
+        return False
+    if isinstance(value, int):
+        value = str(value)
+    return value.strip().lower() in {"yes", "true", "1", "y"}
+
+
 @dataclass(frozen=True)
 class CurrentUser:
     """Bundles user identity and OAuth credentials
@@ -44,8 +53,6 @@ class CurrentUser:
             access_token=token.access_token,
             access_secret=token.access_secret,
             is_active_admin=is_active_admin,
-            # can_run_jobs=token.user.can_run_jobs,
-            # can_run_bg_jobs=token.user.can_run_bg_jobs,
         )
 
 

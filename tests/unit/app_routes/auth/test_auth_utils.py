@@ -20,7 +20,7 @@ class TestOAuthRequired:
         """Test that decorator redirects when no user and OAuth enabled."""
         from src.main_app.config import OAuthConfig
 
-        monkeypatch.setattr("src.main_app.public.auth.utils.get_current_user", lambda: None)
+        monkeypatch.setattr("src.main_app.public.auth.decorators.get_current_user", lambda: None)
         # Create a mock Settings object with OAuth enabled
         mock_settings = MagicMock()
         mock_settings.oauth = OAuthConfig(
@@ -30,7 +30,7 @@ class TestOAuthRequired:
             encryption_key="test_encryption_key",
         )
         # Patch the entire settings object, not just oauth
-        monkeypatch.setattr("src.main_app.public.auth.utils.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.shared.auth.utils.settings", mock_settings)
 
         @oauth_required
         def protected_view():
@@ -51,7 +51,7 @@ class TestOAuthRequired:
         from src.main_app.config import OAuthConfig
 
         mock_user = MagicMock()
-        monkeypatch.setattr("src.main_app.public.auth.utils.get_current_user", lambda: mock_user)
+        monkeypatch.setattr("src.main_app.public.auth.decorators.get_current_user", lambda: mock_user)
         # Create a mock Settings object with OAuth enabled
         mock_settings = MagicMock()
         mock_settings.oauth = OAuthConfig(
@@ -60,7 +60,7 @@ class TestOAuthRequired:
             consumer_secret="test_secret",
             encryption_key="test_encryption_key",
         )
-        monkeypatch.setattr("src.main_app.public.auth.utils.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.shared.auth.utils.settings", mock_settings)
 
         @oauth_required
         def protected_view():
