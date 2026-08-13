@@ -5,6 +5,7 @@ SQLAlchemy-based service for managing user tokens.
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
@@ -23,8 +24,8 @@ class UserTokenService(CRUDService[UserTokenRecord]):
     def __init__(self) -> None:
         super().__init__(db.session, UserTokenRecord)
 
-    def encrypt_value(self, value: str) -> bytes:
-        return encrypt_value(value)
+    def encrypt_value(self, plaintext: str) -> bytes:
+        return encrypt_value(plaintext=plaintext)
 
     def get_authenticated_user_token(self, user_id: int) -> None | UserTokenRecord:
         """Fetch the CurrentUser composite for session restoration."""
@@ -126,6 +127,12 @@ class UserTokenService(CRUDService[UserTokenRecord]):
         except Exception as exc:
             logger.error("Error getting token by username %s: %s", username, exc)
             return None
+
+    def update_last_used(self, user_id: int) -> UserTokenRecord | None:
+        token = self.get_record_by_id(user_id)
+        if token is None:
+            return None
+        return self.update(token, last_used_at=datetime.utcnow())
 
 
 __all__ = [

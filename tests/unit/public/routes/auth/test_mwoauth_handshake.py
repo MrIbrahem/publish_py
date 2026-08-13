@@ -12,8 +12,8 @@ from src.main_app.services.auth.auth_service import (
     IDENTITY_ERROR_MESSAGE,
     OAuthIdentityError,
     complete_login,
+    create_authorization_url,
     get_handshaker,
-    start_login,
 )
 
 
@@ -78,36 +78,20 @@ class TestGetHandshaker:
 
 
 class TestStartLogin:
-    """Tests for start_login function."""
+    """Tests for create_authorization_url function."""
 
     @patch("src.main_app.services.auth.auth_service.OAuthService.get_handshaker")
-    @patch("src.main_app.services.auth.auth_service.url_for")
-    def test_returns_redirect_url_and_request_token(self, mock_url_for, mock_get_handshaker):
+    def test_returns_redirect_url_and_request_token(self, mock_get_handshaker):
         """Test that function returns redirect URL and request token."""
-        mock_url_for.return_value = "https://example.com/callback"
         mock_handshaker = MagicMock()
         mock_handshaker.initiate.return_value = ("https://oauth.provider.com/authorize", "request_token_123")
         mock_get_handshaker.return_value = mock_handshaker
 
-        redirect_url, request_token = start_login("state_token_123")
+        redirect_url, request_token = create_authorization_url("https://host/callback?state=state_token_123")
 
-        mock_url_for.assert_called_once_with("auth.callback", _external=True, state="state_token_123")
-        mock_handshaker.initiate.assert_called_once_with(callback="https://example.com/callback")
+        mock_handshaker.initiate.assert_called_once_with(callback="https://host/callback?state=state_token_123")
         assert redirect_url == "https://oauth.provider.com/authorize"
         assert request_token == "request_token_123"
-
-    @patch("src.main_app.services.auth.auth_service.OAuthService.get_handshaker")
-    @patch("src.main_app.services.auth.auth_service.url_for")
-    def test_uses_provided_state_token(self, mock_url_for, mock_get_handshaker):
-        """Test that the provided state token is used in the callback URL."""
-        mock_url_for.return_value = "https://example.com/callback?state=abc123"
-        mock_handshaker = MagicMock()
-        mock_handshaker.initiate.return_value = ("https://oauth.provider.com/authorize", "token")
-        mock_get_handshaker.return_value = mock_handshaker
-
-        start_login("abc123")
-
-        mock_url_for.assert_called_once_with("auth.callback", _external=True, state="abc123")
 
 
 class TestCompleteLogin:
@@ -206,11 +190,9 @@ class TestOAuthIntegration:
     """Integration-style tests for OAuth flow."""
 
     @patch("src.main_app.services.auth.auth_service.OAuthService.get_handshaker")
-    @patch("src.main_app.services.auth.auth_service.url_for")
-    def test_full_oauth_flow(self, mock_url_for, mock_get_handshaker):
+    def test_full_oauth_flow(self, mock_get_handshaker):
         """Test complete OAuth flow from start to completion."""
         # Setup mocks
-        mock_url_for.return_value = "https://example.com/callback"
         mock_handshaker = MagicMock()
         mock_request_token = "request_token_abc"
         mock_access_token = MagicMock()
@@ -222,7 +204,7 @@ class TestOAuthIntegration:
         mock_get_handshaker.return_value = mock_handshaker
 
         # Step 1: Start login
-        redirect_url, request_token = start_login("state_123")
+        redirect_url, request_token = create_authorization_url("https://host/callback?state=state_123")
         assert redirect_url == "https://oauth.provider.com/authorize"
         assert request_token == mock_request_token
 

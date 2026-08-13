@@ -46,7 +46,7 @@ class TestAuthLogin:
                 mock_limiter.allow.side_effect = allow_side_effect
                 mock_limiter.try_after.return_value = timedelta(seconds=30)
 
-                with patch("src.main_app.public.auth.routes.start_login") as mock_start:
+                with patch("src.main_app.public.auth.routes.OAuthService.create_authorization_url") as mock_start:
                     mock_start.return_value = ("https://oauth.provider.com/authorize", MagicMock())
 
                     # Make 6 requests to exceed rate limit
@@ -63,7 +63,7 @@ class TestAuthLogin:
             mock_settings.sessions.state_key = "oauth_state"
             mock_settings.sessions.request_token_key = "request_token"
 
-            with patch("src.main_app.public.auth.routes.start_login") as mock_start:
+            with patch("src.main_app.public.auth.routes.OAuthService.create_authorization_url") as mock_start:
                 mock_start.return_value = ("https://oauth.provider.com/authorize", MagicMock())
 
                 with patch("src.main_app.public.auth.routes.login_rate_limiter") as mock_limiter:
