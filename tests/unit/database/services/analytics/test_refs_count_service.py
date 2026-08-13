@@ -1,8 +1,8 @@
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import RefsCountRecord
 from src.main_app.database.services.analytics.refs_count_service import RefsCountService
-from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:

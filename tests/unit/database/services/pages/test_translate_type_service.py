@@ -1,8 +1,8 @@
 import pytest
 
+from src.main_app.database.exceptions import UniqueError
 from src.main_app.database.models import PageRecord, QidRecord, TranslateTypeRecord
 from src.main_app.database.services.pages.translate_type_service import TranslateTypeService
-from src.main_app.database.exceptions import UniqueError
 
 
 class TestSetup:

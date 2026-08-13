@@ -1,8 +1,8 @@
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import ProjectRecord
 from src.main_app.database.services.content.project_service import ProjectService
-from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:

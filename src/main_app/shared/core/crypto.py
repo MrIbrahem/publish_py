@@ -22,6 +22,10 @@ class CryptoService:
         key_bytes = enc_key.encode() if isinstance(enc_key, str) else enc_key
         self._fernet = Fernet(key_bytes)
 
+    def generate_key(self) -> str:
+        """Utility: generate a new Fernet key."""
+        return Fernet.generate_key().decode("utf-8")
+
     def encrypt(self, plaintext: str) -> bytes:
         """Encrypt a UTF-8 string and return the raw Fernet token bytes."""
         return self._fernet.encrypt(plaintext.encode("utf-8"))
@@ -35,24 +39,8 @@ class CryptoService:
             raise ValueError("Unable to decrypt stored token") from exc
         return decrypted.decode("utf-8")
 
-    def generate_key(self) -> str:
-        """Utility: generate a new Fernet key."""
-        return Fernet.generate_key().decode("utf-8")
-
-    def _encrypt(self, plaintext: str) -> str:
-        """Encrypt a plaintext string and return the ciphertext as a string."""
-        return self._fernet.encrypt(plaintext.encode("utf-8")).decode("utf-8")
-
-    def _decrypt(self, ciphertext: str) -> str:
-        """Decrypt a ciphertext string back to plaintext."""
-        try:
-            return self._fernet.decrypt(ciphertext.encode("utf-8")).decode("utf-8")
-        except InvalidToken as exc:
-            raise ValueError("Failed to decrypt — invalid token or wrong key") from exc
-
-
-def encrypt_value(ciphertext: str) -> bytes:
-    return CryptoService().encrypt(ciphertext)
+def encrypt_value(plaintext: str) -> bytes:
+    return CryptoService().encrypt(plaintext)
 
 
 def decrypt_value(token: bytes) -> str:

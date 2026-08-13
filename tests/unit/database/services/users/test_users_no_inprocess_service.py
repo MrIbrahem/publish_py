@@ -1,8 +1,8 @@
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import UsersNoInprocessRecord
 from src.main_app.database.services.users import UsersNoInprocessService
-from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:

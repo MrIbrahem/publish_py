@@ -2,9 +2,9 @@ from unittest.mock import patch
 
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import PagesUsersToMainRecord
 from src.main_app.database.services.reports.pages_users_to_main_service import PagesUsersToMainService
-from src.main_app.database.exceptions import RecordNotFoundError
 
 pytestmark = pytest.mark.unit
 

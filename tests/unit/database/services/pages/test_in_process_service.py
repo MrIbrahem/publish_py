@@ -2,11 +2,11 @@ from unittest.mock import patch
 
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import InProcessRecord
 from src.main_app.database.services.pages.in_process_service import (
     InProcessService,
 )
-from src.main_app.database.exceptions import RecordNotFoundError
 
 pytestmark = pytest.mark.unit
 

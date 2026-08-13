@@ -1,8 +1,8 @@
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import WordRecord
 from src.main_app.database.services.analytics.word_service import WordService
-from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:
