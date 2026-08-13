@@ -1,8 +1,8 @@
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import EnwikiPageviewRecord
 from src.main_app.database.services.analytics.enwiki_pageview_service import EnwikiPageviewService
-from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:

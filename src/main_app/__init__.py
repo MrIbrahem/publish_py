@@ -24,6 +24,7 @@ from .shared.core import CookieHeaderClient, filters
 
 logger = logging.getLogger(__name__)
 
+
 class AppFactory:
     """Builds and configures the Flask application."""
 

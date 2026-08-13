@@ -1,8 +1,8 @@
 import pytest
 
+from src.main_app.database.exceptions import RecordNotFoundError
 from src.main_app.database.models import ViewsNewRecord
 from src.main_app.database.services.analytics.views_new_service import ViewsNewService
-from src.main_app.database.exceptions import RecordNotFoundError
 
 
 class TestSetup:
