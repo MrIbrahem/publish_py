@@ -39,7 +39,6 @@ class CryptoService:
             raise ValueError("Unable to decrypt stored token") from exc
         return decrypted.decode("utf-8")
 
-
 def encrypt_value(plaintext: str) -> bytes:
     return CryptoService().encrypt(plaintext)
 
