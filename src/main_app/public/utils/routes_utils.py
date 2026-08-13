@@ -4,7 +4,7 @@ import logging
 from datetime import date, timedelta
 from typing import Any
 
-from ..auth.utils import load_user
+from ..auth.utils import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ def context_data(
     Used in @app.context_processor to inject variables into templates.
     """
     # Safe retrieval from g with a fallback to None
-    user = load_user()
+    user = get_current_user()
 
     username = user.username if user else None
 

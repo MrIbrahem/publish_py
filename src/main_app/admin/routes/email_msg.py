@@ -13,7 +13,7 @@ from flask import (
 )
 
 from ...database.services import PagesService, UserPagesService, UsersService, ViewsNewService
-from ...public.auth.utils import load_user
+from ...public.auth.utils import get_current_user
 from ...public.routes.td.results_api import results_api_result
 from ..decorators import admin_required
 
@@ -59,7 +59,7 @@ def get_user_email(username: str) -> str | None:
 
 
 def get_currect_user_email() -> str | None:
-    currect_user = load_user()
+    currect_user = get_current_user()
 
     if currect_user:
         return get_user_email(currect_user.username)

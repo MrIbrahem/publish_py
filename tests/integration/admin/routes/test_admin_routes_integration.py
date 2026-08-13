@@ -104,11 +104,11 @@ class TestAdminRouteAccess:
 
     def test_authenticated_non_admin_redirected(self, auth_client: FlaskClient):
         """Test that authenticated non-admin users are denied access."""
-        # Mock load_user to return a non-admin user
+        # Mock get_current_user to return a non-admin user
 
         mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
 
-        with patch("src.main_app.admin.decorators.load_user", return_value=mock_user):
+        with patch("src.main_app.admin.decorators.get_current_user", return_value=mock_user):
             response = auth_client.get("/adminpanel/", follow_redirects=False)
 
             # Should return 403 Forbidden (not a redirect)
@@ -116,10 +116,10 @@ class TestAdminRouteAccess:
 
     def test_authenticated_non_admin_forbidden(self, auth_client: FlaskClient):
         """Test that authenticated non-admin users are denied access."""
-        # Mock load_user to return a non-admin user
+        # Mock get_current_user to return a non-admin user
 
         mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
-        with patch("src.main_app.admin.decorators.load_user", return_value=mock_user):
+        with patch("src.main_app.admin.decorators.get_current_user", return_value=mock_user):
 
             response = auth_client.get("/adminpanel/", follow_redirects=False)
             # Should return 403 Forbidden (not a redirect)

@@ -20,7 +20,7 @@ class TestOAuthRequired:
         """Test that decorator redirects when no user and OAuth enabled."""
         from src.main_app.config import OAuthConfig
 
-        monkeypatch.setattr("src.main_app.public.auth.utils.load_user", lambda: None)
+        monkeypatch.setattr("src.main_app.public.auth.utils.get_current_user", lambda: None)
         # Create a mock Settings object with OAuth enabled
         mock_settings = MagicMock()
         mock_settings.oauth = OAuthConfig(
@@ -51,7 +51,7 @@ class TestOAuthRequired:
         from src.main_app.config import OAuthConfig
 
         mock_user = MagicMock()
-        monkeypatch.setattr("src.main_app.public.auth.utils.load_user", lambda: mock_user)
+        monkeypatch.setattr("src.main_app.public.auth.utils.get_current_user", lambda: mock_user)
         # Create a mock Settings object with OAuth enabled
         mock_settings = MagicMock()
         mock_settings.oauth = OAuthConfig(
