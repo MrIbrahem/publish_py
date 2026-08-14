@@ -74,7 +74,7 @@ from src.main_app import AppFactory
 from src.main_app.config import TestingConfig
 from src.main_app.database.create_helper import create_tables, create_views
 from src.main_app.extensions import db as _db
-from src.main_app.services.auth import CurrentUser
+from src.main_app.services.auth.current_user import CurrentUser
 
 
 @pytest.fixture(autouse=True)
