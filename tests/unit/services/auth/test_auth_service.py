@@ -68,7 +68,7 @@ def test_start_login(monkeypatch: pytest.MonkeyPatch) -> None:
             return "https://auth", ("token", "secret")
 
     monkeypatch.setattr(
-        "src.main_app.services.auth.auth_service.Handshaker", lambda self, *args, **kwargs: DummyHandshaker()
+        "src.main_app.services.auth.auth_service.Handshaker", lambda *args, **kwargs: DummyHandshaker()
     )
 
     redirect_url, request_token, request_secret = OAuthService().create_authorization_url("https://host/callback?state=signed-state")
@@ -93,7 +93,7 @@ def test_complete_login(monkeypatch: pytest.MonkeyPatch) -> None:
             return {"sub": "123", "username": "Tester"}
 
     monkeypatch.setattr(
-        "src.main_app.services.auth.auth_service.Handshaker", lambda self, *args, **kwargs: DummyHandshaker()
+        "src.main_app.services.auth.auth_service.Handshaker", lambda *args, **kwargs: DummyHandshaker()
     )
 
     access_token = OAuthService().fetch_access_token("oauth=1", "request-token", "request-secret")
@@ -114,7 +114,7 @@ def test_complete_login_identity_error(monkeypatch: pytest.MonkeyPatch) -> None:
             raise ValueError("bad")
 
     monkeypatch.setattr(
-        "src.main_app.services.auth.auth_service.Handshaker", lambda self, *args, **kwargs: DummyHandshaker()
+        "src.main_app.services.auth.auth_service.Handshaker", lambda *args, **kwargs: DummyHandshaker()
     )
 
     with pytest.raises(auth_service.OAuthIdentityError) as excinfo:
