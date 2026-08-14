@@ -12,6 +12,7 @@ from flask.testing import FlaskClient
 
 from src.main_app.config import TestingConfig
 from src.main_app.database.services import UsersService, UserTokenService
+from src.main_app.services.core.crypto import CryptoService
 
 ALLOWED_DOMAIN = "medwiki.toolforge.org"
 
@@ -82,9 +83,13 @@ class TestCheckCorsOnCxtokenGet:
         user = users_service.create_user("CorsTokenUser")
 
         token_service = UserTokenService()
-        encrypted_token = token_service.encrypt_value("test_access_token")
-        encrypted_secret = token_service.encrypt_value("test_access_secret")
-        token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+        encrypted_token = CryptoService().encrypt("test_access_token")
+        encrypted_secret = CryptoService().encrypt("test_access_secret")
+        token_service.create(
+            user_id=user.user_id,
+            access_token=encrypted_token,
+            access_secret=encrypted_secret,
+        )
 
         with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
             mock_get_cxtoken.return_value = {"cxtoken": "test_cx_token_123"}

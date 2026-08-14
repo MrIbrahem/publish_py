@@ -13,6 +13,7 @@ from flask import Blueprint
 from flask.app import Flask
 
 from src.main_app.database.services import UsersService, UserTokenService
+from src.main_app.services.core.crypto import CryptoService
 
 
 @pytest.fixture
@@ -67,9 +68,13 @@ def real_csrf_user_token():
     user = users_service.create_user("CsrfPublishUser")
 
     token_service = UserTokenService()
-    encrypted_token = token_service.encrypt_value("test_access_token")
-    encrypted_secret = token_service.encrypt_value("test_access_secret")
-    token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+    encrypted_token = CryptoService().encrypt("test_access_token")
+    encrypted_secret = CryptoService().encrypt("test_access_secret")
+    token_service.create(
+        user_id=user.user_id,
+        access_token=encrypted_token,
+        access_secret=encrypted_secret,
+    )
     return user
 
 
@@ -139,12 +144,20 @@ class BasePublishTest:
             token_service = UserTokenService()
 
             user = users_service.create_user("TestUser")
-            encrypted_token = token_service.encrypt_value("test_access_token")
-            encrypted_secret = token_service.encrypt_value("test_access_secret")
-            token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+            encrypted_token = CryptoService().encrypt("test_access_token")
+            encrypted_secret = CryptoService().encrypt("test_access_secret")
+            token_service.create(
+                user_id=user.user_id,
+                access_token=encrypted_token,
+                access_secret=encrypted_secret,
+            )
 
             special_user = users_service.create_user("Mr. Ibrahem")
-            token_service.create_user_token(special_user.user_id, encrypted_token, encrypted_secret)
+            token_service.create(
+                user_id=special_user.user_id,
+                access_token=encrypted_token,
+                access_secret=encrypted_secret,
+            )
         yield user
 
     @pytest.fixture
@@ -322,9 +335,14 @@ class TestComplexWorkflows(BasePublishTest):
         fallback_user = users_service.create_user("Mr. Ibrahem")
 
         token_service = UserTokenService()
-        fallback_token_encrypted = token_service.encrypt_value("fallback_key")
-        fallback_secret_encrypted = token_service.encrypt_value("fallback_secret")
-        token_service.create_user_token(fallback_user.user_id, fallback_token_encrypted, fallback_secret_encrypted)
+        fallback_token_encrypted = CryptoService().encrypt("fallback_key")
+        fallback_secret_encrypted = CryptoService().encrypt("fallback_secret")
+
+        token_service.create(
+            user_id=fallback_user.user_id,
+            access_token=fallback_token_encrypted,
+            access_secret=fallback_secret_encrypted,
+        )
 
         with (patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,):
             mock_should_add.return_value = True
