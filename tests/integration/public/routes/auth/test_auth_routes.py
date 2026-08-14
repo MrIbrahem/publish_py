@@ -44,7 +44,7 @@ class TestLogin:
 
         monkeypatch.setattr("src.main_app.services.auth.flow.OAuthService.create_authorization_url", DummyStart())
 
-        response = mock_client.get("/login")
+        response = mock_client.get("/auth/login")
 
         assert response.status_code == 302
         assert response.headers["Location"] == "https://auth.example"
@@ -72,7 +72,7 @@ class TestLogin:
 
         monkeypatch.setattr("src.main_app.public.auth.routes.login_rate_limiter", DummyLimiter())
 
-        response = mock_client.get("/login")
+        response = mock_client.get("/auth/login")
         assert response.status_code == 302
 
 
@@ -116,7 +116,7 @@ class TestCallback:
             sess[settings.sessions.request_secret_key] = "s"
 
         # The state query param must be the signed token (MediaWiki echoes it back)
-        response = mock_client.get(f"/callback?state={quote(signed_state)}&oauth_verifier=code")
+        response = mock_client.get(f"/auth/callback?state={quote(signed_state)}&oauth_verifier=code")
         cookie_header = response.headers.get("Set-Cookie", "")
 
         assert response.status_code == 302
@@ -148,7 +148,7 @@ class TestCallback:
 
         monkeypatch.setattr("src.main_app.public.auth.routes.callback_rate_limiter", DummyLimiter())
 
-        response = mock_client.get("/callback?state=token&oauth_verifier=code")
+        response = mock_client.get("/auth/callback?state=token&oauth_verifier=code")
         assert response.status_code == 302
 
     def test_callback_missing_state(
@@ -156,7 +156,7 @@ class TestCallback:
     ) -> None:
         """Callback should fail when state is missing."""
 
-        response = mock_client.get("/callback")
+        response = mock_client.get("/auth/callback")
         assert response.status_code == 302
 
 
@@ -184,7 +184,7 @@ class TestLogout:
             sess["uid"] = user_id
             sess["username"] = "LogoutUser"
 
-        response = mock_client.get("/logout")
+        response = mock_client.get("/auth/logout")
 
         assert response.status_code == 302
         assert response.headers["Location"].endswith("/")
