@@ -174,5 +174,6 @@ def test_complete_login_raises_identity_error(monkeypatch):
             raise RuntimeError("boom")
 
     monkeypatch.setattr(auth_service, "Handshaker", FailingHandshaker)
+    access_token = OAuthService().fetch_access_token("x=1", "rk", "rs")
     with pytest.raises(auth_service.OAuthIdentityError):
-        OAuthService().fetch_access_token("x=1", "rk", "rs")
+        OAuthService().identify(access_token)
