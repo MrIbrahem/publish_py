@@ -8,7 +8,7 @@ import logging
 from typing import Any
 
 from ....database.services import AllQidsService, CategoryService, InProcessService, PagesService
-from ....shared.clients import get_mdwiki_cat_members
+from ....services.clients import get_mdwiki_cat_members
 
 logger = logging.getLogger(__name__)
 

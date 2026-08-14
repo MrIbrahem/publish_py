@@ -6,7 +6,7 @@ PHP source:
       - count_category_members($category)
       - statics_by_category($category)
 
-Queries hit the shared MariaDB ``category_members`` table directly (the
+Queries hit the services MariaDB ``category_members`` table directly (the
 many-to-many membership table; backed by ``CategoryMemberRecord`` so the
 table is created when the Flask app launches).
 """

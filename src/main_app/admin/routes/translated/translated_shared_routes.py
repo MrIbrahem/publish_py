@@ -1,5 +1,5 @@
 """
-Admin shared routes for translated pages from (``pages``/``pages_users`` table).
+Admin services routes for translated pages from (``pages``/``pages_users`` table).
 """
 
 from __future__ import annotations

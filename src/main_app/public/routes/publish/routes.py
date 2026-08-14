@@ -11,9 +11,9 @@ from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
 from ....database.services import UserTokenService
-from ....shared.core.cors import check_cors, validate_access
-from ....shared.schemas import PublishRequestSchema
-from ....shared.utils.helpers.format import format_title, format_user
+from ....services.core.cors import check_cors, validate_access
+from ....services.schemas import PublishRequestSchema
+from ....services.utils.helpers.format import format_title, format_user
 from .worker import _handle_no_access, _process_edit
 
 logger = logging.getLogger(__name__)

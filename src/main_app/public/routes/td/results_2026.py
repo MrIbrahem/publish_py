@@ -24,7 +24,7 @@ from ....database.services import (
     Results2026Service,
     TranslateTypeService,
 )
-from ....shared.utils.wiki_links import (
+from ....services.utils.wiki_links import (
     content_translation_url,
     get_endpoint,
     tr_link_medwiki,

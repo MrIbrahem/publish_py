@@ -23,9 +23,9 @@ from ....database.services import (
     UsersService,
 )
 from ....extensions import db
-from ....shared.core.cors import check_cors
-from ....shared.schemas import PublishReportsQuerySchema
-from ....shared.utils.web_utils import parse_select_fields
+from ....services.core.cors import check_cors
+from ....services.schemas import PublishReportsQuerySchema
+from ....services.utils.web_utils import parse_select_fields
 from .form_utils import FormData, get_form
 from .top_stats_routes import get_top_langs, get_top_users
 

@@ -8,8 +8,8 @@ from sqlalchemy import ForeignKey, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from ...extensions import db
-from ...shared.core.crypto import decrypt_value
-from ...shared.utils.decode_bytes import coerce_bytes
+from ...services.core.crypto import decrypt_value
+from ...services.utils.decode_bytes import coerce_bytes
 
 logger = logging.getLogger(__name__)
 

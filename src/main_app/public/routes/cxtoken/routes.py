@@ -13,9 +13,9 @@ from marshmallow import ValidationError
 
 from ....config import settings
 from ....database.services import UserTokenService
-from ....shared.clients.oauth_client import get_cxtoken
-from ....shared.core.cors import check_cors
-from ....shared.schemas import CXTokenRequestSchema
+from ....services.clients.oauth_client import get_cxtoken
+from ....services.core.cors import check_cors
+from ....services.schemas import CXTokenRequestSchema
 from .cache import get_from_store, store_jwt
 
 logger = logging.getLogger(__name__)

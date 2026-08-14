@@ -123,11 +123,11 @@ class TestPublishEndpointWithCSRF2:
 
 
 class BasePublishTest:
-    """Base class with shared fixtures for publish endpoint tests."""
+    """Base class with services fixtures for publish endpoint tests."""
 
     @pytest.fixture(autouse=True)
     def mock_is_allowed(self):
-        with patch("src.main_app.shared.core.cors.is_allowed") as mocked:
+        with patch("src.main_app.services.core.cors.is_allowed") as mocked:
             mocked.return_value = "medwiki.toolforge.org"
             yield mocked
 

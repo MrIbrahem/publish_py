@@ -1,5 +1,5 @@
 """
-SQLAlchemy-based shared logic for managing QID-like tables.
+SQLAlchemy-based services logic for managing QID-like tables.
 
 This module centralizes the logic that is identical between
 ``qid_service.py`` and ``qid_others_service.py`` (and any future

@@ -15,8 +15,8 @@ from flask import (
 )
 
 from ....public.auth import oauth_required
-from ....shared.clients.text_api import get_wikitext
-from ....shared.utils.helpers.text_processor import (
+from ....services.clients.text_api import get_wikitext
+from ....services.utils.helpers.text_processor import (
     do_changes_to_text_with_settings,
 )
 

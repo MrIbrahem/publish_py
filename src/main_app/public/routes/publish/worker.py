@@ -14,14 +14,14 @@ from ....database.services import (
     ReportService,
     UserTokenService,
 )
-from ....shared.clients import (
+from ....services.clients import (
     get_revid,
     get_revid_db,
     get_title_info,
     link_to_wikidata,
     publish_do_edit,
 )
-from ....shared.utils.helpers import (
+from ....services.utils.helpers import (
     determine_hashtag,
     do_changes_to_text_with_settings,
     get_word_count,

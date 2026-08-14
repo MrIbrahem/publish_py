@@ -23,7 +23,7 @@ from ....database.services import (
     MissingStatsService,
     SettingsService,
 )
-from ....public.auth.utils import load_user
+from ....services.auth.utils import get_current_user
 from .results_2026 import results_loader_2026
 from .results_api import results_api_result
 
@@ -106,7 +106,7 @@ class TDRoutes:
         parsed = self._parse_request_args(campaigns)
 
         # Identity / coordinator / full-translator flags — mirrors src/index.php.
-        user = load_user()
+        user = get_current_user()
         user_coord = bool(user and user.is_active_admin)
         full_tr_user = bool(user and self.full_service.is_full_translator(user.username))
 
