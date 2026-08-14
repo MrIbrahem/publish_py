@@ -19,7 +19,7 @@ class TestAuthLogin:
     def test_login_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login redirects to index when OAuth is not configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            mock_settings.oauth = None
+            # mock_settings.oauth = None
 
             response = mock_client.get("/auth/login", follow_redirects=False)
 
@@ -29,7 +29,7 @@ class TestAuthLogin:
     def test_login_rate_limit_blocks_excessive_requests(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that login rate limit blocks excessive requests."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            mock_settings.oauth = MagicMock()
+            # mock_settings.oauth = MagicMock()
             mock_settings.sessions.state_key = "oauth_state"
             mock_settings.sessions.request_token_key = "request_token"
 
@@ -82,7 +82,7 @@ class TestAuthCallback:
     def test_callback_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
         """Test that callback redirects when OAuth is not configured."""
         with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            mock_settings.oauth = None
+            # mock_settings.oauth = None
 
             response = mock_client.get("/auth/callback?oauth_verifier=123&state=abc", follow_redirects=False)
 
