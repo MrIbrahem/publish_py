@@ -7,7 +7,6 @@ from unittest.mock import Mock
 import pytest
 
 
-
 @pytest.mark.usefixtures("mock_app")
 class TestAuthRoutes:
     def test_login_redirects(self, mock_client):
