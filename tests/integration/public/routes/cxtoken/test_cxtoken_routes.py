@@ -10,6 +10,7 @@ import pytest
 from flask.testing import FlaskClient
 
 from src.main_app.database.services import UsersService, UserTokenService
+from src.main_app.services.core.crypto import CryptoService
 
 
 @pytest.mark.integration
@@ -82,9 +83,13 @@ class TestCxTokenGet:
         user = users_service.create_user("TokenUser")
 
         token_service = UserTokenService()
-        encrypted_token = token_service.encrypt_value("test_access_token")
-        encrypted_secret = token_service.encrypt_value("test_access_secret")
-        token_service.create_user_token(user.user_id, encrypted_token, encrypted_secret)
+        encrypted_token = CryptoService().encrypt("test_access_token")
+        encrypted_secret = CryptoService().encrypt("test_access_secret")
+        token_service.create(
+            user_id=user.user_id,
+            access_token=encrypted_token,
+            access_secret=encrypted_secret,
+        )
 
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f

@@ -11,7 +11,7 @@ from unittest.mock import patch
 import pytest
 from flask.testing import FlaskClient
 
-from src.main_app.services.auth import CurrentUser
+from src.main_app.services.auth.current_user import CurrentUser
 
 
 @pytest.mark.integration

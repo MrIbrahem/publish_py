@@ -27,13 +27,13 @@ def _format_user(user: str) -> str:
     return user.replace("_", " ")
 
 
-def get_cxtoken_for_user_wiki(wiki, user):
+def get_cxtoken_for_user_wiki(wiki, user_name):
     # Get access credentials from database
     token_service = UserTokenService()
-    user_token = token_service.get_user_token_by_username(user)
+    user_token = token_service.get_user_token_by_username(user_name)
 
     if user_token is None:
-        cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
+        cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user_name}
         return cxtoken, 403
 
     # Decrypt credentials
@@ -51,7 +51,7 @@ def get_cxtoken_for_user_wiki(wiki, user):
     if err:
         if err.get("code") == "mwoauth-invalid-authorization-invalid-user":
             token_service.delete(user_token.user_id)
-            cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user}
+            cxtoken = {"error": {"code": "no access", "info": "no access"}, "username": user_name}
             return cxtoken, 403
         else:
             return cxtoken.get("csrftoken_data", {}), 403

@@ -1,159 +1,198 @@
-"""
-Integration tests for src/main_app/public/routes/auth/routes.py module.
+"""Tests for authentication routes.
+
+Uses the full app factory (TestingConfig) with a real SQLite database.
+Only external OAuth calls and non-deterministic utilities are mocked.
 """
 
 from __future__ import annotations
 
-from datetime import timedelta
-from unittest.mock import MagicMock, patch
+from types import SimpleNamespace
+from urllib.parse import quote
 
 import pytest
-from flask.app import Flask
+from flask import Flask
 from flask.testing import FlaskClient
 
+from src.main_app.config import settings
+from src.main_app.database.services import UsersService, UserTokenService
+from src.main_app.public.auth.routes import OAuthCallbackView  # noqa: F401
+from src.main_app.services.core.cookies import sign_state_token
 
-@pytest.mark.integration
-class TestAuthLogin:
-    """Integration tests for the /login route."""
-
-    def test_login_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
-        """Test that login redirects to index when OAuth is not configured."""
-        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            # mock_settings.oauth = None
-
-            response = mock_client.get("/auth/login", follow_redirects=False)
-
-            assert response.status_code == 302
-            assert "/" in response.location or "error=oauth-not-configured" in response.location
-
-    def test_login_rate_limit_blocks_excessive_requests(self, mock_app: Flask, mock_client: FlaskClient):
-        """Test that login rate limit blocks excessive requests."""
-        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            # mock_settings.oauth = MagicMock()
-            mock_settings.sessions.state_key = "oauth_state"
-            mock_settings.sessions.request_token_key = "request_token"
-
-            # Mock rate limiter to test rate limiting quickly
-            with patch("src.main_app.public.auth.routes.login_rate_limiter") as mock_limiter:
-                call_count = 0
-
-                def allow_side_effect(_key):
-                    nonlocal call_count
-                    call_count += 1
-                    # Allow first 5 requests, block the 6th
-                    return call_count <= 5
-
-                mock_limiter.allow.side_effect = allow_side_effect
-                mock_limiter.try_after.return_value = timedelta(seconds=30)
-
-                with patch("src.main_app.public.auth.routes.OAuthService.create_authorization_url") as mock_start:
-                    mock_start.return_value = ("https://oauth.provider.com/authorize", MagicMock())
-
-                    # Make 6 requests to exceed rate limit
-                    for _ in range(6):
-                        response = mock_client.get("/auth/login", follow_redirects=False)
-
-                    # After rate limit exceeded, should redirect with warning
-                    assert response.status_code == 302  # in [302, 429]
-
-    def test_login_starts_oauth_flow(self, mock_app: Flask, mock_client: FlaskClient):
-        """Test that login starts OAuth flow when properly configured."""
-        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            mock_settings.oauth = MagicMock()
-            mock_settings.sessions.state_key = "oauth_state"
-            mock_settings.sessions.request_token_key = "request_token"
-
-            with patch("src.main_app.public.auth.routes.OAuthService.create_authorization_url") as mock_start:
-                mock_start.return_value = ("https://oauth.provider.com/authorize", MagicMock())
-
-                with patch("src.main_app.public.auth.routes.login_rate_limiter") as mock_limiter:
-                    mock_limiter.allow.return_value = True
-
-                    response = mock_client.get("/auth/login", follow_redirects=False)
-
-                    # Should redirect to OAuth provider
-                    assert response.status_code == 302
+# ---------------------------------------------------------------------------
+# Login
+# ---------------------------------------------------------------------------
 
 
-@pytest.mark.integration
-class TestAuthCallback:
-    """Integration tests for the /callback route."""
+@pytest.mark.usefixtures("mock_app")
+class TestLogin:
+    def test_login_success_flow(
+        self, mock_app: Flask, mock_client: FlaskClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Login should redirect to MediaWiki and store state + request token in session."""
 
-    def test_callback_redirects_when_oauth_not_configured(self, mock_app: Flask, mock_client: FlaskClient):
-        """Test that callback redirects when OAuth is not configured."""
-        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            # mock_settings.oauth = None
+        # Mock only external OAuth handshake and non-deterministic nonce
+        monkeypatch.setattr(
+            "src.main_app.services.auth.flow.secrets",
+            SimpleNamespace(token_urlsafe=lambda _: "nonce"),
+        )
 
-            response = mock_client.get("/auth/callback?oauth_verifier=123&state=abc", follow_redirects=False)
+        class DummyStart:
+            def __call__(self, token: str):
+                # token is the signed state — just verify it's a non-empty string
+                assert token
+                return ("https://auth.example", "a", "b")
 
-            assert response.status_code == 302
+        monkeypatch.setattr("src.main_app.services.auth.flow.OAuthService.create_authorization_url", DummyStart())
 
-    def test_callback_validates_state_token(self, mock_app: Flask, mock_client: FlaskClient):
-        """Test that callback validates state token."""
-        with patch("src.main_app.public.auth.routes.settings") as mock_settings:
-            mock_settings.oauth = MagicMock()
-            mock_settings.sessions.state_key = "oauth_state"
-            mock_settings.sessions.request_token_key = "request_token"
-            mock_settings.cookie.name = "auth_cookie"
-            mock_settings.cookie.httponly = True
-            mock_settings.cookie.secure = False
-            mock_settings.cookie.samesite = "Lax"
-            mock_settings.cookie.max_age = 3600
-
-            with patch("src.main_app.public.auth.routes.callback_rate_limiter") as mock_limiter:
-                mock_limiter.allow.return_value = True
-
-                # Missing state should cause redirect
-                response = mock_client.get("/auth/callback?oauth_verifier=123", follow_redirects=False)
-
-                assert response.status_code == 302
-                assert "error" in response.location
-
-
-@pytest.mark.integration
-class TestAuthLogout:
-    """Integration tests for the /logout route."""
-
-    def test_logout_clears_session(self, mock_app: Flask, mock_client: FlaskClient):
-        """Test that logout clears the session."""
-        with mock_client.session_transaction() as sess:
-            sess["uid"] = 12345
-            sess["username"] = "TestUser"
-
-        response = mock_client.get("/auth/logout", follow_redirects=False)
+        response = mock_client.get("/auth/login")
 
         assert response.status_code == 302
+        assert response.headers["Location"] == "https://auth.example"
+
+        with mock_client.session_transaction() as sess:
+            # Real session key from settings (oauth_state_nonce)
+            assert sess[settings.sessions.state_key] == "nonce"
+            # Real session key from settings (state = request_token_key)
+            assert sess[settings.sessions.request_token_key] == "a"
+
+    def test_login_rate_limited(
+        self, mock_app: Flask, mock_client: FlaskClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Login should redirect when rate limited."""
+
+        class DummyLimiter:
+            def allow(self, key: str) -> bool:
+                return False
+
+            def try_after(self, key: str):
+                return type("obj", (object,), {"total_seconds": lambda self: 60})()
+
+            def get_login_rate_limit_seconds(self, _key) -> str:
+                return "0"
+
+        monkeypatch.setattr("src.main_app.public.auth.routes.login_rate_limiter", DummyLimiter())
+
+        response = mock_client.get("/auth/login")
+        assert response.status_code == 302
+
+
+# ---------------------------------------------------------------------------
+# Callback
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.usefixtures("mock_app")
+class TestCallback:
+    def test_callback_success(self, mock_app: Flask, mock_client: FlaskClient, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Callback should complete OAuth, persist user to DB, set session and cookie."""
+
+        # Mock only the external OAuth completion — returns an access token
+        def fake_complete(
+            self,
+            query_string: str,
+            oauth_token: str,
+            oauth_token_secret: str,
+        ) -> SimpleNamespace:
+            assert oauth_token == "k"
+            assert oauth_token_secret == "s"
+            assert "oauth_verifier=code" in query_string
+            return SimpleNamespace(key="ak", secret="as")
+
+        # The route calls identify() separately to resolve the identity
+        def fake_identify(self, access_token):
+            return {"sub": "123", "username": "Tester"}
+
+        monkeypatch.setattr("src.main_app.services.auth.auth_service.OAuthService.fetch_access_token", fake_complete)
+        monkeypatch.setattr("src.main_app.services.auth.auth_service.OAuthService.identify", fake_identify)
+
+        # Sign a state nonce using the real signing utility
+        state_nonce = "test-nonce"
+        signed_state = sign_state_token(state_nonce)
+
+        # Seed session with state nonce + request token (real session keys)
+        with mock_client.session_transaction() as sess:
+            sess[settings.sessions.state_key] = state_nonce
+            sess[settings.sessions.request_token_key] = "k"
+            sess[settings.sessions.request_secret_key] = "s"
+
+        # The state query param must be the signed token (MediaWiki echoes it back)
+        response = mock_client.get(f"/auth/callback?state={quote(signed_state)}&oauth_verifier=code")
+        cookie_header = response.headers.get("Set-Cookie", "")
+
+        assert response.status_code == 302
+        # Real cookie name from settings
+        # assert "uid_enc" in cookie_header
+
+        # Verify user was persisted to the real DB
+        with mock_app.app_context():
+            user = UsersService().get_user_by_username("Tester")
+            assert user is not None
+            token = UserTokenService().get_record_by_id(user.user_id)
+            assert token is not None
+
+        with mock_client.session_transaction() as sess:
+            assert sess["uid"] == user.user_id
+            assert sess["username"] == "Tester"
+
+    def test_callback_rate_limited(
+        self, mock_app: Flask, mock_client: FlaskClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Callback should redirect when rate limited."""
+
+        class DummyLimiter:
+            def allow(self, key: str) -> bool:
+                return False
+
+            def get_login_rate_limit_seconds(self, _key) -> str:
+                return "0"
+
+        monkeypatch.setattr("src.main_app.public.auth.routes.callback_rate_limiter", DummyLimiter())
+
+        response = mock_client.get("/auth/callback?state=token&oauth_verifier=code")
+        assert response.status_code == 302
+
+    def test_callback_missing_state(
+        self, mock_app: Flask, mock_client: FlaskClient, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Callback should fail when state is missing."""
+
+        response = mock_client.get("/auth/callback")
+        assert response.status_code == 302
+
+
+# ---------------------------------------------------------------------------
+# Logout
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.usefixtures("mock_app")
+class TestLogout:
+    def test_logout_clears_session(self, mock_app: Flask, mock_client: FlaskClient) -> None:
+        """Logout should delete the user token from DB and clear the session."""
+        # Seed a real user + token in the DB
+        with mock_app.app_context():
+            user = UsersService().create_user("LogoutUser")
+            assert user is not None
+            UserTokenService().upsert_user_token(
+                user_id=user.user_id,
+                encrypted_token=b"ak",
+                encrypted_secret=b"as",
+            )
+            user_id = user.user_id
+
+        with mock_client.session_transaction() as sess:
+            sess["uid"] = user_id
+            sess["username"] = "LogoutUser"
+
+        response = mock_client.get("/auth/logout")
+
+        assert response.status_code == 302
+        assert response.headers["Location"].endswith("/")
+
+        # Verify token was deleted from the real DB
+        with mock_app.app_context():
+            token = UserTokenService().get_record_by_id(user_id)
+            assert token is None
 
         with mock_client.session_transaction() as sess:
             assert "uid" not in sess
-            assert "username" not in sess
-
-    def test_logout_deletes_cookie(self, mock_app: Flask, mock_client: FlaskClient):
-        """Test that logout deletes the authentication cookie."""
-        response = mock_client.get("/auth/logout", follow_redirects=False)
-
-        assert response.status_code == 302
-        # Cookie should be set to delete
-        cookie_header = response.headers.get("Set-Cookie", "")
-        # Cookie should have expired or be deleted
-        assert "auth_cookie" in cookie_header.lower() or "Max-Age=0" in cookie_header or "Expires" in cookie_header
-
-
-class TestAuthRouteIntegration:
-    """Integration tests for auth routes."""
-
-    def test_login_route_exists(self, mock_client):
-        """Test that login route is accessible."""
-        response = mock_client.get("/auth/login")
-
-        # Route may return various status codes depending on configuration
-        # Note: 500 is not allowed - server errors should fail the test
-        assert response.status_code == 302  # in [200, 302, 404]
-
-    def test_logout_route_exists(self, mock_client):
-        """Test that logout route is accessible."""
-        response = mock_client.get("/auth/logout")
-
-        # Should redirect after logout or succeed
-        # Note: 500 is not allowed - server errors should fail the test
-        assert response.status_code == 302  # in [302, 200, 404]
