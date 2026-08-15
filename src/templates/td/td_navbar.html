@@ -29,64 +29,11 @@
             </div>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto flex-row flex-wrap bd-navbar-nav">
+                    {{ navbar.render_main_links(is_admin=is_admin) }}
                     {% set nav_item_class = "nav-item col-lg-auto col-md-4 col-sm-6 col-6" %}
-                    <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-bar-chart-line',
-                            'Leaderboard',
-                            url_for('leaderboard.index'),
-                            '/Translation_Dashboard/leaderboard',
-                            )
-                        }}
-                    </li>
-                    <li class="{{ nav_item_class }}">
-                        <a class="nav-link py-2 px-0 px-lg-2" target="_blank" href="/prior">
-                            <span class="navtitles">
-                                <i class="bi bi-bar-chart me-1"></i> Prior
-                            </span>
-                        </a>
-                    </li>
-                    <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-card-list',
-                            'Missing',
-                            url_for('td.missing'),
-                            '/missing',
-                            )
-                        }}
-                    </li>
-                    <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-list-task',
-                            'Fix Refs',
-                            url_for('fixrefs.index'),
-                            '/fixrefs',
-                            )
-                        }}
-                    </li>
-                    <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-list-task',
-                            'Publish Reports',
-                            url_for('main.reports'),
-                            '/reports',
-                            )
-                        }}
-                    </li>
-                    {% if is_admin %}
-                    <li class="{{ nav_item_class }}">
-                        {{ nav_link(
-                            'bi-people-fill',
-                            'Coordinator Tools',
-                            url_for('adminpanel.index'),
-                            '/adminpanel',
-                            )
-                        }}
-                    </li>
-                    {% endif %}
                 </ul>
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
-                    <!-- <div class="d-flex align-items-center"> <span class="navbar-text"> -->
+                    {{ navbar.render_user_links(current_username=current_username) }}
                     {% if current_username %}
                     {% set profile_href = url_for('leaderboard.users', username=current_username) %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
@@ -104,16 +51,11 @@
                     </li>
                     {% else %}
                     <li class="nav-item col-lg-auto col-md-4 col-sm-6 col-6">
-                        <!-- <button type="submit" form="mainForm" formaction="{{ url_for('auth.login') }}" formmethod="get"
-                            formnovalidate class="nav-link py-2 px-0 px-lg-2 btn btn-link">
-                            <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2"></i> <span class="navtitles">Login</span>
-                        </button> -->
                         <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('auth.login') }}">
                             <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
                         </a>
                     </li>
                     {% endif %}
-                    <!-- </span> </div> -->
                 </ul>
             </div>
         </div>

@@ -248,123 +248,204 @@ def load_groups_menu() -> list[SidebarGroup]:
     by `SidebarItem.resolve_href()` at render time — so this result is safe
     to cache for the lifetime of the process.
     """
-    main_group = SidebarGroup(
-        id="main",
-        title="Main",
+    translations = SidebarGroup(
+        id="translations",
+        title="Translations",
+        icon="bi-translate",
+        items=[
+            SidebarItem(
+                id="last",
+                requires_admin=True,
+                fallback_href="/adminpanel/last",
+                title="Recent",
+                icon="bi-clock-history",
+            ),
+            SidebarItem(
+                id="process",
+                requires_admin=False,
+                fallback_href="/adminpanel/process",
+                title="In Process",
+                icon="bi-hourglass",
+            ),
+            SidebarItem(
+                id="process_total",
+                requires_admin=False,
+                fallback_href="/adminpanel/process_total",
+                title="In Process (Total)",
+                icon="bi-hourglass-split",
+            ),
+            SidebarItem(
+                id="reports",
+                requires_admin=False,
+                fallback_href="/adminpanel/reports",
+                title="Publish Reports",
+                icon="bi-file-earmark-text",
+            ),
+        ],
+    )
+
+    pages = SidebarGroup(
+        id="pages",
+        title="Pages",
         icon="bi-file-text",
         items=[
-            dashboard_item(
-                "templates",
-                "Templates",
-                "bi-list-columns",
-                "adminpanel.templates.dashboard",
-                "/adminpanel/templates/",
+            SidebarItem(
+                id="tt_load",
+                requires_admin=True,
+                fallback_href="/adminpanel/tt",
+                title="Translate Type",
+                icon="bi-translate",
             ),
-            dashboard_item(
-                "templates_need_update",
-                "Templates Need Update",
-                "bi-arrow-repeat",
-                "adminpanel.templates.templates_need_update",
-                "/adminpanel/templates/templates-need-update",
+            SidebarItem(
+                id="translated",
+                requires_admin=True,
+                fallback_href="/adminpanel/translated",
+                title="Pages",
+                icon="bi-check2-square",
             ),
-            dashboard_item(
-                "owid_charts",
-                "OWID Charts",
-                "bi-graph-up",
-                "adminpanel.owidcharts.dashboard",
-                "/adminpanel/owidcharts/",
+            SidebarItem(
+                id="translated_users",
+                requires_admin=True,
+                fallback_href="/adminpanel/translated_users",
+                title="User Pages",
+                icon="bi-check2-circle",
             ),
-            dashboard_item(
-                "slug_redirects",
-                "Slug Redirects",
-                "bi-arrow-right-circle",
-                "adminpanel.slugredirects.dashboard",
-                "/adminpanel/slugredirects/",
+            SidebarItem(
+                id="pages_users_to_main",
+                requires_admin=True,
+                fallback_href="/adminpanel/pages_users_to_main",
+                title="Pages to check",
+                icon="bi-check",
+            ),
+            SidebarItem(
+                id="add",
+                requires_admin=True,
+                fallback_href="/adminpanel/add",
+                title="Add translations",
+                icon="bi-plus-square",
+            ),
+            SidebarItem(
+                id="qidsload",
+                requires_admin=True,
+                fallback_href="/adminpanel/qids",
+                title="Qids",
+                icon="bi-list-ul",
+            ),
+            SidebarItem(
+                id="qids_others",
+                requires_admin=True,
+                fallback_href="/adminpanel/qids_others",
+                title="Qids Others",
+                icon="bi-list-check",
             ),
         ],
     )
 
-    users_group = SidebarGroup(
+    users = SidebarGroup(
         id="users",
         title="Users",
-        icon="bi-person",
+        icon="bi-people",
         items=[
-            dashboard_item(
-                "admins",
-                "Coordinators",
-                "bi-person-gear",
-                "adminpanel.coordinators.dashboard",
-                "/adminpanel/coordinators/",
+            SidebarItem(
+                id="coordinators",
+                requires_admin=True,
+                fallback_href="/adminpanel/coordinators",
+                title="Coordinators",
+                icon="bi-person-gear",
             ),
-            dashboard_item(
-                "users",
-                "Users",
-                "bi-person",
-                "adminpanel.users.dashboard",
-                "/adminpanel/users/",
+            SidebarItem(
+                id="users_emails",
+                requires_admin=True,
+                fallback_href="/adminpanel/users_emails",
+                title="Users Emails",
+                icon="bi-envelope",
             ),
-        ],
-    )
-
-    db_jobs = SidebarGroup(
-        id="db_jobs",
-        title="DB Jobs",
-        icon="bi-database-fill",
-        items=[
-            job_item(
-                "collect_templates_data",
-                "Collect Templates data",
-                "bi-kanban",
+            SidebarItem(
+                id="full_tr",
+                requires_admin=True,
+                fallback_href="/adminpanel/full_translators",
+                title="Full translators",
+                icon="bi-person-check",
             ),
-            job_item(
-                "update_owid_charts",
-                "Update OWID Charts",
-                "bi-arrow-repeat",
+            SidebarItem(
+                id="user_inp",
+                requires_admin=True,
+                fallback_href="/adminpanel/users_no_inprocess",
+                title="Not in process",
+                icon="bi-hourglass",
             ),
         ],
     )
 
-    files_jobs = SidebarGroup(
-        id="files_jobs",
-        title="Files Jobs",
-        icon="bi-files",
+    others = SidebarGroup(
+        id="others",
+        title="Others",
+        icon="bi-three-dots",
         items=[
-            job_item("crop_main_files", "Crop Newest World Files", "bi-crop"),
-            job_item("fix_nested_main_files", "Fix Nested Main Files", "bi-tools"),
-            job_item("download_main_files", "Download Main Files", "bi-download", disabled=True),
-        ],
-    )
-
-    owid_temp_pages = SidebarGroup(
-        id="owid_temp_pages",
-        title="OWID Templates/Pages",
-        icon="bi-file-earmark-richtext",
-        items=[
-            job_item("create_owid_pages", "Create OWID Pages", "bi-file-earmark-text"),
-            job_item("rename_owid_pages", "Rename OWID Pages", "bi-fonts"),
-            job_item("add_svglanguages_template", "Add {{SVGLanguages}}", "bi-file-earmark-text"),
-            job_item("add_lang_categories_to_owid_pages", "Add Lang Categories", "bi-tags"),
-        ],
-    )
-
-    settings_group = SidebarGroup(
-        id="settings",
-        title="Settings",
-        icon="bi-sliders",
-        items=[
-            dashboard_item(
-                "settings",
-                "Settings",
-                "bi-gear",
-                "adminpanel.settings.dashboard",
-                "/adminpanel/settings/",
+            SidebarItem(
+                id="projects",
+                requires_admin=True,
+                fallback_href="/adminpanel/projects",
+                title="Projects",
+                icon="bi-kanban",
             ),
-            dashboard_item(
-                "errors",
-                "App Errors",
-                "bi-exclamation-triangle",
-                "adminpanel.errors.dashboard",
-                "/adminpanel/errors/",
+            SidebarItem(
+                id="campaigns",
+                requires_admin=True,
+                fallback_href="/adminpanel/campaigns",
+                title="Campaigns",
+                icon="bi-megaphone",
+            ),
+            SidebarItem(
+                id="settings",
+                requires_admin=True,
+                fallback_href="/adminpanel/settings",
+                title="Settings",
+                icon="bi-gear",
+            ),
+            SidebarItem(
+                id="categories",
+                requires_admin=False,
+                fallback_href="/adminpanel/categories",
+                title="Categories",
+                icon="bi-tags",
+            ),
+            SidebarItem(
+                id="errors",
+                requires_admin=True,
+                fallback_href="/adminpanel/errors",
+                title="App Errors",
+                icon="bi-exclamation-triangle",
+            ),
+        ],
+    )
+
+    tools = SidebarGroup(
+        id="tools",
+        title="Tools",
+        icon="bi-tools",
+        items=[
+            SidebarItem(
+                id="stat",
+                requires_admin=False,
+                fallback_href="/adminpanel/stat",
+                title="Status",
+                icon="bi-graph-up",
+            ),
+            SidebarItem(
+                id="language_settings",
+                requires_admin=True,
+                fallback_href="/adminpanel/language_settings",
+                title="Fix refs (Options)",
+                icon="bi-wrench-adjustable",
+            ),
+            SidebarItem(
+                id="fixwikirefs",
+                requires_admin=False,
+                fallback_href="/adminpanel//fixrefs",
+                title="Fixwikirefs",
+                link_target="_blank",
+                icon="bi-wrench",
             ),
             SidebarItem(
                 id="db_admin",
@@ -377,12 +458,11 @@ def load_groups_menu() -> list[SidebarGroup]:
     )
 
     return [
-        main_group,
-        users_group,
-        db_jobs,
-        files_jobs,
-        owid_temp_pages,
-        settings_group,
+        translations,
+        pages,
+        users,
+        others,
+        tools,
     ]
 
 
