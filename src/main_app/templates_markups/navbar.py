@@ -14,11 +14,15 @@ Both methods return a safe Markup object (no need for the |safe filter,
 though adding it doesn't hurt).
 """
 
+import logging
 import random
 from dataclasses import dataclass, field
+from urllib.parse import quote
 
 from flask import request, url_for
 from markupsafe import Markup, escape
+
+logger = logging.getLogger(__name__)
 
 NAV_ITEM_CLASS = "nav-item col-lg-auto col-md-4 col-sm-6 col-6"
 
@@ -156,7 +160,8 @@ class Navbar:
         parts = []
         if current_username:
             profile_url = url_for("leaderboard.users", username=current_username)
-            active = bool(request and escape(request.path) == escape(profile_url))
+            active = bool(request and quote(request.path) == profile_url)
+            logger.debug(f"render_user_links: {profile_url=} {request.path=}")
             active_class = " active" if active else ""
 
             profile_html = Markup(
