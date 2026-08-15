@@ -368,7 +368,7 @@ def load_groups_menu() -> list[SidebarGroup]:
             ),
             SidebarItem(
                 id="db_admin",
-                requires_admin=1,
+                requires_admin=True,
                 fallback_href="/adminpanel/db_admin",
                 title="DB admin",
                 icon="bi-database",
