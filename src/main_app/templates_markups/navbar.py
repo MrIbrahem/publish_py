@@ -152,10 +152,11 @@ class Navbar:
 
     # ---------- user links (profile / logout / login) ----------
     def render_user_links(self, current_username=None) -> Markup:
+        """ """
         parts = []
         if current_username:
-            profile_url = url_for("profile.dashboard", user_name=current_username)
-            active = bool(request and request.path == profile_url)
+            profile_url = url_for("leaderboard.users", username=current_username)
+            active = bool(request and escape(request.path) == escape(profile_url))
             active_class = " active" if active else ""
 
             profile_html = Markup(
@@ -165,16 +166,29 @@ class Navbar:
                 "</a>"
             ).format(active_class=active_class, url=escape(profile_url), username=escape(current_username))
 
-            logout_html = Markup('<a class="btn btn-outline-secondary btn-sm" href="{url}">Logout</a>').format(
-                url=escape(url_for("auth.logout"))
-            )
+            a_link = """
+                <a class="nav-link py-2 px-0 px-lg-2" href="{url}">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
+                    <span class="d-lg-none navtitles">
+                        Logout
+                    </span>
+                </a>
+            """
+            logout_html = Markup(a_link).format(url=escape(url_for("auth.logout")))
 
             parts.append(self._wrap_li(profile_html))
             parts.append(self._wrap_li(logout_html))
         else:
-            login_html = Markup('<a class="btn btn-outline-success btn-sm" href="{url}">Login</a>').format(
-                url=escape(url_for("auth.login"))
-            )
+            a_link = """
+                <a class="nav-link py-2 px-0 px-lg-2" href="{url}">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span class="navtitles">
+                        Login
+                    </span>
+                </a>
+            """
+            login_html = Markup(a_link).format(url=escape(url_for("auth.login")))
+
             parts.append(self._wrap_li(login_html))
 
         return Markup("").join(parts)
@@ -234,8 +248,8 @@ nav_list = [
     ),
 ]
 
-navbar = Navbar(nav_list)
+td_navbar = Navbar(nav_list)
 
 __all__ = [
-    "navbar",
+    "td_navbar",
 ]
