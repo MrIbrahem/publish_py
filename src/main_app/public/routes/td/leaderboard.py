@@ -13,6 +13,8 @@ from flask import (
     request,
 )
 
+from dataclasses import asdict
+
 from ....database.services import CategoryService, LeaderboardService, ProjectService
 from ..api.top_stats_routes import get_top_langs, get_top_users
 
@@ -75,8 +77,11 @@ class LeaderBoardRoutes:
 
         form_selected_data = request.args
 
-        langs_data = get_top_langs(request.args)
-        users_data = get_top_users(request.args)
+        langs_res = get_top_langs(request.args)
+        users_res = get_top_users(request.args)
+
+        langs_data = asdict(langs_res)
+        users_data = asdict(users_res)
 
         result = {
             "langs": langs_data.get("results") or [],
@@ -89,8 +94,8 @@ class LeaderBoardRoutes:
             users_top_langs: list[dict[Any, Any]] = self.lederboard_service.top_lang_of_users()
             result["users_top_langs"] = {row["user"]: row for row in users_top_langs}
 
-        users_total = users_data.get("count") or 0
-        langs_total = langs_data.get("count") or 0
+        users_total = users_res.count
+        langs_total = langs_res.count
 
         numbers_summary = self.load_summary_data(result["users"], users_total, langs_total)
 

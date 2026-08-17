@@ -27,6 +27,7 @@ from ....services.core.cors import check_cors
 from ....services.schemas import PublishReportsQuerySchema
 from ....services.utils.web_utils import parse_select_fields
 from .form_utils import FormData, get_form
+from dataclasses import asdict
 from .top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
@@ -452,15 +453,17 @@ class ApiRoutes:
             return response
 
     def get_top_langs(self) -> tuple[Response, int] | Response:
-        data = get_top_langs(request.args)
-        if data.get("error"):
+        result = get_top_langs(request.args)
+        data = asdict(result)
+        if result.error:
             return jsonify(data), 500
 
         return jsonify(data)
 
     def get_top_users(self) -> tuple[Response, int] | Response:
-        data = get_top_users(request.args)
-        if data.get("error"):
+        result = get_top_users(request.args)
+        data = asdict(result)
+        if result.error:
             return jsonify(data), 500
 
         return jsonify(data)
