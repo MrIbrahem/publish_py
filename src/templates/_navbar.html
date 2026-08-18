@@ -1,11 +1,3 @@
-{% macro nav_link(icon, text, url, path) %}
-{% set _active = request and request.path and request.path.startswith(path) %}
-<a class="nav-link {{ 'active fw-bold' if _active }}" href="{{ url }}" {% if _active %}aria-current="page" {% endif %}
-    title="{{ text }}">
-    <i class="bi {{ icon }}"></i> {{ text }}
-</a>
-{% endmacro %}
-
 <header>
     <nav class="navbar navbar-expand-lg mb-3 border-bottom bg-body-tertiary shadow">
         <div class="container-fluid">
@@ -35,8 +27,7 @@
                         </a>
                     </li>
                     <li class="{{ nav_item_class }}">
-                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('leaderboard.index') }}"
-                            target="_blank">
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('leaderboard.index') }}" target="_blank">
                             <span class="navtitles">Leaderboard</span>
                         </a>
                     </li>

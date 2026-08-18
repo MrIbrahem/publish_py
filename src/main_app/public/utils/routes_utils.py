@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from typing import Any
 
 from ...services.auth.utils import get_current_user
+from ...templates_markups import td_navbar
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,7 @@ def context_data(
     username = user.username if user else None
 
     return {
+        "td_navbar": td_navbar,
         "is_authenticated": user is not None,
         "current_username": username,
         "is_admin": _is_admin(user),
