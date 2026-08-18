@@ -28,10 +28,15 @@ class LeaderBoardRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/users/<string:username>", methods=["GET"])(self.users)
-        self.bp.route("/langs/<string:lang_code>", methods=["GET"])(self.langs)
-        self.bp.route("/js", methods=["GET"])(self.index_js)
-        self.bp.route("/", methods=["GET"])(self.index)
+
+        routes = [
+            ("/users/<string:username>", "GET", self.users),
+            ("/langs/<string:lang_code>", "GET", self.langs),
+            ("/js", "GET", self.index_js),
+            ("/", "GET", self.index),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def index_js(self) -> str:
         year = request.args.get("year", type=int)

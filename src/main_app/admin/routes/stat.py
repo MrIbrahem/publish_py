@@ -24,7 +24,12 @@ class StaticsRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.stat_index)
+
+        routes = [
+            ("/", "GET", self.stat_index),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def stat_index(self) -> str:
         """Render a minimal statistics overview."""

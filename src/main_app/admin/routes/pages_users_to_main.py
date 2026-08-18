@@ -32,9 +32,13 @@ class PagesUsersMainRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.pages_users_to_main_index)
-        self.bp.route("/fix_it", methods=["GET"])(self.pages_users_to_main_fix_it)
-        self.bp.route("/fix_it", methods=["POST"])(self.pages_users_to_main_fix_it_post)
+        routes = [
+            ("/", "GET", self.pages_users_to_main_index),
+            ("/fix_it", "GET", self.pages_users_to_main_fix_it),
+            ("/fix_it", "POST", self.pages_users_to_main_fix_it_post),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def pages_users_to_main_index(self) -> str:
         """List user pages flagged for promotion to main pages."""

@@ -28,10 +28,15 @@ class LanguageSettings:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
-        self.bp.post("/add")(admin_required(self.add))
-        self.bp.post("/<int:setting_id>/update")(admin_required(self.update))
-        self.bp.post("/<int:setting_id>/delete")(admin_required(self.delete))
+
+        routes = [
+            ("/", "GET", self.dashboard),
+            ("/add", "POST", self.add),
+            ("/<int:setting_id>/update", "POST", self.update),
+            ("/<int:setting_id>/delete", "POST", self.delete),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         """Render the language settings management dashboard."""

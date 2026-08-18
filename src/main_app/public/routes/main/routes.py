@@ -23,9 +23,13 @@ class MainRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.index)
-        self.bp.route("/reports", methods=["GET"])(self.reports)
-        self.bp.get("/favicon.ico")(self.favicon)
+        routes = [
+            ("/", "GET", self.index),
+            ("/reports", "GET", self.reports),
+            ("/favicon.ico", "GET", self.favicon),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def index(self) -> str:
         return render_template(

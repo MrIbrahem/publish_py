@@ -29,9 +29,14 @@ class ProjectsDashboard:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
-        self.bp.post("/add")(admin_required(self.add))
-        self.bp.post("/update")(admin_required(self.update))
+
+        routes = [
+            ("/", "GET", self.dashboard),
+            ("/add", "POST", self.add),
+            ("/update", "POST", self.update),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         return self._projects_dashboard()

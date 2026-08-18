@@ -69,11 +69,16 @@ class QidsSharedModel:
         return is_valid(qid_id, qid, title, existing_by_qid, existing_by_title)
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.index)
-        self.bp.route("/edit", methods=["GET"])(self.edit)
-        self.bp.route("/add", methods=["GET"])(self.add)
-        self.bp.route("/", methods=["POST"])(self.edit_post)
-        self.bp.route("/add", methods=["POST"])(self.add_post)
+
+        routes = [
+            ("/", "GET", self.index),
+            ("/edit", "GET", self.edit),
+            ("/add", "GET", self.add),
+            ("/", "POST", self.edit_post),
+            ("/add", "POST", self.add_post),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def index(self) -> str:
         """List of rows with optional filter (all / empty / duplicate)."""

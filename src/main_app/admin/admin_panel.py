@@ -31,31 +31,37 @@ class AdminPanel:
 
     def _setup_routes(self) -> None:
 
-        @self.bp.app_context_processor
-        def inject_sidebar() -> dict[str, Any]:
-            return {"create_side": create_side}
+        self.bp.app_context_processor(self.inject_sidebar)
 
-        self.bp.route("/", methods=["GET"])(admin_required(self.index))
-        self.bp.route("/last", methods=["GET"])(admin_required(self.last_dashboard))
-        self.bp.route("/last/pages/<string:lang>", methods=["GET"])(admin_required(self.dashboard_pages))
+        routes = [
+            ("/", "GET", self.index),
+            ("/last", "GET", self.last_dashboard),
+            ("/last/pages/<string:lang>", "GET", self.dashboard_pages),
+            ("/last/pages_users/<string:lang>", "GET", self.dashboard_pages_users),
+            ("/reports", "GET", self.reports),
+            ("/process", "GET", self.in_process_dashboard),
+            ("/process_total", "GET", self.in_process_total_dashboard),
+            ("/edit_done", "GET", self.edit_done),
+            ("/categories", "GET", self.categories_dashboard_route),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(admin_required(target))
+
         self.bp.add_url_rule(
             "/last/pages/",
             endpoint="dashboard_pages_default",
             view_func=admin_required(self.dashboard_pages),
             methods=["GET"],
         )
-        self.bp.route("/last/pages_users/<string:lang>", methods=["GET"])(admin_required(self.dashboard_pages_users))
         self.bp.add_url_rule(
             "/last/pages_users/",
             endpoint="dashboard_pages_users_default",
             view_func=admin_required(self.dashboard_pages_users),
             methods=["GET"],
         )
-        self.bp.route("/reports", methods=["GET"])(admin_required(self.reports))
-        self.bp.route("/process", methods=["GET"])(admin_required(self.in_process_dashboard))
-        self.bp.route("/process_total", methods=["GET"])(admin_required(self.in_process_total_dashboard))
-        self.bp.route("/edit_done", methods=["GET"])(admin_required(self.edit_done))
-        self.bp.route("/categories", methods=["GET"])(admin_required(self.categories_dashboard_route))
+
+    def inject_sidebar(self) -> dict[str, Any]:
+        return {"create_side": create_side}
 
     def index(self):
         return redirect(url_for("adminpanel.last_dashboard"))

@@ -27,11 +27,16 @@ class FullTranslators:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
-        self.bp.post("/add")(admin_required(self.add))
-        self.bp.post("/<int:translator_id>/delete")(admin_required(self.delete))
-        self.bp.post("/<int:record_id>/activate")(admin_required(self.activate))
-        self.bp.post("/<int:record_id>/deactivate")(admin_required(self.deactivate))
+
+        routes = [
+            ("/", "GET", self.dashboard),
+            ("/add", "POST", self.add),
+            ("/<int:translator_id>/delete", "POST", self.delete),
+            ("/<int:record_id>/activate", "POST", self.activate),
+            ("/<int:record_id>/deactivate", "POST", self.deactivate),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         """Render the full translator management dashboard."""
