@@ -452,15 +452,17 @@ class ApiRoutes:
             return response
 
     def get_top_langs(self) -> tuple[Response, int] | Response:
-        data = get_top_langs(request.args)
-        if data.get("error"):
+        result = get_top_langs(request.args)
+        data = result.to_json()
+        if result.error:
             return jsonify(data), 500
 
         return jsonify(data)
 
     def get_top_users(self) -> tuple[Response, int] | Response:
-        data = get_top_users(request.args)
-        if data.get("error"):
+        result = get_top_users(request.args)
+        data = result.to_json()
+        if result.error:
             return jsonify(data), 500
 
         return jsonify(data)
