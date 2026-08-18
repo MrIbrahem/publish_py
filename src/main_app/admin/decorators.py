@@ -26,7 +26,7 @@ def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
     """Decorator enforcing that the current user is an administrator."""
 
     @wraps(view)
-    def wrapped(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         user: CurrentUser | None = get_current_user()
         if not user:
             return redirect(url_for("auth.login"))
@@ -35,7 +35,7 @@ def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
             abort(403)
         return view(*args, **kwargs)
 
-    return cast(FuncType, wrapped)
+    return cast(FuncType, wrapper)
 
 
 __all__ = [
