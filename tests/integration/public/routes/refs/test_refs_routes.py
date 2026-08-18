@@ -9,6 +9,8 @@ from unittest.mock import patch
 import pytest
 from flask.testing import FlaskClient
 
+from src.main_app.services.auth.current_user import CurrentUser
+
 
 @pytest.mark.integration
 class TestRefsIndex:
@@ -31,6 +33,20 @@ class TestRefsIndex:
 @pytest.mark.integration
 class TestRefsProcess:
     """Integration tests for the fixrefs process route."""
+
+    @pytest.fixture(autouse=True)
+    def _patch_current_user(self, monkeypatch):
+        """Authenticate the test request so oauth_required passes."""
+        user = CurrentUser(
+            user_id=12345,
+            username="TestUser",
+            access_token="",
+            access_secret="",
+        )
+        monkeypatch.setattr(
+            "src.main_app.public.auth.decorators.get_current_user",
+            lambda: user,
+        )
 
     def test_fixrefs_process_post_returns_200(self, auth_client: FlaskClient):
         """Test that POST to fixrefs process returns 200."""
