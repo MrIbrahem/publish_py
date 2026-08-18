@@ -29,9 +29,13 @@ class CampaignsDashboard:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
-        self.bp.post("/add")(admin_required(self.add_record))
-        self.bp.post("/update")(admin_required(self.update))
+        routes = [
+            ("/", "GET", admin_required(self.dashboard)),
+            ("/add", "POST", self.add_record),
+            ("/update", "POST", self.update),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def dashboard(self):
         """Render the campaigns management dashboard."""

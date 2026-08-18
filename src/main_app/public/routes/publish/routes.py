@@ -94,8 +94,12 @@ class PublishRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["OPTIONS"])(check_cors(self.publish_preflight))
-        self.bp.route("/", methods=["POST"])(validate_access(self.index))
+        routes = [
+            ("/", "OPTIONS", check_cors(self.publish_preflight)),
+            ("/", "POST", validate_access(self.index)),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def publish_preflight(self) -> Response:
         response = Response("", status=200)

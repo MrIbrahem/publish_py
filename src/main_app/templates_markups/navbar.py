@@ -50,6 +50,10 @@ class NavLink:
     def get_url(self) -> str:
         if self.static_url:
             return self.static_url
+
+        if not self.url_endpoint:
+            return self.path
+
         return url_for(self.url_endpoint, **self.url_kwargs)
 
     def is_active(self) -> bool:

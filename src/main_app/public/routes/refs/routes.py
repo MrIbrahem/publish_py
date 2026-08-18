@@ -90,10 +90,14 @@ class FixRefsRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.index)
-        self.bp.route("/test", methods=["GET"])(self.test)
-        oauth_required(self.bp.route("/", methods=["POST"])(self.process_new))
-        oauth_required(self.bp.route("/process", methods=["GET"])(self.process))
+        routes = [
+            ("/", "GET", self.index),
+            ("/test", "GET", self.test),
+            ("/", "POST", oauth_required(self.process_new)),
+            ("/process", "GET", oauth_required(self.process)),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def index(self) -> str:
         return render_template(

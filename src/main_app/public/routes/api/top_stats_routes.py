@@ -8,7 +8,6 @@ Endpoints:
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
@@ -24,6 +23,12 @@ from ....database.models import (
 )
 from ....extensions import db
 from .form_utils import FormData, get_form
+from .objects import (
+    TopLangsResult,
+    TopLangStat,
+    TopUsersResult,
+    TopUserStat,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +57,7 @@ def apply_filters(form: FormData, query: Query) -> Query:
     return query
 
 
-def get_top_langs(request_args: MultiDict[str, str]) -> dict[str, Any]:
+def get_top_langs(request_args: MultiDict[str, str]) -> TopLangsResult:
     """
     Handle top_langs API requests.
     Returns aggregated statistics per language.
@@ -158,33 +163,27 @@ def get_top_langs(request_args: MultiDict[str, str]) -> dict[str, Any]:
 
     except Exception:
         logger.exception("Error fetching top_langs data")
-        return {"error": "An internal error occurred while fetching top_langs data"}
+        return TopLangsResult(error="An internal error occurred while fetching top_langs data")
 
     try:
-        # Convert results to list of dicts
-        data: list[dict[str, Any]] = [
-            {
-                "lang": row.lang,
-                "lang_name": row.lang_name if row.lang_name else row.lang,
-                "targets": row.targets,
-                "words": int(row.words) if row.words else 0,
-                "views": int(row.views) if row.views else 0,
-            }
+        data: list[TopLangStat] = [
+            TopLangStat(
+                lang=row.lang,
+                lang_name=row.lang_name if row.lang_name else row.lang,
+                targets=row.targets,
+                words=int(row.words) if row.words else 0,
+                views=int(row.views) if row.views else 0,
+            )
             for row in results
         ]
     except Exception:
         logger.exception("Error processing top_langs data")
-        return {"error": "An internal error occurred while processing top_langs data"}
+        return TopLangsResult(error="An internal error occurred while processing top_langs data")
 
-    response_data = {
-        "results": data,
-        "count": len(data),
-    }
-
-    return response_data
+    return TopLangsResult(results=data, count=len(data))
 
 
-def get_top_users(request_args: MultiDict[str, str]) -> dict[str, Any]:
+def get_top_users(request_args: MultiDict[str, str]) -> TopUsersResult:
     """
     Handle top_users API requests.
     Returns aggregated statistics per user.
@@ -285,29 +284,23 @@ def get_top_users(request_args: MultiDict[str, str]) -> dict[str, Any]:
 
     except Exception as e:
         logger.error("Error fetching top_users data %s", str(e))
-        return {"error": "An internal error occurred while fetching top_users data"}
+        return TopUsersResult(error="An internal error occurred while fetching top_users data")
 
     try:
-        # Convert results to list of dicts
-        data: list[dict[str, Any]] = [
-            {
-                "user": row.user,
-                "targets": row.targets,
-                "words": int(row.words) if row.words else 0,
-                "views": int(row.views) if row.views else 0,
-            }
+        data: list[TopUserStat] = [
+            TopUserStat(
+                user=row.user,
+                targets=row.targets,
+                words=int(row.words) if row.words else 0,
+                views=int(row.views) if row.views else 0,
+            )
             for row in results
         ]
     except Exception as e:
         logger.error("Error converting top_users data %s", str(e))
-        return {"error": "An internal error occurred while converting top_users data"}
+        return TopUsersResult(error="An internal error occurred while converting top_users data")
 
-    response_data = {
-        "results": data,
-        "count": len(data),
-    }
-
-    return response_data
+    return TopUsersResult(results=data, count=len(data))
 
 
 __all__ = [

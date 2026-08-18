@@ -153,14 +153,20 @@ class EmailMsgRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/dashboard/<string:last_table>/<int:id>", methods=["GET"])(admin_required(self.dashboard))
+
+        routes = [
+            ("/dashboard/<string:last_table>/<int:id>", "GET", self.dashboard),
+            ("/send", "POST", self.msg_post),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(admin_required(target))
+
         self.bp.add_url_rule(
             "/dashboard/<string:last_table>/<int:id>/<string:user>",
             endpoint="dashboard_with_user",
             view_func=admin_required(self.dashboard),
             methods=["GET"],
         )
-        self.bp.route("/send", methods=["POST"])(admin_required(self.msg_post))
 
     def dashboard(
         self,

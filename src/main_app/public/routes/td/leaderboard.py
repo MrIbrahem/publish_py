@@ -28,10 +28,15 @@ class LeaderBoardRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/users/<string:username>", methods=["GET"])(self.users)
-        self.bp.route("/langs/<string:lang_code>", methods=["GET"])(self.langs)
-        self.bp.route("/js", methods=["GET"])(self.index_js)
-        self.bp.route("/", methods=["GET"])(self.index)
+
+        routes = [
+            ("/users/<string:username>", "GET", self.users),
+            ("/langs/<string:lang_code>", "GET", self.langs),
+            ("/js", "GET", self.index_js),
+            ("/", "GET", self.index),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def index_js(self) -> str:
         year = request.args.get("year", type=int)
@@ -75,8 +80,11 @@ class LeaderBoardRoutes:
 
         form_selected_data = request.args
 
-        langs_data = get_top_langs(request.args)
-        users_data = get_top_users(request.args)
+        langs_res = get_top_langs(request.args)
+        users_res = get_top_users(request.args)
+
+        langs_data = langs_res.to_json()
+        users_data = users_res.to_json()
 
         result = {
             "langs": langs_data.get("results") or [],
@@ -89,10 +97,7 @@ class LeaderBoardRoutes:
             users_top_langs: list[dict[Any, Any]] = self.lederboard_service.top_lang_of_users()
             result["users_top_langs"] = {row["user"]: row for row in users_top_langs}
 
-        users_total = users_data.get("count") or 0
-        langs_total = langs_data.get("count") or 0
-
-        numbers_summary = self.load_summary_data(result["users"], users_total, langs_total)
+        numbers_summary = self.load_summary_data(result["users"], users_res.count, langs_res.count)
 
         return render_template(
             "td/leaderboard/index.html",

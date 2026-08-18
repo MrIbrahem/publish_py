@@ -41,11 +41,16 @@ class UsersEmails:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(admin_required(self.dashboard))
-        self.bp.post("/add")(admin_required(self.add))
-        self.bp.post("/<int:record_id>/delete")(admin_required(self.delete))
-        self.bp.post("/<int:record_id>/update")(admin_required(self.update))
-        self.bp.route("/<int:record_id>/edit", methods=["GET"])(admin_required(self.edit))
+
+        routes = [
+            ("/", "GET", self.dashboard),
+            ("/add", "POST", self.add),
+            ("/<int:record_id>/delete", "POST", self.delete),
+            ("/<int:record_id>/update", "POST", self.update),
+            ("/<int:record_id>/edit", "GET", self.edit),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         """Render the users not in process management dashboard."""

@@ -58,10 +58,14 @@ class TDRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.get("/results_api")(self.results_api)
-        self.bp.get("/table")(self.table)
-        self.bp.get("/")(self.index)
-        self.bp.get("/missing")(self.missing)
+        routes = [
+            ("/results_api", "GET", self.results_api),
+            ("/table", "GET", self.table),
+            ("/", "GET", self.index),
+            ("/missing", "GET", self.missing),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def results_api(self):
         code = request.args.get("code")

@@ -26,9 +26,14 @@ class TranslatedUsersRoutes(SharedTranslatedRoutes):
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.index)
-        self.bp.route("/edit", methods=["GET"])(self.edit)
-        self.bp.route("/edit", methods=["POST"])(self.edit_post)
+
+        routes = [
+            ("/", "GET", self.index),
+            ("/edit", "GET", self.edit),
+            ("/edit", "POST", self.edit_post),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
 
 __all__ = [

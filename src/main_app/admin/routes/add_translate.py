@@ -20,8 +20,13 @@ class AddTranslateRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.add_translate)
-        self.bp.route("/", methods=["POST"])(self.add_translate_post)
+
+        routes = [
+            ("/", "GET", self.add_translate),
+            ("/", "POST", self.add_translate_post),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def add_translate(self) -> str:
         """Render the translations add_translate dashboard."""

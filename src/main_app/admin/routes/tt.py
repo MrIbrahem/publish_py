@@ -28,11 +28,15 @@ class TranslateTypeRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-        self.bp.route("/", methods=["GET"])(self.tt_index)
-        self.bp.route("/edit", methods=["GET"])(self.tt_edit)
-        self.bp.route("/", methods=["POST"])(self.tt_edit_post)
-        self.bp.route("/add", methods=["GET"])(self.add)
-        self.bp.route("/add", methods=["POST"])(self.tt_add_post)
+        routes = [
+            ("/", "GET", self.tt_index),
+            ("/edit", "GET", self.tt_edit),
+            ("/", "POST", self.tt_edit_post),
+            ("/add", "GET", self.add),
+            ("/add", "POST", self.tt_add_post),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(target)
 
     def tt_index(self) -> str:
         """Render the Translate Type listing."""

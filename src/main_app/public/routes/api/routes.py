@@ -425,21 +425,25 @@ class ApiRoutes:
 
         self.bp.before_request(self.handle_options_preflight)
 
-        self.bp.route("/status", methods=["GET"])(self.leaderboard_status)
-        self.bp.route("/top_langs", methods=["GET"])(check_cors(self.get_top_langs))
-        self.bp.route("/top_users", methods=["GET"])(check_cors(self.get_top_users))
-        self.bp.route("/top_lang_of_users", methods=["GET"])(check_cors(self.get_top_lang_of_users))
-        self.bp.route("/publish_reports", methods=["GET"])(check_cors(get_publish_reports))
-        self.bp.route("/publish_reports/stats", methods=["GET"])(check_cors(publish_reports_stats))
-        self.bp.route("/in_process", methods=["GET"])(check_cors(get_in_process))
-        self.bp.route("/in_process_total", methods=["GET"])(check_cors(get_in_process_total))
-        self.bp.route("/pages_users", methods=["GET"])(check_cors(get_pages_users))
-        self.bp.route("/pages_with_views", methods=["GET"])(check_cors(get_pages_with_views))
-        self.bp.route("/categories", methods=["GET"])(check_cors(get_categories))
-        self.bp.route("/distinct_langs", methods=["GET"])(check_cors(get_distinct_langs))
-        self.bp.route("/users_by_translations_count", methods=["GET"])(check_cors(users_by_translations_count))
-        self.bp.route("/langs", methods=["GET"])(check_cors(get_langs))
-        self.bp.route("/users", methods=["GET"])(check_cors(get_users))
+        routes = [
+            ("/status", "GET", self.leaderboard_status),
+            ("/top_langs", "GET", self.get_top_langs),
+            ("/top_users", "GET", self.get_top_users),
+            ("/top_lang_of_users", "GET", self.get_top_lang_of_users),
+            ("/publish_reports", "GET", get_publish_reports),
+            ("/publish_reports/stats", "GET", publish_reports_stats),
+            ("/in_process", "GET", get_in_process),
+            ("/in_process_total", "GET", get_in_process_total),
+            ("/pages_users", "GET", get_pages_users),
+            ("/pages_with_views", "GET", get_pages_with_views),
+            ("/categories", "GET", get_categories),
+            ("/distinct_langs", "GET", get_distinct_langs),
+            ("/users_by_translations_count", "GET", users_by_translations_count),
+            ("/langs", "GET", get_langs),
+            ("/users", "GET", get_users),
+        ]
+        for rule, method, target in routes:
+            self.bp.route(rule, methods=[method])(check_cors(target))
 
     def handle_options_preflight(self):
         if request.method == "OPTIONS":
@@ -452,15 +456,17 @@ class ApiRoutes:
             return response
 
     def get_top_langs(self) -> tuple[Response, int] | Response:
-        data = get_top_langs(request.args)
-        if data.get("error"):
+        result = get_top_langs(request.args)
+        data = result.to_json()
+        if result.error:
             return jsonify(data), 500
 
         return jsonify(data)
 
     def get_top_users(self) -> tuple[Response, int] | Response:
-        data = get_top_users(request.args)
-        if data.get("error"):
+        result = get_top_users(request.args)
+        data = result.to_json()
+        if result.error:
             return jsonify(data), 500
 
         return jsonify(data)
