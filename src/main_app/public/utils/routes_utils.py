@@ -36,7 +36,7 @@ def context_data(
         "wiki_domain": wiki_domain,
         "static_server": static_server,
         "tool_title": tool_title,
-        "username": user.username if user else None,
+        "username": username,
         "yesterday": (date.today() - timedelta(days=1)).isoformat(),
     }
 
