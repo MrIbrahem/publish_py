@@ -7,9 +7,9 @@ live in navbar.html.
 
 Usage in the template after registering via init_app(app):
 
-    {{ navbar.render_main_links(is_admin=is_admin) }}
+    {{ main_navbar.render_main_links(is_admin=is_admin) }}
     {{
-        navbar.render_user_links(
+        main_navbar.render_user_links(
             profile_url = url_for("leaderboard.users", username=current_username),
             current_username = current_username
         )
