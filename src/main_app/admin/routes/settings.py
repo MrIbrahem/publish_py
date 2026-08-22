@@ -115,7 +115,6 @@ class SettingsRoutes(SettingsFuncs):
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-
         routes = [
             ("/", "GET", self.dashboard),
             ("/create", "POST", self.create),
