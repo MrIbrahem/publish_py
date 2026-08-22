@@ -37,6 +37,7 @@ class NavLink:
     icon: str
     path: str
 
+    disabled: bool = False
     url_endpoint: str | None = None
     url_kwargs: dict = field(default_factory=dict)
     title: str | None = None
@@ -97,6 +98,7 @@ class NavDropdown:
     items: list[NavLink] = field(default_factory=list)
     dropdown_id: str = field(default_factory=lambda: f"navbarDarkDropdownMenuLink-{random.randint(1000, 9999)}")
     for_admin: bool = False
+    disabled: bool = False
 
     def is_active(self) -> bool:
         return any(item.is_active() for item in self.items)
@@ -107,8 +109,12 @@ class NavDropdown:
 
     def render(self) -> Markup:
         active_class = " active fw-bold" if self.is_active() else ""
+        items = [item for item in self.items if not item.disabled]
 
-        items_html = Markup("").join(self._wrap_li(item.render()) for item in self.items)
+        if not items:
+            return Markup("")
+
+        items_html = Markup("").join(self._wrap_li(item.render()) for item in items if not item.disabled)
 
         return Markup(
             '<li class="dropdown {cls}">'
@@ -149,18 +155,23 @@ class Navbar:
         parts = []
 
         for link in self.links:
+            if link.disabled:
+                continue
+
             if link.for_admin and not is_admin:
                 continue
+
             if isinstance(link, NavDropdown):
-                parts.append(link.render())
+                markup = link.render()
             else:
-                parts.append(self._wrap_li(link.render()))
+                markup = self._wrap_li(link.render())
+            if markup:
+                parts.append(markup)
 
         return Markup("").join(parts)
 
     # ---------- user links (profile / logout / login) ----------
     def render_user_links(self, current_username=None) -> Markup:
-        """ """
         parts = []
         if current_username:
             profile_url = url_for("leaderboard.users", username=current_username)

@@ -25,6 +25,7 @@ class CheckErrorsRoutes:
         self._setup_routes()
 
     def _setup_routes(self) -> None:
+
         routes = [
             ("/", "GET", self.dashboard),
             ("/<string:file_name>", "GET", self.app_log),

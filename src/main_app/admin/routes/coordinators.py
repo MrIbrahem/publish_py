@@ -129,6 +129,7 @@ class CoordinatorsRoutes(CoordinatorsFuncs):
         self._setup_routes()
 
     def _setup_routes(self) -> None:
+
         routes = [
             ("/", "GET", self.dashboard),
             ("/add", "POST", self.add),
