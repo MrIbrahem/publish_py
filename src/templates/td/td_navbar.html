@@ -26,7 +26,12 @@
                     {% set nav_item_class = "nav-item col-lg-auto col-md-4 col-sm-6 col-6" %}
                 </ul>
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav ms-lg-auto">
-                    {{ td_navbar.render_user_links(current_username=current_username) }}
+                    {{
+                        navbar.render_user_links(
+                            profile_url = url_for("leaderboard.users", username=current_username),
+                            current_username = current_username,
+                        )
+                    }}
                 </ul>
             </div>
         </div>

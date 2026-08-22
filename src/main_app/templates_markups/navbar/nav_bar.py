@@ -8,7 +8,12 @@ live in navbar.html.
 Usage in the template after registering via init_app(app):
 
     {{ navbar.render_main_links(is_admin=is_admin) }}
-    {{ navbar.render_user_links(current_username=current_username) }}
+    {{
+        navbar.render_user_links(
+            profile_url = url_for("leaderboard.users", username=current_username),
+            current_username = current_username
+        )
+    }}
 
 Both methods return a safe Markup object (no need for the |safe filter,
 though adding it doesn't hurt).
@@ -62,10 +67,9 @@ class NavigationBar:
         return Markup("").join(parts)
 
     # ---------- user links (profile / logout / login) ----------
-    def render_user_links(self, current_username=None) -> Markup:
+    def render_user_links(self, profile_url: str, current_username=None) -> Markup:
         parts = []
         if current_username:
-            profile_url = url_for("leaderboard.users", username=current_username)
             active = bool(request and quote(request.path) == profile_url)
             logger.debug(f"render_user_links: {profile_url=} {request.path=}")
             active_class = " active" if active else ""
@@ -85,7 +89,9 @@ class NavigationBar:
                     </span>
                 </a>
             """
-            logout_html = Markup(a_link).format(url=escape(url_for("auth.logout")))
+            logout_html = Markup(a_link).format(
+                url=escape(url_for("auth.logout"))
+            )
 
             parts.append(self._wrap_li(profile_html))
             parts.append(self._wrap_li(logout_html))
@@ -98,8 +104,9 @@ class NavigationBar:
                     </span>
                 </a>
             """
-            login_html = Markup(a_link).format(url=escape(url_for("auth.login")))
-
+            login_html = Markup(a_link).format(
+                url=escape(url_for("auth.login"))
+            )
             parts.append(self._wrap_li(login_html))
 
         return Markup("").join(parts)
