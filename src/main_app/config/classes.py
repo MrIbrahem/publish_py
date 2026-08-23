@@ -17,6 +17,7 @@ class OtherConfig:
     user_agent: str
     wiki_domain: str
     static_server: str
+    tool_title: str
     revids_api_url: str
     wikidata_domain: str
 

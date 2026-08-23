@@ -1,8 +1,9 @@
 {% extends "admins/base1.html" %}
+{% from "_macros.html" import summary_card_2 %}
 
 {% block title %}In Process (Total){% endblock %}
 
-{% block contents %}
+{% block admin_contents %}
 
 <div class="card">
     <div class="card-header">
@@ -11,20 +12,10 @@
     <div class="card-body">
         <div class="row g-3 mb-4">
             <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h2 class="h6 text-uppercase text-muted">Total Users</h2>
-                        <p class="display-6 mb-0" id="totalUsers">0</p>
-                    </div>
-                </div>
+                {{ summary_card_2('Total Users', 0, id="totalUsers") }}
             </div>
             <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h2 class="h6 text-uppercase text-muted">Total Articles</h2>
-                        <p class="display-6 mb-0" id="totalArticles">0</p>
-                    </div>
-                </div>
+                {{ summary_card_2('Total Articles', 0, id="totalArticles") }}
             </div>
         </div>
 
