@@ -89,9 +89,7 @@ class NavigationBar:
                     </span>
                 </a>
             """
-            logout_html = Markup(a_link).format(
-                url=escape(url_for("auth.logout"))
-            )
+            logout_html = Markup(a_link).format(url=escape(url_for("auth.logout")))
 
             parts.append(self._wrap_li(profile_html))
             parts.append(self._wrap_li(logout_html))
@@ -104,9 +102,7 @@ class NavigationBar:
                     </span>
                 </a>
             """
-            login_html = Markup(a_link).format(
-                url=escape(url_for("auth.login"))
-            )
+            login_html = Markup(a_link).format(url=escape(url_for("auth.login")))
             parts.append(self._wrap_li(login_html))
 
         return Markup("").join(parts)
