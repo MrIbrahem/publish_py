@@ -1,4 +1,5 @@
 {% extends "admins/base1.html" %}
+{% from "_macros.html" import summary_card_2 %}
 
 {% block title %}Full Translators{% endblock %}
 
@@ -11,28 +12,13 @@
     <div class="card-body">
         <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h2 class="h6 text-uppercase text-muted">Total Translators</h2>
-                        <p class="display-6 mb-0">{{ total_translators }}</p>
-                    </div>
-                </div>
+                {{ summary_card_2('Total Translators', total_translators) }}
             </div>
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h2 class="h6 text-uppercase text-muted">Active</h2>
-                        <p class="display-6 mb-0">{{ active_translators }}</p>
-                    </div>
-                </div>
+                {{ summary_card_2('Active', active_translators) }}
             </div>
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h2 class="h6 text-uppercase text-muted">Inactive</h2>
-                        <p class="display-6 mb-0">{{ inactive_translators }}</p>
-                    </div>
-                </div>
+                {{ summary_card_2('Inactive', inactive_translators) }}
             </div>
         </div>
 
