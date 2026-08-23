@@ -43,7 +43,7 @@ class LangRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "lang_id": self.lang_id,
             "code": self.code,
@@ -72,7 +72,7 @@ class MdwikiRevidRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "title": self.title,
             "revid": self.revid,
@@ -109,7 +109,7 @@ class TranslateTypeRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "tt_id": self.tt_id,
             "tt_title": self.tt_title,

@@ -63,7 +63,7 @@ class TestInProcessRecord:
             word=1000,
             add_date=None,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "title": "TestArticle",

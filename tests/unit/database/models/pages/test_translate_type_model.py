@@ -42,7 +42,7 @@ class TestTranslateTypeRecord:
             tt_lead=1,
             tt_full=0,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "tt_id": 1,
             "tt_title": "TestArticle",

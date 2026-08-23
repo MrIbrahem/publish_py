@@ -25,7 +25,7 @@ class TestProjectRecord:
             g_id=1,
             g_title="TestProject",
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "g_id": 1,
             "g_title": "TestProject",

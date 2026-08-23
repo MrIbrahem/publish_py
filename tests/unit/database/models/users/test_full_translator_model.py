@@ -27,7 +27,7 @@ class TestFullTranslatorRecord:
     def test_to_dict(self):
         """Test converting FullTranslatorRecord to dictionary."""
         record = FullTranslatorRecord(id=1, user="TestUser", is_active=1)
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "user": "TestUser",

@@ -61,7 +61,7 @@ class CategoryRecord(db.Model):
         if not self.campaign:
             raise ValueError("Campaign name cannot be empty")
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "category": self.category,
@@ -93,7 +93,7 @@ class ProjectRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "g_id": self.g_id,
             "g_title": self.g_title,

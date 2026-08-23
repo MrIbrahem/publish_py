@@ -29,7 +29,7 @@ class TestReportRecord:
         assert record.title == "Test"
 
     def test_to_dict_converts_date_to_iso(self):
-        """Test that to_dict converts date to ISO format."""
+        """Test that to_json converts date to ISO format."""
 
         record = ReportRecord(
             id=1,
@@ -41,14 +41,14 @@ class TestReportRecord:
             result="success",
             data="{}",
         )
-        result = record.to_dict()
+        result = record.to_json()
 
         assert result["date"] == "2024-01-01T12:00:00"
         assert result["id"] == 1
         assert result["title"] == "Test"
 
     def test_to_dict_handles_none_date(self):
-        """Test that to_dict handles None date."""
+        """Test that to_json handles None date."""
 
         record = ReportRecord(
             id=1,
@@ -60,6 +60,6 @@ class TestReportRecord:
             result="success",
             data="{}",
         )
-        result = record.to_dict()
+        result = record.to_json()
         # assert result["date"] == ""
         assert result["date"] is None

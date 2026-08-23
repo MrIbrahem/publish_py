@@ -50,7 +50,7 @@ class UserRecord(db.Model):
         self.wiki = kwargs.get("wiki") or ""
         self.user_group = kwargs.get("user_group") or "Uncategorized"
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         """Serializes the pure model instance into a dictionary."""
         data: dict[str, Any] = {}
         table_keys = [
@@ -92,7 +92,7 @@ class AdminUserRecord(TimestampMixin, db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         """Serializes the pure model instance into a dictionary."""
         data: dict[str, Any] = {}
         table_keys = [
@@ -145,7 +145,7 @@ class UserTokenRecord(TimestampMixin, db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         """Serializes the pure model instance into a dictionary."""
         data: dict[str, Any] = {}
         table_keys = [
@@ -200,7 +200,7 @@ class UsersNoInprocessRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "user": self.user,
@@ -234,7 +234,7 @@ class FullTranslatorRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "user": self.user,

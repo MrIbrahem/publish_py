@@ -25,14 +25,14 @@ class TestQidRecord:
         assert record.qid == "Q12345"
 
     def test_to_dict_returns_correct_dict(self):
-        """Test that to_dict returns the correct dictionary representation."""
+        """Test that to_json returns the correct dictionary representation."""
         record = QidRecord(
             id=1,
             title="TestArticle",
             qid="Q12345",
         )
 
-        result = record.to_dict()
+        result = record.to_json()
 
         assert result == {
             "id": 1,

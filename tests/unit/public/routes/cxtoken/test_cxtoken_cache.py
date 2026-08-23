@@ -48,9 +48,9 @@ class TestCxToken:
         assert token.stored_at > 0
 
     def test_to_dict_returns_correct_format(self):
-        """Test that to_dict returns the expected dictionary format."""
+        """Test that to_json returns the expected dictionary format."""
         token = CxToken(age=3600, exp=1775879885, jwt="test_jwt")
-        result = token.to_dict()
+        result = token.to_json()
 
         assert "age" in result
         assert "exp" in result
@@ -60,9 +60,9 @@ class TestCxToken:
         assert result["jwt"] == "test_jwt"
 
     def test_to_dict_returns_correct_structure(self):
-        """Test that to_dict returns correct dictionary structure."""
+        """Test that to_json returns correct dictionary structure."""
         token = CxToken(age=3600, exp=1234567890, jwt="test_jwt")
-        result = token.to_dict()
+        result = token.to_json()
 
         assert "age" in result
         assert "exp" in result
@@ -74,7 +74,7 @@ class TestCxToken:
         """Test that age decreases as time passes."""
         token = CxToken(age=3600, exp=1775879885, jwt="test")
         time.sleep(0.1)
-        result = token.to_dict()
+        result = token.to_json()
 
         assert result["age"] < 3600
 

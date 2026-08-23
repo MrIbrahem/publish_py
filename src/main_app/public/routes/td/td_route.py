@@ -98,9 +98,9 @@ class TDRoutes:
     def table(self) -> str:
         # Form data — unchanged from the previous index() implementation.
         try:
-            langs = [x.to_dict() for x in self.lang_service.list_langs()]
+            langs = [x.to_json() for x in self.lang_service.list_langs()]
             campaigns_records = self.category_service.list_categories()
-            campaigns = [x.to_dict() for x in campaigns_records]
+            campaigns = [x.to_json() for x in campaigns_records]
         except Exception:
             logger.exception("Failed to load languages/campaigns for index page")
             flash("Failed to load page data — please try again.", "danger")
@@ -158,9 +158,9 @@ class TDRoutes:
     def index(self):
         # Form data — unchanged from the previous index() implementation.
         try:
-            langs = [x.to_dict() for x in self.lang_service.list_langs()]
+            langs = [x.to_json() for x in self.lang_service.list_langs()]
             campaigns_records = self.category_service.list_categories()
-            campaigns = [x.to_dict() for x in campaigns_records]
+            campaigns = [x.to_json() for x in campaigns_records]
         except Exception:
             logger.exception("Failed to load languages/campaigns for index page")
             flash("Failed to load page data — please try again.", "danger")
@@ -202,7 +202,7 @@ class TDRoutes:
         langs_lookup: dict[str, dict] = {}
         try:
             for lang in self.lang_service.list_langs():
-                data = lang.to_dict()
+                data = lang.to_json()
                 code = data.get("code")
                 if code:
                     langs_lookup[code] = data

@@ -48,7 +48,7 @@ class TestViewsNewRecord:
             year=2024,
             views=5000,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "target": "TestArticle",

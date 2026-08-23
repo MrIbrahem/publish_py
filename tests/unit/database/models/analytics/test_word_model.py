@@ -42,7 +42,7 @@ class TestWordRecord:
             w_lead_words=500,
             w_all_words=2000,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "w_id": 1,
             "w_title": "TestArticle",

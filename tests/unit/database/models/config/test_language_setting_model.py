@@ -43,7 +43,7 @@ class TestLanguageSettingRecord:
             expend=0,
             add_en_lang=1,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "lang_code": "en",
