@@ -27,7 +27,7 @@ class TestUsersNoInprocessRecord:
     def test_to_dict(self):
         """Test converting UsersNoInprocessRecord to dictionary."""
         record = UsersNoInprocessRecord(id=1, user="TestUser", is_active=1)
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "user": "TestUser",

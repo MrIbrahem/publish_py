@@ -35,7 +35,7 @@ class TestAssessmentRecord:
             title="TestArticle",
             importance="Medium",
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "title": "TestArticle",
@@ -45,7 +45,7 @@ class TestAssessmentRecord:
     def test_to_dict_with_none_importance(self):
         """Test converting AssessmentRecord to dictionary with None importance."""
         record = AssessmentRecord(id=1, title="TestArticle")
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "title": "TestArticle",

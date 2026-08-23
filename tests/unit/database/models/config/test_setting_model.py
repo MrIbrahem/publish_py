@@ -48,7 +48,7 @@ class TestSettingRecord:
             value_type="boolean",
             value="true",
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "key": "test_key",

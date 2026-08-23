@@ -21,7 +21,7 @@ class CxToken:
     jwt: str
     stored_at: float = field(default_factory=time.time)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         elapsed = time.time() - self.stored_at
         remaining_age = int(self.age - elapsed)
 
@@ -48,6 +48,6 @@ def get_from_store(user: str, wiki: str) -> dict | None:
     in_cache: CxToken = cache.get((user, wiki))  # type: ignore
 
     if in_cache:
-        return in_cache.to_dict()
+        return in_cache.to_json()
 
     return None

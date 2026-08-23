@@ -33,7 +33,7 @@ class TestCategoryRecord:
         assert record.is_default == 1
 
     def test_to_dict_returns_correct_dict(self):
-        """Test that to_dict returns the correct dictionary representation."""
+        """Test that to_json returns the correct dictionary representation."""
         record = CategoryRecord(
             id=1,
             category="TestCategory",
@@ -44,7 +44,7 @@ class TestCategoryRecord:
             is_default=1,
         )
 
-        result = record.to_dict()
+        result = record.to_json()
 
         assert result == {
             "id": 1,

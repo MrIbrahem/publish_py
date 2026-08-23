@@ -31,7 +31,7 @@ class TestLangRecord:
             autonym="English",
             name="English",
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "lang_id": 1,
             "code": "en",
@@ -67,7 +67,7 @@ class TestLangRecordRedirects:
             name="English",
             redirects=redirects_list,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result["redirects"] == redirects_list
         # assert redirects is list
         assert len(result["redirects"]) == 2

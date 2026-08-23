@@ -62,7 +62,7 @@ class PageRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "title": self.title,
@@ -129,7 +129,7 @@ class UserPageRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "title": self.title,
@@ -176,7 +176,7 @@ class PagesUsersToMainRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "new_target": self.new_target,
@@ -227,7 +227,7 @@ class InProcessRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "title": self.title,

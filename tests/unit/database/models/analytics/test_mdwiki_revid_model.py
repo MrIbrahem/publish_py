@@ -25,7 +25,7 @@ class TestMdwikiRevidRecord:
             title="TestArticle",
             revid=12345,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "title": "TestArticle",
             "revid": 12345,

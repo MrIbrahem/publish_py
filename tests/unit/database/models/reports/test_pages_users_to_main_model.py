@@ -39,7 +39,7 @@ class TestPagesUsersToMainRecord:
             new_user="TestUser",
             new_qid="Q12345",
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "new_target": "TargetPage",

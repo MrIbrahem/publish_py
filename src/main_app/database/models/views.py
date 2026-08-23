@@ -38,7 +38,7 @@ class EnwikiPageviewRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "title": self.title,
@@ -78,7 +78,7 @@ class ViewsNewRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "target": self.target,
@@ -109,7 +109,7 @@ class ViewsNewAllRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "target": self.target,
             "lang": self.lang,

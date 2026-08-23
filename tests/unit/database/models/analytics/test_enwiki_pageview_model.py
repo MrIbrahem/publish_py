@@ -35,7 +35,7 @@ class TestEnwikiPageviewRecord:
             title="TestArticle",
             en_views=5000,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "id": 1,
             "title": "TestArticle",

@@ -69,7 +69,7 @@ class UsersEmails:
         users_data = []
 
         for x in users:
-            user_data = x.to_dict()
+            user_data = x.to_json()
             user_data["live"] = users_counts.get(x.username) or 0
             users_data.append(user_data)
 

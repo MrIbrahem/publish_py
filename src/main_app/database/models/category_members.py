@@ -45,7 +45,7 @@ class CategoryMemberRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict:
+    def to_json(self) -> dict:
         return {
             "id": self.id,
             "category": self.category,

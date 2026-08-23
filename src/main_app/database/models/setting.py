@@ -49,7 +49,7 @@ class LanguageSettingRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "lang_code": self.lang_code,
@@ -111,7 +111,7 @@ class SettingRecord(db.Model):
 
         return str(value)  # string
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "key": self.key,

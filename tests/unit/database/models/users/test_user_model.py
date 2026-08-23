@@ -53,7 +53,7 @@ class TestUserRecord:
             user_group="Translator",
             created_at=None,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "user_id": 1,
             "username": "TestUser",

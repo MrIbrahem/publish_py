@@ -82,7 +82,7 @@ def get_publish_reports() -> tuple[Response, int] | Response:
         return jsonify({"error": "An internal error occurred while fetching reports"}), 500
 
     # Build response
-    data = [r.to_dict() for r in records] if records else []
+    data = [r.to_json() for r in records] if records else []
 
     response_data = {
         "results": data,
@@ -314,7 +314,7 @@ def get_categories() -> tuple[Response, int] | Response:
         logger.exception("Error fetching categories data")
         return jsonify({"error": "An internal error occurred while fetching categories data"}), 500
 
-    records = [x.to_dict() for x in records]
+    records = [x.to_json() for x in records]
     response_data = {
         "results": records,
         "count": len(records),
@@ -381,7 +381,7 @@ def get_langs() -> tuple[Response, int] | Response:
         logger.exception("Error fetching langs data")
         return jsonify({"error": "An internal error occurred while fetching langs data"}), 500
 
-    records = [x.to_dict() for x in records]
+    records = [x.to_json() for x in records]
     response_data = {
         "results": records,
         "count": len(records),

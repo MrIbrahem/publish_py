@@ -34,7 +34,7 @@ class AssessmentRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "title": self.title,
@@ -66,7 +66,7 @@ class RefsCountRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "r_id": self.r_id,
             "r_title": self.r_title,
@@ -99,7 +99,7 @@ class WordRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "w_id": self.w_id,
             "w_title": self.w_title,

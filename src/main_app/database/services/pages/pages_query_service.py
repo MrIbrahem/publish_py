@@ -52,7 +52,7 @@ class PagesQueryService:
 
         return [
             {
-                **row[0].to_dict(),
+                **row[0].to_json(),
                 "campaign": row[1] if row[1] else row[0].cat,
             }
             for row in results
@@ -91,7 +91,7 @@ class PagesQueryService:
 
         return [
             {
-                **row[0].to_dict(),
+                **row[0].to_json(),
                 "views": row[1],
             }
             for row in results

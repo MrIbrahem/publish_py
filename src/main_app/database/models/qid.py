@@ -49,7 +49,7 @@ class QidRecord(db.Model):
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "qid": self.qid,
@@ -94,7 +94,7 @@ class QidOthersRecord(db.Model):
         if not self.qid.startswith("Q") or not self.qid[1:].isdigit():
             raise ValueError(f"Invalid QID format: {self.qid}. QID should start with 'Q' followed by digits.")
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "qid": self.qid,
@@ -127,7 +127,7 @@ class AllQidsExistRecord(db.Model):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_json(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "qid": self.qid,

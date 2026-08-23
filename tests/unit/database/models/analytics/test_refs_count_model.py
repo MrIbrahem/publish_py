@@ -42,7 +42,7 @@ class TestRefsCountRecord:
             r_lead_refs=5,
             r_all_refs=20,
         )
-        result = record.to_dict()
+        result = record.to_json()
         assert result == {
             "r_id": 1,
             "r_title": "TestArticle",
