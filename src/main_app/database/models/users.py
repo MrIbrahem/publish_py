@@ -36,7 +36,7 @@ class UserRecord(db.Model):
         nullable=False,
         server_default=func.current_timestamp(),
         default=func.current_timestamp(),
-        )
+    )
 
     # One-to-One relationship with UserTokenRecord using the modern SQLAlchemy 2.0 style
     token: Mapped[UserTokenRecord | None] = relationship(back_populates="user", uselist=False)
