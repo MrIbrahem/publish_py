@@ -1,4 +1,4 @@
-{% if is_admin %}
+{# % if is_admin % #}
 {% extends "base.html" %}
 
 {% block title %}Admins{% endblock %}
@@ -7,8 +7,9 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-desktop.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar-mobile.css') }}">
 {% endblock %}
+
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-1">
     <div class="row content">
         <div class="col-md-2 px-0 colmd2 border">
             {% block sidebar_block %}
@@ -29,4 +30,4 @@
 {% block extra_js %}
 {{ super() }}
 {% endblock %}
-{% endif %}
+{# % endif % #}

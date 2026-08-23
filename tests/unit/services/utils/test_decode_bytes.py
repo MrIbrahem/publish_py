@@ -34,3 +34,18 @@ class TestCoerceBytes:
         """Test that invalid types raise TypeError."""
         with pytest.raises(TypeError, match="Expected bytes-compatible value"):
             coerce_bytes("string_not_allowed")
+
+    def test_coerce_bytes_with_invalid_type(self):
+        """Test coerce_bytes raises TypeError for invalid input."""
+        with pytest.raises(TypeError, match="Expected bytes-compatible value"):
+            coerce_bytes("string_not_bytes")
+
+    def test_coerce_bytes_with_int(self):
+        """Test coerce_bytes raises TypeError for integer input."""
+        with pytest.raises(TypeError, match="Expected bytes-compatible value"):
+            coerce_bytes(123)
+
+    def test_coerce_bytes_with_none(self):
+        """Test coerce_bytes raises TypeError for None input."""
+        with pytest.raises(TypeError, match="Expected bytes-compatible value"):
+            coerce_bytes(None)

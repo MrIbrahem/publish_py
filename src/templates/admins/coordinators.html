@@ -1,6 +1,6 @@
 {% extends "admins/base1.html" %}
 
-{% block title %}Coordinators{% endblock %}
+{% block title %}Coordinators · {{ tool_title }}{% endblock %}
 
 {%- macro update_active_form(coordinator) -%}
 {% set endpoint_target = 'adminpanel.coordinators.deactivate' if coordinator.is_active else 'adminpanel.coordinators.activate' %}
