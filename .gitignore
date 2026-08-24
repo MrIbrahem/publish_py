@@ -48,3 +48,4 @@ _work_files/add_all.py
 **.pyc.**
 /.pytest_cache
 /src/templates/admin/bs4_admin
+*.isorted
