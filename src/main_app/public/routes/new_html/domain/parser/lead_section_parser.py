@@ -22,6 +22,11 @@ def get_lead_section(wikitext: str) -> str:
     if not wikitext:
         return wikitext
 
+    # Nitpick / Suggestion: when the wikitext has no == heading (this branch returns it raw),
+    # the ==References== section is never appended — but when headings exist it is (line 35).
+    # That inconsistency can drop the References section for heading-less pages.
+    # Consider always appending the References section (or never), or document why
+    # heading-less input is an edge case that should stay verbatim.
     if "==" not in wikitext:
         return wikitext
 

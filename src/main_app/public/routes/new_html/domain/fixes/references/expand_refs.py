@@ -57,6 +57,11 @@ def expand_refs(first: str, alltext: str) -> str:
                 short_tag,
                 full_ref,
             )
+            # Suggestion: unlike delete_empty_refs (which guards with if full_tag not in text), this unconditionally
+            # does first.replace(short_tag, full_ref), which replaces all occurrences of the short tag with the full
+            # ref and can create duplicate <ref name=...> definitions when the same short ref appears more than once.
+            # Mirror the dedupe guard from delete_empty_refs (only expand when the full ref isn't already present)
+            # to avoid duplicate references.
             first = first.replace(short_tag, full_ref)
 
     return first

@@ -102,6 +102,10 @@ class RemoveMissingImagesService:
             number = number_match.group(1) if number_match else ""
             fields_to_remove.append(f"caption{number}")
 
+        # Suggestion: this regex fallback removes every |caption{number}= line (and every |image*=) across the entire text,
+        # not just the lines belonging to the infobox whose image was confirmed missing. If the same caption2= / image field
+        # appears in another template elsewhere, it gets deleted too. Scope the removal to the specific infobox block,
+        # or at least only delete a caption whose paired image was actually missing.
         for field in fields_to_remove:
             field_pattern = re.compile(r"^[ \t]*\|\s*" + re.escape(field) + r"\s*=[^\n]*\n?", re.MULTILINE)
             text = field_pattern.sub("", text)
