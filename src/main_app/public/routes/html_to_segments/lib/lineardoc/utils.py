@@ -440,8 +440,7 @@ def is_closing_template_match(
         and (
             (
                 is_transclusion(current_close_tag)
-                and current_close_tag.get("attributes", {}).get("about")
-                == first_block_about
+                and current_close_tag.get("attributes", {}).get("about") == first_block_about
             )
             or is_reference_list(current_close_tag)
         )
