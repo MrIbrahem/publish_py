@@ -1,7 +1,11 @@
 """
 HTML post-processing utilities.
+
 Currently only implements remove_data_parsoid.
-Other helpers (del_div_error, fix_link_red) can be added later.
+
+TODO: Port the remaining helpers from the original PHP HtmlUtils:
+      - del_div_error
+      - fix_link_red
 """
 
 from __future__ import annotations

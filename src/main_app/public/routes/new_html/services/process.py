@@ -3,7 +3,7 @@ Main processing pipeline for the new_html endpoint.
 
 Pipeline:
 1. Fetch wikitext + revision
-2. (fix_wikitext is currently a no-op)
+2. fix_wikitext          ← currently a no-op (TODO)
 3. Convert wikitext → HTML (with cache)
 4. Convert HTML → segments (with cache)
 5. Return JSON envelope or raw content
@@ -35,7 +35,17 @@ logger = logging.getLogger(__name__)
 def fix_wikitext(text: str, title: str) -> str:
     """
     Temporary placeholder.
-    The real fix pipeline (templates, refs, images, etc.) is disabled for now.
+
+    TODO: Port the full fix_wikitext pipeline from the original PHP tool:
+          - {{drugbox / {{Drugbox → {{Infobox drug
+          - remove_templates
+          - remove_lead_templates
+          - remove_bad_refs
+          - del_empty_refs
+          - remove_videos
+          - remove_categories
+          - removeMissingImages
+          - add_missing_title
     """
     return text
 
@@ -50,6 +60,10 @@ def get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str,
     """
     mdwiki = MdwikiApi()
     source, revid, error = mdwiki.get_wikitext(title)
+
+    # TODO: In the original PHP version, fix_wikitext is also applied
+    #       inside WikitextHandler before caching. Currently we only
+    #       apply it later in process_page().
 
     from_cache = False
 

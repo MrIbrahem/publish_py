@@ -3,6 +3,8 @@ External API clients for the new_html module.
 
 - MdwikiApi: fetch wikitext + revision id
 - TransformApi: wikitext → HTML
+
+# TODO: Port CommonsImageService if/when removeMissingImages is implemented.
 """
 
 from __future__ import annotations
