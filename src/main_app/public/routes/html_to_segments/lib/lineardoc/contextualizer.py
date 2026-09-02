@@ -68,3 +68,8 @@ class Contextualizer:
             Whether sentences can be segmented into spans in this context
         """
         return self.get_context() is None
+
+
+__all__ = [
+    "Contextualizer",
+]

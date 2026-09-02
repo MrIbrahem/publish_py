@@ -13,9 +13,11 @@ import logging
 from typing import Any
 
 from flask import Blueprint, Response, jsonify, render_template, request
+
 from .lib.processor import process_html
 
 logger = logging.getLogger(__name__)
+
 
 class ProcessingError(Exception):
     """Exception raised when HTML processing fails."""
@@ -161,7 +163,7 @@ def process_text() -> tuple[Response, int]:
         return create_error_response(error_message, 400)
 
     # Extract HTML from the request data
-    source_html = data["html"] # pyright: ignore[reportOptionalSubscript]
+    source_html = data["html"]  # pyright: ignore[reportOptionalSubscript]
 
     # Process the HTML
     try:
@@ -178,6 +180,7 @@ def process_text() -> tuple[Response, int]:
         # Log the full error internally but return a generic message
         logger.error(f"Unexpected error processing HTML: {e}", exc_info=True)
         return create_error_response("An internal error occurred while processing the HTML", 500)
+
 
 class HtmltoSegmentsRoutes:
     def __init__(self, bp: Blueprint) -> None:
@@ -199,6 +202,7 @@ class HtmltoSegmentsRoutes:
         return render_template(
             "html_to_segments/index.html",
         )
+
 
 __all__ = [
     "HtmltoSegmentsRoutes",

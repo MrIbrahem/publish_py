@@ -8,8 +8,7 @@ import re
 import yaml
 
 from ..lib.lineardoc import Normalizer, Parser
-
-from .lineardoc import mw_contextualizer
+from .lineardoc import MwContextualizer
 from .segmentation import CXSegmenter
 
 # Load configuration
@@ -55,7 +54,7 @@ def process_html(source_html):
     Returns:
         Processed HTML string
     """
-    parser = Parser(mw_contextualizer({"removableSections": removable_sections}), {"wrapSections": True})
+    parser = Parser(MwContextualizer({"removableSections": removable_sections}), {"wrapSections": True})
 
     parser.init()
     parser.write(source_html)
@@ -67,3 +66,9 @@ def process_html(source_html):
     result = segmented_doc.get_html()
 
     return result
+
+
+__all__ = [
+    "normalize",
+    "process_html",
+]

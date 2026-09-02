@@ -92,3 +92,9 @@ def to_do(tab: dict[str, Any], status: str) -> None:
             json.dump(log_entry, f, ensure_ascii=False, indent=2)
     except Exception as e:
         logger.error(f"Failed to write to reports file {status}.json: {e}")
+
+
+__all__ = [
+    "get_reports_dir",
+    "to_do",
+]

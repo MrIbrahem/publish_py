@@ -70,3 +70,11 @@ def make_summary(revid: str | int, sourcetitle: str, target_lang: str, hashtag: 
     """
     revid = str(revid)
     return f"Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{target_lang} {hashtag}"
+
+
+__all__ = [
+    "format_title",
+    "format_user",
+    "determine_hashtag",
+    "make_summary",
+]

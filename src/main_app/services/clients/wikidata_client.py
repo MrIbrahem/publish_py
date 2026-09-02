@@ -122,3 +122,10 @@ def link_to_wikidata(
         return {"result": "success", "qid": qid}
 
     return link_result
+
+
+__all__ = [
+    "get_record_by_title",
+    "get_qid_for_mdtitle",
+    "link_to_wikidata",
+]

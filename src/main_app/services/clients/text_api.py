@@ -53,3 +53,8 @@ def get_wikitext(title, project: str = "commons.wikimedia.org"):
             return revs[0].get("slots", {}).get("main", {}).get("content") or ""
 
     return ""
+
+
+__all__ = [
+    "get_wikitext",
+]
