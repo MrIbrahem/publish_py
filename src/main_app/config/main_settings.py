@@ -11,8 +11,9 @@ from .classes import Settings
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     """
-    Initialize and return a cached Settings object.
-    Main entry point for application configuration.
+    Assemble and return the application's Settings populated from environment variables.
+
+    Reads and validates required environment variables, builds cookie, OAuth, path, and database configurations, and returns a consolidated Settings instance.
 
     Returns:
         Settings: The populated application settings.
@@ -34,11 +35,7 @@ def ensure_directories() -> None:
 
     Call this once at app startup (in the factory), not at import time.
     """
-    for dir_name in [
-        settings.paths.flask_data_dir,
-        settings.paths.log_dir,
-        settings.paths.publish_reports_dir,
-    ]:
+    for dir_name in settings.paths.all_paths():
         Path(dir_name).mkdir(parents=True, exist_ok=True)
 
     for file_name in [

@@ -10,6 +10,13 @@ from typing import Any
 
 # --- Helper Functions ---
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    """Convert environment variable to boolean."""
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
 
 def _env_int(name: str, default: int, safe: bool = False) -> int:
     """Convert environment variable to integer."""
@@ -23,14 +30,6 @@ def _env_int(name: str, default: int, safe: bool = False) -> int:
             raise ValueError(f"Environment variable {name} must be an integer") from exc
         else:
             return default
-
-
-def _env_bool(name: str, default: bool = False) -> bool:
-    """Convert environment variable to boolean."""
-    value = os.getenv(name)
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def load_special_users() -> dict:
@@ -211,6 +210,13 @@ class Paths:
         )
 
 
+    def all_paths(self) -> list[Path]:
+        return [
+            self.flask_data_dir,
+            self.log_dir,
+            self.publish_reports_dir,
+        ]
+
 @dataclass(frozen=True)
 class CookieConfig:
     name: str
@@ -377,6 +383,7 @@ class SecurityConfig:
             secret_key_fallbacks=secret_key_fallbacks,
             publish_secret_code=publish_secret_code,
         )
+
         if not security_config.secret_key:
             raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
 
@@ -414,15 +421,15 @@ class Settings:
             RuntimeError: If the OAuth configuration (OAUTH_MWURI, OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET) is incomplete.
         """
         return Settings(
-            database_data=DbConfig.load(),
-            paths=Paths.load(),
-            cookie=CookieConfig.load(),
-            sessions=SessionConfig.load(),
-            oauth=OAuthConfig.load(),
             security=SecurityConfig.load(),
+            paths=Paths.load(),
+            database_data=DbConfig.load(),
+            cookie=CookieConfig.load(),
+            oauth=OAuthConfig.load(),
+            sessions=SessionConfig.load(),
             other=OtherConfig.load(),
-            users=UsersConfig.load(),
             cors=CorsConfig.load(),
+            users=UsersConfig.load(),
             new_html=NewHtmlConfig.load(),
         )
 
