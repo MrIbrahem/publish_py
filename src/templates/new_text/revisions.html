@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles</title>
+    <link rel='stylesheet' href='https://tools-static.wmflabs.org/cdnjs/ajax/libs/font-awesome/5.15.3/css/all.min.css'>
+    <link rel='stylesheet'
+        href='https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css'>
+    <link rel='stylesheet'
+        href='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css'>
+    <link rel='stylesheet'
+        href='https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.14.0-beta3/css/bootstrap-select.css'>
+    <link rel='stylesheet'
+        href='https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css'>
+    <link rel='stylesheet'
+        href='https://tools-static.wmflabs.org/cdnjs/ajax/libs/datatables.net-bs5/2.2.2/dataTables.bootstrap5.css'>
+
+    <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.7.0/jquery.min.js'></script>
+    <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/popper.js/2.11.8/umd/popper.min.js'></script>
+    <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js'></script>
+    <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js'></script>
+    <script
+        src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js'></script>
+    <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/datatables.net/2.2.2/dataTables.js'></script>
+    <script
+        src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/datatables.net-bs5/2.2.2/dataTables.bootstrap5.min.js'></script>
+    <style>
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light-subtle">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">MDWiki</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/get_html">get_html</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mdtexts">mdtexts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/new_html">new_html</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid mt-4">
+        <div class="card">
+            <div class="card-header">
+            </div>
+            <div class="card-body">
+                <table class="table compact table-striped" id="main_table">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const showReCreate = urlParams.has('re');
+
+        function make_badge(exists) {
+            return exists ? '' : " <span class='badge bg-danger'>Missing</span>";
+        }
+
+        const columns = [
+            {
+                data: 'number',
+                title: '#',
+                className: 'dt-center'
+            },
+            {
+                data: 'lastModified',
+                title: 'lastModified'
+            },
+            {
+                data: 'title',
+                title: 'Title',
+                render: function (data, type, row) {
+                    return `<a class="card-link" href="https://mdwiki.org/wiki/index.php?title=${encodeURIComponent(data)}" target="_blank">${data}</a>`;
+                }
+            }
+        ];
+
+        if (showReCreate) {
+            columns.push({
+                data: null,
+                title: 'Re create',
+                render: function (data, type, row) {
+                    return `<a class="card-link" href="index.php?new=1&title=${encodeURIComponent(row.title)}" target="_blank">Re create</a>`;
+                }
+            });
+        }
+
+        columns.push(
+            {
+                data: 'dir_path',
+                title: 'Revision',
+                render: function (data, type, row) {
+                    return `<a class="card-link" href="https://mdwiki.org/wiki/index.php?oldid=${row.oldid_number}" target="_blank">${data}</a>`;
+                }
+            },
+            {
+                data: 'wikitext_exists',
+                title: 'Wikitext',
+                render: function (data, type, row) {
+                    const url = `open.php?revid=${row.dir_path}&file=wikitext.txt`;
+                    return `<a class="card-link" href="${url}" target="_blank">Wikitext</a> ${make_badge(data)}`;
+                }
+            },
+            {
+                data: 'html_exists',
+                title: 'Html',
+                render: function (data, type, row) {
+                    const url = `open.php?revid=${row.dir_path}&file=html.html`;
+                    return `<a class="card-link" href="${url}" target="_blank">Html</a> ${make_badge(data)}`;
+                }
+            },
+            {
+                data: 'seg_exists',
+                title: 'Segments',
+                render: function (data, type, row) {
+                    const url = `open.php?revid=${row.dir_path}&file=seg.html`;
+                    return `<a class="card-link" href="${url}" target="_blank">Segments</a> ${make_badge(data)}`;
+                }
+            }
+        );
+
+        $('#main_table').DataTable({
+            stateSave: true,
+            paging: false,
+            info: true,
+            searching: true,
+            ajax: {
+                url: '/new_html/revisions_api',
+                dataSrc: 'results'
+            },
+            columns: columns
+        });
+    </script>
+
+</body>
+
+</html>

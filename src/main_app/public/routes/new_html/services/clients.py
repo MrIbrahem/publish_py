@@ -14,7 +14,7 @@ from typing import Any
 
 import requests
 
-from src.main_app.config.main_settings import get_settings
+from .....config.main_settings import get_settings
 
 logger = logging.getLogger(__name__)
 

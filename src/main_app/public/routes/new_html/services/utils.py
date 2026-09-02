@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 from flask import Request, Response
 
-from src.main_app.config.main_settings import get_settings
+from .....config.main_settings import get_settings
 
 
 def get_file_dir(revision: str, all_flag: str = "") -> Path:
