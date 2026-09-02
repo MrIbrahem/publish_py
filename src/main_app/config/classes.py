@@ -49,11 +49,11 @@ def load_special_users() -> dict:
     return special_users
 
 
-def resolve_path(_path) -> Path:
+def resolve_path(_path: str) -> Path:
     """Expand environment variables and user home directory in paths."""
     _path = os.path.expandvars(str(_path))
-    _path = Path(_path).expanduser()
-    return _path
+    path = Path(_path).expanduser()
+    return path
 
 
 # --- Data Classes for Configuration Sections ---
@@ -68,7 +68,6 @@ class NewHtmlConfig:
 
     revisions_dir: Path
     transform_base_url: str = "https://en.wikipedia.org/w/rest.php/v1"
-    segment_api_as_json: bool = True
 
     @property
     def json_file(self) -> Path:
@@ -85,20 +84,13 @@ class NewHtmlConfig:
         """
         Load configuration for the new_html blueprint.
         """
-        revisions_dir = Path(
-            os.getenv(
-                "REVISIONS_DIR",
-                Path.home() / "public_html" / "revisions_new1",
-            )
-        )
+        revisions_dir = os.getenv("REVISIONS_DIR", Path.home() / "public_html" / "revisions_new1")
+
+        transform_base_url = os.getenv("TRANSFORM_BASE_URL", "https://en.wikipedia.org/w/rest.php/v1")
 
         return NewHtmlConfig(
-            revisions_dir=revisions_dir,
-            transform_base_url=os.getenv(
-                "TRANSFORM_BASE_URL",
-                "https://en.wikipedia.org/w/rest.php/v1",
-            ),
-            segment_api_as_json=os.getenv("SEGMENT_API_AS_JSON", "true").lower() in ("1", "true", "yes"),
+            revisions_dir=resolve_path(str(revisions_dir)),
+            transform_base_url=transform_base_url,
         )
 
 

@@ -180,12 +180,10 @@ must be emitted by `main`, `check`, `open`, `revisions_api` (mirror `utils.php::
 
 ### Phase 1 — Configuration (new vars)
 
-| Env var               | Default                                         | Used for                                             |
-| --------------------- | ----------------------------------------------- | ---------------------------------------------------- |
-| `REVISIONS_DIR`       | `~/public_html/revisions_new1`                  | filesystem cache root                                |
-| `TRANSFORM_BASE_URL`  | `https://en.wikipedia.org/w/rest.php/v1`        | wikitext→HTML                                        |
-| `SEGMENT_API_URL`     | `https://mdwikipy.toolforge.org/HtmltoSegments` | HTML→segments                                        |
-| `SEGMENT_API_AS_JSON` | `true`                                          | send `Content-Type: application/json` to segment API |
+| Env var              | Default                                  | Used for              |
+| -------------------- | ---------------------------------------- | --------------------- |
+| `REVISIONS_DIR`      | `~/public_html/revisions_new1`           | filesystem cache root |
+| `TRANSFORM_BASE_URL` | `https://en.wikipedia.org/w/rest.php/v1` | wikitext→HTML         |
 
 ### Phase 2 — Storage (`storage.py`)
 
@@ -204,8 +202,6 @@ Port `JsonDataController` + `FileUtils`:
     back to `https://mdwiki.org/w/api.php`. Use `settings.other.user_agent`.
 -   `transform_wikitext_to_html(wikitext, title)` → POST
     `{TRANSFORM_BASE_URL}/transform/wikitext/to/html/{titleEncoded}` with `wikitext`.
--   `segment_html(html)` → POST `{SEGMENT_API_URL}` (`html=…` or JSON per `SEGMENT_API_AS_JSON`)
-    → parse `{result}`.
 -   `commons_image_exists(filename)` (optional, only if image-fix parity is needed) →
     `https://commons.wikimedia.org/w/api.php` imageinfo.
 

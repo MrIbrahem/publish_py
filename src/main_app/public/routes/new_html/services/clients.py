@@ -20,6 +20,16 @@ from .....config.main_settings import get_settings
 
 logger = logging.getLogger(__name__)
 
+def normalize_title_for_url(title: str) -> str:
+    """
+    doesn't normalize the title. Here the title is only replace("/", "%2F"), whereas MdwikiApi.get_wikitext
+    also replaces spaces with underscores. Multi-word titles will build a malformed REST URL and the
+    transform will fail. Reuse the same encoding as the fetch path.
+    """
+    title = title.replace(" ", "_")
+    title = title.replace("/", "%2F")
+    return title
+
 
 def _get_user_agent() -> str:
     """Return the project-wide User-Agent."""
@@ -115,7 +125,8 @@ class MdwikiApi:
         return source, str(revid) if revid else "", error
 
     def _fetch_rest(self, title: str) -> tuple[str, str, str]:
-        title_encoded = title.replace(" ", "_").replace("/", "%2F")
+        title_encoded = normalize_title_for_url(title)
+
         url = f"{self.REST_BASE}/page/{title_encoded}"
 
         response = _request(url, method="GET")
@@ -177,7 +188,8 @@ class TransformApi:
 
         settings = get_settings()
         base_url = settings.new_html.transform_base_url
-        title_encoded = title.replace("/", "%2F")
+
+        title_encoded = normalize_title_for_url(title)
         url = f"{base_url}/transform/wikitext/to/html/{title_encoded}"
 
         response = _request(

@@ -68,7 +68,7 @@ class NewHtmlRoutes:
         response = Response(result, mimetype="text/plain")
         return apply_cors_headers(response, request)
 
-    def get_revision_id(self):
+    def get_revision_id(self) -> str:
         # Inconsistency: check() validates revid with revid.isdigit(), which rejects _all revision IDs (e.g. 123_all),
         # whereas open_file() uses re.match(r"^\d+(_all)?$", revid). For Video / 'all' pages check will wrongly
         # return false even when the cache exists. Use the same regex here for consistency.
