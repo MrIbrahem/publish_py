@@ -16,7 +16,7 @@ from typing import Any
 
 import requests
 
-from .....config.main_settings import get_settings
+from .....config.main_settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -30,17 +30,6 @@ def normalize_title_for_url(title: str) -> str:
     title = title.replace(" ", "_")
     title = title.replace("/", "%2F")
     return title
-
-
-def _get_user_agent() -> str:
-    """Return the project-wide User-Agent."""
-    settings = get_settings()
-    return getattr(
-        settings.other,
-        "user_agent",
-        ("WikiProjectMed Translation Dashboard/1.0 (https://medwiki.toolforge.org/; tools.mdwikicx@toolforge.org)"),
-    )
-
 
 def _request(
     url: str,
@@ -68,7 +57,7 @@ def _request(
         "http_code": 0,
     }
 
-    headers = {"User-Agent": _get_user_agent()}
+    headers = {"User-Agent": settings.other.user_agent}
 
     try:
         response = requests.request(
@@ -187,7 +176,6 @@ class TransformApi:
         if not wikitext:
             return {"error": "Empty wikitext"}
 
-        settings = get_settings()
         base_url = settings.new_html.transform_base_url
 
         title_encoded = normalize_title_for_url(title)

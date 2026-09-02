@@ -8,7 +8,7 @@ import re
 
 from flask import Blueprint, Response, abort, jsonify, render_template, request
 
-from ....config.main_settings import get_settings
+from ....config.main_settings import settings
 from ....services.core.cors import check_cors
 from .services.html_utils import remove_data_parsoid
 from .services.process import process_page
@@ -18,6 +18,7 @@ from .services.storage import list_revisions, read_file
 class NewHtmlRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
+        self.revisions_dir = settings.new_html.revisions_dir
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -74,8 +75,7 @@ class NewHtmlRoutes:
             response = Response("false", mimetype="text/plain")
             return response
 
-        settings = get_settings()
-        dir_path = settings.new_html.revisions_dir / revid
+        dir_path = self.revisions_dir / revid
 
         if not dir_path.is_dir():
             response = Response("false", mimetype="text/plain")
@@ -103,18 +103,19 @@ class NewHtmlRoutes:
         if file_name not in allowed_files:
             abort(400, description="Invalid file parameter")
 
-        settings = get_settings()
-        file_path = settings.new_html.revisions_dir / revid / file_name
+        file_path = self.revisions_dir / revid / file_name
 
         if not file_path.is_file():
             abort(404, description="File not found")
 
         content = read_file(file_path)
 
-        if file_name in {"html.html", "seg.html"}:
+        mimetype = "text/plain" if file_name == "wikitext.txt" else "text/html"
+
+        # if file_name in {"html.html", "seg.html"}:
+        if mimetype == "text/html":
             content = remove_data_parsoid(content)
 
-        mimetype = "text/plain" if file_name == "wikitext.txt" else "text/html"
         response = Response(content, mimetype=mimetype)
         return response
 
@@ -122,7 +123,8 @@ class NewHtmlRoutes:
         """
         Return list of cached revisions for the dashboard.
         """
-        results = list_revisions()
+
+        results = list_revisions(self.revisions_dir)
         response = jsonify({"results": results})
         return response
 
