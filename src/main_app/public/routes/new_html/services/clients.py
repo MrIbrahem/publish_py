@@ -3,7 +3,6 @@ External API clients for the new_html module.
 
 - MdwikiApi: fetch wikitext + revision id
 - TransformApi: wikitext → HTML
-- SegmentApi: HTML → segments
 """
 
 from __future__ import annotations
@@ -199,46 +198,3 @@ class TransformApi:
             return {"error": "Invalid HTML returned"}
 
         return {"result": html}
-
-
-class SegmentApi:
-    """Convert HTML to segmented content."""
-
-    def convert(self, html: str) -> dict[str, str]:
-        """
-        Returns {"result": segments} or {"error": message}.
-        """
-        if not html:
-            return {"error": "Empty HTML"}
-
-        settings = get_settings()
-        url = settings.new_html.segment_api_url
-        as_json = settings.new_html.segment_api_as_json
-
-        if as_json:
-            response = _request(url, method="POST", json_data={"html": html}, timeout=30.0)
-        else:
-            response = _request(url, method="POST", data={"html": html}, timeout=30.0)
-
-        if response["error"] or not response["output"]:
-            logger.error("Segment API request failed")
-            return {"error": "Could not reach Segment API"}
-
-        try:
-            data = json.loads(response["output"])
-        except Exception:
-            return {"error": "Invalid JSON response from Segment API"}
-
-        if "error" in data:
-            return {"error": data["error"]}
-
-        result = data.get("result", "")
-
-        # Normalize known empty / error messages coming from the external tool
-        if result in (
-            "Content for translate is not given or is empty",
-            "Sectionwrap: Attempting to remove a non-section tag: undefined",
-        ):
-            return {"result": ""}
-
-        return {"result": result}

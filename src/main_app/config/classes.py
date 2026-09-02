@@ -18,7 +18,6 @@ class NewHtmlConfig:
 
     revisions_dir: Path
     transform_base_url: str = "https://en.wikipedia.org/w/rest.php/v1"
-    segment_api_url: str = "https://mdwikipy.toolforge.org/HtmltoSegments"
     segment_api_as_json: bool = True
 
     @property

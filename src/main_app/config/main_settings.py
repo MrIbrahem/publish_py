@@ -70,10 +70,6 @@ def load_new_html_config() -> NewHtmlConfig:
             "TRANSFORM_BASE_URL",
             "https://en.wikipedia.org/w/rest.php/v1",
         ),
-        segment_api_url=os.getenv(
-            "SEGMENT_API_URL",
-            "https://mdwikipy.toolforge.org/HtmltoSegments",
-        ),
         segment_api_as_json=os.getenv("SEGMENT_API_AS_JSON", "true").lower() in ("1", "true", "yes"),
     )
 

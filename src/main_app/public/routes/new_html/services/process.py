@@ -17,7 +17,9 @@ from typing import Any
 
 from flask import Request, Response, jsonify
 
-from .clients import MdwikiApi, SegmentApi, TransformApi
+from ...html_to_segments import process_html
+
+from .clients import MdwikiApi, TransformApi
 from .html_utils import remove_data_parsoid
 from .storage import (
     add_title_revision,
@@ -99,11 +101,7 @@ def get_html(
     write_file(file_html, html)
     return html, from_cache
 
-
 def get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
-    """
-    Convert HTML to segments with simple file caching.
-    """
     from_cache = False
 
     if not force_new:
@@ -114,11 +112,20 @@ def get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]
     if not html:
         return "", from_cache
 
-    segment_service = SegmentApi()
-    result = segment_service.convert(html)
+    try:
+        seg = process_html(html)
+    except Exception as e:
+        logger.error("Segment processing failed: %s", e)
+        return "", from_cache
 
-    seg = result.get("result", "")
     if not seg:
+        return "", from_cache
+
+    # Normalize known empty messages (if any)
+    if seg in (
+        "Content for translate is not given or is empty",
+        "Sectionwrap: Attempting to remove a non-section tag: undefined",
+    ):
         return "", from_cache
 
     seg = remove_data_parsoid(seg)
