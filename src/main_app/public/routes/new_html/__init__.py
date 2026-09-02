@@ -1,5 +1,5 @@
 """
-new_html package.
+new_html blueprint package.
 """
 
 from .routes import NewHtmlRoutes

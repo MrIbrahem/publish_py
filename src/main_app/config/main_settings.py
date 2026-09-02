@@ -11,6 +11,7 @@ from .classes import (
     CookieConfig,
     CorsConfig,
     DbConfig,
+    NewHtmlConfig,
     OAuthConfig,
     OtherConfig,
     Paths,
@@ -52,7 +53,29 @@ def resolve_path(_path) -> Path:
     return _path
 
 
-# --- Configuration Loaders ---
+def load_new_html_config() -> NewHtmlConfig:
+    """
+    Load configuration for the new_html blueprint.
+    """
+    revisions_dir = Path(
+        os.getenv(
+            "REVISIONS_DIR",
+            Path.home() / "public_html" / "revisions_new1",
+        )
+    )
+
+    return NewHtmlConfig(
+        revisions_dir=revisions_dir,
+        transform_base_url=os.getenv(
+            "TRANSFORM_BASE_URL",
+            "https://en.wikipedia.org/w/rest.php/v1",
+        ),
+        segment_api_url=os.getenv(
+            "SEGMENT_API_URL",
+            "https://mdwikipy.toolforge.org/HtmltoSegments",
+        ),
+        segment_api_as_json=os.getenv("SEGMENT_API_AS_JSON", "true").lower() in ("1", "true", "yes"),
+    )
 
 
 def _load_security_config() -> SecurityConfig:
@@ -296,6 +319,7 @@ def get_settings() -> Settings:
         other=other_config,
         users=users_config,
         cors=cors_config,
+        new_html=load_new_html_config(),
     )
 
 
@@ -320,6 +344,16 @@ def ensure_directories() -> None:
         settings.paths.revids_file_path,
     ]:
         Path(file_name).parent.mkdir(parents=True, exist_ok=True)
+
+    settings.new_html.revisions_dir.mkdir(parents=True, exist_ok=True)
+
+    # Ensure JSON index files exist
+    for json_path in (
+        settings.new_html.json_file,
+        settings.new_html.json_file_all,
+    ):
+        if not json_path.exists():
+            json_path.write_text("{}", encoding="utf-8")
 
 
 __all__ = [

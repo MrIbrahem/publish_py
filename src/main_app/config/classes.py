@@ -10,6 +10,29 @@ from typing import Any
 
 
 @dataclass(frozen=True)
+class NewHtmlConfig:
+    """
+    Configuration for the new_html blueprint.
+    Handles revision cache path and external API endpoints.
+    """
+
+    revisions_dir: Path
+    transform_base_url: str = "https://en.wikipedia.org/w/rest.php/v1"
+    segment_api_url: str = "https://mdwikipy.toolforge.org/HtmltoSegments"
+    segment_api_as_json: bool = True
+
+    @property
+    def json_file(self) -> Path:
+        """Path to the main title → revision index."""
+        return self.revisions_dir / "json_data.json"
+
+    @property
+    def json_file_all(self) -> Path:
+        """Path to the 'all' / Video pages title → revision index."""
+        return self.revisions_dir / "json_data_all.json"
+
+
+@dataclass(frozen=True)
 class OtherConfig:
     """configs not in specific sections"""
 
@@ -116,6 +139,7 @@ class Settings:
     other: OtherConfig
     users: UsersConfig
     cors: CorsConfig
+    new_html: NewHtmlConfig
 
 
 __all__ = [

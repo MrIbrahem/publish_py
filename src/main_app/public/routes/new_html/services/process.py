@@ -1,19 +1,31 @@
 """
-Main processing logic for converting a page title into segmented content.
+Main processing pipeline for the new_html endpoint.
+
+Pipeline:
+1. Fetch wikitext + revision
+2. (fix_wikitext is currently a no-op)
+3. Convert wikitext → HTML (with cache)
+4. Convert HTML → segments (with cache)
+5. Return JSON envelope or raw content
 """
+
+from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any
 
-from flask import Response, jsonify, request
+from flask import Request, Response, jsonify
 
-from ..config import JSON_FILE, JSON_FILE_ALL
-from ..services.file_utils import read_file, write_file
-from ..services.json_data import add_title_revision, get_title_revision
-from ..services.mdwiki_api import MdwikiApiService
-from ..services.segment_api import SegmentApiService
-from ..services.transform_api import TransformApiService
-from ..utils import get_content_type, get_file_dir, set_cors_headers
+from .clients import MdwikiApi, SegmentApi, TransformApi
+from .html_utils import remove_data_parsoid
+from .storage import (
+    add_title_revision,
+    get_title_revision,
+    read_file,
+    write_file,
+)
+from .utils import apply_cors_headers, get_file_dir
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +33,7 @@ logger = logging.getLogger(__name__)
 def fix_wikitext(text: str, title: str) -> str:
     """
     Temporary placeholder.
-    Fixes and parsers are disabled for now.
+    The real fix pipeline (templates, refs, images, etc.) is disabled for now.
     """
     return text
 
@@ -34,33 +46,34 @@ def get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str,
     Returns:
         (wikitext, revision_id, from_cache)
     """
-    json_file = JSON_FILE_ALL if all_flag else JSON_FILE
-    mdwiki = MdwikiApiService()
-
-    result = mdwiki.get_wikitext(title)
-    wikitext = result.get("source", "")
-    revision = str(result.get("revid", ""))
+    mdwiki = MdwikiApi()
+    source, revid, error = mdwiki.get_wikitext(title)
 
     from_cache = False
 
-    if not wikitext or not revision:
+    if not source or not revid:
         # Fallback to local JSON mapping + cached file
-        cached_rev = get_title_revision(title, json_file)
+        cached_rev = get_title_revision(title, all_flag)
         if cached_rev:
             file_dir = get_file_dir(cached_rev, all_flag)
             cached_text = read_file(file_dir / "wikitext.txt")
             if cached_text:
-                wikitext = cached_text
-                revision = cached_rev
+                source = cached_text
+                revid = cached_rev
                 from_cache = True
 
-    if wikitext and revision:
-        add_title_revision(title, revision, json_file)
+    if source and revid:
+        add_title_revision(title, revid, all_flag)
 
-    return wikitext, revision, from_cache
+    return source, revid, from_cache
 
 
-def get_html(wikitext: str, file_html: Path, title: str, force_new: bool) -> tuple[str, bool]:
+def get_html(
+    wikitext: str,
+    file_html: Path,
+    title: str,
+    force_new: bool,
+) -> tuple[str, bool]:
     """
     Convert wikitext to HTML with simple file caching.
     """
@@ -69,54 +82,57 @@ def get_html(wikitext: str, file_html: Path, title: str, force_new: bool) -> tup
     if not force_new:
         cached = read_file(file_html)
         if cached:
-            return cached, True
+            return remove_data_parsoid(cached), True
 
     if not wikitext:
         return "", from_cache
 
-    transform = TransformApiService()
+    transform = TransformApi()
     result = transform.convert(wikitext, title)
 
     html = result.get("result", "")
     if not html:
-        logger.error(f"HTML conversion failed for title: {title}")
+        logger.error("HTML conversion failed for title: %s", title)
         return "", from_cache
 
+    html = remove_data_parsoid(html)
     write_file(file_html, html)
     return html, from_cache
 
 
-def get_segments(html: str, file_seg: Path) -> tuple[str, bool]:
+def get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
     """
     Convert HTML to segments with simple file caching.
     """
     from_cache = False
 
-    if "new" not in request.args:
+    if not force_new:
         cached = read_file(file_seg)
         if cached:
-            return cached, True
+            return remove_data_parsoid(cached), True
 
     if not html:
         return "", from_cache
 
-    segment_service = SegmentApiService()
+    segment_service = SegmentApi()
     result = segment_service.convert(html)
 
     seg = result.get("result", "")
     if not seg:
         return "", from_cache
 
+    seg = remove_data_parsoid(seg)
     write_file(file_seg, seg)
     return seg, from_cache
 
 
-def process_page() -> Response:
+def process_page(request: Request) -> Response:
     """
     Main entry point for the /new_html/ endpoint.
     """
-    title = request.args.get("title", "").strip()
-    title = title[:1].upper() + title[1:] if title else ""
+    title = (request.args.get("title") or "").strip()
+    if title:
+        title = title[0].upper() + title[1:]
 
     printetxt = request.args.get("printetxt") or request.args.get("print") or ""
     force_new = "new" in request.args
@@ -126,12 +142,9 @@ def process_page() -> Response:
     if title.startswith("Video"):
         all_flag = "1"
 
-    content_type = get_content_type(printetxt)
-
     if not title:
         response = jsonify({"error": "title is empty"})
-        response.headers["Content-Type"] = "application/json"
-        return set_cors_headers(response)
+        return apply_cors_headers(response, request)
 
     # 1. Get wikitext + revision
     wikitext, revision, text_from_cache = get_wikitext_and_revision(title, all_flag)
@@ -149,7 +162,7 @@ def process_page() -> Response:
             }
         )
         response.status_code = 404
-        return set_cors_headers(response)
+        return apply_cors_headers(response, request)
 
     file_dir = get_file_dir(revision, all_flag)
     file_wikitext = file_dir / "wikitext.txt"
@@ -166,24 +179,24 @@ def process_page() -> Response:
     # Early exit for printetxt=wikitext
     if printetxt == "wikitext":
         response = Response(wikitext, mimetype="text/plain")
-        return set_cors_headers(response)
+        return apply_cors_headers(response, request)
 
     # 2. Convert to HTML
     html, html_from_cache = get_html(wikitext, file_html, title, force_new)
 
     if printetxt == "html":
         response = Response(html, mimetype="text/html")
-        return set_cors_headers(response)
+        return apply_cors_headers(response, request)
 
     # 3. Convert to segments
-    seg, seg_from_cache = get_segments(html, file_seg)
+    seg, seg_from_cache = get_segments(html, file_seg, force_new)
 
     if printetxt == "seg":
         response = Response(seg, mimetype="text/html")
-        return set_cors_headers(response)
+        return apply_cors_headers(response, request)
 
     # Final JSON response
-    data = {
+    data: dict[str, Any] = {
         "cache_data": {
             "wikitext": text_from_cache,
             "html": html_from_cache,
@@ -204,16 +217,7 @@ def process_page() -> Response:
         data["error"] = "No content found"
         response = jsonify(data)
         response.status_code = 404
-        return set_cors_headers(response)
+        return apply_cors_headers(response, request)
 
     response = jsonify(data)
-    return set_cors_headers(response)
-
-
-__all__ = [
-    "fix_wikitext",
-    "get_wikitext_and_revision",
-    "get_html",
-    "get_segments",
-    "process_page",
-]
+    return apply_cors_headers(response, request)
