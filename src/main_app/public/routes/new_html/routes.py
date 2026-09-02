@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import re
 
-from flask import Blueprint, Response, abort, jsonify, render_template, request
+from flask import Blueprint, Response, abort, flash, jsonify, render_template, request
 
 from ....config.main_settings import settings
 from ....services.core.cors import check_cors
 from .services.html_utils import remove_data_parsoid
-from .services.process import process_page
+from .services.process import WikitextFixerService, process_page
 from .services.storage import list_revisions, read_file
 
 
@@ -23,6 +23,7 @@ class NewHtmlRoutes:
 
     def _setup_routes(self) -> None:
         routes = [
+            ("/fix", ["GET", "POST"], self.fix),
             ("/index", ["GET"], self.index),
             ("/", ["GET"], check_cors(self.main)),
             ("/check", ["GET"], check_cors(self.check)),
@@ -35,6 +36,39 @@ class NewHtmlRoutes:
     def index(self) -> str:
         return render_template(
             "new_text/revisions.html",
+        )
+
+    def fix(self) -> str:
+        """
+        Wikitext fixing test page.
+
+        Provides a web interface for testing the wikitext fixing functionality.
+        Users can input wikitext and a title, and see the results of applying
+        various fixes.
+        """
+        title = ""
+        wikitext = ""
+        if request.method == "POST":
+            title = request.form.get("title")
+            wikitext = request.form.get("text")
+            if not title or not wikitext:
+                if not title:
+                    flash("Please enter a title", "danger")
+                if not wikitext:
+                    flash("Please enter wikitext", "danger")
+            else:
+                fixer = WikitextFixerService(wikitext, title)
+                changed_text = fixer.fix()
+                if changed_text == wikitext:
+                    flash("No changes made.", "warning")
+                else:
+                    flash("Changes made.", "success")
+                    wikitext = changed_text
+
+        return render_template(
+            "new_text/fix.html",
+            wikitext=wikitext,
+            title=title,
         )
 
     def main(self) -> Response:

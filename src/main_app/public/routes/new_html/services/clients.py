@@ -31,6 +31,7 @@ def normalize_title_for_url(title: str) -> str:
     title = title.replace("/", "%2F")
     return title
 
+
 def _request(
     url: str,
     method: str = "GET",

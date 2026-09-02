@@ -130,7 +130,12 @@ def _get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool
     return seg, from_cache
 
 
-def process_page(title: str, printetxt: str, force_new: bool, all_flag: str = "") -> Response:
+def process_page(
+    title: str,
+    printetxt: str,
+    force_new: bool,
+    all_flag: str = "",
+) -> Response:
     """
     Main entry point for the /new_html/ endpoint.
     """
