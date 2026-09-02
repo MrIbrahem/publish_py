@@ -48,7 +48,7 @@ class NewHtmlRoutes:
         Check whether both seg.html and html.html exist for a revision.
         Example: /new_html/check?revid=123456
         """
-        revid = (request.args.get("revid") or "").strip()
+        revid = self.get_revision_id()
 
         if not revid or not revid.isdigit():
             response = Response("false", mimetype="text/plain")
@@ -68,12 +68,19 @@ class NewHtmlRoutes:
         response = Response(result, mimetype="text/plain")
         return apply_cors_headers(response, request)
 
+    def get_revision_id(self):
+        # Inconsistency: check() validates revid with revid.isdigit(), which rejects _all revision IDs (e.g. 123_all),
+        # whereas open_file() uses re.match(r"^\d+(_all)?$", revid). For Video / 'all' pages check will wrongly
+        # return false even when the cache exists. Use the same regex here for consistency.
+        revid = (request.args.get("revid") or "").strip()
+        return revid
+
     def open_file(self) -> Response:
         """
         Serve a cached file (wikitext.txt | html.html | seg.html).
         Example: /new_html/open?revid=123456&file=html.html
         """
-        revid = (request.args.get("revid") or "").strip()
+        revid = self.get_revision_id()
         file_name = (request.args.get("file") or "").strip()
 
         # Security: only allow specific revision patterns

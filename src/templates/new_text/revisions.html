@@ -102,7 +102,7 @@
                 data: null,
                 title: 'Re create',
                 render: function (data, type, row) {
-                    return `<a class="card-link" href="index.php?new=1&title=${encodeURIComponent(row.title)}" target="_blank">Re create</a>`;
+                    return `<a class="card-link" href="/new_html/?new=1&title=${encodeURIComponent(row.title)}" target="_blank">Re create</a>`;
                 }
             });
         }
@@ -119,7 +119,7 @@
                 data: 'wikitext_exists',
                 title: 'Wikitext',
                 render: function (data, type, row) {
-                    const url = `open.php?revid=${row.dir_path}&file=wikitext.txt`;
+                    const url = `/new_html/open?revid=${row.dir_path}&file=wikitext.txt`;
                     return `<a class="card-link" href="${url}" target="_blank">Wikitext</a> ${make_badge(data)}`;
                 }
             },
@@ -127,7 +127,7 @@
                 data: 'html_exists',
                 title: 'Html',
                 render: function (data, type, row) {
-                    const url = `open.php?revid=${row.dir_path}&file=html.html`;
+                    const url = `/new_html/open?revid=${row.dir_path}&file=html.html`;
                     return `<a class="card-link" href="${url}" target="_blank">Html</a> ${make_badge(data)}`;
                 }
             },
@@ -135,7 +135,7 @@
                 data: 'seg_exists',
                 title: 'Segments',
                 render: function (data, type, row) {
-                    const url = `open.php?revid=${row.dir_path}&file=seg.html`;
+                    const url = `/new_html/open?revid=${row.dir_path}&file=seg.html`;
                     return `<a class="card-link" href="${url}" target="_blank">Segments</a> ${make_badge(data)}`;
                 }
             }

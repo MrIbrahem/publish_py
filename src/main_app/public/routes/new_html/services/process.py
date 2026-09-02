@@ -3,7 +3,7 @@ Main processing pipeline for the new_html endpoint.
 
 Pipeline:
 1. Fetch wikitext + revision
-2. fix_wikitext          ← currently a no-op (TODO)
+2. WikitextFixerService.fix ← currently a no-op (TODO)
 3. Convert wikitext → HTML (with cache)
 4. Convert HTML → segments (with cache)
 5. Return JSON envelope or raw content
@@ -18,6 +18,7 @@ from typing import Any
 from flask import Request, Response, jsonify
 
 from ...html_to_segments import process_html
+from ..domain.fixes import WikitextFixerService
 from .clients import MdwikiApi, TransformApi
 from .html_utils import remove_data_parsoid
 from .storage import (
@@ -29,24 +30,6 @@ from .storage import (
 from .utils import apply_cors_headers, get_file_dir
 
 logger = logging.getLogger(__name__)
-
-
-def fix_wikitext(text: str, title: str) -> str:
-    """
-    Temporary placeholder.
-
-    TODO: Port the full fix_wikitext pipeline from the original PHP tool:
-          - {{drugbox / {{Drugbox → {{Infobox drug
-          - remove_templates
-          - remove_lead_templates
-          - remove_bad_refs
-          - del_empty_refs
-          - remove_videos
-          - remove_categories
-          - removeMissingImages
-          - add_missing_title
-    """
-    return text
 
 
 def get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str, bool]:
@@ -192,7 +175,8 @@ def process_page(request: Request) -> Response:
     file_title = file_dir / "title.txt"
 
     # Apply temporary (empty) fix
-    wikitext = fix_wikitext(wikitext, title)
+    fixer = WikitextFixerService(wikitext, title)
+    wikitext = fixer.fix()
 
     write_file(file_wikitext, wikitext)
     write_file(file_title, title)
@@ -231,8 +215,13 @@ def process_page(request: Request) -> Response:
     }
 
     if not html:
+        # Inconsistent error contract: When html is empty you still return HTTP 200 with error/error_type set,
+        # but when seg is empty you return 404. Pick one convention (e.g. always 404 with an error envelope,
+        # or always 200 with error fields) so clients can handle failures uniformly.
+
         data["error_type"] = "HTML_text is empty"
         data["error"] = "No content found"
+
     elif not seg:
         data["error_type"] = "SEG_text is empty"
         data["error"] = "No content found"

@@ -25,7 +25,6 @@ class used to provide.
 
 from __future__ import annotations
 
-
 import wikitextparser as wtp
 from wikitextparser import Template, WikiText
 

@@ -3,6 +3,7 @@ Utility functions for HTML processing and tag manipulation.
 """
 
 import re
+from typing import Any
 
 from . import util as cxutil
 from .text_chunk import TextChunk
@@ -411,18 +412,7 @@ def is_ignorable_block(section_doc):
         if item_type == "close":
             if block_stack:
                 current_close_tag = block_stack.pop()
-                if (
-                    current_close_tag
-                    and len(block_stack) == 0
-                    and (
-                        (
-                            is_transclusion(current_close_tag)
-                            and current_close_tag.get("attributes", {}).get("about")
-                            == first_block_template.get("attributes", {}).get("about")
-                        )
-                        or is_reference_list(current_close_tag)
-                    )
-                ):
+                if is_closing_template_match(block_stack, first_block_template, current_close_tag):
                     return True
 
         # Also check for textblocks
@@ -436,6 +426,26 @@ def is_ignorable_block(section_doc):
                 return False
 
     return ignorable
+
+
+def is_closing_template_match(
+    block_stack: list[Any],
+    first_block_template: dict[str, Any] | None,
+    current_close_tag: Any,
+) -> bool:
+    first_block_about = first_block_template.get("attributes", {}).get("about") if first_block_template else None
+    return (
+        current_close_tag
+        and len(block_stack) == 0
+        and (
+            (
+                is_transclusion(current_close_tag)
+                and current_close_tag.get("attributes", {}).get("about")
+                == first_block_about
+            )
+            or is_reference_list(current_close_tag)
+        )
+    )
 
 
 __all__ = [
