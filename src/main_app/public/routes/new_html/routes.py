@@ -56,7 +56,12 @@ class NewHtmlRoutes:
         if not title:
             return jsonify({"error": "title is empty"})
 
-        return process_page(title, printetxt, force_new, all_flag)
+        return process_page(
+            title=title,
+            printetxt=printetxt,
+            force_new=force_new,
+            all_flag=all_flag,
+        )
 
     def check(self) -> Response:
         """
