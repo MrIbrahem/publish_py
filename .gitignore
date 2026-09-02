@@ -44,8 +44,8 @@ src/main_app/db/services/_main_service.py
 /_work_files/php_publish
 /src/results_api_php_code
 /.commandcode
-/.claude/skills
 _work_files/add_all.py
 **.pyc.**
 /.pytest_cache
 /src/templates/admin/bs4_admin
+*.isorted

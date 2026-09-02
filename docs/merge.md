@@ -2,16 +2,17 @@
 
 # Code Sources
 
-| Endpoint                            | Method    | Description                  | Source                                                                                                                                  |
-| ----------------------------------- | --------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`                                 | GET       | Main entry                   | [Mdwiki-TD/mdwiki.toolforge.org](https://github.com/Mdwiki-TD/mdwiki.toolforge.org)                                                     |
-| `/Translation_Dashboard`            | GET       | -                            | [Mdwiki-TD/Translation-Dashboard](https://github.com/Mdwiki-TD/Translation-Dashboard)                                                   |
-| `/publish`, `/cxtoken` , `/reports` | POST      | Publish endpoint and Reports | [Mdwiki-TD/publish](https://github.com/Mdwiki-TD/publish)                                                                               |
-| `/login`, `/logout`, `/callback`    | GET       | OAuth                        | [Mdwiki-TD/auth-repo](https://github.com/Mdwiki-TD/auth-repo)                                                                           |
-| `/fixrefs`                          | GET, POST | Fix refs                     | [MrIbrahem/fix_refs_new_py](https://github.com/MrIbrahem/fix_refs_new_py) & [Mdwiki-TD/fix_refs](https://github.com/Mdwiki-TD/fix_refs) |
-| `/api`                              | GET       | API                          | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API)                                                                                 |
-| `/new_html`                         | GET       | -                            | [mdwikicx/new_html](https://github.com/mdwikicx/new_html)                                                                               |
-| `/admin`                            | GET       | -                            | [Mdwiki-TD/tdc](https://github.com/Mdwiki-TD/tdc/)                                                                                      |
+| Endpoint                            | Method    | Description                  | Source                                                                                                                                  | Language    |
+| ----------------------------------- | --------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `/`                                 | GET       | Main entry                   | [Mdwiki-TD/mdwiki.toolforge.org](https://github.com/Mdwiki-TD/mdwiki.toolforge.org)                                                     | php         |
+| `/Translation_Dashboard`            | GET       | -                            | [Mdwiki-TD/Translation-Dashboard](https://github.com/Mdwiki-TD/Translation-Dashboard)                                                   | php         |
+| `/publish`, `/cxtoken` , `/reports` | POST      | Publish endpoint and Reports | [Mdwiki-TD/publish](https://github.com/Mdwiki-TD/publish)                                                                               | php         |
+| `/login`, `/logout`, `/callback`    | GET       | OAuth                        | [Mdwiki-TD/auth-repo](https://github.com/Mdwiki-TD/auth-repo)                                                                           | php         |
+| `/fixrefs`                          | GET, POST | Fix refs                     | [MrIbrahem/fix_refs_new_py](https://github.com/MrIbrahem/fix_refs_new_py) & [Mdwiki-TD/fix_refs](https://github.com/Mdwiki-TD/fix_refs) | python, php |
+| `/api`                              | GET       | API                          | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API)                                                                                 | php         |
+| `/new_html`                         | GET       | -                            | [mdwikicx/new_html](https://github.com/mdwikicx/new_html)                                                                               | php         |
+| `/admin`                            | GET       | -                            | [Mdwiki-TD/tdc](https://github.com/Mdwiki-TD/tdc/)                                                                                      | php         |
+| `/HtmltoSegments`                   | GET, POST | -                            | [mdwikicx/cxsever](https://github.com/mdwikicx/cxsever/blob/main/www/js/server.js)                                                      | js          |
 
 # End points
 
@@ -19,13 +20,14 @@
 
 ### Source Endpoints
 
-| Endpoint   | Method | Description             | Flask status |
-| ---------- | ------ | ----------------------- | ------------ |
-| `/`        | GET    | Main entry              | ✔️           |
-| `/views/`  | GET    | Pageviews Dashboard     | ❌           |
-| `/prior/`  | GET    | Prior List Dashboard    | ❌           |
-| `/WHO/`    | GET    | WHO Essential Medicines | ❌           |
-| `/gmail1/` | POST   | Gmail Sender            | ❌           |
+| Endpoint           | Method | Description             | Flask status |
+| ------------------ | ------ | ----------------------- | ------------ |
+| `/`                | GET    | Main entry              | ✔️           |
+| `/views/`          | GET    | Pageviews Dashboard     | ❌           |
+| `/prior/`          | GET    | Prior List Dashboard    | ❌           |
+| `/WHO/`            | GET    | WHO Essential Medicines | ❌           |
+| `/gmail1/`         | POST   | Gmail Sender            | ❌           |
+| `/HtmltoSegments/` | POST   |                         | ✔️           |
 
 ### Flask Endpoints
 

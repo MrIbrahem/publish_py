@@ -19,3 +19,8 @@ Flask-Migrate>=4.0.0
 marshmallow
 Flask-Babel
 Flask-Admin
+
+# Core dependencies
+PyYAML==6.0.1           # For YAML config loading
+lxml==5.1.0             # For HTML/XML parsing
+pysbd==0.3.4            # Sentence boundary detection
