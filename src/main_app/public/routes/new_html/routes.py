@@ -9,7 +9,6 @@ import re
 from flask import Blueprint, Response, abort, jsonify, render_template, request
 
 from ....config.main_settings import get_settings
-
 from .services.html_utils import remove_data_parsoid
 from .services.process import process_page
 from .services.storage import list_revisions, read_file
@@ -36,7 +35,6 @@ class NewHtmlRoutes:
         return render_template(
             "new_text/revisions.html",
         )
-
 
     def main(self) -> Response:
         """
