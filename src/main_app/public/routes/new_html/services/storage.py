@@ -96,7 +96,7 @@ def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
     Sorted by last modification time of wikitext.txt (newest first).
     """
 
-    if not revisions_dir.exists() or not not revisions_dir.is_dir():
+    if not revisions_dir.exists() or not revisions_dir.is_dir():
         return []
 
     dirs = [d for d in revisions_dir.iterdir() if d.is_dir()]
