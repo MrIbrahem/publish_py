@@ -17,6 +17,7 @@ from .routes import (
     MainRoutes,
     PublishRoutes,
     TDRoutes,
+    HtmltoSegmentsRoutes,
 )
 
 
@@ -29,6 +30,7 @@ class PublicRouteModule:
 
 
 PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
+    # PublicRouteModule(HtmltoSegmentsRoutes, "HtmltoSegments", "/HtmltoSegments"),
     PublicRouteModule(MainRoutes, "main"),
     PublicRouteModule(AuthRoutes, "auth", "/auth"),
     PublicRouteModule(ApiRoutes, "api", "/api"),
@@ -52,6 +54,10 @@ class RouteRegistrar:
         publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
         app.register_blueprint(publish_model.bp)
         csrf_exempt(app, publish_model.bp)
+
+        htmltosegments_model = HtmltoSegmentsRoutes(Blueprint("HtmltoSegments", __name__, url_prefix="/HtmltoSegments"))
+        app.register_blueprint(htmltosegments_model.bp)
+        csrf_exempt(app, htmltosegments_model.bp)
 
 
 __all__ = [
