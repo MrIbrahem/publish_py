@@ -20,6 +20,7 @@ from .....config.main_settings import get_settings
 
 logger = logging.getLogger(__name__)
 
+
 def normalize_title_for_url(title: str) -> str:
     """
     doesn't normalize the title. Here the title is only replace("/", "%2F"), whereas MdwikiApi.get_wikitext

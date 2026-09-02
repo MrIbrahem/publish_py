@@ -92,6 +92,7 @@ class NewHtmlConfig:
             revisions_dir=resolve_path(str(revisions_dir)),
             transform_base_url=transform_base_url,
         )
+
     def ensure_json_files_exist(self) -> None:
         # Ensure JSON index files exist
         for json_path in (
@@ -103,6 +104,7 @@ class NewHtmlConfig:
 
     def get_file(self, all_flag) -> Path:
         return self.json_file_all if all_flag else self.json_file
+
 
 @dataclass(frozen=True)
 class OtherConfig:

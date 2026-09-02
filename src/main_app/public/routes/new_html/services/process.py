@@ -15,7 +15,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from flask import Request, Response, jsonify
+from flask import Response, jsonify
 
 from ...html_to_segments import process_html
 from ..domain.fixes import WikitextFixerService
@@ -27,7 +27,7 @@ from .storage import (
     read_file,
     write_file,
 )
-from .utils import apply_cors_headers, get_file_dir
+from .utils import get_file_dir
 
 logger = logging.getLogger(__name__)
 
@@ -130,26 +130,10 @@ def _get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool
     return seg, from_cache
 
 
-def process_page(request: Request) -> Response:
+def process_page(title: str, printetxt: str, force_new: bool, all_flag: str = "") -> Response:
     """
     Main entry point for the /new_html/ endpoint.
     """
-    title = (request.args.get("title") or "").strip()
-    if title:
-        title = title[0].upper() + title[1:]
-
-    printetxt = request.args.get("printetxt") or request.args.get("print") or ""
-    force_new = "new" in request.args
-    all_flag = request.args.get("all", "")
-
-    # Special case: titles starting with "Video"
-    if title.startswith("Video"):
-        all_flag = "1"
-
-    if not title:
-        response = jsonify({"error": "title is empty"})
-        return apply_cors_headers(response, request)
-
     # 1. Get wikitext + revision
     wikitext, revision, text_from_cache = _get_wikitext_and_revision(title, all_flag)
 
@@ -166,7 +150,7 @@ def process_page(request: Request) -> Response:
             }
         )
         response.status_code = 404
-        return apply_cors_headers(response, request)
+        return response
 
     file_dir = get_file_dir(revision, all_flag)
     file_wikitext = file_dir / "wikitext.txt"
@@ -184,21 +168,21 @@ def process_page(request: Request) -> Response:
     # Early exit for printetxt=wikitext
     if printetxt == "wikitext":
         response = Response(wikitext, mimetype="text/plain")
-        return apply_cors_headers(response, request)
+        return response
 
     # 2. Convert to HTML
     html, html_from_cache = _get_html(wikitext, file_html, title, force_new)
 
     if printetxt == "html":
         response = Response(html, mimetype="text/html")
-        return apply_cors_headers(response, request)
+        return response
 
     # 3. Convert to segments
     seg, seg_from_cache = _get_segments(html, file_seg, force_new)
 
     if printetxt == "seg":
         response = Response(seg, mimetype="text/html")
-        return apply_cors_headers(response, request)
+        return response
 
     # Final JSON response
     data: dict[str, Any] = {
@@ -227,10 +211,10 @@ def process_page(request: Request) -> Response:
         data["error"] = "No content found"
         response = jsonify(data)
         response.status_code = 404
-        return apply_cors_headers(response, request)
+        return response
 
     response = jsonify(data)
-    return apply_cors_headers(response, request)
+    return response
 
 
 __all__ = [

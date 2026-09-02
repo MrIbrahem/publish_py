@@ -9,10 +9,10 @@ import re
 from flask import Blueprint, Response, abort, jsonify, render_template, request
 
 from ....config.main_settings import get_settings
+from ....services.core.cors import check_cors
 from .services.html_utils import remove_data_parsoid
 from .services.process import process_page
 from .services.storage import list_revisions, read_file
-from .services.utils import apply_cors_headers
 
 
 class NewHtmlRoutes:
@@ -23,10 +23,10 @@ class NewHtmlRoutes:
     def _setup_routes(self) -> None:
         routes = [
             ("/index", ["GET"], self.index),
-            ("/", ["GET"], self.main),
-            ("/check", ["GET"], self.check),
-            ("/open", ["GET"], self.open_file),
-            ("/revisions_api", ["GET"], self.revisions_api),
+            ("/", ["GET"], check_cors(self.main)),
+            ("/check", ["GET"], check_cors(self.check)),
+            ("/open", ["GET"], check_cors(self.open_file)),
+            ("/revisions_api", ["GET"], check_cors(self.revisions_api)),
         ]
         for rule, methods, target in routes:
             self.bp.route(rule, methods=methods)(target)
@@ -41,51 +41,54 @@ class NewHtmlRoutes:
         Main API endpoint.
         Example: /new_html/?title=Trifluoperazine
         """
-        return process_page(request)
+        title = (request.args.get("title") or "").strip()
+        if title:
+            title = title[0].upper() + title[1:]
+
+        printetxt = request.args.get("printetxt") or request.args.get("print") or ""
+        force_new = "new" in request.args
+        all_flag = request.args.get("all", "")
+
+        # Special case: titles starting with "Video"
+        if title.startswith("Video"):
+            all_flag = "1"
+
+        if not title:
+            return jsonify({"error": "title is empty"})
+
+        return process_page(title, printetxt, force_new, all_flag)
 
     def check(self) -> Response:
         """
         Check whether both seg.html and html.html exist for a revision.
         Example: /new_html/check?revid=123456
         """
-        revid = self.get_revision_id()
+        revid = self._get_revision_id()
 
         if not revid:
             response = Response("false", mimetype="text/plain")
-            return apply_cors_headers(response, request)
+            return response
 
         settings = get_settings()
         dir_path = settings.new_html.revisions_dir / revid
 
         if not dir_path.is_dir():
             response = Response("false", mimetype="text/plain")
-            return apply_cors_headers(response, request)
+            return response
 
         seg_exists = (dir_path / "seg.html").is_file()
         html_exists = (dir_path / "html.html").is_file()
 
         result = "true" if (seg_exists and html_exists) else "false"
         response = Response(result, mimetype="text/plain")
-        return apply_cors_headers(response, request)
-
-    def get_revision_id(self) -> str | None:
-        revid = (request.args.get("revid") or "").strip()
-
-        if not revid:
-            return None
-
-        # Security: only allow specific revision patterns
-        if not re.match(r"^\d+(_all)?$", revid):
-            return None
-
-        return revid
+        return response
 
     def open_file(self) -> Response:
         """
         Serve a cached file (wikitext.txt | html.html | seg.html).
         Example: /new_html/open?revid=123456&file=html.html
         """
-        revid = self.get_revision_id()
+        revid = self._get_revision_id()
         file_name = (request.args.get("file") or "").strip()
 
         if not revid:
@@ -108,7 +111,7 @@ class NewHtmlRoutes:
 
         mimetype = "text/plain" if file_name == "wikitext.txt" else "text/html"
         response = Response(content, mimetype=mimetype)
-        return apply_cors_headers(response, request)
+        return response
 
     def revisions_api(self) -> Response:
         """
@@ -116,9 +119,16 @@ class NewHtmlRoutes:
         """
         results = list_revisions()
         response = jsonify({"results": results})
-        return apply_cors_headers(response, request)
+        return response
 
+    def _get_revision_id(self) -> str | None:
+        revid = (request.args.get("revid") or "").strip()
 
-__all__ = [
-    "NewHtmlRoutes",
-]
+        if not revid:
+            return None
+
+        # Security: only allow specific revision patterns
+        if not re.match(r"^\d+(_all)?$", revid):
+            return None
+
+        return revid
