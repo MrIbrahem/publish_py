@@ -69,7 +69,6 @@ def apply_cors_headers(response: Response, request: Request) -> Response:
     # Prefer project-level CORS settings if available
     allowed_domains = settings.cors.allowed_domains
 
-
     if origin_host in allowed_domains:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"

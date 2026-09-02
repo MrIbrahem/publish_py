@@ -371,3 +371,9 @@ def is_valid_lang_code(code: str) -> bool:
         lowercase letters, optionally followed by hyphen-letter groups).
     """
     return bool(_LANG_CODE_RE.match(code))
+
+
+__all__ = [
+    "remove_lang_links",
+    "is_valid_lang_code",
+]

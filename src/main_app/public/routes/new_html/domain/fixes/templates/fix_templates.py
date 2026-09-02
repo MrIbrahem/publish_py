@@ -54,3 +54,8 @@ def add_missing_title(text: str, title: str, ljust: int = 17) -> str:
             template.string = th.render_pretty(template, ljust)
 
     return str(parsed)
+
+
+__all__ = [
+    "add_missing_title",
+]

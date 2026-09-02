@@ -19,3 +19,8 @@ def remove_categories(text: str) -> str:
         text = text.replace(category_tag, "")
 
     return text
+
+
+__all__ = [
+    "remove_categories",
+]

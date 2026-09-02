@@ -140,3 +140,12 @@ def list_revisions() -> list[dict[str, Any]]:
         )
 
     return results
+
+
+__all__ = [
+    "read_file",
+    "write_file",
+    "get_title_revision",
+    "add_title_revision",
+    "list_revisions",
+]

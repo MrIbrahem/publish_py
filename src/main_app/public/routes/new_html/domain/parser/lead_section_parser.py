@@ -38,3 +38,8 @@ def get_lead_section(wikitext: str) -> str:
         return ""
 
     return lead + "\n==References==\n<references />"
+
+
+__all__ = [
+    "get_lead_section",
+]

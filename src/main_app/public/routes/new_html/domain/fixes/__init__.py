@@ -19,3 +19,8 @@ class WikitextFixerService:
             - add_missing_title
         """
         return self.text
+
+
+__all__ = [
+    "WikitextFixerService",
+]

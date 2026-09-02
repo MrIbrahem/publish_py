@@ -3,7 +3,7 @@ Main processing pipeline for the new_html endpoint.
 
 Pipeline:
 1. Fetch wikitext + revision
-2. WikitextFixerService.fix ← currently a no-op (TODO)
+2. WikitextFixerService.fix
 3. Convert wikitext → HTML (with cache)
 4. Convert HTML → segments (with cache)
 5. Return JSON envelope or raw content
@@ -32,7 +32,7 @@ from .utils import apply_cors_headers, get_file_dir
 logger = logging.getLogger(__name__)
 
 
-def get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str, bool]:
+def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str, bool]:
     """
     Fetch wikitext and revision ID.
     Tries live API first, then falls back to local cache.
@@ -66,7 +66,7 @@ def get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str,
     return source, revid, from_cache
 
 
-def get_html(
+def _get_html(
     wikitext: str,
     file_html: Path,
     title: str,
@@ -98,7 +98,7 @@ def get_html(
     return html, from_cache
 
 
-def get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
+def _get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
     from_cache = False
 
     if not force_new:
@@ -151,7 +151,7 @@ def process_page(request: Request) -> Response:
         return apply_cors_headers(response, request)
 
     # 1. Get wikitext + revision
-    wikitext, revision, text_from_cache = get_wikitext_and_revision(title, all_flag)
+    wikitext, revision, text_from_cache = _get_wikitext_and_revision(title, all_flag)
 
     if not wikitext or not revision:
         response = jsonify(
@@ -187,14 +187,14 @@ def process_page(request: Request) -> Response:
         return apply_cors_headers(response, request)
 
     # 2. Convert to HTML
-    html, html_from_cache = get_html(wikitext, file_html, title, force_new)
+    html, html_from_cache = _get_html(wikitext, file_html, title, force_new)
 
     if printetxt == "html":
         response = Response(html, mimetype="text/html")
         return apply_cors_headers(response, request)
 
     # 3. Convert to segments
-    seg, seg_from_cache = get_segments(html, file_seg, force_new)
+    seg, seg_from_cache = _get_segments(html, file_seg, force_new)
 
     if printetxt == "seg":
         response = Response(seg, mimetype="text/html")
@@ -231,3 +231,8 @@ def process_page(request: Request) -> Response:
 
     response = jsonify(data)
     return apply_cors_headers(response, request)
+
+
+__all__ = [
+    "process_page",
+]

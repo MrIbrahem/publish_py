@@ -32,3 +32,8 @@ def remove_data_parsoid(html: str) -> str:
     html = re.sub(r'\s*data-parsoid\s*=\s*"[^"]*"', "", html, flags=re.IGNORECASE)
 
     return html
+
+
+__all__ = [
+    "remove_data_parsoid",
+]

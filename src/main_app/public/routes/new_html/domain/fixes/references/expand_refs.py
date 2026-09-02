@@ -60,3 +60,8 @@ def expand_refs(first: str, alltext: str) -> str:
             first = first.replace(short_tag, full_ref)
 
     return first
+
+
+__all__ = [
+    "expand_refs",
+]

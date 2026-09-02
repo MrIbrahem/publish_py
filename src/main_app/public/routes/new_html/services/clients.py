@@ -212,3 +212,10 @@ class TransformApi:
             return {"error": "Invalid HTML returned"}
 
         return {"result": html}
+
+
+__all__ = [
+    "MdwikiApi",
+    "TransformApi",
+    "normalize_title_for_url",
+]

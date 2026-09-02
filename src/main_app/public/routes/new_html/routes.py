@@ -117,3 +117,8 @@ class NewHtmlRoutes:
         results = list_revisions()
         response = jsonify({"results": results})
         return apply_cors_headers(response, request)
+
+
+__all__ = [
+    "NewHtmlRoutes",
+]

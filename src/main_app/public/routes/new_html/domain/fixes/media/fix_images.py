@@ -68,3 +68,9 @@ def remove_videos(text: str) -> str:
         link.string = ""
 
     return str(parsed)
+
+
+__all__ = [
+    "remove_images",
+    "remove_videos",
+]

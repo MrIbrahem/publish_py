@@ -125,3 +125,11 @@ def remove_lead_templates(text: str) -> str:
             break
 
     return text.strip()
+
+
+__all__ = [
+    "matches_deletion_pattern",
+    "check_temp_to_delete",
+    "remove_templates",
+    "remove_lead_templates",
+]

@@ -106,3 +106,9 @@ def remove_bad_refs(text: str) -> str:
             text = text.replace(citation_tag, "")
 
     return text
+
+
+__all__ = [
+    "check_one_cite",
+    "remove_bad_refs",
+]

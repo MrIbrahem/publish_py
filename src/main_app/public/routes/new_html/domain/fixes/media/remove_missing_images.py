@@ -145,3 +145,9 @@ class RemoveMissingImagesService:
         text = self.remove_missing_infobox_images(text)
         text = self.remove_missing_inline_images(text)
         return text
+
+
+__all__ = [
+    "ImageExistenceChecker",
+    "RemoveMissingImagesService",
+]

@@ -41,3 +41,8 @@ def get_categories(text: str) -> dict[str, str]:
         categories[name] = link.string
 
     return categories
+
+
+__all__ = [
+    "get_categories",
+]

@@ -37,3 +37,8 @@ def delete_empty_refs(text: str) -> str:
             text = text.replace(short_tag, "")
 
     return text
+
+
+__all__ = [
+    "delete_empty_refs",
+]
