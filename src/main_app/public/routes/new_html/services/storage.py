@@ -56,7 +56,7 @@ def get_title_revision(title: str, all_flag: str = "") -> str:
     Get the stored revision ID for a title from the JSON index.
     """
     settings = get_settings()
-    json_path = settings.new_html.json_file_all if all_flag else settings.new_html.json_file
+    json_path = settings.new_html.get_file(all_flag)
 
     content = read_file(json_path)
     if not content:
@@ -77,7 +77,7 @@ def add_title_revision(title: str, revision: str, all_flag: str = "") -> None:
         return
 
     settings = get_settings()
-    json_path = settings.new_html.json_file_all if all_flag else settings.new_html.json_file
+    json_path = settings.new_html.get_file(all_flag)
 
     content = read_file(json_path)
     try:

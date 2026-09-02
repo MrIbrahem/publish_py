@@ -67,9 +67,6 @@ pip install -r requirements.txt
     the PHP `CommonsImageServiceInterface` — you still need to supply a real
     Commons-checking implementation (e.g. calling the Wikimedia Commons API);
     none was included in the PHP source provided for conversion.
--   `ExpandRefsFixture.php`'s call into `Infrastructure\Debug\test_print` is
-    replaced with standard `logging` (that infra module wasn't part of the
-    provided source).
 -   Function/file names were snake_cased per file per the requested layout
     (e.g. `del_empty_refs` → `delete_empty_refs`, `refs_expend_work` →
     `expand_refs`).
@@ -79,4 +76,3 @@ pip install -r requirements.txt
 -   `Services\Api\CommonsImageService` and
     `Services\Interfaces\CommonsImageServiceInterface` (only referenced, not
     included in the PHP dump).
--   `Infrastructure\Debug\test_print`.

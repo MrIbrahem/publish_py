@@ -50,7 +50,7 @@ class NewHtmlRoutes:
         """
         revid = self.get_revision_id()
 
-        if not revid or not revid.isdigit():
+        if not revid:
             response = Response("false", mimetype="text/plain")
             return apply_cors_headers(response, request)
 
@@ -68,11 +68,16 @@ class NewHtmlRoutes:
         response = Response(result, mimetype="text/plain")
         return apply_cors_headers(response, request)
 
-    def get_revision_id(self) -> str:
-        # Inconsistency: check() validates revid with revid.isdigit(), which rejects _all revision IDs (e.g. 123_all),
-        # whereas open_file() uses re.match(r"^\d+(_all)?$", revid). For Video / 'all' pages check will wrongly
-        # return false even when the cache exists. Use the same regex here for consistency.
+    def get_revision_id(self) -> str | None:
         revid = (request.args.get("revid") or "").strip()
+
+        if not revid:
+            return None
+
+        # Security: only allow specific revision patterns
+        if not re.match(r"^\d+(_all)?$", revid):
+            return None
+
         return revid
 
     def open_file(self) -> Response:
@@ -83,8 +88,7 @@ class NewHtmlRoutes:
         revid = self.get_revision_id()
         file_name = (request.args.get("file") or "").strip()
 
-        # Security: only allow specific revision patterns
-        if not re.match(r"^\d+(_all)?$", revid):
+        if not revid:
             abort(400, description="Invalid revision ID")
 
         allowed_files = {"wikitext.txt", "html.html", "seg.html"}

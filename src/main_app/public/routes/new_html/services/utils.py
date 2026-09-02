@@ -67,14 +67,8 @@ def apply_cors_headers(response: Response, request: Request) -> Response:
     settings = get_settings()
 
     # Prefer project-level CORS settings if available
-    allowed_domains = getattr(settings.cors, "allowed_domains", None)
-    if allowed_domains is None:
-        # Fallback to the domains used by the original PHP tool
-        allowed_domains = [
-            "mdwikicx.toolforge.org",
-            "mdwiki.toolforge.org",
-            "medwiki.toolforge.org",
-        ]
+    allowed_domains = settings.cors.allowed_domains
+
 
     if origin_host in allowed_domains:
         response.headers["Access-Control-Allow-Origin"] = origin

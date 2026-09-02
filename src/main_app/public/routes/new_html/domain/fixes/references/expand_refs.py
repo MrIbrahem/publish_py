@@ -3,11 +3,6 @@ Reference expansion utilities.
 
 Port of ``src/Domain/Fixes/References/ExpandRefsFixture.php``.
 
-The PHP version called into an ``Infrastructure\\Debug\\test_print`` helper
-that isn't part of the parser/fixes source provided for conversion; it's
-replaced here with the standard ``logging`` module, which serves the same
-purpose (optional debug tracing) without depending on unavailable
-infrastructure code.
 """
 
 from __future__ import annotations
