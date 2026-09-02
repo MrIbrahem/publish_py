@@ -95,7 +95,7 @@ suitable for the ContentTranslation (`cx-1`) tool. The pipeline is:
 
 ### Storage layout (filesystem cache)
 
--   Root: `REVISIONS_PATH` (env `REVISIONS_DIR`; default `$HOME/public_html/revisions_new1`).
+-   Root: `REVISIONS_PATH` (env `REVISIONS_DIR`; default `$HOME/public_html/revisions_new`).
 -   Per revision: `{revid}/` or `{revid}_all/` containing `wikitext.txt`, `html.html`, `seg.html`, `title.txt`.
 -   Index files (title → revid): `json_data.json` (main) and `json_data_all.json` (`all`/Video pages).
 
@@ -182,7 +182,7 @@ must be emitted by `main`, `check`, `open`, `revisions_api` (mirror `utils.php::
 
 | Env var              | Default                                  | Used for              |
 | -------------------- | ---------------------------------------- | --------------------- |
-| `REVISIONS_DIR`      | `~/public_html/revisions_new1`           | filesystem cache root |
+| `REVISIONS_DIR`      | `~/public_html/revisions_new`           | filesystem cache root |
 | `TRANSFORM_BASE_URL` | `https://en.wikipedia.org/w/rest.php/v1` | wikitext→HTML         |
 
 ### Phase 2 — Storage (`storage.py`)

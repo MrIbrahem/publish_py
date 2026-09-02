@@ -100,6 +100,7 @@ def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
         return []
 
     dirs = [d for d in revisions_dir.iterdir() if d.is_dir()]
+    logger.info("Found %d revision directories in %s", len(dirs), str(revisions_dir))
 
     def sort_key(d: Path) -> float:
         wikitext = d / "wikitext.txt"

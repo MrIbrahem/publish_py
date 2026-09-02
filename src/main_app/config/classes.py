@@ -84,7 +84,7 @@ class NewHtmlConfig:
         """
         Load configuration for the new_html blueprint.
         """
-        revisions_dir = os.getenv("REVISIONS_DIR") or Path.home() / "public_html" / "revisions_new1"
+        revisions_dir = os.getenv("REVISIONS_DIR") or Path.home() / "public_html" / "revisions_new"
 
         transform_base_url = os.getenv("TRANSFORM_BASE_URL", "https://en.wikipedia.org/w/rest.php/v1")
 
