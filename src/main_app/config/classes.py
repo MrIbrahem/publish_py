@@ -10,6 +10,7 @@ from typing import Any
 
 # --- Helper Functions ---
 
+
 def _env_bool(name: str, default: bool = False) -> bool:
     """Convert environment variable to boolean."""
     value = os.getenv(name)
@@ -209,13 +210,13 @@ class Paths:
             revids_file_path=resolve_path(revids_file_path),
         )
 
-
     def all_paths(self) -> list[Path]:
         return [
             self.flask_data_dir,
             self.log_dir,
             self.publish_reports_dir,
         ]
+
 
 @dataclass(frozen=True)
 class CookieConfig:
