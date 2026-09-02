@@ -49,3 +49,4 @@ _work_files/add_all.py
 /.pytest_cache
 /src/templates/admin/bs4_admin
 *.isorted
+/src/main_app/public/routes/php_new_html
