@@ -18,7 +18,6 @@ from typing import Any
 from flask import Request, Response, jsonify
 
 from ...html_to_segments import process_html
-
 from .clients import MdwikiApi, TransformApi
 from .html_utils import remove_data_parsoid
 from .storage import (
@@ -114,6 +113,7 @@ def get_html(
     html = remove_data_parsoid(html)
     write_file(file_html, html)
     return html, from_cache
+
 
 def get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
     from_cache = False
