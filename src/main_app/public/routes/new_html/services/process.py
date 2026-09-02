@@ -3,16 +3,17 @@ Main processing logic for converting a page title into segmented content.
 """
 
 import logging
+from pathlib import Path
 
 from flask import Response, jsonify, request
 
-from app.new_html.config import JSON_FILE, JSON_FILE_ALL
-from app.new_html.services.file_utils import read_file, write_file
-from app.new_html.services.json_data import add_title_revision, get_title_revision
-from app.new_html.services.mdwiki_api import MdwikiApiService
-from app.new_html.services.segment_api import SegmentApiService
-from app.new_html.services.transform_api import TransformApiService
-from app.new_html.utils import get_content_type, get_file_dir, set_cors_headers
+from ..config import JSON_FILE, JSON_FILE_ALL
+from ..services.file_utils import read_file, write_file
+from ..services.json_data import add_title_revision, get_title_revision
+from ..services.mdwiki_api import MdwikiApiService
+from ..services.segment_api import SegmentApiService
+from ..services.transform_api import TransformApiService
+from ..utils import get_content_type, get_file_dir, set_cors_headers
 
 logger = logging.getLogger(__name__)
 
@@ -207,3 +208,12 @@ def process_page() -> Response:
 
     response = jsonify(data)
     return set_cors_headers(response)
+
+
+__all__ = [
+    "fix_wikitext",
+    "get_wikitext_and_revision",
+    "get_html",
+    "get_segments",
+    "process_page",
+]

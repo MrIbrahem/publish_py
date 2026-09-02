@@ -6,10 +6,10 @@ import logging
 
 from flask import Blueprint, Response, abort, jsonify, request
 
-from app.new_html.config import REVISIONS_PATH
-from app.new_html.services.file_utils import read_file
-from app.new_html.services.process import process_page
-from app.new_html.utils import set_cors_headers
+from .config import REVISIONS_PATH
+from .services.file_utils import read_file
+from .services.process import process_page
+from .utils import set_cors_headers
 
 logger = logging.getLogger(__name__)
 
@@ -126,3 +126,8 @@ class NewHtmlRoutes:
 
         response = jsonify({"results": results})
         return set_cors_headers(response)
+
+
+__all__ = [
+    "NewHtmlRoutes",
+]

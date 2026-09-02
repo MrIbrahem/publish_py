@@ -7,7 +7,7 @@ from pathlib import Path
 
 from flask import Response, request
 
-from app.new_html.config import ALLOWED_ORIGINS, REVISIONS_PATH
+from .config import ALLOWED_ORIGINS, REVISIONS_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -66,3 +66,10 @@ def get_content_type(printetxt: str) -> str:
         "seg": "text/html",
     }
     return mapping.get(printetxt, "application/json")
+
+
+__all__ = [
+    "get_file_dir",
+    "set_cors_headers",
+    "get_content_type",
+]

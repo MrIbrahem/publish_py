@@ -5,7 +5,7 @@ Utility functions for HTML processing and tag manipulation.
 import re
 
 from . import util as cxutil
-from .text_chunk import text_chunk
+from .text_chunk import TextChunk
 
 
 def find_all(text, regex, callback):
@@ -346,7 +346,7 @@ def add_common_tag(text_chunks, tag):
     for t_chunk in text_chunks:
         new_tags = t_chunk.tags[:]
         new_tags.insert(common_tag_length, tag)
-        new_text_chunks.append(text_chunk(t_chunk.text, new_tags, t_chunk.inline_content))
+        new_text_chunks.append(TextChunk(t_chunk.text, new_tags, t_chunk.inline_content))
 
     return new_text_chunks
 
@@ -436,3 +436,28 @@ def is_ignorable_block(section_doc):
                 return False
 
     return ignorable
+
+
+__all__ = [
+    "find_all",
+    "esc",
+    "esc_attr",
+    "get_open_tag_html",
+    "get_close_tag_html",
+    "clone_open_tag",
+    "dump_tags",
+    "is_reference",
+    "is_math",
+    "is_gallery",
+    "is_reference_list",
+    "is_external_link",
+    "is_segment",
+    "is_transclusion",
+    "is_transclusion_fragment",
+    "is_non_translatable",
+    "is_inline_empty_tag",
+    "get_chunk_boundary_groups",
+    "add_common_tag",
+    "set_link_ids_in_place",
+    "is_ignorable_block",
+]

@@ -29,3 +29,8 @@ def check_publish_secret_code() -> str | None:
     host = request.headers.get("Origin") or request.host_url
 
     return urlparse(host).netloc
+
+
+__all__ = [
+    "check_publish_secret_code",
+]

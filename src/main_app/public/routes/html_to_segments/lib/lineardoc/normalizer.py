@@ -43,7 +43,7 @@ class Normalizer:
                 for child in tree:
                     self._process_element(child)
             except Exception as e:
-                raise Exception(f"Failed to parse HTML: {e}")
+                raise Exception(f"Failed to parse HTML: {e}") from e
 
     def _process_element(self, element):
         """Process an element recursively."""
@@ -93,3 +93,9 @@ class Normalizer:
             Normalized HTML string
         """
         return "".join(self.doc)
+
+
+__all__ = [
+    "Normalizer",
+    "esc",
+]

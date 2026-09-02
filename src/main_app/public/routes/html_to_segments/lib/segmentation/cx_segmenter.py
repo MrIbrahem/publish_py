@@ -51,3 +51,8 @@ class CXSegmenter:
             return boundaries
 
         return segmenter
+
+
+__all__ = [
+    "CXSegmenter",
+]

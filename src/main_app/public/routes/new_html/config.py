@@ -22,9 +22,7 @@ for json_path in (JSON_FILE, JSON_FILE_ALL):
         json_path.write_text("{}", encoding="utf-8")
 
 # User-Agent used for external API requests
-USER_AGENT = (
-    "WikiProjectMed Translation Dashboard/1.0 (https://medwiki.toolforge.org/; tools.mdwikicx@toolforge.org)"
-)
+USER_AGENT = "WikiProjectMed Translation Dashboard/1.0 (https://medwiki.toolforge.org/; tools.mdwikicx@toolforge.org)"
 
 # Allowed origins for CORS
 ALLOWED_ORIGINS = [

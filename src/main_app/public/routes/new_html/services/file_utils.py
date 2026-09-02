@@ -49,3 +49,9 @@ def write_file(file_path: str | Path | None, text: str) -> None:
         path.write_text(text, encoding="utf-8")
     except Exception as e:
         logger.error(f"Could not write to file: {path} - {e}")
+
+
+__all__ = [
+    "read_file",
+    "write_file",
+]

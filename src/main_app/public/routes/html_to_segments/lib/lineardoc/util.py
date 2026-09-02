@@ -31,3 +31,8 @@ def get_prop(path, obj):
         else:
             return None
     return result
+
+
+__all__ = [
+    "get_prop",
+]

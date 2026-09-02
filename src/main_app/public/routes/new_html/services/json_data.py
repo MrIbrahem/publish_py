@@ -5,7 +5,7 @@ Helpers for managing title → revision_id JSON mappings.
 import json
 from pathlib import Path
 
-from app.new_html.services.file_utils import read_file, write_file
+from ..services.file_utils import read_file, write_file
 
 
 def get_title_revision(title: str, file_path: Path) -> str:
@@ -38,3 +38,9 @@ def add_title_revision(title: str, revision: str, file_path: Path) -> None:
 
     data[title] = revision
     write_file(file_path, json.dumps(data, ensure_ascii=False, indent=2))
+
+
+__all__ = [
+    "get_title_revision",
+    "add_title_revision",
+]

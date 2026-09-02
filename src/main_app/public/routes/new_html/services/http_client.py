@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-from app.new_html.config import USER_AGENT
+from ..config import USER_AGENT
 
 logger = logging.getLogger(__name__)
 
@@ -79,3 +79,8 @@ class HttpClient:
             logger.error(f"Request failed for {url}: {e}")
 
         return result
+
+
+__all__ = [
+    "HttpClient",
+]

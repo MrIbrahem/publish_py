@@ -5,7 +5,7 @@ Service for converting HTML to segmented content.
 import json
 import logging
 
-from app.new_html.services.http_client import HttpClient
+from .http_client import HttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -61,3 +61,8 @@ class SegmentApiService:
             return {"result": result}
 
         return {"error": "Unexpected response format"}
+
+
+__all__ = [
+    "SegmentApiService",
+]

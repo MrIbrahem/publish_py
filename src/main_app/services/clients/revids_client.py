@@ -69,3 +69,9 @@ def get_revid_db(sourcetitle: str) -> str:
     except Exception as e:
         logger.error(f"Error fetching revid from API: {e}")
         return ""
+
+
+__all__ = [
+    "get_revid",
+    "get_revid_db",
+]

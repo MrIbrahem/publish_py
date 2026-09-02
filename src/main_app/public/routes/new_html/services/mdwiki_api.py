@@ -5,7 +5,7 @@ Service for fetching wikitext from MDWiki.
 import logging
 from typing import Any
 
-from app.new_html.services.http_client import HttpClient
+from ..services.http_client import HttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -65,3 +65,8 @@ class MdwikiApiService:
                 "revid": "",
                 "error": str(e),
             }
+
+
+__all__ = [
+    "MdwikiApiService",
+]

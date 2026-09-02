@@ -211,7 +211,7 @@ class Doc:
             elif item_type == "blockspace":
                 html.append(item_obj)
             elif item_type == "textblock":
-                html.append(item_obj.get_html())
+                html.append(item_obj.get_html())  # pyright: ignore[reportAttributeAccessIssue]
             else:
                 raise Exception(f"Unknown item type: {item_type}")
 
@@ -398,3 +398,8 @@ class Doc:
             segments.append(text_block.get_html())
 
         return segments
+
+
+__all__ = [
+    "Doc",
+]

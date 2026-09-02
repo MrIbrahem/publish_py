@@ -4,7 +4,7 @@ Service for converting wikitext to HTML using Wikipedia REST API.
 
 import logging
 
-from app.new_html.services.http_client import HttpClient
+from .http_client import HttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -51,3 +51,8 @@ class TransformApiService:
             return {"error": "Invalid HTML returned"}
 
         return {"result": html}
+
+
+__all__ = [
+    "TransformApiService",
+]
