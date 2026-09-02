@@ -17,7 +17,7 @@ from typing import Any
 
 from flask import Response, jsonify
 
-from ...html_to_segments import process_html
+from .process_seg import get_segments
 from ..domain.fixes import WikitextFixerService
 from .clients import MdwikiApi, TransformApi
 from .html_utils import remove_data_parsoid
@@ -98,38 +98,6 @@ def _get_html(
     return html, from_cache
 
 
-def _get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
-    from_cache = False
-
-    if not force_new:
-        cached = read_file(file_seg)
-        if cached:
-            return remove_data_parsoid(cached), True
-
-    if not html:
-        return "", from_cache
-
-    try:
-        seg = process_html(html)
-    except Exception as e:
-        logger.error("Segment processing failed: %s", e)
-        return "", from_cache
-
-    if not seg:
-        return "", from_cache
-
-    # Normalize known empty messages (if any)
-    if seg in (
-        "Content for translate is not given or is empty",
-        "Sectionwrap: Attempting to remove a non-section tag: undefined",
-    ):
-        return "", from_cache
-
-    seg = remove_data_parsoid(seg)
-    write_file(file_seg, seg)
-    return seg, from_cache
-
-
 def process_page(
     title: str,
     printetxt: str,
@@ -183,10 +151,10 @@ def process_page(
         return response
 
     # 3. Convert to segments
-    seg, seg_from_cache = _get_segments(html, file_seg, force_new)
+    seg_text, seg_from_cache = get_segments(html, file_seg, force_new)
 
     if printetxt == "seg":
-        response = Response(seg, mimetype="text/html")
+        response = Response(seg_text, mimetype="text/html")
         return response
 
     # Final JSON response
@@ -199,7 +167,7 @@ def process_page(
         "sourceLanguage": "en",
         "title": title,
         "revision": revision,
-        "segmentedContent": seg,
+        "segmentedContent": seg_text,
         "categories": [],
     }
 
@@ -208,16 +176,18 @@ def process_page(
         # but when seg is empty you return 404. Pick one convention (e.g. always 404 with an error envelope,
         # or always 200 with error fields) so clients can handle failures uniformly.
 
-        data["error_type"] = "HTML_text is empty"
+        data["error_type"] = "HTML_text:() is empty"
         data["error"] = "No content found"
 
-    elif not seg:
-        data["error_type"] = "SEG_text is empty"
+    elif not seg_text:
+        data["error_type"] = "seg_text:() is empty"
         data["error"] = "No content found"
         response = jsonify(data)
+        # send request error code using status_code
         response.status_code = 404
         return response
 
+    # Encode data as JSON with appropriate options
     response = jsonify(data)
     return response
 
