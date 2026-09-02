@@ -211,7 +211,7 @@ class Doc:
             elif item_type == "blockspace":
                 html.append(item_obj)
             elif item_type == "textblock":
-                html.append(item_obj.get_html())
+                html.append(item_obj.get_html())  # pyright: ignore[reportAttributeAccessIssue]
             else:
                 raise Exception(f"Unknown item type: {item_type}")
 
@@ -253,7 +253,8 @@ class Doc:
 
         def insert_to_prev_section(item, doc):
             nonlocal curr_section, prev_section
-            if new_doc.get_current_item()["item"]["name"] != "section":
+            new_item = new_doc.get_current_item()
+            if new_item and new_item["item"]["name"] != "section":
                 raise Exception(f"Sectionwrap: Attempting to remove a non-section tag: {item['name']}")
             # Undo last section close
             doc.undo_add_item()
@@ -296,7 +297,8 @@ class Doc:
                     close_section(new_doc)
 
             elif item_type == "blockspace":
-                if prev_section and new_doc.get_current_item()["item"]["name"] == "section":
+                new_item = new_doc.get_current_item()
+                if prev_section and new_item and new_item["item"]["name"] == "section":
                     insert_to_prev_section(item, new_doc)
                 else:
                     new_doc.add_item(item_type, item_obj)
@@ -398,3 +400,8 @@ class Doc:
             segments.append(text_block.get_html())
 
         return segments
+
+
+__all__ = [
+    "Doc",
+]

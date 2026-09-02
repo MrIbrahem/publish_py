@@ -60,3 +60,9 @@ def get_form(request_args: MultiDict[str, str]) -> FormData:
         lang=lang,
         user=user,
     )
+
+
+__all__ = [
+    "FormData",
+    "get_form",
+]

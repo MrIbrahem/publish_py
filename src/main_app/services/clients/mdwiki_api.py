@@ -184,3 +184,9 @@ def get_mdwiki_cat_members(cat: str, depth: int = 0, use_cache: bool = True) -> 
     }
     fetcher = CategoryFetcher(options)
     return fetcher.get_mdwiki_cat_members(cat, depth, use_cache)
+
+
+__all__ = [
+    "CategoryFetcher",
+    "get_mdwiki_cat_members",
+]

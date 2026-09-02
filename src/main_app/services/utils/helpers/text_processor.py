@@ -92,3 +92,9 @@ def do_changes_to_text(
         mdwiki_revid=mdwiki_revid,
     )
     return text
+
+
+__all__ = [
+    "do_changes_to_text_with_settings",
+    "do_changes_to_text",
+]

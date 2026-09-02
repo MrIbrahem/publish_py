@@ -153,7 +153,7 @@ class Parser:
                 for child in tree:
                     self._process_element(child)
             except Exception as e:
-                raise Exception(f"Failed to parse HTML: {e}")
+                raise Exception(f"Failed to parse HTML: {e}") from e
 
     def _process_element(self, element):
         """Process an element and its children recursively."""
@@ -297,3 +297,8 @@ class Parser:
 
         # All tags that are not block tags are inline annotation tags
         return tag_name not in BLOCK_TAGS
+
+
+__all__ = [
+    "Parser",
+]

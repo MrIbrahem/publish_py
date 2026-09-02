@@ -76,3 +76,9 @@ def publish_do_edit(
         result = {"error": "Failed to parse response"}
 
     return result
+
+
+__all__ = [
+    "get_title_info",
+    "publish_do_edit",
+]

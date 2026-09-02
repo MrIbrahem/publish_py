@@ -400,3 +400,34 @@
 | `/admin/campaigns/`                 | GET    | Campaigns dashboard       |
 | `/admin/campaigns/add`              | POST   | Add campaign              |
 | `/admin/campaigns/update`           | POST   | Update campaign           |
+
+---
+
+## New HTML
+
+> **Status:** ❌ Not yet migrated to Flask.
+> **Plan:** see [docs/merge_new_html.md](merge_new_html.md) for the full PHP→Python porting plan.
+
+### Source Endpoints
+
+| Endpoint                   | Method   | Description                                      | Flask status |
+| -------------------------- | -------- | ------------------------------------------------ | ------------ |
+| `/` (no `title`)           | GET      | Router → dashboard (`revisions.html`)            | ❌           |
+| `/?title=...` → `main.php` | GET      | Core pipeline: fetch → fix → transform → segment | ❌           |
+| `/check.php?revid=`        | GET      | Cache existence check (`true`/`false`)           | ❌           |
+| `/open.php?revid=&file=`   | GET      | Serve cached wikitext/html/seg (traversal-safe)  | ❌           |
+| `/fix.php`                 | GET/POST | Wikitext-fix dev form                            | ❌           |
+| `/revisions.php`           | GET      | Revisions dashboard table                        | ❌           |
+| `/revisions_api.php`       | GET      | Revisions list (JSON)                            | ❌           |
+| `/revisions.html`          | GET      | Static dashboard UI                              | ❌           |
+
+### Flask Endpoints (proposed)
+
+| Endpoint                  | Method   | Description                         |
+| ------------------------- | -------- | ----------------------------------- |
+| `/new_html/`              | GET      | Dashboard or core pipeline (router) |
+| `/new_html/check`         | GET      | Cache existence check               |
+| `/new_html/open`          | GET      | Serve cached file                   |
+| `/new_html/fix`           | GET/POST | Wikitext-fix dev form               |
+| `/new_html/revisions`     | GET      | Revisions dashboard                 |
+| `/new_html/revisions_api` | GET      | Revisions list (JSON)               |

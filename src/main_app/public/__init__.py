@@ -13,11 +13,11 @@ from .routes import (
     ApiRoutes,
     CxTokenRoutes,
     FixRefsRoutes,
+    HtmltoSegmentsRoutes,
     LeaderBoardRoutes,
     MainRoutes,
     PublishRoutes,
     TDRoutes,
-    HtmltoSegmentsRoutes,
 )
 
 
@@ -30,7 +30,6 @@ class PublicRouteModule:
 
 
 PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
-    # PublicRouteModule(HtmltoSegmentsRoutes, "HtmltoSegments", "/HtmltoSegments"),
     PublicRouteModule(MainRoutes, "main"),
     PublicRouteModule(AuthRoutes, "auth", "/auth"),
     PublicRouteModule(ApiRoutes, "api", "/api"),

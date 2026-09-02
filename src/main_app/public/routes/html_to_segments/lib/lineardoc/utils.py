@@ -3,9 +3,10 @@ Utility functions for HTML processing and tag manipulation.
 """
 
 import re
+from typing import Any
 
 from . import util as cxutil
-from .text_chunk import text_chunk
+from .text_chunk import TextChunk
 
 
 def find_all(text, regex, callback):
@@ -346,7 +347,7 @@ def add_common_tag(text_chunks, tag):
     for t_chunk in text_chunks:
         new_tags = t_chunk.tags[:]
         new_tags.insert(common_tag_length, tag)
-        new_text_chunks.append(text_chunk(t_chunk.text, new_tags, t_chunk.inline_content))
+        new_text_chunks.append(TextChunk(t_chunk.text, new_tags, t_chunk.inline_content))
 
     return new_text_chunks
 
@@ -411,18 +412,7 @@ def is_ignorable_block(section_doc):
         if item_type == "close":
             if block_stack:
                 current_close_tag = block_stack.pop()
-                if (
-                    current_close_tag
-                    and len(block_stack) == 0
-                    and (
-                        (
-                            is_transclusion(current_close_tag)
-                            and current_close_tag.get("attributes", {}).get("about")
-                            == first_block_template.get("attributes", {}).get("about")
-                        )
-                        or is_reference_list(current_close_tag)
-                    )
-                ):
+                if is_closing_template_match(block_stack, first_block_template, current_close_tag):
                     return True
 
         # Also check for textblocks
@@ -436,3 +426,47 @@ def is_ignorable_block(section_doc):
                 return False
 
     return ignorable
+
+
+def is_closing_template_match(
+    block_stack: list[Any],
+    first_block_template: dict[str, Any] | None,
+    current_close_tag: Any,
+) -> bool:
+    first_block_about = first_block_template.get("attributes", {}).get("about") if first_block_template else None
+    return (
+        current_close_tag
+        and len(block_stack) == 0
+        and (
+            (
+                is_transclusion(current_close_tag)
+                and current_close_tag.get("attributes", {}).get("about") == first_block_about
+            )
+            or is_reference_list(current_close_tag)
+        )
+    )
+
+
+__all__ = [
+    "find_all",
+    "esc",
+    "esc_attr",
+    "get_open_tag_html",
+    "get_close_tag_html",
+    "clone_open_tag",
+    "dump_tags",
+    "is_reference",
+    "is_math",
+    "is_gallery",
+    "is_reference_list",
+    "is_external_link",
+    "is_segment",
+    "is_transclusion",
+    "is_transclusion_fragment",
+    "is_non_translatable",
+    "is_inline_empty_tag",
+    "get_chunk_boundary_groups",
+    "add_common_tag",
+    "set_link_ids_in_place",
+    "is_ignorable_block",
+]

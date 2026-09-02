@@ -89,3 +89,10 @@ def is_allowed(request: Request) -> str | None:
     # Access denied: referer_host='google.com', origin_host='google.com'
     logger.warning(f"Access denied: {referer_host=}, {origin_host=}")
     return None
+
+
+__all__ = [
+    "get_host",
+    "make_url",
+    "is_allowed",
+]
