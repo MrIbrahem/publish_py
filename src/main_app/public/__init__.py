@@ -16,6 +16,7 @@ from .routes import (
     HtmltoSegmentsRoutes,
     LeaderBoardRoutes,
     MainRoutes,
+    NewHtmlRoutes,
     PublishRoutes,
     TDRoutes,
 )
@@ -30,6 +31,7 @@ class PublicRouteModule:
 
 
 PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
+    PublicRouteModule(NewHtmlRoutes, "new_html", "/new_html"),
     PublicRouteModule(MainRoutes, "main"),
     PublicRouteModule(AuthRoutes, "auth", "/auth"),
     PublicRouteModule(ApiRoutes, "api", "/api"),

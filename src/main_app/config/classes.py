@@ -49,11 +49,11 @@ def load_special_users() -> dict:
     return special_users
 
 
-def resolve_path(_path) -> Path:
+def resolve_path(_path: str) -> Path:
     """Expand environment variables and user home directory in paths."""
     _path = os.path.expandvars(str(_path))
-    _path = Path(_path).expanduser()
-    return _path
+    path = Path(_path).expanduser()
+    return path
 
 
 # --- Data Classes for Configuration Sections ---
@@ -68,7 +68,6 @@ class NewHtmlConfig:
 
     revisions_dir: Path
     transform_base_url: str = "https://en.wikipedia.org/w/rest.php/v1"
-    segment_api_as_json: bool = True
 
     @property
     def json_file(self) -> Path:
@@ -85,22 +84,25 @@ class NewHtmlConfig:
         """
         Load configuration for the new_html blueprint.
         """
-        revisions_dir = Path(
-            os.getenv(
-                "REVISIONS_DIR",
-                Path.home() / "public_html" / "revisions_new1",
-            )
-        )
+        revisions_dir = os.getenv("REVISIONS_DIR") or Path.home() / "public_html" / "revisions_new1"
+
+        transform_base_url = os.getenv("TRANSFORM_BASE_URL", "https://en.wikipedia.org/w/rest.php/v1")
 
         return NewHtmlConfig(
-            revisions_dir=revisions_dir,
-            transform_base_url=os.getenv(
-                "TRANSFORM_BASE_URL",
-                "https://en.wikipedia.org/w/rest.php/v1",
-            ),
-            segment_api_as_json=os.getenv("SEGMENT_API_AS_JSON", "true").lower() in ("1", "true", "yes"),
+            revisions_dir=resolve_path(str(revisions_dir)),
+            transform_base_url=transform_base_url,
         )
+    def ensure_json_files_exist(self) -> None:
+        # Ensure JSON index files exist
+        for json_path in (
+            self.json_file,
+            self.json_file_all,
+        ):
+            if not json_path.exists():
+                json_path.write_text("{}", encoding="utf-8")
 
+    def get_file(self, all_flag) -> Path:
+        return self.json_file_all if all_flag else self.json_file
 
 @dataclass(frozen=True)
 class OtherConfig:
@@ -306,9 +308,15 @@ class CorsConfig:
     @classmethod
     def load(cls) -> CorsConfig:
         # Load CORS configuration
-        cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS", "medwiki.toolforge.org,mdwikicx.toolforge.org")
+        cors_domains_str = os.getenv("CORS_ALLOWED_DOMAINS") or ""
         cors_domains = [d.strip() for d in cors_domains_str.split(",") if d.strip()]
 
+        if not cors_domains:
+            cors_domains = [
+                "mdwikicx.toolforge.org",
+                "mdwiki.toolforge.org",
+                "medwiki.toolforge.org",
+            ]
         return CorsConfig(
             allowed_domains=cors_domains,
         )

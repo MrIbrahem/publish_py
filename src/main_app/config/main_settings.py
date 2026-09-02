@@ -47,12 +47,7 @@ def ensure_directories() -> None:
     settings.new_html.revisions_dir.mkdir(parents=True, exist_ok=True)
 
     # Ensure JSON index files exist
-    for json_path in (
-        settings.new_html.json_file,
-        settings.new_html.json_file_all,
-    ):
-        if not json_path.exists():
-            json_path.write_text("{}", encoding="utf-8")
+    settings.new_html.ensure_json_files_exist()
 
 
 __all__ = [
