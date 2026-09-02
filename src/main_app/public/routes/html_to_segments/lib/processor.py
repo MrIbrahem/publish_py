@@ -8,7 +8,6 @@ import re
 import yaml
 
 from ..lib.lineardoc import Normalizer, Parser
-
 from .lineardoc import mw_contextualizer
 from .segmentation import CXSegmenter
 
