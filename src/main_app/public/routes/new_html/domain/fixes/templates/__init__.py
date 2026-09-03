@@ -1,9 +1,8 @@
 from .delete_templates import (
-    matches_deletion_pattern,
     check_temp_to_delete,
-    remove_templates,
+    matches_deletion_pattern,
     remove_lead_templates,
-
+    remove_templates,
 )
 from .fix_templates import (
     add_missing_title,

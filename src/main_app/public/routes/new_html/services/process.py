@@ -15,15 +15,13 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from domain.fixes.references.expand_refs import expand_refs
 from flask import Response, jsonify
 
-from domain.fixes.references.expand_refs import expand_refs
-
-from ..domain.parser.lead_section_parser import get_lead_section
-
 from ..domain.fixes import WikitextFixerService
+from ..domain.parser.lead_section_parser import get_lead_section
 from .clients import MdwikiApi, TransformApi
-from .html_utils import remove_data_parsoid
+from .html_utils import del_div_error, fix_link_red, remove_data_parsoid
 from .process_seg import get_segments
 from .storage import (
     add_title_revision,
@@ -32,14 +30,12 @@ from .storage import (
     write_file,
 )
 from .utils import get_file_dir
-from .html_utils import del_div_error, fix_link_red
 
 logger = logging.getLogger(__name__)
 
 
 def get_from_json(title: str, all_flag: str):
-    """
-    """
+    """ """
     cached_rev = get_title_revision(title, all_flag)
 
     if not cached_rev or not cached_rev.isdigit():
@@ -67,7 +63,6 @@ def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str
     """
     mdwiki = MdwikiApi()
     source, revid, error = mdwiki.get_wikitext(title)
-
 
     from_cache = False
     if not source or not revid:

@@ -42,7 +42,6 @@ def expand_refs(first: str, alltext: str) -> str:
 
         if name in lead_full_refs:
             continue
-
         full_ref = all_page_full_refs.get(name, "")
 
         if full_ref:

@@ -27,6 +27,7 @@ def _is_self_closing(tag_string: str) -> bool:
     """
     return tag_string.rstrip().endswith("/>")
 
+
 def get_citations(text: str) -> list[dict]:
     """Get all full (non-self-closing) ``<ref>...</ref>`` citations.
 

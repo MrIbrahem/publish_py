@@ -17,6 +17,7 @@ import re
 
 import wikitextparser as wtp
 from domain.parser import template_helpers as th
+
 from ....services.clients import HttpClientService
 
 _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
@@ -77,6 +78,7 @@ class ImageExistenceChecker:
             return True
 
         return False
+
 
 class RemoveMissingImagesService:
     """Removes image references that don't exist on Commons from wikitext."""

@@ -10,7 +10,8 @@ from domain.parser.citations_parser import get_full_refs, get_short_refs
 
 
 def del_empty_refs(text: str) -> str:
-    """Delete empty short refs, or expand them with their full ref definition.
+    """
+    Delete empty short refs, or expand them with their full ref definition.
 
     For each short (self-closing) ``<ref name="x" />`` tag: if a full
     ``<ref name="x">...</ref>`` definition exists elsewhere in ``text``, the

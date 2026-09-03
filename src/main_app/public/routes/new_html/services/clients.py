@@ -31,6 +31,7 @@ def normalize_title_for_url(title: str) -> str:
     title = title.replace("/", "%2F")
     return title
 
+
 class HttpClientService:
 
     @staticmethod
@@ -94,10 +95,8 @@ class HttpClientService:
 
             # check Cloudflare protection
             if isinstance(output, str) and "Just a moment..." in output:
-                logging.error( "HttpClientService: Cloudflare protection detected" )
-                logger.error(
-                    "Cloudflare protection detected: 'Just a moment...' page returned"
-                )
+                logging.error("HttpClientService: Cloudflare protection detected")
+                logger.error("Cloudflare protection detected: 'Just a moment...' page returned")
                 result["error"] = "CLOUDFLARE_PROTECTION"
 
             else:
@@ -108,23 +107,6 @@ class HttpClientService:
 
         return result
 
-
-def request(
-    url: str,
-    method: str = "GET",
-    params: dict[str, Any] | None = None,
-    data: dict[str, Any] | None = None,
-    json_data: dict[str, Any] | None = None,
-    timeout: float = 15.0,
-) -> dict[str, Any]:
-    return HttpClientService.request(
-        url=url,
-        method=method,
-        params=params,
-        data=data,
-        json_data=json_data,
-        timeout=timeout,
-    )
 
 class MdwikiApi:
     """
@@ -137,7 +119,11 @@ class MdwikiApi:
 
     REST_BASE = "https://mdwiki.org/w/rest.php/v1"
     API_BASE = "https://mdwiki.org/w/api.php"
+
     def __init__(self):
+        """Initialize the checker with an HTTP client instance."""
+        self.http_client = HttpClientService()
+
         # Fallback to Action API
         self.fallback_to_action_api = False
 
@@ -146,7 +132,7 @@ class MdwikiApi:
 
         url = f"{self.REST_BASE}/page/{title_encoded}"
 
-        response = _request(url, method="GET")
+        response = self.http_client.request(url, method="GET")
 
         output = response.get("output")
         error = response.get("error")
@@ -182,7 +168,7 @@ class MdwikiApi:
             "formatversion": "2",
             "rvprop": "content|ids",
         }
-        response = _request(self.API_BASE, method="GET", params=params)
+        response = self.http_client.request(self.API_BASE, method="GET", params=params)
 
         output = response.get("output")
         error = response.get("error")
@@ -208,7 +194,6 @@ class MdwikiApi:
             logger.error("Failed to parse MDWiki Action API response: %s", exc)
             return "", "", str(exc)
 
-
     def get_wikitext(self, title: str) -> tuple[str, str, str]:
         """
         Return (source, revid, error).
@@ -229,6 +214,7 @@ class MdwikiApi:
 
         return source, str(revid) if revid else "", error
 
+
 class TransformApi:
     """Convert wikitext to HTML using English Wikipedia REST API."""
 
@@ -244,7 +230,7 @@ class TransformApi:
         title_encoded = normalize_title_for_url(title)
         url = f"{base_url}/transform/wikitext/to/html/{title_encoded}"
 
-        response = _request(
+        response = self.http_client.request(
             url,
             method="POST",
             data={"wikitext": wikitext},
@@ -272,7 +258,7 @@ class TransformApi:
 
         # Check if response is valid HTML
         if "<html" not in html.lower():
-            logger.error("TransformApi: API returned invalid HTML for title: $title");
+            logger.error("TransformApi: API returned invalid HTML for title: $title")
             return {"error": "Error: Wikipedia API returned invalid HTML."}
 
         return {"result": html}

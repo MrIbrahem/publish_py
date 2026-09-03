@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import wikitextparser as wtp
 
+
 def remove_categories(text: str) -> str:
     """Remove all category tags from wikitext.
 

@@ -1,19 +1,15 @@
-
-
-from .templates import (
-    remove_templates,
-    remove_lead_templates,
-    add_missing_title,
-)
-from .references import (
-    remove_bad_refs,
-    del_empty_refs,
-)
-
-from .structure import remove_categories
 # from .media import remove_images
-from .media import remove_videos
-from .media import RemoveMissingImagesService
+from .media import RemoveMissingImagesService, remove_videos
+from .references import (
+    del_empty_refs,
+    remove_bad_refs,
+)
+from .structure import remove_categories
+from .templates import (
+    add_missing_title,
+    remove_lead_templates,
+    remove_templates,
+)
 
 
 class WikitextFixerService:
