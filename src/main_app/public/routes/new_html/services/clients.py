@@ -70,33 +70,125 @@ def _request(
             headers=headers,
             timeout=timeout,
         )
-        result["http_code"] = response.status_code
-
-        if response.status_code != 200:
-            result["error"] = "HTTP_ERROR"
-            result["error_code"] = str(response.status_code)
-            logger.warning("HTTP %s for URL: %s", response.status_code, url)
-            return result
-
-        result["output"] = response.text
-
     except requests.Timeout:
         result["error"] = "Request timed out"
         result["error_code"] = "TIMEOUT"
         logger.error("Timeout while requesting: %s", url)
+        return result
     except Exception as exc:
         result["error"] = str(exc)
         result["error_code"] = "REQUEST_ERROR"
         logger.error("Request failed for %s: %s", url, exc)
+        return result
+
+    output = response.text
+    result["output"] = output
+    result["http_code"] = response.status_code
+
+    if response.status_code != 200:
+        logging.error("HttpClientService: API returned HTTP %s", response.status_code)
+        result["error"] = "HTTP_ERROR"
+        result["error_code"] = str(response.status_code)
+
+        # check Cloudflare protection
+        if isinstance(output, str) and "Just a moment..." in output:
+            logging.error( "HttpClientService: Cloudflare protection detected" )
+            logger.error(
+                "Cloudflare protection detected: 'Just a moment...' page returned"
+            )
+            result["error"] = "CLOUDFLARE_PROTECTION"
+
+        else:
+            logger.error(repr(output))
+
+        result["output"] = ""
+        return result
 
     return result
 
 
 class MdwikiApi:
-    """Fetch wikitext and revision ID from mdwiki.org."""
+    """
+    Service for fetching wikitext content from mdwiki.org
+
+    https://mdwiki.org/w/rest.php/v1/page/Sympathetic_crashing_acute_pulmonary_edema/html
+    https://mdwiki.org/w/rest.php/v1/revision/1420795/html
+
+    """
 
     REST_BASE = "https://mdwiki.org/w/rest.php/v1"
     API_BASE = "https://mdwiki.org/w/api.php"
+    def __init__(self):
+        # Fallback to Action API
+        self.fallback_to_action_api = False
+
+    def _fetch_rest(self, title: str) -> tuple[str, str, str]:
+        title_encoded = normalize_title_for_url(title)
+
+        url = f"{self.REST_BASE}/page/{title_encoded}"
+
+        response = _request(url, method="GET")
+
+        output = response.get("output")
+        error = response.get("error")
+
+        if response["error"] or not output:
+            logger.error("MdwikiApi: Failed to fetch data from MDWiki REST API for title: %s", title)
+            # Fallback to Action API
+            if self.fallback_to_action_api:
+                return self._fetch_action_api(title)
+
+            return "", "", error or "Empty response"
+
+        try:
+            data = json.loads(output)
+            source = data.get("source", "")
+            revid = data.get("latest", {}).get("id", "")
+            return source, str(revid), ""
+
+        except Exception as exc:
+            logger.error("Failed to parse MDWiki REST response: %s", exc)
+            if self.fallback_to_action_api:
+                return self._fetch_action_api(title)
+
+            return "", "", error or "Empty response"
+
+    def _fetch_action_api(self, title: str) -> tuple[str, str, str]:
+        params = {
+            "action": "query",
+            "format": "json",
+            "prop": "revisions",
+            "titles": title,
+            "utf8": 1,
+            "formatversion": "2",
+            "rvprop": "content|ids",
+        }
+        response = _request(self.API_BASE, method="GET", params=params)
+
+        output = response.get("output")
+        error = response.get("error")
+
+        if response["error"] or not output:
+            logger.error("MdwikiApi: Failed to fetch data from MDWiki API for title: %s", title)
+            return "", "", response.get("error") or "Empty response"
+
+        try:
+            data = json.loads(output)
+            pages = data.get("query", {}).get("pages", [])
+            if not pages:
+                return "", "", "No pages found"
+
+            revisions = pages[0].get("revisions", [])
+            if not revisions:
+                return "", "", "No revisions found"
+
+            source = revisions[0].get("content", "")
+            revid = revisions[0].get("revid", "")
+            return source, str(revid), ""
+        except Exception as exc:
+            logger.error("Failed to parse MDWiki Action API response: %s", exc)
+            return "", "", str(exc)
+
 
     def get_wikitext(self, title: str) -> tuple[str, str, str]:
         """
@@ -113,59 +205,10 @@ class MdwikiApi:
                 logger.info("Redirecting to: %s", redirect_title)
                 source, revid, error = self._fetch_rest(redirect_title)
 
+        if not source:
+            logger.error("WikitextHandler: wikitext empty for title: %s", title)
+
         return source, str(revid) if revid else "", error
-
-    def _fetch_rest(self, title: str) -> tuple[str, str, str]:
-        title_encoded = normalize_title_for_url(title)
-
-        url = f"{self.REST_BASE}/page/{title_encoded}"
-
-        response = _request(url, method="GET")
-        if response["error"] or not response["output"]:
-            # Fallback to Action API
-            return self._fetch_action_api(title)
-
-        try:
-            data = json.loads(response["output"])
-            source = data.get("source", "")
-            revid = data.get("latest", {}).get("id", "")
-            return source, str(revid), ""
-        except Exception as exc:
-            logger.error("Failed to parse MDWiki REST response: %s", exc)
-            return self._fetch_action_api(title)
-
-    def _fetch_action_api(self, title: str) -> tuple[str, str, str]:
-        params = {
-            "action": "query",
-            "format": "json",
-            "prop": "revisions",
-            "titles": title,
-            "utf8": 1,
-            "formatversion": "2",
-            "rvprop": "content|ids",
-        }
-        response = _request(self.API_BASE, method="GET", params=params)
-
-        if response["error"] or not response["output"]:
-            return "", "", response.get("error") or "Empty response"
-
-        try:
-            data = json.loads(response["output"])
-            pages = data.get("query", {}).get("pages", [])
-            if not pages:
-                return "", "", "No pages found"
-
-            revisions = pages[0].get("revisions", [])
-            if not revisions:
-                return "", "", "No revisions found"
-
-            source = revisions[0].get("content", "")
-            revid = revisions[0].get("revid", "")
-            return source, str(revid), ""
-        except Exception as exc:
-            logger.error("Failed to parse MDWiki Action API response: %s", exc)
-            return "", "", str(exc)
-
 
 class TransformApi:
     """Convert wikitext to HTML using English Wikipedia REST API."""
@@ -201,7 +244,7 @@ class TransformApi:
 
             return {"error": response.get("error") or "Error: Could not reach API."}
 
-        html = response["output"]
+        html = response_output or ""
 
         # Check if response contains an error
         if ">Wikimedia Error" in html:
