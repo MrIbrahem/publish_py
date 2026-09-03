@@ -10,10 +10,10 @@ TODO: write tests
 
 
 from src.main_app.public.routes.html_to_segments import (
-    ProcessingError,
     HtmltoSegmentsRoutes,
-    validate_request,
+    ProcessingError,
     create_error_response,
     create_success_response,
     process_text,
+    validate_request,
 )
