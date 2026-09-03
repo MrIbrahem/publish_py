@@ -77,7 +77,7 @@ def get_open_tag_html(tag: dict[str, Any]) -> str:
     attributes = tag.get("attributes", {}).keys()
 
     # sort attributes
-    attributes = sorted(attributes)
+    # attributes = sorted(attributes)
 
     for attr in attributes:
         html.append(" " + esc(attr) + '="' + esc_attr(tag["attributes"][attr]) + '"')
