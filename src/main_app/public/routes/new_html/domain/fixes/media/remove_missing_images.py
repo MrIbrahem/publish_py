@@ -16,7 +16,7 @@ import json
 import re
 
 import wikitextparser as wtp
-from domain.parser import template_helpers as th
+from ...parser import template_helpers as th
 
 from ....services.clients import HttpClientService
 

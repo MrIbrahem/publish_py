@@ -6,7 +6,7 @@ Port of ``src/Domain/Fixes/References/DeleteEmptyRefsFixture.php``.
 
 from __future__ import annotations
 
-from domain.parser.citations_parser import get_full_refs, get_short_refs
+from ...parser.citations_parser import get_full_refs, get_short_refs
 
 
 def del_empty_refs(text: str) -> str:

@@ -218,6 +218,10 @@ class MdwikiApi:
 class TransformApi:
     """Convert wikitext to HTML using English Wikipedia REST API."""
 
+    def __init__(self):
+        """Initialize the checker with an HTTP client instance."""
+        self.http_client = HttpClientService()
+
     def convert(self, wikitext: str, title: str) -> dict[str, str]:
         """
         Returns {"result": html} or {"error": message}.

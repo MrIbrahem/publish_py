@@ -15,9 +15,9 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from domain.fixes.references.expand_refs import expand_refs
 from flask import Response, jsonify
 
+from ..domain.fixes.references.expand_refs import expand_refs
 from ..domain.fixes import WikitextFixerService
 from ..domain.parser.lead_section_parser import get_lead_section
 from .clients import MdwikiApi, TransformApi

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 
-from domain.parser.citations_parser import get_full_refs, get_short_refs
+from ...parser.citations_parser import get_full_refs, get_short_refs
 
 logger = logging.getLogger(__name__)
 

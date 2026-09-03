@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 
 import wikitextparser as wtp
-from domain.parser import template_helpers as th
+from ...parser import template_helpers as th
 
 try:  # DeadIndexError isn't part of wikitextparser's public API.
     from wikitextparser._wikitext import DeadIndexError
