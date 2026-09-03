@@ -3,6 +3,7 @@ Contextualizer for HTML - tracks the segmentation context of the currently open 
 """
 
 from __future__ import annotations
+
 from typing import Any
 
 

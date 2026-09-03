@@ -10,8 +10,8 @@ The document is a list of items, where each item is:
 
 from __future__ import annotations
 
-from collections.abc import Callable
 import hashlib
+from collections.abc import Callable
 from typing import Any
 
 from . import util as cxutil
@@ -22,7 +22,7 @@ from .text_block import TextBlock
 class Doc:
     """An HTML document in linear representation."""
 
-    def __init__(self, wrapper_tag=None) -> None:
+    def __init__(self, wrapper_tag: dict[str, Any] | None = None) -> None:
         """
         Initialize a Doc.
 
@@ -107,7 +107,7 @@ class Doc:
         next_id = 0
         section_number = 0
 
-        def get_next_id(id_type, tag_name=None):
+        def get_next_id(id_type: str, tag_name: str | None = None) -> str:
             nonlocal next_section_id, next_id, section_number
             if tag_name == "section":
                 result = f"cxSourceSection{next_section_id}"
