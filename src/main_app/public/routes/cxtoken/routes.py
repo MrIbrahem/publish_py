@@ -6,6 +6,8 @@ This endpoint provides CSRF tokens for Content Translation operations.
 It validates CORS, retrieves user access credentials, and returns tokens.
 """
 
+from __future__ import annotations
+
 import logging
 
 from flask import Blueprint, Response, jsonify, request

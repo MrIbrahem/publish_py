@@ -1,5 +1,7 @@
 """Analytics db services."""
 
+from __future__ import annotations
+
 from .assessment_service import (
     AssessmentService,
 )

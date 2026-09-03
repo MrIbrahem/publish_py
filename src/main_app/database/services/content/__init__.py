@@ -1,5 +1,7 @@
 """Content db services."""
 
+from __future__ import annotations
+
 from .category_service import (
     CategoryService,
 )

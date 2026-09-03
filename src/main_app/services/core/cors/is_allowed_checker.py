@@ -5,6 +5,8 @@ Mirrors: php_src/bots/cors.php
 
 """
 
+from __future__ import annotations
+
 import logging
 from urllib.parse import urlparse
 

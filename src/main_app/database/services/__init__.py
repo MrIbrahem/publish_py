@@ -2,6 +2,8 @@
 Shared db services, used in both admin and public blueprints
 """
 
+from __future__ import annotations
+
 from .analytics import (
     AssessmentService,
     EnwikiPageviewService,

@@ -1,5 +1,7 @@
 """Utility modules for the main application."""
 
+from __future__ import annotations
+
 from .nav_bar import NavigationBar
 from .navbar_list import nav_list
 from .objects import NavDropdown, NavLink

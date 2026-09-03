@@ -3,6 +3,8 @@
 Mirrors: php_src/bots/wd.php
 """
 
+from __future__ import annotations
+
 import json
 import logging
 from typing import Any

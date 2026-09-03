@@ -1,5 +1,7 @@
 """Wikidata db services."""
 
+from __future__ import annotations
+
 from .allqid_service import (
     AllQidsService,
 )

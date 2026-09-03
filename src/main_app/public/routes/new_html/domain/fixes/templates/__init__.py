@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .delete_templates import (
     check_temp_to_delete,
     matches_deletion_pattern,

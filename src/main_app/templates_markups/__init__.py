@@ -1,5 +1,7 @@
 """Utility modules for the main application."""
 
+from __future__ import annotations
+
 from .admin_sidebar import create_side
 from .navbar import td_navbar
 

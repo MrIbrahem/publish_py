@@ -1,4 +1,6 @@
 # from .media import remove_images
+from __future__ import annotations
+
 from .media import RemoveMissingImagesService, remove_videos
 from .references import (
     del_empty_refs,
