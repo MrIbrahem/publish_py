@@ -361,7 +361,7 @@ class TextBlock:
         utils.set_link_ids_in_place(self.text_chunks, get_next_id)
         return self
 
-    def dump_xml_array(self, pad):
+    def dump_xml_array(self, pad: str):
         """
         Dump an XML Array version of the linear representation, for debugging.
 

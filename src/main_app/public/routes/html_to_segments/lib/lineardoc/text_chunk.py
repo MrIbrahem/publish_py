@@ -11,10 +11,13 @@ therefore text with varying markup must be split into multiple chunks.
 """
 
 
+from typing import Any
+
+
 class TextChunk:
     """A chunk of uniformly-annotated inline text."""
 
-    def __init__(self, text, tags, inline_content=None):
+    def __init__(self, text: str, tags: list[dict[str, Any]], inline_content=None):
         """
         Initialize a text_chunk.
 

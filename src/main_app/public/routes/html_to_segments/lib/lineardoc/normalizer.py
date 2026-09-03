@@ -2,6 +2,8 @@
 Normalizer - Parser to normalize XML.
 """
 
+from typing import Any
+
 from lxml import etree
 
 from . import utils
@@ -69,7 +71,7 @@ class Normalizer:
 
         self.on_close_tag(tag_name)
 
-    def on_open_tag(self, tag):
+    def on_open_tag(self, tag: dict[str, Any]):
         """Handle open tag event."""
         self.tags.append(tag)
         self.doc.append(utils.get_open_tag_html(tag))
@@ -77,11 +79,13 @@ class Normalizer:
     def on_close_tag(self, tag_name):
         """Handle close tag event."""
         tag = self.tags.pop()
+
         if tag["name"] != tag_name:
             raise Exception(f'Unmatched tags: {tag["name"]} !== {tag_name}')
+
         self.doc.append(utils.get_close_tag_html(tag))
 
-    def on_text(self, text):
+    def on_text(self, text: str):
         """Handle text event."""
         self.doc.append(esc(text))
 

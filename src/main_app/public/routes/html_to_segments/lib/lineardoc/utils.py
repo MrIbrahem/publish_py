@@ -314,7 +314,7 @@ def get_chunk_boundary_groups(boundaries, chunks, get_length):
     return groups
 
 
-def add_common_tag(text_chunks, tag):
+def add_common_tag(text_chunks, tag: dict[str, Any]):
     """
     Add a tag to consecutive text chunks, above common tags but below others.
 

@@ -2,6 +2,8 @@
 Builder - A document builder for creating linear documents.
 """
 
+from typing import Any
+
 from . import utils
 from .doc import Doc
 from .text_block import TextBlock
@@ -41,7 +43,7 @@ class Builder:
         """
         return Builder(self, wrapper_tag)
 
-    def push_block_tag(self, tag):
+    def push_block_tag(self, tag: dict[str, Any]):
         """Push a block tag."""
         self.finish_text_block()
         self.block_tags.append(tag)
@@ -51,15 +53,15 @@ class Builder:
             tag["attributes"]["rel"] = "cx:Figure"
         self.doc.add_item("open", tag)
 
-    def is_section(self, tag):
+    def is_section(self, tag: dict[str, Any]):
         """Check if tag is a section."""
         return tag["name"] == "section" and tag.get("attributes", {}).get("data-mw-section-id")
 
-    def is_ignored_tag(self, tag):
+    def is_ignored_tag(self, tag: dict[str, Any]):
         """Check if tag should be ignored."""
         return self.is_section(tag) or self.is_category(tag)
 
-    def is_category(self, tag):
+    def is_category(self, tag: dict[str, Any] | None):
         """Check if tag is a category."""
         # content can be a Doc instance, not just a tag
         if not isinstance(tag, dict):
@@ -96,7 +98,7 @@ class Builder:
 
         return tag
 
-    def push_inline_annotation_tag(self, tag):
+    def push_inline_annotation_tag(self, tag: dict[str, Any]):
         """Push an inline annotation tag."""
         self.inline_annotation_tags.append(tag)
 

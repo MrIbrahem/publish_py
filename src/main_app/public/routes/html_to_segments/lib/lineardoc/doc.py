@@ -335,7 +335,7 @@ class Doc:
 
         return new_doc
 
-    def dump_xml_array(self, pad):
+    def dump_xml_array(self, pad: str):
         """
         Dump an XML Array version of the linear representation, for debugging.
 

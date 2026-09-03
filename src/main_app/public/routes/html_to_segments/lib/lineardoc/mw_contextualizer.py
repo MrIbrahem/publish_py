@@ -6,6 +6,7 @@ See https://www.mediawiki.org/wiki/Specs/HTML
 
 import json
 import re
+from typing import Any
 
 from . import util as cxutil
 from .contextualizer import Contextualizer
@@ -45,7 +46,7 @@ class MwContextualizer(Contextualizer):
         # Array holding transclusion fragment ids (about attribute values)
         self.removable_transclusion_fragments = []
 
-    def get_child_context(self, tag):
+    def get_child_context(self, tag: dict[str, Any]):
         """Get the context for a new tag being opened."""
         context = self.get_context()
         tag_type = tag.get("attributes", {}).get("typeof", "") or tag.get("attributes", {}).get("rel", "")
@@ -83,7 +84,7 @@ class MwContextualizer(Contextualizer):
         """Determine whether sentences can be segmented."""
         return self.get_context() == "contentBranch"
 
-    def is_removable(self, tag):
+    def is_removable(self, tag: dict[str, Any]):
         """
         Check if the tag need to be ignored while parsing and hence removed.
 

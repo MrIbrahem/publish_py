@@ -2,6 +2,8 @@
 Parser to read an HTML stream into a Doc.
 """
 
+from typing import Any
+
 from lxml import etree
 
 from . import utils
@@ -185,7 +187,7 @@ class Parser:
 
         self.on_close_tag(tag_name)
 
-    def on_open_tag(self, tag):
+    def on_open_tag(self, tag: dict[str, Any]):
         """
         Handle open tag event.
 
@@ -255,7 +257,7 @@ class Parser:
         else:
             raise Exception(f"Unexpected close tag: {tag_name}")
 
-    def on_text(self, text):
+    def on_text(self, text: str):
         """
         Handle text event.
 
@@ -266,7 +268,7 @@ class Parser:
             return
         self.builder.add_text_chunk(text, self.contextualizer.can_segment())
 
-    def on_script(self, text):
+    def on_script(self, text: str):
         """Handle script text."""
         self.builder.add_text_chunk(text, self.contextualizer.can_segment())
 
