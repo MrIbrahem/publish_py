@@ -4,7 +4,6 @@ HTML post-processing utilities.
 Currently only implements remove_data_parsoid.
 
 TODO: Port the remaining helpers from the original PHP HtmlUtils:
-      - del_div_error
       - fix_link_red
 """
 
@@ -12,108 +11,76 @@ from __future__ import annotations
 
 import re
 
-from bs4 import BeautifulSoup
-
-
-def get_attrs(text: str) -> dict[str, str]:
-    """Parse HTML attributes from a text string.
-
-    @param text: The text containing attributes.
-    @return: Dictionary of attribute name-value pairs.
-    """
-    text = f"<ref {text}>"
-    attrfind_tolerant = (
-        r"((?<=[\'\"\s\/])[^\s\/>][^\s\/=>]*)(\s*=+\s*(\'[^\']*\'|\"[^\"]*\"|(?![\'\"])[^>\s]*))?(?:\s|\/(?!>))*"
-    )
-
-    attrs = {}
-    matches = re.finditer(attrfind_tolerant, text)
-
-    for match in matches:
-        attr_name = match.group(1).lower()
-        # Extract attribute value if group 3 exists
-        attr_value = match.group(3) if match.group(3) is not None else ""
-        attrs[attr_name] = attr_value
-
-    return attrs
-
+from bs4 import BeautifulSoup, Tag
 
 def del_div_error(html: str) -> str:
-    """
-    TODO: implement this in Python from HtmlUtils.php
-    """
-    return html
-
+    soup = BeautifulSoup(html, "html.parser")
+    # Directly match and remove <div> elements containing class="error"
+    for div_tag in soup.find_all("div", class_="error"):
+        div_tag.decompose()
+    return str(soup)
 
 def fix_link_red(html: str) -> str:
-    """
-    TODO: implement this in Python from HtmlUtils.php
-    """
-    return html
-
-
-def remove_data_parsoid(html: str) -> str:
-    """
-    Remove data-parsoid attributes from HTML text.
-
-    Mirrors the original PHP logic.
-    """
-    if not html:
-        return ""
-
-    # Replace all data-parsoid patterns using Regex
-    html = re.sub(r'\s*data-parsoid\s*=\s*"{}"', "", html, flags=re.IGNORECASE | re.DOTALL)
-    html = re.sub(
-        r"\s*data-parsoid\s*=\s*'[^']*'",
-        "",
-        html,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-    html = re.sub(
-        r'\s*data-parsoid\s*=\s*"[^"]*"',
-        "",
-        html,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-
-    # Match <a> tags and clean up remaining attributes
-    html = clean_link_attributes(html)
-
-    return html
-
-
-def clean_link_attributes_new(html: str):
     soup = BeautifulSoup(html, "html.parser")
+
+    attrs_to_del = ["typeof", "data-mw-i18n", "class"]
+
+    # <a rel="mw:ExtLink" href="//en.wikipedia.org/w/index.php?title=Video:Pelvic_binder&amp;veaction=edit" class="external text"><span class="mw-ui-button mw-ui-progressive">Edit with VisualEditor</span></a>
+
+    # if link has Edit with VisualEditor del it
     for a_tag in soup.find_all("a"):
-        if "data-parsoid" in a_tag.attrs:  # pyright: ignore[reportAttributeAccessIssue]
-            del a_tag["data-parsoid"]  # pyright: ignore[reportIndexIssue]
+        if not isinstance(a_tag, Tag):
+            continue
+
+        if "Edit with VisualEditor" in a_tag.get_text():
+            a_tag.decompose()
+
+    # data-parsoid="{}"
+    for a_tag in soup.find_all("a"):
+        if not isinstance(a_tag, Tag):
+            continue
+
+        typeof = a_tag.get("typeof", "")
+        href = a_tag.get("href", "")
+
+        if typeof and "mw:LocalizedAttrs" in typeof:
+            href_str = str(href)
+            if href and "action=edit" in href_str:
+                new_href = re.sub(r"\?action=edit.*?", "", href_str)
+                new_href = new_href.replace("&amp;redlink=1", "")
+                new_href = new_href.replace("&redlink=1", "")
+
+                a_tag["href"] = new_href
+
+                for attr in attrs_to_del:
+                    if attr in a_tag.attrs:
+                        del a_tag[attr]
 
     return str(soup)
 
 
-def clean_link_attributes(html: str):
-    matches = list(re.finditer(r"<a([^>]*?)>(.+?)<\/a>", html, flags=re.IGNORECASE | re.DOTALL))
-    attrs_to_del = ["data-parsoid"]
+def remove_data_parsoid(html: str) -> str:
+    """
+    Clean link attributes by removing 'data-parsoid' attributes from HTML elements.
 
-    for match in matches:
-        cite_text = match.group(0)
-        options = match.group(1)
-        content = match.group(2)
+    This function parses the provided HTML string, iterates over all tags,
+    and removes the 'data-parsoid' attribute if it exists.
 
-        if re.search(r"data-parsoid", options, flags=re.IGNORECASE):
-            attrs = get_attrs(options)
+    Args:
+        html (str): The HTML string to be cleaned.
 
-            # Remove target attributes
-            for attr in attrs_to_del:
-                attrs.pop(attr, None)
+    Returns:
+        str: The cleaned HTML string with 'data-parsoid' attributes removed.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    for a_tag in soup.find_all(True):
+        if not isinstance(a_tag, Tag):
+            continue
 
-            # Rebuild attribute string
-            new_attrs = " ".join(f"{k}={v}" for k, v in attrs.items())
-            new_cite_text = f"<a {new_attrs}>{content}</a>" if new_attrs else f"<a>{content}</a>"
+        if "data-parsoid" in a_tag.attrs:
+            del a_tag["data-parsoid"]
 
-            html = html.replace(cite_text, new_cite_text)
-
-    return html
+    return str(soup)
 
 
 __all__ = [
