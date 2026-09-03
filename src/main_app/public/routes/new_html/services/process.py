@@ -18,7 +18,7 @@ from typing import Any
 from flask import Response, jsonify
 
 from ..domain.fixes import WikitextFixerService
-from ..domain.fixes.references.expand_refs import expand_refs
+from ..domain.fixes.references.expand_refs import expand_text_refs
 from ..domain.parser.lead_section_parser import get_lead_section
 from .clients import MdwikiApi, TransformApi
 from .html_utils import del_div_error, fix_link_red, remove_data_parsoid
@@ -78,7 +78,7 @@ def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str
         full_text = source
         lead = get_lead_section(full_text)
         if lead and lead != full_text:
-            source = expand_refs(lead, full_text)
+            source = expand_text_refs(lead, full_text)
 
     # run fix_wikitext as in the original PHP version
     fixer = WikitextFixerService(source, title)

@@ -14,7 +14,7 @@ from ...parser.citations_parser import get_full_refs, get_short_refs
 logger = logging.getLogger(__name__)
 
 
-def expand_refs(first: str, alltext: str) -> str:
+def expand_text_refs(first: str, alltext: str) -> str:
     """Expand short references by finding their full definitions elsewhere in the page.
 
     :param first: The lead section text containing short refs.
@@ -62,5 +62,5 @@ def expand_refs(first: str, alltext: str) -> str:
 
 
 __all__ = [
-    "expand_refs",
+    "expand_text_refs",
 ]
