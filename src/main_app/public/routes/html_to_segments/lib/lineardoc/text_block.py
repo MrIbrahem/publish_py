@@ -11,7 +11,7 @@ from .text_chunk import TextChunk
 class TextBlock:
     """A block of annotated inline text."""
 
-    def __init__(self, text_chunks, can_segment=True):
+    def __init__(self, text_chunks: list[TextChunk], can_segment: bool =True):
         """
         Initialize a text_block.
 
@@ -319,7 +319,9 @@ class TextBlock:
 
         # for each chunk, split at any boundaries that occur inside the chunk
         groups = utils.get_chunk_boundary_groups(
-            get_boundaries(self.get_plain_text()), self.text_chunks, lambda t_chunk: len(t_chunk.text)
+            get_boundaries(self.get_plain_text()),
+            self.text_chunks,
+            lambda t_chunk: len(t_chunk.text),
         )
 
         offset = 0
