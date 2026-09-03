@@ -63,7 +63,7 @@ def _get_revid(sourcetitle) -> str | int:
     return revid
 
 
-def should_added_to_wikidata(lang, title) -> bool:
+def should_added_to_wikidata(lang: str, title: str) -> bool:
     """ """
     page_information = get_title_info(title, lang)
     if not page_information:
