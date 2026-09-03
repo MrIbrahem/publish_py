@@ -12,31 +12,80 @@ manual bracket-depth counter, since the parser already resolves nested
 
 from __future__ import annotations
 
+import json
 import re
-from typing import Protocol
 
 import wikitextparser as wtp
 from domain.parser import template_helpers as th
+from ....services.clients import HttpClientService
 
 _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
 
 
-class ImageExistenceChecker(Protocol):
-    """Equivalent of the PHP ``CommonsImageServiceInterface``."""
+class ImageExistenceChecker:
+    """Equivalent of the PHP ``ImageExistenceChecker`` service to check image existence via MediaWiki API."""
+
+    def __init__(self):
+        """Initialize the checker with an HTTP client instance."""
+        self.http_client = HttpClientService()
 
     def image_exists(self, filename: str) -> bool:
-        """Return True if ``filename`` exists (e.g. on Wikimedia Commons)."""
-        ...
+        """Check if an image exists on Wikimedia Commons.
 
+        :param filename: The filename to check (with or without File:/Image: prefix).
+        :return: True if the image exists or if API fails; False otherwise.
+        """
+        # Handle empty or whitespace-only filenames
+        if not filename or not filename.strip():
+            return False
+
+        # Remove File: or Image: prefix case-insensitively
+        filename = re.sub(r"^(File|Image):", "", filename, flags=re.IGNORECASE)
+        filename = filename.strip()
+
+        if not filename:
+            return False
+
+        params = {
+            "action": "query",
+            "titles": f"File:{filename}",
+            "format": "json",
+        }
+
+        url = "https://commons.wikimedia.org/w/api.php"
+
+        response_array = self.http_client.request(url, "GET", params)
+
+        # Handle API or request errors (fallback to assuming the image exists)
+        if response_array.get("error_code") or response_array.get("error"):
+            return True
+
+        response = response_array.get("output", "")
+        if response == "" or response is None:
+            return True
+
+        try:
+            data = json.loads(response) if isinstance(response, str) else response
+            pages = data.get("query", {}).get("pages", {})
+
+            # pages is typically a dict indexed by page IDs
+            for _page_id, page in pages.items():
+                return "missing" not in page
+
+        except (json.JSONDecodeError, TypeError, AttributeError):
+            # Assume exists on response parsing failure
+            return True
+
+        return False
 
 class RemoveMissingImagesService:
     """Removes image references that don't exist on Commons from wikitext."""
 
-    def __init__(self, image_service: ImageExistenceChecker):
+    def __init__(self):
         """
         :param image_service: Service used to check whether an image file exists.
         """
-        self._image_service = image_service
+        self._image_service = ImageExistenceChecker()
 
     def remove_missing_infobox_images(self, text: str) -> str:
         """Remove infobox images that don't exist on Commons.

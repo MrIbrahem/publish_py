@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 
-from domain.parser.citations_parser import get_full_refs, get_short_citations
+from domain.parser.citations_parser import get_full_refs, get_short_refs
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def expand_refs(first: str, alltext: str) -> str:
 
     all_page_full_refs = get_full_refs(alltext)
     lead_full_refs = get_full_refs(first)
-    lead_short_refs = get_short_citations(first)
+    lead_short_refs = get_short_refs(first)
 
     logger.debug("lead_short_refs: %r", lead_short_refs)
 

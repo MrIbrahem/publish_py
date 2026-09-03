@@ -43,7 +43,7 @@ def parse(text: str) -> WikiText:
 def get_templates(text: str) -> list[Template]:
     """Return all templates (including nested ones) found in ``text``.
 
-    Equivalent of the old PHP ``getTemplates()`` helper. NOTE: the returned
+    Equivalent of the old PHP ``get_templates()`` helper. NOTE: the returned
     ``Template`` objects are tied to a fresh, internal ``WikiText`` object.
     If you need the edited text back afterwards, use :func:`parse` yourself
     and iterate ``parsed.templates`` instead, e.g.::
