@@ -146,14 +146,14 @@ class Parser:
         Args:
             html: HTML string to parse
         """
-        parser = etree.HTMLParser()
+        parser = etree.HTMLParser(encoding="utf-8")
         try:
             tree = etree.fromstring(html.encode("utf-8"), parser)
             self._process_element(tree)
         except Exception:
             # Try with wrapping
             try:
-                tree = etree.fromstring(f"<div>{html}</div>".encode(), parser)
+                tree = etree.fromstring(f"<div>{html}</div>".encode("utf-8"), parser)
                 for child in tree:
                     self._process_element(child)
             except Exception as e:
