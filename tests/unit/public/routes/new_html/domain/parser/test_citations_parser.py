@@ -1,4 +1,3 @@
-# ruff: noqa: F401
 """
 Unit tests for src/main_app/public/routes/new_html/domain/parser/citations_parser.py module.
 
@@ -79,7 +78,7 @@ class TestGetCitations:
         assert result[0]["name"] == "spaced"
 
     def test_nested_markup_inside_ref(self):
-        text = '<ref>See [[Some Page|the page]] for {{cite web|url=example.com}} details</ref>'
+        text = "<ref>See [[Some Page|the page]] for {{cite web|url=example.com}} details</ref>"
         result = get_citations(text)
 
         assert len(result) == 1
