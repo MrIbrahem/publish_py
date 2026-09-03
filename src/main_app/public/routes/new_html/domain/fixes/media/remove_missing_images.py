@@ -12,31 +12,82 @@ manual bracket-depth counter, since the parser already resolves nested
 
 from __future__ import annotations
 
+import json
 import re
-from typing import Protocol
 
 import wikitextparser as wtp
-from domain.parser import template_helpers as th
+
+from ....services.clients import HttpClientService
+from ...parser import template_helpers as th
 
 _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
 
 
-class ImageExistenceChecker(Protocol):
-    """Equivalent of the PHP ``CommonsImageServiceInterface``."""
+class ImageExistenceChecker:
+    """Equivalent of the PHP ``ImageExistenceChecker`` service to check image existence via MediaWiki API."""
+
+    def __init__(self):
+        """Initialize the checker with an HTTP client instance."""
+        self.http_client = HttpClientService()
 
     def image_exists(self, filename: str) -> bool:
-        """Return True if ``filename`` exists (e.g. on Wikimedia Commons)."""
-        ...
+        """Check if an image exists on Wikimedia Commons.
+
+        :param filename: The filename to check (with or without File:/Image: prefix).
+        :return: True if the image exists or if API fails; False otherwise.
+        """
+        # Handle empty or whitespace-only filenames
+        if not filename or not filename.strip():
+            return False
+
+        # Remove File: or Image: prefix case-insensitively
+        filename = re.sub(r"^(File|Image):", "", filename, flags=re.IGNORECASE)
+        filename = filename.strip()
+
+        if not filename:
+            return False
+
+        params = {
+            "action": "query",
+            "titles": f"File:{filename}",
+            "format": "json",
+        }
+
+        url = "https://commons.wikimedia.org/w/api.php"
+
+        response_array = self.http_client.request(url, "GET", params)
+
+        # Handle API or request errors (fallback to assuming the image exists)
+        if response_array.get("error_code") or response_array.get("error"):
+            return True
+
+        response = response_array.get("output", "")
+        if response == "" or response is None:
+            return True
+
+        try:
+            data = json.loads(response) if isinstance(response, str) else response
+            pages = data.get("query", {}).get("pages", {})
+
+            # pages is typically a dict indexed by page IDs
+            for _page_id, page in pages.items():
+                return "missing" not in page
+
+        except (json.JSONDecodeError, TypeError, AttributeError):
+            # Assume exists on response parsing failure
+            return True
+
+        return False
 
 
 class RemoveMissingImagesService:
     """Removes image references that don't exist on Commons from wikitext."""
 
-    def __init__(self, image_service: ImageExistenceChecker):
+    def __init__(self):
         """
         :param image_service: Service used to check whether an image file exists.
         """
-        self._image_service = image_service
+        self._image_service = ImageExistenceChecker()
 
     def remove_missing_infobox_images(self, text: str) -> str:
         """Remove infobox images that don't exist on Commons.
@@ -72,44 +123,7 @@ class RemoveMissingImagesService:
                 if th.has_parameter(template, caption_param):
                     th.delete_parameter(template, caption_param)
 
-        text = str(parsed)
-        text = self._remove_missing_infobox_images_regex(text)
-        return text
-
-    def _remove_missing_infobox_images_regex(self, text: str) -> str:
-        """Remove missing infobox images given as raw ``|image=`` lines (fallback).
-
-        Handles infobox-style fields that aren't wrapped in a ``{{...}}``
-        template (e.g. leftover/partial infobox markup).
-
-        :param text: The wikitext to process.
-        :return: The processed wikitext.
-        """
-        pattern = re.compile(r"^[ \t]*\|(\s*image\d*\s*)=([^\n]*)", re.MULTILINE)
-
-        fields_to_remove: list[str] = []
-
-        for match in pattern.finditer(text):
-            field_name = match.group(1).strip()
-            filename = match.group(2).strip()
-
-            if filename and self._image_service.image_exists(filename):
-                continue
-
-            fields_to_remove.append(field_name)
-
-            number_match = re.match(r"^image(\d*)$", field_name, re.IGNORECASE)
-            number = number_match.group(1) if number_match else ""
-            fields_to_remove.append(f"caption{number}")
-
-        # Suggestion: this regex fallback removes every |caption{number}= line (and every |image*=) across the entire text,
-        # not just the lines belonging to the infobox whose image was confirmed missing. If the same caption2= / image field
-        # appears in another template elsewhere, it gets deleted too. Scope the removal to the specific infobox block,
-        # or at least only delete a caption whose paired image was actually missing.
-        for field in fields_to_remove:
-            field_pattern = re.compile(r"^[ \t]*\|\s*" + re.escape(field) + r"\s*=[^\n]*\n?", re.MULTILINE)
-            text = field_pattern.sub("", text)
-
+        text = parsed.string
         return text
 
     def remove_missing_inline_images(self, text: str) -> str:
@@ -134,7 +148,7 @@ class RemoveMissingImagesService:
         for link in to_remove:
             link.string = ""
 
-        return str(parsed)
+        return parsed.string
 
     def remove_missing_images(self, text: str) -> str:
         """Remove all missing images (both infobox and inline).

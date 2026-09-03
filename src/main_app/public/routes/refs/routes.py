@@ -4,6 +4,8 @@ This blueprint provides a user interface for processing text to fix references
 using the `do_changes_to_text_with_settings` service.
 """
 
+from __future__ import annotations
+
 import logging
 import random
 

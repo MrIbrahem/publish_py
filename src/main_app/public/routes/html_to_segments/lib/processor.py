@@ -2,6 +2,8 @@
 Main processing module for HTML transformation.
 """
 
+from __future__ import annotations
+
 import os
 import re
 
@@ -19,7 +21,7 @@ with open(config_path, "r") as f:
 removable_sections = pageloader_config.get("removableSections", {})
 
 
-def normalize(html):
+def normalize(html: str):
     """
     Normalize HTML by parsing and re-serializing.
 
@@ -37,7 +39,7 @@ def normalize(html):
     return normalizer.get_html()
 
 
-def process_html(source_html):
+def process_html(source_html: str, lang: str | None = None):
     """
     Process source HTML through the CX pipeline.
 
@@ -54,6 +56,9 @@ def process_html(source_html):
     Returns:
         Processed HTML string
     """
+    if lang is None:
+        lang = "en"
+
     parser = Parser(MwContextualizer({"removableSections": removable_sections}), {"wrapSections": True})
 
     parser.init()
@@ -61,7 +66,7 @@ def process_html(source_html):
     parsed_doc = parser.builder.doc
     parsed_doc = parsed_doc.wrap_sections()
 
-    segmented_doc = CXSegmenter().segment(parsed_doc, "en")
+    segmented_doc = CXSegmenter().segment(parsed_doc, lang)
 
     result = segmented_doc.get_html()
 

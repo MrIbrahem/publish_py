@@ -2,6 +2,10 @@
 Builder - A document builder for creating linear documents.
 """
 
+from __future__ import annotations
+
+from typing import Any
+
 from . import utils
 from .doc import Doc
 from .text_block import TextBlock
@@ -11,7 +15,7 @@ from .text_chunk import TextChunk
 class Builder:
     """A document builder."""
 
-    def __init__(self, parent=None, wrapper_tag=None):
+    def __init__(self, parent=None, wrapper_tag: dict | None = None) -> None:
         """
         Initialize a Builder.
 
@@ -29,7 +33,7 @@ class Builder:
         self.is_block_segmentable = True
         self.parent = parent
 
-    def create_child_builder(self, wrapper_tag):
+    def create_child_builder(self, wrapper_tag) -> Builder:
         """
         Create a child builder.
 
@@ -41,7 +45,7 @@ class Builder:
         """
         return Builder(self, wrapper_tag)
 
-    def push_block_tag(self, tag):
+    def push_block_tag(self, tag: dict[str, Any]) -> None:
         """Push a block tag."""
         self.finish_text_block()
         self.block_tags.append(tag)
@@ -51,15 +55,15 @@ class Builder:
             tag["attributes"]["rel"] = "cx:Figure"
         self.doc.add_item("open", tag)
 
-    def is_section(self, tag):
+    def is_section(self, tag: dict[str, Any]) -> bool:
         """Check if tag is a section."""
         return tag["name"] == "section" and tag.get("attributes", {}).get("data-mw-section-id")
 
-    def is_ignored_tag(self, tag):
+    def is_ignored_tag(self, tag: dict[str, Any]) -> bool:
         """Check if tag should be ignored."""
         return self.is_section(tag) or self.is_category(tag)
 
-    def is_category(self, tag):
+    def is_category(self, tag: dict[str, Any] | None) -> bool:
         """Check if tag is a category."""
         # content can be a Doc instance, not just a tag
         if not isinstance(tag, dict):
@@ -96,11 +100,11 @@ class Builder:
 
         return tag
 
-    def push_inline_annotation_tag(self, tag):
+    def push_inline_annotation_tag(self, tag: dict[str, Any]) -> None:
         """Push an inline annotation tag."""
         self.inline_annotation_tags.append(tag)
 
-    def pop_inline_annotation_tag(self, tag_name):
+    def pop_inline_annotation_tag(self, tag_name) -> None:
         """Pop an inline annotation tag."""
         if not self.inline_annotation_tags:
             tag = None
@@ -145,7 +149,7 @@ class Builder:
                 .add_item("close", tag)
             )
 
-    def add_text_chunk(self, text, can_segment):
+    def add_text_chunk(self, text: str, can_segment: bool) -> None:
         """
         Add a text chunk.
 
@@ -158,7 +162,7 @@ class Builder:
         # Inside a textblock, if a textchunk becomes segmentable
         self.is_block_segmentable = can_segment
 
-    def add_inline_content(self, content, can_segment=True) -> None:
+    def add_inline_content(self, content, can_segment: bool = True) -> None:
         """
         Add content that doesn't need linearizing, to appear inline.
 
@@ -176,7 +180,7 @@ class Builder:
         if not can_segment:
             self.is_block_segmentable = False
 
-    def finish_text_block(self):
+    def finish_text_block(self) -> None:
         """Finish the current text block."""
         if len(self.text_chunks) == 0:
             return

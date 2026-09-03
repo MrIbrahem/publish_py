@@ -5,6 +5,8 @@ Mirrors: php_src/endpoints/post.php
 This endpoint handles publishing translated pages to Wikipedia.
 """
 
+from __future__ import annotations
+
 import logging
 
 from flask import Blueprint, Response, jsonify, request

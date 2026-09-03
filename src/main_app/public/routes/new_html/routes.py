@@ -82,8 +82,8 @@ class NewHtmlRoutes:
 
         printetxt = request.args.get("printetxt") or request.args.get("print") or ""
         force_new = "new" in request.args
-        all_flag = request.args.get("all", "")
 
+        all_flag = request.args.get("all", "")
         # Special case: titles starting with "Video"
         if title.startswith("Video"):
             all_flag = "1"

@@ -353,14 +353,19 @@ def remove_lang_links(text: str) -> str:
     # has further wikilinks nested in it.
     to_remove = []
     for link in parsed.wikilinks:
-        prefix = link.title.split(":", 1)[0].strip().lower()
-        if prefix in LANG_CODES:
+        # The interwiki prefix must be a *lowercase* language code (e.g.
+        # "en", not "EN"). wikitextparser lowercases the leading letter of a
+        # title, so compare the original text segment, not link.title.
+        segment = link.title.split(":", 1)[0].strip()
+        prefix = segment.lower()
+        if prefix in LANG_CODES and segment == prefix:
             to_remove.append(link)
 
     for link in to_remove:
         link.string = ""
 
-    return str(parsed)
+    # Trailing/leading blank lines left by removed links are normalized.
+    return parsed.string.strip()
 
 
 def is_valid_lang_code(code: str) -> bool:
@@ -370,7 +375,9 @@ def is_valid_lang_code(code: str) -> bool:
     :return: True if the code matches the language code pattern (2+
         lowercase letters, optionally followed by hyphen-letter groups).
     """
-    return bool(_LANG_CODE_RE.match(code))
+    is_valid = re.match(r"^[a-z]{2,}(?:-[a-z]+)*$", code) is not None
+    # is_valid = bool(_LANG_CODE_RE.match(code))
+    return is_valid
 
 
 __all__ = [

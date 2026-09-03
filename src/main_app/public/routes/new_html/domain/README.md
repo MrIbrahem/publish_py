@@ -68,7 +68,7 @@ pip install -r requirements.txt
     Commons-checking implementation (e.g. calling the Wikimedia Commons API);
     none was included in the PHP source provided for conversion.
 -   Function/file names were snake_cased per file per the requested layout
-    (e.g. `del_empty_refs` → `delete_empty_refs`, `refs_expend_work` →
+    (e.g. `del_empty_refs` → `delete_empty_refs`, `expand_refs` →
     `expand_refs`).
 
 ## Not ported (out of scope / not provided)

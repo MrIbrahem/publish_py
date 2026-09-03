@@ -5,6 +5,8 @@ Mirrors: php_src/bots/cors.php
 
 """
 
+from __future__ import annotations
+
 import logging
 from urllib.parse import urlparse
 
@@ -20,7 +22,7 @@ def get_host(url: str) -> str:
     return urlparse(url).netloc
 
 
-def make_url(url) -> str | None:
+def make_url(url: str) -> str | None:
     if not url or not isinstance(url, str):
         return None
 

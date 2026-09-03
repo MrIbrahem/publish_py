@@ -9,7 +9,8 @@ from __future__ import annotations
 import re
 
 import wikitextparser as wtp
-from domain.parser import template_helpers as th
+
+from ...parser import template_helpers as th
 
 try:  # DeadIndexError isn't part of wikitextparser's public API.
     from wikitextparser._wikitext import DeadIndexError
@@ -18,6 +19,7 @@ except ImportError:  # pragma: no cover - defensive, in case the private path mo
 
 #: Template name patterns (lowercase) that should always be removed.
 TEMPLATE_DELETE_PATTERNS = (
+    # any template startswith pp-
     re.compile(r"^pp(-.*)?$"),
     re.compile(r"^articles (for|with|needing|containing).*$"),
     re.compile(r"^engvar[ab]$"),
@@ -76,7 +78,7 @@ def check_temp_to_delete(name: str) -> bool:
     :param name: The template name (lowercase).
     :return: True if the template should be deleted, False otherwise.
     """
-    if name.startswith("defaultsort"):
+    if name.lower().startswith("defaultsort"):
         return True
     return name in TEMPLATES_TO_DELETE
 
@@ -107,15 +109,30 @@ def remove_templates(text: str) -> str:
             # Already removed along with a parent template.
             continue
 
-    return str(parsed)
+    # Parser functions (e.g. {{DEFAULTSORT:...}}, {{#unlinkedwikibase:...}})
+    # are not exposed as templates by wikitextparser; handle them separately.
+    for func in parsed.parser_functions:
+        try:
+            name = func.name.strip().replace("_", " ")
+        except DeadIndexError:
+            continue
+        if _should_delete(name):
+            try:
+                func.string = ""
+            except DeadIndexError:
+                continue
+
+    return parsed.string
 
 
 def remove_lead_templates(text: str) -> str:
-    """Remove content before infobox templates in the lead section.
+    """
+    Remove content before infobox templates in the lead section.
 
     :param text: The wikitext to process.
     :return: The wikitext with content before the infobox removed.
     """
+    # remove any thig before {{Infobox medical condition
     lowered = text.lower()
 
     for prefix in _LEAD_INFOBOX_PREFIXES:

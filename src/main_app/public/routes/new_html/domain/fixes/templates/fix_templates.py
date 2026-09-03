@@ -7,7 +7,8 @@ Port of ``src/Domain/Fixes/Templates/FixTemplatesFixture.php``.
 from __future__ import annotations
 
 import wikitextparser as wtp
-from domain.parser import template_helpers as th
+
+from ...parser import template_helpers as th
 
 #: Infobox-like template name (lowercase) -> the parameter that should hold the page title.
 _TITLE_PARAM_BY_TEMPLATE = {
@@ -53,7 +54,7 @@ def add_missing_title(text: str, title: str, ljust: int = 17) -> str:
             # `toString(true, $ljust)` pretty-printing after modification.
             template.string = th.render_pretty(template, ljust)
 
-    return str(parsed)
+    return parsed.string
 
 
 __all__ = [

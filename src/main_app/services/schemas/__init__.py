@@ -2,6 +2,8 @@
 Validation schemas using marshmallow.
 """
 
+from __future__ import annotations
+
 from typing import ClassVar
 
 from flask import jsonify, request

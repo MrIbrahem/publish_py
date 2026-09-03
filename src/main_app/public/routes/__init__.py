@@ -2,6 +2,8 @@
 Flask public routes
 """
 
+from __future__ import annotations
+
 from .api.routes import ApiRoutes
 from .cxtoken.routes import CxTokenRoutes
 from .html_to_segments import HtmltoSegmentsRoutes

@@ -1,5 +1,7 @@
 """Users db services."""
 
+from __future__ import annotations
+
 from .admin_service import AdminService
 from .full_translator_service import FullTranslatorService
 from .user_token_service import UserTokenService

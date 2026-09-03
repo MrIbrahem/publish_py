@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .qids import QidsRoutes
 from .qids_model import QidsSharedModel
 from .qids_others import QidsOthersRoutes

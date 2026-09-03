@@ -9,12 +9,12 @@ from __future__ import annotations
 
 import logging
 
-from domain.parser.citations_parser import get_full_refs, get_short_citations
+from ...parser.citations_parser import get_full_refs, get_short_refs
 
 logger = logging.getLogger(__name__)
 
 
-def expand_refs(first: str, alltext: str) -> str:
+def expand_text_refs(first: str, alltext: str) -> str:
     """Expand short references by finding their full definitions elsewhere in the page.
 
     :param first: The lead section text containing short refs.
@@ -29,7 +29,7 @@ def expand_refs(first: str, alltext: str) -> str:
 
     all_page_full_refs = get_full_refs(alltext)
     lead_full_refs = get_full_refs(first)
-    lead_short_refs = get_short_citations(first)
+    lead_short_refs = get_short_refs(first)
 
     logger.debug("lead_short_refs: %r", lead_short_refs)
 
@@ -42,7 +42,6 @@ def expand_refs(first: str, alltext: str) -> str:
 
         if name in lead_full_refs:
             continue
-
         full_ref = all_page_full_refs.get(name, "")
 
         if full_ref:
@@ -63,5 +62,5 @@ def expand_refs(first: str, alltext: str) -> str:
 
 
 __all__ = [
-    "expand_refs",
+    "expand_text_refs",
 ]

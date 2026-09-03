@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .routes_utils import (
     context_data,
     load_auth_payload,

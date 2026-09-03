@@ -59,8 +59,7 @@ def generate_domain_test_placeholders(src_root: str, test_root, src_name: str = 
                 file_path = current_path / file
 
                 file_stem = Path(file).stem
-                if "routes" in current_path.parts or file_stem == "routes":
-                    target_dir = test_base_integration / rel_path
+                # if "routes" in current_path.parts or file_stem == "routes": target_dir = test_base_integration / rel_path
 
                 to_re = [
                     "worker",

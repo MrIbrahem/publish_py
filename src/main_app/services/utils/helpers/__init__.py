@@ -1,5 +1,7 @@
 """Helper utilities for the application."""
 
+from __future__ import annotations
+
 from .files import get_reports_dir, to_do
 from .format import (
     determine_hashtag,

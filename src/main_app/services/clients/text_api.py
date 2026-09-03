@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import re
 
@@ -10,7 +12,7 @@ ALLOWED_WIKI_PROJECT = re.compile(r"^(?:[a-z0-9-]+\.wikipedia\.org|commons\.wiki
 logger = logging.getLogger(__name__)
 
 
-def get_wikitext(title, project: str = "commons.wikimedia.org"):
+def get_wikitext(title: str, project: str = "commons.wikimedia.org"):
     """
     Fetch raw wikitext of a page from Wikimedia projects.
     Args:
