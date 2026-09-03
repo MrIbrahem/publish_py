@@ -147,7 +147,7 @@ class Builder:
                 .add_item("close", tag)
             )
 
-    def add_text_chunk(self, text, can_segment):
+    def add_text_chunk(self, text: str, can_segment: bool) -> None:
         """
         Add a text chunk.
 
@@ -160,7 +160,7 @@ class Builder:
         # Inside a textblock, if a textchunk becomes segmentable
         self.is_block_segmentable = can_segment
 
-    def add_inline_content(self, content, can_segment=True) -> None:
+    def add_inline_content(self, content, can_segment: bool=True) -> None:
         """
         Add content that doesn't need linearizing, to appear inline.
 
@@ -178,7 +178,7 @@ class Builder:
         if not can_segment:
             self.is_block_segmentable = False
 
-    def finish_text_block(self):
+    def finish_text_block(self) -> None:
         """Finish the current text block."""
         if len(self.text_chunks) == 0:
             return
