@@ -27,7 +27,7 @@ class Normalizer:
         self.doc = []
         self.tags: list[dict] = []
 
-    def write(self, html):
+    def write(self, html: str):
         """
         Parse and normalize HTML.
 
@@ -47,7 +47,7 @@ class Normalizer:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree.Element | etree._ElementTree):
+    def _process_element(self, element: etree.Element | Any):
         """Process an element recursively."""
         tag_name = element.tag.lower() if self.lowercase else element.tag  # Create tag dict
         tag = {"name": tag_name, "attributes": dict(element.attrib)}

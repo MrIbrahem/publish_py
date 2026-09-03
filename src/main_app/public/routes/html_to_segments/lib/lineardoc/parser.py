@@ -137,7 +137,7 @@ class Parser:
         # Stack of tags currently open
         self.all_tags = []
 
-    def write(self, html):
+    def write(self, html: str):
         """
         Parse HTML into the document.
 
@@ -205,8 +205,10 @@ class Parser:
         if utils.is_reference(tag) or utils.is_math(tag):
             # Start a reference: create a child builder, and move into it
             self.builder = self.builder.create_child_builder(tag)
+
         elif utils.is_inline_empty_tag(tag["name"]):
             self.builder.add_inline_content(tag, self.contextualizer.can_segment())
+
         elif self.is_inline_annotation_tag(tag["name"], utils.is_transclusion(tag)):
             self.builder.push_inline_annotation_tag(tag)
         else:

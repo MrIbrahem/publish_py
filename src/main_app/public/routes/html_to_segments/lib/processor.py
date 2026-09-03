@@ -19,7 +19,7 @@ with open(config_path, "r") as f:
 removable_sections = pageloader_config.get("removableSections", {})
 
 
-def normalize(html):
+def normalize(html: str):
     """
     Normalize HTML by parsing and re-serializing.
 
@@ -37,7 +37,7 @@ def normalize(html):
     return normalizer.get_html()
 
 
-def process_html(source_html, lang: str | None = None):
+def process_html(source_html: str, lang: str | None = None):
     """
     Process source HTML through the CX pipeline.
 
