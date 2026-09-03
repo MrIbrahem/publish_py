@@ -24,5 +24,5 @@ class TestGetHost:
             pytest.param("ftp://ar.wikipedia.org", "ar.wikipedia.org", id="ar.wikipedia.org"),
         ],
     )
-    def test_get_host(self, url, expected):
+    def test_get_host(self, url: str, expected):
         assert get_host(url) == expected

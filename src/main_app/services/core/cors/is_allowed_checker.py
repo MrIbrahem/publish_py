@@ -22,7 +22,7 @@ def get_host(url: str) -> str:
     return urlparse(url).netloc
 
 
-def make_url(url) -> str | None:
+def make_url(url: str) -> str | None:
     if not url or not isinstance(url, str):
         return None
 

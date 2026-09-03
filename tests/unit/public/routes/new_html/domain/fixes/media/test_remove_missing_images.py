@@ -343,7 +343,7 @@ class _FakeHttpClient:
         self._response_array = response_array
         self.last_params = None
 
-    def request(self, url, method, params):
+    def request(self, url: str, method, params):
         self.last_params = params
         return self._response_array
 
