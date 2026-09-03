@@ -109,6 +109,19 @@ def remove_templates(text: str) -> str:
             # Already removed along with a parent template.
             continue
 
+    # Parser functions (e.g. {{DEFAULTSORT:...}}, {{#unlinkedwikibase:...}})
+    # are not exposed as templates by wikitextparser; handle them separately.
+    for func in parsed.parser_functions:
+        try:
+            name = func.name.strip().replace("_", " ")
+        except DeadIndexError:
+            continue
+        if _should_delete(name):
+            try:
+                func.string = ""
+            except DeadIndexError:
+                continue
+
     return parsed.string
 
 
