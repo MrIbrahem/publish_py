@@ -3,6 +3,7 @@ Normalizer - Parser to normalize XML.
 """
 
 from __future__ import annotations
+
 from typing import Any
 
 from lxml import etree

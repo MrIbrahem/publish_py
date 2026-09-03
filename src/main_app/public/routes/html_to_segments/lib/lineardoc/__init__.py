@@ -3,6 +3,7 @@ Lineardoc module - Linear document representation for HTML.
 """
 
 from __future__ import annotations
+
 from .builder import Builder
 from .contextualizer import Contextualizer
 from .doc import Doc

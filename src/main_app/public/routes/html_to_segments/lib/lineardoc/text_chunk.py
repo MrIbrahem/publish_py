@@ -12,6 +12,7 @@ therefore text with varying markup must be split into multiple chunks.
 
 
 from __future__ import annotations
+
 from typing import Any
 
 

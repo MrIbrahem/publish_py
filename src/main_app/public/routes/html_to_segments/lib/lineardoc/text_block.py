@@ -1,6 +1,7 @@
 """
 text_block - A block of annotated inline text.
 """
+
 from __future__ import annotations
 
 import re

@@ -9,6 +9,7 @@ The document is a list of items, where each item is:
 """
 
 from __future__ import annotations
+
 import hashlib
 
 from . import util as cxutil

@@ -2,8 +2,9 @@
 Contextualizer for HTML - tracks the segmentation context of the currently open node.
 """
 
-
 from __future__ import annotations
+
+
 class Contextualizer:
     """Contextualizer for HTML."""
 

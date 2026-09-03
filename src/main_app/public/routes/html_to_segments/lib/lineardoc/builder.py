@@ -3,6 +3,7 @@ Builder - A document builder for creating linear documents.
 """
 
 from __future__ import annotations
+
 from typing import Any
 
 from . import utils

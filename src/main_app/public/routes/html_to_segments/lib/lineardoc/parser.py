@@ -3,6 +3,7 @@ Parser to read an HTML stream into a Doc.
 """
 
 from __future__ import annotations
+
 from typing import Any
 
 from lxml import etree

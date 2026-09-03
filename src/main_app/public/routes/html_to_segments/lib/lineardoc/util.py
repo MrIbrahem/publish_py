@@ -2,8 +2,9 @@
 Utility functions for the lineardoc module.
 """
 
-
 from __future__ import annotations
+
+
 def get_prop(path, obj) -> None:
     """
     Null safe object getter.
