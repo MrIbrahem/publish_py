@@ -353,14 +353,19 @@ def remove_lang_links(text: str) -> str:
     # has further wikilinks nested in it.
     to_remove = []
     for link in parsed.wikilinks:
-        prefix = link.title.split(":", 1)[0].strip().lower()
-        if prefix in LANG_CODES:
+        # The interwiki prefix must be a *lowercase* language code (e.g.
+        # "en", not "EN"). wikitextparser lowercases the leading letter of a
+        # title, so compare the original text segment, not link.title.
+        segment = link.title.split(":", 1)[0].strip()
+        prefix = segment.lower()
+        if prefix in LANG_CODES and segment == prefix:
             to_remove.append(link)
 
     for link in to_remove:
         link.string = ""
 
-    return parsed.string
+    # Trailing/leading blank lines left by removed links are normalized.
+    return parsed.string.strip()
 
 
 def is_valid_lang_code(code: str) -> bool:
