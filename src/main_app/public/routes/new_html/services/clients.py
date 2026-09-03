@@ -189,17 +189,29 @@ class TransformApi:
             timeout=30.0,
         )
 
-        if response["error"] or not response["output"]:
-            logger.error("Transform API failed for title: %s", title)
-            return {"error": response.get("error") or "Empty response"}
+        response_output = response.get("output")
+        error = response.get("error")
+        error_code = response.get("error_code")
+
+        # Handle the response from the API
+        if response_output:
+            logger.error("TransformApi: API request failed for title: %s", title)
+            if error:
+                logger.error("Error details: %s (%s)", error, error_code)
+
+            return {"error": response.get("error") or "Error: Could not reach API."}
 
         html = response["output"]
 
-        if "Wikimedia Error" in html:
-            return {"error": "Wikipedia API returned an error"}
+        # Check if response contains an error
+        if ">Wikimedia Error" in html:
+            logger.error("TransformApi: API returned error for title: %s", title)
+            return {"error": "Error: Wikipedia API returned an error."}
 
+        # Check if response is valid HTML
         if "<html" not in html.lower():
-            return {"error": "Invalid HTML returned"}
+            logger.error("TransformApi: API returned invalid HTML for title: $title");
+            return {"error": "Error: Wikipedia API returned invalid HTML."}
 
         return {"result": html}
 

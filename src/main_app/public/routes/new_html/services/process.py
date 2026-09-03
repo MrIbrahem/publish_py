@@ -17,10 +17,10 @@ from typing import Any
 
 from flask import Response, jsonify
 
-from .process_seg import get_segments
 from ..domain.fixes import WikitextFixerService
 from .clients import MdwikiApi, TransformApi
 from .html_utils import remove_data_parsoid
+from .process_seg import get_segments
 from .storage import (
     add_title_revision,
     get_title_revision,
@@ -28,6 +28,7 @@ from .storage import (
     write_file,
 )
 from .utils import get_file_dir
+from .html_utils import del_div_error, fix_link_red
 
 logger = logging.getLogger(__name__)
 
@@ -76,26 +77,38 @@ def _get_html(
     Convert wikitext to HTML with simple file caching.
     """
     from_cache = False
-
+    # 1. check from cache
     if not force_new:
         cached = read_file(file_html)
         if cached:
-            return remove_data_parsoid(cached), True
+            cached = remove_data_parsoid(cached)  # not in php
+            return cached, True
 
+    # fast return if wikitext is empty
     if not wikitext:
         return "", from_cache
 
+    # convertWikitextToHtml
     transform = TransformApi()
-    result = transform.convert(wikitext, title)
+    fixed = transform.convert(wikitext, title)
+    html = fixed.get("result", "")
 
-    html = result.get("result", "")
+    # HTML conversion failed
     if not html:
         logger.error("HTML conversion failed for title: %s", title)
         return "", from_cache
 
-    html = remove_data_parsoid(html)
-    write_file(file_html, html)
-    return html, from_cache
+    html = del_div_error(html)
+    html = fix_link_red(html)
+
+    if not html or html == wikitext:
+        return "", from_cache
+
+    # remove data parsoid and save file
+    html_removed = remove_data_parsoid(html)
+    write_file(file_html, html_removed)
+
+    return html_removed, from_cache
 
 
 def process_page(
@@ -151,7 +164,11 @@ def process_page(
         return response
 
     # 3. Convert to segments
-    seg_text, seg_from_cache = get_segments(html, file_seg, force_new)
+    seg_text, seg_from_cache = get_segments(
+        source_html=html,
+        file_seg=file_seg,
+        force_new=force_new,
+    )
 
     if printetxt == "seg":
         response = Response(seg_text, mimetype="text/html")

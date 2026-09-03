@@ -11,7 +11,6 @@ from .....config.main_settings import get_settings
 
 logger = logging.getLogger(__name__)
 
-
 def get_file_dir(revision: str, all_flag: str = "") -> Path:
     """
     Build the cache directory path for a given revision.
