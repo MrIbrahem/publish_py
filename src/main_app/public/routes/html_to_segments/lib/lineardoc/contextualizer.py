@@ -3,6 +3,7 @@ Contextualizer for HTML - tracks the segmentation context of the currently open 
 """
 
 from __future__ import annotations
+from typing import Any
 
 
 class Contextualizer:
@@ -18,28 +19,28 @@ class Contextualizer:
         self.contexts = []
         self.config = config or {}
 
-    def get_child_context(self, open_tag) -> str | None:
+    def get_child_context(self, tag: dict[str, Any]) -> str | None:
         """
         Get the context for a new tag being opened.
 
         Args:
-            open_tag: Tag dict with 'name' and 'attributes'
+            tag: Tag dict with 'name' and 'attributes'
 
         Returns:
             The new context
         """
         # Change to 'media' context inside figure
-        if open_tag["name"] == "figure":
+        if tag["name"] == "figure":
             return "media"
 
         # Exception: return to undefined context inside figure//figcaption
-        if open_tag["name"] == "figcaption":
+        if tag["name"] == "figcaption":
             return None
 
         # No change: same as parent context
         return self.get_context()
 
-    def get_context(self):
+    def get_context(self) -> str | None:
         """
         Get the current context.
 
@@ -48,14 +49,14 @@ class Contextualizer:
         """
         return self.contexts[-1] if self.contexts else None
 
-    def on_open_tag(self, open_tag) -> None:
+    def on_open_tag(self, tag: dict[str, Any]) -> None:
         """
         Call when a tag opens.
 
         Args:
-            open_tag: Tag dict with 'name' and 'attributes'
+            tag: Tag dict with 'name' and 'attributes'
         """
-        self.contexts.append(self.get_child_context(open_tag))
+        self.contexts.append(self.get_child_context(tag))
 
     def on_close_tag(self, tag=None) -> None:
         """Call when a tag closes (or just after an empty tag opens)."""

@@ -3,9 +3,10 @@ Utility functions for the lineardoc module.
 """
 
 from __future__ import annotations
+from typing import Any
 
 
-def get_prop(path, obj) -> None:
+def get_prop(path: list[str | int], obj: dict | list | Any) -> None | Any:
     """
     Null safe object getter.
 

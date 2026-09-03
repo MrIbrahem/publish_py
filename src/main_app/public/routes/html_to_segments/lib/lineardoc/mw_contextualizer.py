@@ -48,7 +48,7 @@ class MwContextualizer(Contextualizer):
         # Array holding transclusion fragment ids (about attribute values)
         self.removable_transclusion_fragments = []
 
-    def get_child_context(self, tag: dict[str, Any]) -> str:
+    def get_child_context(self, tag: dict[str, Any]) -> str | None:
         """Get the context for a new tag being opened."""
         context = self.get_context()
         tag_type = tag.get("attributes", {}).get("typeof", "") or tag.get("attributes", {}).get("rel", "")

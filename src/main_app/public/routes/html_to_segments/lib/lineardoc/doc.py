@@ -10,7 +10,9 @@ The document is a list of items, where each item is:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import hashlib
+from typing import Any
 
 from . import util as cxutil
 from . import utils
@@ -31,7 +33,7 @@ class Doc:
         self.wrapper_tag = wrapper_tag
         self.categories = []
 
-    def clone(self, callback) -> Doc:
+    def clone(self, callback: Callable) -> Doc:
         """
         Clone the Doc, modifying as we go.
 
@@ -47,7 +49,7 @@ class Doc:
             new_doc.add_item(new_item["type"], new_item["item"])
         return new_doc
 
-    def add_item(self, item_type, item) -> Doc:
+    def add_item(self, item_type, item: dict[str, Any]) -> Doc:
         """
         Add an item to the document.
 
@@ -74,7 +76,7 @@ class Doc:
         """
         return self.items[-1] if self.items else None
 
-    def get_root_item(self) -> None:
+    def get_root_item(self) -> None | Any:
         """
         Get the root item in the doc.
 
@@ -90,7 +92,7 @@ class Doc:
                 return item["item"]
         return None
 
-    def segment(self, get_boundaries) -> Doc:
+    def segment(self, get_boundaries: Callable) -> Doc:
         """
         Segment the document into sentences.
 

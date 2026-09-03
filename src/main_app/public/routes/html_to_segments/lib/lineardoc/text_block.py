@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
-from datetime import datetime
+from typing import Any
 
 from . import utils
 from .text_chunk import TextChunk
@@ -47,7 +47,7 @@ class TextBlock:
                 result.append(offset)
         return result
 
-    def get_text_chunk_at(self, char_offset) -> datetime:
+    def get_text_chunk_at(self, char_offset) -> TextChunk:
         """
         Get the (last) text chunk at a given char offset.
 
@@ -61,6 +61,7 @@ class TextBlock:
         for i in range(len(self.text_chunks) - 1):
             if self.offsets[i + 1]["start"] > char_offset:
                 break
+
         return self.text_chunks[i]
 
     def get_common_tags(self) -> list:
@@ -86,7 +87,7 @@ class TextBlock:
 
         return common_tags
 
-    def translate_tags(self, target_text, range_mappings) -> TextBlock:
+    def translate_tags(self, target_text: str, range_mappings) -> TextBlock:
         """
         Create a new text_block, applying our annotations to a translation.
 
@@ -253,7 +254,7 @@ class TextBlock:
 
         return "".join(html)
 
-    def get_root_item(self) -> None:
+    def get_root_item(self) -> None | Any:
         """
         Get a root item in the textblock.
 
@@ -289,7 +290,7 @@ class TextBlock:
         """
         return self.get_root_item()
 
-    def segment(self, get_boundaries, get_next_id: Callable) -> TextBlock:
+    def segment(self, get_boundaries: Callable, get_next_id: Callable) -> TextBlock:
         """
         Segment the text block into sentences.
 

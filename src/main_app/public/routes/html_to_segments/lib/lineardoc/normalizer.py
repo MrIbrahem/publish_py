@@ -51,7 +51,8 @@ class Normalizer:
 
     def _process_element(self, element: etree.Element | Any) -> None:
         """Process an element recursively."""
-        tag_name = element.tag.lower() if self.lowercase else element.tag  # Create tag dict
+        # Create tag dict
+        tag_name = element.tag.lower() if self.lowercase else element.tag
         tag = {"name": tag_name, "attributes": dict(element.attrib)}
 
         # Mark HTML void elements as self-closing

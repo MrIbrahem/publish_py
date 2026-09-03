@@ -230,8 +230,8 @@ def is_transclusion(tag: dict[str, Any]) -> bool:
 
 def is_transclusion_fragment(tag: dict[str, Any]) -> bool:
     """Check if tag is a transclusion fragment."""
-    return cxutil.get_prop(["attributes", "about"], tag) and not cxutil.get_prop(["attributes", "data-mw"], tag)
-
+    result = cxutil.get_prop(["attributes", "about"], tag) and not cxutil.get_prop(["attributes", "data-mw"], tag)
+    return result # pyright: ignore[reportReturnType]
 
 def is_non_translatable(tag: dict[str, Any]) -> bool:
     """
