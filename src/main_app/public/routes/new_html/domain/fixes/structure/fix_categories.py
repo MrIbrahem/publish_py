@@ -18,8 +18,11 @@ def remove_categories(text: str) -> str:
     """
     parsed = wtp.parse(text)
     for link in parsed.wikilinks:
-        title = link.title.strip()
-        if not title.lower().startswith("category:"):
+        # The namespace prefix is the segment before the first colon. Strip
+        # internal whitespace (e.g. "[[  Category  :  Medicine  ]]") and compare
+        # case-insensitively.
+        prefix = link.title.split(":", 1)[0].strip().lower()
+        if prefix != "category":
             continue
 
         link.string = ""
