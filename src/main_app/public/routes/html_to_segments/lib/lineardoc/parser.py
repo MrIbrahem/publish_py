@@ -155,7 +155,7 @@ class Parser:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element):
+    def _process_element(self, element: etree.Element):
         """Process an element and its children recursively."""
         # Skip comments and other special nodes
         if not isinstance(element.tag, str):

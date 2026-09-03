@@ -2,6 +2,7 @@
 Utility functions for HTML processing and tag manipulation.
 """
 
+from collections.abc import Callable
 import re
 from typing import Any
 
@@ -9,7 +10,7 @@ from . import util as cxutil
 from .text_chunk import TextChunk
 
 
-def find_all(text, regex, callback):
+def find_all(text, regex, callback: Callable):
     """
     Find all matches of regex in text, calling callback with each match object.
 
@@ -58,7 +59,7 @@ def esc_attr(s) -> str:
     return re.sub(r'["\'&<>]', lambda m: f"&#{ord(m.group(0))};", s)
 
 
-def get_open_tag_html(tag):
+def get_open_tag_html(tag: dict[str, Any]) -> str:
     """
     Render a SAX open tag into an HTML string.
 
@@ -78,7 +79,7 @@ def get_open_tag_html(tag):
     return "".join(html)
 
 
-def get_close_tag_html(tag):
+def get_close_tag_html(tag: dict[str, Any]):
     """
     Render a SAX close tag into an HTML string.
 
@@ -93,7 +94,7 @@ def get_close_tag_html(tag):
     return "</" + esc(tag["name"]) + ">"
 
 
-def clone_open_tag(tag):
+def clone_open_tag(tag: dict[str, Any]):
     """
     Clone a SAX open tag.
 
@@ -109,7 +110,7 @@ def clone_open_tag(tag):
     return new_tag
 
 
-def dump_tags(tag_array):
+def dump_tags(tag_array:list[dict[str, Any]]):
     """
     Represent an inline tag as a single XML attribute, for debugging.
 
@@ -136,7 +137,7 @@ def dump_tags(tag_array):
     return " ".join(tag_dumps)
 
 
-def is_reference(tag):
+def is_reference(tag: dict[str, Any]):
     """
     Detect whether this is a mediawiki reference span.
 
@@ -155,7 +156,7 @@ def is_reference(tag):
     return False
 
 
-def is_math(tag):
+def is_math(tag: dict[str, Any]):
     """
     Detect whether this is a mediawiki maths span.
 
@@ -170,7 +171,7 @@ def is_math(tag):
     ) == "mw:Extension/math"
 
 
-def is_gallery(tag):
+def is_gallery(tag: dict[str, Any]):
     """
     Detect whether this is a mediawiki Gallery.
 
@@ -183,7 +184,7 @@ def is_gallery(tag):
     return tag["name"] == "ul" and tag.get("attributes", {}).get("typeof") == "mw:Extension/gallery"
 
 
-def is_reference_list(tag):
+def is_reference_list(tag: dict[str, Any]):
     """Check if tag is a reference list."""
     return (
         tag["name"] == "div"
@@ -192,7 +193,7 @@ def is_reference_list(tag):
     )
 
 
-def is_external_link(tag):
+def is_external_link(tag: dict[str, Any]):
     """
     If a tag is MediaWiki external link or not.
 
@@ -206,7 +207,7 @@ def is_external_link(tag):
     return tag["name"] == "a" and f" {rel} ".find(" mw:ExtLink ") != -1
 
 
-def is_segment(tag):
+def is_segment(tag: dict[str, Any]):
     """
     Detect whether this is a segment.
 
@@ -219,18 +220,18 @@ def is_segment(tag):
     return tag["name"] == "span" and tag.get("attributes", {}).get("class") == "cx-segment"
 
 
-def is_transclusion(tag):
+def is_transclusion(tag: dict[str, Any]):
     """Check if tag is a transclusion."""
     typeof = tag.get("attributes", {}).get("typeof", "")
     return bool(re.search(r"(^|\s)(mw:Transclusion|mw:Placeholder)\b", typeof))
 
 
-def is_transclusion_fragment(tag):
+def is_transclusion_fragment(tag: dict[str, Any]):
     """Check if tag is a transclusion fragment."""
     return cxutil.get_prop(["attributes", "about"], tag) and not cxutil.get_prop(["attributes", "data-mw"], tag)
 
 
-def is_non_translatable(tag):
+def is_non_translatable(tag: dict[str, Any]):
     """
     Check if the tag need to be translated by an MT service.
 

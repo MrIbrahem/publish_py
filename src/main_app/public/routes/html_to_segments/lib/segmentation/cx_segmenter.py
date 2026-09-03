@@ -8,7 +8,7 @@ import pysbd
 class CXSegmenter:
     """Segmenter for CX documents."""
 
-    def segment(self, parsed_doc, language):
+    def segment(self, parsed_doc, language: str):
         """
         Segment the given parsed linear document object.
 
@@ -21,7 +21,7 @@ class CXSegmenter:
         """
         return parsed_doc.segment(self.get_segmenter(language))
 
-    def get_segmenter(self, language):
+    def get_segmenter(self, language: str):
         """
         Get the segmenter for the given language.
 
