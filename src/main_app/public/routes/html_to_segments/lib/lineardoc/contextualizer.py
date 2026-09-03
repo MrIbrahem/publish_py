@@ -3,10 +3,11 @@ Contextualizer for HTML - tracks the segmentation context of the currently open 
 """
 
 
+from __future__ import annotations
 class Contextualizer:
     """Contextualizer for HTML."""
 
-    def __init__(self, config=None):
+    def __init__(self, config=None) -> None:
         """
         Initialize the contextualizer.
 
@@ -16,7 +17,7 @@ class Contextualizer:
         self.contexts = []
         self.config = config or {}
 
-    def get_child_context(self, open_tag):
+    def get_child_context(self, open_tag) -> str | None:
         """
         Get the context for a new tag being opened.
 
@@ -46,7 +47,7 @@ class Contextualizer:
         """
         return self.contexts[-1] if self.contexts else None
 
-    def on_open_tag(self, open_tag):
+    def on_open_tag(self, open_tag) -> None:
         """
         Call when a tag opens.
 
@@ -55,12 +56,12 @@ class Contextualizer:
         """
         self.contexts.append(self.get_child_context(open_tag))
 
-    def on_close_tag(self, tag=None):
+    def on_close_tag(self, tag=None) -> None:
         """Call when a tag closes (or just after an empty tag opens)."""
         if self.contexts:
             self.contexts.pop()
 
-    def can_segment(self):
+    def can_segment(self) -> bool:
         """
         Determine whether sentences can be segmented into spans in this context.
 

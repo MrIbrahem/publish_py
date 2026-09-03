@@ -2,6 +2,7 @@
 CXSegmenter - Sentence segmentation for Content Translation.
 """
 
+from __future__ import annotations
 import pysbd
 
 

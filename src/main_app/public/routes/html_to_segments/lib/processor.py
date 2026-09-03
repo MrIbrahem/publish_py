@@ -2,6 +2,7 @@
 Main processing module for HTML transformation.
 """
 
+from __future__ import annotations
 import os
 import re
 
