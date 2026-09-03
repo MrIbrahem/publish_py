@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .category_members import CategoryMemberRecord
 from .dashboard import (
     CategoryRecord,

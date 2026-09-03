@@ -3,7 +3,7 @@ Main processing pipeline for the new_html endpoint.
 
 Pipeline:
 1. Fetch wikitext + revision
-2. WikitextFixerService.fix ← currently a no-op (TODO)
+2. WikitextFixerService.fix
 3. Convert wikitext → HTML (with cache)
 4. Convert HTML → segments (with cache)
 5. Return JSON envelope or raw content
@@ -15,24 +15,45 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from flask import Request, Response, jsonify
+from flask import Response, jsonify
 
-from ...html_to_segments import process_html
 from ..domain.fixes import WikitextFixerService
+from ..domain.fixes.references.expand_refs import expand_text_refs
+from ..domain.parser.lead_section_parser import get_lead_section
 from .clients import MdwikiApi, TransformApi
-from .html_utils import remove_data_parsoid
+from .html_utils import del_div_error, fix_link_red, remove_data_parsoid
+from .process_seg import get_segments
 from .storage import (
     add_title_revision,
     get_title_revision,
     read_file,
     write_file,
 )
-from .utils import apply_cors_headers, get_file_dir
+from .utils import get_file_dir
 
 logger = logging.getLogger(__name__)
 
 
-def get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str, bool]:
+def get_from_json(title: str, all_flag: str):
+    """ """
+    cached_rev = get_title_revision(title, all_flag)
+
+    if not cached_rev or not cached_rev.isdigit():
+        return "", ""
+
+    file_dir = get_file_dir(cached_rev, all_flag)
+    if not file_dir.is_dir():
+        return "", ""
+
+    cached_text = read_file(file_dir / "wikitext.txt")
+
+    if not cached_text:
+        return "", ""
+
+    return cached_text, cached_rev
+
+
+def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str, bool]:
     """
     Fetch wikitext and revision ID.
     Tries live API first, then falls back to local cache.
@@ -43,30 +64,30 @@ def get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str,
     mdwiki = MdwikiApi()
     source, revid, error = mdwiki.get_wikitext(title)
 
-    # TODO: In the original PHP version, fix_wikitext is also applied
-    #       inside WikitextHandler before caching. Currently we only
-    #       apply it later in process_page().
-
     from_cache = False
-
     if not source or not revid:
         # Fallback to local JSON mapping + cached file
-        cached_rev = get_title_revision(title, all_flag)
-        if cached_rev:
-            file_dir = get_file_dir(cached_rev, all_flag)
-            cached_text = read_file(file_dir / "wikitext.txt")
-            if cached_text:
-                source = cached_text
-                revid = cached_rev
-                from_cache = True
+        cached_source, revid = get_from_json(title, all_flag)
+        from_cache = cached_source != ""
 
-    if source and revid:
+    # Add or update a title → revision mapping in the JSON index.
+    if revid:
         add_title_revision(title, revid, all_flag)
+
+    if not all_flag:
+        full_text = source
+        lead = get_lead_section(full_text)
+        if lead and lead != full_text:
+            source = expand_text_refs(lead, full_text)
+
+    # run fix_wikitext as in the original PHP version
+    fixer = WikitextFixerService(source, title)
+    source = fixer.fix()
 
     return source, revid, from_cache
 
 
-def get_html(
+def _get_html(
     wikitext: str,
     file_html: Path,
     title: str,
@@ -76,82 +97,51 @@ def get_html(
     Convert wikitext to HTML with simple file caching.
     """
     from_cache = False
-
+    # 1. check from cache
     if not force_new:
         cached = read_file(file_html)
         if cached:
-            return remove_data_parsoid(cached), True
+            cached = remove_data_parsoid(cached)  # not in php
+            return cached, True
 
+    # fast return if wikitext is empty
     if not wikitext:
         return "", from_cache
 
+    # convertWikitextToHtml
     transform = TransformApi()
-    result = transform.convert(wikitext, title)
+    fixed = transform.convert(wikitext, title)
+    html = fixed.get("result", "")
 
-    html = result.get("result", "")
+    # HTML conversion failed
     if not html:
         logger.error("HTML conversion failed for title: %s", title)
         return "", from_cache
 
-    html = remove_data_parsoid(html)
-    write_file(file_html, html)
-    return html, from_cache
+    html = del_div_error(html)
+    html = fix_link_red(html)
 
-
-def get_segments(html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
-    from_cache = False
-
-    if not force_new:
-        cached = read_file(file_seg)
-        if cached:
-            return remove_data_parsoid(cached), True
-
-    if not html:
+    if not html or html == wikitext:
         return "", from_cache
 
-    try:
-        seg = process_html(html)
-    except Exception as e:
-        logger.error("Segment processing failed: %s", e)
-        return "", from_cache
+    # remove data parsoid and save file
+    html_removed = remove_data_parsoid(html)
+    write_file(file_html, html_removed)
 
-    if not seg:
-        return "", from_cache
-
-    # Normalize known empty messages (if any)
-    if seg in (
-        "Content for translate is not given or is empty",
-        "Sectionwrap: Attempting to remove a non-section tag: undefined",
-    ):
-        return "", from_cache
-
-    seg = remove_data_parsoid(seg)
-    write_file(file_seg, seg)
-    return seg, from_cache
+    return html_removed, from_cache
 
 
-def process_page(request: Request) -> Response:
+def process_page(
+    title: str,
+    printetxt: str,
+    force_new: bool,
+    all_flag: str = "",
+) -> Response:
     """
     Main entry point for the /new_html/ endpoint.
     """
-    title = (request.args.get("title") or "").strip()
-    if title:
-        title = title[0].upper() + title[1:]
-
-    printetxt = request.args.get("printetxt") or request.args.get("print") or ""
-    force_new = "new" in request.args
-    all_flag = request.args.get("all", "")
-
-    # Special case: titles starting with "Video"
-    if title.startswith("Video"):
-        all_flag = "1"
-
-    if not title:
-        response = jsonify({"error": "title is empty"})
-        return apply_cors_headers(response, request)
-
     # 1. Get wikitext + revision
-    wikitext, revision, text_from_cache = get_wikitext_and_revision(title, all_flag)
+    wikitext, revision, text_from_cache = _get_wikitext_and_revision(title, all_flag)
 
     if not wikitext or not revision:
         response = jsonify(
@@ -166,7 +156,7 @@ def process_page(request: Request) -> Response:
             }
         )
         response.status_code = 404
-        return apply_cors_headers(response, request)
+        return response
 
     file_dir = get_file_dir(revision, all_flag)
     file_wikitext = file_dir / "wikitext.txt"
@@ -184,21 +174,25 @@ def process_page(request: Request) -> Response:
     # Early exit for printetxt=wikitext
     if printetxt == "wikitext":
         response = Response(wikitext, mimetype="text/plain")
-        return apply_cors_headers(response, request)
+        return response
 
     # 2. Convert to HTML
-    html, html_from_cache = get_html(wikitext, file_html, title, force_new)
+    html, html_from_cache = _get_html(wikitext, file_html, title, force_new)
 
     if printetxt == "html":
         response = Response(html, mimetype="text/html")
-        return apply_cors_headers(response, request)
+        return response
 
     # 3. Convert to segments
-    seg, seg_from_cache = get_segments(html, file_seg, force_new)
+    seg_text, seg_from_cache = get_segments(
+        source_html=html,
+        file_seg=file_seg,
+        force_new=force_new,
+    )
 
     if printetxt == "seg":
-        response = Response(seg, mimetype="text/html")
-        return apply_cors_headers(response, request)
+        response = Response(seg_text, mimetype="text/html")
+        return response
 
     # Final JSON response
     data: dict[str, Any] = {
@@ -210,7 +204,7 @@ def process_page(request: Request) -> Response:
         "sourceLanguage": "en",
         "title": title,
         "revision": revision,
-        "segmentedContent": seg,
+        "segmentedContent": seg_text,
         "categories": [],
     }
 
@@ -219,15 +213,22 @@ def process_page(request: Request) -> Response:
         # but when seg is empty you return 404. Pick one convention (e.g. always 404 with an error envelope,
         # or always 200 with error fields) so clients can handle failures uniformly.
 
-        data["error_type"] = "HTML_text is empty"
+        data["error_type"] = "HTML_text:() is empty"
         data["error"] = "No content found"
 
-    elif not seg:
-        data["error_type"] = "SEG_text is empty"
+    elif not seg_text:
+        data["error_type"] = "seg_text:() is empty"
         data["error"] = "No content found"
         response = jsonify(data)
+        # send request error code using status_code
         response.status_code = 404
-        return apply_cors_headers(response, request)
+        return response
 
+    # Encode data as JSON with appropriate options
     response = jsonify(data)
-    return apply_cors_headers(response, request)
+    return response
+
+
+__all__ = [
+    "process_page",
+]

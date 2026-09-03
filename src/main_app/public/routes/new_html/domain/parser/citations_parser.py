@@ -19,47 +19,36 @@ call sites::
 from __future__ import annotations
 
 import wikitextparser as wtp
-from wikitextparser import Tag
 
 
-def _is_self_closing(tag: Tag) -> bool:
-    """A self-closing ``<ref .../>`` (a "short citation") vs a full ``<ref>...</ref>``."""
-    return tag.string.rstrip().endswith("/>")
-
-
-def get_ref_name(tag: Tag) -> str:
-    """Extract the ``name`` attribute from a ``<ref>`` tag.
-
-    :param tag: A ``wikitextparser`` ``Tag`` object for a ``<ref>`` tag.
-    :return: The trimmed name value, or an empty string if not present.
+def _is_self_closing(tag_string: str) -> bool:
     """
-    name = tag.get_attr("name")
-    return name.strip() if name else ""
-
-
-def _iter_ref_tags(text: str) -> list[Tag]:
-    if not text:
-        return []
-    return wtp.parse(text).get_tags("ref")
+    A self-closing ``<ref .../>`` (a "short citation") vs a full ``<ref>...</ref>``.
+    """
+    return tag_string.rstrip().endswith("/>")
 
 
 def get_citations(text: str) -> list[dict]:
     """Get all full (non-self-closing) ``<ref>...</ref>`` citations.
 
-    Equivalent of the PHP ``get_regex_citations()`` function.
+    Equivalent of the PHP ``get_citations()`` function.
 
     :param text: The text containing citations to extract.
     :return: A list of citation dicts (see module docstring).
     """
     citations = []
-    for tag in _iter_ref_tags(text):
-        if _is_self_closing(tag):
+    parsed = wtp.parse(text)
+
+    for tag in parsed.get_tags("ref"):
+        if _is_self_closing(tag.string):
             continue
+
+        tag_name = tag.get_attr("name")
         citations.append(
             {
                 "content": tag.contents,
                 "tag": tag.string,
-                "name": get_ref_name(tag),
+                "name": tag_name.strip() if tag_name else "",
                 "options": dict(tag.attrs),
             }
         )
@@ -81,7 +70,7 @@ def get_full_refs(text: str) -> dict[str, str]:
     return full
 
 
-def get_short_citations(text: str) -> list[dict]:
+def get_short_refs(text: str) -> list[dict]:
     """Get all short (self-closing) ``<ref name="..." />`` citations.
 
     :param text: The text to parse.
@@ -89,15 +78,26 @@ def get_short_citations(text: str) -> list[dict]:
         always ``""`` for these.
     """
     citations = []
-    for tag in _iter_ref_tags(text):
-        if not _is_self_closing(tag):
+    parsed = wtp.parse(text)
+
+    for tag in parsed.get_tags("ref"):
+        if not _is_self_closing(tag.string):
             continue
+
+        tag_name = tag.get_attr("name")
         citations.append(
             {
                 "content": "",
                 "tag": tag.string,
-                "name": get_ref_name(tag),
+                "name": tag_name.strip() if tag_name else "",
                 "options": dict(tag.attrs),
             }
         )
     return citations
+
+
+__all__ = [
+    "get_citations",
+    "get_full_refs",
+    "get_short_refs",
+]

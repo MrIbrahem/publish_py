@@ -89,19 +89,18 @@ def add_title_revision(title: str, revision: str, all_flag: str = "") -> None:
     write_file(json_path, json.dumps(data, ensure_ascii=False, indent=2))
 
 
-def list_revisions() -> list[dict[str, Any]]:
+def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
     """
     Return a sorted list of cached revisions for the dashboard.
 
     Sorted by last modification time of wikitext.txt (newest first).
     """
-    settings = get_settings()
-    revisions_dir = settings.new_html.revisions_dir
 
-    if not revisions_dir.exists():
+    if not revisions_dir.exists() or not revisions_dir.is_dir():
         return []
 
     dirs = [d for d in revisions_dir.iterdir() if d.is_dir()]
+    logger.info("Found %d revision directories in %s", len(dirs), str(revisions_dir))
 
     def sort_key(d: Path) -> float:
         wikitext = d / "wikitext.txt"
@@ -140,3 +139,12 @@ def list_revisions() -> list[dict[str, Any]]:
         )
 
     return results
+
+
+__all__ = [
+    "read_file",
+    "write_file",
+    "get_title_revision",
+    "add_title_revision",
+    "list_revisions",
+]

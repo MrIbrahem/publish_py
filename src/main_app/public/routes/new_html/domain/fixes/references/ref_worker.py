@@ -15,45 +15,186 @@ from __future__ import annotations
 
 import re
 
-from domain.parser.citations_parser import get_citations
+from ...parser.citations_parser import get_citations
 
 #: Matches DOIs from known predatory/low-quality publishers.
-DOI_PATTERN = re.compile(
-    r"doi[ ]*?[=\|:][ ]*?10\."
-    r"(11648|1166|1234|12677|12692|12720|12988|13005|13172|13188|14218|14257|"
-    r"14303|14419|14445|1453|14569|14662|14738|15373|15406|15415|15680|15761|"
-    r"17265|18005|18052|18311|18775|19030|19044|19070|19080|1999|20319|20431|"
-    r"20472|20849|20902|21102|21767|22158|23937|2495|30845|35841|36648|3844|"
-    r"3923|3968|4018|4156|4172|4236|4303|5267|5296|5376|5430|5455|5539|5567|"
-    r"5580|5772|5812|5815|5829|5897|5899|5923|5963|6007|7243|7439|7537|7575|"
-    r"7718|7763|9734)",
-    re.IGNORECASE,
-)
+DOI_LIST = [
+    11648,
+    1166,
+    1234,
+    12677,
+    12692,
+    12720,
+    12988,
+    13005,
+    13172,
+    13188,
+    14218,
+    14257,
+    14303,
+    14419,
+    14445,
+    1453,
+    14569,
+    14662,
+    14738,
+    15373,
+    15406,
+    15415,
+    15680,
+    15761,
+    17265,
+    18005,
+    18052,
+    18311,
+    18775,
+    19030,
+    19044,
+    19070,
+    19080,
+    1999,
+    20319,
+    20431,
+    20472,
+    20849,
+    20902,
+    21102,
+    21767,
+    22158,
+    23937,
+    2495,
+    30845,
+    35841,
+    36648,
+    3844,
+    3923,
+    3968,
+    4018,
+    4156,
+    4172,
+    4236,
+    4303,
+    5267,
+    5296,
+    5376,
+    5430,
+    5455,
+    5539,
+    5567,
+    5580,
+    5772,
+    5812,
+    5815,
+    5829,
+    5897,
+    5899,
+    5923,
+    5963,
+    6007,
+    7243,
+    7439,
+    7537,
+    7575,
+    7718,
+    7763,
+    9734,
+]
+
+doi_join_pattern = r"|".join(str(x) for x in DOI_LIST)
+
+DOI_PATTERN = re.compile(rf"doi[ ]*?[=\|:][ ]*?10\.({doi_join_pattern})", re.IGNORECASE)
 
 #: Matches domains of known predatory/low-quality open-access journals.
+OPEN_ACCESS_JOURNALS_LIST = [
+    "academicjournals.com",
+    "academicjournals.net",
+    "academicjournals.org",
+    "academicpub.org",
+    "academicresearchjournals.org",
+    "aiac.org.au",
+    "aicit.org",
+    "alliedacademies.org",
+    "arcjournals.org",
+    "ashdin.com",
+    "aspbs.com",
+    "avensonline.org",
+    "biomedres.info",
+    "biopublisher.ca",
+    "bowenpublishing.com",
+    "ccsenet.org",
+    "cennser.org",
+    "clinmedjournals.org",
+    "cluteinstitute.com",
+    "conferenceseries.com",
+    "cpinet.info",
+    "cscanada.net",
+    "davidpublisher.org",
+    "etpub.com",
+    "eujournal.org",
+    "growingscience.com",
+    "grdspublishing.org",
+    "hanspub.org",
+    "hoajonline.com",
+    "hrmars.com",
+    "iacsit.org",
+    "iamure.com",
+    ".idosi.org",
+    "igi-global.com",
+    "iises.net",
+    "imedpub.com",
+    "informaticsjournals.com",
+    "innspub.net",
+    "intechopen.com",
+    "intechweb.org",
+    "interesjournals.org",
+    "internationaljournalssrg.org",
+    "ispacs.com",
+    "ispub.com",
+    "julypress.com",
+    "juniperpublishers.com",
+    "kowsarpub.com",
+    "kspjournals.org",
+    "longdom.org",
+    "m-hikari.com",
+    "macrothink.org",
+    "mecs-press.org",
+    "medcraveonline.com",
+    "oapublishinglondon.com",
+    "oatext.com",
+    "omicsonline.org",
+    "ospcindia.org",
+    "researchleap.com",
+    "sapub.org",
+    "scholink.org",
+    "scialert.net",
+    "scidoc.org",
+    "sciencedomain.org",
+    "sciencedomains.org",
+    "sciedu.ca",
+    "sciencepg.com",
+    "sciencepub.net",
+    "sciencepubco.com",
+    "sciencepublication.org",
+    "sciencepublishinggroup.com",
+    "scipg.net",
+    "scipress.com",
+    "scirp.org",
+    "scopemed.com",
+    "sersc.org",
+    "sphinxsai.com",
+    "scholarpublishing.org",
+    ".ssjournals.com",
+    "thesai.org",
+    "waset.org",
+    "witpress.com",
+    "worldwidejournals.com",
+    "xandhpublishing.com",
+    "xiahepublishing.com",
+    "zantworldpress.com",
+]
+
 OPEN_ACCESS_JOURNALS_PATTERN = re.compile(
-    r"(academicjournals\.com|academicjournals\.net|academicjournals\.org|"
-    r"academicpub\.org|academicresearchjournals\.org|aiac\.org\.au|aicit\.org|"
-    r"alliedacademies\.org|arcjournals\.org|ashdin\.com|aspbs\.com|"
-    r"avensonline\.org|biomedres\.info|biopublisher\.ca|bowenpublishing\.com|"
-    r"ccsenet\.org|cennser\.org|clinmedjournals\.org|cluteinstitute\.com|"
-    r"conferenceseries\.com|cpinet\.info|cscanada\.net|davidpublisher\.org|"
-    r"etpub\.com|eujournal\.org|growingscience\.com|grdspublishing\.org|"
-    r"hanspub\.org|hoajonline\.com|hrmars\.com|iacsit\.org|iamure\.com|"
-    r"\.idosi\.org|igi-global\.com|iises\.net|imedpub\.com|"
-    r"informaticsjournals\.com|innspub\.net|intechopen\.com|intechweb\.org|"
-    r"interesjournals\.org|internationaljournalssrg\.org|ispacs\.com|"
-    r"ispub\.com|julypress\.com|juniperpublishers\.com|kowsarpub\.com|"
-    r"kspjournals\.org|longdom\.org|m-hikari\.com|macrothink\.org|"
-    r"mecs-press\.org|medcraveonline\.com|oapublishinglondon\.com|"
-    r"oatext\.com|omicsonline\.org|ospcindia\.org|researchleap\.com|"
-    r"sapub\.org|scholink\.org|scialert\.net|scidoc\.org|sciencedomain\.org|"
-    r"sciencedomains\.org|sciedu\.ca|sciencepg\.com|sciencepub\.net|"
-    r"sciencepubco\.com|sciencepublication\.org|sciencepublishinggroup\.com|"
-    r"scipg\.net|scipress\.com|scirp\.org|scopemed\.com|sersc\.org|"
-    r"sphinxsai\.com|scholarpublishing\.org|\.ssjournals\.com|thesai\.org|"
-    r"waset\.org|witpress\.com|worldwidejournals\.com|xandhpublishing\.com|"
-    r"xiahepublishing\.com|zantworldpress\.com)",
+    r"(" + "|".join(re.escape(domain) for domain in OPEN_ACCESS_JOURNALS_LIST) + r")",
     re.IGNORECASE,
 )
 
@@ -106,3 +247,9 @@ def remove_bad_refs(text: str) -> str:
             text = text.replace(citation_tag, "")
 
     return text
+
+
+__all__ = [
+    "check_one_cite",
+    "remove_bad_refs",
+]

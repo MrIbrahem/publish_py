@@ -1,5 +1,7 @@
 """Config db services."""
 
+from __future__ import annotations
+
 from .language_setting_service import (
     LanguageSettingService,
 )

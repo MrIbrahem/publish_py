@@ -15,7 +15,7 @@ place. The idiomatic pattern used throughout the ``domain.fixes`` package is:
     parsed = wtp.parse(text)
     for template in parsed.templates:
         ...mutate template...
-    new_text = str(parsed)
+    new_text = parsed.string
 
 The helpers below are thin convenience wrappers around that pattern so the
 ``fixes`` modules don't need to repeat the same small pieces of logic
@@ -28,13 +28,18 @@ from __future__ import annotations
 import wikitextparser as wtp
 from wikitextparser import Template, WikiText
 
+try:  # DeadIndexError isn't part of wikitextparser's public API.
+    from wikitextparser._wikitext import DeadIndexError
+except ImportError:  # pragma: no cover - defensive, in case the private path moves
+    DeadIndexError = Exception  # type: ignore[assignment,misc]
+
 
 def parse(text: str) -> WikiText:
     """Parse wikitext and return the (mutable) WikiText object.
 
     Equivalent to calling ``wikitextparser.parse`` directly; provided here so
     callers only need to import this module. Keep a reference to the
-    returned object and call ``str(parsed)`` after mutating any of its
+    returned object and call ``parsed.string`` after mutating any of its
     templates to get the updated text back.
     """
     return wtp.parse(text or "")
@@ -43,7 +48,7 @@ def parse(text: str) -> WikiText:
 def get_templates(text: str) -> list[Template]:
     """Return all templates (including nested ones) found in ``text``.
 
-    Equivalent of the old PHP ``getTemplates()`` helper. NOTE: the returned
+    Equivalent of the old PHP ``get_templates()`` helper. NOTE: the returned
     ``Template`` objects are tied to a fresh, internal ``WikiText`` object.
     If you need the edited text back afterwards, use :func:`parse` yourself
     and iterate ``parsed.templates`` instead, e.g.::
@@ -51,7 +56,7 @@ def get_templates(text: str) -> list[Template]:
         parsed = parse(text)
         for template in parsed.templates:
             ...
-        text = str(parsed)
+        text = parsed.string
     """
     if not text:
         return []
@@ -64,7 +69,10 @@ def strip_name(template: Template) -> str:
     Underscores are treated as spaces and the result is trimmed, matching
     MediaWiki's template name normalization.
     """
-    return template.name.strip().replace("_", " ")
+    try:
+        return template.name.strip().replace("_", " ")
+    except DeadIndexError:
+        return ""
 
 
 def get_parameter(template: Template, key: str, default: str = "") -> str:
@@ -145,3 +153,17 @@ def get_arg_number(param_name: str, prefix: str) -> str | None:
     if suffix == "" or suffix.isdigit():
         return suffix
     return None
+
+
+__all__ = [
+    "parse",
+    "get_templates",
+    "strip_name",
+    "get_parameter",
+    "has_parameter",
+    "set_parameter",
+    "delete_parameter",
+    "get_parameters",
+    "render_pretty",
+    "get_arg_number",
+]

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content_fluid %}
+<div class="container">
+    <div class='card'>
+        <div class='card-header aligncenter' style='font-weight:bold;'>
+            input infos
+        </div>
+        <div class='card-body'>
+            <form action='{{ url_for('new_html.fix') }}' method='POST'>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class='container'>
+                    <div class='row'>
+                        <div class='col-md-3'>
+                            <div class='input-group mb-3'>
+                                <div class='input-group-prepend'>
+                                    <span class='input-group-text'>title</span>
+                                </div>
+                                <input class='form-control' type='text' id='title' name='title' value='{{ title }}' />
+                            </div>
+                        </div>
+                        <div class='col-md-3'>
+                            <h4 class='aligncenter'>
+                                <input class='btn btn-outline-primary' type='submit' value='start'>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <textarea id="text" name="text" rows="5" class="form-control" required>{{ wikitext }}</textarea>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

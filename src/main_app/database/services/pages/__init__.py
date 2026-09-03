@@ -1,5 +1,7 @@
 """Pages db services."""
 
+from __future__ import annotations
+
 from .in_process_service import InProcessService
 from .leaderboard_service import LeaderboardService
 from .missing_stats_service import MissingStatsService

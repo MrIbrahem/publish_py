@@ -4,6 +4,8 @@ MediaWiki API client for edit operations and category fetching.
 Mirrors: results/getcats.php
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import os

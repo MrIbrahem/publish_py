@@ -6,11 +6,12 @@ Port of ``src/Domain/Fixes/References/DeleteEmptyRefsFixture.php``.
 
 from __future__ import annotations
 
-from domain.parser.citations_parser import get_full_refs, get_short_citations
+from ...parser.citations_parser import get_full_refs, get_short_refs
 
 
-def delete_empty_refs(text: str) -> str:
-    """Delete empty short refs, or expand them with their full ref definition.
+def del_empty_refs(text: str) -> str:
+    """
+    Delete empty short refs, or expand them with their full ref definition.
 
     For each short (self-closing) ``<ref name="x" />`` tag: if a full
     ``<ref name="x">...</ref>`` definition exists elsewhere in ``text``, the
@@ -22,7 +23,7 @@ def delete_empty_refs(text: str) -> str:
     :return: The text with empty refs removed and expandable refs replaced.
     """
     full_refs = get_full_refs(text)
-    short_refs = get_short_citations(text)
+    short_refs = get_short_refs(text)
 
     for cite in short_refs:
         name = cite["name"]
@@ -37,3 +38,8 @@ def delete_empty_refs(text: str) -> str:
             text = text.replace(short_tag, "")
 
     return text
+
+
+__all__ = [
+    "del_empty_refs",
+]

@@ -68,7 +68,14 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         result = decorated()
         headers = dict(result.headers.items())
         assert result.status_code == 403
-        assert headers == {"Content-Length": "110", "Content-Type": "application/json"}
+        assert headers == {
+            "Content-Length": "110",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Max-Age": "86400",
+        }
 
     def test_basics_403(self, mocker, mock_app):
         response = MagicMock(
@@ -85,7 +92,14 @@ class TestCheckCorsDecoratedWithCorsEnabled:
         result = decorated()
         assert result.status_code == 403
         headers = dict(result.headers.items())
-        assert headers == {"Content-Length": "110", "Content-Type": "application/json"}
+        assert headers == {
+            "Content-Length": "110",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Max-Age": "86400",
+        }
 
     def test_basics_200(self, mocker, mock_app):
         response = MagicMock(

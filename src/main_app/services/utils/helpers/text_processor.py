@@ -5,6 +5,8 @@ Mirrors: php_src/text_change.php
 
 """
 
+from __future__ import annotations
+
 import os
 import sys
 from typing import Any

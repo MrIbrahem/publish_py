@@ -4,6 +4,8 @@ Services for external API integration.
 Used in both admin and public blueprints.
 """
 
+from __future__ import annotations
+
 from .mdwiki_api import get_mdwiki_cat_members
 from .mediawiki_api import get_title_info, publish_do_edit
 from .oauth_client import get_csrf_token, get_cxtoken, get_oauth_client, post_params

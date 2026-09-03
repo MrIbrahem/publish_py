@@ -6,9 +6,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from urllib.parse import urlparse
-
-from flask import Request, Response
 
 from .....config.main_settings import get_settings
 
@@ -27,14 +24,19 @@ def get_file_dir(revision: str, all_flag: str = "") -> Path:
         Path object of the revision directory.
     """
     if not revision or not str(revision).isdigit():
-        logger.error("Invalid or empty revision in get_file_dir()")
+        logger.error("Invalid or empty revision in get_file_dir")
         return Path("")
 
     dir_name = f"{revision}_all" if all_flag else str(revision)
     settings = get_settings()
     file_dir = settings.new_html.revisions_dir / dir_name
 
-    file_dir.mkdir(parents=True, exist_ok=True)
+    if not file_dir.exists():
+        try:
+            file_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            logger.error(f"Failed to create directory {file_dir}: {e}")
+
     return file_dir
 
 
@@ -50,38 +52,7 @@ def get_content_type(printetxt: str) -> str:
     return mapping.get(printetxt, "application/json")
 
 
-def apply_cors_headers(response: Response, request: Request) -> Response:
-    """
-    Apply CORS headers if the request origin is allowed.
-    Reuses the project's allowed domains when possible.
-    """
-    origin = request.headers.get("Origin", "")
-    if not origin:
-        return response
-
-    try:
-        origin_host = urlparse(origin).hostname or ""
-    except Exception:
-        return response
-
-    settings = get_settings()
-
-    # Prefer project-level CORS settings if available
-    allowed_domains = settings.cors.allowed_domains
-
-
-    if origin_host in allowed_domains:
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Max-Age"] = "86400"
-
-    return response
-
-
 __all__ = [
     "get_file_dir",
-    "apply_cors_headers",
     "get_content_type",
 ]

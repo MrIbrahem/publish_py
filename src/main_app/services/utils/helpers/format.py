@@ -3,6 +3,8 @@
 Mirrors: php_src/endpoints/post.php (formatTitle, formatUser, determineHashtag, make_summary)
 """
 
+from __future__ import annotations
+
 from ....config import settings
 
 
