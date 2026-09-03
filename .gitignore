@@ -50,3 +50,4 @@ _work_files/add_all.py
 /src/templates/admin/bs4_admin
 *.isorted
 /src/main_app/public/routes/php_new_html
+/tests/unit/public/routes/new_html/domain/fixes/php_tests
