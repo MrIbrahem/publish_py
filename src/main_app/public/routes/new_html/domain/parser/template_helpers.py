@@ -28,6 +28,11 @@ from __future__ import annotations
 import wikitextparser as wtp
 from wikitextparser import Template, WikiText
 
+try:  # DeadIndexError isn't part of wikitextparser's public API.
+    from wikitextparser._wikitext import DeadIndexError
+except ImportError:  # pragma: no cover - defensive, in case the private path moves
+    DeadIndexError = Exception  # type: ignore[assignment,misc]
+
 
 def parse(text: str) -> WikiText:
     """Parse wikitext and return the (mutable) WikiText object.
@@ -64,8 +69,10 @@ def strip_name(template: Template) -> str:
     Underscores are treated as spaces and the result is trimmed, matching
     MediaWiki's template name normalization.
     """
-    return template.name.strip().replace("_", " ")
-
+    try:
+        return template.name.strip().replace("_", " ")
+    except DeadIndexError:
+        return ""
 
 def get_parameter(template: Template, key: str, default: str = "") -> str:
     """Equivalent of PHP's ``Template::getParameter($key, $default)``."""
