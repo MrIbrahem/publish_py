@@ -16,9 +16,9 @@ import json
 import re
 
 import wikitextparser as wtp
-from ...parser import template_helpers as th
 
 from ....services.clients import HttpClientService
+from ...parser import template_helpers as th
 
 _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
 
@@ -123,44 +123,7 @@ class RemoveMissingImagesService:
                 if th.has_parameter(template, caption_param):
                     th.delete_parameter(template, caption_param)
 
-        text = str(parsed)
-        text = self._remove_missing_infobox_images_regex(text)
-        return text
-
-    def _remove_missing_infobox_images_regex(self, text: str) -> str:
-        """Remove missing infobox images given as raw ``|image=`` lines (fallback).
-
-        Handles infobox-style fields that aren't wrapped in a ``{{...}}``
-        template (e.g. leftover/partial infobox markup).
-
-        :param text: The wikitext to process.
-        :return: The processed wikitext.
-        """
-        pattern = re.compile(r"^[ \t]*\|(\s*image\d*\s*)=([^\n]*)", re.MULTILINE)
-
-        fields_to_remove: list[str] = []
-
-        for match in pattern.finditer(text):
-            field_name = match.group(1).strip()
-            filename = match.group(2).strip()
-
-            if filename and self._image_service.image_exists(filename):
-                continue
-
-            fields_to_remove.append(field_name)
-
-            number_match = re.match(r"^image(\d*)$", field_name, re.IGNORECASE)
-            number = number_match.group(1) if number_match else ""
-            fields_to_remove.append(f"caption{number}")
-
-        # Suggestion: this regex fallback removes every |caption{number}= line (and every |image*=) across the entire text,
-        # not just the lines belonging to the infobox whose image was confirmed missing. If the same caption2= / image field
-        # appears in another template elsewhere, it gets deleted too. Scope the removal to the specific infobox block,
-        # or at least only delete a caption whose paired image was actually missing.
-        for field in fields_to_remove:
-            field_pattern = re.compile(r"^[ \t]*\|\s*" + re.escape(field) + r"\s*=[^\n]*\n?", re.MULTILINE)
-            text = field_pattern.sub("", text)
-
+        text = parsed.string
         return text
 
     def remove_missing_inline_images(self, text: str) -> str:
@@ -185,7 +148,7 @@ class RemoveMissingImagesService:
         for link in to_remove:
             link.string = ""
 
-        return str(parsed)
+        return parsed.string
 
     def remove_missing_images(self, text: str) -> str:
         """Remove all missing images (both infobox and inline).

@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 
 import wikitextparser as wtp
+
 from ...parser import template_helpers as th
 
 try:  # DeadIndexError isn't part of wikitextparser's public API.
@@ -18,6 +19,7 @@ except ImportError:  # pragma: no cover - defensive, in case the private path mo
 
 #: Template name patterns (lowercase) that should always be removed.
 TEMPLATE_DELETE_PATTERNS = (
+    # any template startswith pp-
     re.compile(r"^pp(-.*)?$"),
     re.compile(r"^articles (for|with|needing|containing).*$"),
     re.compile(r"^engvar[ab]$"),
@@ -107,15 +109,17 @@ def remove_templates(text: str) -> str:
             # Already removed along with a parent template.
             continue
 
-    return str(parsed)
+    return parsed.string
 
 
 def remove_lead_templates(text: str) -> str:
-    """Remove content before infobox templates in the lead section.
+    """
+    Remove content before infobox templates in the lead section.
 
     :param text: The wikitext to process.
     :return: The wikitext with content before the infobox removed.
     """
+    # remove any thig before {{Infobox medical condition
     lowered = text.lower()
 
     for prefix in _LEAD_INFOBOX_PREFIXES:

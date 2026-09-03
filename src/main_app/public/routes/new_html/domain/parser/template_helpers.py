@@ -15,7 +15,7 @@ place. The idiomatic pattern used throughout the ``domain.fixes`` package is:
     parsed = wtp.parse(text)
     for template in parsed.templates:
         ...mutate template...
-    new_text = str(parsed)
+    new_text = parsed.string
 
 The helpers below are thin convenience wrappers around that pattern so the
 ``fixes`` modules don't need to repeat the same small pieces of logic
@@ -34,7 +34,7 @@ def parse(text: str) -> WikiText:
 
     Equivalent to calling ``wikitextparser.parse`` directly; provided here so
     callers only need to import this module. Keep a reference to the
-    returned object and call ``str(parsed)`` after mutating any of its
+    returned object and call ``parsed.string`` after mutating any of its
     templates to get the updated text back.
     """
     return wtp.parse(text or "")
@@ -51,7 +51,7 @@ def get_templates(text: str) -> list[Template]:
         parsed = parse(text)
         for template in parsed.templates:
             ...
-        text = str(parsed)
+        text = parsed.string
     """
     if not text:
         return []

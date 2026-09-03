@@ -17,8 +17,8 @@ from typing import Any
 
 from flask import Response, jsonify
 
-from ..domain.fixes.references.expand_refs import expand_refs
 from ..domain.fixes import WikitextFixerService
+from ..domain.fixes.references.expand_refs import expand_refs
 from ..domain.parser.lead_section_parser import get_lead_section
 from .clients import MdwikiApi, TransformApi
 from .html_utils import del_div_error, fix_link_red, remove_data_parsoid

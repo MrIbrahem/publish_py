@@ -360,7 +360,7 @@ def remove_lang_links(text: str) -> str:
     for link in to_remove:
         link.string = ""
 
-    return str(parsed)
+    return parsed.string
 
 
 def is_valid_lang_code(code: str) -> bool:
@@ -370,7 +370,9 @@ def is_valid_lang_code(code: str) -> bool:
     :return: True if the code matches the language code pattern (2+
         lowercase letters, optionally followed by hyphen-letter groups).
     """
-    return bool(_LANG_CODE_RE.match(code))
+    is_valid = re.match(r"^[a-z]{2,}(?:-[a-z]+)*$", code) is not None
+    # is_valid = bool(_LANG_CODE_RE.match(code))
+    return is_valid
 
 
 __all__ = [

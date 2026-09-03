@@ -17,7 +17,8 @@ VIDEO_EXTENSIONS = {"webm", "ogv", "ogg", "mp4"}
 
 
 def remove_images(text: str) -> str:
-    """Wrap ``[[File:...]]`` image links in a ``{{subst:#ifexist:...}}`` check.
+    """
+    Wrap ``[[File:...]]`` image links in a ``{{subst:#ifexist:...}}`` check.
 
     :param text: The wikitext to process.
     :return: The wikitext with images wrapped in ``{{subst:#ifexist:...}}``.
@@ -36,7 +37,7 @@ def remove_images(text: str) -> str:
     for link, file_name, original in targets:
         link.string = f"{{{{subst:#ifexist:{file_name}|{original}}}}}"
 
-    return str(parsed)
+    return parsed.string
 
 
 def remove_videos(text: str) -> str:
@@ -48,6 +49,7 @@ def remove_videos(text: str) -> str:
 
     :param text: The wikitext to process.
     :return: The wikitext with video files removed.
+
     """
     if not text:
         return text
@@ -60,6 +62,7 @@ def remove_videos(text: str) -> str:
         title = link.title.strip()
         if not title.lower().startswith("file:"):
             continue
+
         ext = posixpath.splitext(title)[1].lstrip(".").lower()
         if ext in VIDEO_EXTENSIONS:
             to_remove.append(link)
@@ -67,7 +70,7 @@ def remove_videos(text: str) -> str:
     for link in to_remove:
         link.string = ""
 
-    return str(parsed)
+    return parsed.string
 
 
 __all__ = [
