@@ -109,7 +109,7 @@ class TranslateTypeService(CRUDService[TranslateTypeRecord]):
         try:
             return self.update_by_id(tt_id, kwargs)
         except IntegrityError:
-            raise UniqueError(title=tt_title) from None
+            raise UniqueError(title=str(tt_title)) from None
         except ValueError as exc:
             raise ValueError(f"TranslateType record with ID {tt_id} not found") from exc
 
