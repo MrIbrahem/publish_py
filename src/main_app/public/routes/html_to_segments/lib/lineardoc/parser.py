@@ -153,7 +153,7 @@ class Parser:
         except Exception:
             # Try with wrapping
             try:
-                tree = etree.fromstring(f"<div>{html}</div>".encode("utf-8"), parser)
+                tree = etree.fromstring(f"<div>{html}</div>".encode(), parser)
                 for child in tree:
                     self._process_element(child)
             except Exception as e:

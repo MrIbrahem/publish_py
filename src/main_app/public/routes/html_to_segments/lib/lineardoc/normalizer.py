@@ -36,7 +36,7 @@ class Normalizer:
         Args:
             html: HTML string to normalize
         """
-        parser = etree.HTMLParser()
+        parser = etree.HTMLParser(encoding="utf-8")
         try:
             tree = etree.fromstring(html, parser)
             self._process_element(tree)
