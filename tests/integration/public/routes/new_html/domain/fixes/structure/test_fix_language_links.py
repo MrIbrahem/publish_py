@@ -9,6 +9,6 @@ TODO: write tests
 
 
 from src.main_app.public.routes.new_html.domain.fixes.structure.fix_language_links import (
-    remove_lang_links,
     is_valid_lang_code,
+    remove_lang_links,
 )

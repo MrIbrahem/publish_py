@@ -9,6 +9,6 @@ TODO: write tests
 
 
 from src.main_app.public.routes.new_html.services.utils import (
-    get_file_dir,
     get_content_type,
+    get_file_dir,
 )

@@ -77,6 +77,7 @@ class TestDelDivError:
         assert "<div>After</div>" in result
         assert "Error" not in result
 
+
 class TestFixLinkRed:
     """
     tests for fix_link_red method

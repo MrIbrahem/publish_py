@@ -9,9 +9,9 @@ TODO: write tests
 
 
 from src.main_app.public.routes.new_html.services.storage import (
+    add_title_revision,
+    get_title_revision,
+    list_revisions,
     read_file,
     write_file,
-    get_title_revision,
-    add_title_revision,
-    list_revisions,
 )

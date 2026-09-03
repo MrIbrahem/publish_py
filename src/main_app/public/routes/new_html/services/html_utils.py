@@ -13,12 +13,14 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 
+
 def del_div_error(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
     # Directly match and remove <div> elements containing class="error"
     for div_tag in soup.find_all("div", class_="error"):
         div_tag.decompose()
     return str(soup)
+
 
 def fix_link_red(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
