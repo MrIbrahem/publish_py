@@ -3,7 +3,7 @@ Normalizer - Parser to normalize XML.
 """
 
 from __future__ import annotations
-
+import logging
 from typing import Any
 
 from lxml import etree
@@ -11,6 +11,7 @@ from lxml import etree
 from . import utils
 from .parser import VOID_ELEMENTS
 
+logger = logging.getLogger(__name__)
 
 def esc(s):
     """Escape text for inclusion in HTML."""
@@ -21,11 +22,15 @@ class Normalizer:
     """Parser to normalize XML."""
 
     def __init__(self) -> None:
-        """Initialize the normalizer."""
+        """
+        Initialize the parser.
+        """
         self.lowercase = True
 
     def init(self) -> None:
-        """Initialize state for parsing."""
+        """
+        Initialize state for parsing.
+        """
         self.doc = []
         self.tags: list[dict] = []
 
@@ -40,7 +45,8 @@ class Normalizer:
         try:
             tree = etree.fromstring(html, parser)
             self._process_element(tree)
-        except Exception:
+        except Exception as exc:
+            logger.error("Failed to parse HTML error: %s", str(exc))
             # Try with wrapping
             try:
                 tree = etree.fromstring(f"<div>{html}</div>", parser)
@@ -80,7 +86,12 @@ class Normalizer:
         self.doc.append(utils.get_open_tag_html(tag))
 
     def on_close_tag(self, tag_name) -> None:
-        """Handle close tag event."""
+        """
+        Handle close tag event.
+
+        Args:
+            tag_name: Name of tag to close
+        """
         tag = self.tags.pop()
 
         if tag["name"] != tag_name:
@@ -89,7 +100,12 @@ class Normalizer:
         self.doc.append(utils.get_close_tag_html(tag))
 
     def on_text(self, text: str) -> None:
-        """Handle text event."""
+        """
+        Handle text event.
+
+        Args:
+            text: Text content
+        """
         self.doc.append(esc(text))
 
     def get_html(self) -> str:

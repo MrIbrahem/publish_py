@@ -51,3 +51,4 @@ _work_files/add_all.py
 *.isorted
 /src/main_app/public/routes/php_new_html
 tests/**/*.php
+/src/main_app/public/routes/html_to_segments/*.html

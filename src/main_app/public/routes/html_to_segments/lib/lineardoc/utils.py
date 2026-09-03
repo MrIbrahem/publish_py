@@ -8,6 +8,8 @@ import re
 from collections.abc import Callable
 from typing import Any
 
+from .doc import Doc
+
 from . import util as cxutil
 from .text_chunk import TextChunk
 
@@ -72,11 +74,17 @@ def get_open_tag_html(tag: dict[str, Any]) -> str:
         HTML representation of open tag
     """
     html = ["<" + esc(tag["name"])]
-    attributes = sorted(tag.get("attributes", {}).keys())
+    attributes = tag.get("attributes", {}).keys()
+
+    # sort attributes
+    attributes = sorted(attributes)
+
     for attr in attributes:
         html.append(" " + esc(attr) + '="' + esc_attr(tag["attributes"][attr]) + '"')
+
     if tag.get("isSelfClosing"):
         html.append(" /")
+
     html.append(">")
     return "".join(html)
 
@@ -86,7 +94,7 @@ def get_close_tag_html(tag: dict[str, Any]) -> str:
     Render a SAX close tag into an HTML string.
 
     Args:
-        tag: Tag dict with 'name'
+            tag: Tag dict with 'name' and 'attributes'
 
     Returns:
         HTML representation of close tag
@@ -96,7 +104,7 @@ def get_close_tag_html(tag: dict[str, Any]) -> str:
     return "</" + esc(tag["name"]) + ">"
 
 
-def clone_open_tag(tag: dict[str, Any]) -> dict:
+def clone_open_tag(tag: dict[str, Any]) -> dict[str, Any]:
     """
     Clone a SAX open tag.
 
@@ -388,7 +396,7 @@ def set_link_ids_in_place(text_chunks, get_next_id: Callable) -> None:
                 tag["attributes"]["href"] = href
 
 
-def is_ignorable_block(section_doc) -> bool:
+def is_ignorable_block(section_doc: Doc) -> bool:
     """
     Check if the passed document is a section containing block level template or reference list.
 
@@ -420,14 +428,15 @@ def is_ignorable_block(section_doc) -> bool:
                     return True
 
         # Also check for textblocks
-        if not first_block_template and item_type == "textblock":
-            root_item = item["item"].get_root_item()
-            if root_item and is_non_translatable(root_item):
-                first_block_template = root_item
-                ignorable = True
-            else:
-                # There is non ignorable content to translate
-                return False
+        if item_type == "textblock":
+            if not first_block_template:
+                root_item = item["item"].get_root_item()
+                if root_item and is_non_translatable(root_item):
+                    first_block_template = root_item
+                    ignorable = True
+                else:
+                    # There is non ignorable content to translate
+                    return False
 
     return ignorable
 

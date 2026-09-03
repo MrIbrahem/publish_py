@@ -12,11 +12,14 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Literal
 
 from . import util as cxutil
 from . import utils
 from .text_block import TextBlock
+
+ITEM_TYPES = Literal["open", "close", "blockspace", "textblock"]
+ITEM_OBJECT_TYPES = dict[str, Any] | TextBlock | str
 
 
 class Doc:
@@ -49,7 +52,7 @@ class Doc:
             new_doc.add_item(new_item["type"], new_item["item"])
         return new_doc
 
-    def add_item(self, item_type, item: dict[str, Any] | TextBlock | str) -> Doc:
+    def add_item(self, item_type: ITEM_TYPES, item: ITEM_OBJECT_TYPES | Any) -> Doc:
         """
         Add an item to the document.
 
@@ -76,7 +79,7 @@ class Doc:
         """
         return self.items[-1] if self.items else None
 
-    def get_root_item(self) -> None | Any:
+    def get_root_item(self) -> None | dict[str, Any]:
         """
         Get the root item in the doc.
 
@@ -242,23 +245,23 @@ class Doc:
         # Copy the categories already collected
         new_doc.categories = self.categories
 
-        def get_tag_id(tag):
+        def get_tag_id(tag: dict[str, Any]):
             """Get something that can identify the tag."""
             tag_id = None
             if tag.get("attributes"):
                 tag_id = tag["attributes"].get("about") or tag["attributes"].get("id")
             return tag_id or tag["name"]
 
-        def open_section(doc):
+        def open_section(doc: Doc):
             doc.add_item("open", {"name": "section", "attributes": {"rel": "cx:Section"}})
 
-        def close_section(doc):
+        def close_section(doc: Doc):
             nonlocal prev_section, curr_section
             doc.add_item("close", {"name": "section"})
             prev_section = curr_section
             curr_section = None
 
-        def insert_to_prev_section(item, doc):
+        def insert_to_prev_section(item, doc: Doc):
             nonlocal curr_section, prev_section
             new_item = new_doc.get_current_item()
             if new_item and new_item["item"]["name"] != "section":
