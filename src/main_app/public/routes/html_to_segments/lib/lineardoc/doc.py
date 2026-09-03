@@ -49,7 +49,7 @@ class Doc:
             new_doc.add_item(new_item["type"], new_item["item"])
         return new_doc
 
-    def add_item(self, item_type, item: dict[str, Any]) -> Doc:
+    def add_item(self, item_type, item: dict[str, Any] | TextBlock | str) -> Doc:
         """
         Add an item to the document.
 
