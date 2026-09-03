@@ -78,7 +78,7 @@ def check_temp_to_delete(name: str) -> bool:
     :param name: The template name (lowercase).
     :return: True if the template should be deleted, False otherwise.
     """
-    if name.startswith("defaultsort"):
+    if name.lower().startswith("defaultsort"):
         return True
     return name in TEMPLATES_TO_DELETE
 

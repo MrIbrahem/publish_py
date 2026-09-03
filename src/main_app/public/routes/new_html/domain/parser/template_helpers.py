@@ -74,6 +74,7 @@ def strip_name(template: Template) -> str:
     except DeadIndexError:
         return ""
 
+
 def get_parameter(template: Template, key: str, default: str = "") -> str:
     """Equivalent of PHP's ``Template::getParameter($key, $default)``."""
     arg = template.get_arg(key)
