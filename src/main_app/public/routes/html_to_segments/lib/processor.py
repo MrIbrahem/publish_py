@@ -4,13 +4,11 @@ Main processing module for HTML transformation.
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import yaml
 
-from .lineardoc import Normalizer, Parser
-from .lineardoc import MwContextualizer
+from .lineardoc import MwContextualizer, Parser
 from .segmentation import CXSegmenter
 
 # Load configuration
@@ -21,25 +19,6 @@ with open(config_path, "r") as f:
 removable_sections = pageloader_config.get("removableSections", {})
 if not removable_sections:
     raise ValueError("removableSections must be defined in config")
-
-
-def normalize(html: str, sort_attrs: bool = True) -> str:
-    """
-    Normalize HTML by parsing and re-serializing.
-
-    Args:
-        html: HTML string to normalize
-
-    Returns:
-        Normalized HTML string
-    """
-    html = html.strip()
-    normalizer = Normalizer(sort_attrs=sort_attrs)
-    normalizer.init()
-    # Remove tabs, carriage returns, and newlines
-    html = re.sub(r"[\t\r\n]+", "", html)
-    normalizer.write(html)
-    return normalizer.get_html()
 
 
 def process_html(source_html: str, lang: str | None = None):
@@ -62,7 +41,10 @@ def process_html(source_html: str, lang: str | None = None):
     if lang is None:
         lang = "en"
 
-    parser = Parser(MwContextualizer({"removableSections": removable_sections}), {"wrapSections": True})
+    parser = Parser(
+        contextualizer=MwContextualizer({"removableSections": removable_sections}),
+        options={"wrapSections": True},
+    )
 
     parser.init()
     parser.write(source_html)
@@ -77,6 +59,5 @@ def process_html(source_html: str, lang: str | None = None):
 
 
 __all__ = [
-    "normalize",
     "process_html",
 ]
