@@ -6,12 +6,17 @@ The document is a list of items, where each item is:
 - a block close tag (e.g. </p>); or
 - a text_block of annotated inline text; or
 - "block whitespace" (a run of whitespace separating two block boundaries)
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Doc.js
 """
 
 from __future__ import annotations
 
 import hashlib
 from collections.abc import Callable
+from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from . import util as cxutil
@@ -20,7 +25,6 @@ from .text_block import TextBlock
 
 ITEM_TYPES = Literal["open", "close", "blockspace", "textblock"]
 ITEM_OBJECT_TYPES = dict[str, Any] | TextBlock | str
-
 
 class Doc:
     """An HTML document in linear representation."""
@@ -129,7 +133,11 @@ class Doc:
                 tag = utils.clone_open_tag(item["item"])
 
                 if tag.get("attributes", {}).get("id"):
-                    # If the item is a header, we make it a fixed length id
+                    # If the item is a header, we make it a fixed length id using hash of
+                    # the text content. Header ids are originally the header text to get
+                    # the URL fragments working, but for CX, it is irrelevant and we need
+                    # a fixed length id that can be used as DB key.
+                    # The text inside this 'open tag' is in the next item(i+1).
                     if (
                         tag["name"] in ["h1", "h2", "h3", "h4", "h5"]
                         and i + 1 < len(self.items)
@@ -137,8 +145,11 @@ class Doc:
                     ):
                         h = hashlib.sha256()
                         h.update(self.items[i + 1]["item"].get_plain_text().encode("utf-8"))
+                        # 30 is the max length of ids we allow. We also prepend the sequence id
+                        # just to make sure the ids don't collide if the same text repeats.
                         tag["attributes"]["id"] = h.hexdigest()[:30]
                     elif len(tag["attributes"]["id"]) > 30:
+                        # At any case, make sure that the section id never exceeds 30 bytes
                         tag["attributes"]["id"] = tag["attributes"]["id"][:30]
                 else:
                     tag["attributes"]["id"] = get_next_id("block", tag["name"])
@@ -216,10 +227,13 @@ class Doc:
 
             if item_type == "open":
                 html.append(utils.get_open_tag_html(item_obj))
+
             elif item_type == "close":
                 html.append(utils.get_close_tag_html(item_obj))
+
             elif item_type == "blockspace":
                 html.append(item_obj)
+
             elif item_type == "textblock":
                 html.append(item_obj.get_html())  # pyright: ignore[reportAttributeAccessIssue]
             else:
@@ -246,7 +260,15 @@ class Doc:
         new_doc.categories = self.categories
 
         def get_tag_id(tag: dict[str, Any]):
-            """Get something that can identify the tag."""
+            """
+            Get something that can identify the tag.
+
+            For a given tag, get something that can be used to identify the tag.
+            `about` attribute has more preference in our context since it connects
+            template fragments. If `about` is not present, use id attribute.
+            If no attributes, then it is tag name. In real wiki content, the case
+            of no attributes is not found.
+            """
             tag_id = None
             if tag.get("attributes"):
                 tag_id = tag["attributes"].get("about") or tag["attributes"].get("id")
@@ -287,7 +309,8 @@ class Doc:
                 tag = item_obj
                 if not curr_section:
                     if prev_section == get_tag_id(tag):
-                        # This tag is connected to previous section
+                        # This tag is connected to previous section. Can be a template fragment.
+                        # Undo last section close
                         new_doc.undo_add_item()
                         curr_section = prev_section
                     else:
@@ -318,14 +341,17 @@ class Doc:
                 tag_for_id = text_block.get_tag_for_id()
 
                 if not tag_for_id and not curr_section:
-                    # Textblock with no tag identifier
-                    insert_to_prev_section(item, new_doc)
-                    continue
+                    new_item = new_doc.get_current_item()
+                    # Textblock with no tag identifier. Add it to the previous section
+                    if prev_section and new_item and new_item["item"]["name"] == "section":
+                        insert_to_prev_section(item, new_doc)
+                        continue
 
-                is_connected = tag_for_id and prev_section == get_tag_id(tag_for_id)
+                # No previous section to attach to; fall through to open a new one
+                is_connected = tag_for_id and not curr_section and prev_section == get_tag_id(tag_for_id)
 
                 if is_connected:
-                    # This tag is connected to previous section
+                    # This tag is connected to previous section. Can be a template fragment.
                     insert_to_prev_section(item, new_doc)
                     continue
 
@@ -335,6 +361,8 @@ class Doc:
                     if not curr_section:
                         raise Exception(f'No id for the opened section for tag {tag_for_id.get("name")}')
                     new_doc.add_item(item_type, text_block)
+                    # There was no open sections. Close the section now itself. If this tag is a template
+                    # fragment, `is_connected` check above will insert the fragments to closed section.
                     close_section(new_doc)
                     continue
 
@@ -374,13 +402,16 @@ class Doc:
                     dump.append(f"{pad}cxtextchunk {{ border-right: solid #f88 1px }}</style>")
 
             elif item_type == "close":
+                # close block tag
                 tag = item_obj
                 dump.append(f'{pad}</{tag["name"]}>')
 
             elif item_type == "blockspace":
+                # Non-inline whitespace
                 dump.append(f"{pad}<cxblockspace/>")
 
             elif item_type == "textblock":
+                # Block of inline text
                 text_block = item_obj
                 dump.append(f"{pad}<cxtextblock>")
                 dump.extend(text_block.dump_xml_array(pad + "  "))
