@@ -149,6 +149,7 @@ class Normalizer:
         """
         return "".join(self.doc)
 
+
 def normalize(html: str, sort_attrs: bool = True) -> str:
     """
     Normalize HTML by parsing and re-serializing.
@@ -166,6 +167,7 @@ def normalize(html: str, sort_attrs: bool = True) -> str:
     html = re.sub(r"[\t\r\n]+", "", html)
     normalizer.write(html)
     return normalizer.get_html()
+
 
 __all__ = [
     "Normalizer",

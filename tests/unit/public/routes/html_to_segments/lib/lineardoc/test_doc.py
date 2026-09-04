@@ -6,11 +6,11 @@ Classes to test: Doc
 
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_block import TextBlock
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_chunk import TextChunk
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc import (
     Doc,
 )
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_block import TextBlock
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_chunk import TextChunk
 
 
 class TestDocCreation:

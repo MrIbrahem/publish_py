@@ -6,8 +6,8 @@ Classes to test: Parser
 
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.mw_contextualizer import MwContextualizer
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.contextualizer import Contextualizer
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.mw_contextualizer import MwContextualizer
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.parser import Parser
 
 
@@ -132,6 +132,7 @@ class TestParserInlineAnnotationTag:
         ctx = Contextualizer()
         parser = Parser(ctx)
         assert parser.is_inline_annotation_tag("i", False) is True
+
 
 class TestParserIntegration:
     """Test parser integration."""

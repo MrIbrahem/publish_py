@@ -7,6 +7,7 @@ Classes to test: TextBlock
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_block import TextBlock
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_chunk import TextChunk
 
+
 class TestTextBlockCreation:
     """Test text_block initialization."""
 

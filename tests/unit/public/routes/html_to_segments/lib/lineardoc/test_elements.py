@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.elements import BLOCK_TAGS
 
@@ -23,4 +22,3 @@ class TestParserBlockTags:
         assert "a" not in BLOCK_TAGS
         assert "b" not in BLOCK_TAGS
         assert "i" not in BLOCK_TAGS
-

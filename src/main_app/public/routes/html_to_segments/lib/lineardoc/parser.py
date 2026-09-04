@@ -15,9 +15,9 @@ from lxml import etree
 
 from .builder import Builder
 from .contextualizer import Contextualizer
+from .elements import BLOCK_TAGS, VOID_ELEMENTS
 from .mw_contextualizer import MwContextualizer
 from .utils import Utils
-from .elements import BLOCK_TAGS, VOID_ELEMENTS
 
 logger = logging.getLogger(__name__)
 
