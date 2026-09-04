@@ -10,13 +10,54 @@ The document is a list of items, where each item is:
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 import hashlib
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Literal
 
 from . import util as cxutil
 from .text_block import TextBlock
 from .utils import Utils
+
+ITEM_TYPES = Literal["open", "close", "blockspace", "textblock"]
+ITEM_OBJECT_TYPES = dict[str, Any] | TextBlock | str
+
+
+@dataclass
+class Item:
+    item_type: ITEM_TYPES
+    item: ITEM_OBJECT_TYPES | Any
+    item_text_block: TextBlock | None = None
+    item_str: str | None = None
+    item_dict: dict[str, Any] = field(default_factory=dict)
+
+    def to_json(self) -> dict[str, Any]:
+        return {"type": self.item_type, "item": self.item}
+
+    def __getitem__(self, key: str) -> Any:
+        # connect keys to object properties
+        if key == "type":
+            return self.item_type
+        elif key == "item":
+            return self.item
+        else:
+            raise KeyError(f"key '{key}' not found in Item")
+
+    @classmethod
+    def from_any(cls, item_type: ITEM_TYPES, obj: ITEM_OBJECT_TYPES | Any) -> Item:
+        result = cls(item_type=item_type, item=obj)
+        if isinstance(obj, TextBlock):
+            result.item_text_block = obj
+
+        elif isinstance(obj, dict):
+            result.item_dict = obj
+
+        elif isinstance(obj, str):
+            result.item_str = obj
+        else:
+            raise TypeError(f"Invalid type for Item: {type(obj)}")
+
+        return result
 
 
 class Doc:
@@ -122,8 +163,8 @@ class Doc:
 
         transclusion_context = None
         for i, item in enumerate(self.items):
-            if item["type"] == "open":
-                tag = Utils.clone_open_tag(item["item"])
+            if item.item_type == "open":
+                tag = Utils.clone_open_tag(item.item_dict)
 
                 if tag.get("attributes", {}).get("id"):
                     # If the item is a header, we make it a fixed length id
@@ -202,7 +243,7 @@ class Doc:
         html = []
 
         if self.wrapper_tag:
-            html.append(Utils.get_open_tag_html(self.wrapper_tag))
+            html.append(Utils.get_open_tag_html(self.wrapper_tag, self.sort_attrs))
 
         for item in self.items:
             item_type = item["type"]
@@ -212,9 +253,11 @@ class Doc:
                 continue
 
             if item_type == "open":
-                html.append(Utils.get_open_tag_html(item_obj))
+                html.append(Utils.get_open_tag_html(item_dict, self.sort_attrs))
+
             elif item_type == "close":
-                html.append(Utils.get_close_tag_html(item_obj))
+                html.append(Utils.get_close_tag_html(item_dict))
+
             elif item_type == "blockspace":
                 html.append(item_obj)
             elif item_type == "textblock":

@@ -4,12 +4,17 @@ Parser to read an HTML stream into a Doc.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from lxml import etree
 
 from .builder import Builder
+from .contextualizer import Contextualizer
+from .mw_contextualizer import MwContextualizer
 from .utils import Utils
+
+logger = logging.getLogger(__name__)
 
 BLOCK_TAGS = [
     "html",

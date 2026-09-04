@@ -4,12 +4,15 @@ Normalizer - Parser to normalize XML.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from lxml import etree
 
 from .parser import VOID_ELEMENTS
 from .utils import Utils
+
+logger = logging.getLogger(__name__)
 
 
 class Normalizer:
@@ -75,7 +78,7 @@ class Normalizer:
     def on_open_tag(self, tag: dict[str, Any]) -> None:
         """Handle open tag event."""
         self.tags.append(tag)
-        self.doc.append(Utils.get_open_tag_html(tag))
+        self.doc.append(Utils.get_open_tag_html(tag, self.sort_attrs))
 
     def on_close_tag(self, tag_name) -> None:
         """Handle close tag event."""
@@ -87,7 +90,12 @@ class Normalizer:
         self.doc.append(Utils.get_close_tag_html(tag))
 
     def on_text(self, text: str) -> None:
-        """Handle text event."""
+        """
+        Handle text event.
+
+        Args:
+            text: Text content
+        """
         self.doc.append(Utils.esc(text))
 
     def get_html(self) -> str:
