@@ -20,8 +20,8 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from . import util as cxutil
-from .utils import Utils
 from .text_block import TextBlock
+from .utils import Utils
 
 ITEM_TYPES = Literal["open", "close", "blockspace", "textblock"]
 ITEM_OBJECT_TYPES = dict[str, Any] | TextBlock | str
@@ -71,7 +71,6 @@ class Doc:
         self,
         wrapper_tag: dict[str, Any] | None = None,
         sort_attrs: bool = True,
-        utils: Any | None = None,
     ) -> None:
         """
         Initialize a Doc.
@@ -83,8 +82,6 @@ class Doc:
         self.wrapper_tag = wrapper_tag
         self.sort_attrs = sort_attrs
         self.categories = []
-        self.utils = Utils
-
 
     def clone(self, callback: Callable) -> Doc:
         """
@@ -176,7 +173,7 @@ class Doc:
         transclusion_context = None
         for i, item in enumerate(self.items):
             if item.item_type == "open":
-                tag = self.utils.clone_open_tag(item.item_dict)
+                tag = Utils.clone_open_tag(item.item_dict)
 
                 if tag.get("attributes", {}).get("id"):
                     # If the item is a header, we make it a fixed length id using hash of
@@ -262,7 +259,7 @@ class Doc:
         html = []
 
         if self.wrapper_tag:
-            html.append(self.utils.get_open_tag_html(self.wrapper_tag, self.sort_attrs))
+            html.append(Utils.get_open_tag_html(self.wrapper_tag, self.sort_attrs))
 
         for item in self.items:
             item_type = item.item_type
@@ -272,10 +269,10 @@ class Doc:
                 continue
 
             if item_type == "open":
-                html.append(self.utils.get_open_tag_html(item_dict, self.sort_attrs))
+                html.append(Utils.get_open_tag_html(item_dict, self.sort_attrs))
 
             elif item_type == "close":
-                html.append(self.utils.get_close_tag_html(item_dict))
+                html.append(Utils.get_close_tag_html(item_dict))
 
             elif item_type == "blockspace":
                 html.append(item.item_str)
@@ -286,7 +283,7 @@ class Doc:
                 raise Exception(f"Unknown item type: {item_type}")
 
         if self.wrapper_tag:
-            html.append(self.utils.get_close_tag_html(self.wrapper_tag))
+            html.append(Utils.get_close_tag_html(self.wrapper_tag))
 
         return "".join(html)
 
