@@ -35,7 +35,7 @@ class NewHtmlRoutes:
 
     def index(self) -> str:
         return render_template(
-            "new_text/revisions.html",
+            "new_html/revisions.html",
         )
 
     def fix(self) -> str:
@@ -66,7 +66,7 @@ class NewHtmlRoutes:
                     wikitext = changed_text
 
         return render_template(
-            "new_text/fix.html",
+            "new_html/fix.html",
             wikitext=wikitext,
             title=title,
         )
