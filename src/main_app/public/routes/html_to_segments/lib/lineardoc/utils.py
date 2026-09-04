@@ -1,5 +1,9 @@
 """
 Utility functions for HTML processing and tag manipulation.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Utils.js
 """
 
 from __future__ import annotations
@@ -8,9 +12,8 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from .doc import Doc
-
 from . import util as cxutil
+from .doc import Doc
 from .text_chunk import TextChunk
 
 
@@ -325,7 +328,7 @@ def get_chunk_boundary_groups(boundaries, chunks, get_length) -> list:
     return groups
 
 
-def add_common_tag(text_chunks, tag: dict[str, Any]) -> list:
+def add_common_tag(text_chunks: list[TextChunk], tag: dict[str, Any]) -> list:
     """
     Add a tag to consecutive text chunks, above common tags but below others.
 
@@ -364,7 +367,7 @@ def add_common_tag(text_chunks, tag: dict[str, Any]) -> list:
     return new_text_chunks
 
 
-def set_link_ids_in_place(text_chunks, get_next_id: Callable) -> None:
+def set_link_ids_in_place(text_chunks: list[TextChunk], get_next_id: Callable) -> None:
     """
     Set link IDs in-place on text chunks.
 
@@ -413,13 +416,13 @@ def is_ignorable_block(section_doc: Doc) -> bool:
     # We start with index 1 since the first tag will be <section>.
     for i in range(1, len(section_doc.items)):
         item = section_doc.items[i]
-        tag = item["item"]
-        item_type = item["type"]
+        tag_dict = item.item_dict
+        item_type = item.item_type
 
         if item_type == "open":
-            block_stack.append(tag)
-            if not first_block_template and (is_transclusion(tag) or is_reference_list(tag)):
-                first_block_template = tag
+            block_stack.append(tag_dict)
+            if not first_block_template and (is_transclusion(tag_dict) or is_reference_list(tag_dict)):
+                first_block_template = tag_dict
 
         if item_type == "close":
             if block_stack:
@@ -430,7 +433,7 @@ def is_ignorable_block(section_doc: Doc) -> bool:
         # Also check for textblocks
         if item_type == "textblock":
             if not first_block_template:
-                root_item = item["item"].get_root_item()
+                root_item = item.item_text_block.get_root_item()
                 if root_item and is_non_translatable(root_item):
                     first_block_template = root_item
                     ignorable = True

@@ -1,8 +1,13 @@
 """
 Normalizer - Parser to normalize XML.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Normalizer.js
 """
 
 from __future__ import annotations
+
 import logging
 from typing import Any
 
@@ -12,6 +17,7 @@ from . import utils
 from .parser import VOID_ELEMENTS
 
 logger = logging.getLogger(__name__)
+
 
 def esc(s):
     """Escape text for inclusion in HTML."""
@@ -55,10 +61,34 @@ class Normalizer:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree.Element | Any) -> None:
-        """Process an element recursively."""
+    def extract_tag_name(self, element: Any) -> str | None:
+        if isinstance(element, etree._ElementTree):
+            tag_name = element.getroot().tag
+        elif isinstance(element, etree._Element):
+            tag_name = element.tag
+        elif isinstance(element, etree.QName):
+            tag_name = element.localname
+        else:
+            tag_name = getattr(element, "tag", None)
+
+        # Handle Cython comment/processing instruction function objects
+        if callable(tag_name):
+            return None
+
+        return tag_name
+
+    def _process_element(self, element: etree._ElementTree | etree._Element | Any, tag_name: str | None = None) -> None:
+        """
+        Process an element and its children recursively.
+        """
         # Create tag dict
-        tag_name = element.tag.lower() if self.lowercase else element.tag
+        if tag_name is None:
+            tag_name = element.tag
+
+        if self.lowercase:
+            tag_name = tag_name.lower()
+
+        # Create tag dict
         tag = {"name": tag_name, "attributes": dict(element.attrib)}
 
         # Mark HTML void elements as self-closing
@@ -81,7 +111,12 @@ class Normalizer:
         self.on_close_tag(tag_name)
 
     def on_open_tag(self, tag: dict[str, Any]) -> None:
-        """Handle open tag event."""
+        """
+        Handle open tag event.
+
+        Args:
+            tag: Tag dict with 'name' and 'attributes'
+        """
         self.tags.append(tag)
         self.doc.append(utils.get_open_tag_html(tag))
 
