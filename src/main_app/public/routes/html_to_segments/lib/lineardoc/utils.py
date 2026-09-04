@@ -1,5 +1,9 @@
 """
 Utility functions for HTML processing and tag manipulation.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Utils.js
 """
 
 from __future__ import annotations
@@ -9,6 +13,7 @@ from collections.abc import Callable
 from typing import Any
 
 from . import util as cxutil
+from .doc import Doc
 from .text_chunk import TextChunk
 
 html_escape_table = {
@@ -62,7 +67,7 @@ class Utils:
         return re.sub(r'["\'&<>]', lambda m: f"&#{ord(m.group(0))};", s)
 
     @staticmethod
-    def get_open_tag_html(tag: dict[str, Any]) -> str:
+    def get_open_tag_html(tag: dict[str, Any], sort_attrs: bool = True) -> str:
         """
         Render a SAX open tag into an HTML string.
 
@@ -73,11 +78,18 @@ class Utils:
             HTML representation of open tag
         """
         html = ["<" + Utils.esc(tag["name"])]
-        attributes = sorted(tag.get("attributes", {}).keys())
+        attributes = tag.get("attributes", {}).keys()
+
+        # sort attributes
+        if sort_attrs:
+            attributes = sorted(attributes)
+
         for attr in attributes:
             html.append(" " + Utils.esc(attr) + '="' + Utils.esc_attr(tag["attributes"][attr]) + '"')
+
         if tag.get("isSelfClosing"):
             html.append(" /")
+
         html.append(">")
         return "".join(html)
 
@@ -87,7 +99,7 @@ class Utils:
         Render a SAX close tag into an HTML string.
 
         Args:
-            tag: Tag dict with 'name'
+                tag: Tag dict with 'name' and 'attributes'
 
         Returns:
             HTML representation of close tag
@@ -97,7 +109,7 @@ class Utils:
         return "</" + Utils.esc(tag["name"]) + ">"
 
     @staticmethod
-    def clone_open_tag(tag: dict[str, Any]) -> dict:
+    def clone_open_tag(tag: dict[str, Any]) -> dict[str, Any]:
         """
         Clone a SAX open tag.
 
@@ -318,7 +330,7 @@ class Utils:
         return groups
 
     @staticmethod
-    def add_common_tag(text_chunks, tag: dict[str, Any]) -> list:
+    def add_common_tag(text_chunks: list[TextChunk], tag: dict[str, Any]) -> list:
         """
         Add a tag to consecutive text chunks, above common tags but below others.
 
@@ -357,7 +369,7 @@ class Utils:
         return new_text_chunks
 
     @staticmethod
-    def set_link_ids_in_place(text_chunks, get_next_id: Callable) -> None:
+    def set_link_ids_in_place(text_chunks: list[TextChunk], get_next_id: Callable) -> None:
         """
         Set link IDs in-place on text chunks.
 
@@ -389,7 +401,7 @@ class Utils:
                     tag["attributes"]["href"] = href
 
     @staticmethod
-    def is_ignorable_block(section_doc) -> bool:
+    def is_ignorable_block(section_doc: Doc) -> bool:
         """
         Check if the passed document is a section containing block level template or reference list.
 
@@ -421,14 +433,15 @@ class Utils:
                         return True
 
             # Also check for textblocks
-            if not first_block_template and item_type == "textblock":
-                root_item = item["item"].get_root_item()
-                if root_item and Utils.is_non_translatable(root_item):
-                    first_block_template = root_item
-                    ignorable = True
-                else:
-                    # There is non ignorable content to translate
-                    return False
+            if item_type == "textblock":
+                if not first_block_template:
+                    root_item = item["item"].get_root_item()
+                    if root_item and Utils.is_non_translatable(root_item):
+                        first_block_template = root_item
+                        ignorable = True
+                    else:
+                        # There is non ignorable content to translate
+                        return False
 
         return ignorable
 
