@@ -15,6 +15,7 @@ from lxml import etree
 
 from . import utils
 from .builder import Builder
+from .contextualizer import Contextualizer
 from .mw_contextualizer import MwContextualizer
 
 logger = logging.getLogger(__name__)
@@ -129,7 +130,9 @@ VOID_ELEMENTS = [
 class Parser:
     """Parser to read an HTML stream into a Doc."""
 
-    def __init__(self, contextualizer: MwContextualizer, options=None, sort_attrs: bool = True) -> None:
+    def __init__(
+        self, contextualizer: MwContextualizer | Contextualizer, options=None, sort_attrs: bool = True
+    ) -> None:
         """
         Initialize the parser.
 
