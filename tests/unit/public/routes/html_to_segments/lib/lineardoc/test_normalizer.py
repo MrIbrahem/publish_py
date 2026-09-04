@@ -2,14 +2,13 @@
 Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/normalizer.py module.
 
 Classes to test: Normalizer
-Functions to test: esc
+Functions to test: normalize
 
 
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.normalizer import (
-    Normalizer,
-)
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.normalizer import Normalizer
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.normalizer import normalize  # noqa: F401
 
 
 class TestNormalizer:

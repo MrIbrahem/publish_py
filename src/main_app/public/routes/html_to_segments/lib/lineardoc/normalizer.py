@@ -9,6 +9,7 @@ https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineard
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any
 
 from lxml import etree
@@ -148,7 +149,25 @@ class Normalizer:
         """
         return "".join(self.doc)
 
+def normalize(html: str, sort_attrs: bool = True) -> str:
+    """
+    Normalize HTML by parsing and re-serializing.
+
+    Args:
+        html: HTML string to normalize
+
+    Returns:
+        Normalized HTML string
+    """
+    html = html.strip()
+    normalizer = Normalizer(sort_attrs=sort_attrs)
+    normalizer.init()
+    # Remove tabs, carriage returns, and newlines
+    html = re.sub(r"[\t\r\n]+", "", html)
+    normalizer.write(html)
+    return normalizer.get_html()
 
 __all__ = [
     "Normalizer",
+    "normalize",
 ]
