@@ -1,8 +1,13 @@
 """
 Parser to read an HTML stream into a Doc.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Parser.js
 """
 
 from __future__ import annotations
+
 import logging
 from typing import Any
 
@@ -10,6 +15,7 @@ from lxml import etree
 
 from . import utils
 from .builder import Builder
+from .mw_contextualizer import MwContextualizer
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +104,7 @@ BLOCK_TAGS = [
     # non-annotation inline tags
     "img",
     "br",
+    "wiki-chart",
 ]
 
 # HTML void elements that cannot have content and should be self-closing
@@ -122,7 +129,7 @@ VOID_ELEMENTS = [
 class Parser:
     """Parser to read an HTML stream into a Doc."""
 
-    def __init__(self, contextualizer, options=None) -> None:
+    def __init__(self, contextualizer: MwContextualizer, options=None) -> None:
         """
         Initialize the parser.
 
@@ -163,8 +170,10 @@ class Parser:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree.Element) -> None:
-        """Process an element and its children recursively."""
+    def _process_element(self, element: etree._Element | Any) -> None:
+        """
+        Process an element recursively.
+        """
         # Skip comments and other special nodes
         if not isinstance(element.tag, str):
             return
