@@ -12,11 +12,6 @@ from . import utils
 from .parser import VOID_ELEMENTS
 
 
-def esc(s):
-    """Escape text for inclusion in HTML."""
-    return s.replace("&", "&#38;").replace("<", "&#60;").replace(">", "&#62;")
-
-
 class Normalizer:
     """Parser to normalize XML."""
 
@@ -90,7 +85,7 @@ class Normalizer:
 
     def on_text(self, text: str) -> None:
         """Handle text event."""
-        self.doc.append(esc(text))
+        self.doc.append(utils.esc(text))
 
     def get_html(self) -> str:
         """
