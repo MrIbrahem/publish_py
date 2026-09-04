@@ -1,5 +1,9 @@
 """
 Normalizer - Parser to normalize XML.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Normalizer.js
 """
 
 from __future__ import annotations
@@ -18,12 +22,17 @@ logger = logging.getLogger(__name__)
 class Normalizer:
     """Parser to normalize XML."""
 
-    def __init__(self) -> None:
-        """Initialize the normalizer."""
+    def __init__(self, sort_attrs: bool = True) -> None:
+        """
+        Initialize the parser.
+        """
         self.lowercase = True
+        self.sort_attrs = sort_attrs
 
     def init(self) -> None:
-        """Initialize state for parsing."""
+        """
+        Initialize state for parsing.
+        """
         self.doc = []
         self.tags: list[dict] = []
 
@@ -38,7 +47,8 @@ class Normalizer:
         try:
             tree = etree.fromstring(html, parser)
             self._process_element(tree)
-        except Exception:
+        except Exception as exc:
+            logger.error("Failed to parse HTML error: %s", str(exc))
             # Try with wrapping
             try:
                 tree = etree.fromstring(f"<div>{html}</div>", parser)
@@ -47,13 +57,34 @@ class Normalizer:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree.Element | Any) -> None:
-        """Process an element recursively."""
-        # Create tag dict
-        tag_name = element.tag
-        if self.lowercase:
-            tag_name = tag_name.lower()  # pyright: ignore[reportAttributeAccessIssue]
+    def extract_tag_name(self, element: Any) -> str | None:
+        if isinstance(element, etree._ElementTree):
+            tag_name = element.getroot().tag
+        elif isinstance(element, etree._Element):
+            tag_name = element.tag
+        elif isinstance(element, etree.QName):
+            tag_name = element.localname
+        else:
+            tag_name = getattr(element, "tag", None)
 
+        # Handle Cython comment/processing instruction function objects
+        if callable(tag_name):
+            return None
+
+        return tag_name
+
+    def _process_element(self, element: etree._ElementTree | etree._Element | Any, tag_name: str | None = None) -> None:
+        """
+        Process an element and its children recursively.
+        """
+        # Create tag dict
+        if tag_name is None:
+            tag_name = element.tag
+
+        if self.lowercase:
+            tag_name = tag_name.lower()
+
+        # Create tag dict
         tag = {"name": tag_name, "attributes": dict(element.attrib)}
 
         # Mark HTML void elements as self-closing
@@ -76,12 +107,22 @@ class Normalizer:
         self.on_close_tag(tag_name)
 
     def on_open_tag(self, tag: dict[str, Any]) -> None:
-        """Handle open tag event."""
+        """
+        Handle open tag event.
+
+        Args:
+            tag: Tag dict with 'name' and 'attributes'
+        """
         self.tags.append(tag)
         self.doc.append(Utils.get_open_tag_html(tag, self.sort_attrs))
 
     def on_close_tag(self, tag_name) -> None:
-        """Handle close tag event."""
+        """
+        Handle close tag event.
+
+        Args:
+            tag_name: Name of tag to close
+        """
         tag = self.tags.pop()
 
         if tag["name"] != tag_name:

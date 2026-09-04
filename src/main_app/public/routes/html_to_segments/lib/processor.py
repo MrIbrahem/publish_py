@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from ..lib.lineardoc import Normalizer, Parser
+from .lineardoc import Normalizer, Parser
 from .lineardoc import MwContextualizer
 from .segmentation import CXSegmenter
 

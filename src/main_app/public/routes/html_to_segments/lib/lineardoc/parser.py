@@ -1,5 +1,9 @@
 """
 Parser to read an HTML stream into a Doc.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Parser.js
 """
 
 from __future__ import annotations
@@ -101,6 +105,7 @@ BLOCK_TAGS = [
     # non-annotation inline tags
     "img",
     "br",
+    "wiki-chart",
 ]
 
 # HTML void elements that cannot have content and should be self-closing
@@ -125,7 +130,12 @@ VOID_ELEMENTS = [
 class Parser:
     """Parser to read an HTML stream into a Doc."""
 
-    def __init__(self, contextualizer, options=None) -> None:
+    def __init__(
+        self,
+        contextualizer: MwContextualizer | Contextualizer,
+        options=None,
+        sort_attrs: bool = True,
+    ) -> None:
         """
         Initialize the parser.
 
@@ -136,10 +146,13 @@ class Parser:
         self.contextualizer = contextualizer
         self.options = options or {}
         self.lowercase = True
+        self.sort_attrs = sort_attrs
 
     def init(self) -> None:
-        """Initialize parser state."""
-        self.root_builder = Builder()
+        """
+        Initialize state for parsing.
+        """
+        self.root_builder = Builder(sort_attrs=self.sort_attrs)
         self.builder = self.root_builder
         # Stack of tags currently open
         self.all_tags = []
@@ -164,8 +177,10 @@ class Parser:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree.Element) -> None:
-        """Process an element and its children recursively."""
+    def _process_element(self, element: etree._Element | Any) -> None:
+        """
+        Process an element recursively.
+        """
         # Skip comments and other special nodes
         if not isinstance(element.tag, str):
             return
@@ -199,7 +214,7 @@ class Parser:
         Handle open tag event.
 
         Args:
-            tag: Tag dict
+            tag: Tag dict with 'name' and 'attributes'
         """
         if self.contextualizer.get_context() == "removable" or self.contextualizer.is_removable(tag):
             self.all_tags.append(tag)

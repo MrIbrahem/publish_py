@@ -1,5 +1,9 @@
 """
-text_block - A block of annotated inline text.
+Functions for working with text chunks in the LinearDoc library.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/TextBlock.js
 """
 
 from __future__ import annotations
@@ -266,7 +270,12 @@ def suppress_about_group_boundaries(boundaries: list[int], text_chunks: list[Tex
 class TextBlock:
     """A block of annotated inline text."""
 
-    def __init__(self, text_chunks: list[TextChunk], can_segment: bool = True) -> None:
+    def __init__(
+        self,
+        text_chunks: list[TextChunk],
+        can_segment: bool = True,
+        sort_attrs: bool = True,
+    ) -> None:
         """
         Initialize a text_block.
 
@@ -274,6 +283,7 @@ class TextBlock:
             text_chunks: Annotated inline text
             can_segment: This is a block which can be segmented
         """
+        self.sort_attrs = sort_attrs
         self.text_chunks = text_chunks
         self.can_segment = can_segment
         self.offsets = []
@@ -425,7 +435,6 @@ class TextBlock:
 
         # Get trailing text and trailing whitespace
         tail = target_text[pos:]
-        import re
 
         tail_space_match = re.search(r"\s*$", tail)
         tail_space = tail_space_match.group(0) if tail_space_match else ""
@@ -447,7 +456,7 @@ class TextBlock:
                 {"start": pos, "length": len(tail_space), "text_chunk": TextChunk(tail_space, common_tags)}
             )
 
-        return TextBlock([x["text_chunk"] for x in text_chunks])
+        return TextBlock([x["text_chunk"] for x in text_chunks], sort_attrs=self.sort_attrs)
 
     def get_plain_text(self) -> str:
         """
@@ -505,7 +514,7 @@ class TextBlock:
 
         return "".join(html)
 
-    def get_root_item(self) -> None | Any:
+    def get_root_item(self) -> None | dict[str, Any]:
         """
         Get a root item in the textblock.
 
@@ -532,7 +541,7 @@ class TextBlock:
 
         return None
 
-    def get_tag_for_id(self):
+    def get_tag_for_id(self) -> None | dict[str, Any]:
         """
         Get a tag that can represent this textblock.
 
@@ -603,7 +612,7 @@ class TextBlock:
             offset += len(t_chunk.text)
 
         flush_chunks()
-        return TextBlock(all_text_chunks)
+        return TextBlock(all_text_chunks, sort_attrs=self.sort_attrs)
 
     def set_link_ids(self, get_next_id: Callable) -> TextBlock:
         """
@@ -652,4 +661,11 @@ class TextBlock:
 
 __all__ = [
     "TextBlock",
+    "is_reference_chunk",
+    "to_char_items",
+    "to_chunks",
+    "escape_for_char_class",
+    "move_punctuation_across_references",
+    "get_chunk_about_values",
+    "suppress_about_group_boundaries",
 ]
