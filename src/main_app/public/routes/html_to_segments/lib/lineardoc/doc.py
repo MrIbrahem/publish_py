@@ -15,8 +15,8 @@ from collections.abc import Callable
 from typing import Any
 
 from . import util as cxutil
-from . import utils
 from .text_block import TextBlock
+from .utils import Utils
 
 
 class Doc:
@@ -123,7 +123,7 @@ class Doc:
         transclusion_context = None
         for i, item in enumerate(self.items):
             if item["type"] == "open":
-                tag = utils.clone_open_tag(item["item"])
+                tag = Utils.clone_open_tag(item["item"])
 
                 if tag.get("attributes", {}).get("id"):
                     # If the item is a header, we make it a fixed length id
@@ -202,7 +202,7 @@ class Doc:
         html = []
 
         if self.wrapper_tag:
-            html.append(utils.get_open_tag_html(self.wrapper_tag))
+            html.append(Utils.get_open_tag_html(self.wrapper_tag))
 
         for item in self.items:
             item_type = item["type"]
@@ -212,9 +212,9 @@ class Doc:
                 continue
 
             if item_type == "open":
-                html.append(utils.get_open_tag_html(item_obj))
+                html.append(Utils.get_open_tag_html(item_obj))
             elif item_type == "close":
-                html.append(utils.get_close_tag_html(item_obj))
+                html.append(Utils.get_close_tag_html(item_obj))
             elif item_type == "blockspace":
                 html.append(item_obj)
             elif item_type == "textblock":
@@ -223,7 +223,7 @@ class Doc:
                 raise Exception(f"Unknown item type: {item_type}")
 
         if self.wrapper_tag:
-            html.append(utils.get_close_tag_html(self.wrapper_tag))
+            html.append(Utils.get_close_tag_html(self.wrapper_tag))
 
         return "".join(html)
 

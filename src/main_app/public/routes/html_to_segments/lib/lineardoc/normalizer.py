@@ -8,8 +8,8 @@ from typing import Any
 
 from lxml import etree
 
-from . import utils
 from .parser import VOID_ELEMENTS
+from .utils import Utils
 
 
 class Normalizer:
@@ -47,7 +47,10 @@ class Normalizer:
     def _process_element(self, element: etree.Element | Any) -> None:
         """Process an element recursively."""
         # Create tag dict
-        tag_name = element.tag.lower() if self.lowercase else element.tag
+        tag_name = element.tag
+        if self.lowercase:
+            tag_name = tag_name.lower()  # pyright: ignore[reportAttributeAccessIssue]
+
         tag = {"name": tag_name, "attributes": dict(element.attrib)}
 
         # Mark HTML void elements as self-closing
@@ -72,7 +75,7 @@ class Normalizer:
     def on_open_tag(self, tag: dict[str, Any]) -> None:
         """Handle open tag event."""
         self.tags.append(tag)
-        self.doc.append(utils.get_open_tag_html(tag))
+        self.doc.append(Utils.get_open_tag_html(tag))
 
     def on_close_tag(self, tag_name) -> None:
         """Handle close tag event."""
@@ -81,11 +84,11 @@ class Normalizer:
         if tag["name"] != tag_name:
             raise Exception(f'Unmatched tags: {tag["name"]} !== {tag_name}')
 
-        self.doc.append(utils.get_close_tag_html(tag))
+        self.doc.append(Utils.get_close_tag_html(tag))
 
     def on_text(self, text: str) -> None:
         """Handle text event."""
-        self.doc.append(utils.esc(text))
+        self.doc.append(Utils.esc(text))
 
     def get_html(self) -> str:
         """
@@ -99,5 +102,4 @@ class Normalizer:
 
 __all__ = [
     "Normalizer",
-    "esc",
 ]
