@@ -131,7 +131,10 @@ class Parser:
     """Parser to read an HTML stream into a Doc."""
 
     def __init__(
-        self, contextualizer: MwContextualizer | Contextualizer, options=None, sort_attrs: bool = True
+        self,
+        contextualizer: MwContextualizer | Contextualizer,
+        options=None,
+        sort_attrs: bool = True,
     ) -> None:
         """
         Initialize the parser.
