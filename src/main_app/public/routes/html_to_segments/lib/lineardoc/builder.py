@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import utils
 from .doc import Doc
 from .text_block import TextBlock
 from .text_chunk import TextChunk
+from .utils import Utils
 
 
 class Builder:
@@ -148,7 +148,7 @@ class Builder:
             i -= 1
 
         # Allow empty external links and references
-        if replace and (utils.is_reference(tag) or utils.is_external_link(tag) or utils.is_transclusion(tag)):
+        if replace and (Utils.is_reference(tag) or Utils.is_external_link(tag) or Utils.is_transclusion(tag)):
             # truncate list and add data span as new sub-Doc
             self.text_chunks = self.text_chunks[: i + 1]
             whitespace.reverse()

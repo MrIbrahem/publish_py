@@ -1,24 +1,15 @@
 """
 Parser to read an HTML stream into a Doc.
-
-converted from the LinearDoc javascript library of the Wikimedia Content translation project
-
-https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Parser.js
 """
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from lxml import etree
 
-from . import utils
 from .builder import Builder
-from .contextualizer import Contextualizer
-from .mw_contextualizer import MwContextualizer
-
-logger = logging.getLogger(__name__)
+from .utils import Utils
 
 BLOCK_TAGS = [
     "html",
@@ -105,7 +96,6 @@ BLOCK_TAGS = [
     # non-annotation inline tags
     "img",
     "br",
-    "wiki-chart",
 ]
 
 # HTML void elements that cannot have content and should be self-closing
@@ -130,12 +120,7 @@ VOID_ELEMENTS = [
 class Parser:
     """Parser to read an HTML stream into a Doc."""
 
-    def __init__(
-        self,
-        contextualizer: MwContextualizer | Contextualizer,
-        options=None,
-        sort_attrs: bool = True,
-    ) -> None:
+    def __init__(self, contextualizer, options=None) -> None:
         """
         Initialize the parser.
 
@@ -146,13 +131,10 @@ class Parser:
         self.contextualizer = contextualizer
         self.options = options or {}
         self.lowercase = True
-        self.sort_attrs = sort_attrs
 
     def init(self) -> None:
-        """
-        Initialize state for parsing.
-        """
-        self.root_builder = Builder(sort_attrs=self.sort_attrs)
+        """Initialize parser state."""
+        self.root_builder = Builder()
         self.builder = self.root_builder
         # Stack of tags currently open
         self.all_tags = []
@@ -177,10 +159,8 @@ class Parser:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree._Element | Any) -> None:
-        """
-        Process an element recursively.
-        """
+    def _process_element(self, element: etree.Element) -> None:
+        """Process an element and its children recursively."""
         # Skip comments and other special nodes
         if not isinstance(element.tag, str):
             return
@@ -214,24 +194,24 @@ class Parser:
         Handle open tag event.
 
         Args:
-            tag: Tag dict with 'name' and 'attributes'
+            tag: Tag dict
         """
         if self.contextualizer.get_context() == "removable" or self.contextualizer.is_removable(tag):
             self.all_tags.append(tag)
             self.contextualizer.on_open_tag(tag)
             return
 
-        if self.options.get("isolateSegments") and utils.is_segment(tag):
+        if self.options.get("isolateSegments") and Utils.is_segment(tag):
             self.builder.push_block_tag({"name": "div", "attributes": {"class": "cx-segment-block"}})
 
-        if utils.is_reference(tag) or utils.is_math(tag):
+        if Utils.is_reference(tag) or Utils.is_math(tag):
             # Start a reference: create a child builder, and move into it
             self.builder = self.builder.create_child_builder(tag)
 
-        elif utils.is_inline_empty_tag(tag["name"]):
+        elif Utils.is_inline_empty_tag(tag["name"]):
             self.builder.add_inline_content(tag, self.contextualizer.can_segment())
 
-        elif self.is_inline_annotation_tag(tag["name"], utils.is_transclusion(tag)):
+        elif self.is_inline_annotation_tag(tag["name"], Utils.is_transclusion(tag)):
             self.builder.push_inline_annotation_tag(tag)
         else:
             self.builder.push_block_tag(tag)
@@ -250,7 +230,7 @@ class Parser:
             return
 
         tag = self.all_tags.pop()
-        is_ann = self.is_inline_annotation_tag(tag_name, utils.is_transclusion(tag))
+        is_ann = self.is_inline_annotation_tag(tag_name, Utils.is_transclusion(tag))
 
         if self.contextualizer.is_removable(tag) or self.contextualizer.get_context() == "removable":
             self.contextualizer.on_close_tag(tag)
@@ -258,11 +238,11 @@ class Parser:
 
         self.contextualizer.on_close_tag(tag)
 
-        if utils.is_inline_empty_tag(tag_name):
+        if Utils.is_inline_empty_tag(tag_name):
             return
         elif is_ann and len(self.builder.inline_annotation_tags) > 0:
             self.builder.pop_inline_annotation_tag(tag_name)
-            if self.options.get("isolateSegments") and utils.is_segment(tag):
+            if self.options.get("isolateSegments") and Utils.is_segment(tag):
                 self.builder.pop_block_tag("div")
         elif is_ann and self.builder.parent is not None:
             # In a sub document: should be a span or sup that closes a reference
