@@ -13,7 +13,7 @@ from typing import Any
 
 from lxml import etree
 
-from .parser import VOID_ELEMENTS
+from .elements import VOID_ELEMENTS
 from .utils import Utils
 
 logger = logging.getLogger(__name__)

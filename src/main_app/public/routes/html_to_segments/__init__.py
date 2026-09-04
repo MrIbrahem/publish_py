@@ -14,7 +14,7 @@ from typing import Any
 
 from flask import Blueprint, Response, jsonify, render_template, request
 
-from .lib import process_html
+from .lib.processor import process_html
 
 logger = logging.getLogger(__name__)
 
