@@ -8,8 +8,8 @@ import re
 from collections.abc import Callable
 from typing import Any
 
-from . import utils
 from .text_chunk import TextChunk
+from .utils import Utils
 
 
 class TextBlock:
@@ -230,27 +230,27 @@ class TextBlock:
                     break
 
             for j in range(len(old_tags) - 1, match_top, -1):
-                html.append(utils.get_close_tag_html(old_tags[j]))
+                html.append(Utils.get_close_tag_html(old_tags[j]))
 
             for j in range(match_top + 1, len(t_chunk.tags)):
-                html.append(utils.get_open_tag_html(t_chunk.tags[j]))
+                html.append(Utils.get_open_tag_html(t_chunk.tags[j]))
 
             old_tags = t_chunk.tags
 
             # Now add text and inline content
-            html.append(utils.esc(t_chunk.text))
+            html.append(Utils.esc(t_chunk.text))
             if t_chunk.inline_content:
                 if hasattr(t_chunk.inline_content, "get_html"):
                     # a sub-doc
                     html.append(t_chunk.inline_content.get_html())
                 else:
                     # an empty inline tag
-                    html.append(utils.get_open_tag_html(t_chunk.inline_content))
-                    html.append(utils.get_close_tag_html(t_chunk.inline_content))
+                    html.append(Utils.get_open_tag_html(t_chunk.inline_content))
+                    html.append(Utils.get_close_tag_html(t_chunk.inline_content))
 
         # Finally, close any remaining tags
         for j in range(len(old_tags) - 1, -1, -1):
-            html.append(utils.get_close_tag_html(old_tags[j]))
+            html.append(Utils.get_close_tag_html(old_tags[j]))
 
         return "".join(html)
 
@@ -309,21 +309,21 @@ class TextBlock:
             if len(current_text_chunks) == 0:
                 return
 
-            modified_text_chunks = utils.add_common_tag(
+            modified_text_chunks = Utils.add_common_tag(
                 current_text_chunks,
                 {"name": "span", "attributes": {"class": "cx-segment", "data-segmentid": get_next_id("segment")}},
             )
-            utils.set_link_ids_in_place(modified_text_chunks, get_next_id)
+            Utils.set_link_ids_in_place(modified_text_chunks, get_next_id)
             all_text_chunks.extend(modified_text_chunks)
             current_text_chunks.clear()
 
         root_item = self.get_root_item()
-        if root_item and utils.is_transclusion(root_item):
+        if root_item and Utils.is_transclusion(root_item):
             # Avoid segmenting inside transclusions
             return self
 
         # for each chunk, split at any boundaries that occur inside the chunk
-        groups = utils.get_chunk_boundary_groups(
+        groups = Utils.get_chunk_boundary_groups(
             get_boundaries(self.get_plain_text()),
             self.text_chunks,
             lambda t_chunk: len(t_chunk.text),
@@ -363,7 +363,7 @@ class TextBlock:
         Returns:
             Self with link IDs set
         """
-        utils.set_link_ids_in_place(self.text_chunks, get_next_id)
+        Utils.set_link_ids_in_place(self.text_chunks, get_next_id)
         return self
 
     def dump_xml_array(self, pad: str) -> list:
@@ -378,12 +378,12 @@ class TextBlock:
         """
         dump = []
         for chunk in self.text_chunks:
-            tags_dump = utils.dump_tags(chunk.tags)
+            tags_dump = Utils.dump_tags(chunk.tags)
             tags_attr = f' tags="{tags_dump}"' if tags_dump else ""
 
             if chunk.text:
                 dump.append(
-                    f"{pad}<cxtextchunk{tags_attr}>" + utils.esc(chunk.text).replace("\n", "&#10;") + "</cxtextchunk>"
+                    f"{pad}<cxtextchunk{tags_attr}>" + Utils.esc(chunk.text).replace("\n", "&#10;") + "</cxtextchunk>"
                 )
 
             if chunk.inline_content:

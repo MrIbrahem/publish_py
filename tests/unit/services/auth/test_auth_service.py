@@ -57,7 +57,7 @@ class TestAuthService:
 
         class DummyHandshaker:
             def __init__(self, mw_uri, *, consumer_token, user_agent) -> None:
-                created_handshakers.append((mw_uri, consumer_token, user_agent)) # pyright: ignore[reportArgumentType]
+                created_handshakers.append((mw_uri, consumer_token, user_agent))  # pyright: ignore[reportArgumentType]
 
         def fake_consumer(key: str, secret: str) -> tuple[str, str]:
             created_tokens.append((key, secret))
@@ -71,7 +71,7 @@ class TestAuthService:
         assert isinstance(handshaker, DummyHandshaker)
         assert created_tokens == [("consumer", "secret")]
         assert created_handshakers[0][0] == "https://example.com"
-        assert created_handshakers[0][2] == "agent" # pyright: ignore[reportGeneralTypeIssues]
+        assert created_handshakers[0][2] == "agent"  # pyright: ignore[reportGeneralTypeIssues]
 
     def test_start_login(self, monkeypatch: pytest.MonkeyPatch) -> None:
         captured_state: list[str] = []
