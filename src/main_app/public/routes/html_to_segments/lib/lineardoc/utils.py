@@ -13,6 +13,7 @@ from collections.abc import Callable
 from typing import Any
 
 from . import util as cxutil
+
 # from .doc import Doc
 from .text_chunk import TextChunk
 
@@ -401,7 +402,7 @@ class Utils:
                     tag["attributes"]["href"] = href
 
     @staticmethod
-    def is_ignorable_block(section_doc: "Doc") -> bool:
+    def is_ignorable_block(section_doc) -> bool:
         """
         Check if the passed document is a section containing block level template or reference list.
 

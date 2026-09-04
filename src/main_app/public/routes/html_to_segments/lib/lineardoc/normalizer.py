@@ -78,6 +78,9 @@ class Normalizer:
         """
         Process an element and its children recursively.
         """
+        if element is None:
+            return
+
         # Create tag dict
         if tag_name is None:
             tag_name = element.tag
