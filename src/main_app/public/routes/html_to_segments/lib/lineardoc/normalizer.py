@@ -46,35 +46,19 @@ class Normalizer:
         """
         parser = etree.HTMLParser(encoding="utf-8")
         try:
-            tree = etree.fromstring(html, parser)
-            self._process_element(tree)
+            root = etree.fromstring(html, parser)
+            self._process_element(root)
         except Exception as exc:
             logger.error("Failed to parse HTML error: %s", str(exc))
             # Try with wrapping
             try:
-                tree = etree.fromstring(f"<div>{html}</div>", parser)
-                for child in tree:
+                root = etree.fromstring(f"<div>{html}</div>", parser)
+                for child in root:
                     self._process_element(child)
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def extract_tag_name(self, element: Any) -> str | None:
-        if isinstance(element, etree._ElementTree):
-            tag_name = element.getroot().tag
-        elif isinstance(element, etree._Element):
-            tag_name = element.tag
-        elif isinstance(element, etree.QName):
-            tag_name = element.localname
-        else:
-            tag_name = getattr(element, "tag", None)
-
-        # Handle Cython comment/processing instruction function objects
-        if callable(tag_name):
-            return None
-
-        return tag_name
-
-    def _process_element(self, element: etree._ElementTree | etree._Element | Any, tag_name: str | None = None) -> None:
+    def _process_element(self, element: etree._Element | Any, tag_name: str | None = None) -> None:
         """
         Process an element and its children recursively.
         """
@@ -83,9 +67,9 @@ class Normalizer:
 
         # Create tag dict
         if tag_name is None:
-            tag_name = element.tag
+            tag_name = element.tag  # pyright: ignore[reportAssignmentType]
 
-        if self.lowercase:
+        if tag_name and self.lowercase:
             tag_name = tag_name.lower()
 
         # Create tag dict

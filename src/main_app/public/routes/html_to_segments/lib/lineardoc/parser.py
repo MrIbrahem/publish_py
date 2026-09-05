@@ -61,13 +61,13 @@ class Parser:
         """
         parser = etree.HTMLParser(encoding="utf-8")
         try:
-            tree = etree.fromstring(html.encode("utf-8"), parser)
-            self._process_element(tree)
+            root = etree.fromstring(html.encode("utf-8"), parser)
+            self._process_element(root)
         except Exception:
             # Try with wrapping
             try:
-                tree = etree.fromstring(f"<div>{html}</div>".encode(), parser)
-                for child in tree:
+                root = etree.fromstring(f"<div>{html}</div>".encode(), parser)
+                for child in root:
                     self._process_element(child)
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e

@@ -21,7 +21,11 @@ if not removable_sections:
     raise ValueError("removableSections must be defined in config")
 
 
-def process_html(source_html: str, lang: str | None = None):
+def process_html(
+    source_html: str,
+    lang: str | None = None,
+    sort_attrs: bool = True,
+):
     """
     Process source HTML through the CX pipeline.
 
@@ -44,6 +48,7 @@ def process_html(source_html: str, lang: str | None = None):
     parser = Parser(
         contextualizer=MwContextualizer({"removableSections": removable_sections}),
         options={"wrapSections": True},
+        sort_attrs=sort_attrs,
     )
 
     parser.init()

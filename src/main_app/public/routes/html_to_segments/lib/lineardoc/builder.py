@@ -152,10 +152,11 @@ class Builder:
             # truncate list and add data span as new sub-Doc
             self.text_chunks = self.text_chunks[: i + 1]
             whitespace.reverse()
+            whitespace_text_chunk = TextChunk("".join(whitespace), [])
             self.add_inline_content(
                 Doc(sort_attrs=self.sort_attrs)
                 .add_item("open", tag)
-                .add_item("textblock", TextBlock([TextChunk("".join(whitespace), [])]))
+                .add_item("textblock", TextBlock([whitespace_text_chunk], sort_attrs=self.sort_attrs))
                 .add_item("close", tag)
             )
 
@@ -208,7 +209,14 @@ class Builder:
         if whitespace_only:
             self.doc.add_item("blockspace", "".join(whitespace))
         else:
-            self.doc.add_item("textblock", TextBlock(self.text_chunks, self.is_block_segmentable))
+            self.doc.add_item(
+                "textblock",
+                TextBlock(
+                    self.text_chunks,
+                    self.is_block_segmentable,
+                    sort_attrs=self.sort_attrs,
+                ),
+            )
 
         self.text_chunks = []
         self.is_block_segmentable = True

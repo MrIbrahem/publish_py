@@ -16,52 +16,12 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Callable
-from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any
 
 from . import util as cxutil
+from .doc_item import ITEM_OBJECT_TYPES, ITEM_TYPES, DocItem
 from .text_block import TextBlock
 from .utils import Utils
-
-ITEM_TYPES = Literal["open", "close", "blockspace", "textblock"]
-ITEM_OBJECT_TYPES = dict[str, Any] | TextBlock | str
-
-
-@dataclass
-class Item:
-    item_type: ITEM_TYPES
-    item: ITEM_OBJECT_TYPES | Any
-    item_text_block: TextBlock | None = None
-    item_str: str | None = None
-    item_dict: dict[str, Any] = field(default_factory=dict)
-
-    def to_json(self) -> dict[str, Any]:
-        return {"type": self.item_type, "item": self.item}
-
-    def __getitem__(self, key: str) -> Any:
-        # connect keys to object properties
-        if key == "type":
-            return self.item_type
-        elif key == "item":
-            return self.item
-        else:
-            raise KeyError(f"key '{key}' not found in Item")
-
-    @classmethod
-    def from_any(cls, item_type: ITEM_TYPES, obj: ITEM_OBJECT_TYPES | Any) -> Item:
-        result = cls(item_type=item_type, item=obj)
-        if isinstance(obj, TextBlock):
-            result.item_text_block = obj
-
-        elif isinstance(obj, dict):
-            result.item_dict = obj
-
-        elif isinstance(obj, str):
-            result.item_str = obj
-        else:
-            raise TypeError(f"Invalid type for Item: {type(obj)}")
-
-        return result
 
 
 class Doc:
@@ -78,7 +38,7 @@ class Doc:
         Args:
             wrapper_tag: Open/close tags
         """
-        self.items: list[Item] = []
+        self.items: list[DocItem] = []
         self.wrapper_tag = wrapper_tag
         self.sort_attrs = sort_attrs
         self.categories = []
@@ -110,7 +70,7 @@ class Doc:
         Returns:
             Self for chaining
         """
-        self.items.append(Item.from_any(item_type, item))
+        self.items.append(DocItem.from_any(item_type, item))
         return self
 
     def undo_add_item(self) -> None:
