@@ -54,6 +54,7 @@ def do_changes_to_text_with_settings(
         add_category=add_category,
     )
 
+
 __all__ = [
     "do_changes_to_text_with_settings",
 ]
