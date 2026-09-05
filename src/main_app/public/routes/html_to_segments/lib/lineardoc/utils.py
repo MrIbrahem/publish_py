@@ -408,52 +408,6 @@ class Utils:
                     tag["attributes"]["href"] = href
 
     @staticmethod
-    def is_ignorable_block(section_doc) -> bool:
-        """
-        Check if the passed document is a section containing block level template or reference list.
-
-        Args:
-            section_doc: Doc object
-
-        Returns:
-            Whether the section is ignorable
-        """
-        ignorable = False
-        block_stack = []
-        first_block_template = None
-
-        # We start with index 1 since the first tag will be <section>.
-        # for i in range(1, len(section_doc.items)):
-        # item = section_doc.items[i]
-        for _i, item in enumerate(section_doc.items, start=1):
-            tag_dict = item.item
-            item_type = item.item_type
-
-            if item_type == "open":
-                block_stack.append(tag_dict)
-                if not first_block_template and (Utils.is_transclusion(tag_dict) or Utils.is_reference_list(tag_dict)):
-                    first_block_template = tag_dict
-
-            if item_type == "close":
-                if block_stack:
-                    current_close_tag = block_stack.pop()
-                    if Utils.is_closing_template_match(block_stack, first_block_template, current_close_tag):
-                        return True
-
-            # Also check for textblocks
-            if item_type == "textblock":
-                if not first_block_template:
-                    root_item = item.item.get_root_item()
-                    if root_item and Utils.is_non_translatable(root_item):
-                        first_block_template = root_item
-                        ignorable = True
-                    else:
-                        # There is non ignorable content to translate
-                        return False
-
-        return ignorable
-
-    @staticmethod
     def is_closing_template_match(
         block_stack: list[Any],
         first_block_template: dict[str, Any] | None,

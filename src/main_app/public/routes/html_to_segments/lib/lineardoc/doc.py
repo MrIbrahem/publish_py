@@ -106,7 +106,7 @@ class Doc:
         for i_item in self.items:
             # Ignore all blockspaces, loop till we see a tag opening
             if i_item.item_type == "open" and isinstance(i_item, DocDict):
-                return i_item.item
+                return i_item.item.to_json()
         return None
 
     def segment(self, get_boundaries: Callable) -> Doc:
@@ -189,7 +189,7 @@ class Doc:
                     transclusion_context = None
                 new_doc.add_dict_item(i_item.item_type, tag.to_json())
 
-            elif i_item.item_type == "textblock":
+            elif i_item.item_type == "textblock" and isinstance(i_item, DocTextBlock):
                 text_block = i_item.item
 
                 if text_block.can_segment and not transclusion_context:
@@ -301,54 +301,57 @@ class Doc:
             close_section(new_doc)
 
         for i_item in self.items:
-            item = i_item.item
             item_type = i_item.item_type
 
             if not in_body:
                 # Till we reach body, keep on adding items to new_doc
                 new_doc.add_item(item_type, i_item.item)
-                if item.name == "body":
+                if getattr(i_item.item, "name", None) == "body":
                     in_body = True
                 continue
 
             if item_type == "open" and isinstance(i_item, DocDict):
+                tag = i_item.item
                 if not curr_section:
-                    if prev_section == get_tag_id(item):
+                    if prev_section == get_tag_id(tag):
                         # This tag is connected to previous section. Can be a template fragment.
                         # Undo last section close
                         new_doc.undo_add_item()
                         curr_section = prev_section
                     else:
                         open_section(new_doc)
-                        curr_section = get_tag_id(item)
+                        curr_section = get_tag_id(tag)
 
-                new_doc.add_item(item_type, item)
+                new_doc.add_item(item_type, tag)
 
             elif item_type == "close" and isinstance(i_item, DocDict):
-                if curr_section and item.name == "body":
+                tag = i_item.item
+                if curr_section and tag.name == "body":
                     close_section(new_doc)
                     in_body = False
 
-                new_doc.add_item(item_type, item)
-                if get_tag_id(item) == curr_section:
+                new_doc.add_item(item_type, tag)
+                if get_tag_id(tag) == curr_section:
                     close_section(new_doc)
 
             elif item_type == "blockspace":
+                tag = i_item.item
                 new_item = new_doc.get_current_item()
                 if prev_section and new_item and new_item["item"]["name"] == "section":
-                    insert_to_prev_section(item, new_doc)
+                    insert_to_prev_section(tag, new_doc)
                 else:
-                    new_doc.add_blockspace_item(item.item)
+                    new_doc.add_blockspace_item(tag.item)
 
-            elif item_type == "textblock":
-                text_block = item.item
+            elif item_type == "textblock" and isinstance(i_item, DocTextBlock):
+                tag = i_item.item
+                text_block = i_item.item
                 tag_for_id = text_block.get_tag_for_id() or {}
 
                 if not tag_for_id and not curr_section:
                     new_item = new_doc.get_current_item()
                     # Textblock with no tag identifier. Add it to the previous section
                     if prev_section and new_item and new_item["item"]["name"] == "section":
-                        insert_to_prev_section(item, new_doc)
+                        insert_to_prev_section(tag, new_doc)
                         continue
 
                 # No previous section to attach to; fall through to open a new one
@@ -356,7 +359,7 @@ class Doc:
 
                 if is_connected:
                     # This tag is connected to previous section. Can be a template fragment.
-                    insert_to_prev_section(item, new_doc)
+                    insert_to_prev_section(tag, new_doc)
                     continue
 
                 if not curr_section:
@@ -415,7 +418,7 @@ class Doc:
                 # Non-inline whitespace
                 dump.append(f"{pad}<cxblockspace/>")
 
-            elif i_item.item_type == "textblock":
+            elif i_item.item_type == "textblock" and isinstance(i_item, DocTextBlock):
                 # Block of inline text
                 dump.extend(i_item.generate_textblock_xml(pad))
 
@@ -461,6 +464,54 @@ class Doc:
             new_doc.add_item(new_item.item_type, new_item["item"])
 
         return new_doc
+
+    def is_ignorable_block(self) -> bool:
+        """
+        Check if the passed document is a section containing block level template or reference list.
+
+        Args:
+            section_doc: Doc object
+
+        Returns:
+            Whether the section is ignorable
+        """
+        ignorable = False
+        block_stack = []
+        first_block_template = None
+
+        # We start with index 1 since the first tag will be <section>.
+
+        for i, i_item in enumerate(self.items):
+            if i == 0:
+                continue
+
+            item_type = i_item.item_type
+
+            if item_type == "open" and isinstance(i_item, DocDict):
+                tag_dict = i_item.item.to_json()
+                block_stack.append(tag_dict)
+                if not first_block_template and (Utils.is_transclusion(tag_dict) or Utils.is_reference_list(tag_dict)):
+                    first_block_template = tag_dict
+
+            if item_type == "close" and isinstance(i_item, DocDict):
+                tag_dict = i_item.item.to_json()
+                if block_stack:
+                    current_close_tag = block_stack.pop()
+                    if Utils.is_closing_template_match(block_stack, first_block_template, current_close_tag):
+                        return True
+
+            # Also check for textblocks
+            if item_type == "textblock" and isinstance(i_item, DocTextBlock):
+                if not first_block_template:
+                    root_item = i_item.item.get_root_item()
+                    if root_item and Utils.is_non_translatable(root_item):
+                        first_block_template = root_item
+                        ignorable = True
+                    else:
+                        # There is non ignorable content to translate
+                        return False
+
+        return ignorable
 
 
 __all__ = [
