@@ -55,3 +55,4 @@ src/main_app/public/routes/html_to_segments/*.html
 _work_files/*
 !_work_files/tree.md
 !_work_files/test_tree.md
+tests/unit/public/routes/new_html/domain/fixes/data/output-1.wiki
