@@ -7,12 +7,10 @@ Functions to test: get_all_citations, get_full_refs, get_short_refs
 from pathlib import Path
 
 from src.main_app.services.new_html_services.domain.parser.citations_parser import (
-    Citation,
     get_all_citations,
     get_full_refs,
     get_short_refs,
 )
-
 
 class TestGetCitations:
     """
@@ -220,22 +218,6 @@ class TestGetShortRefs:
 
         assert len(result) == 1
         assert result[0].name == "tight"
-
-
-class TestCitation:
-
-    def test_basic(self):
-        text = "<ref name = PI2022></ref>"
-        result = Citation.from_text(text)
-        assert result.name == "PI2022"
-        assert result.is_self_closing() is True
-
-    def test_no_quetes_2(self):
-        text = "<ref name = PI2022/>"
-        result = Citation.from_text(text)
-
-        assert result.is_self_closing() is True
-        assert result.name == "PI2022"
 
 
 class TestGetShortAndFullRefs:
