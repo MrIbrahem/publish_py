@@ -461,7 +461,10 @@ class Doc:
 
         for i_item in self.items:
             new_item = callback(i_item)
-            new_doc.add_item(new_item.item_type, new_item["item"])
+            if isinstance(new_item, dict):
+                new_doc.add_item(new_item["item_type"], new_item["item"])
+            else:
+                new_doc.add_item(new_item.item_type, new_item.item)
 
         return new_doc
 

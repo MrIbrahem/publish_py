@@ -18,11 +18,11 @@ class ItemBase:
     item_type: Any
 
     def to_json(self) -> dict[str, Any]:
-        return {"type": self.item_type, "item": self.item}
+        return {"item_type": self.item_type, "item": self.item}
 
     def __getitem__(self, key: str) -> Any:
         # connect keys to object properties
-        if key == "type":
+        if key == "item_type":
             return self.item_type
         elif key == "item":
             return self.item

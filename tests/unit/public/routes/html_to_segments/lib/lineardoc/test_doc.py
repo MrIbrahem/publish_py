@@ -224,7 +224,7 @@ class TestDocClone:
             if item.item_type == "open":
                 item_item = item.item
                 new_item = {
-                    "type": item.item_type,
+                    "item_type": item.item_type,
                     "item": {"name": item_item["name"], "attributes": dict(item_item.get("attributes", {}))},
                 }
                 new_item["item"]["attributes"]["class"] = "modified"
