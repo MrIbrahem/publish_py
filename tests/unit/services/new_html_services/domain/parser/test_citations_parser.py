@@ -4,6 +4,8 @@ Unit tests for src/main_app/services/new_html_services/domain/parser/citations_p
 Functions to test: get_citations, get_full_refs, get_short_refs
 """
 
+from pathlib import Path
+
 from src.main_app.services.new_html_services.domain.parser.citations_parser import (
     get_citations,
     get_full_refs,
@@ -21,35 +23,35 @@ class TestGetCitations:
         result = get_citations(text)
 
         assert len(result) == 1
-        assert result[0]["content"] == "A basic citation"
-        assert result[0]["tag"] == "<ref>A basic citation</ref>"
-        assert result[0]["name"] == ""
+        assert result[0].contents == "A basic citation"
+        assert result[0].tag == "<ref>A basic citation</ref>"
+        assert result[0].name == ""
 
     def test_single_full_ref_with_name(self):
         text = '<ref name="smith2020">Smith, J. (2020)</ref>'
         result = get_citations(text)
 
         assert len(result) == 1
-        assert result[0]["content"] == "Smith, J. (2020)"
-        assert result[0]["name"] == "smith2020"
-        assert result[0]["options"]["name"] == "smith2020"
-        assert result[0]["tag"] == text
+        assert result[0].contents == "Smith, J. (2020)"
+        assert result[0].name == "smith2020"
+        assert result[0].attrs["name"] == "smith2020"
+        assert result[0].tag == text
 
     def test_multiple_full_refs(self):
         text = "Text<ref>First</ref> more<ref>Second</ref>"
         result = get_citations(text)
 
         assert len(result) == 2
-        assert result[0]["content"] == "First"
-        assert result[1]["content"] == "Second"
+        assert result[0].contents == "First"
+        assert result[1].contents == "Second"
 
     def test_excludes_self_closing_refs(self):
         text = 'Text<ref name="a">Full ref</ref> and<ref name="a" /> a short ref'
         result = get_citations(text)
 
         assert len(result) == 1
-        assert result[0]["content"] == "Full ref"
-        assert result[0]["name"] == "a"
+        assert result[0].contents == "Full ref"
+        assert result[0].name == "a"
 
     def test_no_refs_returns_empty_list(self):
         result = get_citations("Just some plain text without any refs")
@@ -66,39 +68,39 @@ class TestGetCitations:
         result = get_citations(text)
 
         assert len(result) == 1
-        assert result[0]["name"] == "foo"
-        assert result[0]["options"]["name"] == "foo"
-        assert result[0]["options"]["group"] == "note"
+        assert result[0].name == "foo"
+        assert result[0].attrs["name"] == "foo"
+        assert result[0].attrs["group"] == "note"
 
     def test_ref_name_is_stripped(self):
         text = '<ref name=" spaced ">Content</ref>'
         result = get_citations(text)
 
         assert len(result) == 1
-        assert result[0]["name"] == "spaced"
+        assert result[0].name == "spaced"
 
     def test_nested_markup_inside_ref(self):
         text = "<ref>See [[Some Page|the page]] for {{cite web|url=example.com}} details</ref>"
         result = get_citations(text)
 
         assert len(result) == 1
-        assert "[[Some Page|the page]]" in result[0]["content"]
-        assert "{{cite web|url=example.com}}" in result[0]["content"]
+        assert "[[Some Page|the page]]" in result[0].contents
+        assert "{{cite web|url=example.com}}" in result[0].contents
 
     def test_multiline_ref_content(self):
         text = "<ref>Line one\nLine two\nLine three</ref>"
         result = get_citations(text)
 
         assert len(result) == 1
-        assert result[0]["content"] == "Line one\nLine two\nLine three"
+        assert result[0].contents == "Line one\nLine two\nLine three"
 
     def test_duplicate_names_both_returned(self):
         text = '<ref name="dup">First</ref> text <ref name="dup">Second</ref>'
         result = get_citations(text)
 
         assert len(result) == 2
-        assert [c["content"] for c in result] == ["First", "Second"]
-        assert all(c["name"] == "dup" for c in result)
+        assert [c.contents for c in result] == ["First", "Second"]
+        assert all(c.name == "dup" for c in result)
 
 
 class TestGetFullRefs:
@@ -159,24 +161,24 @@ class TestGetShortRefs:
         result = get_short_refs(text)
 
         assert len(result) == 1
-        assert result[0]["name"] == "smith2020"
-        assert result[0]["content"] == ""
-        assert result[0]["tag"] == '<ref name="smith2020" />'
+        assert result[0].name == "smith2020"
+        assert result[0].contents == ""
+        assert result[0].tag == '<ref name="smith2020" />'
 
     def test_multiple_short_refs(self):
         text = 'Text<ref name="a"/> more<ref name="b" />'
         result = get_short_refs(text)
 
         assert len(result) == 2
-        assert {c["name"] for c in result} == {"a", "b"}
-        assert all(c["content"] == "" for c in result)
+        assert {c.name for c in result} == {"a", "b"}
+        assert all(c.contents == "" for c in result)
 
     def test_excludes_full_refs(self):
         text = '<ref name="full">Full content</ref><ref name="short" />'
         result = get_short_refs(text)
 
         assert len(result) == 1
-        assert result[0]["name"] == "short"
+        assert result[0].name == "short"
 
     def test_no_refs_returns_empty_list(self):
         result = get_short_refs("No refs in this text")
@@ -193,27 +195,81 @@ class TestGetShortRefs:
         result = get_short_refs(text)
 
         assert len(result) == 1
-        assert result[0]["name"] == ""
-        assert result[0]["content"] == ""
+        assert result[0].name == ""
+        assert result[0].contents == ""
 
     def test_short_ref_name_is_stripped(self):
         text = '<ref name=" spaced " />'
         result = get_short_refs(text)
 
         assert len(result) == 1
-        assert result[0]["name"] == "spaced"
+        assert result[0].name == "spaced"
 
     def test_short_ref_with_extra_attributes(self):
         text = '<ref name="foo" group="note" />'
         result = get_short_refs(text)
 
         assert len(result) == 1
-        assert result[0]["options"]["name"] == "foo"
-        assert result[0]["options"]["group"] == "note"
+        assert result[0].attrs["name"] == "foo"
+        assert result[0].attrs["group"] == "note"
 
     def test_no_space_before_self_close(self):
         text = '<ref name="tight"/>'
         result = get_short_refs(text)
 
         assert len(result) == 1
-        assert result[0]["name"] == "tight"
+        assert result[0].name == "tight"
+
+
+class TestGetShortAndFullRefs:
+
+    def load_fixture(self, name: str) -> str:
+        path = Path(__file__).parent / "data" / name
+        assert path.exists(), f"Fixture file missing: {path}"
+
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        assert content is not None, f"Unable to read fixture file: {path}"
+        return content
+
+    def test_fix_wikitext_matches_result_fixture(self) -> None:
+        source = self.load_fixture("source-1.wiki")
+
+        full_refs = get_full_refs(source)
+        short_refs = get_short_refs(source)
+
+        assert len(full_refs) == 11
+        assert len(short_refs) == 22
+
+        assert len(set(full_refs.keys())) == 11
+
+        assert set(full_refs.keys()) == {
+            "AHFS2022",
+            "PI2022",
+            "EPAR2022",
+            "WHO22nd",
+            "BNF81",
+            "TGA",
+            "EMC",
+            "EMA",
+            "MSR",
+            "Minkovsky",
+            "Lin",
+        }
+
+        short_refs_by_name = {x.name: x for x in short_refs}
+
+        assert set(short_refs_by_name.keys()) == {
+            "Minkovsky",
+            "Lin/",
+            "BNF81/",
+            "AHFS2022/",
+            "TGA/",
+            "EMC/",
+            "PI2022/",
+            "PI2022",
+            "EPAR2022/",
+            "EMA/",
+            "not_exists_ref_should_be_deleted",
+        }

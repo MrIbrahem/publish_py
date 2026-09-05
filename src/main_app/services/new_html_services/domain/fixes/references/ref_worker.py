@@ -242,7 +242,7 @@ def remove_bad_refs(text: str) -> str:
     :return: The text with bad references removed.
     """
     for citation in get_citations(text):
-        citation_tag = citation["tag"]
+        citation_tag = citation.tag
         if check_one_cite(citation_tag):
             text = text.replace(citation_tag, "")
 

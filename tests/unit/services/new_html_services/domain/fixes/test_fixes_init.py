@@ -17,7 +17,7 @@ def strip_result(result: str) -> str:
     text = result.strip()
     # remove empty space from end of each line of text
     text = "\n".join([line.rstrip() for line in text.splitlines()])
-    return text
+    return text.strip()
 
 
 class TestWikitextFixerService:
@@ -42,14 +42,16 @@ class TestWikitextFixerService:
     def test_fix_wikitext_matches_result_fixture(self, source_file: str, result_file: str, output_file: str) -> None:
         source = self.load_fixture(source_file)
         expected = self.load_fixture(result_file)
+        expected = strip_result(expected)
 
         fixer = WikitextFixerService()
-        result = fixer.fix(text=source, title="PLACEHOLDER_TEST")
+        result = fixer.fix(text=source, title="PLACEHOLDER_TEST", all_flag=True)
+        result = strip_result(result)
 
-        if result.strip() != expected.strip():
+        if result != expected:
             # write to output-1.wiki
             output_path = Path(__file__).parent / "data" / output_file
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(result)
 
-        assert strip_result(result) == strip_result(expected)
+        assert result == expected
