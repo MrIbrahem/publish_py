@@ -54,8 +54,8 @@ class DocStr(ItemBase):
     item_type: Literal["blockspace"] = "blockspace"
 
     @classmethod
-    def from_any(cls, item_type: Literal["blockspace"], obj: str):
-        return cls(item_type=item_type, item=obj)
+    def from_any(cls, obj: str):
+        return cls(item=obj)
 
 
 __all__ = [

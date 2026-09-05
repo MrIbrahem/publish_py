@@ -207,7 +207,7 @@ class Builder:
                 whitespace.append(_chunk.text)
 
         if whitespace_only:
-            self.doc.add_blockspace_item("blockspace", "".join(whitespace))
+            self.doc.add_blockspace_item("".join(whitespace))
         else:
             self.doc.add_textblock_item(
                 TextBlock(

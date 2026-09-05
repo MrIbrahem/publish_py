@@ -72,7 +72,7 @@ class TestDocAddBlockSpaceItem:
     def test_add_blockspace(self):
         """Test adding block space."""
         doc = Doc()
-        doc.add_blockspace_item("blockspace", "  ")
+        doc.add_blockspace_item("  ")
         assert len(doc.items) == 1
         assert doc.items[0]["type"] == "blockspace"
 

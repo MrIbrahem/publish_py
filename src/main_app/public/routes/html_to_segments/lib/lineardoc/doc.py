@@ -62,8 +62,8 @@ class Doc:
         self.items.append(DocDict(item_type=item_type, item=item))
         return self
 
-    def add_blockspace_item(self, item_type: Literal["blockspace"], item: str) -> Doc:
-        self.items.append(DocStr(item_type=item_type, item=item))
+    def add_blockspace_item(self, item: str) -> Doc:
+        self.items.append(DocStr(item=item))
         return self
 
     def add_item(self, item_type: ITEM_TYPES_STR, item: ITEM_OBJECT_TYPES) -> Doc:
