@@ -43,7 +43,7 @@ class WikitextFixerService:
 
         # Clean up references
         text = remove_bad_refs(text)
-        # text = del_empty_refs(text)
+        text = del_empty_refs(text)
 
         text = remove_lang_links(text)
 

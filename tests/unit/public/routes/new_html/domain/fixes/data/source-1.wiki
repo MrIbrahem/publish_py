@@ -7,7 +7,7 @@
 | image2            = Afatinib 3D ball-and-stick 4G5P.png
 
 <!-- Names -->
-| pronounce         = 
+| pronounce         =
 | tradename         = Gilotrif, Giotrif, Afanix
 | synonyms          = BIBW 2992
 | IUPAC_name        = ''N''-[4-[(3-Chloro-4-fluorophenyl)amino]-7-<nowiki>[[</nowiki>(3''S'')-tetrahydro-3-furanyl]oxy]-6-quinazolinyl]-4(dimethylamino)-2-butenamide
@@ -18,12 +18,12 @@
 | side_effects      = Diarrhea, rash, mouth inflammation, dry skin, nausea, itchiness<ref name=PI2022/>
 | interactions      = <!-- notable interactions -->
 | pregnancy_AU      = C
-| pregnancy_category= 
-| breastfeeding     = 
+| pregnancy_category=
+| breastfeeding     =
 | routes_of_administration= [[Oral administration|By mouth]]
-| onset             = 
-| duration_of_action= 
-| defined_daily_dose= 
+| onset             =
+| duration_of_action=
+| defined_daily_dose=
 | typical_dose      = 40 mg OD<ref name=PI2022/>
 
 <!-- External links -->
@@ -37,20 +37,20 @@
 | legal_UK          = POM
 | legal_US          = Rx-only
 | legal_US_comment  = <ref name = PI2022 />
-| legal_status      = 
+| legal_status      =
 | DailyMedID        = Afatinib
 | licence_EU        = yes
 
 <!-- Pharmacokinetic data -->
-| bioavailability   = 
+| bioavailability   =
 | protein_bound     = 95%
 | metabolism        = [[Cytochrome P450|CYP]] not involved
 | elimination_half-life= 37 hours
 | excretion         = Faeces (85%), urine (4%)
 
 <!-- Chemical and physical data -->
-| C= 24 | Cl= 1 | F= 1 | H= 25 | N= 5 
-| O= 3 
+| C= 24 | Cl= 1 | F= 1 | H= 25 | N= 5
+| O= 3
 | SMILES            = CN(C)C\C=C\C(=O)Nc3cc1c(Nc(cc2Cl)ccc2F)ncnc1cc3OC4COCC4
 | StdInChI          = 1S/C24H25ClFN5O3/c1-31(2)8-3-4-23(32)30-21-11-17-20(12-22(21)34-16-7-9-33-13-16)27-14-28-24(17)29-15-5-6-19(26)18(25)10-15/h3-6,10-12,14,16H,7-9,13H2,1-2H3,(H,30,32)(H,27,28,29)/b4-3+/t16-/m0/s1
 | StdInChI_Ref      = {{stdinchicite|correct|chemspider}}
@@ -116,7 +116,7 @@ Like [[lapatinib]] and [[neratinib]], afatinib is a [[protein kinase inhibitor]]
 
 == Society and culture ==
 === Brand names ===
-In [[Bangladesh]] under the trade name Afanix.
+In [[Bangladesh]] under the trade name Afanix. <ref name="not_exists_ref_should_be_deleted"/>
 
 == References ==
 {{reflist|refs=
@@ -134,8 +134,8 @@ In [[Bangladesh]] under the trade name Afanix.
 
 <!--Identifiers-->
 | ChemSpiderID_Ref = {{chemspidercite|correct|chemspider}}
-| ATC_supplemental = 
-| CAS_supplemental = 
+| ATC_supplemental =
+| CAS_supplemental =
 | ChEBI_Ref = {{ebicite|correct|EBI}}
 | DrugBank_Ref = {{drugbankcite|correct|drugbank}}
 | KEGG2_Ref = {{keggcite|changed|kegg}}
