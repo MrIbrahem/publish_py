@@ -5,6 +5,7 @@ Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/utils.p
 from pathlib import Path
 
 import pytest
+
 from src.main_app.public.routes.html_to_segments.lib.lineardoc import MwContextualizer, Parser
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.utils import Utils
 
@@ -26,7 +27,6 @@ def test_is_ignorable_block(test_file):
     parser.write(html.strip())
     result = parser.builder.doc.is_ignorable_block()
     assert result is True, f"Expected block to be ignorable for file: {test_file.name}"
-
 
 
 class TestEscapeFunctions:

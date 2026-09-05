@@ -13,6 +13,8 @@ from typing import Any
 
 from lxml import etree
 
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc import Doc
+
 from .builder import Builder
 from .contextualizer import Contextualizer
 from .elements import BLOCK_TAGS, VOID_ELEMENTS
@@ -51,6 +53,9 @@ class Parser:
         self.builder = self.root_builder
         # Stack of tags currently open
         self.all_tags = []
+
+    def create_wrapped_doc(self) -> Doc:
+        return self.builder.doc.wrap_sections()
 
     def write(self, html: str) -> None:
         """
