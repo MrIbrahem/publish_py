@@ -4,7 +4,6 @@ Unit tests for src/main_app/services/new_html_services/domain/fixes/__init__.py 
 Classes to test: WikitextFixerService
 """
 
-
 import os
 
 from src.main_app.services.new_html_services.domain.fixes import (
