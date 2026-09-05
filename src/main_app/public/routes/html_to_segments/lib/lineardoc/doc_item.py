@@ -152,12 +152,15 @@ class DocDict(ItemBase):
     item: DictTag
 
     @classmethod
-    def load(cls, item_type: ITEM_TYPES_STR, obj: dict[str, Any]) -> DocDict:
+    def load(cls, item_type: ITEM_TYPES_STR, obj: DictTag | dict[str, Any]) -> DocDict:
         """
         Args:
             item_type: Literal["open", "close"]
             obj: Tag dict with 'name' and 'attributes'
         """
+        if isinstance(obj, DictTag):
+            obj = obj.to_json()
+
         item_obj = DictTag(
             name=obj.get("name") or "",
             attributes=obj.get("attributes") or {},

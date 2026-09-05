@@ -68,13 +68,13 @@ class Doc:
         Add an item to the document.
         """
         if item_type == "textblock":
-            return self.add_textblock_item(item)  # pyright: ignore[reportArgumentType]
+            return self.add_textblock_item(item)
 
         if item_type == "blockspace":
-            return self.add_blockspace_item(item)  # pyright: ignore[reportArgumentType]
+            return self.add_blockspace_item(item)
 
         if item_type in ("open", "close"):
-            return self.add_dict_item(item_type, item)  # pyright: ignore[reportArgumentType]
+            return self.add_dict_item(item_type, item)
 
         raise TypeError(f"Invalid type for Item: {type(item)}")
 
