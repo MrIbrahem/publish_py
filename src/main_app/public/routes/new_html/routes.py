@@ -48,28 +48,39 @@ class NewHtmlRoutes:
         """
         title = ""
         wikitext = ""
-        if request.method == "POST":
-            title = request.form.get("title")
-            wikitext = request.form.get("text")
-            if not title or not wikitext:
-                if not title:
-                    flash("Please enter a title", "danger")
-                if not wikitext:
-                    flash("Please enter wikitext", "danger")
-            else:
-                fixer = WikitextFixerService(wikitext, title)
-                changed_text = fixer.fix()
-                if changed_text == wikitext:
-                    flash("No changes made.", "warning")
-                else:
-                    flash("Changes made.", "success")
-                    wikitext = changed_text
 
-        return render_template(
-            "new_html/fix.html",
-            wikitext=wikitext,
-            title=title,
-        )
+        def render(title: str | None = "", wikitext: str | None = "") -> str:
+            return render_template(
+                "new_html/fix.html",
+                wikitext=wikitext,
+                title=title,
+            )
+
+        if request.method != "POST":
+            return render()
+
+        title = request.form.get("title")
+        wikitext = request.form.get("text")
+
+        if not title:
+            flash("Please enter a title", "danger")
+
+        if not wikitext:
+            flash("Please enter wikitext", "danger")
+
+        if not title or not wikitext:
+            return render(title, wikitext)
+
+        fixer = WikitextFixerService()
+
+        changed_text = fixer.fix(wikitext, title)
+        if changed_text != wikitext:
+            flash("Changes made.", "success")
+            return render(title, changed_text)
+
+        flash("No changes made.", "warning")
+        return render(title, wikitext)
+
 
     def main(self) -> Response:
         """
