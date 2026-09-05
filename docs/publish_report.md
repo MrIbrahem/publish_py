@@ -16,7 +16,7 @@ The Python implementation is a thorough port of the PHP publish endpoint, coveri
 -   **`formatUser`/`formatTitle`**: Both replace underscores with spaces and apply special user mappings.
 -   **`make_summary`**: Both produce the same summary format: `Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{lang} {hashtag}`.
 -   **`get_revid` / `get_revid_db`**: Both read a local JSON file first, then fall back to an API call. Both set `"empty revid"` flag and fall back to `request['revid']`/`request['revision']`.
--   **`do_changes_to_text` (text_changes)**: Both attempt to load the `fix_refs` module and call `DoChangesToText1`, falling back to returning the original text if unavailable.
+-   **`do_changes_to_text` (text_changes)**: Both attempt to load the `fix_refs` module and call `apply_text_modifications`, falling back to returning the original text if unavailable.
 -   **`publish_do_edit`**: Both construct the same API parameters (`action=edit`, `title`, `summary`, `text`, `format=json`, captcha params), get a CSRF token, and POST via OAuth. Both return the parsed JSON edit result.
 -   **`shouldAddedToWikidata` / `GetTitleInfo`**: Both query the MediaWiki API with `formatversion=2` and check `ns == 2` to skip user pages.
 -   **`link_to_wikidata` / `LinkToWikidata`**: Both look up the QID, call `wbsetsitelink` with `id` or `title/site`, detect `success` return, and return `{result: "success", qid}`.
