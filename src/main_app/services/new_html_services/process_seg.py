@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from ...html_to_segments import process_html
+from ...public.routes.html_to_segments import process_html
 from .html_utils import remove_data_parsoid
 from .storage import read_file
 

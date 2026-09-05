@@ -16,7 +16,7 @@ from typing import Any
 
 import requests
 
-from .....config.main_settings import settings
+from ...config.main_settings import settings
 
 logger = logging.getLogger(__name__)
 
