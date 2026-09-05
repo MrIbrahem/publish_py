@@ -186,12 +186,12 @@ class Doc:
                 new_doc.add_item(item.item_type, item.item)
 
             else:
-                text_block: TextBlock = item.item_text_block
-                segmented_text_block = (
-                    text_block.segment(get_boundaries, get_next_id)
-                    if (text_block.can_segment and not transclusion_context)
-                    else text_block.set_link_ids(get_next_id)
-                )
+                text_block: TextBlock = item.item_text_block  # pyright: ignore[reportAssignmentType]
+
+                if text_block.can_segment and not transclusion_context:
+                    segmented_text_block = text_block.segment(get_boundaries, get_next_id)
+                else:
+                    segmented_text_block = text_block.set_link_ids(get_next_id)
 
                 new_doc.add_item(
                     "textblock",

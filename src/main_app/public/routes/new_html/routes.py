@@ -81,7 +81,6 @@ class NewHtmlRoutes:
         flash("No changes made.", "warning")
         return render(title, wikitext)
 
-
     def main(self) -> Response:
         """
         Main API endpoint.
