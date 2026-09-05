@@ -637,25 +637,7 @@ class TextBlock:
         Returns:
             Array that will concatenate to an XML string representation
         """
-        dump = []
-        for chunk in self.text_chunks:
-            tags_dump = Utils.dump_tags(chunk.tags)
-            tags_attr = f' tags="{tags_dump}"' if tags_dump else ""
-
-            if chunk.text:
-                dump.append(
-                    f"{pad}<cxtextchunk{tags_attr}>" + Utils.esc(chunk.text).replace("\n", "&#10;") + "</cxtextchunk>"
-                )
-
-            if chunk.inline_content:
-                dump.append(f"{pad}<cxinlineelement{tags_attr}>")
-                if hasattr(chunk.inline_content, "dump_xml_array"):
-                    # sub-doc: concatenate
-                    dump.extend(chunk.inline_content.dump_xml_array(pad + "  "))
-                else:
-                    dump.append(f'{pad}  <{chunk.inline_content["name"]}/>')
-                dump.append(f"{pad}</cxinlineelement>")
-
+        dump = [chunk.generate_xml_chunk(Utils, pad) for chunk in self.text_chunks]
         return dump
 
 

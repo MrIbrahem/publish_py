@@ -111,7 +111,7 @@ class TestBuilderTextChunks:
         builder.add_text_chunk("Hello", True)
         builder.finish_text_block()
         # Should have added textblock to doc
-        assert any(item["type"] == "textblock" for item in builder.doc.items)
+        assert any(i_item.item_type == "textblock" for i_item in builder.doc.items)
 
 
 class TestBuilderChildBuilder:

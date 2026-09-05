@@ -39,7 +39,7 @@ class TestDocAddItem:
         tag = {"name": "p", "attributes": {}}
         doc.add_dict_item("open", tag)
         assert len(doc.items) == 1
-        assert doc.items[0]["type"] == "open"
+        assert doc.items[0].item_type == "open"
         assert doc.items[0]["item"] == tag
 
     def test_add_close_tag(self):
@@ -48,7 +48,7 @@ class TestDocAddItem:
         tag = {"name": "p"}
         doc.add_dict_item("close", tag)
         assert len(doc.items) == 1
-        assert doc.items[0]["type"] == "close"
+        assert doc.items[0].item_type == "close"
 
     def test_add_textblock(self):
         """Test adding a text block."""
@@ -57,7 +57,7 @@ class TestDocAddItem:
         block = TextBlock(chunks)
         doc.add_textblock_item(block)
         assert len(doc.items) == 1
-        assert doc.items[0]["type"] == "textblock"
+        assert doc.items[0].item_type == "textblock"
 
     def test_add_dict_item_chaining(self):
         """Test that add_dict_item returns self for chaining."""
@@ -74,7 +74,7 @@ class TestDocAddBlockSpaceItem:
         doc = Doc()
         doc.add_blockspace_item("  ")
         assert len(doc.items) == 1
-        assert doc.items[0]["type"] == "blockspace"
+        assert doc.items[0].item_type == "blockspace"
 
 
 class TestDocAddTextBlockItem:
@@ -86,7 +86,7 @@ class TestDocAddTextBlockItem:
         chunks = [TextChunk("text", [])]
         doc.add_textblock_item(TextBlock(chunks))
         assert len(doc.items) == 1
-        assert doc.items[0]["type"] == "textblock"
+        assert doc.items[0].item_type == "textblock"
 
 
 class TestDocItemManagement:
@@ -99,7 +99,7 @@ class TestDocItemManagement:
         doc.add_dict_item("open", tag)
         current = doc.get_current_item()
         assert current is not None
-        assert current["type"] == "open"
+        assert current.item_type == "open"
         assert current["item"] == tag
 
     def test_get_current_item_empty(self):
@@ -140,7 +140,7 @@ class TestDocGetRootItem:
     def test_get_root_item_skip_blockspace(self):
         """Test that get_root_item skips blockspace."""
         doc = Doc()
-        doc.add_item("blockspace", " ")
+        doc.add_blockspace_item(" ")
         doc.add_dict_item("open", {"name": "div", "attributes": {}})
         root = doc.get_root_item()
         assert root["name"] == "div"
@@ -181,7 +181,7 @@ class TestDocGetHtml:
     def test_get_html_blockspace(self):
         """Test that blockspace is included."""
         doc = Doc()
-        doc.add_item("blockspace", "\n  ")
+        doc.add_blockspace_item("\n  ")
         html = doc.get_html()
         assert "\n  " in html
 

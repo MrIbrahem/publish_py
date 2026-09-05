@@ -104,7 +104,7 @@ class Normalizer:
         self.tags.append(tag)
         self.doc.append(Utils.get_open_tag_html(tag, self.sort_attrs))
 
-    def on_close_tag(self, tag_name) -> None:
+    def on_close_tag(self, tag_name: str) -> None:
         """
         Handle close tag event.
 

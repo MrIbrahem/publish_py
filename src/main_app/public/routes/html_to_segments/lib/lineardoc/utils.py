@@ -274,7 +274,7 @@ class Utils:
         return any(ntr in rdfa for ntr in non_translatable_rdfa)
 
     @staticmethod
-    def is_inline_empty_tag(tag_name) -> bool:
+    def is_inline_empty_tag(tag_name: str) -> bool:
         """
         Determine whether a tag is an inline empty tag.
 

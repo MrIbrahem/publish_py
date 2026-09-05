@@ -59,8 +59,10 @@ class Builder:
         """Push a block tag."""
         self.finish_text_block()
         self.block_tags.append(tag)
+
         if self.is_ignored_tag(tag):
             return
+
         if tag["name"] == "figure":
             tag["attributes"]["rel"] = "cx:Figure"
         self.doc.add_dict_item("open", tag)
@@ -85,7 +87,7 @@ class Builder:
             and not tag.get("attributes", {}).get("about")
         )
 
-    def pop_block_tag(self, tag_name):
+    def pop_block_tag(self, tag_name: str):
         """
         Pop a block tag.
 
@@ -114,7 +116,7 @@ class Builder:
         """Push an inline annotation tag."""
         self.inline_annotation_tags.append(tag)
 
-    def pop_inline_annotation_tag(self, tag_name) -> None:
+    def pop_inline_annotation_tag(self, tag_name: str) -> None:
         """Pop an inline annotation tag."""
         if not self.inline_annotation_tags:
             tag = None

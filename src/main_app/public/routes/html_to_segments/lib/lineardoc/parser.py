@@ -134,7 +134,7 @@ class Parser:
         self.all_tags.append(tag)
         self.contextualizer.on_open_tag(tag)
 
-    def on_close_tag(self, tag_name) -> None:
+    def on_close_tag(self, tag_name: str) -> None:
         """
         Handle close tag event.
 

@@ -16,11 +16,10 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Callable
-from typing import Any, Literal
+from typing import Any
 
 from . import util as cxutil
 from .doc_item import (
-    ITEM_TYPES_STR,
     DocDict,
     DocStr,
     DocTextBlock,
@@ -28,7 +27,6 @@ from .doc_item import (
 from .text_block import TextBlock
 from .utils import Utils
 
-ITEM_OBJECT_TYPES = dict[str, Any] | str | Any
 DOC_ITEM_VARS = DocTextBlock | DocDict | DocStr
 
 
@@ -66,27 +64,20 @@ class Doc:
         self.items.append(DocStr(item=item))
         return self
 
-    def add_item(self, item_type: ITEM_TYPES_STR, item: ITEM_OBJECT_TYPES) -> Doc:
+    def add_item(self, item_type: str, item: Any) -> Doc:
         """
         Add an item to the document.
-
-        Args:
-            item_type: Type of item: open|close
-            item: Open/close tag, space or text block
-
-        Returns:
-            Self for chaining
         """
-        if isinstance(item, dict):
-            obj = DocDict.from_any(item_type=item_type, obj=item)  # pyright: ignore[reportArgumentType]
+        if item_type == "textblock":
+            return self.add_textblock_item(item)  # pyright: ignore[reportArgumentType]
 
-        if isinstance(item, str):
-            obj = DocStr.from_any(item_type=item_type, obj=item)  # pyright: ignore[reportArgumentType]
-        else:
-            raise TypeError(f"Invalid type for Item: {type(item)}")
+        if item_type == "blockspace":
+            return self.add_blockspace_item(item)  # pyright: ignore[reportArgumentType]
 
-        self.items.append(obj)
-        return self
+        if item_type in ("open", "close"):
+            return self.add_dict_item(item_type, item)  # pyright: ignore[reportArgumentType]
+
+        raise TypeError(f"Invalid type for Item: {type(item)}")
 
     def undo_add_item(self) -> None:
         """Remove the top item from the linear array of items."""
@@ -113,10 +104,10 @@ class Doc:
         if self.wrapper_tag:
             return self.wrapper_tag
 
-        for item in self.items:
+        for i_item in self.items:
             # Ignore all blockspaces, loop till we see a tag opening
-            if item.item_type == "open":
-                return item.item
+            if i_item.item_type == "open" and isinstance(i_item, DocDict):
+                return i_item.item
         return None
 
     def segment(self, get_boundaries: Callable) -> Doc:
@@ -148,9 +139,9 @@ class Doc:
                 raise Exception(f"Unknown ID type: {id_type}")
 
         transclusion_context = None
-        for i, item in enumerate(self.items):
-            if item.item_type == "open":
-                tag = Utils.clone_open_tag(item.item)
+        for i, i_item in enumerate(self.items):
+            if i_item.item_type == "open" and isinstance(i_item, DocDict):
+                tag = Utils.clone_open_tag(i_item.item)
 
                 if tag.get("attributes", {}).get("id"):
                     # If the item is a header, we make it a fixed length id using hash of
@@ -161,7 +152,7 @@ class Doc:
                     if (
                         tag["name"] in ["h1", "h2", "h3", "h4", "h5"]
                         and i + 1 < len(self.items)
-                        and self.items[i + 1]["type"] == "textblock"
+                        and self.items[i + 1].item_type == "textblock"
                     ):
                         h = hashlib.sha256()
                         h.update(self.items[i + 1]["item"].get_plain_text().encode("utf-8"))
@@ -176,7 +167,7 @@ class Doc:
                     # Section headers (<h2> tags) mark the start of a new section
                     if (
                         i + 1 < len(self.items)
-                        and self.items[i + 1]["type"] == "open"
+                        and self.items[i + 1].item_type == "open"
                         and self.items[i + 1]["item"].get("name") == "h2"
                     ):
                         section_number += 1
@@ -184,7 +175,7 @@ class Doc:
                 if tag["name"] == "section":
                     tag["attributes"]["data-mw-section-number"] = section_number
 
-                new_doc.add_item(item.item_type, tag)
+                new_doc.add_dict_item(i_item.item_type, tag)
 
                 # Content of tags that are either mw:Transclusion or mw:Extension need not be segmented
                 about = cxutil.get_prop(["attributes", "about"], tag)
@@ -192,18 +183,14 @@ class Doc:
                 if about and typeof:
                     transclusion_context = about
 
-            elif item.item_type == "close":
-                tag = item.item
-                about = cxutil.get_prop(["attributes", "about"], tag)
+            elif i_item.item_type == "close":
+                about = cxutil.get_prop(["attributes", "about"], i_item.item)
                 if about and about == transclusion_context:
                     transclusion_context = None
-                new_doc.add_item(item.item_type, item.item)
+                new_doc.add_dict_item(i_item.item_type, i_item.item)
 
-            elif item.item_type != "textblock":
-                new_doc.add_item(item.item_type, item.item)
-
-            else:
-                text_block: TextBlock = item.item  # pyright: ignore[reportAssignmentType]
+            elif i_item.item_type == "textblock":
+                text_block: TextBlock = i_item.item  # pyright: ignore[reportAssignmentType]
 
                 if text_block.can_segment and not transclusion_context:
                     segmented_text_block = text_block.segment(get_boundaries, get_next_id)
@@ -211,6 +198,8 @@ class Doc:
                     segmented_text_block = text_block.set_link_ids(get_next_id)
 
                 new_doc.add_textblock_item(segmented_text_block)
+            else:
+                raise Exception(f"Unknown item type: {i_item.item_type}")
 
         return new_doc
 
@@ -235,24 +224,24 @@ class Doc:
         if self.wrapper_tag:
             html.append(Utils.get_open_tag_html(self.wrapper_tag, self.sort_attrs))
 
-        for item in self.items:
-            item_type = item.item_type
-            item = item.item
+        for i_item in self.items:
+            item_type = i_item.item_type
+            item = i_item.item
 
-            if item.get("attributes", {}).get("class") == "cx-segment-block":
+            if i_item.get("attributes", {}).get("class") == "cx-segment-block":
                 continue
 
-            if item_type == "open":
+            if item_type == "open" and isinstance(i_item, DocDict):
                 html.append(Utils.get_open_tag_html(item, self.sort_attrs))
 
             elif item_type == "close":
-                html.append(Utils.get_close_tag_html(item))
+                html.append(Utils.get_close_tag_html(i_item))
 
             elif item_type == "blockspace":
-                html.append(item.item)
+                html.append(i_item.item)
 
-            elif item_type == "textblock" and item.item:
-                html.append(item.item.get_html())
+            elif item_type == "textblock" and i_item.item:
+                html.append(i_item.item.get_html())
             else:
                 raise Exception(f"Unknown item type: {item_type}")
 
@@ -289,6 +278,7 @@ class Doc:
             tag_id = None
             if tag.get("attributes"):
                 tag_id = tag["attributes"].get("about") or tag["attributes"].get("id")
+
             return tag_id or tag["name"]
 
         def open_section(doc: Doc):
@@ -313,20 +303,18 @@ class Doc:
             doc.add_item(item.item_type, item.item)
             close_section(new_doc)
 
-        for item in self.items:
-            item_obj = item.item
-            item = item.item
-            item_type = item.item_type
+        for i_item in self.items:
+            item = i_item.item
+            item_type = i_item.item_type
 
             if not in_body:
                 # Till we reach body, keep on adding items to new_doc
-                new_doc.add_item(item_type, item_obj)
-                if item.get("name") == "body":
+                new_doc.add_item(item_type, i_item.item)
+                if item.name == "body":
                     in_body = True
                 continue
 
-            if item_type == "open":
-                # tag = item_obj
+            if item_type == "open" and isinstance(i_item, DocDict):
                 if not curr_section:
                     if prev_section == get_tag_id(item):
                         # This tag is connected to previous section. Can be a template fragment.
@@ -340,8 +328,7 @@ class Doc:
                 new_doc.add_item(item_type, item)
 
             elif item_type == "close":
-                # tag = item_obj
-                if curr_section and item.get("name") == "body":
+                if curr_section and item.name == "body":
                     close_section(new_doc)
                     in_body = False
 
@@ -354,7 +341,7 @@ class Doc:
                 if prev_section and new_item and new_item["item"]["name"] == "section":
                     insert_to_prev_section(item, new_doc)
                 else:
-                    new_doc.add_item(item_type, item_obj)
+                    new_doc.add_blockspace_item(item.item)
 
             elif item_type == "textblock":
                 text_block = item.item
@@ -380,13 +367,15 @@ class Doc:
                     curr_section = get_tag_id(tag_for_id)
                     if not curr_section:
                         raise Exception(f'No id for the opened section for tag {tag_for_id.get("name")}')
-                    new_doc.add_item(item_type, text_block)
+
+                    new_doc.add_textblock_item(text_block)
                     # There was no open sections. Close the section now itself. If this tag is a template
                     # fragment, `is_connected` check above will insert the fragments to closed section.
+
                     close_section(new_doc)
                     continue
 
-                new_doc.add_item(item_type, text_block)
+                new_doc.add_textblock_item(text_block)
 
             else:
                 raise Exception(f"Unknown item type: {item_type}")
@@ -408,37 +397,32 @@ class Doc:
         if self.wrapper_tag:
             dump.append(f"{pad}<cxwrapper>")
 
-        for item in self.items:
-            item_type = item.item_type
-            item_obj = item.item
+        for i_item in self.items:
 
-            if item_type == "open":
-                tag = item.item
-                dump.append(f'{pad}<{tag["name"]}>')
-                if tag["name"] == "head":
+            if i_item.item_type == "open" and isinstance(i_item, DocDict):
+                tag = i_item.item
+                dump.append(i_item.opening_tag(pad))
+
+                if tag.name == "head":
                     # Add a few things for easy display
                     dump.append(f'{pad}<meta charset="UTF-8" />')
                     dump.append(f"{pad}<style>cxtextblock {{ border: solid #88f 1px }}")
                     dump.append(f"{pad}cxtextchunk {{ border-right: solid #f88 1px }}</style>")
 
-            elif item_type == "close":
+            elif i_item.item_type == "close" and isinstance(i_item, DocDict):
                 # close block tag
-                tag = item.item
-                dump.append(f'{pad}</{tag["name"]}>')
+                dump.append(i_item.closing_tag(pad))
 
-            elif item_type == "blockspace":
+            elif i_item.item_type == "blockspace":
                 # Non-inline whitespace
                 dump.append(f"{pad}<cxblockspace/>")
 
-            elif item_type == "textblock":
+            elif i_item.item_type == "textblock":
                 # Block of inline text
-                text_block = item.item
-                dump.append(f"{pad}<cxtextblock>")
-                dump.extend(text_block.dump_xml_array(pad + "  "))
-                dump.append(f"{pad}</cxtextblock>")
+                dump.extend(i_item.generate_textblock_xml(pad))
 
             else:
-                raise Exception(f"Unknown item type: {item_type}")
+                raise Exception(f"Unknown item type: {i_item.item_type}")
 
         if self.wrapper_tag:
             dump.append(f"{pad}</cxwrapper>")
@@ -454,10 +438,10 @@ class Doc:
         """
         segments = []
 
-        for item in self.items:
-            if item.item_type != "textblock":
+        for i_item in self.items:
+            if i_item.item_type != "textblock":
                 continue
-            text_block = item.item
+            text_block = i_item.item
             segments.append(text_block.get_html())
 
         return segments
@@ -474,9 +458,9 @@ class Doc:
         """
         new_doc = Doc(self.wrapper_tag, self.sort_attrs)
 
-        for item in self.items:
-            new_item = callback(item)
-            new_doc.add_item(new_item["type"], new_item["item"])
+        for i_item in self.items:
+            new_item = callback(i_item)
+            new_doc.add_item(new_item.item_type, new_item["item"])
 
         return new_doc
 
