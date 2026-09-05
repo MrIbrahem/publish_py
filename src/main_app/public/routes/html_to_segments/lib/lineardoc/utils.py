@@ -120,10 +120,10 @@ class Utils:
         Returns:
             Cloned tag
         """
-        new_tag = {"name": tag["name"], "attributes": {}}
-        for attr, value in tag.get("attributes", {}).items():
-            new_tag["attributes"][attr] = value
-        return new_tag
+        return {
+            "name": tag["name"],
+            "attributes": tag.get("attributes", {}).copy(),
+        }
 
     @staticmethod
     def dump_tags(tag_array: list[dict[str, Any]]) -> str:
@@ -274,7 +274,7 @@ class Utils:
         return any(ntr in rdfa for ntr in non_translatable_rdfa)
 
     @staticmethod
-    def is_inline_empty_tag(tag_name) -> bool:
+    def is_inline_empty_tag(tag_name: str) -> bool:
         """
         Determine whether a tag is an inline empty tag.
 
@@ -365,7 +365,13 @@ class Utils:
         for t_chunk in text_chunks:
             new_tags = t_chunk.tags[:]
             new_tags.insert(common_tag_length, tag)
-            new_text_chunks.append(TextChunk(t_chunk.text, new_tags, t_chunk.inline_content))
+            new_text_chunks.append(
+                TextChunk(
+                    t_chunk.text,
+                    new_tags,
+                    inline_content=t_chunk.inline_content,
+                )
+            )
 
         return new_text_chunks
 
@@ -400,51 +406,6 @@ class Utils:
                     tag["attributes"]["class"] = "cx-link"
                     tag["attributes"]["data-linkid"] = get_next_id("link")
                     tag["attributes"]["href"] = href
-
-    @staticmethod
-    def is_ignorable_block(section_doc) -> bool:
-        """
-        Check if the passed document is a section containing block level template or reference list.
-
-        Args:
-            section_doc: Doc object
-
-        Returns:
-            Whether the section is ignorable
-        """
-        ignorable = False
-        block_stack = []
-        first_block_template = None
-
-        # We start with index 1 since the first tag will be <section>.
-        for i in range(1, len(section_doc.items)):
-            item = section_doc.items[i]
-            tag_dict = item.item_dict
-            item_type = item.item_type
-
-            if item_type == "open":
-                block_stack.append(tag_dict)
-                if not first_block_template and (Utils.is_transclusion(tag_dict) or Utils.is_reference_list(tag_dict)):
-                    first_block_template = tag_dict
-
-            if item_type == "close":
-                if block_stack:
-                    current_close_tag = block_stack.pop()
-                    if Utils.is_closing_template_match(block_stack, first_block_template, current_close_tag):
-                        return True
-
-            # Also check for textblocks
-            if item_type == "textblock":
-                if not first_block_template:
-                    root_item = item.item_text_block.get_root_item()
-                    if root_item and Utils.is_non_translatable(root_item):
-                        first_block_template = root_item
-                        ignorable = True
-                    else:
-                        # There is non ignorable content to translate
-                        return False
-
-        return ignorable
 
     @staticmethod
     def is_closing_template_match(

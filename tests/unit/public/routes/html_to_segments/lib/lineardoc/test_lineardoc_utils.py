@@ -2,7 +2,31 @@
 Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/utils.py module.
 """
 
+from pathlib import Path
+
+import pytest
+
+from src.main_app.public.routes.html_to_segments.lib.lineardoc import MwContextualizer, Parser
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.utils import Utils
+
+test_files = [
+    Path(__file__).parent / "data" / "test-block-template-section-1.html",
+    Path(__file__).parent / "data" / "test-block-template-section-2.html",
+    Path(__file__).parent / "data" / "test-block-template-section-3.html",
+    Path(__file__).parent / "data" / "test-block-template-section-4.html",
+]
+
+
+@pytest.mark.parametrize("test_file", test_files)
+def test_is_ignorable_block(test_file):
+    with open(test_file, "r", encoding="utf-8") as f:
+        html = f.read()
+    parser = Parser(MwContextualizer())
+
+    parser.init()
+    parser.write(html.strip())
+    result = parser.builder.doc.is_ignorable_block()
+    assert result is True, f"Expected block to be ignorable for file: {test_file.name}"
 
 
 class TestEscapeFunctions:

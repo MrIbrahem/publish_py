@@ -29,7 +29,7 @@ def _format_user(user: str) -> str:
     return user.replace("_", " ")
 
 
-def get_cxtoken_for_user_wiki(wiki, user_name):
+def get_cxtoken_for_user_wiki(wiki: str, user_name: str):
     # Get access credentials from database
     token_service = UserTokenService()
     user_token = token_service.get_user_token_by_username(user_name)

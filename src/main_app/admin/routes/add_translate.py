@@ -53,14 +53,17 @@ class AddTranslateRoutes:
         texts: list[str] = []
         errors: list[str] = []
 
-        for i in range(len(titles)):
-            mdtitle = titles[i].strip()
-            cat = cats[i].strip() if i < len(cats) else ""
-            translate_type = types[i].strip() if i < len(types) else ""
-            user = users[i].strip() if i < len(users) else ""
-            lang = langs[i].strip() if i < len(langs) else ""
-            target = targets[i].strip() if i < len(targets) else ""
-            pupdate = pupdates[i].strip() if i < len(pupdates) else ""
+        def get_val(lst: list[str], idx: int) -> str:
+            return lst[idx].strip() if idx < len(lst) else ""
+
+        for i, title in enumerate(titles):
+            mdtitle = title.strip()
+            cat = get_val(cats, i)
+            translate_type = get_val(types, i)
+            user = get_val(users, i)
+            lang = get_val(langs, i)
+            target = get_val(targets, i)
+            pupdate = get_val(pupdates, i)
 
             if not mdtitle or not lang or not user:
                 continue

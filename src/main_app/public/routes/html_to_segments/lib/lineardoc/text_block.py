@@ -34,7 +34,7 @@ def is_reference_chunk(chunk: TextChunk) -> bool:
     """
     inline = chunk.inline_content
     if inline and getattr(inline, "wrapper_tag", None):
-        wrapper_tag = inline.wrapper_tag
+        wrapper_tag = inline.wrapper_tag  # pyright: ignore[reportAttributeAccessIssue]
         if getattr(wrapper_tag, "attributes", None) and Utils.is_reference(wrapper_tag):
             return True
 
@@ -390,7 +390,11 @@ class TextBlock:
                 {
                     "start": range_mapping["target"]["start"],
                     "length": range_mapping["target"]["length"],
-                    "text_chunk": TextChunk(text, source_text_chunk.tags, source_text_chunk.inline_content),
+                    "text_chunk": TextChunk(
+                        text,
+                        source_text_chunk.tags,
+                        inline_content=source_text_chunk.inline_content,
+                    ),
                 }
             )
 
@@ -443,7 +447,13 @@ class TextBlock:
 
         if tail:
             # Append tail as text with common_tags
-            text_chunks.append({"start": pos, "length": len(tail), "text_chunk": TextChunk(tail, common_tags)})
+            text_chunks.append(
+                {
+                    "start": pos,
+                    "length": len(tail),
+                    "text_chunk": TextChunk(tail, common_tags),
+                }
+            )
             pos += len(tail)
 
         # Copy any remaining text_chunks that have no text
@@ -453,7 +463,11 @@ class TextBlock:
         if tail_space:
             # Append tail_space as text with common_tags
             text_chunks.append(
-                {"start": pos, "length": len(tail_space), "text_chunk": TextChunk(tail_space, common_tags)}
+                {
+                    "start": pos,
+                    "length": len(tail_space),
+                    "text_chunk": TextChunk(tail_space, common_tags),
+                }
             )
 
         return TextBlock([x["text_chunk"] for x in text_chunks], sort_attrs=self.sort_attrs)
@@ -499,14 +513,9 @@ class TextBlock:
 
             # Now add text and inline content
             html.append(Utils.esc(t_chunk.text))
+
             if t_chunk.inline_content:
-                if hasattr(t_chunk.inline_content, "get_html"):
-                    # a sub-doc
-                    html.append(t_chunk.inline_content.get_html())
-                else:
-                    # an empty inline tag
-                    html.append(Utils.get_open_tag_html(t_chunk.inline_content, sort_attrs=self.sort_attrs))
-                    html.append(Utils.get_close_tag_html(t_chunk.inline_content))
+                html.extend(t_chunk.get_inline_content_html(sort_attrs=self.sort_attrs))
 
         # Finally, close any remaining tags
         for j in range(len(old_tags) - 1, -1, -1):
@@ -534,7 +543,7 @@ class TextBlock:
                 inline_doc = t_chunk.inline_content
                 # Presence of get_root_item confirms that inline_doc is a Doc instance
                 if hasattr(inline_doc, "get_root_item"):
-                    root_item = inline_doc.get_root_item()
+                    root_item = inline_doc.get_root_item()  # pyright: ignore[reportAttributeAccessIssue]
                     return root_item or None
                 else:
                     return inline_doc
@@ -600,8 +609,15 @@ class TextBlock:
                 if rel_offset == 0:
                     flush_chunks()
                 else:
-                    left_part = TextChunk(t_chunk.text[:rel_offset], t_chunk.tags[:])
-                    right_part = TextChunk(t_chunk.text[rel_offset:], t_chunk.tags[:], t_chunk.inline_content)
+                    left_part = TextChunk(
+                        t_chunk.text[:rel_offset],
+                        t_chunk.tags[:],
+                    )
+                    right_part = TextChunk(
+                        t_chunk.text[rel_offset:],
+                        t_chunk.tags[:],
+                        inline_content=t_chunk.inline_content,
+                    )
                     current_text_chunks.append(left_part)
                     offset += rel_offset
                     flush_chunks()
@@ -637,31 +653,12 @@ class TextBlock:
         Returns:
             Array that will concatenate to an XML string representation
         """
-        dump = []
-        for chunk in self.text_chunks:
-            tags_dump = Utils.dump_tags(chunk.tags)
-            tags_attr = f' tags="{tags_dump}"' if tags_dump else ""
-
-            if chunk.text:
-                dump.append(
-                    f"{pad}<cxtextchunk{tags_attr}>" + Utils.esc(chunk.text).replace("\n", "&#10;") + "</cxtextchunk>"
-                )
-
-            if chunk.inline_content:
-                dump.append(f"{pad}<cxinlineelement{tags_attr}>")
-                if hasattr(chunk.inline_content, "dump_xml_array"):
-                    # sub-doc: concatenate
-                    dump.extend(chunk.inline_content.dump_xml_array(pad + "  "))
-                else:
-                    dump.append(f'{pad}  <{chunk.inline_content["name"]}/>')
-                dump.append(f"{pad}</cxinlineelement>")
-
+        dump = [chunk.generate_xml_chunk(pad) for chunk in self.text_chunks]
         return dump
 
 
 __all__ = [
     "TextBlock",
-    "is_reference_chunk",
     "to_char_items",
     "to_chunks",
     "escape_for_char_class",

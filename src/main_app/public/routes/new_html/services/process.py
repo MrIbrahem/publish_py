@@ -34,7 +34,7 @@ from .utils import get_file_dir
 logger = logging.getLogger(__name__)
 
 
-def get_from_json(title: str, all_flag: str):
+def _get_from_json(title: str, all_flag: str):
     """ """
     cached_rev = get_title_revision(title, all_flag)
 
@@ -67,7 +67,7 @@ def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str
     from_cache = False
     if not source or not revid:
         # Fallback to local JSON mapping + cached file
-        cached_source, revid = get_from_json(title, all_flag)
+        cached_source, revid = _get_from_json(title, all_flag)
         from_cache = cached_source != ""
 
     # Add or update a title → revision mapping in the JSON index.
@@ -81,8 +81,8 @@ def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str
             source = expand_text_refs(lead, full_text)
 
     # run fix_wikitext as in the original PHP version
-    fixer = WikitextFixerService(source, title)
-    source = fixer.fix()
+    fixer = WikitextFixerService()
+    source = fixer.fix(source, title)
 
     return source, revid, from_cache
 
@@ -165,8 +165,8 @@ def process_page(
     file_title = file_dir / "title.txt"
 
     # Apply temporary (empty) fix
-    fixer = WikitextFixerService(wikitext, title)
-    wikitext = fixer.fix()
+    fixer = WikitextFixerService()
+    wikitext = fixer.fix(wikitext, title)
 
     write_file(file_wikitext, wikitext)
     write_file(file_title, title)
@@ -189,6 +189,7 @@ def process_page(
         file_seg=file_seg,
         force_new=force_new,
     )
+    write_file(file_seg, seg_text)
 
     if printetxt == "seg":
         response = Response(seg_text, mimetype="text/html")

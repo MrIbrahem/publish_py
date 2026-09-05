@@ -7,10 +7,7 @@ from pathlib import Path
 
 from ...html_to_segments import process_html
 from .html_utils import remove_data_parsoid
-from .storage import (
-    read_file,
-    write_file,
-)
+from .storage import read_file
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +45,6 @@ def get_segments(source_html: str, file_seg: Path, force_new: bool) -> tuple[str
 
     # php write to file before remove_data_parsoid
     seg_text = remove_data_parsoid(seg_text)
-
-    write_file(file_seg, seg_text)
 
     return seg_text, from_cache
 

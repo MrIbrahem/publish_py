@@ -13,6 +13,8 @@ from typing import Any
 
 from lxml import etree
 
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc import Doc
+
 from .builder import Builder
 from .contextualizer import Contextualizer
 from .elements import BLOCK_TAGS, VOID_ELEMENTS
@@ -52,6 +54,9 @@ class Parser:
         # Stack of tags currently open
         self.all_tags = []
 
+    def create_wrapped_doc(self) -> Doc:
+        return self.builder.doc.wrap_sections()
+
     def write(self, html: str) -> None:
         """
         Parse HTML into the document.
@@ -63,7 +68,8 @@ class Parser:
         try:
             root = etree.fromstring(html.encode("utf-8"), parser)
             self._process_element(root)
-        except Exception:
+        except Exception as exc:
+            logger.error("Failed to parse HTML error: %s", str(exc))
             # Try with wrapping
             try:
                 root = etree.fromstring(f"<div>{html}</div>".encode(), parser)
@@ -72,7 +78,7 @@ class Parser:
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree._Element | Any) -> None:
+    def _process_element(self, element: etree._Element | Any, tag_name: str | None = None) -> None:
         """
         Process an element recursively.
         """
@@ -80,14 +86,17 @@ class Parser:
         if not isinstance(element.tag, str):
             return
 
-        tag_name = element.tag.lower() if self.lowercase else element.tag
+        if tag_name is None:
+            tag_name = element.tag  # pyright: ignore[reportAssignmentType]
+
+        if tag_name and self.lowercase:
+            tag_name = tag_name.lower()
 
         # Create tag dict
         tag = {"name": tag_name, "attributes": dict(element.attrib)}
 
         # Mark HTML void elements as self-closing
-        if tag_name in VOID_ELEMENTS:
-            tag["isSelfClosing"] = True
+        tag["isSelfClosing"] = tag_name in VOID_ELEMENTS
 
         self.on_open_tag(tag)
 
@@ -121,10 +130,13 @@ class Parser:
 
         if Utils.is_reference(tag) or Utils.is_math(tag):
             # Start a reference: create a child builder, and move into it
-            self.builder = self.builder.create_child_builder(tag)
+            self.builder = self.builder.create_child_builder(wrapper_tag=tag)
 
         elif Utils.is_inline_empty_tag(tag["name"]):
-            self.builder.add_inline_content(tag, self.contextualizer.can_segment())
+            self.builder.add_inline_content(
+                content=tag,
+                can_segment=self.contextualizer.can_segment(),
+            )
 
         elif self.is_inline_annotation_tag(tag["name"], Utils.is_transclusion(tag)):
             self.builder.push_inline_annotation_tag(tag)
@@ -134,7 +146,7 @@ class Parser:
         self.all_tags.append(tag)
         self.contextualizer.on_open_tag(tag)
 
-    def on_close_tag(self, tag_name) -> None:
+    def on_close_tag(self, tag_name: str) -> None:
         """
         Handle close tag event.
 
@@ -155,18 +167,26 @@ class Parser:
 
         if Utils.is_inline_empty_tag(tag_name):
             return
-        elif is_ann and len(self.builder.inline_annotation_tags) > 0:
+
+        if is_ann and len(self.builder.inline_annotation_tags) > 0:
             self.builder.pop_inline_annotation_tag(tag_name)
             if self.options.get("isolateSegments") and Utils.is_segment(tag):
                 self.builder.pop_block_tag("div")
-        elif is_ann and self.builder.parent is not None:
+
+        elif is_ann and self.builder.builder_parent is not None:
             # In a sub document: should be a span or sup that closes a reference
             if tag_name not in ("span", "sup"):
                 raise Exception(f'Expected close reference - span or sup tags, got "{tag_name}"')
             self.builder.finish_text_block()
-            self.builder.parent.add_inline_content(self.builder.doc, self.contextualizer.can_segment())
+
+            self.builder.builder_parent.add_inline_content(
+                content=self.builder.doc,
+                can_segment=self.contextualizer.can_segment(),
+            )
+
             # Finished with child now. Move back to the parent builder
-            self.builder = self.builder.parent
+            self.builder = self.builder.builder_parent
+
         elif not is_ann:
             # Block level tag close
             if tag_name == "p" and self.contextualizer.can_segment():

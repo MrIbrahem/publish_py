@@ -86,14 +86,17 @@ class CampaignsDashboard:
         displays = request.form.getlist("rows[][display]")
         deletes = request.form.getlist("rows[][delete]")
 
+        def get_val(lst: list[str], idx: int) -> str:
+            return lst[idx].strip() if idx < len(lst) else ""
+
         for i, id in enumerate(ids):
             is_default = id == default_cat
             record_id = int(id)
-            campaign = campaigns[i] if i < len(campaigns) else ""
-            category = categories[i] if i < len(categories) else ""
-            category2 = categories2[i] if i < len(categories2) else ""
-            display = displays[i] if i < len(displays) else ""
-            depth = depths[i] if i < len(depths) else 0
+            campaign = get_val(campaigns, i)
+            category = get_val(categories, i)
+            category2 = get_val(categories2, i)
+            display = get_val(displays, i)
+            depth = get_val(depths, i)
             is_deleted = str(record_id) in deletes
 
             if is_deleted:

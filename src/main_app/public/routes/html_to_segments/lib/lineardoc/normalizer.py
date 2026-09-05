@@ -65,7 +65,6 @@ class Normalizer:
         if element is None:
             return
 
-        # Create tag dict
         if tag_name is None:
             tag_name = element.tag  # pyright: ignore[reportAssignmentType]
 
@@ -76,8 +75,7 @@ class Normalizer:
         tag = {"name": tag_name, "attributes": dict(element.attrib)}
 
         # Mark HTML void elements as self-closing
-        if tag_name in VOID_ELEMENTS:
-            tag["isSelfClosing"] = True
+        tag["isSelfClosing"] = tag_name in VOID_ELEMENTS
 
         self.on_open_tag(tag)
 
@@ -92,7 +90,7 @@ class Normalizer:
             if child.tail:
                 self.on_text(child.tail)
 
-        self.on_close_tag(tag_name)
+        self.on_close_tag(tag_name)  # pyright: ignore[reportArgumentType]
 
     def on_open_tag(self, tag: dict[str, Any]) -> None:
         """
@@ -104,7 +102,7 @@ class Normalizer:
         self.tags.append(tag)
         self.doc.append(Utils.get_open_tag_html(tag, self.sort_attrs))
 
-    def on_close_tag(self, tag_name) -> None:
+    def on_close_tag(self, tag_name: str) -> None:
         """
         Handle close tag event.
 
