@@ -1,0 +1,1 @@
+[[File:Afatinib mechanism.svg|thumb|left|upright=2|Afatinib [[covalent]]ly binds to [[cysteine]] number 797 of the [[epidermal growth factor receptor]] (EGFR) via a [[Michael addition reaction|Michael addition]] ([[IC50|IC<sub>50</sub>]] = 0.5 [[nanomolar|nM]]).<ref>Schubert-Zsilavecz, M, Wurglics, M, ''Neue Arzneimittel Frühjahr 2013''. {{in lang|de}}</ref>]]
