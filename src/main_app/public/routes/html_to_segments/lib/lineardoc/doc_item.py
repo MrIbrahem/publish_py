@@ -5,7 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from .elements import VOID_ELEMENTS
 from .text_block import TextBlock
+from .utils import Utils
 
 ITEM_TYPES_STR = Literal["open", "close"]
 
@@ -44,20 +46,89 @@ class DocTextBlock(ItemBase):
 
         return dump
 
+    def get_html(self) -> str:
+        return self.item.get_html()
+
 
 @dataclass
 class DictTag:
     name: str
     attributes: dict[str, Any]
+    isSelfClosing: bool = False  # noqa: N815
 
-    def __getitem__(self, key: str) -> str | dict[str, Any]:
+    def __post_init__(self) -> None:
+        # Mark HTML void elements as self-closing
+        self.isSelfClosing = self.name in VOID_ELEMENTS
+
+    def __getitem__(self, key: str) -> str | bool | dict[str, Any]:
         # connect keys to object properties
         if key == "name":
             return self.name
         elif key == "attributes":
             return self.attributes
+        elif key == "isSelfClosing":
+            return self.isSelfClosing
         else:
             raise KeyError(f"key '{key}' not found in dict tag")
+
+    def clone(self) -> DictTag:
+        """
+        Clone a SAX open tag.
+        """
+        return DictTag(
+            name=self.name,
+            attributes=self.attributes.copy(),
+        )
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "isSelfClosing": self.isSelfClosing,
+            "attributes": self.attributes,
+        }
+
+    def opening_tag(self, pad: str = "") -> str:
+        return f"{pad}<{self.name}>"
+
+    def closing_tag(self, pad: str = "") -> str:
+        return f"{pad}</{self.name}>"
+
+    def get_open_tag_html(self, sort_attrs: bool = True) -> str:
+        """
+        Render a SAX open tag into an HTML string.
+
+        Args:
+            sort_attrs: Sort attributes alphabetically
+
+        Returns:
+            HTML representation of open tag
+        """
+        html = ["<" + Utils.esc(self.name)]
+        attributes = self.attributes.keys()
+
+        # sort attributes
+        if sort_attrs:
+            attributes = sorted(attributes)
+
+        for attr in attributes:
+            html.append(" " + Utils.esc(attr) + '="' + Utils.esc_attr(self.attributes[attr]) + '"')
+
+        if self.isSelfClosing:
+            html.append(" /")
+
+        html.append(">")
+        return "".join(html)
+
+    def get_close_tag_html(self) -> str:
+        """
+        Render a SAX close tag into an HTML string.
+
+        Returns:
+            HTML representation of close tag
+        """
+        if self.isSelfClosing:
+            return ""
+        return "</" + Utils.esc(self.name) + ">"
 
 
 class DocDict(ItemBase):
@@ -71,14 +142,20 @@ class DocDict(ItemBase):
             item_type: Literal["open", "close"]
             obj: Tag dict with 'name' and 'attributes'
         """
-        item_obj = DictTag(name=obj["name"], attributes=obj["attributes"])
+        item_obj = DictTag(
+            name=obj.get("name") or "",
+            attributes=obj.get("attributes") or {},
+        )
         return cls(item_type=item_type, item=item_obj)
 
-    def opening_tag(self, pad: str = "") -> str:
-        return f"{pad}<{self.item.name}>"
+    def get_html(self, sort_attrs: bool = True) -> str:
+        if self.item_type == "close":
+            return self.item.get_close_tag_html()
 
-    def closing_tag(self, pad: str = "") -> str:
-        return f"{pad}</{self.item.name}>"
+        if self.item_type == "open":
+            return self.item.get_open_tag_html(sort_attrs)
+
+        raise ValueError(f"Invalid item type: {self.item_type}")
 
 
 @dataclass
@@ -89,6 +166,9 @@ class DocStr(ItemBase):
     @classmethod
     def load(cls, obj: str):
         return cls(item=obj)
+
+    def get_html(self) -> str:
+        return self.item
 
 
 __all__ = [

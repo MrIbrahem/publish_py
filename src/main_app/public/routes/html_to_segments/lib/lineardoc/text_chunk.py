@@ -15,10 +15,11 @@ from __future__ import annotations
 
 from typing import Any
 
+
 class TextChunk:
     """A chunk of uniformly-annotated inline text."""
 
-    def __init__(self, text: str, tags: list[dict[str, Any]], inline_content=None) -> None:
+    def __init__(self, text: str, tags: list[dict[str, Any]], *, inline_content: None = None) -> None:
         """
         Initialize a text_chunk.
 

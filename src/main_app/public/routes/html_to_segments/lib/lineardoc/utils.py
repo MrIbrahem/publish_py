@@ -120,10 +120,10 @@ class Utils:
         Returns:
             Cloned tag
         """
-        new_tag = {"name": tag["name"], "attributes": {}}
-        for attr, value in tag.get("attributes", {}).items():
-            new_tag["attributes"][attr] = value
-        return new_tag
+        return {
+            "name": tag["name"],
+            "attributes": tag.get("attributes", {}).copy(),
+        }
 
     @staticmethod
     def dump_tags(tag_array: list[dict[str, Any]]) -> str:
@@ -365,7 +365,13 @@ class Utils:
         for t_chunk in text_chunks:
             new_tags = t_chunk.tags[:]
             new_tags.insert(common_tag_length, tag)
-            new_text_chunks.append(TextChunk(t_chunk.text, new_tags, t_chunk.inline_content))
+            new_text_chunks.append(
+                TextChunk(
+                    t_chunk.text,
+                    new_tags,
+                    inline_content=t_chunk.inline_content,
+                )
+            )
 
         return new_text_chunks
 

@@ -65,7 +65,6 @@ class Normalizer:
         if element is None:
             return
 
-        # Create tag dict
         if tag_name is None:
             tag_name = element.tag  # pyright: ignore[reportAssignmentType]
 
@@ -76,8 +75,7 @@ class Normalizer:
         tag = {"name": tag_name, "attributes": dict(element.attrib)}
 
         # Mark HTML void elements as self-closing
-        if tag_name in VOID_ELEMENTS:
-            tag["isSelfClosing"] = True
+        tag["isSelfClosing"] = tag_name in VOID_ELEMENTS
 
         self.on_open_tag(tag)
 

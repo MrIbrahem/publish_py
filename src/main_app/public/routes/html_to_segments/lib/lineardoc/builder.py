@@ -21,16 +21,16 @@ class Builder:
 
     def __init__(
         self,
-        parent=None,
-        wrapper_tag: dict | None = None,
+        builder_parent: Builder | None = None,
+        wrapper_tag: dict[str, Any] | None = None,
         sort_attrs: bool = True,
     ) -> None:
         """
         Initialize a Builder.
 
         Args:
-            parent: Parent document builder
-            wrapper_tag: Tag that wraps document (if there is a parent)
+            builder_parent: Parent document builder
+            wrapper_tag: Tag that wraps document (if there is a builder_parent)
         """
         self.sort_attrs = sort_attrs
         self.block_tags = []
@@ -41,9 +41,9 @@ class Builder:
         self.doc = Doc(wrapper_tag, sort_attrs=sort_attrs)
         self.text_chunks = []
         self.is_block_segmentable = True
-        self.parent = parent
+        self.builder_parent = builder_parent
 
-    def create_child_builder(self, wrapper_tag) -> Builder:
+    def create_child_builder(self, wrapper_tag: dict[str, Any]) -> Builder:
         """
         Create a child builder.
 
@@ -53,7 +53,7 @@ class Builder:
         Returns:
             New Builder instance
         """
-        return Builder(self, wrapper_tag, sort_attrs=self.sort_attrs)
+        return Builder(builder_parent=self, wrapper_tag=wrapper_tag, sort_attrs=self.sort_attrs)
 
     def push_block_tag(self, tag: dict[str, Any]) -> None:
         """Push a block tag."""
@@ -154,13 +154,17 @@ class Builder:
             # truncate list and add data span as new sub-Doc
             self.text_chunks = self.text_chunks[: i + 1]
             whitespace.reverse()
+
             whitespace_text_chunk = TextChunk("".join(whitespace), [])
-            self.add_inline_content(
+
+            tagged_content_doc: Doc = (
                 Doc(sort_attrs=self.sort_attrs)
                 .add_dict_item("open", tag)
                 .add_textblock_item(TextBlock([whitespace_text_chunk], sort_attrs=self.sort_attrs))
                 .add_dict_item("close", tag)
             )
+
+            self.add_inline_content(tagged_content_doc)
 
     def add_text_chunk(self, text: str, can_segment: bool) -> None:
         """
@@ -188,7 +192,13 @@ class Builder:
             self.doc.categories.append(content)
             return
 
-        self.text_chunks.append(TextChunk("", self.inline_annotation_tags[:], content))
+        self.text_chunks.append(
+            TextChunk(
+                "",
+                self.inline_annotation_tags[:],
+                inline_content=content,
+            )
+        )
         self.inline_annotation_tags_used = len(self.inline_annotation_tags)
         if not can_segment:
             self.is_block_segmentable = False

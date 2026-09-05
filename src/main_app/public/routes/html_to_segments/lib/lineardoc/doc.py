@@ -18,7 +18,6 @@ import hashlib
 from collections.abc import Callable
 from typing import Any
 
-from . import util as cxutil
 from .doc_item import (
     DocDict,
     DocStr,
@@ -141,16 +140,16 @@ class Doc:
         transclusion_context = None
         for i, i_item in enumerate(self.items):
             if i_item.item_type == "open" and isinstance(i_item, DocDict):
-                tag = Utils.clone_open_tag(i_item.item)
+                tag = i_item.item.clone()
 
-                if tag.get("attributes", {}).get("id"):
+                if tag.attributes.get("id"):
                     # If the item is a header, we make it a fixed length id using hash of
                     # the text content. Header ids are originally the header text to get
                     # the URL fragments working, but for CX, it is irrelevant and we need
                     # a fixed length id that can be used as DB key.
                     # The text inside this 'open tag' is in the next item(i+1).
                     if (
-                        tag["name"] in ["h1", "h2", "h3", "h4", "h5"]
+                        tag.name in ["h1", "h2", "h3", "h4", "h5"]
                         and i + 1 < len(self.items)
                         and self.items[i + 1].item_type == "textblock"
                     ):
@@ -158,12 +157,12 @@ class Doc:
                         h.update(self.items[i + 1]["item"].get_plain_text().encode("utf-8"))
                         # 30 is the max length of ids we allow. We also prepend the sequence id
                         # just to make sure the ids don't collide if the same text repeats.
-                        tag["attributes"]["id"] = h.hexdigest()[:30]
-                    elif len(tag["attributes"]["id"]) > 30:
+                        tag.attributes["id"] = h.hexdigest()[:30]
+                    elif len(tag.attributes["id"]) > 30:
                         # At any case, make sure that the section id never exceeds 30 bytes
-                        tag["attributes"]["id"] = tag["attributes"]["id"][:30]
+                        tag.attributes["id"] = tag.attributes["id"][:30]
                 else:
-                    tag["attributes"]["id"] = get_next_id("block", tag["name"])
+                    tag.attributes["id"] = get_next_id("block", tag.name)
                     # Section headers (<h2> tags) mark the start of a new section
                     if (
                         i + 1 < len(self.items)
@@ -172,25 +171,26 @@ class Doc:
                     ):
                         section_number += 1
 
-                if tag["name"] == "section":
-                    tag["attributes"]["data-mw-section-number"] = section_number
+                if tag.name == "section":
+                    tag.attributes["data-mw-section-number"] = section_number
 
-                new_doc.add_dict_item(i_item.item_type, tag)
+                new_doc.add_dict_item(i_item.item_type, tag.to_json())
 
                 # Content of tags that are either mw:Transclusion or mw:Extension need not be segmented
-                about = cxutil.get_prop(["attributes", "about"], tag)
-                typeof = cxutil.get_prop(["attributes", "typeof"], tag)
+                about = tag.attributes.get("about")
+                typeof = tag.attributes.get("typeof")
                 if about and typeof:
                     transclusion_context = about
 
-            elif i_item.item_type == "close":
-                about = cxutil.get_prop(["attributes", "about"], i_item.item)
+            elif i_item.item_type == "close" and isinstance(i_item, DocDict):
+                tag = i_item.item
+                about = tag.attributes.get("about")
                 if about and about == transclusion_context:
                     transclusion_context = None
-                new_doc.add_dict_item(i_item.item_type, i_item.item)
+                new_doc.add_dict_item(i_item.item_type, tag.to_json())
 
             elif i_item.item_type == "textblock":
-                text_block: TextBlock = i_item.item  # pyright: ignore[reportAssignmentType]
+                text_block = i_item.item
 
                 if text_block.can_segment and not transclusion_context:
                     segmented_text_block = text_block.segment(get_boundaries, get_next_id)
@@ -226,22 +226,19 @@ class Doc:
 
         for i_item in self.items:
             item_type = i_item.item_type
-            item = i_item.item
 
-            if i_item.get("attributes", {}).get("class") == "cx-segment-block":
-                continue
+            if isinstance(i_item, DocDict):
+                if i_item.item.attributes.get("class") == "cx-segment-block":
+                    continue
 
-            if item_type == "open" and isinstance(i_item, DocDict):
-                html.append(Utils.get_open_tag_html(item, self.sort_attrs))
-
-            elif item_type == "close":
-                html.append(Utils.get_close_tag_html(i_item))
+            if item_type in ("open", "close") and isinstance(i_item, DocDict):
+                html.append(i_item.get_html(self.sort_attrs))
 
             elif item_type == "blockspace":
-                html.append(i_item.item)
+                html.append(i_item.get_html())
 
-            elif item_type == "textblock" and i_item.item:
-                html.append(i_item.item.get_html())
+            elif item_type == "textblock" and isinstance(i_item, DocTextBlock):
+                html.append(i_item.get_html())
             else:
                 raise Exception(f"Unknown item type: {item_type}")
 
@@ -327,7 +324,7 @@ class Doc:
 
                 new_doc.add_item(item_type, item)
 
-            elif item_type == "close":
+            elif item_type == "close" and isinstance(i_item, DocDict):
                 if curr_section and item.name == "body":
                     close_section(new_doc)
                     in_body = False
@@ -401,7 +398,7 @@ class Doc:
 
             if i_item.item_type == "open" and isinstance(i_item, DocDict):
                 tag = i_item.item
-                dump.append(i_item.opening_tag(pad))
+                dump.append(tag.opening_tag(pad))
 
                 if tag.name == "head":
                     # Add a few things for easy display
@@ -411,7 +408,8 @@ class Doc:
 
             elif i_item.item_type == "close" and isinstance(i_item, DocDict):
                 # close block tag
-                dump.append(i_item.closing_tag(pad))
+                tag = i_item.item
+                dump.append(tag.closing_tag(pad))
 
             elif i_item.item_type == "blockspace":
                 # Non-inline whitespace
