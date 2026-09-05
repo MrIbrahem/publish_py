@@ -234,7 +234,7 @@ class Doc:
             if item_type in ("open", "close") and isinstance(i_item, DocDict):
                 html.append(i_item.get_html(self.sort_attrs))
 
-            elif item_type == "blockspace":
+            elif item_type == "blockspace" and isinstance(i_item, DocStr):
                 html.append(i_item.get_html())
 
             elif item_type == "textblock" and isinstance(i_item, DocTextBlock):
@@ -313,14 +313,14 @@ class Doc:
             if item_type == "open" and isinstance(i_item, DocDict):
                 tag = i_item.item
                 if not curr_section:
-                    if prev_section == get_tag_id(tag):
+                    if prev_section == tag.get_tag_id():
                         # This tag is connected to previous section. Can be a template fragment.
                         # Undo last section close
                         new_doc.undo_add_item()
                         curr_section = prev_section
                     else:
                         open_section(new_doc)
-                        curr_section = get_tag_id(tag)
+                        curr_section = tag.get_tag_id()
 
                 new_doc.add_item(item_type, tag)
 
@@ -331,16 +331,16 @@ class Doc:
                     in_body = False
 
                 new_doc.add_item(item_type, tag)
-                if get_tag_id(tag) == curr_section:
+                if tag.get_tag_id() == curr_section:
                     close_section(new_doc)
 
-            elif item_type == "blockspace":
+            elif item_type == "blockspace" and isinstance(i_item, DocStr):
                 tag = i_item.item
                 new_item = new_doc.get_current_item()
                 if prev_section and new_item and new_item["item"]["name"] == "section":
                     insert_to_prev_section(tag, new_doc)
                 else:
-                    new_doc.add_blockspace_item(tag.item)
+                    new_doc.add_blockspace_item(tag)
 
             elif item_type == "textblock" and isinstance(i_item, DocTextBlock):
                 tag = i_item.item
@@ -414,7 +414,7 @@ class Doc:
                 tag = i_item.item
                 dump.append(tag.closing_tag(pad))
 
-            elif i_item.item_type == "blockspace":
+            elif i_item.item_type == "blockspace" and isinstance(i_item, DocStr):
                 # Non-inline whitespace
                 dump.append(f"{pad}<cxblockspace/>")
 

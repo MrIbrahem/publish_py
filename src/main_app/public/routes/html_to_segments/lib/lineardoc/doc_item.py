@@ -130,6 +130,22 @@ class DictTag:
             return ""
         return "</" + Utils.esc(self.name) + ">"
 
+    def get_tag_id(self) -> str:
+        """
+        Get something that can identify the tag.
+
+        For a given tag, get something that can be used to identify the tag.
+        `about` attribute has more preference in our context since it connects
+        template fragments. If `about` is not present, use id attribute.
+        If no attributes, then it is tag name. In real wiki content, the case
+        of no attributes is not found.
+        """
+        tag_id = None
+        if self.attributes:
+            tag_id = self.attributes.get("about") or self.attributes.get("id")
+
+        return str(tag_id) if tag_id else str(self.name)
+
 
 class DocDict(ItemBase):
     item_type: ITEM_TYPES_STR
