@@ -4,8 +4,6 @@ Unit tests for src/main_app/public/routes/new_html/domain/fixes/__init__.py modu
 Classes to test: WikitextFixerService
 """
 
-
-import os
 from pathlib import Path
 
 import pytest
@@ -13,6 +11,7 @@ import pytest
 from src.main_app.public.routes.new_html.domain.fixes import (
     WikitextFixerService,
 )
+
 
 def strip_result(result: str) -> str:
     text = result.strip()
@@ -26,7 +25,7 @@ class TestWikitextFixerService:
         path = Path(__file__).parent / "data" / name
         assert path.exists(), f"Fixture file missing: {path}"
 
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
             content = f.read()
 
         assert content is not None, f"Unable to read fixture file: {path}"
@@ -50,7 +49,7 @@ class TestWikitextFixerService:
         if result.strip() != expected.strip():
             # write to output-1.wiki
             output_path = Path(__file__).parent / "data" / output_file
-            with open(output_path, 'w', encoding='utf-8') as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 f.write(result)
 
         assert strip_result(result) == strip_result(expected)

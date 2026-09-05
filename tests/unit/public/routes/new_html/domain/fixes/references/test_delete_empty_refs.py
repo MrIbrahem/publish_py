@@ -27,7 +27,10 @@ class TestDelEmptyRefs:
 
         assert '<ref name="not_exists_ref_should_be_deleted"/>' not in result
 
-        assert result == """Afatinib [[covalent]]ly binds to [[cysteine]] number 797 of the [[epidermal growth factor receptor]] (EGFR) via a [[Michael addition reaction|Michael addition]] ([[IC50|IC<sub>50</sub>]] = 0.5 [[nanomolar|nM]]).<ref name="AHFS2022"/><ref>Schubert-Zsilavecz, M, Wurglics, M, ''Neue Arzneimittel Frühjahr 2013''. {{in lang|de}}</ref><ref name=AHFS2022>Afatinib Monograph for Professionals</ref>"""
+        assert (
+            result
+            == """Afatinib [[covalent]]ly binds to [[cysteine]] number 797 of the [[epidermal growth factor receptor]] (EGFR) via a [[Michael addition reaction|Michael addition]] ([[IC50|IC<sub>50</sub>]] = 0.5 [[nanomolar|nM]]).<ref name="AHFS2022"/><ref>Schubert-Zsilavecz, M, Wurglics, M, ''Neue Arzneimittel Frühjahr 2013''. {{in lang|de}}</ref><ref name=AHFS2022>Afatinib Monograph for Professionals</ref>"""
+        )
 
     def test_del_empty_refs_with_valid_short_ref(self):
         """A short ref stays untouched when its full ref definition exists elsewhere."""
