@@ -1,9 +1,11 @@
-# from .media import remove_images
 from __future__ import annotations
+
+from ..parser.lead_section_parser import get_lead_section
 
 from .media import RemoveMissingImagesService, remove_videos
 from .references import (
     del_empty_refs,
+    expand_text_refs,
     remove_bad_refs,
 )
 from .structure import remove_categories, remove_lang_links
@@ -20,7 +22,7 @@ class WikitextFixerService:
         init
         """
 
-    def fix(self, text: str, title: str) -> str:
+    def fix(self, text: str, title: str, all_flag: bool = False) -> str:
         """
         Port the full fix_wikitext pipeline from the original PHP tool:
             - remove_templates
@@ -32,6 +34,9 @@ class WikitextFixerService:
             - remove_missing_images
             - add_missing_title
         """
+
+        if not all_flag:
+            text = self.strip_text_into_lead_section(text)
 
         # Replace templates
         text = text.replace("{{drugbox", "{{Infobox drug")
@@ -60,6 +65,27 @@ class WikitextFixerService:
 
         text = service.remove_missing_images(text)
         text = add_missing_title(text, title)
+
+        return text
+
+    def strip_text_into_lead_section(self, text: str) -> str:
+        """
+        Extracts the lead section from the given text and expands its references if applicable.
+
+        If the lead section exists and is different from the original text,
+        it expands the references within the lead section using the full text as context.
+        Otherwise, it returns the original text unchanged.
+
+        Args:
+            text (str): The input text from which to extract and process the lead section.
+
+        Returns:
+            str: The expanded lead section if it differs from the original text,
+                 otherwise the original text.
+        """
+        lead = get_lead_section(text)
+        if lead and lead != text:
+            return expand_text_refs(lead, text)
 
         return text
 

@@ -8,6 +8,8 @@ Classes to test: WikitextFixerService
 import os
 from pathlib import Path
 
+import pytest
+
 from src.main_app.public.routes.new_html.domain.fixes import (
     WikitextFixerService,
 )
@@ -30,15 +32,24 @@ class TestWikitextFixerService:
         assert content is not None, f"Unable to read fixture file: {path}"
         return content
 
-    def test_fix_wikitext_matches_result_fixture(self):
-        source = self.load_fixture('source-1.wiki')
-        expected = self.load_fixture('result-1.wiki')
+    # put parametrize with 3 source-1.wiki, result-1.wiki, output-1.wiki
+    @pytest.mark.parametrize(
+        "source_file,result_file,output_file",
+        [
+            ("source-1.wiki", "result-1.wiki", "output-1.wiki"),
+            ("source-2.wiki", "result-2.wiki", "output-2.wiki"),
+        ],
+    )
+    def test_fix_wikitext_matches_result_fixture(self, source_file: str, result_file: str, output_file: str) -> None:
+        source = self.load_fixture(source_file)
+        expected = self.load_fixture(result_file)
 
         fixer = WikitextFixerService()
         result = fixer.fix(text=source, title="PLACEHOLDER_TEST")
+
         if result.strip() != expected.strip():
             # write to output-1.wiki
-            output_path = Path(__file__).parent / "data" / "output-1.wiki"
+            output_path = Path(__file__).parent / "data" / output_file
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(result)
 

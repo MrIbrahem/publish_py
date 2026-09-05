@@ -74,15 +74,9 @@ def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str
     if revid:
         add_title_revision(title, revid, all_flag)
 
-    if not all_flag:
-        full_text = source
-        lead = get_lead_section(full_text)
-        if lead and lead != full_text:
-            source = expand_text_refs(lead, full_text)
-
     # run fix_wikitext as in the original PHP version
     fixer = WikitextFixerService()
-    source = fixer.fix(source, title)
+    source = fixer.fix(source, title, all_flag=bool(all_flag))
 
     return source, revid, from_cache
 

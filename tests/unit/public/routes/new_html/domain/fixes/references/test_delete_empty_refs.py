@@ -16,6 +16,19 @@ from src.main_app.public.routes.new_html.domain.fixes.references.delete_empty_re
 class TestDelEmptyRefs:
     """Tests for the `del_empty_refs` function of the `delete_empty_refs` module."""
 
+    def test_basic(self):
+        text = """[[File:Afatinib mechanism.svg|thumb|left|upright=2|Afatinib [[covalent]]ly binds to [[cysteine]] number 797 of the [[epidermal growth factor receptor]] (EGFR) via a [[Michael addition reaction|Michael addition]] ([[IC50|IC<sub>50</sub>]] = 0.5 [[nanomolar|nM]]).<ref>Schubert-Zsilavecz, M, Wurglics, M, ''Neue Arzneimittel Frühjahr 2013''. {{in lang|de}}</ref>]]<ref name="not_exists_ref_should_be_deleted"/>"""
+        result = del_empty_refs(text)
+
+    def test_basic2(self):
+        text = """Afatinib [[covalent]]ly binds to [[cysteine]] number 797 of the [[epidermal growth factor receptor]] (EGFR) via a [[Michael addition reaction|Michael addition]] ([[IC50|IC<sub>50</sub>]] = 0.5 [[nanomolar|nM]]).<ref name="AHFS2022"/><ref>Schubert-Zsilavecz, M, Wurglics, M, ''Neue Arzneimittel Frühjahr 2013''. {{in lang|de}}</ref><ref name="not_exists_ref_should_be_deleted"/><ref name=AHFS2022>Afatinib Monograph for Professionals</ref>"""
+
+        result = del_empty_refs(text)
+
+        assert '<ref name="not_exists_ref_should_be_deleted"/>' not in result
+
+        assert result == """Afatinib [[covalent]]ly binds to [[cysteine]] number 797 of the [[epidermal growth factor receptor]] (EGFR) via a [[Michael addition reaction|Michael addition]] ([[IC50|IC<sub>50</sub>]] = 0.5 [[nanomolar|nM]]).<ref name="AHFS2022"/><ref>Schubert-Zsilavecz, M, Wurglics, M, ''Neue Arzneimittel Frühjahr 2013''. {{in lang|de}}</ref><ref name=AHFS2022>Afatinib Monograph for Professionals</ref>"""
+
     def test_del_empty_refs_with_valid_short_ref(self):
         """A short ref stays untouched when its full ref definition exists elsewhere."""
         text = '<ref name="test">Full citation</ref> Some text <ref name="test" />'
