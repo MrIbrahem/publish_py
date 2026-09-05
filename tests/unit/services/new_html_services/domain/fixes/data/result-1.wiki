@@ -136,8 +136,8 @@ In [[Bangladesh]] under the trade name Afanix.
 
 <!--Identifiers-->
 | ChemSpiderID_Ref = {{chemspidercite|correct|chemspider}}
-| ATC_supplemental = 
-| CAS_supplemental = 
+| ATC_supplemental =
+| CAS_supplemental =
 | ChEBI_Ref = {{ebicite|correct|EBI}}
 | DrugBank_Ref = {{drugbankcite|correct|drugbank}}
 | KEGG2_Ref = {{keggcite|changed|kegg}}
@@ -162,19 +162,3 @@ In [[Bangladesh]] under the trade name Afanix.
 * {{cite web | url = https://druginfo.nlm.nih.gov/drugportal/name/afatinib%20dimaleate | publisher = U.S. National Library of Medicine | work = Drug Information Portal | title = Afatinib dimaleate | access-date = 4 October 2021 | archive-date = 4 November 2021 | archive-url = https://web.archive.org/web/20211104142033/https://druginfo.nlm.nih.gov/drugportal/name/afatinib%20dimaleate | url-status = live }} {{Webarchive|url=https://web.archive.org/web/20211104142033/https://druginfo.nlm.nih.gov/drugportal/name/afatinib%20dimaleate |date=4 November 2021 }}
 {{Targeted cancer therapeutic agents}}
 {{Growth factor receptor modulators}}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[[or:ଆଫାଟିନିବ]]
-[[ar:أفاتينيب]]

@@ -181,9 +181,11 @@ tests/
 │   │   │   ├── html_to_segments/
 │   │   │   │   ├── lib/
 │   │   │   │   │   ├── lineardoc/
+│   │   │   │   │   │   ├── data/
 │   │   │   │   │   │   ├── test_builder.py
 │   │   │   │   │   │   ├── test_contextualizer.py
 │   │   │   │   │   │   ├── test_doc.py
+│   │   │   │   │   │   ├── test_doc_item.py
 │   │   │   │   │   │   ├── test_elements.py
 │   │   │   │   │   │   ├── test_lineardoc_utils.py
 │   │   │   │   │   │   ├── test_mw_contextualizer.py
@@ -198,33 +200,6 @@ tests/
 │   │   │   │   └── test_html_to_segments_init.py
 │   │   │   ├── main/
 │   │   │   ├── new_html/
-│   │   │   │   ├── domain/
-│   │   │   │   │   ├── fixes/
-│   │   │   │   │   │   ├── media/
-│   │   │   │   │   │   │   ├── test_fix_images.py
-│   │   │   │   │   │   │   └── test_remove_missing_images.py
-│   │   │   │   │   │   ├── references/
-│   │   │   │   │   │   │   ├── test_delete_empty_refs.py
-│   │   │   │   │   │   │   ├── test_expand_refs.py
-│   │   │   │   │   │   │   └── test_ref_worker.py
-│   │   │   │   │   │   ├── structure/
-│   │   │   │   │   │   │   ├── test_fix_categories.py
-│   │   │   │   │   │   │   └── test_fix_language_links.py
-│   │   │   │   │   │   ├── templates/
-│   │   │   │   │   │   │   ├── test_delete_templates.py
-│   │   │   │   │   │   │   └── test_fix_templates.py
-│   │   │   │   │   │   └── test_fixes_init.py
-│   │   │   │   │   └── parser/
-│   │   │   │   │       ├── test_citations_parser.py
-│   │   │   │   │       ├── test_lead_section_parser.py
-│   │   │   │   │       └── test_template_helpers.py
-│   │   │   │   ├── services/
-│   │   │   │   │   ├── test_clients.py
-│   │   │   │   │   ├── test_html_utils.py
-│   │   │   │   │   ├── test_process.py
-│   │   │   │   │   ├── test_process_seg.py
-│   │   │   │   │   ├── test_services_utils.py
-│   │   │   │   │   └── test_storage.py
 │   │   │   │   └── test_new_html_routes.py
 │   │   │   ├── publish/
 │   │   │   │   └── test_publish_worker.py
@@ -254,6 +229,42 @@ tests/
 │   │   │   │   └── test_publish_secret_checks.py
 │   │   │   ├── test_crypto.py
 │   │   │   └── test_extensions.py
+│   │   ├── new_html_services/
+│   │   │   ├── domain/
+│   │   │   │   ├── fixes/
+│   │   │   │   │   ├── data/
+│   │   │   │   │   │   ├── output-2.wiki
+│   │   │   │   │   │   ├── result-1.wiki
+│   │   │   │   │   │   ├── result-2.wiki
+│   │   │   │   │   │   ├── source-1.wiki
+│   │   │   │   │   │   └── source-2.wiki
+│   │   │   │   │   ├── media/
+│   │   │   │   │   │   ├── test_fix_images.py
+│   │   │   │   │   │   └── test_remove_missing_images.py
+│   │   │   │   │   ├── references/
+│   │   │   │   │   │   ├── test_delete_empty_refs.py
+│   │   │   │   │   │   ├── test_expand_refs.py
+│   │   │   │   │   │   └── test_ref_worker.py
+│   │   │   │   │   ├── structure/
+│   │   │   │   │   │   ├── test_fix_categories.py
+│   │   │   │   │   │   └── test_fix_language_links.py
+│   │   │   │   │   ├── templates/
+│   │   │   │   │   │   ├── test_delete_templates.py
+│   │   │   │   │   │   └── test_fix_templates.py
+│   │   │   │   │   ├── test_fixtures/
+│   │   │   │   │   │   ├── local.wiki.txt
+│   │   │   │   │   │   └── mwikicx.wiki.txt
+│   │   │   │   │   └── test_fixes_init.py
+│   │   │   │   └── parser/
+│   │   │   │       ├── test_citations_parser.py
+│   │   │   │       ├── test_lead_section_parser.py
+│   │   │   │       └── test_template_helpers.py
+│   │   │   ├── test_clients.py
+│   │   │   ├── test_html_utils.py
+│   │   │   ├── test_process.py
+│   │   │   ├── test_process_seg.py
+│   │   │   ├── test_services_utils.py
+│   │   │   └── test_storage.py
 │   │   ├── schemas/
 │   │   └── utils/
 │   │       ├── helpers/
