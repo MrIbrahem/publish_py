@@ -1,126 +1,36 @@
 """
 Parser to read an HTML stream into a Doc.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Parser.js
 """
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from lxml import etree
 
 from .builder import Builder
+from .contextualizer import Contextualizer
+from .elements import BLOCK_TAGS, VOID_ELEMENTS
+from .mw_contextualizer import MwContextualizer
 from .utils import Utils
 
-BLOCK_TAGS = [
-    "html",
-    "head",
-    "body",
-    "script",
-    # head tags
-    # In HTML5+RDFa, link/meta are actually allowed anywhere in the body, and are to be
-    # treated as void flow content (like <br> and <img>).
-    "title",
-    "style",
-    "meta",
-    "link",
-    "noscript",
-    "base",
-    # non-visual content
-    "audio",
-    "data",
-    "datagrid",
-    "datalist",
-    "dialog",
-    "eventsource",
-    "form",
-    "iframe",
-    "main",
-    "menu",
-    "menuitem",
-    "optgroup",
-    "option",
-    # paragraph
-    "div",
-    "p",
-    # tables
-    "table",
-    "tbody",
-    "thead",
-    "tfoot",
-    "caption",
-    "th",
-    "tr",
-    "td",
-    # lists
-    "ul",
-    "ol",
-    "li",
-    "dl",
-    "dt",
-    "dd",
-    # HTML5 heading content
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "hgroup",
-    # HTML5 sectioning content
-    "article",
-    "aside",
-    "body",
-    "nav",
-    "section",
-    "footer",
-    "header",
-    "figure",
-    "figcaption",
-    "fieldset",
-    "details",
-    "blockquote",
-    "address",  # added by Giovanni Toffoli
-    # other
-    "hr",
-    "button",
-    "canvas",
-    "center",
-    "col",
-    "colgroup",
-    "embed",
-    "map",
-    "object",
-    "pre",
-    "progress",
-    "video",
-    # non-annotation inline tags
-    "img",
-    "br",
-]
-
-# HTML void elements that cannot have content and should be self-closing
-VOID_ELEMENTS = [
-    "area",
-    "base",
-    "br",
-    "col",
-    "embed",
-    "hr",
-    "img",
-    "input",
-    "link",
-    "meta",
-    "param",
-    "source",
-    "track",
-    "wbr",
-]
+logger = logging.getLogger(__name__)
 
 
 class Parser:
     """Parser to read an HTML stream into a Doc."""
 
-    def __init__(self, contextualizer, options=None) -> None:
+    def __init__(
+        self,
+        contextualizer: MwContextualizer | Contextualizer,
+        options=None,
+        sort_attrs: bool = True,
+    ) -> None:
         """
         Initialize the parser.
 
@@ -131,10 +41,13 @@ class Parser:
         self.contextualizer = contextualizer
         self.options = options or {}
         self.lowercase = True
+        self.sort_attrs = sort_attrs
 
     def init(self) -> None:
-        """Initialize parser state."""
-        self.root_builder = Builder()
+        """
+        Initialize state for parsing.
+        """
+        self.root_builder = Builder(sort_attrs=self.sort_attrs)
         self.builder = self.root_builder
         # Stack of tags currently open
         self.all_tags = []
@@ -148,19 +61,21 @@ class Parser:
         """
         parser = etree.HTMLParser(encoding="utf-8")
         try:
-            tree = etree.fromstring(html.encode("utf-8"), parser)
-            self._process_element(tree)
+            root = etree.fromstring(html.encode("utf-8"), parser)
+            self._process_element(root)
         except Exception:
             # Try with wrapping
             try:
-                tree = etree.fromstring(f"<div>{html}</div>".encode(), parser)
-                for child in tree:
+                root = etree.fromstring(f"<div>{html}</div>".encode(), parser)
+                for child in root:
                     self._process_element(child)
             except Exception as e:
                 raise Exception(f"Failed to parse HTML: {e}") from e
 
-    def _process_element(self, element: etree.Element) -> None:
-        """Process an element and its children recursively."""
+    def _process_element(self, element: etree._Element | Any) -> None:
+        """
+        Process an element recursively.
+        """
         # Skip comments and other special nodes
         if not isinstance(element.tag, str):
             return
@@ -194,7 +109,7 @@ class Parser:
         Handle open tag event.
 
         Args:
-            tag: Tag dict
+            tag: Tag dict with 'name' and 'attributes'
         """
         if self.contextualizer.get_context() == "removable" or self.contextualizer.is_removable(tag):
             self.all_tags.append(tag)

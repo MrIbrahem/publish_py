@@ -4,42 +4,28 @@ Main processing module for HTML transformation.
 
 from __future__ import annotations
 
-import os
-import re
+from pathlib import Path
 
 import yaml
 
-from ..lib.lineardoc import Normalizer, Parser
-from .lineardoc import MwContextualizer
+from .lineardoc import MwContextualizer, Parser
 from .segmentation import CXSegmenter
 
 # Load configuration
-config_path = os.path.join(os.path.dirname(__file__), "..", "config", "MWPageLoader.yaml")
+config_path = Path(__file__).parent.parent / "config" / "MWPageLoader.yaml"
 with open(config_path, "r") as f:
     pageloader_config = yaml.safe_load(f)
 
 removable_sections = pageloader_config.get("removableSections", {})
+if not removable_sections:
+    raise ValueError("removableSections must be defined in config")
 
 
-def normalize(html: str):
-    """
-    Normalize HTML by parsing and re-serializing.
-
-    Args:
-        html: HTML string to normalize
-
-    Returns:
-        Normalized HTML string
-    """
-    normalizer = Normalizer()
-    normalizer.init()
-    # Remove tabs, carriage returns, and newlines
-    html = re.sub(r"[\t\r\n]+", "", html)
-    normalizer.write(html)
-    return normalizer.get_html()
-
-
-def process_html(source_html: str, lang: str | None = None):
+def process_html(
+    source_html: str,
+    lang: str | None = None,
+    sort_attrs: bool = True,
+):
     """
     Process source HTML through the CX pipeline.
 
@@ -59,7 +45,11 @@ def process_html(source_html: str, lang: str | None = None):
     if lang is None:
         lang = "en"
 
-    parser = Parser(MwContextualizer({"removableSections": removable_sections}), {"wrapSections": True})
+    parser = Parser(
+        contextualizer=MwContextualizer({"removableSections": removable_sections}),
+        options={"wrapSections": True},
+        sort_attrs=sort_attrs,
+    )
 
     parser.init()
     parser.write(source_html)
@@ -74,6 +64,5 @@ def process_html(source_html: str, lang: str | None = None):
 
 
 __all__ = [
-    "normalize",
     "process_html",
 ]

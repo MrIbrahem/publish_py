@@ -4,6 +4,7 @@ tests/
 │   ├── admin/
 │   │   └── routes/
 │   │       ├── qids/
+│   │       ├── translated/
 │   │       ├── test_admin_routes_integration.py
 │   │       ├── test_coordinators_routes_integration.py
 │   │       ├── test_full_translators_routes_integration.py
@@ -34,6 +35,10 @@ tests/
 │   │       │   ├── test_cxtoken_cors_disabled.py
 │   │       │   ├── test_cxtoken_cors_on.py
 │   │       │   └── test_cxtoken_routes.py
+│   │       ├── html_to_segments/
+│   │       │   └── lib/
+│   │       │       ├── lineardoc/
+│   │       │       └── segmentation/
 │   │       ├── main/
 │   │       │   └── test_main_routes.py
 │   │       ├── publish/
@@ -44,17 +49,18 @@ tests/
 │   │       ├── refs/
 │   │       │   └── test_refs_routes.py
 │   │       └── td/
-│   └── shared/
+│   └── services/
 │       ├── core/
 │       │   └── cors/
 │       │       ├── test_is_allowed_checker.py
 │       │       └── test_main_routes_with_cors.py
 │       └── services/
-│           ├── test_pages_service_integration.py
-│           └── test_user_token_service_integration.py
+│           └── test_pages_service_integration.py
 ├── unit/
 │   ├── admin/
 │   │   └── routes/
+│   │       ├── qids/
+│   │       ├── translated/
 │   │       ├── test_admin_routes.py
 │   │       ├── test_coordinators_routes.py
 │   │       ├── test_full_translators_routes.py
@@ -66,7 +72,7 @@ tests/
 │   │       ├── test_auth_utils.py
 │   │       └── test_identity.py
 │   ├── config/
-│   ├── db/
+│   ├── database/
 │   │   ├── models/
 │   │   │   ├── analytics/
 │   │   │   │   ├── test_assessment_model.py
@@ -119,6 +125,7 @@ tests/
 │   │       │   ├── test_pages_users_to_main_service_admin.py
 │   │       │   ├── test_translate_type_service.py
 │   │       │   └── test_user_page_service.py
+│   │       ├── pages_tables/
 │   │       ├── reports/
 │   │       │   ├── test_pages_users_to_main_service.py
 │   │       │   └── test_report_service.py
@@ -163,51 +170,104 @@ tests/
 │   │           └── helpers/
 │   ├── public/
 │   │   ├── auth/
+│   │   │   └── test_routes.py
 │   │   ├── routes/
 │   │   │   ├── api/
 │   │   │   │   └── test_api_routes_unit.py
 │   │   │   ├── auth/
-│   │   │   │   ├── test_mwoauth_handshake.py
 │   │   │   │   └── test_rate_limit.py
 │   │   │   ├── cxtoken/
 │   │   │   │   └── test_cxtoken_cache.py
+│   │   │   ├── html_to_segments/
+│   │   │   │   ├── lib/
+│   │   │   │   │   ├── lineardoc/
+│   │   │   │   │   │   ├── test_builder.py
+│   │   │   │   │   │   ├── test_contextualizer.py
+│   │   │   │   │   │   ├── test_doc.py
+│   │   │   │   │   │   ├── test_elements.py
+│   │   │   │   │   │   ├── test_lineardoc_utils.py
+│   │   │   │   │   │   ├── test_mw_contextualizer.py
+│   │   │   │   │   │   ├── test_normalizer.py
+│   │   │   │   │   │   ├── test_parser.py
+│   │   │   │   │   │   ├── test_text_block.py
+│   │   │   │   │   │   ├── test_text_chunk.py
+│   │   │   │   │   │   └── test_util.py
+│   │   │   │   │   ├── segmentation/
+│   │   │   │   │   │   └── test_cx_segmenter.py
+│   │   │   │   │   └── test_processor.py
+│   │   │   │   └── test_html_to_segments_init.py
 │   │   │   ├── main/
+│   │   │   ├── new_html/
+│   │   │   │   ├── domain/
+│   │   │   │   │   ├── fixes/
+│   │   │   │   │   │   ├── media/
+│   │   │   │   │   │   │   ├── test_fix_images.py
+│   │   │   │   │   │   │   └── test_remove_missing_images.py
+│   │   │   │   │   │   ├── references/
+│   │   │   │   │   │   │   ├── test_delete_empty_refs.py
+│   │   │   │   │   │   │   ├── test_expand_refs.py
+│   │   │   │   │   │   │   └── test_ref_worker.py
+│   │   │   │   │   │   ├── structure/
+│   │   │   │   │   │   │   ├── test_fix_categories.py
+│   │   │   │   │   │   │   └── test_fix_language_links.py
+│   │   │   │   │   │   ├── templates/
+│   │   │   │   │   │   │   ├── test_delete_templates.py
+│   │   │   │   │   │   │   └── test_fix_templates.py
+│   │   │   │   │   │   └── test_fixes_init.py
+│   │   │   │   │   └── parser/
+│   │   │   │   │       ├── test_citations_parser.py
+│   │   │   │   │       ├── test_lead_section_parser.py
+│   │   │   │   │       └── test_template_helpers.py
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── test_clients.py
+│   │   │   │   │   ├── test_html_utils.py
+│   │   │   │   │   ├── test_process.py
+│   │   │   │   │   ├── test_process_seg.py
+│   │   │   │   │   ├── test_services_utils.py
+│   │   │   │   │   └── test_storage.py
+│   │   │   │   └── test_new_html_routes.py
 │   │   │   ├── publish/
 │   │   │   │   └── test_publish_worker.py
-│   │   │   └── refs/
+│   │   │   ├── refs/
+│   │   │   └── td/
 │   │   └── utils/
-│   └── shared/
-│       ├── auth/
-│       │   └── test_auth_service.py
-│       ├── clients/
-│       │   ├── test_mdwiki_api.py
-│       │   ├── test_mediawiki_api.py
-│       │   ├── test_oauth_client.py
-│       │   ├── test_revids_client.py
-│       │   ├── test_text_api.py
-│       │   └── test_wikidata_client.py
-│       ├── core/
-│       │   ├── cookies/
-│       │   │   └── test_cookie.py
-│       │   ├── cors/
-│       │   │   ├── test_check_cors_decorated.py
-│       │   │   ├── test_cors_request_unit.py
-│       │   │   ├── test_cors_wrappers.py
-│       │   │   ├── test_cors_wrappers_and_headers.py
-│       │   │   ├── test_is_allowed_checker_unit.py
-│       │   │   └── test_publish_secret_checks.py
-│       │   ├── test_crypto.py
-│       │   └── test_extensions.py
-│       ├── schemas/
-│       └── utils/
-│           ├── helpers/
-│           │   ├── test_files.py
-│           │   ├── test_format.py
-│           │   ├── test_text_processor.py
-│           │   ├── test_words.py
-│           │   └── test_words_unit.py
-│           ├── test_decode_bytes.py
-│           └── test_web_utils.py
+│   ├── services/
+│   │   ├── auth/
+│   │   │   ├── test_auth_service.py
+│   │   │   └── test_token_manager.py
+│   │   ├── clients/
+│   │   │   ├── test_mdwiki_api.py
+│   │   │   ├── test_mediawiki_api.py
+│   │   │   ├── test_oauth_client.py
+│   │   │   ├── test_revids_client.py
+│   │   │   ├── test_text_api.py
+│   │   │   └── test_wikidata_client.py
+│   │   ├── core/
+│   │   │   ├── cookies/
+│   │   │   │   └── test_cookie.py
+│   │   │   ├── cors/
+│   │   │   │   ├── test_check_cors_decorated.py
+│   │   │   │   ├── test_cors_request_unit.py
+│   │   │   │   ├── test_cors_wrappers.py
+│   │   │   │   ├── test_cors_wrappers_and_headers.py
+│   │   │   │   ├── test_is_allowed_checker_unit.py
+│   │   │   │   └── test_publish_secret_checks.py
+│   │   │   ├── test_crypto.py
+│   │   │   └── test_extensions.py
+│   │   ├── schemas/
+│   │   └── utils/
+│   │       ├── helpers/
+│   │       │   ├── test_files.py
+│   │       │   ├── test_format.py
+│   │       │   ├── test_text_processor.py
+│   │       │   ├── test_words.py
+│   │       │   └── test_words_unit.py
+│   │       ├── test_decode_bytes.py
+│   │       └── test_web_utils.py
+│   └── templates_markups/
+│       ├── admin_sidebar/
+│       ├── navbar/
+│       └── test_admin_sidebar.py
 ├── __init__.py
 ├── conftest.py
 └── README.md

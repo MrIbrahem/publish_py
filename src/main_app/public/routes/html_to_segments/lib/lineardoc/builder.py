@@ -1,5 +1,9 @@
 """
 Builder - A document builder for creating linear documents.
+
+converted from the LinearDoc javascript library of the Wikimedia Content translation project
+
+https://github.com/wikimedia/mediawiki-services-cxserver/blob/master/lib/lineardoc/Builder.js
 """
 
 from __future__ import annotations
@@ -15,7 +19,12 @@ from .utils import Utils
 class Builder:
     """A document builder."""
 
-    def __init__(self, parent=None, wrapper_tag: dict | None = None) -> None:
+    def __init__(
+        self,
+        parent=None,
+        wrapper_tag: dict | None = None,
+        sort_attrs: bool = True,
+    ) -> None:
         """
         Initialize a Builder.
 
@@ -23,12 +32,13 @@ class Builder:
             parent: Parent document builder
             wrapper_tag: Tag that wraps document (if there is a parent)
         """
+        self.sort_attrs = sort_attrs
         self.block_tags = []
         # Stack of annotation tags
         self.inline_annotation_tags = []
         # The height of the annotation tags that have been used, minus one
         self.inline_annotation_tags_used = 0
-        self.doc = Doc(wrapper_tag)
+        self.doc = Doc(wrapper_tag, sort_attrs=sort_attrs)
         self.text_chunks = []
         self.is_block_segmentable = True
         self.parent = parent
@@ -43,7 +53,7 @@ class Builder:
         Returns:
             New Builder instance
         """
-        return Builder(self, wrapper_tag)
+        return Builder(self, wrapper_tag, sort_attrs=self.sort_attrs)
 
     def push_block_tag(self, tag: dict[str, Any]) -> None:
         """Push a block tag."""
@@ -142,10 +152,11 @@ class Builder:
             # truncate list and add data span as new sub-Doc
             self.text_chunks = self.text_chunks[: i + 1]
             whitespace.reverse()
+            whitespace_text_chunk = TextChunk("".join(whitespace), [])
             self.add_inline_content(
-                Doc()
+                Doc(sort_attrs=self.sort_attrs)
                 .add_item("open", tag)
-                .add_item("textblock", TextBlock([TextChunk("".join(whitespace), [])]))
+                .add_item("textblock", TextBlock([whitespace_text_chunk], sort_attrs=self.sort_attrs))
                 .add_item("close", tag)
             )
 
@@ -198,7 +209,14 @@ class Builder:
         if whitespace_only:
             self.doc.add_item("blockspace", "".join(whitespace))
         else:
-            self.doc.add_item("textblock", TextBlock(self.text_chunks, self.is_block_segmentable))
+            self.doc.add_item(
+                "textblock",
+                TextBlock(
+                    self.text_chunks,
+                    self.is_block_segmentable,
+                    sort_attrs=self.sort_attrs,
+                ),
+            )
 
         self.text_chunks = []
         self.is_block_segmentable = True

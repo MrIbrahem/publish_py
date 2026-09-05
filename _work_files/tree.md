@@ -33,19 +33,19 @@ src/
 │   │   ├── __init__.py
 │   │   ├── admin_panel.py
 │   │   ├── decorators.py
-│   │   ├── README.md
-│   │   └── sidebar.py
+│   │   ├── flask_admin_panel.py
+│   │   ├── flask_admin_panel_models.py
+│   │   └── README.md
 │   ├── config/
 │   │   ├── __init__.py
 │   │   ├── classes.py
 │   │   ├── flask_config.py
 │   │   ├── main_settings.py
 │   │   └── README.md
-│   ├── db/
-│   │   ├── c/
-│   │   │   └── content/
+│   ├── database/
 │   │   ├── models/
 │   │   │   ├── __init__.py
+│   │   │   ├── base.py
 │   │   │   ├── category_members.py
 │   │   │   ├── dashboard.py
 │   │   │   ├── metrics.py
@@ -123,22 +123,87 @@ src/
 │   ├── public/
 │   │   ├── auth/
 │   │   │   ├── __init__.py
+│   │   │   ├── decorators.py
 │   │   │   ├── rate_limit.py
-│   │   │   ├── routes.py
-│   │   │   └── utils.py
+│   │   │   └── routes.py
 │   │   ├── routes/
 │   │   │   ├── api/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── form_utils.py
+│   │   │   │   ├── objects.py
 │   │   │   │   ├── routes.py
 │   │   │   │   └── top_stats_routes.py
-│   │   │   ├── auth/
 │   │   │   ├── cxtoken/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── cache.py
 │   │   │   │   └── routes.py
+│   │   │   ├── html_to_segments/
+│   │   │   │   ├── config/
+│   │   │   │   │   └── MWPageLoader.yaml
+│   │   │   │   ├── lib/
+│   │   │   │   │   ├── lineardoc/
+│   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   ├── builder.py
+│   │   │   │   │   │   ├── contextualizer.py
+│   │   │   │   │   │   ├── doc.py
+│   │   │   │   │   │   ├── elements.py
+│   │   │   │   │   │   ├── mw_contextualizer.py
+│   │   │   │   │   │   ├── normalizer.py
+│   │   │   │   │   │   ├── parser.py
+│   │   │   │   │   │   ├── README.md
+│   │   │   │   │   │   ├── text_block.py
+│   │   │   │   │   │   ├── text_chunk.py
+│   │   │   │   │   │   ├── util.py
+│   │   │   │   │   │   └── utils.py
+│   │   │   │   │   ├── segmentation/
+│   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   ├── cx_segmenter.py
+│   │   │   │   │   │   └── README.md
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   └── processor.py
+│   │   │   │   └── __init__.py
 │   │   │   ├── main/
 │   │   │   │   ├── __init__.py
+│   │   │   │   └── routes.py
+│   │   │   ├── new_html/
+│   │   │   │   ├── domain/
+│   │   │   │   │   ├── fixes/
+│   │   │   │   │   │   ├── media/
+│   │   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   │   ├── fix_images.py
+│   │   │   │   │   │   │   └── remove_missing_images.py
+│   │   │   │   │   │   ├── references/
+│   │   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   │   ├── delete_empty_refs.py
+│   │   │   │   │   │   │   ├── expand_refs.py
+│   │   │   │   │   │   │   └── ref_worker.py
+│   │   │   │   │   │   ├── structure/
+│   │   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   │   ├── fix_categories.py
+│   │   │   │   │   │   │   └── fix_language_links.py
+│   │   │   │   │   │   ├── templates/
+│   │   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   │   ├── delete_templates.py
+│   │   │   │   │   │   │   └── fix_templates.py
+│   │   │   │   │   │   └── __init__.py
+│   │   │   │   │   ├── parser/
+│   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   ├── citations_parser.py
+│   │   │   │   │   │   ├── lead_section_parser.py
+│   │   │   │   │   │   └── template_helpers.py
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── Domain_php_source.txt
+│   │   │   │   │   └── README.md
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── clients.py
+│   │   │   │   │   ├── html_utils.py
+│   │   │   │   │   ├── process.py
+│   │   │   │   │   ├── process_seg.py
+│   │   │   │   │   ├── storage.py
+│   │   │   │   │   └── utils.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── README.md
 │   │   │   │   └── routes.py
 │   │   │   ├── publish/
 │   │   │   │   ├── __init__.py
@@ -160,13 +225,15 @@ src/
 │   │   │   └── routes_utils.py
 │   │   ├── __init__.py
 │   │   └── README.md
-│   ├── shared/
+│   ├── services/
 │   │   ├── auth/
 │   │   │   ├── __init__.py
+│   │   │   ├── auth_exceptions.py
 │   │   │   ├── auth_service.py
-│   │   │   ├── auth_users_service.py
 │   │   │   ├── current_user.py
-│   │   │   └── mwoauth_handshake.py
+│   │   │   ├── flow.py
+│   │   │   ├── token_manager.py
+│   │   │   └── utils.py
 │   │   ├── clients/
 │   │   │   ├── __init__.py
 │   │   │   ├── mdwiki_api.py
@@ -184,7 +251,6 @@ src/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── is_allowed_checker.py
 │   │   │   │   └── publish_secret_checks.py
-│   │   │   ├── extensions/
 │   │   │   ├── __init__.py
 │   │   │   ├── crypto.py
 │   │   │   └── jinja_filters.py
@@ -203,7 +269,21 @@ src/
 │   │   │   └── wiki_links.py
 │   │   ├── __init__.py
 │   │   └── README.md
+│   ├── templates_markups/
+│   │   ├── admin_sidebar/
+│   │   │   ├── __init__.py
+│   │   │   ├── objects.py
+│   │   │   ├── sidebar.py
+│   │   │   └── sidebar_list.py
+│   │   ├── navbar/
+│   │   │   ├── __init__.py
+│   │   │   ├── nav_bar.py
+│   │   │   ├── navbar_list.py
+│   │   │   └── objects.py
+│   │   └── __init__.py
 │   ├── __init__.py
+│   ├── error_pages.py
+│   ├── logger_config.py
 │   └── README.md
 ├── results_api_php_code/
 │   ├── backend/
@@ -226,13 +306,13 @@ src/
 │   │   ├── styles.css
 │   │   ├── tdstyle.css
 │   │   └── theme.css
-│   ├── images/
 │   ├── js/
 │   │   ├── add_by_url.js
 │   │   ├── card-tools.js
 │   │   ├── Chart.min.js
 │   │   ├── dark-mode.js
 │   │   ├── graph.js
+│   │   ├── html_to_segments.js
 │   │   ├── publish_reports.js
 │   │   ├── sidebar.js
 │   │   ├── td_autocomplete.js
@@ -240,6 +320,13 @@ src/
 │   ├── favicon.ico
 │   └── favicon.svg
 ├── templates/
+│   ├── admin/
+│   │   └── bs4_admin/
+│   │       ├── file/
+│   │       │   └── modals/
+│   │       ├── model/
+│   │       │   └── modals/
+│   │       └── rediscli/
 │   ├── admins/
 │   │   ├── email_msg/
 │   │   ├── last/
@@ -248,12 +335,13 @@ src/
 │   │   ├── tt/
 │   │   └── users_emails/
 │   ├── fixrefs/
+│   ├── html_to_segments/
+│   ├── new_html/
 │   ├── results_2026/
 │   └── td/
 │       └── leaderboard/
 ├── __init__.py
 ├── app.py
-├── logger_config.py
 └── README.md
 
 ```
