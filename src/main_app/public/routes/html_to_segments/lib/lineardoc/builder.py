@@ -63,7 +63,7 @@ class Builder:
             return
         if tag["name"] == "figure":
             tag["attributes"]["rel"] = "cx:Figure"
-        self.doc.add_item("open", tag)
+        self.doc.add_dict_item("open", tag)
 
     def is_section(self, tag: dict[str, Any]) -> bool:
         """Check if tag is a section."""
@@ -106,7 +106,7 @@ class Builder:
         self.finish_text_block()
 
         if not self.is_ignored_tag(tag):
-            self.doc.add_item("close", tag)
+            self.doc.add_dict_item("close", tag)
 
         return tag
 
@@ -155,9 +155,9 @@ class Builder:
             whitespace_text_chunk = TextChunk("".join(whitespace), [])
             self.add_inline_content(
                 Doc(sort_attrs=self.sort_attrs)
-                .add_item("open", tag)
-                .add_item("textblock", TextBlock([whitespace_text_chunk], sort_attrs=self.sort_attrs))
-                .add_item("close", tag)
+                .add_dict_item("open", tag)
+                .add_textblock_item(TextBlock([whitespace_text_chunk], sort_attrs=self.sort_attrs))
+                .add_dict_item("close", tag)
             )
 
     def add_text_chunk(self, text: str, can_segment: bool) -> None:
@@ -207,10 +207,9 @@ class Builder:
                 whitespace.append(_chunk.text)
 
         if whitespace_only:
-            self.doc.add_item("blockspace", "".join(whitespace))
+            self.doc.add_blockspace_item("blockspace", "".join(whitespace))
         else:
-            self.doc.add_item(
-                "textblock",
+            self.doc.add_textblock_item(
                 TextBlock(
                     self.text_chunks,
                     self.is_block_segmentable,

@@ -417,9 +417,10 @@ class Utils:
         first_block_template = None
 
         # We start with index 1 since the first tag will be <section>.
-        for i in range(1, len(section_doc.items)):
-            item = section_doc.items[i]
-            tag_dict = item.item_dict
+        # for i in range(1, len(section_doc.items)):
+        # item = section_doc.items[i]
+        for _i, item in enumerate(section_doc.items, start=1):
+            tag_dict = item.item
             item_type = item.item_type
 
             if item_type == "open":
@@ -436,7 +437,7 @@ class Utils:
             # Also check for textblocks
             if item_type == "textblock":
                 if not first_block_template:
-                    root_item = item.item_text_block.get_root_item()
+                    root_item = item.item.get_root_item()
                     if root_item and Utils.is_non_translatable(root_item):
                         first_block_template = root_item
                         ignorable = True

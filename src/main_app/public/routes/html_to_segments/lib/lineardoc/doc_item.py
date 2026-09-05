@@ -7,17 +7,13 @@ from typing import Any, Literal
 
 from .text_block import TextBlock
 
-ITEM_TYPES = Literal["open", "close", "blockspace", "textblock"]
-ITEM_OBJECT_TYPES = dict[str, Any] | TextBlock | str
+ITEM_TYPES_STR = Literal["open", "close"]
 
 
 @dataclass
-class DocItem:
-    item_type: ITEM_TYPES
-    item: ITEM_OBJECT_TYPES | Any
-    item_text_block: TextBlock | None = None
-    item_str: str | None = None
-    item_dict: dict[str, Any] = field(default_factory=dict)
+class ItemBase:
+    item: Any
+    item_type: Any
 
     def to_json(self) -> dict[str, Any]:
         return {"type": self.item_type, "item": self.item}
@@ -31,23 +27,39 @@ class DocItem:
         else:
             raise KeyError(f"key '{key}' not found in Item")
 
+
+@dataclass
+class DocTextBlock(ItemBase):
+    item: TextBlock
+    item_type: str = "textblock"
+
     @classmethod
-    def from_any(cls, item_type: ITEM_TYPES, obj: ITEM_OBJECT_TYPES | Any) -> DocItem:
-        result = cls(item_type=item_type, item=obj)
-        if isinstance(obj, TextBlock):
-            result.item_text_block = obj
+    def from_any(cls, item_type: str, obj: TextBlock):
+        return cls(item_type=item_type, item=obj)
 
-        elif isinstance(obj, dict):
-            result.item_dict = obj
 
-        elif isinstance(obj, str):
-            result.item_str = obj
-        else:
-            raise TypeError(f"Invalid type for Item: {type(obj)}")
+@dataclass
+class DocDict(ItemBase):
+    item_type: ITEM_TYPES_STR
+    item: dict[str, Any] = field(default_factory=dict)
 
-        return result
+    @classmethod
+    def from_any(cls, item_type: ITEM_TYPES_STR, obj: dict[str, Any]):
+        return cls(item_type=item_type, item=obj)
+
+
+@dataclass
+class DocStr(ItemBase):
+    item: str
+    item_type: Literal["blockspace"] = "blockspace"
+
+    @classmethod
+    def from_any(cls, item_type: Literal["blockspace"], obj: str):
+        return cls(item_type=item_type, item=obj)
 
 
 __all__ = [
-    "DocItem",
+    "DocStr",
+    "DocDict",
+    "DocTextBlock",
 ]

@@ -50,10 +50,15 @@ class ProjectsDashboard:
         titles_original = request.form.getlist("titles_original[][g_title]")
         deletes = request.form.getlist("projects[][delete]")
 
+        def get_val(lst: list[str], idx: int) -> str:
+            return lst[idx].strip() if idx < len(lst) else ""
+
         for i, g_id in enumerate(projects):
             record_id = int(g_id)
-            g_title = titles[i] if i < len(titles) else ""
-            g_title_original = titles_original[i] if i < len(titles_original) else ""
+
+            g_title = get_val(titles, i)
+            g_title_original = get_val(titles_original, i)
+
             is_deleted = str(record_id) in deletes
 
             if is_deleted:

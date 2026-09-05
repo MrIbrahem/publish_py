@@ -37,7 +37,7 @@ class TestDocAddItem:
         """Test adding an open tag."""
         doc = Doc()
         tag = {"name": "p", "attributes": {}}
-        doc.add_item("open", tag)
+        doc.add_dict_item("open", tag)
         assert len(doc.items) == 1
         assert doc.items[0]["type"] == "open"
         assert doc.items[0]["item"] == tag
@@ -46,7 +46,7 @@ class TestDocAddItem:
         """Test adding a close tag."""
         doc = Doc()
         tag = {"name": "p"}
-        doc.add_item("close", tag)
+        doc.add_dict_item("close", tag)
         assert len(doc.items) == 1
         assert doc.items[0]["type"] == "close"
 
@@ -55,22 +55,38 @@ class TestDocAddItem:
         doc = Doc()
         chunks = [TextChunk("text", [])]
         block = TextBlock(chunks)
-        doc.add_item("textblock", block)
+        doc.add_textblock_item(block)
         assert len(doc.items) == 1
         assert doc.items[0]["type"] == "textblock"
+
+    def test_add_dict_item_chaining(self):
+        """Test that add_dict_item returns self for chaining."""
+        doc = Doc()
+        result = doc.add_dict_item("open", {"name": "div"})
+        assert result is doc
+
+
+class TestDocAddBlockSpaceItem:
+    """Test add_blockspace_item method."""
 
     def test_add_blockspace(self):
         """Test adding block space."""
         doc = Doc()
-        doc.add_item("blockspace", "  ")
+        doc.add_blockspace_item("blockspace", "  ")
         assert len(doc.items) == 1
         assert doc.items[0]["type"] == "blockspace"
 
-    def test_add_item_chaining(self):
-        """Test that add_item returns self for chaining."""
+
+class TestDocAddTextBlockItem:
+    """Test add_textblock_item method."""
+
+    def test_add_textblock_item(self):
+        """Test adding block space."""
         doc = Doc()
-        result = doc.add_item("open", {"name": "div"})
-        assert result is doc
+        chunks = [TextChunk("text", [])]
+        doc.add_textblock_item(TextBlock(chunks))
+        assert len(doc.items) == 1
+        assert doc.items[0]["type"] == "textblock"
 
 
 class TestDocItemManagement:
@@ -80,7 +96,7 @@ class TestDocItemManagement:
         """Test getting current item."""
         doc = Doc()
         tag = {"name": "p", "attributes": {}}
-        doc.add_item("open", tag)
+        doc.add_dict_item("open", tag)
         current = doc.get_current_item()
         assert current is not None
         assert current["type"] == "open"
@@ -95,8 +111,8 @@ class TestDocItemManagement:
     def test_undo_add_item(self):
         """Test undoing add item."""
         doc = Doc()
-        doc.add_item("open", {"name": "div"})
-        doc.add_item("open", {"name": "p"})
+        doc.add_dict_item("open", {"name": "div"})
+        doc.add_dict_item("open", {"name": "p"})
         assert len(doc.items) == 2
         doc.undo_add_item()
         assert len(doc.items) == 1
@@ -117,7 +133,7 @@ class TestDocGetRootItem:
         """Test getting root item without wrapper."""
         doc = Doc()
         tag = {"name": "p", "attributes": {}}
-        doc.add_item("open", tag)
+        doc.add_dict_item("open", tag)
         root = doc.get_root_item()
         assert root == tag
 
@@ -125,7 +141,7 @@ class TestDocGetRootItem:
         """Test that get_root_item skips blockspace."""
         doc = Doc()
         doc.add_item("blockspace", " ")
-        doc.add_item("open", {"name": "div", "attributes": {}})
+        doc.add_dict_item("open", {"name": "div", "attributes": {}})
         root = doc.get_root_item()
         assert root["name"] == "div"
 
@@ -142,10 +158,10 @@ class TestDocGetHtml:
     def test_get_html_simple(self):
         """Test getting HTML from simple doc."""
         doc = Doc()
-        doc.add_item("open", {"name": "p", "attributes": {}})
+        doc.add_dict_item("open", {"name": "p", "attributes": {}})
         chunks = [TextChunk("Hello", [])]
-        doc.add_item("textblock", TextBlock(chunks))
-        doc.add_item("close", {"name": "p"})
+        doc.add_textblock_item(TextBlock(chunks))
+        doc.add_dict_item("close", {"name": "p"})
         html = doc.get_html()
         assert "<p>" in html
         assert "Hello" in html
@@ -156,7 +172,7 @@ class TestDocGetHtml:
         wrapper = {"name": "div", "attributes": {"class": "wrapper"}}
         doc = Doc(wrapper)
         chunks = [TextChunk("content", [])]
-        doc.add_item("textblock", TextBlock(chunks))
+        doc.add_textblock_item(TextBlock(chunks))
         html = doc.get_html()
         assert "<div" in html
         assert 'class="wrapper"' in html
@@ -172,10 +188,10 @@ class TestDocGetHtml:
     def test_get_html_skip_segment_block(self):
         """Test that cx-segment-block divs are skipped."""
         doc = Doc()
-        doc.add_item("open", {"name": "div", "attributes": {"class": "cx-segment-block"}})
+        doc.add_dict_item("open", {"name": "div", "attributes": {"class": "cx-segment-block"}})
         chunks = [TextChunk("text", [])]
-        doc.add_item("textblock", TextBlock(chunks))
-        doc.add_item("close", {"name": "div"})
+        doc.add_textblock_item(TextBlock(chunks))
+        doc.add_dict_item("close", {"name": "div"})
         html = doc.get_html()
         # cx-segment-block should not be in output
         assert "cx-segment-block" not in html
@@ -189,7 +205,7 @@ class TestDocClone:
     def test_clone_simple(self):
         """Test cloning a doc."""
         doc = Doc()
-        doc.add_item("open", {"name": "p", "attributes": {}})
+        doc.add_dict_item("open", {"name": "p", "attributes": {}})
 
         def callback(item):
             return item  # No modification
@@ -201,12 +217,12 @@ class TestDocClone:
     def test_clone_with_modification(self):
         """Test cloning with modification."""
         doc = Doc()
-        doc.add_item("open", {"name": "p", "attributes": {}})
+        doc.add_dict_item("open", {"name": "p", "attributes": {}})
 
         def callback(item):
             # Add a class to all open tags
             if item.item_type == "open":
-                item_item = item.item_dict
+                item_item = item.item
                 new_item = {
                     "type": item.item_type,
                     "item": {"name": item_item["name"], "attributes": dict(item_item.get("attributes", {}))},
@@ -225,12 +241,12 @@ class TestDocWrapSections:
     def test_wrap_sections_simple(self):
         """Test wrapping simple sections."""
         doc = Doc()
-        doc.add_item("open", {"name": "body", "attributes": {}})
-        doc.add_item("open", {"name": "h2", "attributes": {}})
+        doc.add_dict_item("open", {"name": "body", "attributes": {}})
+        doc.add_dict_item("open", {"name": "h2", "attributes": {}})
         chunks = [TextChunk("Heading", [])]
-        doc.add_item("textblock", TextBlock(chunks))
-        doc.add_item("close", {"name": "h2"})
-        doc.add_item("close", {"name": "body"})
+        doc.add_textblock_item(TextBlock(chunks))
+        doc.add_dict_item("close", {"name": "h2"})
+        doc.add_dict_item("close", {"name": "body"})
 
         wrapped = doc.wrap_sections()
         html = wrapped.get_html()
@@ -254,8 +270,8 @@ class TestDocGetSegments:
         doc = Doc()
         chunks1 = [TextChunk("First", [])]
         chunks2 = [TextChunk("Second", [])]
-        doc.add_item("textblock", TextBlock(chunks1))
-        doc.add_item("textblock", TextBlock(chunks2))
+        doc.add_textblock_item(TextBlock(chunks1))
+        doc.add_textblock_item(TextBlock(chunks2))
 
         segments = doc.get_segments()
         assert len(segments) == 2
@@ -265,10 +281,10 @@ class TestDocGetSegments:
     def test_get_segments_skip_non_textblocks(self):
         """Test that get_segments only returns textblocks."""
         doc = Doc()
-        doc.add_item("open", {"name": "p", "attributes": {}})
+        doc.add_dict_item("open", {"name": "p", "attributes": {}})
         chunks = [TextChunk("Text", [])]
-        doc.add_item("textblock", TextBlock(chunks))
-        doc.add_item("close", {"name": "p"})
+        doc.add_textblock_item(TextBlock(chunks))
+        doc.add_dict_item("close", {"name": "p"})
 
         segments = doc.get_segments()
         # Should only have one segment (the textblock)
