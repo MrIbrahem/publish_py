@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 
 from .elements import VOID_ELEMENTS
@@ -18,7 +18,8 @@ class ItemBase:
     item_type: Any
 
     def to_json(self) -> dict[str, Any]:
-        return {"item_type": self.item_type, "item": self.item}
+        # return {"item_type": self.item_type, "item": self.item}
+        return asdict(self)
 
     def __getitem__(self, key: str) -> Any:
         # connect keys to object properties

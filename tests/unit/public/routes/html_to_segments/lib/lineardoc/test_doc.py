@@ -42,7 +42,7 @@ class TestDocAddItem:
 
         assert len(doc.items) == 1
         assert doc.items[0].item_type == "open"
-        assert doc.items[0].item.to_json() == tag
+        assert doc.items[0].item.to_json() == tag # type: ignore
 
     def test_add_close_tag(self):
         """Test adding a close tag."""
@@ -147,7 +147,7 @@ class TestDocGetRootItem:
         doc.add_blockspace_item(" ")
         doc.add_dict_item("open", {"name": "div", "attributes": {}})
         root = doc.get_root_item()
-        assert root["name"] == "div"
+        assert root["name"] == "div" # type: ignore
 
     def test_get_root_item_empty(self):
         """Test getting root from empty doc."""
