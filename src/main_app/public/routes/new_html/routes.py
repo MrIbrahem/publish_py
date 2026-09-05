@@ -10,9 +10,13 @@ from flask import Blueprint, Response, abort, flash, jsonify, render_template, r
 
 from ....config.main_settings import settings
 from ....services.core.cors import check_cors
-from .services.html_utils import remove_data_parsoid
-from .services.process import WikitextFixerService, process_page
-from .services.storage import list_revisions, read_file
+from ....services.new_html_services import (
+    WikitextFixerService,
+    list_revisions,
+    process_page,
+    read_file,
+    remove_data_parsoid,
+)
 
 
 class NewHtmlRoutes:

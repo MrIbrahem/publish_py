@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from .....config.main_settings import get_settings
+from ...config.main_settings import get_settings
 
 logger = logging.getLogger(__name__)
 

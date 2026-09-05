@@ -3,7 +3,8 @@ Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/doc_ite
 
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc_item import DocDict, DictTag
+from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc_item import DictTag, DocDict
+
 
 class TestDictTag:
     """
@@ -21,7 +22,8 @@ class TestDictTag:
         attributes = doc_dict["attributes"]
 
         attributes["id"] = 0  # pyright: ignore[reportIndexIssue]
-        assert attributes["id"] == 0 # type: ignore
+        assert attributes["id"] == 0  # type: ignore
+
 
 class TestDocDict:
     """

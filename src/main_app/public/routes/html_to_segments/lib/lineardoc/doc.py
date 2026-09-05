@@ -173,7 +173,9 @@ class Doc:
                     if i + 1 < len(self.items):
                         item_z = self.items[i + 1]
                         # if item_z.item_type == "open" and item_z["item"].get("name") == "h2":
-                        if item_z.item_type == "open" and item_z.item.name == "h2": # pyright: ignore[reportAttributeAccessIssue]
+                        if (
+                            item_z.item_type == "open" and item_z.item.name == "h2"
+                        ):  # pyright: ignore[reportAttributeAccessIssue]
                             section_number += 1
 
                 if tag.name == "section":
