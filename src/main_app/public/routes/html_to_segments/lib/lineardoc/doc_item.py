@@ -152,7 +152,7 @@ class DocDict(ItemBase):
     item: DictTag
 
     @classmethod
-    def load(cls, item_type: ITEM_TYPES_STR, obj: dict[str, Any]):
+    def load(cls, item_type: ITEM_TYPES_STR, obj: dict[str, Any]) -> DocDict:
         """
         Args:
             item_type: Literal["open", "close"]

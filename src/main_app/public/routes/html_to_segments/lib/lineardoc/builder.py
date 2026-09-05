@@ -164,7 +164,7 @@ class Builder:
                 .add_dict_item("close", tag)
             )
 
-            self.add_inline_content(tagged_content_doc)
+            self.add_inline_content(content=tagged_content_doc)
 
     def add_text_chunk(self, text: str, can_segment: bool) -> None:
         """

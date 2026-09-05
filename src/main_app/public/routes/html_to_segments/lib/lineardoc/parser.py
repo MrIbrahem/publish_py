@@ -133,7 +133,10 @@ class Parser:
             self.builder = self.builder.create_child_builder(wrapper_tag=tag)
 
         elif Utils.is_inline_empty_tag(tag["name"]):
-            self.builder.add_inline_content(tag, can_segment=self.contextualizer.can_segment())
+            self.builder.add_inline_content(
+                content=tag,
+                can_segment=self.contextualizer.can_segment(),
+            )
 
         elif self.is_inline_annotation_tag(tag["name"], Utils.is_transclusion(tag)):
             self.builder.push_inline_annotation_tag(tag)
@@ -177,7 +180,7 @@ class Parser:
             self.builder.finish_text_block()
 
             self.builder.builder_parent.add_inline_content(
-                self.builder.doc,
+                content=self.builder.doc,
                 can_segment=self.contextualizer.can_segment(),
             )
 

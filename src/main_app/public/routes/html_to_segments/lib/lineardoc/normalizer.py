@@ -90,7 +90,7 @@ class Normalizer:
             if child.tail:
                 self.on_text(child.tail)
 
-        self.on_close_tag(tag_name)
+        self.on_close_tag(tag_name)  # pyright: ignore[reportArgumentType]
 
     def on_open_tag(self, tag: dict[str, Any]) -> None:
         """

@@ -56,7 +56,7 @@ class Doc:
         return self
 
     def add_dict_item(self, item_type, item: dict[str, Any]) -> Doc:
-        self.items.append(DocDict(item_type=item_type, item=item))
+        self.items.append(DocDict.load(item_type=item_type, obj=item))
         return self
 
     def add_blockspace_item(self, item: str) -> Doc:
@@ -138,6 +138,7 @@ class Doc:
                 raise Exception(f"Unknown ID type: {id_type}")
 
         transclusion_context = None
+
         for i, i_item in enumerate(self.items):
             if i_item.item_type == "open" and isinstance(i_item, DocDict):
                 tag = i_item.item.clone()
