@@ -37,10 +37,12 @@ class TestDocAddItem:
         """Test adding an open tag."""
         doc = Doc()
         tag = {"name": "p", "attributes": {}}
+
         doc.add_dict_item("open", tag)
+
         assert len(doc.items) == 1
         assert doc.items[0].item_type == "open"
-        assert doc.items[0].item == tag
+        assert doc.items[0].item.to_json() == tag
 
     def test_add_close_tag(self):
         """Test adding a close tag."""
@@ -97,10 +99,12 @@ class TestDocItemManagement:
         doc = Doc()
         tag = {"name": "p", "attributes": {}}
         doc.add_dict_item("open", tag)
+
         current = doc.get_current_item()
+
         assert current is not None
-        assert current.item_type == "open"
-        assert current.item == tag
+        assert current["item_type"] == "open"
+        assert current["item"] == tag
 
     def test_get_current_item_empty(self):
         """Test getting current item from empty doc."""

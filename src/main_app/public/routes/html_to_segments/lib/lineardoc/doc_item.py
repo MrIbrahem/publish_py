@@ -99,11 +99,13 @@ class DictTag:
         )
 
     def to_json(self) -> dict[str, Any]:
-        return {
+        data = {
             "name": self.name,
-            "isSelfClosing": self.isSelfClosing,
             "attributes": self.attributes,
         }
+        if self.isSelfClosing:
+            data["isSelfClosing"] = True
+        return data
 
     def opening_tag(self, pad: str = "") -> str:
         return f"{pad}<{self.name}>"

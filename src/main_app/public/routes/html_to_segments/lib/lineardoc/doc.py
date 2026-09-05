@@ -91,7 +91,12 @@ class Doc:
         Returns:
             Current item
         """
-        return self.items[-1] if self.items else None
+        item = self.items[-1] if self.items else None
+
+        if item and hasattr(item, "to_json"):
+            return item.to_json()
+
+        return item
 
     def get_root_item(self) -> None | dict[str, Any]:
         """
