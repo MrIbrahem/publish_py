@@ -81,8 +81,8 @@ def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str
             source = expand_text_refs(lead, full_text)
 
     # run fix_wikitext as in the original PHP version
-    fixer = WikitextFixerService(source, title)
-    source = fixer.fix()
+    fixer = WikitextFixerService()
+    source = fixer.fix(source, title)
 
     return source, revid, from_cache
 
@@ -165,8 +165,8 @@ def process_page(
     file_title = file_dir / "title.txt"
 
     # Apply temporary (empty) fix
-    fixer = WikitextFixerService(wikitext, title)
-    wikitext = fixer.fix()
+    fixer = WikitextFixerService()
+    wikitext = fixer.fix(wikitext, title)
 
     write_file(file_wikitext, wikitext)
     write_file(file_title, title)

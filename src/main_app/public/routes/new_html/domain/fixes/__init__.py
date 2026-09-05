@@ -15,15 +15,14 @@ from .templates import (
 
 
 class WikitextFixerService:
-    def __init__(self, text: str, title: str) -> None:
-        self.text = text
-        self.title = title
-
-    def fix(self) -> str:
+    def __init__(self) -> None:
         """
-        Temporary placeholder.
+        init
+        """
 
-        TODO: Port the full fix_wikitext pipeline from the original PHP tool:
+    def fix(self, text: str, title: str) -> str:
+        """
+        Port the full fix_wikitext pipeline from the original PHP tool:
             - remove_templates
             - remove_lead_templates
             - remove_bad_refs
@@ -33,8 +32,6 @@ class WikitextFixerService:
             - remove_missing_images
             - add_missing_title
         """
-        text = self.text
-        title = self.title
 
         # Replace templates
         text = text.replace("{{drugbox", "{{Infobox drug")
@@ -64,7 +61,7 @@ class WikitextFixerService:
         text = service.remove_missing_images(text)
         text = add_missing_title(text, title)
 
-        return self.text
+        return text
 
 
 __all__ = [
