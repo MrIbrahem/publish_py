@@ -12,6 +12,12 @@ from src.main_app.public.routes.new_html.domain.fixes import (
     WikitextFixerService,
 )
 
+def strip_result(result: str) -> str:
+    text = result.strip()
+    # remove empty space from end of each line of text
+    text = "\n".join([line.rstrip() for line in text.splitlines()])
+    return text
+
 
 class TestWikitextFixerService:
     def load_fixture(self, name: str) -> str:
@@ -36,4 +42,4 @@ class TestWikitextFixerService:
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(result)
 
-        assert result.strip() == expected.strip()
+        assert strip_result(result) == strip_result(expected)

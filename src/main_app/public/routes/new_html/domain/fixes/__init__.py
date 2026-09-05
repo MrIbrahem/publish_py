@@ -6,7 +6,7 @@ from .references import (
     del_empty_refs,
     remove_bad_refs,
 )
-from .structure import remove_categories
+from .structure import remove_categories, remove_lang_links
 from .templates import (
     add_missing_title,
     remove_lead_templates,
@@ -43,9 +43,9 @@ class WikitextFixerService:
 
         # Clean up references
         text = remove_bad_refs(text)
-        text = del_empty_refs(text)
+        # text = del_empty_refs(text)
 
-        # text = remove_lang_links(text)
+        text = remove_lang_links(text)
 
         # Remove videos
         text = remove_videos(text)
