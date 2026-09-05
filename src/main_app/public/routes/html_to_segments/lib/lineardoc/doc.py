@@ -165,12 +165,11 @@ class Doc:
                 else:
                     tag.attributes["id"] = get_next_id("block", tag.name)
                     # Section headers (<h2> tags) mark the start of a new section
-                    if (
-                        i + 1 < len(self.items)
-                        and self.items[i + 1].item_type == "open"
-                        and self.items[i + 1]["item"].get("name") == "h2"
-                    ):
-                        section_number += 1
+                    if i + 1 < len(self.items):
+                        item_z = self.items[i + 1]
+                        # if item_z.item_type == "open" and item_z["item"].get("name") == "h2":
+                        if item_z.item_type == "open" and item_z.item.name == "h2": # pyright: ignore[reportAttributeAccessIssue]
+                            section_number += 1
 
                 if tag.name == "section":
                     tag.attributes["data-mw-section-number"] = section_number

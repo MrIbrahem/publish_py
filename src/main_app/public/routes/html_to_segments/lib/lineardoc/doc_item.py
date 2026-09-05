@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from .elements import VOID_ELEMENTS
@@ -29,6 +29,12 @@ class ItemBase:
         else:
             raise KeyError(f"key '{key}' not found in Item")
 
+    def get(self, key: str, default: Any = None) -> Any:
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
 
 @dataclass
 class DocTextBlock(ItemBase):
@@ -53,12 +59,18 @@ class DocTextBlock(ItemBase):
 @dataclass
 class DictTag:
     name: str
-    attributes: dict[str, Any]
-    isSelfClosing: bool = False  # noqa: N815
+    attributes: dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self) -> None:
+    @property
+    def isSelfClosing(self) -> bool:  # noqa: N802
         # Mark HTML void elements as self-closing
-        self.isSelfClosing = self.name in VOID_ELEMENTS
+        return self.name in VOID_ELEMENTS
+
+    def get(self, key: str, default: Any = None) -> Any:
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
     def __getitem__(self, key: str) -> str | bool | dict[str, Any]:
         # connect keys to object properties
@@ -66,10 +78,16 @@ class DictTag:
             return self.name
         elif key == "attributes":
             return self.attributes
-        elif key == "isSelfClosing":
-            return self.isSelfClosing
         else:
             raise KeyError(f"key '{key}' not found in dict tag")
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        if key == "name":
+            self.name = value
+        elif key == "attributes":
+            self.attributes = value
+        else:
+            raise KeyError(f"Cannot set key '{key}': not a valid tag property")
 
     def clone(self) -> DictTag:
         """
@@ -158,8 +176,7 @@ class DocDict(ItemBase):
             item_type: Literal["open", "close"]
             obj: Tag dict with 'name' and 'attributes'
         """
-        if isinstance(obj, DictTag):
-            obj = obj.to_json()
+        # if isinstance(obj, DictTag): obj = obj.to_json()
 
         item_obj = DictTag(
             name=obj.get("name") or "",
