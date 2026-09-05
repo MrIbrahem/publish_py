@@ -1,13 +1,14 @@
 """
 Unit tests for src/main_app/services/new_html_services/domain/parser/citations_parser.py module.
 
-Functions to test: get_citations, get_full_refs, get_short_refs
+Functions to test: get_all_citations, get_full_refs, get_short_refs
 """
 
 from pathlib import Path
 
 from src.main_app.services.new_html_services.domain.parser.citations_parser import (
-    get_citations,
+    Citation,
+    get_all_citations,
     get_full_refs,
     get_short_refs,
 )
@@ -15,12 +16,12 @@ from src.main_app.services.new_html_services.domain.parser.citations_parser impo
 
 class TestGetCitations:
     """
-    Tests for get_citations function
+    Tests for get_all_citations function
     """
 
     def test_single_full_ref_no_name(self):
         text = "Some text<ref>A basic citation</ref> more text"
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 1
         assert result[0].contents == "A basic citation"
@@ -29,7 +30,7 @@ class TestGetCitations:
 
     def test_single_full_ref_with_name(self):
         text = '<ref name="smith2020">Smith, J. (2020)</ref>'
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 1
         assert result[0].contents == "Smith, J. (2020)"
@@ -39,33 +40,33 @@ class TestGetCitations:
 
     def test_multiple_full_refs(self):
         text = "Text<ref>First</ref> more<ref>Second</ref>"
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 2
         assert result[0].contents == "First"
         assert result[1].contents == "Second"
 
-    def test_excludes_self_closing_refs(self):
+    def test_not_excludes_self_closing_refs(self):
         text = 'Text<ref name="a">Full ref</ref> and<ref name="a" /> a short ref'
-        result = get_citations(text)
+        result = get_all_citations(text)
 
-        assert len(result) == 1
+        assert len(result) == 2
         assert result[0].contents == "Full ref"
         assert result[0].name == "a"
 
     def test_no_refs_returns_empty_list(self):
-        result = get_citations("Just some plain text without any refs")
+        result = get_all_citations("Just some plain text without any refs")
 
         assert result == []
 
     def test_empty_text_returns_empty_list(self):
-        result = get_citations("")
+        result = get_all_citations("")
 
         assert result == []
 
     def test_ref_with_extra_attributes(self):
         text = '<ref name="foo" group="note">Some content</ref>'
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 1
         assert result[0].name == "foo"
@@ -74,14 +75,14 @@ class TestGetCitations:
 
     def test_ref_name_is_stripped(self):
         text = '<ref name=" spaced ">Content</ref>'
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 1
         assert result[0].name == "spaced"
 
     def test_nested_markup_inside_ref(self):
         text = "<ref>See [[Some Page|the page]] for {{cite web|url=example.com}} details</ref>"
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 1
         assert "[[Some Page|the page]]" in result[0].contents
@@ -89,14 +90,14 @@ class TestGetCitations:
 
     def test_multiline_ref_content(self):
         text = "<ref>Line one\nLine two\nLine three</ref>"
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 1
         assert result[0].contents == "Line one\nLine two\nLine three"
 
     def test_duplicate_names_both_returned(self):
         text = '<ref name="dup">First</ref> text <ref name="dup">Second</ref>'
-        result = get_citations(text)
+        result = get_all_citations(text)
 
         assert len(result) == 2
         assert [c.contents for c in result] == ["First", "Second"]
@@ -221,6 +222,22 @@ class TestGetShortRefs:
         assert result[0].name == "tight"
 
 
+class TestCitation:
+
+    def test_basic(self):
+        text = "<ref name = PI2022></ref>"
+        result = Citation.from_text(text)
+        assert result.name == "PI2022"
+        assert result.is_self_closing() is True
+
+    def test_no_quetes_2(self):
+        text = "<ref name = PI2022/>"
+        result = Citation.from_text(text)
+
+        assert result.is_self_closing() is True
+        assert result.name == "PI2022"
+
+
 class TestGetShortAndFullRefs:
 
     def load_fixture(self, name: str) -> str:
@@ -233,7 +250,7 @@ class TestGetShortAndFullRefs:
         assert content is not None, f"Unable to read fixture file: {path}"
         return content
 
-    def test_fix_wikitext_matches_result_fixture(self) -> None:
+    def test_refs(self) -> None:
         source = self.load_fixture("source-1.wiki")
 
         full_refs = get_full_refs(source)

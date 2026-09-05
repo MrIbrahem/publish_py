@@ -34,8 +34,8 @@ def expand_text_refs(first: str, alltext: str) -> str:
     logger.debug("lead_short_refs: %r", lead_short_refs)
 
     for cite in lead_short_refs:
-        name = cite.get("name", "")
-        short_tag = cite.get("tag", "")
+        name = cite.name
+        short_tag = cite.tag
 
         if not name or not short_tag:
             continue

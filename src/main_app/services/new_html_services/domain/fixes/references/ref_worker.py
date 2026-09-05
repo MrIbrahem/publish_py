@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 
-from ...parser.citations_parser import get_citations
+from ...parser.citations_parser import get_all_citations
 
 #: Matches DOIs from known predatory/low-quality publishers.
 DOI_LIST = [
@@ -241,7 +241,7 @@ def remove_bad_refs(text: str) -> str:
     :param text: The text containing references to check and potentially remove.
     :return: The text with bad references removed.
     """
-    for citation in get_citations(text):
+    for citation in get_all_citations(text):
         citation_tag = citation.tag
         if check_one_cite(citation_tag):
             text = text.replace(citation_tag, "")
