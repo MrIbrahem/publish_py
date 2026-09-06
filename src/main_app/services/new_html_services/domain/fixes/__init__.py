@@ -5,8 +5,8 @@ from .media import RemoveMissingImagesService, remove_videos
 from .references import (
     del_empty_refs,
     expand_text_refs,
-    remove_bad_refs,
     fix_refs_name_issue,
+    remove_bad_refs,
 )
 from .structure import remove_categories, remove_lang_links
 from .templates import (

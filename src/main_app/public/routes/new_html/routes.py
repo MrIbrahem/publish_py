@@ -78,7 +78,7 @@ class NewHtmlRoutes:
 
         fixer = WikitextFixerService()
 
-        changed_text = fixer.fix(wikitext, title, all_flag=not(lead_only))
+        changed_text = fixer.fix(wikitext, title, all_flag=not (lead_only))
 
         if changed_text != wikitext:
             flash("Changes made.", "success")

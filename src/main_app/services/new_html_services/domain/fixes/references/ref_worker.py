@@ -14,10 +14,11 @@ See also:
 from __future__ import annotations
 
 import re
+
 import wikitextparser as wtp
 
-from ...parser.citations_parser import get_all_citations
 from ...parser.citation import Citation
+from ...parser.citations_parser import get_all_citations
 
 #: Matches DOIs from known predatory/low-quality publishers.
 DOI_LIST = [
@@ -251,6 +252,7 @@ def remove_bad_refs(text: str) -> str:
 
     return text
 
+
 def fix_refs_name_issue(text: str) -> str:
     """
     Fix tag name for self-closing tags
@@ -265,7 +267,6 @@ def fix_refs_name_issue(text: str) -> str:
                 tag.string = new_text
 
     return parsed.string
-
 
 
 __all__ = [
