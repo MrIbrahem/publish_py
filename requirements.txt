@@ -28,5 +28,5 @@ Werkzeug==3.1.8
 PyYAML==6.0.3           # For YAML config loading
 lxml==6.0.2             # For HTML/XML parsing
 pysbd==0.3.4            # Sentence boundary detection
-wikitextparser>=1.0.3
+wikitextparser>=2.0.0
 beautifulsoup4==4.15.0
