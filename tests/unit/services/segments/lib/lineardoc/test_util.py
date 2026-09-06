@@ -1,8 +1,8 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/util.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/util.py module.
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.util import (
+from src.main_app.services.segments.lib.lineardoc.util import (
     get_prop,
 )
 

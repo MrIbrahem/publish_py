@@ -1,13 +1,13 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/contextualizer.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/contextualizer.py module.
 
 Classes to test: Contextualizer
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.contextualizer import (
+from src.main_app.services.segments.lib.lineardoc.contextualizer import (
     Contextualizer,
 )
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.mw_contextualizer import MwContextualizer
+from src.main_app.services.segments.lib.lineardoc.mw_contextualizer import MwContextualizer
 
 
 class TestContextualizer:

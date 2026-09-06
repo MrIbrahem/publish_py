@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/normalizer.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/normalizer.py module.
 
 Classes to test: Normalizer
 Functions to test: normalize
@@ -7,8 +7,8 @@ Functions to test: normalize
 
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.normalizer import normalize  # noqa: F401
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.normalizer import Normalizer
+from src.main_app.services.segments.lib.lineardoc.normalizer import normalize  # noqa: F401
+from src.main_app.services.segments.lib.lineardoc.normalizer import Normalizer
 
 
 class TestNormalizer:

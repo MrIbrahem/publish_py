@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import re
 
-
 from ...parser.citations_parser import get_all_citations
 
 #: Matches DOIs from known predatory/low-quality publishers.

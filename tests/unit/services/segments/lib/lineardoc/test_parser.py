@@ -1,14 +1,14 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/parser.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/parser.py module.
 
 Classes to test: Parser
 
 
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.contextualizer import Contextualizer
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.mw_contextualizer import MwContextualizer
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.parser import Parser
+from src.main_app.services.segments.lib.lineardoc.contextualizer import Contextualizer
+from src.main_app.services.segments.lib.lineardoc.mw_contextualizer import MwContextualizer
+from src.main_app.services.segments.lib.lineardoc.parser import Parser
 
 
 class TestParserCreation:

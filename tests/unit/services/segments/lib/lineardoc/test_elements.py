@@ -1,6 +1,6 @@
 """ """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.elements import BLOCK_TAGS
+from src.main_app.services.segments.lib.lineardoc.elements import BLOCK_TAGS
 
 
 class TestParserBlockTags:

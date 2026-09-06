@@ -13,9 +13,9 @@ from typing import Any
 
 from lxml import etree
 
-from .doc import Doc
 from .builder import Builder
 from .contextualizer import Contextualizer
+from .doc import Doc
 from .elements import BLOCK_TAGS, VOID_ELEMENTS
 from .mw_contextualizer import MwContextualizer
 from .utils import Utils

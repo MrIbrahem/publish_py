@@ -1,10 +1,10 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/text_chunk.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/text_chunk.py module.
 
 Classes to test: TextChunk
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_chunk import (
+from src.main_app.services.segments.lib.lineardoc.text_chunk import (
     TextChunk,
 )
 

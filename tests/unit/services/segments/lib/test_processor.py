@@ -1,10 +1,10 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/processor.py module.
+Unit tests for src/main_app/services/segments/lib/processor.py module.
 
 Functions to test: process_html
 """
 
-from src.main_app.public.routes.html_to_segments.lib.processor import (
+from src.main_app.services.segments.lib.processor import (
     process_html,
 )
 

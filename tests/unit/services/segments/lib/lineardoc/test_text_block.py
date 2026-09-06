@@ -1,11 +1,11 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/text_block.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/text_block.py module.
 
 Classes to test: TextBlock
 """
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_block import TextBlock
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.text_chunk import TextChunk
+from src.main_app.services.segments.lib.lineardoc.text_block import TextBlock
+from src.main_app.services.segments.lib.lineardoc.text_chunk import TextChunk
 
 
 class TestTextBlockCreation:

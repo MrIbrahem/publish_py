@@ -1,15 +1,15 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/builder.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/builder.py module.
 
 Classes to test: Builder
 """
 
 import pytest
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.builder import (
+from src.main_app.services.segments.lib.lineardoc.builder import (
     Builder,
 )
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc import Doc
+from src.main_app.services.segments.lib.lineardoc.doc import Doc
 
 
 class TestBuilderCreation:

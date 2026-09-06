@@ -1,13 +1,13 @@
 """
-Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/utils.py module.
+Unit tests for src/main_app/services/segments/lib/lineardoc/utils.py module.
 """
 
 from pathlib import Path
 
 import pytest
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc import MwContextualizer, Parser
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.utils import Utils
+from src.main_app.services.segments.lib.lineardoc import MwContextualizer, Parser
+from src.main_app.services.segments.lib.lineardoc.utils import Utils
 
 test_files = [
     # Path(__file__).parent / "data" / "test-block-template-section-1.html",
