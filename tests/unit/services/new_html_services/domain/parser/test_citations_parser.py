@@ -12,7 +12,8 @@ from src.main_app.services.new_html_services.domain.parser.citations_parser impo
     get_short_refs,
 )
 
-class TestGetCitations:
+
+class TestGetRefs:
     """
     Tests for get_all_citations function
     """

@@ -5,7 +5,9 @@ Citation parser for WikiText reference tags
 from __future__ import annotations
 
 import wikitextparser as wtp
+
 from .citation import Citation
+
 
 def get_all_citations(text: str) -> list[Citation]:
     """Extract all citations from text
