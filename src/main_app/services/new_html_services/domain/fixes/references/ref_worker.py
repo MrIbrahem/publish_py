@@ -14,8 +14,10 @@ See also:
 from __future__ import annotations
 
 import re
+import wikitextparser as wtp
 
 from ...parser.citations_parser import get_all_citations
+from ...parser.citation import Citation
 
 #: Matches DOIs from known predatory/low-quality publishers.
 DOI_LIST = [
@@ -222,7 +224,8 @@ _BAD_CITATION_PATTERNS = (
 
 
 def check_one_cite(cite: str) -> bool:
-    """Check whether a citation matches any "bad source" pattern.
+    """
+    Check whether a citation matches any "bad source" pattern.
 
     :param cite: The citation text to check.
     :return: True if the citation matches a predatory/self-published
@@ -248,8 +251,24 @@ def remove_bad_refs(text: str) -> str:
 
     return text
 
+def fix_refs_name_issue(text: str) -> str:
+    """
+    Fix tag name for self-closing tags
+    refs like: "<ref name = PI2022/>" shoule have attrs.name == "PI2022" not "PI2022/"
+    """
+    parsed = wtp.parse(text)
+
+    for tag in parsed.get_tags():
+        if tag.name == "ref":
+            new_text = Citation.fix_tag_name(tag.string)
+            if new_text != tag.string:
+                tag.string = new_text
+
+    return parsed.string
+
+
 
 __all__ = [
-    "check_one_cite",
     "remove_bad_refs",
+    "fix_refs_name_issue",
 ]

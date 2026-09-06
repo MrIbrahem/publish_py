@@ -6,6 +6,7 @@ from .references import (
     del_empty_refs,
     expand_text_refs,
     remove_bad_refs,
+    fix_refs_name_issue,
 )
 from .structure import remove_categories, remove_lang_links
 from .templates import (
@@ -46,9 +47,11 @@ class WikitextFixerService:
         text = remove_lead_templates(text)
 
         # Clean up references
+        text = fix_refs_name_issue(text)
         text = remove_bad_refs(text)
         text = del_empty_refs(text)
 
+        # Remove language links
         text = remove_lang_links(text)
 
         # Remove videos
@@ -61,8 +64,9 @@ class WikitextFixerService:
 
         # Handle missing images and add title
         service = RemoveMissingImagesService()
-
         text = service.remove_missing_images(text)
+
+        # Add a missing title parameter to infobox templates.
         text = add_missing_title(text, title)
 
         return text

@@ -69,8 +69,10 @@ class Citation:
         Fix tag name for self-closing tags
         BUG: Citation.from_text("<ref name = PI2022/>").name == "PI2022/" this should be fixed in Citation to become "PI2022"
         """
+        # Match a pattern where there's a space before the closing slash in a self-closing tag
         m = re.match(r"(<ref [^\/>]*[^ ])\/\s*>", ref_text)
         if m:
+            # If pattern matches, replace with properly formatted self-closing tag
             ref_text = m.group(1) + " />"
 
         return ref_text
