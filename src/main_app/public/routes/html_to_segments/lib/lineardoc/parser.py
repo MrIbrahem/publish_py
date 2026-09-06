@@ -13,8 +13,7 @@ from typing import Any
 
 from lxml import etree
 
-from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc import Doc
-
+from .doc import Doc
 from .builder import Builder
 from .contextualizer import Contextualizer
 from .elements import BLOCK_TAGS, VOID_ELEMENTS

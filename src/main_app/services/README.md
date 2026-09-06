@@ -109,7 +109,7 @@ Two decorators in `shared/core/cors/`:
 
 ### Code Quality
 
-3. **`do_changes_to_text()` vs `do_changes_to_text_with_settings()`** (`text_processor.py`): Two similar functions exist. The former uses legacy `DoChangesToText1`, the latter uses `fix_one_page`. Only `do_changes_to_text_with_settings()` is used by routes.
+3. **`do_changes_to_text()` vs `do_changes_to_text_with_settings()`** (`text_processor.py`): Two similar functions exist. The former uses legacy `apply_text_modifications`, the latter uses `fix_one_page`. Only `do_changes_to_text_with_settings()` is used by routes.
 
 4. **`os.sys.path.insert` in `text_processor.py`**: Uses `os.sys.path.insert(0, fix_refs_path)` instead of the standard `import sys; sys.path.insert(...)`.
 

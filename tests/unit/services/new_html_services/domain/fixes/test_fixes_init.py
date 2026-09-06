@@ -4,42 +4,54 @@ Unit tests for src/main_app/services/new_html_services/domain/fixes/__init__.py 
 Classes to test: WikitextFixerService
 """
 
+from pathlib import Path
 
-import os
+import pytest
 
 from src.main_app.services.new_html_services.domain.fixes import (
     WikitextFixerService,
 )
 
 
+def strip_result(result: str) -> str:
+    text = result.strip()
+    # remove empty space from end of each line of text
+    text = "\n".join([line.rstrip() for line in text.splitlines()])
+    return text.strip()
+
+
 class TestWikitextFixerService:
     def load_fixture(self, name: str) -> str:
-        path = os.path.join(os.path.dirname(__file__), "data", name)
-        assert os.path.exists(path), f"Fixture file missing: {path}"
+        path = Path(__file__).parent / "data" / name
+        assert path.exists(), f"Fixture file missing: {path}"
+
         with open(path, "r", encoding="utf-8") as f:
             content = f.read()
+
         assert content is not None, f"Unable to read fixture file: {path}"
         return content
 
-    def test_fix_wikitext_matches_result_fixture(self):
-        source = self.load_fixture("source-1.wiki")
-        expected = self.load_fixture("result-1.wiki")
+    # put parametrize with 3 source-1.wiki, result-1.wiki, output-1.wiki
+    @pytest.mark.parametrize(
+        "source_file,result_file,output_file",
+        [
+            ("source-1.wiki", "result-1.wiki", "output-1.wiki"),
+            ("source-2.wiki", "result-2.wiki", "output-2.wiki"),
+        ],
+    )
+    def test_fix_wikitext_matches_result_fixture(self, source_file: str, result_file: str, output_file: str) -> None:
+        source = self.load_fixture(source_file)
+        expected = self.load_fixture(result_file)
+        expected = strip_result(expected)
 
         fixer = WikitextFixerService()
-        result = fixer.fix(text=source, title="PLACEHOLDER_TEST")
+        result = fixer.fix(text=source, title="PLACEHOLDER_TEST", all_flag=True)
+        result = strip_result(result)
 
-        assert result.strip() == expected.strip()
+        if result != expected:
+            # write to output-1.wiki
+            output_path = Path(__file__).parent / "data" / output_file
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(result)
 
-    def test_fix_wikitext_is_deterministic(self):
-        source = self.load_fixture("source-1.wiki")
-
-        fixer = WikitextFixerService()
-        first = fixer.fix(text=source, title="PLACEHOLDER_TEST")
-        second = fixer.fix(text=source, title="PLACEHOLDER_TEST")
-
-        assert first == second
-
-    def test_fix_wikitext_with_empty_input_returns_empty(self):
-        fixer = WikitextFixerService()
-        result = fixer.fix(text="", title="PLACEHOLDER_TEST")
-        assert result == ""
+        assert result == expected

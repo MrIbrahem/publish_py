@@ -146,6 +146,7 @@ src/
 │   │   │   │   │   │   ├── builder.py
 │   │   │   │   │   │   ├── contextualizer.py
 │   │   │   │   │   │   ├── doc.py
+│   │   │   │   │   │   ├── doc_item.py
 │   │   │   │   │   │   ├── elements.py
 │   │   │   │   │   │   ├── mw_contextualizer.py
 │   │   │   │   │   │   ├── normalizer.py
@@ -166,42 +167,6 @@ src/
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── routes.py
 │   │   │   ├── new_html/
-│   │   │   │   ├── domain/
-│   │   │   │   │   ├── fixes/
-│   │   │   │   │   │   ├── media/
-│   │   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   │   ├── fix_images.py
-│   │   │   │   │   │   │   └── remove_missing_images.py
-│   │   │   │   │   │   ├── references/
-│   │   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   │   ├── delete_empty_refs.py
-│   │   │   │   │   │   │   ├── expand_refs.py
-│   │   │   │   │   │   │   └── ref_worker.py
-│   │   │   │   │   │   ├── structure/
-│   │   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   │   ├── fix_categories.py
-│   │   │   │   │   │   │   └── fix_language_links.py
-│   │   │   │   │   │   ├── templates/
-│   │   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   │   ├── delete_templates.py
-│   │   │   │   │   │   │   └── fix_templates.py
-│   │   │   │   │   │   └── __init__.py
-│   │   │   │   │   ├── parser/
-│   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   ├── citations_parser.py
-│   │   │   │   │   │   ├── lead_section_parser.py
-│   │   │   │   │   │   └── template_helpers.py
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── Domain_php_source.txt
-│   │   │   │   │   └── README.md
-│   │   │   │   ├── services/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── clients.py
-│   │   │   │   │   ├── html_utils.py
-│   │   │   │   │   ├── process.py
-│   │   │   │   │   ├── process_seg.py
-│   │   │   │   │   ├── storage.py
-│   │   │   │   │   └── utils.py
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── README.md
 │   │   │   │   └── routes.py
@@ -254,6 +219,42 @@ src/
 │   │   │   ├── __init__.py
 │   │   │   ├── crypto.py
 │   │   │   └── jinja_filters.py
+│   │   ├── new_html_services/
+│   │   │   ├── domain/
+│   │   │   │   ├── fixes/
+│   │   │   │   │   ├── media/
+│   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   ├── fix_images.py
+│   │   │   │   │   │   └── remove_missing_images.py
+│   │   │   │   │   ├── references/
+│   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   ├── delete_empty_refs.py
+│   │   │   │   │   │   ├── expand_refs.py
+│   │   │   │   │   │   └── ref_worker.py
+│   │   │   │   │   ├── structure/
+│   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   ├── fix_categories.py
+│   │   │   │   │   │   └── fix_language_links.py
+│   │   │   │   │   ├── templates/
+│   │   │   │   │   │   ├── __init__.py
+│   │   │   │   │   │   ├── delete_templates.py
+│   │   │   │   │   │   └── fix_templates.py
+│   │   │   │   │   └── __init__.py
+│   │   │   │   ├── parser/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── citations_parser.py
+│   │   │   │   │   ├── lead_section_parser.py
+│   │   │   │   │   └── template_helpers.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── Domain_php_source.txt
+│   │   │   │   └── README.md
+│   │   │   ├── __init__.py
+│   │   │   ├── clients.py
+│   │   │   ├── html_utils.py
+│   │   │   ├── process.py
+│   │   │   ├── process_seg.py
+│   │   │   ├── storage.py
+│   │   │   └── utils.py
 │   │   ├── schemas/
 │   │   │   └── __init__.py
 │   │   ├── utils/

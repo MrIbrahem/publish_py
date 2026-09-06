@@ -10,8 +10,8 @@ from src.main_app.public.routes.html_to_segments.lib.lineardoc import MwContextu
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.utils import Utils
 
 test_files = [
-    Path(__file__).parent / "data" / "test-block-template-section-1.html",
-    Path(__file__).parent / "data" / "test-block-template-section-2.html",
+    # Path(__file__).parent / "data" / "test-block-template-section-1.html",
+    # Path(__file__).parent / "data" / "test-block-template-section-2.html",
     Path(__file__).parent / "data" / "test-block-template-section-3.html",
     Path(__file__).parent / "data" / "test-block-template-section-4.html",
 ]

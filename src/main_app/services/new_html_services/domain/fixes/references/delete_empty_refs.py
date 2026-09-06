@@ -26,16 +26,14 @@ def del_empty_refs(text: str) -> str:
     short_refs = get_short_refs(text)
 
     for cite in short_refs:
-        name = cite["name"]
-        short_tag = cite["tag"]
 
-        full_tag = full_refs.get(name)
+        full_tag = full_refs.get(cite.name)
         if full_tag:
             # Don't duplicate the full ref if it's already present in `text`.
             if full_tag not in text:
-                text = text.replace(short_tag, full_tag)
+                text = text.replace(cite.tag, full_tag)
         else:
-            text = text.replace(short_tag, "")
+            text = text.replace(cite.tag, "")
 
     return text
 

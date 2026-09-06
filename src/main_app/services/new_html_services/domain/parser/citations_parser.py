@@ -1,103 +1,75 @@
 """
-Wiki citation parsing utilities.
-
-Port of ``src/Domain/Parser/CitationsParser.php``. ``<ref>`` tags are parsed
-with ``wikitextparser``'s tag parser instead of hand-rolled regexes, so
-malformed/nested markup inside citations is handled correctly.
-
-A "citation" dict has the same shape the PHP code used, for easy porting of
-call sites::
-
-    {
-        "content": "...",   # inner text ("" for self-closing refs)
-        "tag": "<ref ...>...</ref>",  # full original tag text
-        "name": "some-name" or "",    # the `name` attribute, if any
-        "options": {"name": "some-name", ...},  # all attributes (dict, not a raw string)
-    }
+Citation parser for WikiText reference tags
 """
 
 from __future__ import annotations
 
 import wikitextparser as wtp
 
-
-def _is_self_closing(tag_string: str) -> bool:
-    """
-    A self-closing ``<ref .../>`` (a "short citation") vs a full ``<ref>...</ref>``.
-    """
-    return tag_string.rstrip().endswith("/>")
+from .citation import Citation
 
 
-def get_citations(text: str) -> list[dict]:
-    """Get all full (non-self-closing) ``<ref>...</ref>`` citations.
+def get_all_citations(text: str) -> list[Citation]:
+    """Extract all citations from text
 
-    Equivalent of the PHP ``get_citations()`` function.
+    Args:
+        text: Text containing citations
 
-    :param text: The text containing citations to extract.
-    :return: A list of citation dicts (see module docstring).
+    Returns:
+        List of Citation objects
     """
     citations = []
     parsed = wtp.parse(text)
 
-    for tag in parsed.get_tags("ref"):
-        if _is_self_closing(tag.string):
-            continue
+    for tag in parsed.get_tags():
+        if tag.name == "ref":
+            # citations.append(Citation.from_text(tag.string))
+            citations.append(Citation(tag))
 
-        tag_name = tag.get_attr("name")
-        citations.append(
-            {
-                "content": tag.contents,
-                "tag": tag.string,
-                "name": tag_name.strip() if tag_name else "",
-                "options": dict(tag.attrs),
-            }
-        )
     return citations
 
 
 def get_full_refs(text: str) -> dict[str, str]:
-    """Get all full ref tags that have a ``name`` attribute.
+    """Get mapping of citation names to their full reference tags
 
-    :param text: The text to parse.
-    :return: A dict mapping ref names to their full ``<ref>...</ref>`` tag text.
+    Args:
+        text: Text containing citations
+
+    Returns:
+        Dictionary mapping citation names to their full tags
     """
-    full: dict[str, str] = {}
-    for cite in get_citations(text):
-        name = cite["name"]
-        if not name:
-            continue
-        full[name] = cite["tag"]
+    full = {}
+    citations = get_all_citations(text)
+
+    for cite in citations:
+        if cite.contents and cite.name:
+            full[cite.name] = cite.tag
+
     return full
 
 
-def get_short_refs(text: str) -> list[dict]:
-    """Get all short (self-closing) ``<ref name="..." />`` citations.
+def get_short_refs(text: str) -> list[Citation]:
+    """
+    Extract short/empty citations (self-closing tags)
 
-    :param text: The text to parse.
-    :return: A list of citation dicts (see module docstring); ``content`` is
-        always ``""`` for these.
+    Args:
+        text: Text containing short citations
+
+    Returns:
+        List of Citation objects for short references
     """
     citations = []
     parsed = wtp.parse(text)
+    for tag in parsed.get_tags():
+        if tag.name == "ref" and not tag.contents:
+            # citations.append(Citation.from_text(tag.string))
+            citations.append(Citation(tag))
 
-    for tag in parsed.get_tags("ref"):
-        if not _is_self_closing(tag.string):
-            continue
-
-        tag_name = tag.get_attr("name")
-        citations.append(
-            {
-                "content": "",
-                "tag": tag.string,
-                "name": tag_name.strip() if tag_name else "",
-                "options": dict(tag.attrs),
-            }
-        )
     return citations
 
 
 __all__ = [
-    "get_citations",
+    "get_all_citations",
     "get_full_refs",
     "get_short_refs",
 ]

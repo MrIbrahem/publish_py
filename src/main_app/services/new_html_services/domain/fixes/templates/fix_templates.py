@@ -21,7 +21,8 @@ _TITLE_PARAM_BY_TEMPLATE = {
 
 
 def add_missing_title(text: str, title: str, ljust: int = 17) -> str:
-    """Add a missing title parameter to infobox templates.
+    """
+    Add a missing title parameter to infobox templates.
 
     Only templates whose title parameter (``name``/``drug_name``, depending
     on the template) is missing or empty are touched; a template that

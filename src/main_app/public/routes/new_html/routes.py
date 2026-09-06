@@ -63,8 +63,9 @@ class NewHtmlRoutes:
         if request.method != "POST":
             return render()
 
-        title = request.form.get("title")
-        wikitext = request.form.get("text")
+        title = request.form.get("title", type=str)
+        wikitext = request.form.get("text", type=str)
+        lead_only = request.form.get("lead_only", type=bool, default=True)
 
         if not title:
             flash("Please enter a title", "danger")
@@ -77,7 +78,8 @@ class NewHtmlRoutes:
 
         fixer = WikitextFixerService()
 
-        changed_text = fixer.fix(wikitext, title)
+        changed_text = fixer.fix(wikitext, title, all_flag=not (lead_only))
+
         if changed_text != wikitext:
             flash("Changes made.", "success")
             return render(title, changed_text)
