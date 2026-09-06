@@ -6,8 +6,8 @@ import logging
 from pathlib import Path
 
 from ...segments import process_html
-from ..utils import remove_data_parsoid
 from ..storage import read_file
+from ..utils import remove_data_parsoid
 
 logger = logging.getLogger(__name__)
 

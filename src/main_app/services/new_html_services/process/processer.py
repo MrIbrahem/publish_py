@@ -19,15 +19,14 @@ from flask import Response, jsonify
 
 from ..clients import MdwikiApi, TransformApi
 from ..fixes import WikitextFixerService
-from ..utils import del_div_error, fix_link_red, remove_data_parsoid
-from .process_seg import get_segments
 from ..storage import (
     add_title_revision,
     get_title_revision,
     read_file,
     write_file,
 )
-from ..utils import get_file_dir
+from ..utils import del_div_error, fix_link_red, get_file_dir, remove_data_parsoid
+from .process_seg import get_segments
 
 logger = logging.getLogger(__name__)
 
