@@ -12,6 +12,7 @@ import logging
 from typing import Any
 
 from lxml import etree
+from lxml import html as lxml_html
 
 from .builder import Builder
 from .contextualizer import Contextualizer
@@ -55,6 +56,35 @@ class Parser:
 
     def create_wrapped_doc(self) -> Doc:
         return self.builder.doc.wrap_sections()
+
+    def write_fragments(self, html: str) -> None:
+        """
+        Parse HTML into the document.
+
+        Uses ``lxml.html.fragments_fromstring`` so that HTML *fragments* (such as
+        a bare ``<p>…</p>``) are parsed without the implicit ``<html><body>``
+        wrapper that ``etree.HTMLParser`` would inject. This keeps the behaviour
+        consistent with the upstream (sax-based) parser, which only emits the
+        elements actually present in the input.
+        """
+        try:
+            fragments = lxml_html.fragments_fromstring(html)
+        except Exception as exc:
+            logger.error("Failed to parse HTML error: %s", str(exc))
+            # Fallback: wrap in a div and try again
+            try:
+                fragments = lxml_html.fragments_fromstring(f"<div>{html}</div>")
+            except Exception as exc2:
+                raise Exception(f"Failed to parse HTML: {exc2}") from exc2
+
+        for fragment in fragments:
+            if isinstance(fragment, str):
+                # Leading/trailing text outside any tag (e.g. before the first tag)
+                if fragment.strip():
+                    self.on_text(fragment)
+                continue
+
+            self._process_element(fragment)
 
     def write(self, html: str) -> None:
         """
