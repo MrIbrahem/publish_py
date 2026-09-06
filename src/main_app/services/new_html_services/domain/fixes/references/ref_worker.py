@@ -15,9 +15,7 @@ from __future__ import annotations
 
 import re
 
-import wikitextparser as wtp
 
-from ...parser.citation import Citation
 from ...parser.citations_parser import get_all_citations
 
 #: Matches DOIs from known predatory/low-quality publishers.
@@ -253,23 +251,6 @@ def remove_bad_refs(text: str) -> str:
     return text
 
 
-def fix_refs_name_issue(text: str) -> str:
-    """
-    Fix tag name for self-closing tags
-    refs like: "<ref name = PI2022/>" shoule have attrs.name == "PI2022" not "PI2022/"
-    """
-    parsed = wtp.parse(text)
-
-    for tag in parsed.get_tags():
-        if tag.name == "ref":
-            new_text = Citation.fix_tag_name(tag.string)
-            if new_text != tag.string:
-                tag.string = new_text
-
-    return parsed.string
-
-
 __all__ = [
     "remove_bad_refs",
-    "fix_refs_name_issue",
 ]

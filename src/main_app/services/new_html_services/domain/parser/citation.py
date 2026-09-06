@@ -5,7 +5,6 @@ Citation parser for WikiText reference tags
 from __future__ import annotations
 
 import logging
-import re
 from dataclasses import dataclass
 
 import wikitextparser as wtp
@@ -63,22 +62,8 @@ class Citation:
     def is_self_closing(self) -> bool:
         return not self.contents or not self.contents.strip()
 
-    @staticmethod
-    def fix_tag_name(ref_text: str) -> str:
-        """
-        Fix tag name for self-closing tags
-        BUG: Citation.from_text("<ref name = PI2022/>").name == "PI2022/" this should be fixed in Citation to become "PI2022"
-        """
-        # Match a pattern where there's a space before the closing slash in a self-closing tag
-        m = re.match(r"(<ref [^\/>]*[^ ])\/\s*>", ref_text)
-        if m:
-            # If pattern matches, replace with properly formatted self-closing tag
-            ref_text = m.group(1) + " />"
-
-        return ref_text
-
     @classmethod
-    def from_text(cls, ref_text: str, fix_name_issue: bool = True) -> Citation:
+    def from_text(cls, ref_text: str) -> Citation:
         """Create a Citation from a reference tag string"""
 
         if not ref_text.strip().startswith("<ref"):
@@ -86,9 +71,6 @@ class Citation:
 
         if ref_text.count("<ref") != 1:
             raise ValueError("Multiple reference tags")
-
-        if fix_name_issue:
-            ref_text = cls.fix_tag_name(ref_text)
 
         tag = wtp._tag.Tag(ref_text)
         return Citation(tag)

@@ -246,30 +246,29 @@ class TestGetShortAndFullRefs:
 
         assert set(full_refs.keys()) == {
             "AHFS2022",
-            "PI2022",
-            "EPAR2022",
-            "WHO22nd",
             "BNF81",
-            "TGA",
-            "EMC",
             "EMA",
+            "EMC",
+            "EPAR2022",
+            "Lin",
             "MSR",
             "Minkovsky",
-            "Lin",
+            "PI2022",
+            "TGA",
+            "WHO22nd",
         }
 
         short_refs_by_name = {x.name: x for x in short_refs}
 
         assert set(short_refs_by_name.keys()) == {
+            "AHFS2022",
+            "BNF81",
+            "EMA",
+            "EMC",
+            "EPAR2022",
+            "Lin",
             "Minkovsky",
-            "Lin/",
-            "BNF81/",
-            "AHFS2022/",
-            "TGA/",
-            "EMC/",
-            "PI2022/",
             "PI2022",
-            "EPAR2022/",
-            "EMA/",
+            "TGA",
             "not_exists_ref_should_be_deleted",
         }

@@ -16,27 +16,15 @@ class TestCitation:
         assert result.is_self_closing() is True
 
     def test_for_bug(self):
+        """
+        BUG: Citation.from_text("<ref name = PI2022/>").name == "PI2022/" this should be fixed in Citation to become "PI2022"
+        This bug already solved in wikitextparser>0.55
+        """
         wtp_tag = wtp._tag.Tag("<ref name = PI2022/>")
-        # BUG: Citation.from_text("<ref name = PI2022/>").name == "PI2022/" this should be fixed in Citation to become "PI2022"
-        assert wtp_tag.attrs["name"] == "PI2022/"
+        # assert wtp_tag.attrs["name"] == "PI2022/"
+        assert wtp_tag.attrs["name"] == "PI2022"
 
         wtp_tag = wtp._tag.Tag("<ref name=PI2022/>")
         # this should be fixed in Citation to become "PI2022"
-        assert wtp_tag.attrs["name"] == "PI2022/"
-
-    def test_bug_fix(self):
-
-        text = "<ref name = PI2022/>"
-        result = Citation.from_text(text)
-        new_text = Citation.fix_tag_name(text)
-
-        assert new_text == "<ref name = PI2022 />"
-        assert result.is_self_closing() is True
-        assert result.name == "PI2022"
-
-    def test_fix_tag_name(self):
-        new_text = Citation.fix_tag_name("<ref name = PI2022/>")
-        assert new_text == "<ref name = PI2022 />"
-
-        new_text2 = Citation.fix_tag_name("<ref name = test/ >")
-        assert new_text2 == "<ref name = test />"
+        # assert wtp_tag.attrs["name"] == "PI2022/"
+        assert wtp_tag.attrs["name"] == "PI2022"

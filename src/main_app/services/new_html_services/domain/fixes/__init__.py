@@ -5,7 +5,6 @@ from .media import RemoveMissingImagesService, remove_videos
 from .references import (
     del_empty_refs,
     expand_text_refs,
-    fix_refs_name_issue,
     remove_bad_refs,
 )
 from .structure import remove_categories, remove_lang_links
@@ -47,7 +46,6 @@ class WikitextFixerService:
         text = remove_lead_templates(text)
 
         # Clean up references
-        text = fix_refs_name_issue(text)
         text = remove_bad_refs(text)
         text = del_empty_refs(text)
 
