@@ -4,10 +4,13 @@ Citation parser for WikiText reference tags
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 import re
 
 import wikitextparser as wtp
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
