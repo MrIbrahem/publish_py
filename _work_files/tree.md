@@ -257,7 +257,11 @@ src/
 │   │   │   │   │   └── README.md
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── processor.py
-│   │   │   └── __init__.py
+│   │   │   ├── __init__.py
+│   │   │   ├── local.html
+│   │   │   ├── local_not_sort.html
+│   │   │   ├── local_not_sort_z.html
+│   │   │   └── ncc2c.html
 │   │   ├── utils/
 │   │   │   ├── helpers/
 │   │   │   │   ├── __init__.py
@@ -323,25 +327,106 @@ src/
 │   └── favicon.svg
 ├── templates/
 │   ├── admin/
-│   │   └── bs4_admin/
-│   │       ├── file/
-│   │       │   └── modals/
-│   │       ├── model/
-│   │       │   └── modals/
-│   │       └── rediscli/
+│   │   ├── bs4_admin/
+│   │   │   ├── file/
+│   │   │   │   ├── modals/
+│   │   │   │   │   └── form.html
+│   │   │   │   ├── form.html
+│   │   │   │   └── list.html
+│   │   │   ├── model/
+│   │   │   │   ├── modals/
+│   │   │   │   │   ├── create.html
+│   │   │   │   │   ├── details.html
+│   │   │   │   │   └── edit.html
+│   │   │   │   ├── create.html
+│   │   │   │   ├── details.html
+│   │   │   │   ├── edit.html
+│   │   │   │   ├── inline_field_list.html
+│   │   │   │   ├── inline_form.html
+│   │   │   │   ├── inline_list_base.html
+│   │   │   │   ├── layout.html
+│   │   │   │   ├── list.html
+│   │   │   │   └── row_actions.html
+│   │   │   ├── rediscli/
+│   │   │   │   ├── console.html
+│   │   │   │   └── response.html
+│   │   │   ├── actions.html
+│   │   │   ├── base.html
+│   │   │   ├── index.html
+│   │   │   ├── layout.html
+│   │   │   ├── lib.html
+│   │   │   ├── master.html
+│   │   │   └── static.html
+│   │   ├── base.html
+│   │   └── index_with_sidebar.html
 │   ├── admins/
 │   │   ├── email_msg/
+│   │   │   ├── index.html
+│   │   │   └── msg_template.html
 │   │   ├── last/
+│   │   │   └── index.html
 │   │   ├── qids/
+│   │   │   ├── edit.html
+│   │   │   └── index.html
 │   │   ├── translated/
+│   │   │   ├── edit.html
+│   │   │   └── index.html
 │   │   ├── tt/
-│   │   └── users_emails/
+│   │   │   ├── edit.html
+│   │   │   └── index.html
+│   │   ├── users_emails/
+│   │   │   ├── edit.html
+│   │   │   └── index.html
+│   │   ├── _sidebar.html
+│   │   ├── add_translate.html
+│   │   ├── base1.html
+│   │   ├── base1_no_navbar.html
+│   │   ├── campaigns.html
+│   │   ├── categories.html
+│   │   ├── close_btn.html
+│   │   ├── coordinators.html
+│   │   ├── errors.html
+│   │   ├── full_translators.html
+│   │   ├── in_process.html
+│   │   ├── in_process_total.html
+│   │   ├── index.html
+│   │   ├── language_settings.html
+│   │   ├── pages_users_to_main.html
+│   │   ├── pages_users_to_main_fix_it.html
+│   │   ├── projects.html
+│   │   ├── reports.html
+│   │   ├── settings.html
+│   │   ├── stat.html
+│   │   └── users_no_inprocess.html
 │   ├── fixrefs/
+│   │   └── index.html
 │   ├── html_to_segments/
+│   │   └── index.html
 │   ├── new_html/
+│   │   ├── fix.html
+│   │   └── revisions.html
 │   ├── results_2026/
-│   └── td/
-│       └── leaderboard/
+│   │   ├── _exists_table.html
+│   │   ├── _inprocess_table.html
+│   │   ├── _results_card.html
+│   │   └── _results_table.html
+│   ├── td/
+│   │   ├── leaderboard/
+│   │   │   ├── index-js.html
+│   │   │   ├── index.html
+│   │   │   ├── langs.html
+│   │   │   └── users.html
+│   │   ├── index.html
+│   │   ├── missing.html
+│   │   ├── td_base.html
+│   │   └── td_navbar.html
+│   ├── _macros.html
+│   ├── _navbar.html
+│   ├── base.html
+│   ├── error.html
+│   ├── index.html
+│   ├── index_db_error.html
+│   └── reports.html
 ├── __init__.py
 ├── app.py
 └── README.md

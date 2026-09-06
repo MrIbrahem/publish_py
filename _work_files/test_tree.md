@@ -255,6 +255,10 @@ tests/
 │   │   │   └── lib/
 │   │   │       ├── lineardoc/
 │   │   │       │   ├── data/
+│   │   │       │   │   ├── test-block-template-section-1.html
+│   │   │       │   │   ├── test-block-template-section-2.html
+│   │   │       │   │   ├── test-block-template-section-3.html
+│   │   │       │   │   └── test-block-template-section-4.html
 │   │   │       │   ├── test_builder.py
 │   │   │       │   ├── test_contextualizer.py
 │   │   │       │   ├── test_doc.py
