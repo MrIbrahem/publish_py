@@ -3,7 +3,6 @@ Unit tests for src/main_app/public/routes/html_to_segments/lib/lineardoc/doc.py 
 
 Classes to test: Doc
 
-
 """
 
 from src.main_app.public.routes.html_to_segments.lib.lineardoc.doc import (
