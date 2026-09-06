@@ -5,8 +5,8 @@ Citation parser for WikiText reference tags
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 
 import wikitextparser as wtp
 

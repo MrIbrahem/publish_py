@@ -40,4 +40,3 @@ class TestCitation:
 
         new_text2 = Citation.fix_tag_name("<ref name = test/ >")
         assert new_text2 == "<ref name = test />"
-
