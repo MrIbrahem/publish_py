@@ -65,7 +65,7 @@ class NewHtmlRoutes:
 
         title = request.form.get("title", type=str)
         wikitext = request.form.get("text", type=str)
-        all_flag = request.form.get("all_flag", type=bool, default=True)
+        lead_only = request.form.get("lead_only", type=bool, default=True)
 
         if not title:
             flash("Please enter a title", "danger")
@@ -78,7 +78,7 @@ class NewHtmlRoutes:
 
         fixer = WikitextFixerService()
 
-        changed_text = fixer.fix(wikitext, title, all_flag=all_flag)
+        changed_text = fixer.fix(wikitext, title, all_flag=not(lead_only))
 
         if changed_text != wikitext:
             flash("Changes made.", "success")
