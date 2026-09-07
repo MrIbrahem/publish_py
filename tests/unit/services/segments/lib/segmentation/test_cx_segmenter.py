@@ -7,7 +7,6 @@ Classes to test: CXSegmenter
 TODO: write tests
 """
 
-
 from src.main_app.services.segments.lib.segmentation.cx_segmenter import (
     CXSegmenter,
 )

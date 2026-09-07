@@ -27,8 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 # logic from new_sql_tables.php — missing_by_lang_and_category
-_MISSING_SQL = text(
-    """
+_MISSING_SQL = text("""
     SELECT
         c.article_id   AS title,
         c.category     AS category,
@@ -49,13 +48,11 @@ _MISSING_SQL = text(
     WHERE c.category = :cat
       AND aq.target IS NULL
       AND EXISTS (SELECT 1 FROM langs la WHERE la.code = :lang)
-    """
-)
+    """)
 
 
 # logic from new_sql_tables.php — exists_by_lang_and_category
-_EXISTS_SQL = text(
-    """
+_EXISTS_SQL = text("""
     SELECT
         c.article_id   AS title,
         c.category     AS category,
@@ -77,8 +74,7 @@ _EXISTS_SQL = text(
     WHERE c.category = :cat
       AND aq.target IS NOT NULL
       AND EXISTS (SELECT 1 FROM langs la WHERE la.code = :lang)
-    """
-)
+    """)
 
 
 def _rows_to_dicts(rows: list[Any] | Any) -> list[dict]:
