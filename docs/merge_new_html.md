@@ -182,7 +182,7 @@ must be emitted by `main`, `check`, `open`, `revisions_api` (mirror `utils.php::
 
 | Env var              | Default                                  | Used for              |
 | -------------------- | ---------------------------------------- | --------------------- |
-| `REVISIONS_DIR`      | `~/public_html/revisions_new`           | filesystem cache root |
+| `REVISIONS_DIR`      | `~/public_html/revisions_new`            | filesystem cache root |
 | `TRANSFORM_BASE_URL` | `https://en.wikipedia.org/w/rest.php/v1` | wikitext→HTML         |
 
 ### Phase 2 — Storage (`storage.py`)
