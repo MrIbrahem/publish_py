@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from src.main_app.services.new_html_services.fixes import (
+from src.main_app.services.new_html_services.wikitext_fixes import (
     WikitextFixerService,
 )
 
