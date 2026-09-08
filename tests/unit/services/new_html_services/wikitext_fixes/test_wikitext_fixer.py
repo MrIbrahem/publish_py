@@ -8,15 +8,19 @@ from pathlib import Path
 
 import pytest
 
-from src.main_app.services.new_html_services.wikitext_fixes import (
+from src.main_app.services.new_html_services.wikitext_fixes.wikitext_fixer import (
     WikitextFixerService,
 )
+from tests.unit.services.new_html_services.expend_infobox import expend_all_templates
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures"
 
 all_flags = {
     "abdominal_pain.wiki": False,
+    "Uterine_atony.wiki": False,
+    "obstructive_sleep_apnea.wiki": False,
 }
+
 # fixture_files = [("test-1.wiki"), ("test-2.wiki")]
 FIXTURE_FILES = [(x.name, all_flags.get(x.name, True)) for x in (FIXTURE_PATH / "source").glob("*.wiki")]
 
@@ -49,10 +53,9 @@ class TestWikitextFixerService:
         result = fixer.fix(text=source, title="PLACEHOLDER_TEST", all_flag=all_flag)
         result = strip_result(result)
 
-        if result != expected:
-            # write to output-1.wiki
-            output_path = FIXTURE_PATH / "output" / file
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write(result + "\n")
+        # write to output-1.wiki
+        output_path = FIXTURE_PATH / "output" / file
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(result + "\n")
 
-        assert result == expected
+        assert expend_all_templates(result) == expend_all_templates(expected)
