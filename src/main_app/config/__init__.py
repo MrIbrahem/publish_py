@@ -21,7 +21,7 @@ from .flask_config import (
     TestingConfig,
     build_sqlalchemy_uri,
 )
-from .main_settings import ensure_directories, settings
+from .main_settings import app_settings, ensure_directories
 
 __all__ = [
     "ConfigLoader",
@@ -40,6 +40,6 @@ __all__ = [
     "CorsConfig",
     "UsersConfig",
     "Settings",
-    "settings",
+    "app_settings",
     "ensure_directories",
 ]

@@ -8,7 +8,7 @@ import re
 
 from flask import Blueprint, Response, abort, flash, jsonify, render_template, request
 
-from ...config.main_settings import settings
+from ...config.main_settings import app_settings
 from ...services.core.cors import check_cors
 from ...services.new_html_services import (
     WikitextFixerService,
@@ -22,7 +22,7 @@ from ...services.new_html_services import (
 class NewHtmlRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
-        self.revisions_dir = settings.new_html.revisions_dir
+        self.revisions_dir = app_settings.new_html.revisions_dir
         self._setup_routes()
 
     def _setup_routes(self) -> None:

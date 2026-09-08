@@ -5,7 +5,7 @@ import re
 
 import requests
 
-from ...config import settings
+from ...config import app_settings
 
 ALLOWED_WIKI_PROJECT = re.compile(r"^(?:[a-z0-9-]+\.wikipedia\.org|commons\.wikimedia\.org)$", re.IGNORECASE)
 
@@ -26,7 +26,7 @@ def get_wikitext(title: str, project: str = "commons.wikimedia.org"):
         logger.warning("Rejected unsupported wiki project: %s", project)
         return ""
 
-    headers = {"User-Agent": settings.other.user_agent}
+    headers = {"User-Agent": app_settings.other.user_agent}
     api_url = f"https://{project}/w/api.php"
     # https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=Yemen&rvprop=content&formatversion=2&rvslots=main&format=json
     params = {

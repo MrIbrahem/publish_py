@@ -15,7 +15,7 @@ from typing import Any
 
 import requests
 
-from ...config import settings
+from ...config import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -172,7 +172,7 @@ class CategoryFetcher:
         resp = requests.post(
             self.endpoint,
             data=params,
-            headers={"User-Agent": settings.other.user_agent},
+            headers={"User-Agent": app_settings.other.user_agent},
             timeout=(self.connect_timeout, self.timeout),
         )
         resp.raise_for_status()

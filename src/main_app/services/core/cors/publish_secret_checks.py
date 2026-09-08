@@ -8,13 +8,13 @@ from urllib.parse import urlparse
 
 from flask import request
 
-from ....config import settings
+from ....config import app_settings
 
 logger = logging.getLogger(__name__)
 
 
 def _get_publish_secret_code() -> str:
-    return settings.security.publish_secret_code
+    return app_settings.security.publish_secret_code
 
 
 def check_publish_secret_code() -> str | None:

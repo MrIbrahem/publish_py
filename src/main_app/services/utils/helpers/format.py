@@ -5,7 +5,7 @@ Mirrors: php_src/endpoints/post.php (formatTitle, formatUser, determineHashtag, 
 
 from __future__ import annotations
 
-from ....config import settings
+from ....config import app_settings
 
 
 def format_title(title: str) -> str:
@@ -19,7 +19,7 @@ def format_title(title: str) -> str:
     """
     title = title.replace("_", " ")
     # Normalize special user paths based on config
-    for alt_user, canonical_user in settings.users.special_users.items():
+    for alt_user, canonical_user in app_settings.users.special_users.items():
         title = title.replace(f"{alt_user}/", f"{canonical_user}/")
     return title
 
@@ -33,7 +33,7 @@ def format_user(user: str) -> str:
     Returns:
         Formatted username with underscores replaced and special users mapped
     """
-    user = settings.users.special_users.get(user, user)
+    user = app_settings.users.special_users.get(user, user)
     return user.replace("_", " ")
 
 
@@ -49,7 +49,7 @@ def determine_hashtag(title: str, user: str) -> str:
     """
     hashtag = "#mdwikicx"
     # Users without hashtag on their own pages (check for user path pattern)
-    for exempt_user in settings.users.users_without_hashtag:
+    for exempt_user in app_settings.users.users_without_hashtag:
         # Match user pages like "Username/..." or exact username match in title
         # if exempt_user in title and user == exempt_user:
         if (f"{exempt_user}/" in title or title == exempt_user) and user == exempt_user:

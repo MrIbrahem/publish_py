@@ -16,7 +16,7 @@ from typing import Any
 
 import requests
 
-from ...config.main_settings import settings
+from ...config.main_settings import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ class HttpClientService:
             "http_code": 0,
         }
 
-        headers = {"User-Agent": settings.other.user_agent}
+        headers = {"User-Agent": app_settings.other.user_agent}
 
         try:
             response = requests.request(
@@ -229,7 +229,7 @@ class TransformApi:
         if not wikitext:
             return {"error": "Empty wikitext"}
 
-        base_url = settings.new_html.transform_base_url
+        base_url = app_settings.new_html.transform_base_url
 
         title_encoded = normalize_title_for_url(title)
         url = f"{base_url}/transform/wikitext/to/html/{title_encoded}"

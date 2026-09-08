@@ -11,7 +11,7 @@ from typing import Any
 
 import requests
 
-from ...config import settings
+from ...config import app_settings
 from .oauth_client import post_params
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
     }
     url = f"https://{lang}.wikipedia.org/w/api.php"
 
-    headers = {"User-Agent": settings.other.user_agent}
+    headers = {"User-Agent": app_settings.other.user_agent}
 
     try:
         response = requests.get(url, headers=headers, params=params, timeout=30)

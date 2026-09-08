@@ -19,7 +19,7 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 
-from ....config import settings
+from ....config import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ def _load_words_table() -> dict[str, int]:
     Returns:
         Dictionary mapping article titles to word counts
     """
-    words_path: Path = settings.paths.words_json_path
+    words_path: Path = app_settings.paths.words_json_path
 
     if not words_path:
         logger.warning("Words JSON path not set in settings")

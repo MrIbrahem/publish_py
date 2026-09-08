@@ -7,8 +7,7 @@ Functions to test: normalize
 
 """
 
-from src.main_app.services.segments.lib.lineardoc.normalizer import normalize
-from src.main_app.services.segments.lib.lineardoc.normalizer import Normalizer
+from src.main_app.services.segments.lib.lineardoc.normalizer import Normalizer, normalize
 
 
 class TestNormalizer:

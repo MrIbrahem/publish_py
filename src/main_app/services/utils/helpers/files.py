@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from ....config import settings
+from ....config import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def get_reports_dir() -> Path:
     Returns the path to the reports directory for today:
     {settings.paths.publish_reports_dir}/YYYY/MM/DD/{rand_id}/
     """
-    publish_reports: Path = settings.paths.publish_reports_dir
+    publish_reports: Path = app_settings.paths.publish_reports_dir
 
     # Create directory structure: YYYY/MM/DD/rand_id
     now = datetime.now()
@@ -70,7 +70,7 @@ def to_do(tab: dict[str, Any], status: str) -> None:
     log_entry["status"] = status
 
     # Write to JSON lines log file (existing behavior)
-    flask_data_dir: Path = settings.paths.flask_data_dir
+    flask_data_dir: Path = app_settings.paths.flask_data_dir
     today = now.strftime("%Y-%m-%d")
     log_file = flask_data_dir / "publishes" / f"publish_{today}.json"
 

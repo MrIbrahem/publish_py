@@ -9,7 +9,7 @@ import json
 import logging
 from typing import Any
 
-from ...config import settings
+from ...config import app_settings
 from ...database.models import QidRecord
 from ...database.services import QidService
 from .oauth_client import post_params
@@ -59,7 +59,7 @@ def _link_it(
     Returns:
         API response dictionary
     """
-    https_domain = f"https://{settings.other.wikidata_domain}"
+    https_domain = f"https://{app_settings.other.wikidata_domain}"
     api_params = {
         "action": "wbsetsitelink",
         "linktitle": targettitle,
