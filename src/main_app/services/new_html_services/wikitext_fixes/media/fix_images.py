@@ -1,7 +1,7 @@
 """
 Image and video removal utilities.
 
-Port of ``src/Domain/Fixes/Media/FixImagesFixture.php``. Wikilinks are found
+Port of ``src/Domain/wikitext_fixes/Media/FixImagesFixture.php``. Wikilinks are found
 using ``wikitextparser`` instead of a manual regex, which correctly handles
 nested wikilinks inside a caption (e.g. ``[[File:x.png|caption with a
 [[link]] inside]]``) without the PHP pattern's fragile lookaround tricks.

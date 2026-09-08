@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/new_html_services/fixes/media/fix_images.py module.
+Unit tests for src/main_app/services/new_html_services/wikitext_fixes/media/fix_images.py module.
 
 Functions to test: remove_images, remove_videos
 
@@ -8,7 +8,7 @@ Ported from the PHP suite ``FixImagesTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.fixes.media.fix_images import (
+from src.main_app.services.new_html_services.wikitext_fixes.media.fix_images import (
     remove_images,
     remove_videos,
 )

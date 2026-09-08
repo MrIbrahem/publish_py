@@ -1,7 +1,7 @@
 """
 Reference expansion utilities.
 
-Port of ``src/Domain/Fixes/References/ExpandRefsFixture.php``.
+Port of ``src/Domain/wikitext_fixes/References/ExpandRefsFixture.php``.
 
 """
 

@@ -1,7 +1,7 @@
 """
 Category removal utilities.
 
-Port of ``src/Domain/Fixes/Structure/FixCategoriesFixture.php``.
+Port of ``src/Domain/wikitext_fixes/Structure/FixCategoriesFixture.php``.
 """
 
 from __future__ import annotations

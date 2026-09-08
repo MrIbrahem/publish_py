@@ -1,7 +1,7 @@
 """
 Template removal utilities.
 
-Port of ``src/Domain/Fixes/Templates/DeleteTemplatesFixture.php``.
+Port of ``src/Domain/wikitext_fixes/Templates/DeleteTemplatesFixture.php``.
 """
 
 from __future__ import annotations

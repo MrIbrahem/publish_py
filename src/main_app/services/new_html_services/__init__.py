@@ -1,7 +1,7 @@
-from .fixes import WikitextFixerService
 from .process import process_page
 from .storage import list_revisions, read_file
 from .utils import remove_data_parsoid
+from .wikitext_fixes import WikitextFixerService
 
 __all__ = [
     "WikitextFixerService",

@@ -1,7 +1,7 @@
 """
 Missing image removal service.
 
-Port of ``src/Domain/Fixes/Media/RemoveMissingImagesService.php``.
+Port of ``src/Domain/wikitext_fixes/Media/RemoveMissingImagesService.php``.
 
 Template parameter handling uses ``domain.parser.template_helpers`` (built
 on ``wikitextparser``). Inline ``[[File:...]]``/``[[Image:...]]`` removal

@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/new_html_services/fixes/structure/fix_categories.py module.
+Unit tests for src/main_app/services/new_html_services/wikitext_fixes/structure/fix_categories.py module.
 
 Functions to test: remove_categories
 
@@ -8,7 +8,7 @@ Ported from the PHP suite ``FixCatsTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.fixes.structure.fix_categories import (
+from src.main_app.services.new_html_services.wikitext_fixes.structure.fix_categories import (
     remove_categories,
 )
 

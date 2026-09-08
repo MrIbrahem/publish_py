@@ -1,7 +1,7 @@
 """
 Empty reference handling utilities.
 
-Port of ``src/Domain/Fixes/References/DeleteEmptyRefsFixture.php``.
+Port of ``src/Domain/wikitext_fixes/References/DeleteEmptyRefsFixture.php``.
 """
 
 from __future__ import annotations

@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/new_html_services/fixes/templates/fix_templates.py module.
+Unit tests for src/main_app/services/new_html_services/wikitext_fixes/templates/fix_templates.py module.
 
 Functions to test: add_missing_title
 
@@ -10,7 +10,7 @@ All PHP test cases call the function with `ljust=0`, so tests here pass
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.fixes.templates.fix_templates import (
+from src.main_app.services.new_html_services.wikitext_fixes.templates.fix_templates import (
     add_missing_title,
 )
 

@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/new_html_services/fixes/structure/fix_language_links.py module.
+Unit tests for src/main_app/services/new_html_services/wikitext_fixes/structure/fix_language_links.py module.
 
 Functions to test: remove_lang_links, is_valid_lang_code
 
@@ -8,7 +8,7 @@ Ported from the PHP suite ``FixLangsLinksTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.fixes.structure.fix_language_links import (
+from src.main_app.services.new_html_services.wikitext_fixes.structure.fix_language_links import (
     LANG_CODES,
     is_valid_lang_code,
     remove_lang_links,

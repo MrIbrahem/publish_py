@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/new_html_services/fixes/references/expand_refs.py module.
+Unit tests for src/main_app/services/new_html_services/wikitext_fixes/references/expand_refs.py module.
 
 Functions to test: expand_text_refs
 
@@ -8,7 +8,7 @@ Ported from the PHP suite ``ExpendRefsTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.fixes.references.expand_refs import (
+from src.main_app.services.new_html_services.wikitext_fixes.references.expand_refs import (
     expand_text_refs,
 )
 

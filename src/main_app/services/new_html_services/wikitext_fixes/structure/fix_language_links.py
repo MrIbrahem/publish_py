@@ -1,7 +1,7 @@
 """
 Language link removal utilities.
 
-Port of ``src/Domain/Fixes/Structure/FixLanguageLinksFixture.php``.
+Port of ``src/Domain/wikitext_fixes/Structure/FixLanguageLinksFixture.php``.
 Interwiki language links are found with ``wikitextparser``'s wikilink
 parsing (checked against ``LANG_CODES``) instead of a single giant
 ``[[(ar|en|de|...):...]]`` regex alternation.

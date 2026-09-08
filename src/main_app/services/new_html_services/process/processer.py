@@ -18,7 +18,6 @@ from typing import Any
 from flask import Response, jsonify
 
 from ..clients import MdwikiApi, TransformApi
-from ..fixes import WikitextFixerService
 from ..storage import (
     add_title_revision,
     get_title_revision,
@@ -26,6 +25,7 @@ from ..storage import (
     write_file,
 )
 from ..utils import del_div_error, fix_link_red, get_file_dir, remove_data_parsoid
+from ..wikitext_fixes import WikitextFixerService
 from .process_seg import get_segments
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 """
 Reference quality checking utilities.
 
-Port of ``src/Domain/Fixes/References/RefWorkerFixture.php``. Removes
+Port of ``src/Domain/wikitext_fixes/References/RefWorkerFixture.php``. Removes
 low-quality/unreliable references (predatory journals, self-published
 sources) from wikitext.
 

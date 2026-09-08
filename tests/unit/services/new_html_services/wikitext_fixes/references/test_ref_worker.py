@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/new_html_services/fixes/references/ref_worker.py module.
+Unit tests for src/main_app/services/new_html_services/wikitext_fixes/references/ref_worker.py module.
 
 Functions to test: check_one_cite, remove_bad_refs
 
@@ -8,7 +8,7 @@ Ported from the PHP suite ``RefWorkTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.fixes.references.ref_worker import (
+from src.main_app.services.new_html_services.wikitext_fixes.references.ref_worker import (
     check_one_cite,
     remove_bad_refs,
 )

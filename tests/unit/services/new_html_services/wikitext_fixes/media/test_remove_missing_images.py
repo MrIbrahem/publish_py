@@ -1,6 +1,6 @@
 """
 Unit tests for
-src/main_app/services/new_html_services/fixes/media/remove_missing_images.py
+src/main_app/services/new_html_services/wikitext_fixes/media/remove_missing_images.py
 
 Ported from the PHP suite ``RemoveMissingImagesTest`` (FixRefs\\Tests\\Domain).
 
@@ -30,7 +30,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.main_app.services.new_html_services.fixes.media.remove_missing_images import (
+from src.main_app.services.new_html_services.wikitext_fixes.media.remove_missing_images import (
     ImageExistenceChecker,
     RemoveMissingImagesService,
 )

@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/new_html_services/fixes/__init__.py module.
+Unit tests for src/main_app/services/new_html_services/wikitext_fixes/__init__.py module.
 
 Classes to test: WikitextFixerService
 """

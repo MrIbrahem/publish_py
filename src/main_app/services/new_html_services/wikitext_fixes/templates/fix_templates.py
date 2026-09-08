@@ -1,7 +1,7 @@
 """
 Template fixing utilities.
 
-Port of ``src/Domain/Fixes/Templates/FixTemplatesFixture.php``.
+Port of ``src/Domain/wikitext_fixes/Templates/FixTemplatesFixture.php``.
 """
 
 from __future__ import annotations
