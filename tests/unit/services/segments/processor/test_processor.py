@@ -9,17 +9,7 @@ import re
 from src.main_app.services.segments.lib.processor import (
     process_html,
 )
-
-
-def normalize_test(html: str) -> str:
-    """ """
-    # html = normalize(html)
-    html = html.strip()
-    # Remove tabs, carriage returns, and newlines
-    html = re.sub(r"[\t\r\n]+", " ", html)
-    html = re.sub(r"\s+", " ", html)
-    html = re.sub(r">\s+<", "><", html)
-    return html
+from tests.unit.html_normalizer import normalize_test
 
 
 class TestProcessHtml:
