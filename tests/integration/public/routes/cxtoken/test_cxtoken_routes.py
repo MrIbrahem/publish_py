@@ -145,7 +145,7 @@ class TestCxTokenUserFormatting:
         with patch("src.main_app.public.routes.cxtoken.routes.check_cors") as mock_cors:
             mock_cors.return_value = lambda f: f
 
-            with patch("src.main_app.public.routes.cxtoken.routes.settings") as mock_settings:
+            with patch("src.main_app.public.routes.cxtoken.routes.app_settings") as mock_settings:
                 mock_settings.users.special_users = {"SpecialUser": "MappedUser"}
 
                 mock_client.get("/cxtoken/?wiki=en&user=SpecialUser")

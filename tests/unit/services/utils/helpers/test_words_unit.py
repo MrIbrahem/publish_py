@@ -31,7 +31,7 @@ class TestLoadWordsTable:
         mock_path.__str__ = MagicMock(return_value=str(words_file))
         mock_path.__fspath__ = MagicMock(return_value=str(words_file))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
             result = _load_words_table()
@@ -43,7 +43,7 @@ class TestLoadWordsTable:
         mock_path = MagicMock()
         mock_path.exists.return_value = False
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = mock_path
             clear_words_cache()
             result = _load_words_table()
@@ -55,7 +55,7 @@ class TestLoadWordsTable:
         words_file = tmp_path / "words.json"
         words_file.write_text("invalid json content")
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
             result = _load_words_table()
@@ -68,7 +68,7 @@ class TestLoadWordsTable:
         words_file = tmp_path / "words.json"
         words_file.write_text(json.dumps(words_data))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
             result = _load_words_table()
@@ -82,7 +82,7 @@ class TestLoadWordsTable:
         words_file = tmp_path / "words.json"
         words_file.write_text(json.dumps(words_data))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
             result = _load_words_table()
@@ -97,7 +97,7 @@ class TestLoadWordsTable:
         words_file = tmp_path / "words.json"
         words_file.write_text(json.dumps(words_data))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
 
@@ -110,7 +110,7 @@ class TestLoadWordsTable:
 
     def test_returns_empty_dict_when_path_not_set(self, monkeypatch):
         """Test handling when words_json_path is not set."""
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = None
             clear_words_cache()
             result = _load_words_table()
@@ -131,7 +131,7 @@ class TestGetWordCount:
         words_file = tmp_path / "words.json"
         words_file.write_text(json.dumps(words_data))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
             result = get_word_count("TestArticle")
@@ -144,7 +144,7 @@ class TestGetWordCount:
         words_file = tmp_path / "words.json"
         words_file.write_text(json.dumps(words_data))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
             result = get_word_count("MissingArticle")
@@ -156,7 +156,7 @@ class TestGetWordCount:
         mock_path = MagicMock()
         mock_path.exists.return_value = False
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = mock_path
             clear_words_cache()
             result = get_word_count("AnyArticle")
@@ -169,7 +169,7 @@ class TestGetWordCount:
         words_file = tmp_path / "words.json"
         words_file.write_text(json.dumps(words_data))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
 
@@ -186,7 +186,7 @@ class TestClearWordsCache:
         words_file = tmp_path / "words.json"
         words_file.write_text(json.dumps(words_data_v1))
 
-        with patch("src.main_app.services.utils.helpers.words.settings") as mock_settings:
+        with patch("src.main_app.services.utils.helpers.words.app_settings") as mock_settings:
             mock_settings.paths.words_json_path = words_file
             clear_words_cache()
 
