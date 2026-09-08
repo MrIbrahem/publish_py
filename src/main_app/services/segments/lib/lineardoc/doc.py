@@ -20,7 +20,6 @@ from typing import Any
 
 from .doc_item import (
     ALL_ITEMS_TYPES,
-    ITEM_TYPES_STR,
     DocDict,
     DocStr,
     DocTextBlock,
@@ -48,7 +47,7 @@ class Doc:
         self.items: list[DOC_ITEM_VARS] = []
         self.wrapper_tag = wrapper_tag
         self.sort_attrs = sort_attrs
-        self.categories: list[Any] = []
+        self.categories = []
 
     # ----------------
     # Write
@@ -57,7 +56,7 @@ class Doc:
         self.items.append(DocTextBlock(item))
         return self
 
-    def add_dict_item(self, item_type: ITEM_TYPES_STR, item: dict[str, Any]) -> Doc:
+    def add_dict_item(self, item_type, item: dict[str, Any]) -> Doc:
         self.items.append(DocDict.load(item_type=item_type, obj=item))
         return self
 
@@ -82,13 +81,11 @@ class Doc:
 
     def undo_add_item(self) -> None:
         """Remove the top item from the linear array of items."""
-        if self.items:
-            self.items.pop()
+        self.items.pop()
 
     # ----------------
-    # Read / Accessors
     # ----------------
-    def get_current_item(self) -> Any:
+    def get_current_item(self):
         """
         Get the top item in the linear array of items.
 
@@ -101,23 +98,6 @@ class Doc:
             return item.to_json()
 
         return item
-
-    def get_current_item_name(self) -> None | str:
-        """
-        Get the top item in the linear array of items.
-
-        Returns:
-            Current item
-        """
-        new_item = self.get_current_item()
-
-        if not new_item or not isinstance(new_item, dict):
-            return None
-
-        if not isinstance(new_item.get("item"), dict):
-            return None
-
-        return new_item["item"].get("name")
 
     def get_root_item(self) -> None | dict[str, Any]:
         """
@@ -160,8 +140,8 @@ class Doc:
                 result = str(next_id)
                 next_id += 1
                 return result
-
-            raise ValueError(f"Unknown ID type: {id_type}")
+            else:
+                raise Exception(f"Unknown ID type: {id_type}")
 
         transclusion_context = None
 
@@ -194,7 +174,10 @@ class Doc:
                     if i + 1 < len(self.items):
                         item_z = self.items[i + 1]
                         # if item_z.item_type == "open" and item_z["item"].get("name") == "h2":
-                        if item_z.item_type == "open" and getattr(item_z.item, "name", None) == "h2":
+                        if (
+                            item_z.item_type == "open"
+                            and item_z.item.name == "h2"  # pyright: ignore[reportAttributeAccessIssue]
+                        ):  # pyright: ignore[reportAttributeAccessIssue]
                             section_number += 1
 
                 if tag.name == "section":
@@ -231,7 +214,7 @@ class Doc:
 
     def raise_if_unknown_item(self, item_type: str) -> None:
         if item_type not in ALL_ITEMS_TYPES:
-            raise ValueError(f"Unknown item type: {item_type}")
+            raise Exception(f"Unknown item type: {item_type}")
 
     def dump_xml(self) -> str:
         """
@@ -257,8 +240,9 @@ class Doc:
         for i_item in self.items:
             item_type = i_item.item_type
 
-            if isinstance(i_item, DocDict) and i_item.item.attributes.get("class") == "cx-segment-block":
-                continue
+            if isinstance(i_item, DocDict):
+                if i_item.item.attributes.get("class") == "cx-segment-block":
+                    continue
 
             if item_type in ("open", "close") and isinstance(i_item, DocDict):
                 html.append(i_item.get_html(self.sort_attrs))
@@ -269,7 +253,7 @@ class Doc:
             elif item_type == "textblock" and isinstance(i_item, DocTextBlock):
                 html.append(i_item.get_html())
             else:
-                self.raise_if_unknown_item(item_type)
+                self.raise_if_unknown_item(i_item.item_type)
 
         if self.wrapper_tag:
             html.append(Utils.get_close_tag_html(self.wrapper_tag))
@@ -291,7 +275,7 @@ class Doc:
         # Copy the categories already collected
         new_doc.categories = self.categories
 
-        def get_tag_id(tag: dict[str, Any]) -> str:
+        def get_tag_id(tag: dict[str, Any]):
             """
             Get something that can identify the tag.
 
@@ -307,29 +291,27 @@ class Doc:
 
             return tag_id or tag["name"]
 
-        def open_section(doc: Doc) -> None:
+        def open_section(doc: Doc):
             doc.add_dict_item("open", {"name": "section", "attributes": {"rel": "cx:Section"}})
 
-        def close_section(doc: Doc) -> None:
+        def close_section(doc: Doc):
             nonlocal prev_section, curr_section
             doc.add_dict_item("close", {"name": "section"})
             prev_section = curr_section
             curr_section = None
 
-        def insert_to_prev_section(i_item: DOC_ITEM_VARS, doc: Doc) -> None:
+        def insert_to_prev_section(item, doc: Doc):
             nonlocal curr_section, prev_section
-            new_item_name = new_doc.get_current_item_name()
+            new_item = new_doc.get_current_item()
 
-            if new_item_name != "section":
-                tag_name = getattr(i_item.item, "name", type(i_item.item).__name__)
-                # tag_name = get_prop(["item", "name"], tag)
-                raise RuntimeError(f"Sectionwrap: Attempting to remove a non-section tag: {tag_name}")
+            if new_item and new_item["item"]["name"] != "section":
+                raise Exception(f"Sectionwrap: Attempting to remove a non-section tag: {item['name']}")
 
             # Undo last section close
             doc.undo_add_item()
             curr_section = prev_section
             # 'str' object has no attribute 'item_type'
-            doc.add_item(i_item.item_type, i_item.item)
+            doc.add_item(item.item_type, item.item)
             close_section(new_doc)
 
         for i_item in self.items:
@@ -368,20 +350,21 @@ class Doc:
 
             elif item_type == "blockspace" and isinstance(i_item, DocStr):
                 tag = i_item.item
-                new_item_name = new_doc.get_current_item_name()
-                if prev_section and new_item_name == "section":
+                new_item = new_doc.get_current_item()
+                if prev_section and new_item and new_item["item"]["name"] == "section":
                     insert_to_prev_section(i_item, new_doc)
                 else:
                     new_doc.add_blockspace_item(tag)
 
             elif item_type == "textblock" and isinstance(i_item, DocTextBlock):
+                tag = i_item.item
                 text_block = i_item.item
                 tag_for_id = text_block.get_tag_for_id() or {}
 
                 if not tag_for_id and not curr_section:
-                    new_item_name = new_doc.get_current_item_name()
+                    new_item = new_doc.get_current_item()
                     # Textblock with no tag identifier. Add it to the previous section
-                    if prev_section and new_item_name == "section":
+                    if prev_section and new_item and new_item["item"]["name"] == "section":
                         insert_to_prev_section(i_item, new_doc)
                         continue
 
@@ -397,7 +380,7 @@ class Doc:
                     open_section(new_doc)
                     curr_section = get_tag_id(tag_for_id)
                     if not curr_section:
-                        raise ValueError(f'No id for the opened section for tag {tag_for_id.get("name")}')
+                        raise Exception(f'No id for the opened section for tag {tag_for_id.get("name")}')
 
                     new_doc.add_textblock_item(text_block)
                     # There was no open sections. Close the section now itself. If this tag is a template
@@ -468,13 +451,17 @@ class Doc:
         Returns:
             Balanced html fragments, one per segment
         """
-        return [
-            i_item.item.get_html()
-            for i_item in self.items
-            if i_item.item_type == "textblock" and isinstance(i_item, DocTextBlock)
-        ]
+        segments = []
 
-    def clone(self, callback: Callable[[DOC_ITEM_VARS], Any]) -> Doc:
+        for i_item in self.items:
+            if i_item.item_type != "textblock":
+                continue
+            text_block = i_item.item
+            segments.append(text_block.get_html())
+
+        return segments
+
+    def clone(self, callback: Callable) -> Doc:
         """
         Clone the Doc, modifying as we go.
 
