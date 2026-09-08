@@ -12,6 +12,14 @@ from src.main_app.services.new_html_services.wikitext_fixes import (
     WikitextFixerService,
 )
 
+FIXTURE_PATH = Path(__file__).parent / "fixtures"
+
+all_flags = {
+    "abdominal_pain.wiki": False,
+}
+# fixture_files = [("test-1.wiki"), ("test-2.wiki")]
+FIXTURE_FILES = [(x.name, all_flags.get(x.name, True)) for x in (FIXTURE_PATH / "source").glob("*.wiki")]
+
 
 def strip_result(result: str) -> str:
     text = result.strip()
@@ -21,8 +29,8 @@ def strip_result(result: str) -> str:
 
 
 class TestWikitextFixerService:
-    def load_fixture(self, name: str) -> str:
-        path = Path(__file__).parent / "data" / name
+    def load_fixture(self, name: str, folder: str = "source") -> str:
+        path = FIXTURE_PATH / folder / name
         assert path.exists(), f"Fixture file missing: {path}"
 
         with open(path, "r", encoding="utf-8") as f:
@@ -31,27 +39,20 @@ class TestWikitextFixerService:
         assert content is not None, f"Unable to read fixture file: {path}"
         return content
 
-    # put parametrize with 3 source-1.wiki, result-1.wiki, output-1.wiki
-    @pytest.mark.parametrize(
-        "source_file,result_file,output_file",
-        [
-            ("source-1.wiki", "result-1.wiki", "output-1.wiki"),
-            ("source-2.wiki", "result-2.wiki", "output-2.wiki"),
-        ],
-    )
-    def test_fix_wikitext_matches_result_fixture(self, source_file: str, result_file: str, output_file: str) -> None:
-        source = self.load_fixture(source_file)
-        expected = self.load_fixture(result_file)
+    @pytest.mark.parametrize("file, all_flag", FIXTURE_FILES)
+    def test_fix_wikitext_matches_result_fixture(self, file: str, all_flag: bool) -> None:
+        source = self.load_fixture(file, "source")
+        expected = self.load_fixture(file, "result")
         expected = strip_result(expected)
 
         fixer = WikitextFixerService()
-        result = fixer.fix(text=source, title="PLACEHOLDER_TEST", all_flag=True)
+        result = fixer.fix(text=source, title="PLACEHOLDER_TEST", all_flag=all_flag)
         result = strip_result(result)
 
         if result != expected:
             # write to output-1.wiki
-            output_path = Path(__file__).parent / "data" / output_file
+            output_path = FIXTURE_PATH / "output" / file
             with open(output_path, "w", encoding="utf-8") as f:
-                f.write(result)
+                f.write(result + "\n")
 
         assert result == expected

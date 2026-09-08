@@ -1,0 +1,38 @@
+{{Infobox medical condition
+|name             =Abdominal pain
+|synonym          =Stomach ache, tummy ache, belly ache, belly pain, gut ache
+|image            =Gray1220.png
+|image_size       =
+|image_thumbtime  =
+|alt              =
+|caption          =Abdominal pain can be characterized by the region it affects
+|pronounce        =
+|field            =[[General surgery]]
+|symptoms         =
+|complications    =
+|onset            =
+|duration         =
+|types            =Acute, chronic<ref name=Mer2020Over/>
+|causes           ='''Common''': [[Gastroenteritis]], [[irritable bowel syndrome]]<ref name=Vin2014/><br>'''Serious''': [[Appendicitis]], perforated [[stomach ulcer]], [[pancreatitis]], ruptured [[diverticulitis]], [[ovarian torsion]], [[volvulus]], ruptured [[aortic aneurysm]], [[lacerated spleen]] or liver, [[ischemic bowel]]<ref name=Stat2020/>
+|risks            =
+|diagnosis        =
+|differential     =
+|prevention       =
+|treatment        =
+|medication       =
+|prognosis        =
+|frequency        =
+|deaths           =
+|named after      =
+}}
+<!-- Definition and symptoms -->
+'''Abdominal pain''', also known as a '''stomach ache''', is a [[symptom]] of discomfort anywhere in the [[abdomen|abdominal region]].<ref name=MESH2020>{{cite web |title=Abdominal Pain - MeSH - NCBI |url=https://www.ncbi.nlm.nih.gov/mesh?Db=mesh&Cmd=DetailsSearch&Term=%22Abdominal+Pain%22%5BMeSH+Terms%5D |website=www.ncbi.nlm.nih.gov |access-date=20 October 2020 |archive-date=22 May 2021 |archive-url=https://web.archive.org/web/20210522035910/https://www.ncbi.nlm.nih.gov/mesh?Db=mesh&Cmd=DetailsSearch&Term=%22Abdominal+Pain%22%5BMeSH+Terms%5D |url-status=live }} {{Webarchive|url=https://web.archive.org/web/20210522035910/https://www.ncbi.nlm.nih.gov/mesh?Db=mesh&Cmd=DetailsSearch&Term=%22Abdominal+Pain%22%5BMeSH+Terms%5D |date=22 May 2021 }}</ref> It can be localized in one of the four [[quadrants]] or the abdomen or occur diffusely.<ref name=Stat2020/> Other symptoms such as [[nausea]], vomiting, [[diarrhea]], or [[constipation]] may be present.<ref name=Stat2020/><ref>{{cite book |last1=Mahadevan |first1=S. V. |last2=Garmel |first2=Gus M. |title=An Introduction to Clinical Emergency Medicine |date=2012 |publisher=Cambridge University Press |isbn=978-0-521-74776-9 |page=143 |url=https://www.google.ca/books/edition/An_Introduction_to_Clinical_Emergency_Me/pyAlcOfBhjIC?hl=en&gbpv=1&dq |language=en |access-date=20 October 2020 |archive-date=27 August 2021 |archive-url=https://web.archive.org/web/20210827201544/https://www.google.ca/books/edition/An_Introduction_to_Clinical_Emergency_Me/pyAlcOfBhjIC?hl=en&gbpv=1&dq= |url-status=live }} {{Webarchive|url=https://web.archive.org/web/20210827201544/https://www.google.ca/books/edition/An_Introduction_to_Clinical_Emergency_Me/pyAlcOfBhjIC?hl=en&gbpv=1&dq= |date=27 August 2021 }}</ref> It may be divided into pain of sudden onset (acute) and long term pain (chronic).<ref name=Mer2020Over>{{cite web |title=Search results for: Acute Abdominal Pain |url=https://www.merckmanuals.com/home/SearchResults?query=Acute+Abdominal+Pain&icd9=789.0%3b789.6%3b567.0%3b567.21%3b567.9%3b567.2 |website=Merck Manuals Consumer Version |access-date=20 October 2020 |archive-date=11 April 2021 |archive-url=https://web.archive.org/web/20210411125508/https://www.merckmanuals.com/home/SearchResults?query=Acute+Abdominal+Pain&icd9=789.0%3B789.6%3B567.0%3B567.21%3B567.9%3B567.2 |url-status=live }} {{Webarchive|url=https://web.archive.org/web/20210411125508/https://www.merckmanuals.com/home/SearchResults?query=Acute+Abdominal+Pain&icd9=789.0%3B789.6%3B567.0%3B567.21%3B567.9%3B567.2 |date=11 April 2021 }}</ref>
+
+<!-- Cause -->
+Common causes include [[gastroenteritis]] and [[irritable bowel syndrome]].<ref name=Vin2014>{{cite journal | vauthors = Viniol A, Keunecke C, Biroga T, Stadje R, Dornieden K, Bösner S, Donner-Banzhoff N, Haasenritter J, Becker A | display-authors = 6 | title = Studies of the symptom abdominal pain--a systematic review and meta-analysis | journal = Family Practice | volume = 31 | issue = 5 | pages = 517–29 | date = October 2014 | pmid = 24987023 | doi = 10.1093/fampra/cmu036 | doi-access = free }}</ref> About 15% of people have a more serious underlying condition such as [[appendicitis]], [[cholecystitis|gall bladder disease]], ruptured [[abdominal aortic aneurysm]], perforated [[peptic ulcer]], [[pancreatitis]], [[ovarian torsion]], [[volvulus]], [[diabetic ketoacidosis]], [[diverticulitis]], [[ischemic bowel]], or [[ectopic pregnancy]].<ref name=Vin2014/><ref name=Stat2020/> In babies [[necrotizing enterocolitis]], vulvulus, and [[intussuception]] should be considered.<ref name=Stat2020/> In a third of cases the exact cause is unclear.<ref name=Stat2020/>
+
+<!-- Diagnosis, treatment and epidemioloy -->
+Diagnosis may be based on the history of symptoms, examination, blood work, and [[medical imaging]].<ref name=Stat2020/> An [[Electrocardiography|ECG]] may be done to rule out a [[heart attack]].<ref name=Stat2020/> Treatment may include [[intravenous fluids]] and [[pain management]].<ref name=Stat2020/> Depending on the underlying cause [[surgery]] may be required.<ref name=Stat2020/> About 10% of people in the emergency department are there for abdominal pain.<ref name=Stat2020>{{cite journal | title = Acute Abdomenal | journal = StatPearls | date = 14 Nov 2018 | pmid = 29083722 | vauthors = Patterson JW, Dominique E }}</ref>
+
+==References==
+<references />
