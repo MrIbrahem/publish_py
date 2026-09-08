@@ -3,6 +3,7 @@ Unit tests for src/main_app/services/segments/lib/processor.py module.
 
 Functions to test: process_html
 """
+
 import re
 
 from src.main_app.services.segments.lib.processor import (
@@ -19,6 +20,7 @@ def normalize_test(html: str) -> str:
     html = re.sub(r"\s+", " ", html)
     html = re.sub(r">\s+<", "><", html)
     return html
+
 
 class TestProcessHtml:
     def test_process_html_with_simple_html(self):
