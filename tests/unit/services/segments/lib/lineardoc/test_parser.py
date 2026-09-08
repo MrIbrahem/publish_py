@@ -7,6 +7,7 @@ Classes to test: Parser
 """
 
 from src.main_app.services.segments.lib.lineardoc.contextualizer import Contextualizer
+from src.main_app.services.segments.lib.lineardoc.elements import BLOCK_TAGS
 from src.main_app.services.segments.lib.lineardoc.mw_contextualizer import MwContextualizer
 from src.main_app.services.segments.lib.lineardoc.parser import Parser
 
@@ -25,7 +26,7 @@ class TestParserCreation:
     def test_parser_with_options(self):
         """Test creating parser with options."""
         ctx = Contextualizer()
-        options = {"wrapSections": True}
+        options = {"wrapSections": True, "sort_attrs": True}
         parser = Parser(ctx, options)
         assert parser.options == options
 
@@ -132,6 +133,27 @@ class TestParserInlineAnnotationTag:
         ctx = Contextualizer()
         parser = Parser(ctx)
         assert parser.is_inline_annotation_tag("i", False) is True
+
+
+class TestParserBlockTags:
+    """Test block tag constants."""
+
+    def test_block_tags_list(self):
+        """Test that BLOCK_TAGS is defined."""
+
+        assert isinstance(BLOCK_TAGS, list)
+        assert "div" in BLOCK_TAGS
+        assert "p" in BLOCK_TAGS
+        assert "h1" in BLOCK_TAGS
+        assert "table" in BLOCK_TAGS
+
+    def test_inline_tags_not_in_block_tags(self):
+        """Test that inline tags are not in BLOCK_TAGS."""
+
+        assert "span" not in BLOCK_TAGS
+        assert "a" not in BLOCK_TAGS
+        assert "b" not in BLOCK_TAGS
+        assert "i" not in BLOCK_TAGS
 
 
 class TestParserIntegration:

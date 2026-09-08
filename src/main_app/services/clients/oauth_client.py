@@ -12,7 +12,7 @@ from typing import Any
 import requests
 from requests_oauthlib import OAuth1
 
-from ...config import settings
+from ...config import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +32,8 @@ def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wiki
         RuntimeError: If OAuth is not configured
     """
     return OAuth1(
-        settings.oauth.consumer_key,
-        client_secret=settings.oauth.consumer_secret,
+        app_settings.oauth.consumer_key,
+        client_secret=app_settings.oauth.consumer_secret,
         resource_owner_key=access_key,
         resource_owner_secret=access_secret,
     )
@@ -56,7 +56,7 @@ def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dic
         "meta": "tokens",
         "format": "json",
     }
-    headers = {"User-Agent": settings.other.user_agent}
+    headers = {"User-Agent": app_settings.other.user_agent}
     client = get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
 
     try:
@@ -120,7 +120,7 @@ def post_params(
     logger.debug(f"post_params: apiParams: {api_params}")
 
     client = get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
-    headers = {"User-Agent": settings.other.user_agent}  # , headers=headers
+    headers = {"User-Agent": app_settings.other.user_agent}  # , headers=headers
     response = requests.post(api_url, headers=headers, data=api_params, auth=client, timeout=60)
     return response.text
 

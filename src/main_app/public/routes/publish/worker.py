@@ -8,7 +8,7 @@ import json
 import logging
 from typing import Any
 
-from ....config import settings
+from ....config import app_settings
 from ....database.models import LanguageSettingRecord
 from ....database.services import (
     LanguageSettingService,
@@ -138,7 +138,7 @@ def _retry_with_fallback_user(
     Returns:
         Link result dictionary
     """
-    fallback_user = settings.users.fallback_user
+    fallback_user = app_settings.users.fallback_user
     logger.debug(f"get_csrftoken failed for user: {user}, retrying with {fallback_user}")
 
     # Retry with fallback user credentials
@@ -195,7 +195,7 @@ def _handle_successful_edit(
     link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
 
     # Check if the error is get_csrftoken failure and user is not already the fallback user
-    fallback_user = settings.users.fallback_user
+    fallback_user = app_settings.users.fallback_user
     if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
         link_result["fallback"] = _retry_with_fallback_user(sourcetitle, lang, title, user)
 

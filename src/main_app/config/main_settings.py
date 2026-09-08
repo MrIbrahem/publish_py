@@ -27,7 +27,7 @@ def get_settings() -> Settings:
 
 
 # Singleton settings instance
-settings = get_settings()
+app_settings = get_settings()
 
 
 def ensure_directories() -> None:
@@ -35,22 +35,22 @@ def ensure_directories() -> None:
 
     Call this once at app startup (in the factory), not at import time.
     """
-    for dir_name in settings.paths.all_paths():
+    for dir_name in app_settings.paths.all_paths():
         Path(dir_name).mkdir(parents=True, exist_ok=True)
 
     for file_name in [
-        settings.paths.words_json_path,
-        settings.paths.revids_file_path,
+        app_settings.paths.words_json_path,
+        app_settings.paths.revids_file_path,
     ]:
         Path(file_name).parent.mkdir(parents=True, exist_ok=True)
 
-    settings.new_html.revisions_dir.mkdir(parents=True, exist_ok=True)
+    app_settings.new_html.revisions_dir.mkdir(parents=True, exist_ok=True)
 
     # Ensure JSON index files exist
-    settings.new_html.ensure_json_files_exist()
+    app_settings.new_html.ensure_json_files_exist()
 
 
 __all__ = [
     "ensure_directories",
-    "settings",
+    "app_settings",
 ]

@@ -13,7 +13,7 @@ import logging
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
 
-from ....config import settings
+from ....config import app_settings
 from ....database.services import UserTokenService
 from ....services.clients.oauth_client import get_cxtoken
 from ....services.core.cors import check_cors
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def _format_user(user: str) -> str:
     """Format username, applying special user mappings."""
-    user = settings.users.special_users.get(user, user)
+    user = app_settings.users.special_users.get(user, user)
     return user.replace("_", " ")
 
 

@@ -13,7 +13,7 @@ from pathlib import Path
 
 import requests
 
-from ...config import settings
+from ...config import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def get_revid(sourcetitle: str) -> str:
     Returns:
         Revision ID as string, or empty string if not found
     """
-    revids_file_path: Path = settings.paths.revids_file_path
+    revids_file_path: Path = app_settings.paths.revids_file_path
 
     if not revids_file_path:
         logger.warning("revids_file_path not set in config")
@@ -58,13 +58,13 @@ def get_revid_db(sourcetitle: str) -> str:
         "title": sourcetitle,
     }
 
-    if not settings.other.revids_api_url:
+    if not app_settings.other.revids_api_url:
         logger.warning("other.revids_api_url not set in config")
         return ""
 
-    headers = {"User-Agent": settings.other.user_agent}
+    headers = {"User-Agent": app_settings.other.user_agent}
     try:
-        response = requests.get(settings.other.revids_api_url, headers=headers, params=params, timeout=30)
+        response = requests.get(app_settings.other.revids_api_url, headers=headers, params=params, timeout=30)
         data = response.json()
         results = {r["title"]: str(r["revid"]) for r in data.get("results", [])}
         return results.get(sourcetitle, "")

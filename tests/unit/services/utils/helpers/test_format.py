@@ -1,6 +1,6 @@
 """Tests for helpers.format module."""
 
-from src.main_app.config import settings
+from src.main_app.config import app_settings
 from src.main_app.services.utils.helpers.format import (
     determine_hashtag,
     format_title,
@@ -85,13 +85,13 @@ class TestUsersConfig:
 
     def test_special_users_mapping_from_config(self):
         """Test that special users mapping is correctly loaded from config."""
-        assert settings.users.special_users["Mr. Ibrahem 1"] == "Mr. Ibrahem"
-        assert settings.users.special_users["Admin"] == "Mr. Ibrahem"
+        assert app_settings.users.special_users["Mr. Ibrahem 1"] == "Mr. Ibrahem"
+        assert app_settings.users.special_users["Admin"] == "Mr. Ibrahem"
 
     def test_fallback_user_from_config(self):
         """Test that fallback user is correctly loaded from config."""
-        assert settings.users.fallback_user == "Mr. Ibrahem"
+        assert app_settings.users.fallback_user == "Mr. Ibrahem"
 
     def test_users_without_hashtag_from_config(self):
         """Test that users without hashtag is correctly loaded from config."""
-        assert "Mr. Ibrahem" in settings.users.users_without_hashtag
+        assert "Mr. Ibrahem" in app_settings.users.users_without_hashtag

@@ -8,7 +8,7 @@ class TestGetOauthClient:
 
     def test_creates_oauth1_object(self):
         """Test that OAuth1 object is created correctly."""
-        with patch("src.main_app.services.clients.oauth_client.settings") as mock_settings:
+        with patch("src.main_app.services.clients.oauth_client.app_settings") as mock_settings:
             mock_settings.oauth.consumer_key = "test_consumer_key"
             mock_settings.oauth.consumer_secret = "test_consumer_secret"
 
@@ -28,7 +28,7 @@ class TestGetCsrfToken:
         """Test that CSRF token is retrieved from API."""
         with (
             patch("src.main_app.services.clients.oauth_client.requests") as mock_requests,
-            patch("src.main_app.services.clients.oauth_client.settings") as mock_settings,
+            patch("src.main_app.services.clients.oauth_client.app_settings") as mock_settings,
         ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
@@ -54,7 +54,7 @@ class TestPostParams:
         with (
             patch("src.main_app.services.clients.oauth_client.get_csrf_token") as mock_get_token,
             patch("src.main_app.services.clients.oauth_client.requests") as mock_requests,
-            patch("src.main_app.services.clients.oauth_client.settings") as mock_settings,
+            patch("src.main_app.services.clients.oauth_client.app_settings") as mock_settings,
         ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"
@@ -82,7 +82,7 @@ class TestPostParams:
         """Test that error is returned when CSRF token retrieval fails."""
         with (
             patch("src.main_app.services.clients.oauth_client.get_csrf_token") as mock_get_token,
-            patch("src.main_app.services.clients.oauth_client.settings") as mock_settings,
+            patch("src.main_app.services.clients.oauth_client.app_settings") as mock_settings,
         ):
             mock_settings.oauth.consumer_key = "test_key"
             mock_settings.oauth.consumer_secret = "test_secret"

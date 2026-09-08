@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 from flask import current_app
 from flask.wrappers import Request
 
-from ....config import settings
+from ....config import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ def make_url(url: str) -> str | None:
 
 
 def _get_allowed_domains() -> list[str]:
-    return settings.cors.allowed_domains
+    return app_settings.cors.allowed_domains
 
 
 def is_allowed(request: Request) -> str | None:

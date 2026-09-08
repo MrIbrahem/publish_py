@@ -21,7 +21,7 @@ class TestGetPublishSecretCode:
         mock_settings = MagicMock()
         mock_settings.security.publish_secret_code = "my_secret_code"
 
-        monkeypatch.setattr("src.main_app.services.core.cors.publish_secret_checks.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.services.core.cors.publish_secret_checks.app_settings", mock_settings)
 
         result = _get_publish_secret_code()
 
@@ -32,7 +32,7 @@ class TestGetPublishSecretCode:
         mock_settings = MagicMock()
         mock_settings.security.publish_secret_code = ""
 
-        monkeypatch.setattr("src.main_app.services.core.cors.publish_secret_checks.settings", mock_settings)
+        monkeypatch.setattr("src.main_app.services.core.cors.publish_secret_checks.app_settings", mock_settings)
 
         result = _get_publish_secret_code()
 
