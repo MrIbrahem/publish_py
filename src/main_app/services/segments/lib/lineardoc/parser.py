@@ -11,13 +11,11 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from lxml import etree
-from lxml import html as lxml_html
-
 from .builder import Builder
 from .contextualizer import Contextualizer
-from .elements import BLOCK_TAGS, VOID_ELEMENTS
+from .elements import BLOCK_TAGS
 from .mw_contextualizer import MwContextualizer
+from .sax_html_parser import SaxHTMLParser
 from .utils import Utils
 
 logger = logging.getLogger(__name__)
@@ -30,7 +28,6 @@ class Parser:
         self,
         contextualizer: MwContextualizer | Contextualizer,
         options=None,
-        sort_attrs: bool = True,
     ) -> None:
         """
         Initialize the parser.
@@ -42,6 +39,11 @@ class Parser:
         self.contextualizer = contextualizer
         self.options = options or {}
         self.lowercase = True
+
+        sort_attrs = bool(self.options.get("sort_attrs"))
+        if self.options.get("sort_attrs") is None:
+            sort_attrs = True
+
         self.sort_attrs = sort_attrs
 
     def init(self) -> None:
@@ -60,29 +62,40 @@ class Parser:
         Args:
             tag: Tag dict with 'name' and 'attributes'
         """
+        # Check if the tag is an inline annotation
+        is_ann = self.is_inline_annotation_tag(tag["name"], Utils.is_transclusion(tag))
+
+        # Handle removable tags or tags in removable context
         if self.contextualizer.get_context() == "removable" or self.contextualizer.is_removable(tag):
             self.all_tags.append(tag)
             self.contextualizer.on_open_tag(tag)
             return
 
+        # Handle segment isolation if enabled
         if self.options.get("isolateSegments") and Utils.is_segment(tag):
+            # Wrap segment in a div block with specific class
             self.builder.push_block_tag({"name": "div", "attributes": {"class": "cx-segment-block"}})
 
+        # Handle reference and math tags by creating a child builder
         if Utils.is_reference(tag) or Utils.is_math(tag):
             # Start a reference: create a child builder, and move into it
             self.builder = self.builder.create_child_builder(wrapper_tag=tag)
 
+        # Handle inline empty tags
         elif Utils.is_inline_empty_tag(tag["name"]):
             self.builder.add_inline_content(
                 content=tag,
                 can_segment=self.contextualizer.can_segment(),
             )
 
-        elif self.is_inline_annotation_tag(tag["name"], Utils.is_transclusion(tag)):
+        # Handle inline annotation tags
+        elif is_ann:
             self.builder.push_inline_annotation_tag(tag)
         else:
+            # Handle all other block tags
             self.builder.push_block_tag(tag)
 
+        # Add tag to all tags list and notify contextualizer
         self.all_tags.append(tag)
         self.contextualizer.on_open_tag(tag)
 
@@ -93,26 +106,37 @@ class Parser:
         Args:
             tag_name: Name of tag to close
         """
+        # If there are no tags to close, return immediately
         if not self.all_tags:
             return
 
+        # Get the last opened tag from the stack
         tag = self.all_tags.pop()
+
+        # Check if the tag is an inline annotation
         is_ann = self.is_inline_annotation_tag(tag_name, Utils.is_transclusion(tag))
 
-        if self.contextualizer.is_removable(tag) or self.contextualizer.get_context() == "removable":
+        # Handle removable tags or tags in removable context
+        if self.contextualizer.get_context() == "removable" or self.contextualizer.is_removable(tag):
             self.contextualizer.on_close_tag(tag)
             return
 
+        # Process the tag close for non-removable tags
         self.contextualizer.on_close_tag(tag)
 
+        # Skip processing for empty inline tags
         if Utils.is_inline_empty_tag(tag_name):
             return
 
+        # Handle annotation tags
         if is_ann and len(self.builder.inline_annotation_tags) > 0:
+            # Pop the annotation tag from the builder
             self.builder.pop_inline_annotation_tag(tag_name)
+            # Handle segment isolation if enabled
             if self.options.get("isolateSegments") and Utils.is_segment(tag):
                 self.builder.pop_block_tag("div")
 
+        # Handle annotation tags in sub-documents
         elif is_ann and self.builder.builder_parent is not None:
             # In a sub document: should be a span or sup that closes a reference
             if tag_name not in ("span", "sup"):
@@ -146,13 +170,14 @@ class Parser:
         """
         if self.contextualizer.get_context() == "removable":
             return
+
         self.builder.add_text_chunk(text, self.contextualizer.can_segment())
 
     def on_script(self, text: str) -> None:
         """Handle script text."""
         self.builder.add_text_chunk(text, self.contextualizer.can_segment())
 
-    def is_inline_annotation_tag(self, tag_name, is_transclusion) -> bool:
+    def is_inline_annotation_tag(self, tag_name, is_transclusion: bool) -> bool:
         """
         Determine whether a tag is an inline annotation or not.
 
@@ -182,35 +207,6 @@ class Parser:
         # All tags that are not block tags are inline annotation tags.
         return tag_name not in BLOCK_TAGS
 
-    def write_fragments(self, html: str) -> None:
-        """
-        Parse HTML into the document.
-
-        Uses ``lxml.html.fragments_fromstring`` so that HTML *fragments* (such as
-        a bare ``<p>…</p>``) are parsed without the implicit ``<html><body>``
-        wrapper that ``etree.HTMLParser`` would inject. This keeps the behaviour
-        consistent with the upstream (sax-based) parser, which only emits the
-        elements actually present in the input.
-        """
-        try:
-            fragments = lxml_html.fragments_fromstring(html)
-        except Exception as exc:
-            logger.error("Failed to parse HTML error: %s", str(exc))
-            # Fallback: wrap in a div and try again
-            try:
-                fragments = lxml_html.fragments_fromstring(f"<div>{html}</div>")
-            except Exception as exc2:
-                raise Exception(f"Failed to parse HTML: {exc2}") from exc2
-
-        for fragment in fragments:
-            if isinstance(fragment, str):
-                # Leading/trailing text outside any tag (e.g. before the first tag)
-                if fragment.strip():
-                    self.on_text(fragment)
-                continue
-
-            self._process_element(fragment)
-
     def write(self, html: str) -> None:
         """
         Parse HTML into the document.
@@ -218,54 +214,9 @@ class Parser:
         Args:
             html: HTML string to parse
         """
-        parser = etree.HTMLParser(encoding="utf-8")
-        try:
-            root = etree.fromstring(html.encode("utf-8"), parser)
-            self._process_element(root)
-        except Exception as exc:
-            logger.error("Failed to parse HTML error: %s", str(exc))
-            # Try with wrapping
-            try:
-                root = etree.fromstring(f"<div>{html}</div>".encode(), parser)
-                for child in root:
-                    self._process_element(child)
-            except Exception as e:
-                raise Exception(f"Failed to parse HTML: {e}") from e
-
-    def _process_element(self, element: etree._Element | Any, tag_name: str | None = None) -> None:
-        """
-        Process an element recursively.
-        """
-        # Skip comments and other special nodes
-        if not isinstance(element.tag, str):
-            return
-
-        if tag_name is None:
-            tag_name = element.tag  # pyright: ignore[reportAssignmentType]
-
-        if tag_name and self.lowercase:
-            tag_name = tag_name.lower()
-
-        # Create tag dict
-        tag = {"name": tag_name, "attributes": dict(element.attrib)}
-
-        # Mark HTML void elements as self-closing
-        tag["isSelfClosing"] = tag_name in VOID_ELEMENTS
-
-        self.on_open_tag(tag)
-
-        # Process text content
-        if element.text:
-            self.on_text(element.text)
-
-        # Process children
-        for child in element:
-            self._process_element(child)
-            # Process tail text after child
-            if child.tail:
-                self.on_text(child.tail)
-
-        self.on_close_tag(tag_name)
+        parser = SaxHTMLParser(self, html)
+        parser.feed(html)
+        parser.close()
 
 
 __all__ = [

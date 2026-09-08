@@ -12,22 +12,30 @@ import yaml
 from ..lineardoc import Doc, MwContextualizer, Parser
 from ..segmentation import CXSegmenter
 
-# Load configuration
-config_path = Path(__file__).parent.parent.parent / "config" / "MWPageLoader.yaml"
 
-with open(config_path, "r", encoding="utf-8") as f:
-    pageloader_config = yaml.safe_load(f)
+def load_removable_sections() -> dict[str, list[str]]:
+    # Load configuration
+    config_path = Path(__file__).parent.parent.parent / "config" / "MWPageLoader.yaml"
 
-removable_sections = pageloader_config.get("removableSections", {})
-if not removable_sections:
-    raise ValueError("removableSections must be defined in config")
+    with open(config_path, "r", encoding="utf-8") as f:
+        pageloader_config = yaml.safe_load(f)
+
+    removable_sections = pageloader_config.get("removableSections", {})
+    if not removable_sections:
+        raise ValueError("removableSections must be defined in config")
+    return removable_sections
+
+
+removable_sections = load_removable_sections()
 
 
 class MWPageLoader:
 
     def get_parsed_doc(self, source_html: str, options: dict[str, Any]) -> Doc:
         parser = Parser(
-            contextualizer=MwContextualizer(config={"removableSections": removable_sections}),
+            contextualizer=MwContextualizer(
+                config={"removableSections": removable_sections},
+            ),
             options=options,
         )
 
@@ -41,7 +49,7 @@ class MWPageLoader:
         lang: str | None = None,
         sort_attrs: bool = True,
         wrap_sections: bool = True,
-    ) -> str:
+    ) -> Doc:
         """
         Process source HTML through the CX pipeline.
 
@@ -56,7 +64,7 @@ class MWPageLoader:
             source_html: Source HTML string
 
         Returns:
-            Processed HTML string
+            Processed document
         """
         if lang is None:
             lang = "en"
@@ -74,7 +82,7 @@ class MWPageLoader:
         # Extract category tags from source document.
         segmented_doc = CXSegmenter().segment(parsed_doc, lang)
 
-        return segmented_doc.get_html()
+        return segmented_doc
 
 
 __all__ = [
