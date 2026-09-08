@@ -20,8 +20,7 @@ class AllQidsService:
 
     def list_targets_by_lang(self, lang: str) -> list[dict]:
         """ """
-        sql = text(
-            """
+        sql = text("""
             SELECT
                 t.qid AS qid,
                 q.title AS title,
@@ -38,8 +37,7 @@ class AllQidsService:
                 AND t.target IS NOT NULL
             GROUP BY
                 t.qid, q.title, t.code, t.target
-        """
-        )
+        """)
         rows = self.session.execute(sql, {"lang": lang}).fetchall()
         return [dict(row._mapping) for row in rows]
 

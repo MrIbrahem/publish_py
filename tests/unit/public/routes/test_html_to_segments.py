@@ -8,7 +8,6 @@ Functions to test: validate_request, create_error_response, create_success_respo
 TODO: write tests
 """
 
-
 from src.main_app.public.routes.html_to_segments import (
     HtmltoSegmentsRoutes,
     ProcessingError,

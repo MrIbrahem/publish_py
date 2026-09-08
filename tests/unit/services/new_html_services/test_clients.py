@@ -8,7 +8,6 @@ Functions to test: normalize_title_for_url
 TODO: write tests
 """
 
-
 from src.main_app.services.new_html_services.clients import (
     HttpClientService,
     MdwikiApi,

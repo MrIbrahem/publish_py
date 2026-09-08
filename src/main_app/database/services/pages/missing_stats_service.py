@@ -23,18 +23,15 @@ logger = logging.getLogger(__name__)
 
 
 # logic from new_sql_tables.php — count_category_members
-_COUNT_MEMBERS_SQL = text(
-    """
+_COUNT_MEMBERS_SQL = text("""
     SELECT COUNT(c.article_id) AS members
     FROM category_members c
     WHERE c.category = :cat
-    """
-)
+    """)
 
 
 # logic from new_sql_tables.php — statics_by_category
-_STATS_BY_CATEGORY_SQL = text(
-    """
+_STATS_BY_CATEGORY_SQL = text("""
     SELECT
         aq.code   AS language_code,
         COUNT(*)  AS available_title_count
@@ -44,8 +41,7 @@ _STATS_BY_CATEGORY_SQL = text(
     WHERE c.category = :cat
     GROUP BY aq.code
     ORDER BY available_title_count ASC
-    """
-)
+    """)
 
 
 class MissingStatsService:

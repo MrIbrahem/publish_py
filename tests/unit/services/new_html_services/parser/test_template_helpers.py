@@ -7,7 +7,6 @@ Functions to test: parse, get_templates, strip_name, get_parameter, has_paramete
 TODO: write tests
 """
 
-
 from src.main_app.services.new_html_services.parser.template_helpers import (
     delete_parameter,
     get_arg_number,

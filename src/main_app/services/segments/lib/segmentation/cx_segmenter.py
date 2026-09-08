@@ -7,8 +7,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-import pysbd
-from pysbd.languages import LANGUAGE_CODES
+import sentencex
 
 from ..lineardoc.doc import Doc
 
@@ -40,11 +39,9 @@ class CXSegmenter:
             Function that returns sentence boundary offsets
         """
 
-        def segmenter(text) -> list[Any]:
+        def segmenter(text: str) -> list[Any]:
             """Segment text into sentences."""
-
-            seg = pysbd.Segmenter(language=language, clean=False)
-            sentences = seg.segment(text)
+            sentences = sentencex.segment(language, text)
             boundaries = []
 
             # Track position to avoid finding duplicate sentences
@@ -62,7 +59,7 @@ class CXSegmenter:
         return segmenter
 
     def is_language_supported(self, language: str) -> bool:
-        return language in LANGUAGE_CODES
+        return True
 
 
 __all__ = [

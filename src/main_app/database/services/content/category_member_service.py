@@ -86,12 +86,10 @@ class CategoryMemberService(CRUDService[CategoryMemberRecord]):
                     seen.add((cat, aid))
             if new_rows:
                 self.session.execute(
-                    text(
-                        """
+                    text("""
                         INSERT INTO category_members (category, article_id)
                         VALUES (:category, :article_id)
-                    """
-                    ),
+                    """),
                     new_rows,
                 )
                 self.session.commit()

@@ -12,10 +12,10 @@ import logging
 from typing import Any
 
 from lxml import etree
+from lxml import html as lxml_html
 
 from .builder import Builder
 from .contextualizer import Contextualizer
-from .doc import Doc
 from .elements import BLOCK_TAGS, VOID_ELEMENTS
 from .mw_contextualizer import MwContextualizer
 from .utils import Utils
@@ -52,65 +52,6 @@ class Parser:
         self.builder = self.root_builder
         # Stack of tags currently open
         self.all_tags = []
-
-    def create_wrapped_doc(self) -> Doc:
-        return self.builder.doc.wrap_sections()
-
-    def write(self, html: str) -> None:
-        """
-        Parse HTML into the document.
-
-        Args:
-            html: HTML string to parse
-        """
-        parser = etree.HTMLParser(encoding="utf-8")
-        try:
-            root = etree.fromstring(html.encode("utf-8"), parser)
-            self._process_element(root)
-        except Exception as exc:
-            logger.error("Failed to parse HTML error: %s", str(exc))
-            # Try with wrapping
-            try:
-                root = etree.fromstring(f"<div>{html}</div>".encode(), parser)
-                for child in root:
-                    self._process_element(child)
-            except Exception as e:
-                raise Exception(f"Failed to parse HTML: {e}") from e
-
-    def _process_element(self, element: etree._Element | Any, tag_name: str | None = None) -> None:
-        """
-        Process an element recursively.
-        """
-        # Skip comments and other special nodes
-        if not isinstance(element.tag, str):
-            return
-
-        if tag_name is None:
-            tag_name = element.tag  # pyright: ignore[reportAssignmentType]
-
-        if tag_name and self.lowercase:
-            tag_name = tag_name.lower()
-
-        # Create tag dict
-        tag = {"name": tag_name, "attributes": dict(element.attrib)}
-
-        # Mark HTML void elements as self-closing
-        tag["isSelfClosing"] = tag_name in VOID_ELEMENTS
-
-        self.on_open_tag(tag)
-
-        # Process text content
-        if element.text:
-            self.on_text(element.text)
-
-        # Process children
-        for child in element:
-            self._process_element(child)
-            # Process tail text after child
-            if child.tail:
-                self.on_text(child.tail)
-
-        self.on_close_tag(tag_name)
 
     def on_open_tag(self, tag: dict[str, Any]) -> None:
         """
@@ -189,7 +130,8 @@ class Parser:
         elif not is_ann:
             # Block level tag close
             if tag_name == "p" and self.contextualizer.can_segment():
-                # Add an empty textchunk before the closing block tag
+                # Add an empty textchunk before the closing block tag to flush segmentation contexts
+                # For example, transclusion based references at the end of paragraphs
                 self.builder.add_text_chunk("", self.contextualizer.can_segment())
             self.builder.pop_block_tag(tag_name)
         else:
@@ -223,7 +165,8 @@ class Parser:
         """
         context = self.contextualizer.get_context()
 
-        # <span> inside a media context acts like a block tag
+        # <span> inside a media context acts like a block tag wrapping another block tag <video>
+        # See https://www.mediawiki.org/wiki/Specs/HTML/1.7.0#Audio/Video
         if tag_name == "span" and context == "media":
             return False
 
@@ -232,11 +175,97 @@ class Parser:
             return True
 
         # Styles are usually block tags, but sometimes style tags are used as transclusions
+        # Example: T217585. In such cases treat styles as inline to avoid wrong segmentations.
         if tag_name == "style" and is_transclusion:
             return True
 
-        # All tags that are not block tags are inline annotation tags
+        # All tags that are not block tags are inline annotation tags.
         return tag_name not in BLOCK_TAGS
+
+    def write_fragments(self, html: str) -> None:
+        """
+        Parse HTML into the document.
+
+        Uses ``lxml.html.fragments_fromstring`` so that HTML *fragments* (such as
+        a bare ``<p>…</p>``) are parsed without the implicit ``<html><body>``
+        wrapper that ``etree.HTMLParser`` would inject. This keeps the behaviour
+        consistent with the upstream (sax-based) parser, which only emits the
+        elements actually present in the input.
+        """
+        try:
+            fragments = lxml_html.fragments_fromstring(html)
+        except Exception as exc:
+            logger.error("Failed to parse HTML error: %s", str(exc))
+            # Fallback: wrap in a div and try again
+            try:
+                fragments = lxml_html.fragments_fromstring(f"<div>{html}</div>")
+            except Exception as exc2:
+                raise Exception(f"Failed to parse HTML: {exc2}") from exc2
+
+        for fragment in fragments:
+            if isinstance(fragment, str):
+                # Leading/trailing text outside any tag (e.g. before the first tag)
+                if fragment.strip():
+                    self.on_text(fragment)
+                continue
+
+            self._process_element(fragment)
+
+    def write(self, html: str) -> None:
+        """
+        Parse HTML into the document.
+
+        Args:
+            html: HTML string to parse
+        """
+        parser = etree.HTMLParser(encoding="utf-8")
+        try:
+            root = etree.fromstring(html.encode("utf-8"), parser)
+            self._process_element(root)
+        except Exception as exc:
+            logger.error("Failed to parse HTML error: %s", str(exc))
+            # Try with wrapping
+            try:
+                root = etree.fromstring(f"<div>{html}</div>".encode(), parser)
+                for child in root:
+                    self._process_element(child)
+            except Exception as e:
+                raise Exception(f"Failed to parse HTML: {e}") from e
+
+    def _process_element(self, element: etree._Element | Any, tag_name: str | None = None) -> None:
+        """
+        Process an element recursively.
+        """
+        # Skip comments and other special nodes
+        if not isinstance(element.tag, str):
+            return
+
+        if tag_name is None:
+            tag_name = element.tag  # pyright: ignore[reportAssignmentType]
+
+        if tag_name and self.lowercase:
+            tag_name = tag_name.lower()
+
+        # Create tag dict
+        tag = {"name": tag_name, "attributes": dict(element.attrib)}
+
+        # Mark HTML void elements as self-closing
+        tag["isSelfClosing"] = tag_name in VOID_ELEMENTS
+
+        self.on_open_tag(tag)
+
+        # Process text content
+        if element.text:
+            self.on_text(element.text)
+
+        # Process children
+        for child in element:
+            self._process_element(child)
+            # Process tail text after child
+            if child.tail:
+                self.on_text(child.tail)
+
+        self.on_close_tag(tag_name)
 
 
 __all__ = [

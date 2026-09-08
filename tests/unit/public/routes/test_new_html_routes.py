@@ -7,7 +7,6 @@ Classes to test: NewHtmlRoutes
 TODO: write tests
 """
 
-
 from src.main_app.public.routes.new_html import (
     NewHtmlRoutes,
 )
