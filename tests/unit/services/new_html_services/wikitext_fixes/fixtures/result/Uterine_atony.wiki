@@ -1,0 +1,37 @@
+{{Infobox medical condition
+|name             =Uterine atony
+|synonym          =
+|image            =Postpartum hemorrhage.webm
+|image_size       =
+|image_thumbtime  =
+|alt              =
+|caption          =Video explanation of postpartum bleeding
+|pronounce        =
+|field            =[[Obstetrics]]
+|symptoms         =[[Postpartum bleeding]]<ref name=Stat2020/>
+|complications    =[[Anemia]], [[iron deficiency]]<ref name=Stat2020/>
+|onset            =Post delivery<ref name=Stat2020/>
+|duration         =
+|types            =
+|causes           =
+|risks            =[[Prolonged labor]], [[precipitous labor]], uterine distension (twins, [[polyhydramnios]], [[large for gestational age]]), [[fibroids]], [[body mass index|BMI]] > 40, [[chorioamnionitis]]<ref name=Stat2020/>
+|diagnosis        =[[Physical examination|Examination]]<ref name=Stat2020/>
+|differential     =[[Retained placenta]], lacerations, [[uterine inversion]]<ref name=Stat2020/>
+|prevention       =[[Oxytocin (medication)|Oxytocin]]<ref name=Stat2020/>
+|treatment        =Uterine massage, medications, packing, surgery<ref name=Stat2020/>
+|medication       =Oxytocin, [[methylergometrine]], [[carboprost]], [[misoprostol]], [[prostaglandin E2]]<ref name=Stat2020/>
+|prognosis        =
+|frequency        =2.5% of deliveries<ref name=Stat2020/>
+|deaths           =
+|named after      =
+}}
+<!-- Definition and symptoms -->
+'''Uterine atony''' is the failure of the [[uterus]] to contract adequately following [[delivery]].<ref name=Stat2020/> Symptoms can include [[post partum bleeding]], of which it is the causes in more than 75% of cases.<ref name=Stat2020>{{cite journal | vauthors = Gill P, Patel A, Van Hook JW | title = Uterine Atony | date = 2020 | pmid = 29630290 | url = https://www.ncbi.nlm.nih.gov/books/NBK493238/ | access-date = 2020-10-19 | publisher = StatPearls Publishing | journal = StatPearls | place = Treasure Island (FL) | archive-date = 2021-08-27 | archive-url = https://web.archive.org/web/20210827174413/https://www.ncbi.nlm.nih.gov/books/NBK493238/ | url-status = live }}  [[File:CC-BY icon.svg|50px]]  Text was copied from this source, which is available under a [https://creativecommons.org/licenses/by/4.0/ Creative Commons Attribution 4.0 International License] {{Webarchive|url=https://web.archive.org/web/20171016050101/https://creativecommons.org/licenses/by/4.0/ |date=2017-10-16 }}.</ref> Complications may include [[anemia]] and [[iron deficiency]].<ref name=Stat2020/>
+
+<!-- Cause and diagnosis -->
+Risk factors include [[prolonged labor]], [[precipitous labor]], uterine distension (twins, [[polyhydramnios]], [[large for gestational age]]), [[fibroids]], [[body mass index|BMI]] > 40, and [[chorioamnionitis]].<ref name=Stat2020/> Contraction of the muscles of the uterus is required to close the blood vessels that supply were the [[placenta]] attaches after its delivery.<ref name=Stat2020/> Diagnosis is by feeling the uterus following delivery.<ref name=Stat2020/> Other conditions that may present similarly include [[retained placenta]], [[uterine inversion]], and lacerations associated with delivery.<ref name=Stat2020/>
+
+<!-- Prevention, treatment, and epidemiology -->
+Blood products should be ready for us in those at high risk.<ref name=Stat2020/> [[Oxytocin (medication)|Oxytocin]] may also be given to try to prevent its occurrence.<ref name=Stat2020/> Treatment may include [[uterine massage]], medications, uterus packing, or surgery.<ref name=Stat2020/> Medications used include oxytocin, [[methylergometrine]], [[carboprost]], [[misoprostol]], and [[prostaglandin E2]].<ref name=Stat2020/><ref name=Bi2021>{{cite journal |last1=Bienstock |first1=JL |last2=Eke |first2=AC |last3=Hueppchen |first3=NA |title=Postpartum Hemorrhage. |journal=The New England journal of medicine |date=29 April 2021 |volume=384 |issue=17 |pages=1635-1645 |doi=10.1056/NEJMra1513247 |pmid=33913640}}</ref> Uterine atony occurs in 2.5% of deliveries in the United States.<ref name=Stat2020/> Globally postpartum bleeding is a top 5 causes of [[maternal death]].<ref name=Coch2014>{{cite journal | vauthors = Mousa HA, Blum J, Abou El Senoun G, Shakur H, Alfirevic Z | title = Treatment for primary postpartum haemorrhage | journal = The Cochrane Database of Systematic Reviews | issue = 2 | pages = CD003249 | date = February 2014 | pmid = 24523225 | pmc = 6483801 | doi = 10.1002/14651858.CD003249.pub3 | collaboration = Cochrane Pregnancy and Childbirth Group }}</ref>
+==References==
+<references />
