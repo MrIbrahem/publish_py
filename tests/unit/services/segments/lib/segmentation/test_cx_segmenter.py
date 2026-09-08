@@ -14,11 +14,13 @@ from src.main_app.services.segments.lib.segmentation.cx_segmenter import (
 )
 from tests.unit.html_normalizer import normalize_test_base
 
+
 def get_parsed_doc(content, config=None, options=None) -> Doc:
     parser = Parser(MwContextualizer(config=config), options=options)
     parser.init()
     parser.write(content)
     return parser.builder.doc
+
 
 def test_cx_segmenter_1():
 

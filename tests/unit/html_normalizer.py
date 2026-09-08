@@ -2,8 +2,8 @@
 
 import re
 
-
 import pywikibot
+
 from src.main_app.services.segments.lib.lineardoc.normalizer import normalize
 
 

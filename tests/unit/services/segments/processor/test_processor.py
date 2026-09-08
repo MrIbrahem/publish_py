@@ -4,7 +4,6 @@ Unit tests for src/main_app/services/segments/lib/processor.py module.
 Functions to test: process_html
 """
 
-import re
 
 from src.main_app.services.segments.lib.processor import (
     process_html,
