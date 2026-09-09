@@ -73,7 +73,7 @@ def _get_wikitext_and_revision(title: str, all_flag: str = "") -> tuple[str, str
 
     # run fix_wikitext as in the original PHP version
     fixer = WikitextFixerService()
-    source = fixer.fix(source, title, all_flag=bool(all_flag))
+    source = fixer.run(source, title, all_flag=bool(all_flag))
 
     return source, revid, from_cache
 
@@ -99,7 +99,7 @@ def _get_html(
     if not wikitext:
         return "", from_cache
 
-    # convertWikitextToHtml
+    # TransformApiService.convert()
     transform = TransformApi()
     fixed = transform.convert(wikitext, title)
     html = fixed.get("result", "")

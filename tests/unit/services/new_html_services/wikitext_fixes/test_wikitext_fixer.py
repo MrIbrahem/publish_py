@@ -15,14 +15,15 @@ from tests.unit.services.new_html_services.expend_infobox import expend_all_temp
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures"
 
-all_flags = {
-    "abdominal_pain.wiki": False,
-    "Uterine_atony.wiki": False,
-    "obstructive_sleep_apnea.wiki": False,
+lead_only_files = {
+    "abdominal_pain.wiki",
+    "Uterine_atony.wiki",
+    "obstructive_sleep_apnea.wiki",
+    "Wernicke–Korsakoff_syndrome.wiki",
 }
 
 # fixture_files = [("test-1.wiki"), ("test-2.wiki")]
-FIXTURE_FILES = [(x.name, all_flags.get(x.name, True)) for x in (FIXTURE_PATH / "source").glob("*.wiki")]
+FIXTURE_FILES = [(x.name, x.name not in lead_only_files) for x in (FIXTURE_PATH / "source").glob("*.wiki")]
 
 
 def strip_result(result: str) -> str:
@@ -50,7 +51,7 @@ class TestWikitextFixerService:
         expected = strip_result(expected)
 
         fixer = WikitextFixerService()
-        result = fixer.fix(text=source, title="PLACEHOLDER_TEST", all_flag=all_flag)
+        result = fixer.run(text=source, title="PLACEHOLDER_TEST", all_flag=all_flag)
         result = strip_result(result)
 
         # write to output-1.wiki

@@ -21,22 +21,8 @@ class WikitextFixerService:
         init
         """
 
-    def fix(self, text: str, title: str, all_flag: bool = False) -> str:
-        """
-        Port the full fix_wikitext pipeline from the original PHP tool:
-            - remove_templates
-            - remove_lead_templates
-            - remove_bad_refs
-            - del_empty_refs
-            - remove_videos
-            - remove_categories
-            - remove_missing_images
-            - add_missing_title
-        """
-
-        if not all_flag:
-            text = self.strip_text_into_lead_section(text)
-
+    def fix(self, text: str, title: str) -> str:
+        """ """
         # Replace templates
         text = text.replace("{{drugbox", "{{Infobox drug")
         text = text.replace("{{Drugbox", "{{Infobox drug")
@@ -87,6 +73,14 @@ class WikitextFixerService:
         lead = get_lead_section(text)
         if lead and lead != text:
             return expand_text_refs(lead, text)
+
+        return text
+
+    def run(self, text: str, title: str, all_flag: bool = False) -> str:
+        """ """
+        if not all_flag:
+            text = self.strip_text_into_lead_section(text)
+        text = self.fix(text, title)
 
         return text
 

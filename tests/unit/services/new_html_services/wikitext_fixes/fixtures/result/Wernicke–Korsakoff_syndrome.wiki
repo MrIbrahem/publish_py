@@ -1,0 +1,37 @@
+{{Infobox medical condition
+|name             =Wernicke–Korsakoff syndrome
+|synonym          =Korsakoff's psychosis, alcoholic encephalopathy,<ref name="Medline771">{{MedlinePlusEncyclopedia|000771|Wernicke-Korsakoff syndrome}}</ref> wet brain<ref>[https://americanaddictioncenters.org/alcoholism-treatment/wet-brain Wet Brain from Alcohol: Signs, Symptoms, and Recovery] {{Webarchive|url=https://web.archive.org/web/20210701215829/https://americanaddictioncenters.org/alcoholism-treatment/wet-brain |date=2021-07-01 }} November 25, 2020</ref>
+|image            =Thiamine cation 3D ball.png
+|image_size       =
+|image_thumbtime  =
+|alt              =
+|caption          =[[Thiamine]]
+|pronounce        =
+|field            =[[Psychiatry]], [[neurology]]
+|symptoms         =Confusion, vision problems, [[hypothermia|low body temperature]], [[low blood pressure]], [[memory loss]], [[ataxia|poor coordination]]<ref name=NIH2022/>
+|complications    =
+|onset            =
+|duration         =
+|types            =[[Wernicke encephalopathy]], [[Korsakoff syndrome]]<ref name=NIH2022/>
+|causes           =[[thiamine deficiency|Thiamine (vitamin B<sub>1</sub>) deficiency]]<ref name=NIH2022/>
+|risks            =[[Alcohol use disorder]], [[eating disorders]], [[malnutrition]], prolonged vomiting, [[chemotherapy]]<ref name=NIH2022/>
+|diagnosis        =Based on symptoms after ruling out other possible causes<ref name=Mer2022Pt/>
+|differential     =[[Alzheimer's]], [[herpes encephalitis]], [[transient global amnesia]], [[concussion]]<ref name=NORD2022/>
+|prevention       =
+|treatment        =[[Thiamine supplement]]s, improved diet, stopping alcohol<ref name=NIH2022/>
+|medication       =
+|prognosis        =
+|frequency        =1-2% (USA)<ref name=NORD2022/>
+|deaths           =
+|named after      =
+}}
+<!-- Definition and symptoms -->
+'''Wernicke–Korsakoff syndrome''' ('''WKS''') is a disorder which include [[Wernicke encephalopathy]] (WE) and [[Korsakoff syndrome]].<ref name=NIH2022/> Symptoms of Wernicke's include sudden onset confusion, vision problems, [[hypothermia|low body temperature]], [[low blood pressure]], and [[ataxia|poor coordination]].<ref name=NIH2022/> Symptoms of  Korsakoff's include [[memory loss]], [[tremor]], and vision problems and is long-term.<ref name=NIH2022/> Most people who have untreated Korsakoff's develop Wernicke's.<ref name=Mer2022Pt>{{cite web |title=Wernicke-Korsakoff Syndrome - Brain, Spinal Cord, and Nerve Disorders |url=https://www.merckmanuals.com/en-ca/home/brain,-spinal-cord,-and-nerve-disorders/brain-dysfunction/wernicke-korsakoff-syndrome |website=Merck Manuals Consumer Version |access-date=18 February 2022 |language=en-CA |archive-date=8 November 2021 |archive-url=https://web.archive.org/web/20211108034328/https://www.merckmanuals.com/en-ca/home/brain,-spinal-cord,-and-nerve-disorders/brain-dysfunction/wernicke-korsakoff-syndrome |url-status=live }}</ref>
+
+<!-- Cause and diagnosis -->
+The cause is [[thiamine deficiency|thiamine (vitamin B<sub>1</sub>) deficiency]].<ref name=NIH2022>{{cite web |title=Wernicke-Korsakoff Syndrome Information Page {{!}} National Institute of Neurological Disorders and Stroke |url=https://www.ninds.nih.gov/Disorders/All-Disorders/Wernicke-Korsakoff-Syndrome-Information-Page |website=www.ninds.nih.gov |access-date=18 February 2022 |archive-date=14 January 2022 |archive-url=https://web.archive.org/web/20220114204455/https://www.ninds.nih.gov/Disorders/All-Disorders/Wernicke-Korsakoff-Syndrome-Information-Page |url-status=live }}</ref> This occurs most commonly due to [[alcohol use disorder]]; but may also result from [[eating disorders]], [[malnutrition]], prolonged vomiting, or [[chemotherapy]].<ref name=NIH2022/> The disorder involves damage to the [[brain]].<ref name=NIH2022/> Diagnosis is based on symptoms after ruling out other possible causes.<ref name=Mer2022Pt/>
+
+<!-- Treatment and epidemiology -->
+Treatment involves [[thiamine supplement]]s followed by an improved diet.<ref name=NIH2022/> Alcohol should be stopped.<ref name=NIH2022/> While many of the symptoms may improve, return of memory function is slow and often incomplete.<ref name=NIH2022/> Without treatment 20% die and 75% are left permanently disabled.<ref name=Thom2006>{{cite journal |last1=Thomson |first1=Allan D. |last2=Marshall |first2=E. Jane |title=The natural history and pathophysiology of Wernicke's Encephalopathy and Korsakoff's Psychosis |journal=Alcohol and Alcoholism |volume=41 |issue=2 |pages=151–8 |year=2006 |pmid=16384871 |doi=10.1093/alcalc/agh249 |doi-access=free }}</ref> About 25% with Korsakoff syndrome require long-term [[institutionalization]].<ref name=Thom2006/> About 1 to 2% of people are affected in the United States.<ref name=NORD2022>{{cite web |title=Wernicke-Korsakoff Syndrome |url=https://rarediseases.org/rare-diseases/wernicke-korsakoff-syndrome/ |website=NORD (National Organization for Rare Disorders) |access-date=18 February 2022 |archive-date=25 January 2022 |archive-url=https://web.archive.org/web/20220125065326/https://rarediseases.org/rare-diseases/wernicke-korsakoff-syndrome/ |url-status=live }}</ref>
+==References==
+<references />
