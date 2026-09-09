@@ -56,7 +56,9 @@ class TestWikitextFixerService:
 
         # write to output-1.wiki
         output_path = FIXTURE_PATH / "output" / file
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(result + "\n")
+
+        if output_path.parent.exists():
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(result + "\n")
 
         assert expend_all_templates(result) == expend_all_templates(expected)
