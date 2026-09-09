@@ -1,0 +1,421 @@
+{{#unlinkedwikibase:id=Q183425}}{{Short description|Stomach aches}}
+{{Infobox medical condition
+| name            = Abdominal pain
+| synonym         = Stomach ache, tummy ache, belly ache, belly pain, gut ache
+| image           = Gray1220.png
+| image_size      =
+| image_thumbtime =
+| alt             =
+| caption         = Abdominal pain can be characterized by the region it affects
+| pronounce       =
+| field           = [[General surgery]]
+| symptoms        =
+| complications   =
+| onset           =
+| duration        =
+| types           = Acute, chronic<ref name=Mer2020Over/>
+| causes          = '''Common''': [[Gastroenteritis]], [[irritable bowel syndrome]]<ref name=Vin2014/><br>'''Serious''': [[Appendicitis]], perforated [[stomach ulcer]], [[pancreatitis]], ruptured [[diverticulitis]], [[ovarian torsion]], [[volvulus]], ruptured [[aortic aneurysm]], [[lacerated spleen]] or liver, [[ischemic bowel]]<ref name=Stat2020/>
+| risks           =
+| diagnosis       =
+| differential    =
+| prevention      =
+| treatment       =
+| medication      =
+| prognosis       =
+| frequency       =
+| deaths          =
+| named after     =
+}}
+<!-- Definition and symptoms -->
+'''Abdominal pain''', also known as a '''stomach ache''', is a [[symptom]] of discomfort anywhere in the [[abdomen|abdominal region]].<ref name=MESH2020>{{cite web |title=Abdominal Pain - MeSH - NCBI |url=https://www.ncbi.nlm.nih.gov/mesh?Db=mesh&Cmd=DetailsSearch&Term=%22Abdominal+Pain%22%5BMeSH+Terms%5D |website=www.ncbi.nlm.nih.gov |access-date=20 October 2020 |archive-date=22 May 2021 |archive-url=https://web.archive.org/web/20210522035910/https://www.ncbi.nlm.nih.gov/mesh?Db=mesh&Cmd=DetailsSearch&Term=%22Abdominal+Pain%22%5BMeSH+Terms%5D |url-status=live }} {{Webarchive|url=https://web.archive.org/web/20210522035910/https://www.ncbi.nlm.nih.gov/mesh?Db=mesh&Cmd=DetailsSearch&Term=%22Abdominal+Pain%22%5BMeSH+Terms%5D |date=22 May 2021 }}</ref> It can be localized in one of the four [[quadrants]] or the abdomen or occur diffusely.<ref name=Stat2020/> Other symptoms such as [[nausea]], vomiting, [[diarrhea]], or [[constipation]] may be present.<ref name=Stat2020/><ref>{{cite book |last1=Mahadevan |first1=S. V. |last2=Garmel |first2=Gus M. |title=An Introduction to Clinical Emergency Medicine |date=2012 |publisher=Cambridge University Press |isbn=978-0-521-74776-9 |page=143 |url=https://www.google.ca/books/edition/An_Introduction_to_Clinical_Emergency_Me/pyAlcOfBhjIC?hl=en&gbpv=1&dq |language=en |access-date=20 October 2020 |archive-date=27 August 2021 |archive-url=https://web.archive.org/web/20210827201544/https://www.google.ca/books/edition/An_Introduction_to_Clinical_Emergency_Me/pyAlcOfBhjIC?hl=en&gbpv=1&dq= |url-status=live }} {{Webarchive|url=https://web.archive.org/web/20210827201544/https://www.google.ca/books/edition/An_Introduction_to_Clinical_Emergency_Me/pyAlcOfBhjIC?hl=en&gbpv=1&dq= |date=27 August 2021 }}</ref> It may be divided into pain of sudden onset (acute) and long term pain (chronic).<ref name=Mer2020Over>{{cite web |title=Search results for: Acute Abdominal Pain |url=https://www.merckmanuals.com/home/SearchResults?query=Acute+Abdominal+Pain&icd9=789.0%3b789.6%3b567.0%3b567.21%3b567.9%3b567.2 |website=Merck Manuals Consumer Version |access-date=20 October 2020 |archive-date=11 April 2021 |archive-url=https://web.archive.org/web/20210411125508/https://www.merckmanuals.com/home/SearchResults?query=Acute+Abdominal+Pain&icd9=789.0%3B789.6%3B567.0%3B567.21%3B567.9%3B567.2 |url-status=live }} {{Webarchive|url=https://web.archive.org/web/20210411125508/https://www.merckmanuals.com/home/SearchResults?query=Acute+Abdominal+Pain&icd9=789.0%3B789.6%3B567.0%3B567.21%3B567.9%3B567.2 |date=11 April 2021 }}</ref>
+
+<!-- Cause -->
+Common causes include [[gastroenteritis]] and [[irritable bowel syndrome]].<ref name=Vin2014>{{cite journal | vauthors = Viniol A, Keunecke C, Biroga T, Stadje R, Dornieden K, Bösner S, Donner-Banzhoff N, Haasenritter J, Becker A | display-authors = 6 | title = Studies of the symptom abdominal pain--a systematic review and meta-analysis | journal = Family Practice | volume = 31 | issue = 5 | pages = 517–29 | date = October 2014 | pmid = 24987023 | doi = 10.1093/fampra/cmu036 | doi-access = free }}</ref> About 15% of people have a more serious underlying condition such as [[appendicitis]], [[cholecystitis|gall bladder disease]], ruptured [[abdominal aortic aneurysm]], perforated [[peptic ulcer]], [[pancreatitis]], [[ovarian torsion]], [[volvulus]], [[diabetic ketoacidosis]], [[diverticulitis]], [[ischemic bowel]], or [[ectopic pregnancy]].<ref name=Vin2014/><ref name=Stat2020/> In babies [[necrotizing enterocolitis]], vulvulus, and [[intussuception]] should be considered.<ref name=Stat2020/> In a third of cases the exact cause is unclear.<ref name=Stat2020/>
+
+<!-- Diagnosis, treatment and epidemioloy -->
+Diagnosis may be based on the history of symptoms, examination, blood work, and [[medical imaging]].<ref name=Stat2020/> An [[Electrocardiography|ECG]] may be done to rule out a [[heart attack]].<ref name=Stat2020/> Treatment may include [[intravenous fluids]] and [[pain management]].<ref name=Stat2020/> Depending on the underlying cause [[surgery]] may be required.<ref name=Stat2020/> About 10% of people in the emergency department are there for abdominal pain.<ref name=Stat2020>{{cite journal | title = Acute Abdomenal | journal = StatPearls | date = 14 Nov 2018 | pmid = 29083722 | vauthors = Patterson JW, Dominique E }}</ref>
+{{TOC limit}}
+
+==Differential diagnosis==
+[[File:Abdominal pain hariadhi full.svg|thumb|upright=2|Areas to which pain from intraabdominal organs may refer]]
+
+The most frequent reasons for abdominal pain are [[gastroenteritis]] (13%), [[irritable bowel syndrome]] (8%), urinary tract problems (5%), [[gastritis|inflammation of the stomach]] (5%) and [[constipation]] (5%).<!-- <ref name=Vin2014/> --> In about 30% of cases, the cause is not determined.<!-- <ref name=Vin2014/> --> About 10% of cases have a more serious cause including gallbladder ([[gallstone]]s or [[biliary dyskinesia]]) or [[pancreas]] problems (4%), [[diverticulitis]] (3%), [[appendicitis]] (2%) and [[cancer]] (1%).<ref name=Vin2014/> More common in those who are older, [[mesenteric ischemia]] and [[abdominal aortic aneurysm]]s are other serious causes.<ref name=":0">{{cite journal | vauthors = Spangler R, Van Pham T, Khoujah D, Martinez JP | title = Abdominal emergencies in the geriatric patient | journal = International Journal of Emergency Medicine | volume = 7 | pages = 43 | date = 2014 | pmid = 25635203 | pmc = 4306086 | doi = 10.1186/s12245-014-0043-2 }}</ref>
+
+===Sudden onset===
+[[Acute abdomen]] can be defined as severe, persistent abdominal pain of sudden onset that is likely to require [[surgery|surgical intervention]] to treat its cause. The pain may frequently be associated with [[nausea]] and [[vomiting]], [[abdominal distention]], [[fever]] and signs of [[Shock (circulatory)|shock]]. One of the most common conditions associated with acute abdominal pain is acute appendicitis.
+
+* Traumatic: [[Blunt trauma|blunt]] or perforating [[physical trauma|trauma]] to the [[stomach]], [[bowel]], [[spleen]], [[liver]], or [[kidney]]
+* Inflammatory:
+** Infections such as [[appendicitis]], [[cholecystitis]], [[pancreatitis]], [[pyelonephritis]], [[pelvic inflammatory disease]], [[hepatitis]], [[mesenteric adenitis]], or a subdiaphragmatic [[abscess]]
+** [[Gastrointestinal perforation|Perforation]] of a [[peptic ulcer]], a [[diverticulitis|diverticulum]], or the [[caecum]]
+** Complications of [[inflammatory bowel disease]] such as [[Crohn's disease]] or [[ulcerative colitis]]
+* Mechanical:
+** [[Small intestine|Small bowel]] [[bowel obstruction|obstruction]] secondary to adhesions caused by previous surgeries, [[intussusception (medical disorder)|intussusception]], [[hernia]]s, benign or malignant [[neoplasia|neoplasm]]s
+** [[Large intestine|Large bowel]] [[bowel obstruction|obstruction]] caused by [[colorectal cancer]], [[inflammatory bowel disease]], [[volvulus]], [[fecal impaction]] or [[hernia]]
+* Vascular: occlusive [[ischemic colitis|intestinal ischemia]], usually caused by [[thromboembolism]] of the [[superior mesenteric artery]]
+
+===By system===
+A more extensive list includes the following:<ref name=Slater2022>{{cite book |last1=Slater |first1=Thomas A. |last2=Waduud |first2=Mohammed Abdul |last3=Ahmed |first3=Nadeem |title=Pocketbook of Differential Diagnosis |date=2022 |publisher=Elsevier |isbn=978-0-7020-7778-4 |edition=5th |url=https://books.google.com/books?id=6bA2EAAAQBAJ&newbks=0&printsec=frontcover&pg=en |language=en |chapter=2. Abdominal pain |access-date=13 August 2022 |archive-date=17 August 2022 |archive-url=https://web.archive.org/web/20220817001050/https://books.google.com/books?id=6bA2EAAAQBAJ&newbks=0&printsec=frontcover&pg=en |url-status=live }}</ref>
+* Gastrointestinal
+** GI tract
+*** Inflammatory: [[gastroenteritis]], [[appendicitis]], [[gastritis]], [[esophagitis]], [[diverticulitis]], [[Crohn's disease]], [[ulcerative colitis]], [[microscopic colitis]]
+*** Obstruction: [[hernia]], [[intussusception (medical disorder)|intussusception]], [[volvulus]], post-surgical [[adhesions]], [[tumor]]s, severe [[constipation]], [[hemorrhoids]]
+*** Vascular: [[embolism]], [[thrombosis]], [[hemorrhage]], [[sickle cell disease]], [[abdominal angina]], blood vessel compression (such as celiac artery compression syndrome), [[superior mesenteric artery syndrome]], [[postural orthostatic tachycardia syndrome]]
+*** [[digestion|Digestive]]: [[peptic ulcer]], [[lactose intolerance]], [[coeliac disease|celiac disease]], [[food allergies]]
+** Glands
+*** Bile system
+**** Inflammatory: [[cholecystitis]], [[cholangitis]]
+**** Obstruction: [[cholelithiasis]], [[tumour]]s
+*** Liver
+**** Inflammatory: [[hepatitis]], [[liver abscess]]
+*** Pancreatic
+**** Inflammatory: [[pancreatitis]]
+* Renal and urological
+** Inflammation: [[pyelonephritis]], [[cystitis|bladder infection]], [[indigestion]]
+** Obstruction: [[nephrolithiasis|kidney stones]], [[urolithiasis]], [[urinary retention]], [[tumour]]s
+** Vascular: [[left renal vein entrapment]]
+* Gynaecological or obstetric
+** Inflammatory: [[pelvic inflammatory disease]]
+** Mechanical: [[ovarian torsion]]
+** Endocrinological: [[menstruation]], [[Mittelschmerz]]
+** Tumors: [[endometriosis]], [[fibroma|fibroids]], [[ovarian cyst]], [[ovarian cancer]]
+** Pregnancy: ruptured [[ectopic pregnancy]], [[threatened abortion]]
+* [[Abdominal wall]]
+** muscle strain or trauma
+** muscular infection
+** [[neurogenic]] pain: [[herpes zoster]], [[radiculitis]] in [[Lyme disease]], [[Nerve compression syndrome#Lower limb.2C abdomen and pelvis|abdominal cutaneous nerve entrapment syndrome]] (ACNES), [[tabes dorsalis]]
+* [[Referred pain]]
+** from the [[thorax]]: [[pneumonia]], [[pulmonary embolism]], [[ischemic heart disease]], [[pericarditis]]
+** from the [[vertebral column|spine]]: [[radiculitis]]
+** from the [[genitals]]: [[testicular torsion]]
+* [[Metabolic disorder|Metabolic disturbance]]
+** [[uremia]], [[diabetic ketoacidosis]], [[porphyria]], [[Hereditary angioedema|C1-esterase inhibitor deficiency]], adrenal insufficiency, [[lead poisoning]], [[latrodectus|black widow spider]] bite, [[narcotic]] [[Drug withdrawal|withdrawal]]
+* Blood vessels
+** [[aortic dissection]], [[abdominal aortic aneurysm]]
+* Immune system
+** [[sarcoidosis]]
+** [[vasculitis]]
+** [[familial Mediterranean fever]]
+* Idiopathic
+** [[irritable bowel syndrome]] (affecting up to 20% of the population, IBS is the most common cause of recurrent, intermittent abdominal pain)
+
+=== By location ===
+The location of abdominal pain can provide information about what may be causing the pain. The abdomen can be divided into four regions called quadrants. Locations and associated conditions include:<ref>{{Cite book|title=IM Essentials |last=Masters |first=Philip | name-list-style = vanc |publisher=American College of Physicians|year=2015|isbn=9781938921094}}</ref><ref>{{Cite book|title=Diagnostics| first = Richard F. | last = LeBlond | name-list-style = vanc |publisher=McGraw-Hill Companies, Inc.|isbn=978-0-07-140923-0|location=US|year=2004}}</ref>
+
+* Diffuse
+** [[Peritonitis]]
+** Vascular: [[mesenteric ischemia]], [[ischemic colitis]], [[Henoch–Schönlein purpura|Henoch-Schonlein purpura]], [[sickle cell disease]], [[systemic lupus erythematosus]], [[polyarteritis nodosa]]
+** Small [[bowel obstruction]]
+** [[Irritable bowel syndrome]]
+** [[Metabolic disorder]]s: [[ketoacidosis]], [[porphyria]], [[familial Mediterranean fever]], [[adrenal crisis]]
+* Epigastric
+** Heart: [[myocardial infarction]], [[pericarditis]]
+** Stomach: [[gastritis]], [[stomach ulcer]], [[stomach cancer]]
+** Pancreas: [[pancreatitis]], [[pancreatic cancer]]
+** Intestinal: [[Peptic ulcer disease|duodenal ulcer]], [[diverticulitis]], [[appendicitis]]
+* Right upper quadrant
+** Liver: [[hepatomegaly]], [[fatty liver]], [[hepatitis]], [[liver cancer]], [[abscess]]
+** Gallbladder and biliary tract: [[Cholecystitis|inflammation]], [[gallstone]]s, [[Helminthiasis|worm infection]], [[cholangitis]]
+** Colon: [[bowel obstruction]], functional disorders, gas accumulation, spasm, inflammation, [[colon cancer]]
+** Other: [[pneumonia]], [[Fitz-Hugh–Curtis syndrome|Fitz-Hugh-Curtis syndrome]]
+* Left upper quadrant
+** [[Splenomegaly]]
+** Colon: [[bowel obstruction]], functional disorders, gas accumulation, spasm, inflammation, colon cancer
+* Around the belly button
+** [[Appendicitis]]
+** [[Pancreatitis]]
+** [[Myocardial infarction|Inferior myocardial infarction]]
+** [[Peptic ulcer disease|Peptic ulcer]]
+** [[Diabetic ketoacidosis]]
+** Vascular: [[aortic dissection]], aortic rupture
+** Bowel: [[mesenteric ischemia]], [[Coeliac disease|Celiac disease]], inflammation, intestinal spasm, functional disorders, [[Bowel obstruction|small bowel obstruction]]
+* Lower abdominal pain
+** [[Diarrhea]]
+** [[Colitis]]
+** [[Crohn's disease|Crohn's]]
+** [[Dysentery]]
+** [[Hernia]]
+* Right lower quadrant
+** Colon: [[Intussusception (medical disorder)|intussusception]], [[bowel obstruction]], [[appendicitis]] ([[McBurney's point]])
+** Kidney: [[Kidney stone disease|kidney stone]] (nephrolithiasis), [[pyelonephritis]]
+** Pelvic: [[cystitis]], [[bladder stone]], [[bladder cancer]], [[pelvic inflammatory disease]], pelvic pain syndrome
+** Gynecologic: [[endometriosis]], intrauterine [[pregnancy]], [[ectopic pregnancy]], [[ovarian cyst]], [[ovarian torsion]], fibroid ([[leiomyoma]]), [[abscess]], [[ovarian cancer]], [[endometrial cancer]]
+* Left lower quadrant
+** Bowel: [[diverticulitis]], [[sigmoid colon volvulus]], [[bowel obstruction]], gas accumulation, [[Toxic megacolon]]
+* Right [[low back pain]]
+** Liver: [[hepatomegaly]]
+** Kidney: [[Kidney stone disease|kidney stone]] (nephrolithiasis), complicated urinary tract infection
+* Left low back pain
+** Spleen
+** Kidney: [[Kidney stone disease|kidney stone]] (nephrolithiasis), complicated urinary tract infection
+* Low back pain
+** kidney pain ([[kidney stone]], [[kidney cancer]], [[hydronephrosis]])
+** [[Ureter#Ureteral stones|Ureteral stone]] pain
+
+== Pathophysiology ==
+{| class="wikitable" style = "float: right; margin-left:15px; text-align:center"
+!Region
+!Blood supply<ref name=":03" />
+!Innervation<ref>{{Cite book|title=Netter's Clinical Anatomy, 4e|last=Hansen |first=John T.| name-list-style = vanc |publisher=Elsevier|year=2019|isbn=978-0-323-53188-7|location=Philadelphia, PA|pages=157–231|chapter=4: Abdomen}}</ref>
+!Structures<ref name=":03" />
+|-
+|[[Foregut]]
+|[[Celiac artery]]
+|T5 - T9
+|[[Pharynx]]
+[[Esophagus]]
+
+[[Respiratory tract|Lower respiratory tract]]
+
+[[Stomach]]
+
+Proximal [[duodenum]]
+
+[[Liver]]
+
+[[Biliary tract]]
+
+[[Gallbladder]]
+
+[[Pancreas]]
+|-
+|[[Midgut]]
+|[[Superior mesenteric artery]]
+|T10 - T12
+|Distal [[duodenum]]
+[[Cecum]]
+
+[[Appendix (anatomy)|Appendix]]
+
+[[Ascending colon]]
+
+Proximal [[transverse colon]]
+|-
+|[[Hindgut]]
+|[[Inferior mesenteric artery]]
+|L1 - L3
+|Distal [[transverse colon]]
+[[Descending colon]]
+
+[[Sigmoid colon]]
+
+[[Rectum]]
+
+[[Fever]]
+
+Superior [[anal canal]]
+|}
+Abdominal pain can be referred to as [[visceral pain]] or peritoneal pain. The contents of the abdomen can be divided into the [[foregut]], [[midgut]], and [[hindgut]].<ref name=":03">{{Cite book|title=The Developing Human Tenth Edition|last=Moore |first=Keith L | name-list-style = vanc |publisher=Elsevier, Inc.|year=2016|isbn=978-0-323-31338-4|location=Philadelphia, PA|pages=209–240|chapter=11}}</ref> The foregut contains the pharynx, lower respiratory tract, portions of the esophagus, stomach, portions of the duodenum (proximal), liver, biliary tract (including the gallbladder and bile ducts), and the pancreas.<ref name=":03" /> The midgut contains portions of the duodenum (distal), cecum, appendix, ascending colon, and first half of the transverse colon.<ref name=":03" /> The hindgut contains the distal half of the transverse colon, descending colon, sigmoid colon, rectum, and superior anal canal.<ref name=":03" />
+
+Each subsection of the gut has an associated visceral afferent nerve that transmits sensory information from the viscera to the spinal cord, traveling with the autonomic sympathetic nerves.<ref>{{Cite book|title=Gray's Anatomy For Students |edition=Third | first1 = Richard L. | last1 = Drake | first2 = A. Wayne | last2 = Vogl | first3 = Adam W.M. | last3 = Mitchell | name-list-style = vanc |publisher=Churchill Livingstone Elsevier|year=2015|isbn=978-0-7020-5131-9 |pages=253–420 |chapter=4: Abdomen}}</ref> The visceral sensory information from the gut traveling to the spinal cord, termed the visceral afferent, is non-specific and overlaps with the somatic afferent nerves, which are very specific.<ref name=":12">{{Cite book|title=Essentials of General Surgery, 5e | first1 = Leigh | last1 = Neumayer | first2 =Dale A. | last2 = Dangleben | first3 =Shannon | last3 = Fraser | first4 = Jonathan | last4 = Gefen | first5 = John | last5 = Maa | first6 = Barry D. | last6 = Mann | name-list-style = vanc |publisher=Wolters Kluwer Health|year=2013|location=Baltimore, MD|chapter=11: Abdominal Wall, Including Hernia}}</ref> Therefore, visceral afferent information traveling to the spinal cord can present in the distribution of the somatic afferent nerve; this is why [[appendicitis]] initially presents with T10 periumbilical pain when it first begins and becomes T12 pain as the abdominal wall peritoneum (which is rich with somatic afferent nerves) is involved.<ref name=":12" />
+
+==Diagnostic approach==
+In order to better understand the underlying cause of abdominal pain, one can perform a thorough history and physical examination.
+
+The process of gathering a history may include:<ref name=":1">{{Cite book|title=Bates' Guide to Physical Examination & History Taking|last=Bickley|first=Lynn| name-list-style = vanc |publisher=Lippincott Williams & Wilkins|year=2016|isbn=9781469893419|location=Philadelphia, Pennsylvania}}</ref>
+* Identifying more information about the [[Chief complaint|chief complaint]] by eliciting a [[History of the present illness|history of present illness]]; i.e. a narrative of the current symptoms such as the onset, location, duration, character, aggravating or relieving factors, and temporal nature of the pain. Identifying other possible factors may aid in the diagnosis of the underlying cause of abdominal pain, such as recent travel, recent contact with other ill individuals, and for females, a thorough [[Gynaecology|gynecologic]] history.
+* Learning about the patient's past medical history, focusing on any prior issues or surgical procedures.
+* Clarifying the patient's current medication regimen, including prescriptions, over-the-counter medications, and supplements.
+* Confirming the patient's drug and food allergies.
+* Discussing with the patient any family history of disease processes, focusing on conditions that might resemble the patient's current presentation.
+* Discussing with the patient any health-related behaviors (e.g. tobacco use, alcohol consumption, drug use, and sexual activity) that might make certain diagnoses more likely.
+* Reviewing the presence of non-abdominal symptoms (e.g., [[fever]], chills, [[chest pain]], [[shortness of breath]], [[vaginal bleeding]]) that can further clarify the diagnostic picture.
+
+After gathering a thorough history, one should perform a [[Physical examination|physical exam]] in order to identify important physical signs that might clarify the diagnosis, including a [[Cardiovascular examination|cardiovascular exam]], lung exam, thorough abdominal exam, and for females, a [[Genitourinary system|genitourinary]] exam.<ref name=":1" />
+
+Additional investigations that can aid diagnosis include:<ref name=":2">{{cite journal | vauthors = Cartwright SL, Knudson MP | title = Evaluation of acute abdominal pain in adults | journal = American Family Physician | volume = 77 | issue = 7 | pages = 971–8 | date = April 2008 | pmid = 18441863 | url = http://www.aafp.org/afp/2008/0401/p971.html | access-date = 6 December 2017 | archive-date = 26 July 2020 | archive-url = https://web.archive.org/web/20200726113605/https://www.aafp.org/afp/2008/0401/p971.html | url-status = live }} {{Webarchive|url=https://web.archive.org/web/20200726113605/https://www.aafp.org/afp/2008/0401/p971.html |date=26 July 2020 }}</ref>
+* Blood tests including [[complete blood count]], [[basic metabolic panel]], [[electrolyte]]s, [[liver function tests]], [[amylase]], [[lipase]], [[troponin I]], and for females, a serum [[pregnancy test]].
+* [[Urinalysis]]
+* Imaging including chest and abdominal [[X-ray]]s
+* [[electrocardiograph|Electrocardiogram]]
+
+If diagnosis remains unclear after history, examination, and basic investigations as above, then more advanced investigations may reveal a diagnosis. Such tests include:<ref name=":2" />
+* [[CT scan|Computed tomography]] of the abdomen/pelvis
+* Abdominal or pelvic [[ultrasound]]
+* [[Endoscopy]] and/or [[colonoscopy]]
+
+==Management==
+The management of abdominal pain depends on many factors, including the etiology of the pain. In the emergency department, a person presenting with abdominal pain may initially require IV fluids due to decreased intake secondary to abdominal pain and possible emesis or vomiting.<ref name=":02">{{Cite book|title=Essentials of Family Medicine 6e| vauthors = Mahadevan SV |year=|isbn=|location=|pages=149}}</ref> Treatment for abdominal pain includes analgesia, such as non-opioid (ketorolac) and opioid medications (morphine, fentanyl).<ref name=":02" /> Choice of analgesia is dependent on the cause of the pain, as ketorolac can worsen some intra-abdominal processes.<ref name=":02" /> Patients presenting to the emergency department with abdominal pain may receive a "GI cocktail" that includes an antacid (examples include omeprazole, ranitidine, magnesium hydroxide, and calcium chloride) and lidocaine.<ref name=":02" /> After addressing pain, there may be a role for antimicrobial treatment in some cases of abdominal pain.<ref name=":02" /> [[Hyoscine butylbromide|Butylscopolamine]] (Buscopan) is used to treat cramping abdominal pain with some success.<ref>{{cite journal | vauthors = Tytgat GN | title = Hyoscine butylbromide: a review of its use in the treatment of abdominal cramping and pain | journal = Drugs | volume = 67 | issue = 9 | pages = 1343–57 | year = 2007 | pmid = 17547475 | doi = 10.2165/00003495-200767090-00007 }}</ref> Surgical management for causes of abdominal pain includes but is not limited to [[cholecystectomy]], [[appendectomy]], and exploratory [[laparotomy]].
+
+=== Emergencies ===
+Below is a brief overview of abdominal pain emergencies.
+{| class="wikitable"
+|+
+!Condition
+!Presentation
+!Diagnosis
+!Management
+|-
+|[[Appendicitis]]<ref name=":22">{{Cite book |title=Atlas of Clinical Emergency Medicine | last1 = Sherman | first1 = Scott C. | last2 = Cico | first2 = Stephen John | last3 = Nordquist | first3 = Erik | last4 = Ross | first4 =  Christopher | last5 = Wang | first5 = Ernest | name-list-style = vanc |publisher=Wolters Kluwer |year=2016 |isbn=978-1-4511-8882-0}}</ref>
+|Abdominal pain, nausea, vomiting, fever
+Periumbilical pain, migrates to RLQ
+|Clinical (history & physical exam)
+Abdominal CT
+|Nothing by mouth
+IV fluids as needed
+
+General surgery consultation, possible [[appendectomy]]
+
+Antibiotics
+
+Pain control
+|-
+|[[Cholecystitis]]<ref name=":22" />
+|Abdominal pain (RUQ, radiates epigastric), nausea, vomiting, fever, [[Murphy's sign]]
+|Clinical (history & physical exam)
+Imaging (RUQ ultrasound)
+
+Labs ([[leukocytosis]], [[Elevated transaminases|transamintis]], [[hyperbilirubinemia]])
+|Patient made NPO (nothing by mouth)
+IV fluids as needed
+
+General surgery consultation, possible [[cholecystectomy]]
+
+Antibiotics
+
+Pain, nausea control
+|-
+|[[Acute pancreatitis]]<ref name=":22" />
+|Abdominal pain (sharp epigastric, shooting to back), nausea, vomiting
+|Clinical (history & physical exam)
+Labs (elevated [[lipase]])
+
+Imaging (abdominal CT, ultrasound)
+|Patient made NPO (nothing by mouth)
+IV fluids as needed
+
+Pain, nausea control
+
+Possibly consultation of [[Surgery|general surgery]] or [[interventional radiology]]
+|-
+|[[Bowel obstruction]]<ref name=":22" />
+|Abdominal pain (diffuse, crampy), [[Bile|bilious]] [[Vomiting|emesis]], [[constipation]]
+|Clinical (history & physical exam)
+Imaging (abdominal X-ray, abdominal CT)
+|Patient made NPO (nothing by mouth)
+IV fluids as needed
+
+[[Nasogastric intubation|Nasogastric tube]] placement
+
+[[General surgery]] consultation
+
+Pain control
+|-
+|[[Upper gastrointestinal bleeding|Upper GI bleed]]<ref name=":22" />
+|Abdominal pain (epigastric), [[hematochezia]], [[melena]], [[hematemesis]], [[hypovolemia]]
+|Clinical (history & physical exam, including [[Rectal examination|digital rectal exam]])
+Labs ([[complete blood count]], coagulation profile, [[transaminase]]s, [[Stool guaiac test|stool guaiac]])
+|Aggressive IV fluid resuscitation
+[[Blood transfusion]] as needed
+
+Medications: [[Proton-pump inhibitors|proton pump inhibitor]], [[octreotide]]
+
+Stable patient: observation
+
+Unstable patient: consultation ([[general surgery]], [[gastroenterology]], [[interventional radiology]])
+|-
+|Lower [[Gastrointestinal bleeding|GI Bleed]]<ref name=":22" />
+|Abdominal pain, [[hematochezia]], [[melena]], [[hypovolemia]]
+|Clinical (history & physical exam, including [[Rectal examination|digital rectal exam]])
+Labs ([[complete blood count]], coagulation profile, [[transaminase]]s, [[Stool guaiac test|stool guaiac]])
+|Aggressive IV fluid resuscitation
+[[Blood transfusion]] as needed
+
+Medications: [[Proton-pump inhibitors|proton pump inhibitor]]
+
+Stable patient: observation
+
+Unstable patient: consultation ([[general surgery]], [[gastroenterology]], [[interventional radiology]])
+|-
+|Perforated Viscous<ref name=":22" />
+|Abdominal pain (sudden onset of localized pain), [[abdominal distension]], rigid abdomen
+|Clinical (history & physical exam)
+Imaging (abdominal X-ray or CT showing free air)
+
+Labs ([[complete blood count]])
+|Aggressive IV fluid resuscitation
+[[General surgery]] consultation
+
+Antibiotics
+|-
+|[[Volvulus]]<ref name=":22" />
+|[[Sigmoid colon volvulus]]: Abdominal pain (>2 days, distention, constipation)
+Cecal volvulus: Abdominal pain (acute onset), nausea, vomiting
+|Clinical (history & physical exam)
+Imaging (abdominal X-ray or CT)
+|Sigmoid: [[Gastroenterology]] consultation ([[Sigmoidoscopy|flexibile sigmoidoscopy]])
+Cecal: [[General surgery]] consultation ([[Colectomy|right hemicolectomy]])
+|-
+|[[Ectopic pregnancy]]<ref name=":22" />
+|Abdominal and pelvic pain, bleeding
+If ruptured ectopic pregnancy, patient may present with peritoneal irritation and [[hypovolemic shock]]
+|Clinical (history & physical exam)
+Labs: [[complete blood count]], urine pregnancy test followed with quantitative blood [[Human chorionic gonadotropin|beta-hCG]]
+
+Imaging: [[Vaginal ultrasonography|transvaginal ultrasound]]
+|If patient is unstable: IV fluid resuscitation, urgent [[Obstetrics and gynaecology|obstetrics and gynecology]] consultation
+If patient is stable: continue diagnostic workup, establish [[Obstetrics and gynaecology|OBGYN]] follow-up
+|-
+|[[Abdominal aortic aneurysm]]<ref name=":22" />
+|Abdominal pain, flank pain, back pain, hypotension, pulsatile abdominal mass
+|Clinical (history & physical exam)
+Imaging: Ultrasound, [[Computed tomography angiography|CT angiography]], MRA/[[magnetic resonance angiography]]
+|If patient is unstable: IV fluid resuscitation, urgent surgical consultation
+If patient is stable: admit for observation
+|-
+|[[Aortic dissection]]<ref name=":22" />
+|Abdominal pain (sudden onset of epigastric or back pain), hypertension, new aortic [[Heart murmur|murmur]]
+|Clinical (history & physical exam)
+Imaging: Chest X-Ray (showing widened [[mediastinum]]), [[Computed tomography angiography|CT angiography]], [[Magnetic resonance angiography|MRA]], [[transthoracic echocardiogram]]/TTE, [[transesophageal echocardiogram]]/TEE
+|IV fluid resuscitation
+[[Blood transfusion]] as needed (obtain [[Blood transfusion|type and cross]])
+
+Medications: reduce blood pressure ([[sodium nitroprusside]] plus [[beta blocker]] or [[calcium channel blocker]])
+
+Surgery consultation
+|-
+|[[Liver injury]]<ref name=":22" />
+|After trauma ([[Blunt trauma|blunt]] or [[Penetrating trauma|penetrating]]), abdominal pain (RUQ), right rib pain, right flank pain, right shoulder pain
+|Clinical (history & physical exam)
+Imaging: [[Focused assessment with sonography for trauma|FAST]] examination, CT of abdomen and pelvis
+
+[[Diagnostic peritoneal lavage|Diagnostic peritoneal aspiration and lavage]]
+|Resuscitation ([[Advanced trauma life support|Advanced Trauma Life Support]]) with IV fluids ([[Fluid replacement|crystalloid]]) and [[blood transfusion]]
+If patient is unstable: [[General surgery|general]] or [[trauma surgery]] consultation with subsequent [[exploratory laparotomy]]
+|-
+|[[Splenic injury]]<ref name=":22" />
+|After trauma ([[Blunt trauma|blunt]] or [[Penetrating trauma|penetrating]]), abdominal pain (LUQ), left rib pain, left flank pain
+|Clinical (history & physical exam)
+Imaging: [[Focused assessment with sonography for trauma|FAST]] examination, CT of abdomen and pelvis
+
+[[Diagnostic peritoneal lavage|Diagnostic peritoneal aspiration and lavage]]
+|Resuscitation ([[Advanced trauma life support|Advanced Trauma Life Support]]) with IV fluids ([[Fluid replacement|crystalloid]]) and [[blood transfusion]]
+If patient is unstable: [[General surgery|general]] or [[trauma surgery]] consultation with subsequent [[exploratory laparotomy]] and possible [[splenectomy]]
+
+If patient is stable: medical management, consultation of [[interventional radiology]] for possible [[Embolization|arterial embolization]]
+|}
+
+==Epidemiology==
+Abdominal pain is the reason about 3% of adults see their family physician.<ref name=Vin2014/> Rates of [[emergency department]] visits in the United States for abdominal pain increased 18% from 2006 through 2011. This was the largest increase out of 20 common conditions seen in the ED. The rate of ED use for nausea and vomiting also increased 18%.<ref>{{cite web | vauthors = Skiner HG, Blanchard J, Elixhauser A | title = Trends in Emergency Department Visits, 2006-2011 | work = HCUP Statistical Brief #179 | publisher = Agency for Healthcare Research and Quality | location = Rockville, MD | date = September 2014 | url = https://www.hcup-us.ahrq.gov/reports/statbriefs/sb179-Emergency-Department-Trends.jsp | access-date = 20 October 2014 | archive-date = 24 December 2014 | archive-url = https://web.archive.org/web/20141224224220/http://www.hcup-us.ahrq.gov/reports/statbriefs/sb179-Emergency-Department-Trends.jsp | url-status = live }} {{Webarchive|url=https://web.archive.org/web/20141224224220/http://www.hcup-us.ahrq.gov/reports/statbriefs/sb179-Emergency-Department-Trends.jsp |date=24 December 2014 }}</ref>
+
+== References ==
+{{reflist}}
+
+== External links ==
+{{Medical resources
+|  ICD10       = {{ICD10|R|10||r|10}}
+|  ICD9        = {{ICD9|789.0}}
+|DiseasesDB=14367
+|  MedlinePlus = 003120
+|MeshID=D015746
+}}
+{{Digestive system and abdomen symptoms and signs}}
+
+{{DEFAULTSORT:Abdominal Pain}}
+{{RTT}}
+[[Category:Abdominal pain| ]]
+[[Category:Symptoms and signs: Digestive system and abdomen]]
+[[Category:Acute pain]]
+[[Category:RTT]]
+[[or:ଉଦର ଯନ୍ତ୍ରଣା]]
+[[ha:Ciwon ciki]]

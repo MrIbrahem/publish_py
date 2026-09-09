@@ -54,6 +54,5 @@ src/test.php
 src/tx.php
 test.php
 tests/**/*.php
-tests/unit/public/routes/new_html/domain/fixes/data/output-1.wiki
-tests/unit/services/new_html_services/fixes/data/output-1.wiki
 /00
+/tests/unit/services/new_html_services/wikitext_fixes/fixtures/output
