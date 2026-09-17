@@ -6,15 +6,42 @@ Tests for QidRecord.
 
 import pytest
 
-from src.main_app.database.models import QidRecord
+from src.main_app.database.models.qid import (
+    AllQidsExistRecord,
+    QidOthersRecord,
+    QidRecord,
+    QidSharedRecord,
+)
 
 
-class TestQidRecord:
+class TestAllQidsExistRecord:
+    """Tests for AllQidsExistRecord dataclass."""
+
+    qid_model = AllQidsExistRecord
+
+    def test_create_valid_qid_record(self):
+        """Test creating a valid AllQidsExistRecord."""
+        record = AllQidsExistRecord(
+            id=1,
+            code="ar",
+            target="TestArticle",
+            qid="Q12345",
+        )
+
+        assert record.id == 1
+        assert record.code == "ar"
+        assert record.target == "TestArticle"
+        assert record.qid == "Q12345"
+
+
+class QidRecordTests:
     """Tests for QidRecord dataclass."""
+
+    qid_model: type[QidSharedRecord]
 
     def test_create_valid_qid_record(self):
         """Test creating a valid QidRecord."""
-        record = QidRecord(
+        record = self.qid_model(
             id=1,
             title="TestArticle",
             qid="Q12345",
@@ -26,7 +53,7 @@ class TestQidRecord:
 
     def test_to_dict_returns_correct_dict(self):
         """Test that to_json returns the correct dictionary representation."""
-        record = QidRecord(
+        record = self.qid_model(
             id=1,
             title="TestArticle",
             qid="Q12345",
@@ -43,7 +70,7 @@ class TestQidRecord:
     def test_raises_error_when_title_is_empty(self):
         """Test that ValueError is raised when title is empty."""
         with pytest.raises(ValueError, match="Title cannot be empty"):
-            QidRecord(
+            self.qid_model(
                 id=1,
                 title="",
                 qid="Q12345",
@@ -52,7 +79,7 @@ class TestQidRecord:
     def test_raises_error_when_qid_is_empty(self):
         """Test that ValueError is raised when QID is empty."""
         with pytest.raises(ValueError, match="QID cannot be empty"):
-            QidRecord(
+            self.qid_model(
                 id=1,
                 title="TestArticle",
                 qid="",
@@ -61,7 +88,7 @@ class TestQidRecord:
     def test_raises_error_when_qid_does_not_start_with_q(self):
         """Test that ValueError is raised when QID doesn't start with Q."""
         with pytest.raises(ValueError, match="Invalid QID format"):
-            QidRecord(
+            self.qid_model(
                 id=1,
                 title="TestArticle",
                 qid="12345",
@@ -70,7 +97,7 @@ class TestQidRecord:
     def test_raises_error_when_qid_has_no_digits(self):
         """Test that ValueError is raised when QID has no digits after Q."""
         with pytest.raises(ValueError, match="Invalid QID format"):
-            QidRecord(
+            self.qid_model(
                 id=1,
                 title="TestArticle",
                 qid="QABC",
@@ -79,7 +106,7 @@ class TestQidRecord:
     def test_raises_error_when_qid_is_just_q(self):
         """Test that ValueError is raised when QID is just 'Q'."""
         with pytest.raises(ValueError, match="Invalid QID format"):
-            QidRecord(
+            self.qid_model(
                 id=1,
                 title="TestArticle",
                 qid="Q",
@@ -87,7 +114,7 @@ class TestQidRecord:
 
     def test_accepts_valid_qid_with_large_number(self):
         """Test that large QID numbers are accepted."""
-        record = QidRecord(
+        record = self.qid_model(
             id=1,
             title="TestArticle",
             qid="Q123456789",
@@ -97,10 +124,22 @@ class TestQidRecord:
 
     def test_accepts_valid_qid_with_small_number(self):
         """Test that small QID numbers are accepted."""
-        record = QidRecord(
+        record = self.qid_model(
             id=1,
             title="TestArticle",
             qid="Q1",
         )
 
         assert record.qid == "Q1"
+
+
+class TestQidRecord(QidRecordTests):
+    """Tests for QidRecord dataclass."""
+
+    qid_model = QidRecord
+
+
+class TestQidOthersRecord(QidRecordTests):
+    """Tests for QidOthersRecord dataclass."""
+
+    qid_model = QidOthersRecord

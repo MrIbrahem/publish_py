@@ -56,7 +56,7 @@ class TestAuthService:
         created_handshakers: list[tuple[str, object]] = []
 
         class DummyHandshaker:
-            def __init__(self, mw_uri, *, consumer_token, user_agent) -> None:
+            def __init__(self, mw_uri: str, *, consumer_token: object, user_agent: str) -> None:
                 created_handshakers.append((mw_uri, consumer_token, user_agent))  # pyright: ignore[reportArgumentType]
 
         def fake_consumer(key: str, secret: str) -> tuple[str, str]:
@@ -137,7 +137,7 @@ class TestAuthService:
         )
 
         with pytest.raises(auth_service.OAuthIdentityError) as excinfo:
-            self.service.identify("token")
+            self.service.identify("token")  # pyright: ignore[reportArgumentType]
 
         assert "MediaWiki" in str(excinfo.value)
         assert isinstance(excinfo.value.original_exception, ValueError)

@@ -13,6 +13,7 @@ from .metrics import (
 from .pages import (
     InProcessRecord,
     PageRecord,
+    PageSharedRecord,
     PagesUsersToMainRecord,
     UserPageRecord,
 )
@@ -45,6 +46,7 @@ from .views import (
 )
 
 __all__ = [
+    "PageSharedRecord",
     "AllQidsExistRecord",
     "AssessmentRecord",
     "CategoryMemberRecord",

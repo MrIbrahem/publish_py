@@ -15,7 +15,7 @@ Each table-specific service module should only need to:
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, TypeVar
 
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session, aliased
@@ -25,7 +25,7 @@ from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
-ServiceRecord = QidRecord | QidOthersRecord
+QidsModel = TypeVar("QidsModel", bound=QidOthersRecord | QidRecord)
 
 
 def validate_or_raise(title: str, qid: str) -> None:
@@ -41,7 +41,7 @@ def validate_or_raise(title: str, qid: str) -> None:
         raise ValueError(f"Invalid QID format: {qid}. QID should start with 'Q' followed by digits.")
 
 
-class BaseQidService(CRUDService[ServiceRecord]):
+class BaseQidService(CRUDService[QidsModel]):
     """Generic service class for managing QID-like records.
 
     Subclasses (or direct instances) are bound to a specific ORM
@@ -52,14 +52,14 @@ class BaseQidService(CRUDService[ServiceRecord]):
                 super().__init__(QidRecord, db.session)
     """
 
-    def __init__(self, model: type[ServiceRecord], session: Session | Any) -> None:
+    def __init__(self, model: type[QidsModel], session: Session | Any) -> None:
         super().__init__(session, model)
         self.model = model
 
     # ───────────────────────────────────────────────────────────────
     # lists
 
-    def list_empty_records(self) -> list[ServiceRecord]:
+    def list_empty_records(self) -> list[QidsModel]:
         try:
             base = self.session.query(self.model)
             rows = base.filter(or_(self.model.qid.is_(None), self.model.qid == "")).order_by(self.model.id.asc()).all()
@@ -68,7 +68,7 @@ class BaseQidService(CRUDService[ServiceRecord]):
             logger.exception("Failed to list records: %s", e)
             return []
 
-    def list_duplicate_records(self) -> list[ServiceRecord]:
+    def list_duplicate_records(self) -> list[QidsModel]:
         try:
             base = self.session.query(self.model)
             other = aliased(self.model)
@@ -92,7 +92,7 @@ class BaseQidService(CRUDService[ServiceRecord]):
             logger.exception("Failed to list records: %s", e)
             return []
 
-    def list_records(self, dis: str = "all") -> list[ServiceRecord]:
+    def list_records(self, dis: str = "all") -> list[QidsModel]:
         """
         Return records, optionally filtered by ``dis``.
 
@@ -108,7 +108,7 @@ class BaseQidService(CRUDService[ServiceRecord]):
 
         return self.list_all(order_by=[self.model.id.asc()])
 
-    def list_qid_records(self) -> list[ServiceRecord]:
+    def list_qid_records(self) -> list[QidsModel]:
         """Return all QID records."""
         return self.list_all(order_by=[self.model.id.asc()])
 
@@ -120,26 +120,26 @@ class BaseQidService(CRUDService[ServiceRecord]):
     # ───────────────────────────────────────────────────────────────
     # get by
 
-    def get_by_qid(self, qid: str) -> ServiceRecord | None:
+    def get_by_qid(self, qid: str) -> QidsModel | None:
         """Get the first record matching the specified QID string."""
         if not qid:
             return None
         return self.get_by(qid=qid)
 
-    def get_by_title(self, title: str) -> ServiceRecord | None:
+    def get_by_title(self, title: str) -> QidsModel | None:
         """Get the record matching the specified title."""
         if not title:
             return None
         return self.get_by(title=title)
 
-    def get_by_id(self, qid_id: int) -> ServiceRecord | None:
+    def get_by_id(self, qid_id: int) -> QidsModel | None:
         """Get a record by its primary key ID."""
         return self.get_record_by_id(qid_id)
 
     # ───────────────────────────────────────────────────────────────
     # create/update
 
-    def add_or_update(self, title: str, qid: str) -> ServiceRecord | None:
+    def add_or_update(self, title: str, qid: str) -> QidsModel | None:
         """Add or update a record for a given title."""
         try:
             validate_or_raise(title, qid)
@@ -180,7 +180,7 @@ class BaseQidService(CRUDService[ServiceRecord]):
             logger.exception("Failed to insert record title=%r qid=%r", title, qid)
             return False
 
-    def update_qid(self, qid_id: int, title: str, qid: str) -> ServiceRecord:
+    def update_qid(self, qid_id: int, title: str, qid: str) -> QidsModel:
         """Update an existing row by primary key."""
         if not qid_id:
             raise ValueError("qid_id is required")

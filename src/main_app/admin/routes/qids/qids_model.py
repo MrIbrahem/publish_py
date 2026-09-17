@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import TypeVar
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
@@ -14,6 +15,8 @@ from ....database.services import QidOthersService, QidService
 logger = logging.getLogger(__name__)
 
 VALID_DIS = {"all", "empty", "duplicate"}
+
+QidsModel = TypeVar("QidsModel", bound=QidOthersRecord | QidRecord)
 
 
 def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing_by_title) -> bool:
