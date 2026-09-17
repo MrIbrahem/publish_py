@@ -1,19 +1,12 @@
 import pytest
 
-from src.main_app.database.models import UserPageRecord
-from src.main_app.database.services import (
-    UserPagesService,
-)
-
-pytestmark = pytest.mark.unit
+from src.main_app.database.services.pages_tables.pages_shared_service import BasePagesService
 
 
-class TestSetup:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        self.service = UserPagesService()
+class TestInit:
+    service: BasePagesService
 
-    def _make_page(self, title: str, lang: str, target: str, user: str = "u") -> UserPageRecord:
+    def _make_page(self, title: str, lang: str, target: str, user: str = "u"):
         return self.service.add_page(
             sourcetitle=title,
             translate_type="lead",
@@ -24,7 +17,7 @@ class TestSetup:
         )
 
 
-class TestPagesAndUserPagesService(TestSetup):
+class PagesAndUserPagesServiceTests(TestInit):
     """Tests for PagesService/UserPagesService class."""
 
     def test_page_workflow(self, sqlite_db):
@@ -77,7 +70,7 @@ class TestPagesAndUserPagesService(TestSetup):
         assert any(p.title == "Evolution" for p in result)
 
 
-class TestAddPage(TestSetup):
+class AddPageTests(TestInit):
     """Tests for add_page function."""
 
     def test_adds_page(self, monkeypatch):
@@ -93,7 +86,7 @@ class TestAddPage(TestSetup):
             self.service.add_page("", "lead", "Test", "en", "TestUser", "test.html")
 
 
-class TestUpdatePage(TestSetup):
+class UpdatePageTests(TestInit):
     """Tests for update_page function."""
 
     def test_updates_the_record(self, monkeypatch):
@@ -105,7 +98,7 @@ class TestUpdatePage(TestSetup):
         assert updated.target == "Social_Science.html"
 
 
-class TestDeletePage(TestSetup):
+class DeletePageTests(TestInit):
     """Tests for delete_page function."""
 
     def test_deletes_the_record(self, monkeypatch):
@@ -118,7 +111,7 @@ class TestDeletePage(TestSetup):
         assert self.service.delete(9999) is False
 
 
-class TestInsertPageTarget(TestSetup):
+class InsertPageTargetTests(TestInit):
     """Tests for insert_page_target function."""
 
     def test_inserts_correctly(self, monkeypatch):
@@ -155,7 +148,7 @@ class TestInsertPageTarget(TestSetup):
 # ---------------------------------------------------------------------------
 
 
-class TestListTranslated(TestSetup):
+class ListTranslatedTests(TestInit):
     """Tests for list_translated."""
 
     def test_excludes_rows_with_empty_or_null_target(self, sqlite_db):
@@ -204,7 +197,7 @@ class TestListTranslated(TestSetup):
         assert self.service.list_translated(lang="All") == []
 
 
-class TestCountTranslated(TestSetup):
+class CountTranslatedTests(TestInit):
     """Tests for count_translated."""
 
     def test_counts_only_rows_with_target(self, sqlite_db):
@@ -227,7 +220,7 @@ class TestCountTranslated(TestSetup):
         assert self.service.count_translated(lang="All") == 0
 
 
-class TestGetById(TestSetup):
+class GetByIdTests(TestInit):
     """Tests for get_by_id."""
 
     def test_returns_record_when_found(self, monkeypatch):
@@ -238,3 +231,15 @@ class TestGetById(TestSetup):
 
     def test_returns_none_when_not_found(self, monkeypatch):
         assert self.service.get_by_id(99999) is None
+
+
+__all__ = [
+    "AddPageTests",
+    "CountTranslatedTests",
+    "DeletePageTests",
+    "GetByIdTests",
+    "InsertPageTargetTests",
+    "ListTranslatedTests",
+    "PagesAndUserPagesServiceTests",
+    "UpdatePageTests",
+]

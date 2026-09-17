@@ -11,9 +11,9 @@ from .metrics import (
     WordRecord,
 )
 from .pages import (
-    PageSharedRecord,
     InProcessRecord,
     PageRecord,
+    PageSharedRecord,
     PagesUsersToMainRecord,
     UserPageRecord,
 )

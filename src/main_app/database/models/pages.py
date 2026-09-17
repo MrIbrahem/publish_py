@@ -56,6 +56,7 @@ class PageSharedRecord:
             "mdwiki_revid": self.mdwiki_revid,
         }
 
+
 class PageRecord(PageSharedRecord, db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages (
@@ -79,6 +80,7 @@ class PageRecord(PageSharedRecord, db.Model):
     """
 
     __tablename__ = "pages"
+
 
 class UserPageRecord(PageSharedRecord, db.Model):
     """
