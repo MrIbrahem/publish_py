@@ -44,7 +44,7 @@ class QidSharedRecord:
         }
 
 
-class QidRecord(db.Model, QidSharedRecord):
+class QidRecord(QidSharedRecord, db.Model):
     """
     CREATE TABLE IF NOT EXISTS qids (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -59,7 +59,7 @@ class QidRecord(db.Model, QidSharedRecord):
     __tablename__ = "qids"
 
 
-class QidOthersRecord(db.Model, QidSharedRecord):
+class QidOthersRecord(QidSharedRecord, db.Model):
     """
     CREATE TABLE IF NOT EXISTS qids_others (
         id int unsigned NOT NULL AUTO_INCREMENT,
