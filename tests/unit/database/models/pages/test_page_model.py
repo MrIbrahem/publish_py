@@ -6,7 +6,7 @@ Tests for PageRecord.
 
 import pytest
 
-from src.main_app.database.models import PageRecord
+from src.main_app.database.models.pages import PageSharedRecord, PageRecord, UserPageRecord
 
 
 @pytest.fixture
@@ -29,12 +29,13 @@ def sample_page_row():
     }
 
 
-class TestPageRecord:
+class PagesTests:
     """Tests for PageRecord dataclass."""
+    record_type: type[PageSharedRecord]
 
     def test_create_with_required_fields(self):
         """Test creating PageRecord with required fields."""
-        record = PageRecord(id=1, title="TestPage")
+        record = self.record_type(id=1, title="TestPage")
         assert record.id == 1
         assert record.title == "TestPage"
         assert record.word is None
@@ -42,9 +43,22 @@ class TestPageRecord:
 
     def test_create_with_all_fields(self, sample_page_row):
         """Test creating PageRecord with all fields."""
-        record = PageRecord(**sample_page_row)
+        record = self.record_type(**sample_page_row)
         assert record.id == 1
         assert record.title == "TestPage"
         assert record.word == 100
         assert record.translate_type == "Lead"
         assert record.mdwiki_revid == 12345
+
+class TestPageRecord(PagesTests):
+    """Tests for PageRecord dataclass."""
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.record_type = PageRecord
+
+class TestUserPageRecord(PagesTests):
+    """Tests for UserPageRecord dataclass."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.record_type = UserPageRecord

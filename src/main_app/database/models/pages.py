@@ -13,7 +13,50 @@ from sqlalchemy.orm import Mapped, mapped_column
 from ...extensions import db
 
 
-class PageRecord(db.Model):
+class PageSharedRecord:
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    word: Mapped[int | None] = mapped_column()
+    translate_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="lead", server_default=text("'lead'")
+    )
+    cat: Mapped[str | None] = mapped_column(String(120))
+    lang: Mapped[str | None] = mapped_column(String(30))
+    user: Mapped[str | None] = mapped_column(String(120))
+    target: Mapped[str | None] = mapped_column(String(120))
+    date: Mapped[date | None] = mapped_column()
+    pupdate: Mapped[str | None] = mapped_column(String(120))
+    add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
+    deleted: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
+    mdwiki_revid: Mapped[int | None] = mapped_column()
+
+    def __init__(self, **kwargs: Any) -> None:
+        # Apply Python-level defaults for fields not provided
+        if "deleted" not in kwargs:
+            kwargs["deleted"] = 0
+
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "word": self.word,
+            "translate_type": self.translate_type,
+            "cat": self.cat,
+            "lang": self.lang,
+            "user": self.user,
+            "target": self.target,
+            "date": self.date,
+            "pupdate": self.pupdate,
+            "add_date": self.add_date,
+            "deleted": self.deleted,
+            "mdwiki_revid": self.mdwiki_revid,
+        }
+
+class PageRecord(PageSharedRecord, db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -37,50 +80,7 @@ class PageRecord(db.Model):
 
     __tablename__ = "pages"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    title: Mapped[str] = mapped_column(String(120), nullable=False)
-    word: Mapped[int | None] = mapped_column()
-    translate_type: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="lead", server_default=text("'lead'")
-    )
-    cat: Mapped[str | None] = mapped_column(String(120))
-    lang: Mapped[str | None] = mapped_column(String(30))
-    user: Mapped[str | None] = mapped_column(String(120))
-    target: Mapped[str | None] = mapped_column(String(120))
-    date: Mapped[date | None] = mapped_column()
-    pupdate: Mapped[str | None] = mapped_column(String(120))
-    add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
-    deleted: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
-    mdwiki_revid: Mapped[int | None] = mapped_column()
-
-    def __init__(self, **kwargs: Any) -> None:
-        # Apply Python-level defaults for fields not provided
-        if "deleted" not in kwargs:
-            kwargs["deleted"] = 0
-
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
-    def to_json(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
-
-
-class UserPageRecord(db.Model):
+class UserPageRecord(PageSharedRecord, db.Model):
     """
     CREATE TABLE IF NOT EXISTS pages_users (
         id int unsigned NOT NULL AUTO_INCREMENT,
@@ -103,48 +103,6 @@ class UserPageRecord(db.Model):
     """
 
     __tablename__ = "pages_users"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    title: Mapped[str] = mapped_column(String(120), nullable=False)
-    word: Mapped[int | None] = mapped_column()
-    translate_type: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="lead", server_default=text("'lead'")
-    )
-    cat: Mapped[str | None] = mapped_column(String(120))
-    lang: Mapped[str | None] = mapped_column(String(30))
-    user: Mapped[str | None] = mapped_column(String(120))
-    target: Mapped[str | None] = mapped_column(String(120))
-    date: Mapped[date | None] = mapped_column()
-    pupdate: Mapped[str | None] = mapped_column(String(120))
-    add_date: Mapped[datetime] = mapped_column(nullable=False, server_default=db.func.current_timestamp())
-    deleted: Mapped[int] = mapped_column(nullable=False, default=0, server_default=text("0"))
-    mdwiki_revid: Mapped[int | None] = mapped_column()
-
-    def __init__(self, **kwargs: Any) -> None:
-        # Apply Python-level defaults for fields not provided
-        if "deleted" not in kwargs:
-            kwargs["deleted"] = 0
-
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
-    def to_json(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "title": self.title,
-            "word": self.word,
-            "translate_type": self.translate_type,
-            "cat": self.cat,
-            "lang": self.lang,
-            "user": self.user,
-            "target": self.target,
-            "date": self.date,
-            "pupdate": self.pupdate,
-            "add_date": self.add_date,
-            "deleted": self.deleted,
-            "mdwiki_revid": self.mdwiki_revid,
-        }
 
 
 class PagesUsersToMainRecord(db.Model):
