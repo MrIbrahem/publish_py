@@ -24,7 +24,7 @@ from ....database.services import (
     SettingsService,
 )
 from ....services.auth.utils import get_current_user
-from .results_2026 import ResultsBundle, results_loader_2026
+from .results_27 import ResultsBundle, results_loader_27
 from .results_api import results_api_result
 
 logger = logging.getLogger(__name__)
