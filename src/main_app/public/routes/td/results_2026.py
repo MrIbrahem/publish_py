@@ -18,6 +18,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from flask import url_for
+
 from ....database.services import (
     InProcessService,
     PagesService,
@@ -116,9 +118,13 @@ def _missing_translate_html(
     words: int,
     full_tr_user: bool,
     is_video_title: bool,
+    user_is_logged_in: bool,
 ) -> str:
     """Mirror PHP ``_make_one_row_results`` — translate column HTML."""
     # logic from results_table.php — anonymous user
+    if not user_is_logged_in:
+        login_url = url_for("auth.login")
+        return f"<a href='{login_url}' class='btn btn-outline-primary btn-sm'>Login</a>"
 
     full_url = tr_link_medwiki(title, langcode, cat, camp, "all", words)
     lead_url = tr_link_medwiki(title, langcode, cat, camp, tra_type, words)
@@ -145,6 +151,7 @@ def _make_missing_row_dict(
     cat: str,
     camp: str,
     full_tr_user: bool,
+    user_is_logged_in: bool,
 ) -> dict[str, Any]:
     """Build one row dict for the Results table (PHP _make_one_row_results)."""
     is_video_title = _is_video(title)
@@ -160,6 +167,7 @@ def _make_missing_row_dict(
         words=words,
         full_tr_user=full_tr_user,
         is_video_title=is_video_title,
+        user_is_logged_in=user_is_logged_in,
     )
 
     # PHP "$count = $full && (substr != 'video:') ? '$count.Full' : $count"
@@ -188,6 +196,7 @@ def _build_missing_rows(
     full_tr_user: bool,
     nolead_titles: set[str],
     full_titles: set[str],
+    user_is_logged_in: bool,
 ) -> list[dict[str, Any]]:
     """Mirror of PHP ``make_results_table_2026``."""
     do_full = (tra_type or "lead") != "all"
@@ -221,6 +230,7 @@ def _build_missing_rows(
             cat=cat,
             camp=camp,
             full_tr_user=full_tr_user,
+            user_is_logged_in=user_is_logged_in,
         )
 
         # PHP: "if (!$do_full || $full_tr_user) { emit and continue; }"
@@ -251,6 +261,7 @@ def _build_missing_rows(
                     cat=cat,
                     camp=camp,
                     full_tr_user=full_tr_user,
+                    user_is_logged_in=user_is_logged_in,
                 )
             )
 
@@ -325,6 +336,7 @@ def _build_inprocess_rows(
     full_tr_user: bool,
     titles_infos: dict[str, dict],
     endpoint: str,
+    user_is_logged_in: bool,
 ) -> list[dict[str, Any]]:
     """Mirror of PHP ``make_results_table_inprocess``."""
     rows: list[dict[str, Any]] = []
@@ -393,6 +405,7 @@ def _build_exists_rows(
     camp: str,
     user_coord: bool,
     endpoint: str,
+    user_is_logged_in: bool,
 ) -> tuple[list[dict[str, Any]], int, int]:
     """Mirror of PHP ``make_results_table_exists_2026``.
 
@@ -461,6 +474,7 @@ def results_loader_2026(
     user_coord: bool,
     settings: dict[str, bool],
     full_tr_user: bool,
+    user_is_logged_in: bool,
 ) -> dict[str, Any]:
     """Build the results bundle for the index page.
 
@@ -481,14 +495,17 @@ def results_loader_2026(
     titles_infos: dict[str, dict] = {}
     for row in bucket["missing"]:
         titles_infos[row["title"]] = row
+
     for title, row in bucket["exists"].items():
         titles_infos.setdefault(title, row)
 
     endpoint = get_endpoint()
 
     show_btn = settings["show_translation_button"]
+
     if isinstance(show_btn, str):
         show_btn = show_btn.lower() in ("1", "true", "yes", "on")
+
     inprocess_button = "1" if (show_btn and user_coord) else "0"
 
     missing_rows = _build_missing_rows(
@@ -500,6 +517,7 @@ def results_loader_2026(
         full_tr_user=full_tr_user,
         nolead_titles=nolead_titles,
         full_titles=full_titles,
+        user_is_logged_in=user_is_logged_in,
     )
 
     inprocess_rows = _build_inprocess_rows(
@@ -511,6 +529,7 @@ def results_loader_2026(
         full_tr_user=full_tr_user,
         titles_infos=titles_infos,
         endpoint=endpoint,
+        user_is_logged_in=user_is_logged_in,
     )
 
     exists_rows, exists_translated_count, exists_translated_before_count = _build_exists_rows(
@@ -520,6 +539,7 @@ def results_loader_2026(
         camp=camp,
         user_coord=user_coord,
         endpoint=endpoint,
+        user_is_logged_in=user_is_logged_in,
     )
 
     return {

@@ -113,6 +113,7 @@ class TDRoutes:
         user = get_current_user()
         user_coord = bool(user and user.is_active_admin)
         full_tr_user = bool(user and self.full_service.is_full_translator(user.username))
+        user_is_logged_in = bool(user)
 
         parsed_settings = parsed["settings"]
 
@@ -129,6 +130,7 @@ class TDRoutes:
                     user_coord=user_coord,
                     settings=parsed_settings,
                     full_tr_user=full_tr_user,
+                    user_is_logged_in=user_is_logged_in,
                 )
             except Exception:
                 logger.exception(
