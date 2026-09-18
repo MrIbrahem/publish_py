@@ -1,4 +1,4 @@
-"""Port of ``results_27/Data/ResultsFetcher.php``.
+r"""Port of ``results_27/Data/ResultsFetcher.php``.
 
 Responsible for fetching and preparing all result data (exists, missing,
 in-process) for a given category and language. Mirrors PHP

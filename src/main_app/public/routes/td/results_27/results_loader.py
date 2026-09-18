@@ -1,4 +1,4 @@
-"""Port of ``results_27/ResultsLoader.php``.
+r"""Port of ``results_27/ResultsLoader.php``.
 
 Main entry point for the results module. Mirrors PHP
 ``Results\GetResults27\ResultsLoader::load()``; produces a
