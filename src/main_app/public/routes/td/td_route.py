@@ -117,11 +117,11 @@ class TDRoutes:
 
         parsed_settings = parsed["settings"]
 
-        # PHP: only invoke results_loader_2026 when both code and camp are valid.
+        # PHP: only invoke results_loader_27 when both code and camp are valid.
         results_bundle: ResultsBundle | None = None
         if parsed["code"] and parsed["camp"] and parsed["code_lang_name"]:
             try:
-                results_bundle = results_loader_2026(
+                results_bundle = results_loader_27(
                     code=parsed["code"],
                     camp=parsed["camp"],
                     cat=parsed["cat"],
@@ -134,7 +134,7 @@ class TDRoutes:
                 )
             except Exception:
                 logger.exception(
-                    "results_loader_2026 failed for code=%r camp=%r cat=%r",
+                    "results_loader_27 failed for code=%r camp=%r cat=%r",
                     parsed["code"],
                     parsed["camp"],
                     parsed["cat"],
