@@ -9,13 +9,14 @@ Reference PHP files:
   - src/backend/results_2026/results_table_inprocess.php (make_one_row_new_inprocess, make_results_table_inprocess)
   - src/results/helps.php                        (make_translate_urls)
 
-The orchestrator returns a plain dict (the "results bundle") that
+The orchestrator returns a :class:`ResultsBundle` (the "results bundle") that
 ``templates/index.html`` consumes via three Jinja partials.
 """
 
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import Any
 
 from flask import url_for
@@ -464,6 +465,32 @@ def _build_exists_rows(
 # ---------------------------------------------------------------------------
 
 
+@dataclass
+class ResultsBundle:
+    """The results bundle returned by ``results_loader_2026()``.
+
+    Consumed by the ``results_2026`` Jinja partials (and enriched with
+    ``code_lang_name`` by the route). Mirrors PHP ``Results_tables_2026``.
+    """
+
+    summary_data: dict[str, Any]
+    summary_count: int
+    missing_rows: list[dict[str, Any]]
+    inprocess_rows: list[dict[str, Any]]
+    inprocess_count: int
+    exists_rows: list[dict[str, Any]]
+    exists_count: int
+    exists_translated_count: int
+    exists_translated_before_count: int
+    show_translation_button: str
+    code: str
+    camp: str
+    cat: str
+    tra_type: str
+    code_lang_name: str
+    full_tr_user: bool
+
+
 def results_loader_2026(
     *,
     code: str,
@@ -475,12 +502,12 @@ def results_loader_2026(
     settings: dict[str, bool],
     full_tr_user: bool,
     user_is_logged_in: bool,
-) -> dict[str, Any]:
+) -> ResultsBundle:
     """Build the results bundle for the index page.
 
     Mirrors PHP ``results_loader_2026($data)`` + ``Results_tables_2026(...)``.
-    Returns a dict with the data the Jinja templates need; produces no HTML
-    side effects of its own.
+    Returns a :class:`ResultsBundle` with the data the Jinja templates need;
+    produces no HTML side effects of its own.
     """
     # logic from results_2026/get_results_2026.php
     bucket = get_results_2026(cat, code)
@@ -542,24 +569,24 @@ def results_loader_2026(
         user_is_logged_in=user_is_logged_in,
     )
 
-    return {
-        "summary_data": bucket["summary_data"],
-        "summary_count": len(bucket["missing"]),
-        "missing_rows": missing_rows,
-        "inprocess_rows": inprocess_rows,
-        "inprocess_count": len(bucket["inprocess"]),
-        "exists_rows": exists_rows,
-        "exists_count": len(bucket["exists"]),
-        "exists_translated_count": exists_translated_count,
-        "exists_translated_before_count": exists_translated_before_count,
-        "show_translation_button": inprocess_button,
-        "code": code,
-        "camp": camp,
-        "cat": cat,
-        "tra_type": tra_type or "lead",
-        "code_lang_name": code_lang_name,
-        "full_tr_user": full_tr_user,
-    }
+    return ResultsBundle(
+        summary_data=bucket["summary_data"],
+        summary_count=len(bucket["missing"]),
+        missing_rows=missing_rows,
+        inprocess_rows=inprocess_rows,
+        inprocess_count=len(bucket["inprocess"]),
+        exists_rows=exists_rows,
+        exists_count=len(bucket["exists"]),
+        exists_translated_count=exists_translated_count,
+        exists_translated_before_count=exists_translated_before_count,
+        show_translation_button=inprocess_button,
+        code=code,
+        camp=camp,
+        cat=cat,
+        tra_type=tra_type or "lead",
+        code_lang_name=code_lang_name,
+        full_tr_user=full_tr_user,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -620,6 +647,7 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
 
 
 __all__ = [
+    "ResultsBundle",
     "results_loader_2026",
     "get_results_2026",
 ]
