@@ -24,14 +24,14 @@ is a faithful mirror of
 
 ## Endpoint Facts
 
-| Item           | Value                                                                                                                                                                                                                                     |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Blueprint name | `translate_med`                                                                                                                                                                                                                           |
-| URL prefix     | `/Translation_Dashboard/translate_med`                                                                                                                                                                                                    |
-| Route rule     | `GET /` (i.e. `/Translation_Dashboard/translate_med/`)                                                                                                                                                                                    |
-| Endpoint name  | `translate_med.index`                                                                                                                                                                                                                     |
-| Registration   | [src/main_app/public/**init**.py:45](../../src/main_app/public/__init__.py#L45)                                                                                                                                                           |
-| Inbound links  | `tr_link_medwiki()` in [services/utils/wiki_links.py:80](../../src/main_app/services/utils/wiki_links.py#L80), used by `results_2026/rows/missing_row_builder.py`, `results_2026/mapping/missing_mapping.py`, `admin/routes/email_msg.py` |
+| Item | Value |
+|---|---|
+| Blueprint name | `translate_med` |
+| URL prefix | `/Translation_Dashboard/translate_med` |
+| Route rule | `GET /` (i.e. `/Translation_Dashboard/translate_med/`) |
+| Endpoint name | `translate_med.index` |
+| Registration | [src/main_app/public/__init__.py:45](../../src/main_app/public/__init__.py#L45) |
+| Inbound links | `tr_link_medwiki()` in [services/utils/wiki_links.py:80](../../src/main_app/services/utils/wiki_links.py#L80), used by `results_2026/rows/missing_row_builder.py`, `results_2026/mapping/missing_mapping.py`, `admin/routes/email_msg.py` |
 
 Query string emitted by every in-repo caller (`tr_link_medwiki`):
 
@@ -47,24 +47,24 @@ The route **must** accept all six names, plus `test` used by the PHP page.
 
 Line-by-line reading of [translate_med.php](../../src/main_app/public/routes/td/translate_med.php):
 
-| PHP lines | Behavior                                                                                                                                                                       |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 6–26      | `execute_query()` — raw SQL helper (no Python equivalent needed; replaced by services).                                                                                        |
-| 27–52     | `make_ContentTranslation_url()` — builds `Special:ContentTranslation` URL; `%20` → `_` in the title; query params `title`, `tr_type`, `from=mdwiki`, `to`, `campaign`, `page`. |
-| 54–65     | `get_td_or_sql_users_no_inprocess()` — map `user` → `is_active`.                                                                                                               |
-| 67–81     | `get_td_or_sql_categories()` — map `category` → `campaign`.                                                                                                                    |
-| 83–88     | `get_endpoint()` — constant `https://mdwikicx.toolforge.org/w/index.php`.                                                                                                      |
-| 90–108    | `insertPage()` — **dead code in this file** (never called from the main flow); inserts into the `pages` table.                                                                 |
-| 110–129   | `insertPage_inprocess()` — `INSERT … WHERE NOT EXISTS` guarded insert into `in_process`.                                                                                       |
-| 131–163   | `go_to_translate_url()` — echoes an `<h2>` "Click here" link; when `$_GET['test']` is empty also emits `window.open(url, '_self')` + two `<meta http-equiv="refresh">` tags.   |
-| 165–167   | Reads `code` (lowercased), `title`, and `$GLOBALS['global_username']`.                                                                                                         |
-| 169–184   | No user → render a Bootstrap login card linking to `/auth/login.php`, then `exit`.                                                                                             |
-| 186–205   | Requires `title` **and** `code`; reads `cat`, `camp`, `type` (default `lead`), `word` (int, default 0, `min_range` 0).                                                         |
-| 207–209   | If `camp` empty and `cat` set → `camp = cats_data[cat]`.                                                                                                                       |
-| 211–215   | `rawurldecode()` on user, cat, title, camp.                                                                                                                                    |
-| 216–218   | Insert into `in_process` **only if** the user is not an active `users_no_inprocess` member.                                                                                    |
-| 220–229   | Build the URL and emit the redirect page.                                                                                                                                      |
-| 232–240   | Echo the layout closing tags (handled by the base template in Python).                                                                                                         |
+| PHP lines | Behavior |
+|---|---|
+| 6–26 | `execute_query()` — raw SQL helper (no Python equivalent needed; replaced by services). |
+| 27–52 | `make_ContentTranslation_url()` — builds `Special:ContentTranslation` URL; `%20` → `_` in the title; query params `title`, `tr_type`, `from=mdwiki`, `to`, `campaign`, `page`. |
+| 54–65 | `get_td_or_sql_users_no_inprocess()` — map `user` → `is_active`. |
+| 67–81 | `get_td_or_sql_categories()` — map `category` → `campaign`. |
+| 83–88 | `get_endpoint()` — constant `https://mdwikicx.toolforge.org/w/index.php`. |
+| 90–108 | `insertPage()` — **dead code in this file** (never called from the main flow); inserts into the `pages` table. |
+| 110–129 | `insertPage_inprocess()` — `INSERT … WHERE NOT EXISTS` guarded insert into `in_process`. |
+| 131–163 | `go_to_translate_url()` — echoes an `<h2>` "Click here" link; when `$_GET['test']` is empty also emits `window.open(url, '_self')` + two `<meta http-equiv="refresh">` tags. |
+| 165–167 | Reads `code` (lowercased), `title`, and `$GLOBALS['global_username']`. |
+| 169–184 | No user → render a Bootstrap login card linking to `/auth/login.php`, then `exit`. |
+| 186–205 | Requires `title` **and** `code`; reads `cat`, `camp`, `type` (default `lead`), `word` (int, default 0, `min_range` 0). |
+| 207–209 | If `camp` empty and `cat` set → `camp = cats_data[cat]`. |
+| 211–215 | `rawurldecode()` on user, cat, title, camp. |
+| 216–218 | Insert into `in_process` **only if** the user is not an active `users_no_inprocess` member. |
+| 220–229 | Build the URL and emit the redirect page. |
+| 232–240 | Echo the layout closing tags (handled by the base template in Python). |
 
 ---
 
@@ -72,17 +72,17 @@ Line-by-line reading of [translate_med.php](../../src/main_app/public/routes/td/
 
 What [translate_med.py](../../src/main_app/public/routes/td/translate_med.py) does today, versus the PHP flow:
 
-| #   | Gap                                                                                                                                                                                | Impact                                                                                                       |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| 1   | `index()` **returns `None`** after the `add_in_process` call.                                                                                                                      | Flask raises `TypeError: The view function did not return a valid response`. The route is broken end-to-end. |
-| 2   | No `camp` parameter and no `cat → campaign` resolution.                                                                                                                            | The CX URL is never built; PHP lines 200–209 have no counterpart.                                            |
-| 3   | `users_no_inprocess` gate missing.                                                                                                                                                 | Every logged-in user gets an `in_process` row; PHP skips active members of that table.                       |
-| 4   | Required-args check rejects missing `tra_type`/`cat`.                                                                                                                              | PHP defaults `type` to `lead` and tolerates an empty `cat`; the stub 404s valid links.                       |
-| 5   | `word` read with `type=int` but no `min_range` clamp.                                                                                                                              | Negative values pass through; PHP clamps to 0.                                                               |
-| 6   | No `test` flag.                                                                                                                                                                    | The debug/preview mode of `go_to_translate_url()` cannot be exercised.                                       |
-| 7   | Anonymous user returns the bare string `"Not logged in"`.                                                                                                                          | PHP renders a login card with a link to the login page.                                                      |
-| 8   | `get_current_user` imported from `....services.auth` (package) while [td_route.py:26](../../src/main_app/public/routes/td/td_route.py#L26) imports from `....services.auth.utils`. | Both work; standardize on `.utils` for consistency.                                                          |
-| 9   | No use of the already-ported `content_translation_url()` / `get_endpoint()` helpers.                                                                                               | Duplicated logic risk; `wiki_links.py` already mirrors `make_ContentTranslation_url` and `get_endpoint`.     |
+| # | Gap | Impact |
+|---|---|---|
+| 1 | `index()` **returns `None`** after the `add_in_process` call. | Flask raises `TypeError: The view function did not return a valid response`. The route is broken end-to-end. |
+| 2 | No `camp` parameter and no `cat → campaign` resolution. | The CX URL is never built; PHP lines 200–209 have no counterpart. |
+| 3 | `users_no_inprocess` gate missing. | Every logged-in user gets an `in_process` row; PHP skips active members of that table. |
+| 4 | Required-args check rejects missing `tra_type`/`cat`. | PHP defaults `type` to `lead` and tolerates an empty `cat`; the stub 404s valid links. |
+| 5 | `word` read with `type=int` but no `min_range` clamp. | Negative values pass through; PHP clamps to 0. |
+| 6 | No `test` flag. | The debug/preview mode of `go_to_translate_url()` cannot be exercised. |
+| 7 | Anonymous user returns the bare string `"Not logged in"`. | PHP renders a login card with a link to the login page. |
+| 8 | `get_current_user` imported from `....services.auth` (package) while [td_route.py:26](../../src/main_app/public/routes/td/td_route.py#L26) imports from `....services.auth.utils`. | Both work; standardize on `.utils` for consistency. |
+| 9 | No use of the already-ported `content_translation_url()` / `get_endpoint()` helpers. | Duplicated logic risk; `wiki_links.py` already mirrors `make_ContentTranslation_url` and `get_endpoint`. |
 
 ---
 
@@ -193,24 +193,24 @@ class TranslateRoutes:
 
 ### Argument parsing helpers
 
-| PHP                                              | Python                                                                   | Notes                                                                                                  |
-| ------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| `filter_input(INPUT_GET, 'code')` + `strtolower` | `_normalize(request.args.get("langcode")).lower()`                       | Name stays `langcode` — see [Deviations](#deviations-and-rationale).                                   |
-| `filter_input(INPUT_GET, 'title')`               | `_normalize(request.args.get("title"))`                                  | `_normalize` = `strip()`; mirrors the PHP `trim()` calls (lines 195–197).                              |
-| `$_GET['type'] ?? 'lead'`                        | `tra_type or _DEFAULT_TRA_TYPE`                                          | PHP default is `"lead"`.                                                                               |
-| `FILTER_VALIDATE_INT, min_range 0, default 0`    | `_word()` helper: `max(int(value or 0), 0)` with `try/except ValueError` | Clamp negative values to 0.                                                                            |
-| `$_GET['test'] ?? ''` (truthy = keep the page)   | `_as_bool(request.args.get("test"))`                                     | Reuse the `_as_bool` shape from [td_route.py:45](../../src/main_app/public/routes/td/td_route.py#L45). |
+| PHP | Python | Notes |
+|---|---|---|
+| `filter_input(INPUT_GET, 'code')` + `strtolower` | `_normalize(request.args.get("langcode")).lower()` | Name stays `langcode` — see [Deviations](#deviations-and-rationale). |
+| `filter_input(INPUT_GET, 'title')` | `_normalize(request.args.get("title"))` | `_normalize` = `strip()`; mirrors the PHP `trim()` calls (lines 195–197). |
+| `$_GET['type'] ?? 'lead'` | `tra_type or _DEFAULT_TRA_TYPE` | PHP default is `"lead"`. |
+| `FILTER_VALIDATE_INT, min_range 0, default 0` | `_word()` helper: `max(int(value or 0), 0)` with `try/except ValueError` | Clamp negative values to 0. |
+| `$_GET['test'] ?? ''` (truthy = keep the page) | `_as_bool(request.args.get("test"))` | Reuse the `_as_bool` shape from [td_route.py:45](../../src/main_app/public/routes/td/td_route.py#L45). |
 
 ### Service / helper reuse map
 
-| PHP construct                                                            | Python replacement                                                               | Already exists                                                                                                         |
-| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `get_td_or_sql_categories()` + `array_column(…, "campaign", "category")` | `CategoryService().list_categories()` → `{r.category: r.campaign for r in rows}` | yes — [category_service.py:105](../../src/main_app/database/services/content/category_service.py#L105)                 |
-| `get_td_or_sql_users_no_inprocess()` + `is_active` check                 | `UsersNoInprocessService().should_hide_from_inprocess(user)`                     | yes — [users_no_inprocess_service.py:76](../../src/main_app/database/services/users/users_no_inprocess_service.py#L76) |
-| `insertPage_inprocess()` (idempotent insert)                             | `InProcessService.get_in_process_by_title_user_lang()` then `add_in_process()`   | yes — [in_process_service.py:53-89](../../src/main_app/database/services/pages/in_process_service.py#L53)              |
-| `make_ContentTranslation_url()`                                          | `content_translation_url()`                                                      | yes — [wiki_links.py:99](../../src/main_app/services/utils/wiki_links.py#L99)                                          |
-| `get_endpoint()`                                                         | `get_endpoint()`                                                                 | yes — [wiki_links.py:148](../../src/main_app/services/utils/wiki_links.py#L148)                                        |
-| `insertPage()` (pages table)                                             | —                                                                                | **skip**: unreachable in the PHP flow; if ever needed it belongs in `PagesService`, not here.                          |
+| PHP construct | Python replacement | Already exists |
+|---|---|---|
+| `get_td_or_sql_categories()` + `array_column(…, "campaign", "category")` | `CategoryService().list_categories()` → `{r.category: r.campaign for r in rows}` | yes — [category_service.py:105](../../src/main_app/database/services/content/category_service.py#L105) |
+| `get_td_or_sql_users_no_inprocess()` + `is_active` check | `UsersNoInprocessService().should_hide_from_inprocess(user)` | yes — [users_no_inprocess_service.py:76](../../src/main_app/database/services/users/users_no_inprocess_service.py#L76) |
+| `insertPage_inprocess()` (idempotent insert) | `InProcessService.get_in_process_by_title_user_lang()` then `add_in_process()` | yes — [in_process_service.py:53-89](../../src/main_app/database/services/pages/in_process_service.py#L53) |
+| `make_ContentTranslation_url()` | `content_translation_url()` | yes — [wiki_links.py:99](../../src/main_app/services/utils/wiki_links.py#L99) |
+| `get_endpoint()` | `get_endpoint()` | yes — [wiki_links.py:148](../../src/main_app/services/utils/wiki_links.py#L148) |
+| `insertPage()` (pages table) | — | **skip**: unreachable in the PHP flow; if ever needed it belongs in `PagesService`, not here. |
 
 `_register_in_process()` must stay idempotent: PHP uses
 `INSERT … WHERE NOT EXISTS`, and the dashboard links fire repeatedly.
@@ -224,43 +224,33 @@ extending the existing TD base layout ([td_base.html](../../src/templates/td/td_
 which provides `{% block content %}`):
 
 ```html
-{% extends "td/td_base.html" %} {% block title %}Translate — Translation
-Dashboard{% endblock %} {% block content %}
+{% extends "td/td_base.html" %}
+
+{% block title %}Translate — Translation Dashboard{% endblock %}
+
+{% block content %}
 <div class="container py-4">
-    {% if login_url %}
+  {% if login_url %}
     <div class="card">
-        <div class="card-body">
-            <a
-                role="button"
-                class="btn btn-outline-primary"
-                href="{{ login_url }}">
-                <i class="fas fa-sign-in-alt fa-sm fa-fw me-1"></i
-                ><span>Login</span>
-            </a>
-        </div>
+      <div class="card-body">
+        <a role="button" class="btn btn-outline-primary" href="{{ login_url }}">
+          <i class="fas fa-sign-in-alt fa-sm fa-fw me-1"></i><span>Login</span>
+        </a>
+      </div>
     </div>
-    {% elif url %}
-    <br />
-    <h2>
-        <a
-            target="_blank"
-            href="{{ url }}"
-            >Click here to go to ContentTranslation in mdwiki</a
-        >
-    </h2>
+  {% elif url %}
+    <br>
+    <h2><a target="_blank" href="{{ url }}">Click here to go to ContentTranslation in mdwiki</a></h2>
     {% if auto_redirect %}
-    <script type="text/javascript">
-        window.open("{{ url }}", "_self");
-    </script>
-    <meta
-        http-equiv="refresh"
-        content="0; url={{ url }}" />
-    <noscript>
-        <meta
-            http-equiv="refresh"
-            content="0; url={{ url }}" />
-    </noscript>
-    {% endif %} {% endif %}
+      <script type="text/javascript">
+        window.open('{{ url }}', '_self');
+      </script>
+      <meta http-equiv="refresh" content="0; url={{ url }}">
+      <noscript>
+        <meta http-equiv="refresh" content="0; url={{ url }}">
+      </noscript>
+    {% endif %}
+  {% endif %}
 </div>
 {% endblock %}
 ```
@@ -314,13 +304,13 @@ can inject markup (attribute breakout via `'`, or `">` in the meta tag).
 
 The Python port must **not** replicate that:
 
--   `content_translation_url()` runs every component through
-    `urlencode(…, quote_via=quote)`, so the URL itself is well-formed.
--   Render with plain Jinja (`{{ url }}`) — **no `|safe`** — so autoescaping
-    neutralizes any residual `&`/`'`/`"` in the value inside both the `href`
-    attribute and the meta tag.
--   Keep `target="_blank"` with `rel="noopener"` on the link (the PHP markup
-    omits it; harmless to add).
+- `content_translation_url()` runs every component through
+  `urlencode(…, quote_via=quote)`, so the URL itself is well-formed.
+- Render with plain Jinja (`{{ url }}`) — **no `|safe`** — so autoescaping
+  neutralizes any residual `&`/`'`/`"` in the value inside both the `href`
+  attribute and the meta tag.
+- Keep `target="_blank"` with `rel="noopener"` on the link (the PHP markup
+  omits it; harmless to add).
 
 ---
 
@@ -333,17 +323,17 @@ the fixture style of
 
 Cases to cover:
 
-| Case                                            | Assertion                                                                                                                                                          |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Anonymous request                               | 200; response contains a link to the auth login URL; **no** `in_process` row created.                                                                              |
-| Missing `title` or `langcode`                   | 200; page renders without a redirect block; no `in_process` row.                                                                                                   |
-| Logged-in, valid params                         | 200; body contains the `mdwikicx.toolforge.org` URL with `page=<title>`, `to=<langcode>`, `campaign=<camp>`; exactly one `in_process` row for (title, user, lang). |
-| Repeated request (same title/user/lang)         | Still one row — idempotent insert.                                                                                                                                 |
-| `cat` given, `camp` omitted                     | Campaign resolved from the seeded category.                                                                                                                        |
-| `word` negative or non-numeric                  | Clamped/fallback to 0; no 500.                                                                                                                                     |
-| `test=1`                                        | Page renders the link but **no** `window.open` / meta refresh.                                                                                                     |
-| Active `users_no_inprocess` user                | No `in_process` row inserted; redirect page still rendered.                                                                                                        |
-| Injected markup in `title` (e.g. `'"><script>`) | Escaped in output; no raw `<script>` from the title in the body.                                                                                                   |
+| Case | Assertion |
+|---|---|
+| Anonymous request | 200; response contains a link to the auth login URL; **no** `in_process` row created. |
+| Missing `title` or `langcode` | 200; page renders without a redirect block; no `in_process` row. |
+| Logged-in, valid params | 200; body contains the `mdwikicx.toolforge.org` URL with `page=<title>`, `to=<langcode>`, `campaign=<camp>`; exactly one `in_process` row for (title, user, lang). |
+| Repeated request (same title/user/lang) | Still one row — idempotent insert. |
+| `cat` given, `camp` omitted | Campaign resolved from the seeded category. |
+| `word` negative or non-numeric | Clamped/fallback to 0; no 500. |
+| `test=1` | Page renders the link but **no** `window.open` / meta refresh. |
+| Active `users_no_inprocess` user | No `in_process` row inserted; redirect page still rendered. |
+| Injected markup in `title` (e.g. `'"><script>`) | Escaped in output; no raw `<script>` from the title in the body. |
 
 Route wiring is already covered by the blueprint registration; no changes to
 `public/__init__.py` are expected.
@@ -354,33 +344,33 @@ Route wiring is already covered by the blueprint registration; no changes to
 
 ### Phase 1 — Route logic
 
--   [ ] Replace the argument parsing in `translate_med.py` with the six-param
-        scheme (`title`, `langcode`, `cat`, `camp`, `tra_type`, `word`) plus
-        `test`.
--   [ ] Fix the `get_current_user` import to `....services.auth.utils`.
--   [ ] Add `CategoryService` + `UsersNoInprocessService` to `__init__`.
--   [ ] Implement the `cat → campaign` fallback.
--   [ ] Implement the `users_no_inprocess` gate around the `in_process` insert.
--   [ ] Build the CX URL via `content_translation_url()` + `get_endpoint()`.
+- [ ] Replace the argument parsing in `translate_med.py` with the six-param
+      scheme (`title`, `langcode`, `cat`, `camp`, `tra_type`, `word`) plus
+      `test`.
+- [ ] Fix the `get_current_user` import to `....services.auth.utils`.
+- [ ] Add `CategoryService` + `UsersNoInprocessService` to `__init__`.
+- [ ] Implement the `cat → campaign` fallback.
+- [ ] Implement the `users_no_inprocess` gate around the `in_process` insert.
+- [ ] Build the CX URL via `content_translation_url()` + `get_endpoint()`.
 
 ### Phase 2 — Response
 
--   [ ] Create `src/templates/td/translate_med.html` with the three states
-        (login card / empty / redirect page).
--   [ ] Wire `auto_redirect` to the absence of the `test` flag.
--   [ ] Return a value from every branch — no implicit `None`.
+- [ ] Create `src/templates/td/translate_med.html` with the three states
+      (login card / empty / redirect page).
+- [ ] Wire `auto_redirect` to the absence of the `test` flag.
+- [ ] Return a value from every branch — no implicit `None`.
 
 ### Phase 3 — Tests
 
--   [ ] Add `tests/unit/public/routes/td/test_translate_med.py` with the cases
-        listed above.
--   [ ] Run `pytest tests/unit/public/routes/td` and the full suite.
--   [ ] Run `ruff check` / `ruff format` / `black` / `isort` on touched files.
+- [ ] Add `tests/unit/public/routes/td/test_translate_med.py` with the cases
+      listed above.
+- [ ] Run `pytest tests/unit/public/routes/td` and the full suite.
+- [ ] Run `ruff check` / `ruff format` / `black` / `isort` on touched files.
 
 ### Phase 4 — Verification
 
--   [ ] Click a Translate/Lead/Full button on the local dashboard and confirm
-        the `in_process` row appears and the browser lands on
-        `Special:ContentTranslation`.
--   [ ] Compare a side-by-side URL dump from the PHP and Python endpoints for
-        the same input tuple (`title`, `code`, `cat`, `camp`, `type`, `word`).
+- [ ] Click a Translate/Lead/Full button on the local dashboard and confirm
+      the `in_process` row appears and the browser lands on
+      `Special:ContentTranslation`.
+- [ ] Compare a side-by-side URL dump from the PHP and Python endpoints for
+      the same input tuple (`title`, `code`, `cat`, `camp`, `type`, `word`).
