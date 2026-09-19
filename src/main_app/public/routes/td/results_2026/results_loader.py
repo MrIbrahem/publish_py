@@ -9,7 +9,7 @@ Reference PHP files:
   - src/backend/results_2026/results_table_inprocess.php (make_one_row_new_inprocess, make_results_table_inprocess)
   - src/results/helps.php                        (make_translate_urls)
 
-The orchestrator returns a plain dict (the "results bundle") that
+The orchestrator returns a :class:`ResultsBundle` (the "results bundle") that
 ``templates/index.html`` consumes via three Jinja partials.
 """
 
@@ -18,15 +18,13 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....database.services import (
+from flask import url_for
+
+from .....database.services import (
     InProcessService,
-    PagesService,
-    Results2026Service,
-    TranslateTypeService,
 )
-from ....services.utils.wiki_links import (
+from .....services.utils.wiki_links import (
     content_translation_url,
-    get_endpoint,
     tr_link_medwiki,
     wikidata_link,
     wikipedia_link,
@@ -35,7 +33,7 @@ from ....services.utils.wiki_links import (
 logger = logging.getLogger(__name__)
 
 
-def _get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str, dict]:
+def get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str, dict]:
     """Mirror of PHP ``getinprocess_n($missing, $code)``."""
     service = InProcessService()
     records = service.list_in_process_by_lang(code)
@@ -54,32 +52,6 @@ def _get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str,
             "add_date": r.add_date,  # datetime or None
         }
     return result
-
-
-# ---------------------------------------------------------------------------
-# load_translate_type — partition translate_type rows into the two sets
-# ---------------------------------------------------------------------------
-
-
-def _load_translate_type_sets() -> tuple[set[str], set[str]]:
-    """Mirror of PHP ``load_translate_type('no')`` + ``load_translate_type('full')``.
-
-    Returns ``(nolead_titles, full_titles)``.
-    """
-    nolead: set[str] = set()
-    full: set[str] = set()
-    try:
-        service = TranslateTypeService()
-        rows = service.list_translate_types()
-    except Exception:
-        logger.exception("Failed to load translate_type rows")
-        return nolead, full
-    for row in rows:
-        if row.tt_full == 1:
-            full.add(row.tt_title)
-        if row.tt_lead == 0:
-            nolead.add(row.tt_title)
-    return nolead, full
 
 
 # ---------------------------------------------------------------------------
@@ -116,9 +88,13 @@ def _missing_translate_html(
     words: int,
     full_tr_user: bool,
     is_video_title: bool,
+    user_is_logged_in: bool,
 ) -> str:
     """Mirror PHP ``_make_one_row_results`` — translate column HTML."""
     # logic from results_table.php — anonymous user
+    if not user_is_logged_in:
+        login_url = url_for("auth.login")
+        return f"<a href='{login_url}' class='btn btn-outline-primary btn-sm'>Login</a>"
 
     full_url = tr_link_medwiki(title, langcode, cat, camp, "all", words)
     lead_url = tr_link_medwiki(title, langcode, cat, camp, tra_type, words)
@@ -145,6 +121,7 @@ def _make_missing_row_dict(
     cat: str,
     camp: str,
     full_tr_user: bool,
+    user_is_logged_in: bool,
 ) -> dict[str, Any]:
     """Build one row dict for the Results table (PHP _make_one_row_results)."""
     is_video_title = _is_video(title)
@@ -160,6 +137,7 @@ def _make_missing_row_dict(
         words=words,
         full_tr_user=full_tr_user,
         is_video_title=is_video_title,
+        user_is_logged_in=user_is_logged_in,
     )
 
     # PHP "$count = $full && (substr != 'video:') ? '$count.Full' : $count"
@@ -178,7 +156,7 @@ def _make_missing_row_dict(
     }
 
 
-def _build_missing_rows(
+def build_missing_rows(
     *,
     missing: list[dict],
     langcode: str,
@@ -188,6 +166,7 @@ def _build_missing_rows(
     full_tr_user: bool,
     nolead_titles: set[str],
     full_titles: set[str],
+    user_is_logged_in: bool,
 ) -> list[dict[str, Any]]:
     """Mirror of PHP ``make_results_table_2026``."""
     do_full = (tra_type or "lead") != "all"
@@ -221,6 +200,7 @@ def _build_missing_rows(
             cat=cat,
             camp=camp,
             full_tr_user=full_tr_user,
+            user_is_logged_in=user_is_logged_in,
         )
 
         # PHP: "if (!$do_full || $full_tr_user) { emit and continue; }"
@@ -251,6 +231,7 @@ def _build_missing_rows(
                     cat=cat,
                     camp=camp,
                     full_tr_user=full_tr_user,
+                    user_is_logged_in=user_is_logged_in,
                 )
             )
 
@@ -315,7 +296,7 @@ def _format_inprocess_date(value: Any) -> str:
     return text
 
 
-def _build_inprocess_rows(
+def build_inprocess_rows(
     *,
     inprocess: dict[str, dict],
     langcode: str,
@@ -325,6 +306,7 @@ def _build_inprocess_rows(
     full_tr_user: bool,
     titles_infos: dict[str, dict],
     endpoint: str,
+    user_is_logged_in: bool,
 ) -> list[dict[str, Any]]:
     """Mirror of PHP ``make_results_table_inprocess``."""
     rows: list[dict[str, Any]] = []
@@ -385,7 +367,7 @@ def _build_inprocess_rows(
 # ---------------------------------------------------------------------------
 
 
-def _build_exists_rows(
+def build_exists_rows(
     *,
     exists: dict[str, dict],
     langcode: str,
@@ -393,6 +375,7 @@ def _build_exists_rows(
     camp: str,
     user_coord: bool,
     endpoint: str,
+    user_is_logged_in: bool,
 ) -> tuple[list[dict[str, Any]], int, int]:
     """Mirror of PHP ``make_results_table_exists_2026``.
 
@@ -446,160 +429,9 @@ def _build_exists_rows(
     return rows, count_translated, count_translated_before
 
 
-# ---------------------------------------------------------------------------
-# Public entry point
-# ---------------------------------------------------------------------------
-
-
-def results_loader_2026(
-    *,
-    code: str,
-    camp: str,
-    cat: str,
-    tra_type: str,
-    code_lang_name: str,
-    user_coord: bool,
-    settings: dict[str, bool],
-    full_tr_user: bool,
-) -> dict[str, Any]:
-    """Build the results bundle for the index page.
-
-    Mirrors PHP ``results_loader_2026($data)`` + ``Results_tables_2026(...)``.
-    Returns a dict with the data the Jinja templates need; produces no HTML
-    side effects of its own.
-    """
-    # logic from results_2026/get_results_2026.php
-    bucket = get_results_2026(cat, code)
-
-    # logic from results_2026/index.php — load_translate_type('no'|'full')
-    nolead_titles, full_titles = _load_translate_type_sets()
-
-    # logic from results_2026/index.php — Results_tables_2026
-    # Build a lookup of per-title metrics so the inprocess rows can reuse the
-    # missing/exists data we already loaded (PHP gets this via
-    # get_td_or_sql_titles_infos — a separate large query we deliberately skip).
-    titles_infos: dict[str, dict] = {}
-    for row in bucket["missing"]:
-        titles_infos[row["title"]] = row
-    for title, row in bucket["exists"].items():
-        titles_infos.setdefault(title, row)
-
-    endpoint = get_endpoint()
-
-    show_btn = settings["show_translation_button"]
-    if isinstance(show_btn, str):
-        show_btn = show_btn.lower() in ("1", "true", "yes", "on")
-    inprocess_button = "1" if (show_btn and user_coord) else "0"
-
-    missing_rows = _build_missing_rows(
-        missing=bucket["missing"],
-        langcode=code,
-        cat=cat,
-        camp=camp,
-        tra_type=tra_type,
-        full_tr_user=full_tr_user,
-        nolead_titles=nolead_titles,
-        full_titles=full_titles,
-    )
-
-    inprocess_rows = _build_inprocess_rows(
-        inprocess=bucket["inprocess"],
-        langcode=code,
-        cat=cat,
-        camp=camp,
-        tra_btn=inprocess_button,
-        full_tr_user=full_tr_user,
-        titles_infos=titles_infos,
-        endpoint=endpoint,
-    )
-
-    exists_rows, exists_translated_count, exists_translated_before_count = _build_exists_rows(
-        exists=bucket["exists"],
-        langcode=code,
-        cat=cat,
-        camp=camp,
-        user_coord=user_coord,
-        endpoint=endpoint,
-    )
-
-    return {
-        "summary_data": bucket["summary_data"],
-        "summary_count": len(bucket["missing"]),
-        "missing_rows": missing_rows,
-        "inprocess_rows": inprocess_rows,
-        "inprocess_count": len(bucket["inprocess"]),
-        "exists_rows": exists_rows,
-        "exists_count": len(bucket["exists"]),
-        "exists_translated_count": exists_translated_count,
-        "exists_translated_before_count": exists_translated_before_count,
-        "show_translation_button": inprocess_button,
-        "code": code,
-        "camp": camp,
-        "cat": cat,
-        "tra_type": tra_type or "lead",
-        "code_lang_name": code_lang_name,
-        "full_tr_user": full_tr_user,
-    }
-
-
-# ---------------------------------------------------------------------------
-# get_results_2026 — data fetcher
-# ---------------------------------------------------------------------------
-
-
-def get_results_2026(cat: str, code: str) -> dict[str, Any]:
-    """Mirror of PHP ``get_results_2026($cat, $code)``.
-
-    Returns ``{"summary_data", "inprocess", "exists", "missing"}`` where:
-      - ``inprocess`` is a dict[title -> in_process row dict]
-      - ``exists``    is a dict[title -> exists row dict] with ``via`` set
-      - ``missing``   is a list[missing row dict] (in DB order)
-    """
-    # logic from results_2026/get_results_2026.php — exists_via_td
-    pages_service = PagesService()
-    exists_via_td_rows = pages_service.list_pages_by_lang_cat(code, cat)
-    exists_via_td = {p.title: p for p in exists_via_td_rows}
-
-    result_2026_service = Results2026Service()
-    items_missing = result_2026_service.missing_by_lang_and_category(code, cat)
-    missing_by_title = {row["title"]: row for row in items_missing if row.get("title")}
-    items_exists_list = result_2026_service.exists_by_lang_and_category(code, cat)
-    items_exists: dict[str, dict] = {row["title"]: row for row in items_exists_list}
-
-    # Tag each exists row with via="td" or via="before" — PHP foreach loop.
-    for title, row in items_exists.items():
-        row["via"] = "td" if title in exists_via_td else "before"
-
-    # logic from results_2026/get_results_2026.php — getinprocess_n
-    missing_titles = {row["title"] for row in items_missing}
-    inprocess = _get_inprocess_for_missing(missing_titles, code)
-
-    # Remove inprocess titles from missing.
-    if inprocess:
-        inprocess_titles = set(inprocess.keys())
-        items_missing = [m for m in items_missing if m["title"] not in inprocess_titles]
-
-    summary_data = {
-        "code": code,
-        "cat": cat,
-        "len_inprocess": len(inprocess),
-        "len_missing": len(items_missing),
-        "len_exists": len(items_exists),
-        "total": len(items_exists) + len(items_missing) + len(inprocess),
-    }
-    # Match PHP ksort($items_exists)
-    items_exists = dict(sorted(items_exists.items()))
-
-    return {
-        "summary_data": summary_data,
-        "inprocess": inprocess,
-        "exists": items_exists,
-        "missing": items_missing,
-        "missing_by_title": missing_by_title,
-    }
-
-
 __all__ = [
-    "results_loader_2026",
-    "get_results_2026",
+    "build_exists_rows",
+    "build_inprocess_rows",
+    "build_missing_rows",
+    "get_inprocess_for_missing",
 ]

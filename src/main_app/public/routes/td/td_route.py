@@ -24,7 +24,7 @@ from ....database.services import (
     SettingsService,
 )
 from ....services.auth.utils import get_current_user
-from .results_2026 import results_loader_2026
+from .results_2026 import ResultsBundle, results_loader_2026
 from .results_api import results_api_result
 
 logger = logging.getLogger(__name__)
@@ -113,11 +113,12 @@ class TDRoutes:
         user = get_current_user()
         user_coord = bool(user and user.is_active_admin)
         full_tr_user = bool(user and self.full_service.is_full_translator(user.username))
+        user_is_logged_in = bool(user)
 
         parsed_settings = parsed["settings"]
 
         # PHP: only invoke results_loader_2026 when both code and camp are valid.
-        results_bundle = {}
+        results_bundle: ResultsBundle | None = None
         if parsed["code"] and parsed["camp"] and parsed["code_lang_name"]:
             try:
                 results_bundle = results_loader_2026(
@@ -129,6 +130,7 @@ class TDRoutes:
                     user_coord=user_coord,
                     settings=parsed_settings,
                     full_tr_user=full_tr_user,
+                    user_is_logged_in=user_is_logged_in,
                 )
             except Exception:
                 logger.exception(
@@ -139,8 +141,8 @@ class TDRoutes:
                 )
                 flash("Failed to load results — please try again.", "danger")
 
-        if results_bundle.get("summary_data"):
-            results_bundle["summary_data"]["code_lang_name"] = parsed["code_lang_name"]
+        if results_bundle and results_bundle.summary_data:
+            results_bundle.summary_data["code_lang_name"] = parsed["code_lang_name"]
 
         return render_template(
             "td/index.html",
