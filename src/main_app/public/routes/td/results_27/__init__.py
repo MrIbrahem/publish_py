@@ -19,7 +19,7 @@ templates.
 from __future__ import annotations
 
 from .bundle import ResultsBundle
-from .data import ResultsFetcher, get_results_27
+from .data import ResultsFetcher
 from .loader import results_loader_27
 from .results_loader import ResultsLoader
 
@@ -28,5 +28,4 @@ __all__ = [
     "ResultsLoader",
     "ResultsBundle",
     "ResultsFetcher",
-    "get_results_27",
 ]
