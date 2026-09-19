@@ -25,8 +25,8 @@ class ResultsCounts:
 @dataclass
 class ResultsRows:
     missing_rows: list[MissingItem]
-    inprocess_rows: list[dict[str, Any]]
-    exists_rows: list[dict[str, Any]]
+    inprocess_rows: list[InProcessItem]
+    exists_rows: list[ExistsItem]
 
 
 @dataclass

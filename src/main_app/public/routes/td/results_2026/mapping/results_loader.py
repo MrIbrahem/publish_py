@@ -17,11 +17,11 @@ from __future__ import annotations
 
 import logging
 
-from .....services.utils.wiki_links import get_endpoint
-from .bundle import ResultsBundle, ResultsCounts, ResultsRows
-from .data import ResultsFetcher
-from .helpers import TranslateTypeLoader
-from .tables import ExistsTable, InProcessTable, MissingTable
+from ......services.utils.wiki_links import get_endpoint
+from ..bundle import ResultsBundle, ResultsCounts, ResultsRows
+from ..data import ResultsFetcher
+from ..helpers import TranslateTypeLoader
+from ..tables import ExistsTable, InProcessTable, MissingTable
 
 logger = logging.getLogger(__name__)
 
@@ -91,24 +91,16 @@ class ResultsLoader:
         missing_rows = missing_table.build(bucket["missing"])
 
         inprocess_table = InProcessTable(
-            langcode=code,
-            cat=cat,
-            camp=camp,
             inprocess_button=inprocess_button,
             full_tr_user=full_tr_user,
             titles_infos=titles_infos,
             endpoint=endpoint,
-            user_is_logged_in=user_is_logged_in,
         )
         inprocess_rows = inprocess_table.build(bucket["inprocess"])
 
         exists_table = ExistsTable(
-            langcode=code,
-            cat=cat,
-            camp=camp,
             user_coord=user_coord,
             endpoint=endpoint,
-            user_is_logged_in=user_is_logged_in,
         )
 
         exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
