@@ -1,30 +1,36 @@
 {# Exists table — port of src/backend/results_2026/results_table_exists.php #}
-<table class="table compact table-striped table_100 table_text_left table_responsive display">
+<table class="table compact table-striped table_100 table_text_left display table_responsive">
     <thead>
         <tr>
             <th class="num">#</th>
             <th class="spannowrap" style="text-align: center">Title</th>
             <th><span>Translate</span></th>
-            <th>Translated ({{ results.exists_translated_count }})</th>
-            <th>Translated before ({{ results.exists_translated_before_count }})</th>
+            <th>Translated ({{ results.counts.exists_translated_count }})</th>
+            <th>Translated before ({{ results.counts.exists_translated_before_count }})</th>
             <th class="spannowrap" style="text-align: center">
                 <span data-bs-toggle="tooltip" data-bs-title="Wikidata identifier">Qid</span>
             </th>
         </tr>
     </thead>
     <tbody>
-        {% for row in results.exists_rows %}
+        {% for row in results.rows.exists_rows %}
         <tr>
-            <th scope="row" style="text-align: center">{{ row.n }}</th>
+            <th scope="row" style="text-align: center">{{ loop.index }}</th>
             <td class="link_container spannowrap">
                 <a href="https://mdwiki.org/wiki/{{ row.display_title | replace(' ', '_') | urlencode }}"
                     target="_blank">
                     {{ row.display_title }}
                 </a>
             </td>
-            <td>
+            <th>
+                {% if is_authenticated %}
                 {{ row.translate_html|safe }}
-            </td>
+                {% else %}
+                <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}">
+                    <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
+                </a>
+                {% endif %}
+            </th>
             <td>
                 {{ row.translated_html|safe }}
             </td>

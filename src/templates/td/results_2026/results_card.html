@@ -1,0 +1,46 @@
+{% from "_macros.html" import card_header %}
+
+{% macro results_summary(data) %}
+
+{% set category_href = "https://mdwiki.org/wiki/Category:" ~ (data.cat | replace(" ", "_") | urlencode) %}
+{% set wiki_href = "https://" ~ data.code ~ ".wikipedia.org" %}
+Found {{ data.total }} pages in
+<a target="_blank" rel="noopener noreferrer" href="{{ category_href }}">Category</a>,
+{{ data.len_exists }} exists, and {{ data.len_missing }} missing in
+(<a href="{{ wiki_href }}" target="_blank" rel="noopener noreferrer">{{ data.code_lang_name or data.code }}</a>),
+{{ data.len_inprocess }} In process.
+{% endmacro %}
+
+<br>
+<div class="card">
+    <div class="card-header">
+        {{ card_header("Results: (" ~ results.counts.summary_count ~ ")", results_summary(results.summary_data)) }}
+    </div>
+    <div class="card-body1 card2">
+        {% include "td/results_2026/missing_table.html" %}
+    </div>
+</div>
+
+{% if results.counts.inprocess_count > 0 %}
+<br>
+<div class="card">
+    <div class="card-header">
+        {{ card_header("In process: (" ~ results.counts.inprocess_count ~ ")") }}
+    </div>
+    <div class="card-body1 card2">
+        {% include "td/results_2026/inprocess_table.html" %}
+    </div>
+</div>
+{% endif %}
+
+{% if settings and settings.show_exists_table == True and results.counts.exists_count > 1 %}
+<br>
+<div class="card">
+    <div class="card-header">
+        {{ card_header("Exists: (" ~ results.counts.exists_count ~ ")") }}
+    </div>
+    <div class="card-body1 card2">
+        {% include "td/results_2026/exists_table.html" %}
+    </div>
+</div>
+{% endif %}

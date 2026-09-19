@@ -12,6 +12,22 @@ from typing import Any
 
 
 @dataclass
+class ResultsCounts:
+    summary_count: int
+    inprocess_count: int
+    exists_count: int
+    exists_translated_count: int
+    exists_translated_before_count: int
+
+
+@dataclass
+class ResultsRows:
+    missing_rows: list[dict[str, Any]]
+    inprocess_rows: list[dict[str, Any]]
+    exists_rows: list[dict[str, Any]]
+
+
+@dataclass
 class ResultsBundle:
     """The results bundle returned by ``results_loader_27()``.
 
@@ -19,24 +35,17 @@ class ResultsBundle:
     ``code_lang_name`` by the route). Mirrors PHP ``Results_tables_2026``.
     """
 
+    counts: ResultsCounts
+    rows: ResultsRows
     summary_data: dict[str, Any]
-    summary_count: int
-    missing_rows: list[dict[str, Any]]
-    inprocess_rows: list[dict[str, Any]]
-    inprocess_count: int
-    exists_rows: list[dict[str, Any]]
-    exists_count: int
-    exists_translated_count: int
-    exists_translated_before_count: int
     show_translation_button: str
-    code: str
-    camp: str
-    cat: str
     tra_type: str
     code_lang_name: str
     full_tr_user: bool
 
 
 __all__ = [
+    "ResultsRows",
+    "ResultsCounts",
     "ResultsBundle",
 ]

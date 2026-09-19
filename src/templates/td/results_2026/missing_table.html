@@ -27,15 +27,25 @@
         </tr>
     </thead>
     <tbody>
-        {% for row in results.missing_rows %}
+        {% for row in results.rows.missing_rows %}
         <tr>
-            <th class="num" scope="row">{{ row.n }}</th>
+            <th class="num" scope="row">
+                {{ row.n }}
+            </th>
             <td class="link_container">
                 <a target="_blank" href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}">
                     {{ row.title }}
                 </a>
             </td>
-            <th>{{ row.translate_html|safe }}</th>
+            <th>
+                {% if is_authenticated %}
+                {{ row.translate_html|safe }}
+                {% else %}
+                <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}">
+                    <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
+                </a>
+                {% endif %}
+            </th>
             <td class="num" style="text-align: left">
                 {{ row.en_views }}
             </td>

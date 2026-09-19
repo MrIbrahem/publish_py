@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from .bundle import ResultsBundle
-from .loader import get_results_2026, results_loader_2026
+from .bundle import ResultsBundle, ResultsCounts, ResultsRows
+from .data import ResultsFetcher
+from .mapping import ResultsLoader
 
 __all__ = [
+    "ResultsLoader",
     "ResultsBundle",
-    "get_results_2026",
-    "results_loader_2026",
+    "ResultsRows",
+    "ResultsCounts",
+    "ResultsFetcher",
 ]

@@ -1,5 +1,5 @@
 {# In-process table — port of src/backend/results_2026/results_table_inprocess.php #}
-{# Header mirrors make_table_start with inprocess=true (extra user/date columns; Translate header collapses to empty when tra_btn != '1'). #}
+{# Header mirrors make_table_start with inprocess=true (extra user/date columns; Translate header collapses to empty when inprocess_button != '1'). #}
 {% set show_translate_header = settings and settings.show_translation_button == True %}
 <table class="table compact table-striped table_100 table_text_left display table_responsive_main">
     <thead>
@@ -34,15 +34,23 @@
         </tr>
     </thead>
     <tbody>
-        {% for row in results.inprocess_rows %}
+        {% for row in results.rows.inprocess_rows %}
         <tr>
-            <th class="num" scope="row">{{ row.n }}</th>
+            <th class="num" scope="row">{{ loop.index }}</th>
             <td class="link_container">
                 <a target="_blank" href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}">
                     {{ row.title }}
                 </a>
             </td>
-            <th>{{ row.translate_html|safe }}</th>
+            <th>
+                {% if is_authenticated %}
+                {{ row.translate_html|safe }}
+                {% else %}
+                <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}">
+                    <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
+                </a>
+                {% endif %}
+            </th>
             <td class="num" style="text-align: left">
                 {{ row.en_views }}
             </td>
