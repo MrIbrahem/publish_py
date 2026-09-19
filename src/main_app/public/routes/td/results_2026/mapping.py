@@ -111,6 +111,7 @@ class ResultsLoader:
             endpoint=endpoint,
             user_is_logged_in=user_is_logged_in,
         )
+
         exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
             items=bucket["exists"],
         )
@@ -130,9 +131,6 @@ class ResultsLoader:
             ),
             summary_data=bucket["summary_data"],
             show_translation_button=inprocess_button,
-            code=code,
-            camp=camp,
-            cat=cat,
             tra_type=tra_type or "lead",
             code_lang_name=code_lang_name,
             full_tr_user=full_tr_user,
