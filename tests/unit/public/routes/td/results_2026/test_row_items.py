@@ -38,10 +38,10 @@ class TestExistsItem:
         item = ExistsItem.from_row(
             title="Tuberculosis",
             counter=3,
-            target_tab={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
+            row={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
         )
         assert item.counter == 3
-        assert item.display_title == "Tuberculosis"
+        assert item.title == "Tuberculosis"
         assert item.target == "Tuberkulose"
         assert item.via == "td"
         assert item.qid == "Q1338"
@@ -50,9 +50,9 @@ class TestExistsItem:
         item = ExistsItem.from_row(
             title="Influenza_vaccine",
             counter=1,
-            target_tab={},
+            row={},
         )
-        assert item.display_title == "Influenza vaccine"
+        assert item.title == "Influenza vaccine"
         # Missing keys degrade to empty strings (no KeyError).
         assert item.target == ""
         assert item.via == ""
@@ -62,12 +62,11 @@ class TestExistsItem:
         item = ExistsItem.from_row(
             title="Tuberculosis",
             counter=1,
-            target_tab={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
+            row={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
             endpoint=ENDPOINT,
-            user_coord=True,
         )
         with app.test_request_context("/table?code=ar"):
-            html = str(item.render("ar", "RTT", is_authenticated=True))
+            html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=True))
 
         assert "<tr>" in html
         # Translate button links to ContentTranslation for the lead section.
@@ -82,12 +81,11 @@ class TestExistsItem:
         item = ExistsItem.from_row(
             title="Tuberculosis",
             counter=1,
-            target_tab={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
+            row={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
             endpoint=ENDPOINT,
-            user_coord=False,
         )
         with app.test_request_context("/table?code=ar"):
-            html = str(item.render("ar", "RTT", is_authenticated=True))
+            html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=False))
 
         assert "Translate</a>" not in html
         # Row is still complete.
@@ -97,12 +95,11 @@ class TestExistsItem:
         item = ExistsItem.from_row(
             title="Tuberculosis",
             counter=1,
-            target_tab={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
+            row={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
             endpoint=ENDPOINT,
-            user_coord=True,
         )
         with app.test_request_context("/table?code=ar"):
-            html = str(item.render("ar", "RTT", is_authenticated=False))
+            html = str(item.render("ar", "RTT", is_authenticated=False, user_coord=True))
 
         assert "/auth/login" in html
         assert "Translate</a>" not in html
@@ -111,12 +108,11 @@ class TestExistsItem:
         item = ExistsItem.from_row(
             title="Influenza",
             counter=2,
-            target_tab={"target": "Grippe", "via": "other", "qid": "Q1"},
+            row={"target": "Grippe", "via": "other", "qid": "Q1"},
             endpoint=ENDPOINT,
-            user_coord=False,
         )
         with app.test_request_context("/table?code=ar"):
-            html = str(item.render("ar", "RTT", is_authenticated=True))
+            html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=False))
 
         # via != "td" → link still rendered exactly once.
         assert html.count("ar.wikipedia.org/wiki/Grippe") == 1
@@ -125,12 +121,11 @@ class TestExistsItem:
         item = ExistsItem.from_row(
             title="A & B <i>",
             counter=1,
-            target_tab={},
+            row={},
             endpoint=ENDPOINT,
-            user_coord=False,
         )
         with app.test_request_context("/table?code=ar"):
-            html = str(item.render("ar", "RTT", is_authenticated=True))
+            html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=False))
 
         # href is URL-encoded (spaces → "_", "&" → %26, "<i>" → %3Ci%3E),
         # while the visible text is HTML-escaped.
