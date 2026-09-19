@@ -94,6 +94,7 @@ class ResultsFetcher:
             }
         return result
 
+
 __all__ = [
     "ResultsFetcher",
 ]
