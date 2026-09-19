@@ -108,7 +108,7 @@ class ResultsLoader:
 
         exists_table = ExistsRowBuilder()
         exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
-            exists=bucket["exists"],
+            items=bucket["exists"],
             langcode=code,
             cat=cat,
             camp=camp,
