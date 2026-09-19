@@ -16,6 +16,7 @@ from flask import (
 from werkzeug.datastructures import MultiDict
 
 from ....database.services import CategoryService, LeaderboardService, ProjectService
+from ..api.form_utils import FormData
 from ..api.top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
@@ -113,8 +114,9 @@ class LeaderBoardRoutes:
         cat = campaign_to_cats.get(args.camp) if args.camp else None
         chart_data = self._load_chart_data(cat, args.year, args.camp, args.user_group)
 
-        langs_res = get_top_langs(request.args)
-        users_res = get_top_users(request.args)
+        form = FormData.get_form(request.args)
+        langs_res = get_top_langs(form)
+        users_res = get_top_users(form)
 
         langs_data = langs_res.to_json()
         users_data = users_res.to_json()

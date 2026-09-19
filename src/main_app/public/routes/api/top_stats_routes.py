@@ -11,7 +11,6 @@ import logging
 
 from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
-from werkzeug.datastructures import MultiDict
 
 from ....database.models import (
     CategoryRecord,
@@ -22,7 +21,7 @@ from ....database.models import (
     WordRecord,
 )
 from ....extensions import db
-from .form_utils import FormData, get_form
+from .form_utils import FormData
 from .objects import (
     TopLangsResult,
     TopLangStat,
@@ -57,7 +56,7 @@ def apply_filters(form: FormData, query: Query) -> Query:
     return query
 
 
-def get_top_langs(request_args: MultiDict[str, str]) -> TopLangsResult:
+def get_top_langs(form: FormData) -> TopLangsResult:
     """
     Handle top_langs API requests.
     Returns aggregated statistics per language.
@@ -111,8 +110,6 @@ def get_top_langs(request_args: MultiDict[str, str]) -> TopLangsResult:
     """
 
     # /api/top_langs?camp=Video&user_group=all&year=all&month=All&cat=RTTVideo
-
-    form = get_form(request_args)
 
     try:
         # Build the word count expression
@@ -183,7 +180,7 @@ def get_top_langs(request_args: MultiDict[str, str]) -> TopLangsResult:
     return TopLangsResult(results=data, count=len(data))
 
 
-def get_top_users(request_args: MultiDict[str, str]) -> TopUsersResult:
+def get_top_users(form: FormData) -> TopUsersResult:
     """
     Handle top_users API requests.
     Returns aggregated statistics per user.
@@ -234,8 +231,6 @@ def get_top_users(request_args: MultiDict[str, str]) -> TopUsersResult:
     Returns:
         JSON response with user statistics
     """
-
-    form = get_form(request_args)
 
     try:
         # Build the word count expression
