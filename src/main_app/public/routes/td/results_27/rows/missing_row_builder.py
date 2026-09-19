@@ -1,4 +1,5 @@
-"""Port of ``results_27/Rows/MissingRowBuilder.php``.
+"""
+Port of ``results_27/Rows/MissingRowBuilder.php``.
 
 Builds one row dict for the Results (missing) table. Mirrors PHP
 ``MissingRowBuilder::build()``, but returns data for the Jinja partial
@@ -7,12 +8,22 @@ instead of an HTML string.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from flask import url_for
 
-from ......services.utils.wiki_links import tr_link_medwiki, wikidata_link
+from ......services.utils.wiki_links import (
+    tr_link_medwiki,
+    wikidata_link,
+)
 from ._common import _is_video, _row_metrics
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Row builders
+# ---------------------------------------------------------------------------
 
 
 class MissingRowBuilder:
@@ -81,7 +92,7 @@ class MissingRowBuilder:
         is_video_title: bool,
         user_is_logged_in: bool,
     ) -> str:
-        """PHP ``_make_one_row_results`` translate column HTML."""
+        """PHP ``_make_one_row_results`` — translate column HTML."""
         # logic from results_table.php — anonymous user
         if not user_is_logged_in:
             login_url = url_for("auth.login")

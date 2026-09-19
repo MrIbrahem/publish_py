@@ -7,10 +7,21 @@ instead of an HTML string.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
-from ......services.utils.wiki_links import content_translation_url, wikidata_link
+from ......services.utils.wiki_links import (
+    content_translation_url,
+    wikidata_link,
+)
 from ._common import _is_video, _row_metrics
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# In-process rows
+# ---------------------------------------------------------------------------
 
 
 def _format_inprocess_date(value: Any) -> str:

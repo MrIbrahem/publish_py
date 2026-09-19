@@ -46,7 +46,8 @@ class ResultsLoader:
         full_tr_user: bool,
         user_is_logged_in: bool,
     ) -> ResultsBundle:
-        """Build the results bundle for the index page.
+        """
+        Build the results bundle for the index page.
 
         Mirrors PHP ``results_loader_2026($data)`` + ``Results_tables_2026(...)``.
         Returns a :class:`ResultsBundle` with the data the Jinja templates need;
@@ -79,7 +80,8 @@ class ResultsLoader:
 
         inprocess_button = "1" if (show_btn and user_coord) else "0"
 
-        missing_rows = MissingRowBuilder().build(
+        missing_table = MissingRowBuilder()
+        missing_rows = missing_table.build(
             missing=bucket["missing"],
             langcode=code,
             cat=cat,
@@ -91,7 +93,8 @@ class ResultsLoader:
             user_is_logged_in=user_is_logged_in,
         )
 
-        inprocess_rows = InProcessRowBuilder().build(
+        inprocess_table = InProcessRowBuilder()
+        inprocess_rows = inprocess_table.build(
             inprocess=bucket["inprocess"],
             langcode=code,
             cat=cat,
@@ -103,7 +106,8 @@ class ResultsLoader:
             user_is_logged_in=user_is_logged_in,
         )
 
-        exists_rows, exists_translated_count, exists_translated_before_count = ExistsRowBuilder().build(
+        exists_table = ExistsRowBuilder()
+        exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
             exists=bucket["exists"],
             langcode=code,
             cat=cat,

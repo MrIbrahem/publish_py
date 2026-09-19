@@ -18,6 +18,10 @@ from .tables import ExistsTable, InProcessTable, MissingTable
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Public entry point
+# ---------------------------------------------------------------------------
+
 
 class ResultsLoader:
     """Builds the results bundle for the index page."""
@@ -35,7 +39,8 @@ class ResultsLoader:
         full_tr_user: bool,
         user_is_logged_in: bool,
     ) -> ResultsBundle:
-        """Mirrors PHP ``results_loader_27($data)`` + ``Results_tables_2026()``.
+        """
+        Mirrors PHP ``results_loader_27($data)`` + ``Results_tables_2026()``.
 
         Returns a :class:`ResultsBundle` with the data the Jinja templates
         need; produces no HTML side effects of its own.
@@ -67,7 +72,7 @@ class ResultsLoader:
 
         inprocess_button = "1" if (show_btn and user_coord) else "0"
 
-        missing_rows = MissingTable(
+        missing_table = MissingTable(
             langcode=code,
             cat=cat,
             camp=camp,
@@ -76,9 +81,10 @@ class ResultsLoader:
             nolead_titles=nolead_titles,
             full_titles=full_titles,
             user_is_logged_in=user_is_logged_in,
-        ).build(bucket["missing"])
+        )
+        missing_rows = missing_table.build(bucket["missing"])
 
-        inprocess_rows = InProcessTable(
+        inprocess_table = InProcessTable(
             langcode=code,
             cat=cat,
             camp=camp,
@@ -87,16 +93,18 @@ class ResultsLoader:
             titles_infos=titles_infos,
             endpoint=endpoint,
             user_is_logged_in=user_is_logged_in,
-        ).build(bucket["inprocess"])
+        )
+        inprocess_rows = inprocess_table.build(bucket["inprocess"])
 
-        exists_rows, exists_translated_count, exists_translated_before_count = ExistsTable(
+        exists_table = ExistsTable(
             langcode=code,
             cat=cat,
             camp=camp,
             user_coord=user_coord,
             endpoint=endpoint,
             user_is_logged_in=user_is_logged_in,
-        ).build(bucket["exists"])
+        )
+        exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(bucket["exists"])
 
         return ResultsBundle(
             summary_data=bucket["summary_data"],

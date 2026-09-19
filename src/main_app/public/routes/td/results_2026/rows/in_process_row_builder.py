@@ -9,7 +9,7 @@ from ......services.utils.wiki_links import (
     content_translation_url,
     wikidata_link,
 )
-from ..rows._common import _is_video, _row_metrics
+from ._common import _is_video, _row_metrics
 
 logger = logging.getLogger(__name__)
 

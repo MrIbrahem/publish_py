@@ -6,11 +6,16 @@ from typing import Any
 
 
 def _is_video(title: str) -> bool:
+    """PHP ``str_starts_with(strtolower($title), "video:")``."""
     return title.lower().startswith("video:")
 
 
 def _row_metrics(title_data: dict, tra_type: str) -> tuple[int, int, str, Any, str]:
-    """Pick (words, refs, importance, en_views, qid) per PHP _make_one_row_results."""
+    """Pick (words, refs, importance, en_views, qid) per PHP row builders.
+
+    ``tra_type == "all"`` reads the whole-article counters; otherwise the
+    lead-only counters are used.
+    """
     if tra_type == "all":
         words = title_data.get("w_all_words") or 0
         refs = title_data.get("w_all_refs") or title_data.get("r_all_refs") or 0
