@@ -30,11 +30,11 @@
         {% for row in results.rows.missing_rows %}
         {{
             row.render(
-                form_data.args.code,
-                form_data.args.cat,
-                form_data.args.camp,
-                form_data.full_tr_user,
-                is_authenticated
+                langcode=form_data.args.code,
+                cat=form_data.args.cat,
+                camp=form_data.args.camp,
+                full_tr_user=form_data.full_tr_user,
+                is_authenticated=is_authenticated
             )
         }}
         {% endfor %}

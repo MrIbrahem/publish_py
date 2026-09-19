@@ -17,11 +17,11 @@ from __future__ import annotations
 
 import logging
 
-from ......services.utils.wiki_links import get_endpoint
-from ..bundle import ResultsBundle, ResultsCounts, ResultsRows
-from ..data import ResultsFetcher
-from ..helpers import TranslateTypeLoader
-from ..tables import ExistsTable, InProcessTable, MissingTable
+from .....services.utils.wiki_links import get_endpoint
+from .bundle import ResultsBundle, ResultsCounts, ResultsRows
+from .data import ResultsFetcher
+from .helpers import TranslateTypeLoader
+from .tables import ExistsTable, InProcessTable, MissingTable
 
 logger = logging.getLogger(__name__)
 

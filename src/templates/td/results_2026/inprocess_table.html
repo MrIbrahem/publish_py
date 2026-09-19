@@ -37,9 +37,10 @@
         {% for row in results.rows.inprocess_rows %}
         {{
             row.render(
-                form_data.args.code,
-                form_data.args.camp,
-                is_authenticated
+                langcode=form_data.args.code,
+                camp=form_data.args.camp,
+                is_authenticated=is_authenticated,
+                inprocess_button=show_translate_header
             )
         }}
         {% endfor %}
