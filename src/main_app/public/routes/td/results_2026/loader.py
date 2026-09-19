@@ -20,7 +20,7 @@ import logging
 from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle
 from .data import get_results_2026
-from .helpers import load_translate_type_sets
+from .helpers import TranslateTypeLoader
 from .results_loader import (
     build_exists_rows,
     build_inprocess_rows,
@@ -56,7 +56,8 @@ def results_loader_2026(
     bucket = get_results_2026(cat, code)
 
     # logic from results_2026/index.php — load_translate_type('no'|'full')
-    nolead_titles, full_titles = load_translate_type_sets()
+    nolead_titles = TranslateTypeLoader.load("no")
+    full_titles = TranslateTypeLoader.load("full")
 
     # logic from results_2026/index.php — Results_tables_2026
     # Build a lookup of per-title metrics so the inprocess rows can reuse the
