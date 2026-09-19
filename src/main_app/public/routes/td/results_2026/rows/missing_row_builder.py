@@ -61,11 +61,8 @@ class MissingRowBuilder:
             is_video_title=is_video_title,
         )
 
-        # PHP "$count = $full && (substr != 'video:') ? '$count.Full' : $count"
-        display_n: str = f"{counter}.Full" if is_full_row and not is_video_title else str(counter)
-
         return {
-            "n": display_n,
+            "n": str(counter),
             "title": title,
             "translate_html": translate_html,
             "en_views": en_views,

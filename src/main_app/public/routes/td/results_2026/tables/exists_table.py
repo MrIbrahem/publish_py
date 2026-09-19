@@ -1,42 +1,32 @@
 """Port of ``results_27/Tables/ExistsTable.php``.
 
 Renders the table of already-existing pages. Mirrors PHP
-``ExistsTable::render()``, but builds row dicts for the Jinja partial instead
-of an HTML string.
+``ExistsTable::render()``, but builds :class:`ExistsItem` rows for the Jinja
+partial instead of an HTML string.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-from ..rows import ExistsRowBuilder
+from ..mapping import ExistsItem
 
 
 class ExistsTable:
-    """Builds a single row for the Exists results table."""
+    """Builds the rows of the Exists results table."""
 
     def __init__(
         self,
         *,
-        langcode: str,
-        cat: str,
-        camp: str,
-        user_coord: bool,
         endpoint: str,
-        user_is_logged_in: bool,
+        translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
-        self._row_builder = ExistsRowBuilder(
-            langcode=langcode,
-            cat=cat,
-            camp=camp,
-            user_coord=user_coord,
-            endpoint=endpoint,
-            user_is_logged_in=user_is_logged_in,
-        )
+        self.translate_type_data = translate_type_data
+        self._endpoint = endpoint
 
-    def build(self, items: dict[str, dict]) -> tuple[list[dict[str, Any]], int, int]:
+    def build(self, items: dict[str, dict]) -> tuple[list[ExistsItem], int, int]:
         """Returns ``(rows, count_translated, count_translated_before)``."""
-        rows: list[dict[str, Any]] = []
+        rows: list[ExistsItem] = []
         numb = 1
         count_translated = 0
         count_translated_before = 0
@@ -45,6 +35,9 @@ class ExistsTable:
             if not title:
                 continue
 
+            display_title = title.replace("_", " ")
+            translate_type_info = self.translate_type_data.get(display_title) or {"tt_lead": None, "tt_full": None}
+
             via = target_tab.get("via", "")
 
             if via == "td":
@@ -52,13 +45,15 @@ class ExistsTable:
             else:
                 count_translated_before += 1
 
-            row = self._row_builder.build(
-                title=title,
-                counter=numb,
-                target_tab=target_tab,
+            rows.append(
+                ExistsItem.from_row(
+                    title=title,
+                    counter=numb,
+                    row=target_tab,
+                    endpoint=self._endpoint,
+                    translate_type_info=translate_type_info,
+                )
             )
-
-            rows.append(row)
 
             numb += 1
 

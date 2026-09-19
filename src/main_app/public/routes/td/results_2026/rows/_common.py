@@ -4,6 +4,32 @@ from __future__ import annotations
 
 from typing import Any
 
+from flask import url_for
+from markupsafe import Markup
+
+
+def _login_html() -> Markup:
+    """Login button shown to anonymous users (PHP ``results_table*.php``)."""
+    return Markup(
+        "<a class='btn btn-outline-primary' href='{login_url}'>"
+        "<i class='bi bi-box-arrow-in-right'></i> <span class='navtitles'>Login</span>"
+        "</a>"
+    ).format(login_url=url_for("auth.login"))
+
+
+def _format_inprocess_date(value: Any) -> str:
+    """Mirror of PHP ``if (strpos($_date_, ':') !== false) explode(' ', $_date_)[0]``."""
+    if value is None:
+        return ""
+    if hasattr(value, "isoformat"):
+        # datetime → ISO; PHP receives "YYYY-MM-DD HH:MM:SS".
+        text = value.isoformat(sep=" ")
+    else:
+        text = str(value)
+    if ":" in text:
+        return text.split(" ", 1)[0]
+    return text
+
 
 def _is_video(title: str) -> bool:
     """PHP ``str_starts_with(strtolower($title), "video:")``."""
@@ -27,3 +53,11 @@ def _row_metrics(title_data: dict, tra_type: str) -> tuple[int, int, str, Any, s
     en_views = title_data.get("en_views") if title_data.get("en_views") is not None else ""
     qid = title_data.get("qid") or ""
     return int(words or 0), int(refs or 0), importance, en_views, qid
+
+
+__all__ = [
+    "_is_video",
+    "_login_html",
+    "_row_metrics",
+    "_format_inprocess_date",
+]

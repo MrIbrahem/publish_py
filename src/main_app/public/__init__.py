@@ -21,6 +21,7 @@ from .routes import (
     NewHtmlRoutes,
     PublishRoutes,
     TDRoutes,
+    TranslateRoutes,
 )
 
 
@@ -41,6 +42,7 @@ PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
     PublicRouteModule(FixRefsRoutes, "fixrefs", "/fixrefs"),
     PublicRouteModule(TDRoutes, "td", "/Translation_Dashboard"),
     PublicRouteModule(LeaderBoardRoutes, "leaderboard", "/Translation_Dashboard/leaderboard"),
+    PublicRouteModule(TranslateRoutes, "translate_med", "/Translation_Dashboard/translate_med"),
 ]
 
 

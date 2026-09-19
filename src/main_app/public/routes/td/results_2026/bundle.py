@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from .mapping import ExistsItem, InProcessItem, MissingItem
+
 
 @dataclass
 class ResultsCounts:
@@ -22,9 +24,9 @@ class ResultsCounts:
 
 @dataclass
 class ResultsRows:
-    missing_rows: list[dict[str, Any]]
-    inprocess_rows: list[dict[str, Any]]
-    exists_rows: list[dict[str, Any]]
+    missing_rows: list[MissingItem]
+    inprocess_rows: list[InProcessItem]
+    exists_rows: list[ExistsItem]
 
 
 @dataclass

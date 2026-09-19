@@ -28,40 +28,15 @@
     </thead>
     <tbody>
         {% for row in results.rows.missing_rows %}
-        <tr>
-            <th class="num" scope="row">
-                {{ row.n }}
-            </th>
-            <td class="link_container">
-                <a target="_blank" href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}">
-                    {{ row.title }}
-                </a> {{ '(Full text)' if row.is_full_row else '' }}
-            </td>
-            <th>
-                {% if is_authenticated %}
-                {{ row.translate_html|safe }}
-                {% else %}
-                <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}">
-                    <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
-                </a>
-                {% endif %}
-            </th>
-            <td class="num" style="text-align: left">
-                {{ row.en_views }}
-            </td>
-            <td class="num" style="text-align: left">
-                {{ row.importance }}
-            </td>
-            <td class="num" style="text-align: left">
-                {{ row.words }}
-            </td>
-            <td class="num" style="text-align: left">
-                {{ row.refs }}
-            </td>
-            <td>
-                {{ row.qid_html|safe }}
-            </td>
-        </tr>
+        {{
+            row.render(
+                langcode=form_data.args.code,
+                cat=form_data.args.cat,
+                camp=form_data.args.camp,
+                full_tr_user=form_data.full_tr_user,
+                is_authenticated=is_authenticated
+            )
+        }}
         {% endfor %}
     </tbody>
 </table>

@@ -2,7 +2,8 @@
 Port of ``Tables/MissingTable.php``.
 
 Renders the table of missing pages. Mirrors PHP ``MissingTable::render()``,
-but builds row dicts for the Jinja partial instead of an HTML string.
+but builds :class:`MissingItem` rows for the Jinja partial instead of an
+HTML string.
 """
 
 from __future__ import annotations
@@ -10,7 +11,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ..rows import MissingRowBuilder
+from ..mapping import MissingItem
 
 logger = logging.getLogger(__name__)
 
@@ -21,32 +22,18 @@ class MissingTable:
     def __init__(
         self,
         *,
-        langcode: str,
-        cat: str,
-        camp: str,
         tra_type: str,
         full_tr_user: bool,
-        nolead_titles: set[str],
-        full_titles: set[str],
-        user_is_logged_in: bool,
+        translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
-        self._tra_type = tra_type
+        self.translate_type_data = translate_type_data
+        self._tra_type = tra_type or "lead"
         self._full_tr_user = full_tr_user
-        self._nolead_titles = nolead_titles
-        self._full_titles = full_titles
 
-        self._row_builder = MissingRowBuilder(
-            langcode=langcode,
-            cat=cat,
-            camp=camp,
-            full_tr_user=full_tr_user,
-            user_is_logged_in=user_is_logged_in,
-        )
+    def build(self, items: list[dict]) -> list[MissingItem]:
+        is_full_mode = self._tra_type == "all"
 
-    def build(self, items: list[dict]) -> list[dict[str, Any]]:
-        do_full = (self._tra_type or "lead") != "all"
-
-        # PHP usort by en_views desc.
+        # Sort by English page views (descending)
         sorted_items = sorted(items, key=lambda r: int(r.get("en_views") or 0), reverse=True)
 
         # PHP array_column($items, null, 'title') — keep last entry per title.
@@ -56,47 +43,54 @@ class MissingTable:
             if title:
                 items_by_title[title] = row
 
-        rows: list[dict[str, Any]] = []
+        rows: list[MissingItem] = []
         numb = 1
 
         for title, title_data in items_by_title.items():
             if not title:
                 continue
-            # PHP str_replace('_', ' ', $title)
-            display_title = title.replace("_", " ")
 
-            primary_row = self._row_builder.build(
+            display_title = title.replace("_", " ")
+            translate_type_info = self.translate_type_data.get(display_title) or {"tt_lead": None, "tt_full": None}
+
+            no_lead = translate_type_info["tt_lead"] == 0
+            is_full_eligible = translate_type_info["tt_full"] == 1
+
+            primary_row = MissingItem.from_row(
                 title=display_title,
-                title_data=title_data,
+                row=title_data,
                 counter=numb,
                 is_full_row=False,
                 tra_type=self._tra_type,
+                translate_type_info=translate_type_info,
             )
+            # Default stats of item: TranslateTypeRecord(tt_title=title, tt_lead=1, tt_full=0)
 
-            # PHP: "if (!$do_full || $full_tr_user) { emit and continue; }"
-            if not do_full or self._full_tr_user:
+            # Skip lead filtering when full translation applies or user is allowed full access
+            if is_full_mode or self._full_tr_user:
                 rows.append(primary_row)
                 numb += 1
                 continue
 
-            no_lead = display_title in self._nolead_titles
-            is_full_eligible = display_title in self._full_titles
-
             # PHP: "if ($no_lead && !$full) continue;"
+            # no_lead and no full: TranslateTypeRecord(tt_title=title, tt_lead=0, tt_full=0)
             if no_lead and not is_full_eligible:
                 continue
 
             if not no_lead:
+                # When TranslateTypeRecord.tt_lead=0
                 rows.append(primary_row)
 
             if is_full_eligible:
+                # When TranslateTypeRecord.tt_full=1
                 rows.append(
-                    self._row_builder.build(
+                    MissingItem.from_row(
                         title=display_title,
-                        title_data=title_data,
+                        row=title_data,
                         counter=numb,
                         is_full_row=True,
                         tra_type="all",
+                        translate_type_info=translate_type_info,
                     )
                 )
 
