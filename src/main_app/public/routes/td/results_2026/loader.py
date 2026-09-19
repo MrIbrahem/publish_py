@@ -17,17 +17,10 @@ from __future__ import annotations
 
 import logging
 
-from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle
-from .data import get_results_2026
-from .helpers import TranslateTypeLoader
-from .rows import build_exists_rows, build_inprocess_rows, build_missing_rows
+from .results_loader import ResultsLoader
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# Public entry point
-# ---------------------------------------------------------------------------
 
 
 def results_loader_2026(
@@ -42,94 +35,26 @@ def results_loader_2026(
     full_tr_user: bool,
     user_is_logged_in: bool,
 ) -> ResultsBundle:
-    """Build the results bundle for the index page.
+    """
+    Build the results bundle for the index page.
 
     Mirrors PHP ``results_loader_2026($data)`` + ``Results_tables_2026(...)``.
     Returns a :class:`ResultsBundle` with the data the Jinja templates need;
     produces no HTML side effects of its own.
     """
-    # logic from results_2026/get_results_2026.php
-    bucket = get_results_2026(cat, code)
-
-    # logic from results_2026/index.php — load_translate_type('no'|'full')
-    nolead_titles = TranslateTypeLoader.load("no")
-    full_titles = TranslateTypeLoader.load("full")
-
-    # logic from results_2026/index.php — Results_tables_2026
-    # Build a lookup of per-title metrics so the inprocess rows can reuse the
-    # missing/exists data we already loaded (PHP gets this via
-    # get_td_or_sql_titles_infos — a separate large query we deliberately skip).
-    titles_infos: dict[str, dict] = {}
-    for row in bucket["missing"]:
-        titles_infos[row["title"]] = row
-
-    for title, row in bucket["exists"].items():
-        titles_infos.setdefault(title, row)
-
-    endpoint = get_endpoint()
-
-    show_btn = settings["show_translation_button"]
-
-    if isinstance(show_btn, str):
-        show_btn = show_btn.lower() in ("1", "true", "yes", "on")
-
-    inprocess_button = "1" if (show_btn and user_coord) else "0"
-
-    missing_rows = build_missing_rows(
-        missing=bucket["missing"],
-        langcode=code,
-        cat=cat,
-        camp=camp,
-        tra_type=tra_type,
-        full_tr_user=full_tr_user,
-        nolead_titles=nolead_titles,
-        full_titles=full_titles,
-        user_is_logged_in=user_is_logged_in,
-    )
-
-    inprocess_rows = build_inprocess_rows(
-        inprocess=bucket["inprocess"],
-        langcode=code,
-        cat=cat,
-        camp=camp,
-        tra_btn=inprocess_button,
-        full_tr_user=full_tr_user,
-        titles_infos=titles_infos,
-        endpoint=endpoint,
-        user_is_logged_in=user_is_logged_in,
-    )
-
-    exists_rows, exists_translated_count, exists_translated_before_count = build_exists_rows(
-        exists=bucket["exists"],
-        langcode=code,
-        cat=cat,
-        camp=camp,
-        user_coord=user_coord,
-        endpoint=endpoint,
-        user_is_logged_in=user_is_logged_in,
-    )
-
-    return ResultsBundle(
-        summary_data=bucket["summary_data"],
-        summary_count=len(bucket["missing"]),
-        missing_rows=missing_rows,
-        inprocess_rows=inprocess_rows,
-        inprocess_count=len(bucket["inprocess"]),
-        exists_rows=exists_rows,
-        exists_count=len(bucket["exists"]),
-        exists_translated_count=exists_translated_count,
-        exists_translated_before_count=exists_translated_before_count,
-        show_translation_button=inprocess_button,
+    return ResultsLoader().load(
         code=code,
         camp=camp,
         cat=cat,
-        tra_type=tra_type or "lead",
+        tra_type=tra_type,
         code_lang_name=code_lang_name,
+        user_coord=user_coord,
+        settings=settings,
         full_tr_user=full_tr_user,
+        user_is_logged_in=user_is_logged_in,
     )
 
 
 __all__ = [
-    "get_results_2026",
     "results_loader_2026",
 ]

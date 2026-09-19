@@ -18,8 +18,12 @@ templates.
 
 from __future__ import annotations
 
+import logging
+
 from .bundle import ResultsBundle
 from .results_loader import ResultsLoader
+
+logger = logging.getLogger(__name__)
 
 
 def results_loader_27(

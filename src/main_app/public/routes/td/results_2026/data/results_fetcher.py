@@ -5,11 +5,31 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ......database.services import PagesService
+from ......database.services import InProcessService, PagesService
 from ......database.services.pages import Results2026Service
-from ..results_loader import get_inprocess_for_missing
 
 logger = logging.getLogger(__name__)
+
+
+def get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str, dict]:
+    """Mirror of PHP ``getinprocess_n($missing, $code)``."""
+    service = InProcessService()
+    records = service.list_in_process_by_lang(code)
+    result: dict[str, dict] = {}
+    for r in records:
+        if r.title not in missing_titles:
+            continue
+        result[r.title] = {
+            "id": r.id,
+            "title": r.title,
+            "user": r.user or "",
+            "lang": r.lang,
+            "cat": r.cat or "",
+            "translate_type": r.translate_type or "",
+            "word": r.word or 0,
+            "add_date": r.add_date,  # datetime or None
+        }
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -71,4 +91,5 @@ def get_results_2026(cat: str, code: str) -> dict[str, Any]:
 
 __all__ = [
     "get_results_2026",
+    "get_inprocess_for_missing",
 ]
