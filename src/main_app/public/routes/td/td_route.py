@@ -147,7 +147,7 @@ class TDRoutes:
         return render_template(
             "td/index.html",
             settings=parsed_settings,
-            form_data = {
+            form_data={
                 "langs": langs,
                 "campaigns": campaigns,
                 "args": {

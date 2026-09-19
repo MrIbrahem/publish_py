@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 # Row builders
 # ---------------------------------------------------------------------------
 
+
 class MissingRowBuilder:
     """Builds a single row for the Missing results table."""
 
@@ -101,6 +102,7 @@ class MissingRowBuilder:
             )
 
         return f"<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
+
 
 __all__ = [
     "MissingRowBuilder",
