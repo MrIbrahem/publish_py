@@ -2,7 +2,8 @@
 Port of ``Tables/MissingTable.php``.
 
 Renders the table of missing pages. Mirrors PHP ``MissingTable::render()``,
-but builds row dicts for the Jinja partial instead of an HTML string.
+but builds :class:`MissingItem` rows for the Jinja partial instead of an
+HTML string.
 """
 
 from __future__ import annotations
@@ -10,7 +11,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ..rows import MissingItem, MissingRowBuilder
+from ..rows import MissingItem
 
 logger = logging.getLogger(__name__)
 
@@ -32,14 +33,6 @@ class MissingTable:
         self._tra_type = tra_type or "lead"
         self._full_tr_user = full_tr_user
         self.translate_type_data = translate_type_data
-
-        self._row_builder = MissingRowBuilder(
-            langcode=langcode,
-            cat=cat,
-            camp=camp,
-            full_tr_user=full_tr_user,
-            user_is_logged_in=user_is_logged_in,
-        )
 
     def build(self, items: list[dict]) -> list[MissingItem]:
         is_full_mode = self._tra_type == "all"
