@@ -112,7 +112,7 @@ class LeaderBoardRoutes:
             users_top_langs: list[dict[Any, Any]] = self.lederboard_service.top_lang_of_users()
             result["users_top_langs"] = {row["user"]: row for row in users_top_langs}
 
-        numbers_summary = self.load_summary_data(result["users"], users_res.count, langs_res.count)
+        numbers_summary = self._load_summary_data(result["users"], users_res.count, langs_res.count)
 
         return render_template(
             "td/leaderboard/index.html",
@@ -230,7 +230,7 @@ class LeaderBoardRoutes:
 
         return form_data
 
-    def load_summary_data(
+    def _load_summary_data(
         self,
         result_users: list[dict[str, Any]],
         users_total: int,
