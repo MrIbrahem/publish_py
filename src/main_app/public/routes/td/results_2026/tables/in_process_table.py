@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ..rows import InProcessRowBuilder
+from ..rows import InProcessItem, InProcessRowBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +41,8 @@ class InProcessTable:
             endpoint=endpoint,
         )
 
-    def build(self, items: dict[str, dict]) -> list[dict[str, Any]]:
-        rows: list[dict[str, Any]] = []
+    def build(self, items: dict[str, dict]) -> list[InProcessItem]:
+        rows: list[InProcessItem] = []
         numb = 1
 
         for title, title_tab in items.items():
@@ -53,11 +53,13 @@ class InProcessTable:
             title_data = self._titles_infos.get(title) or self._titles_infos.get(display_title) or {}
 
             rows.append(
-                self._row_builder.build(
+                InProcessItem.from_row(
                     title=display_title,
                     counter=numb,
                     title_tab=title_tab,
                     title_data=title_data,
+                    inprocess_button=self._row_builder.inprocess_button,
+                    endpoint=self._row_builder.endpoint,
                 )
             )
 

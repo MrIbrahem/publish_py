@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..rows import ExistsRowBuilder
+from ..rows import ExistsItem, ExistsRowBuilder
 
 
 class ExistsTable:
@@ -34,9 +34,9 @@ class ExistsTable:
             user_is_logged_in=user_is_logged_in,
         )
 
-    def build(self, items: dict[str, dict]) -> tuple[list[dict[str, Any]], int, int]:
+    def build(self, items: dict[str, dict]) -> tuple[list[ExistsItem], int, int]:
         """Returns ``(rows, count_translated, count_translated_before)``."""
-        rows: list[dict[str, Any]] = []
+        rows: list[ExistsItem] = []
         numb = 1
         count_translated = 0
         count_translated_before = 0
@@ -52,10 +52,12 @@ class ExistsTable:
             else:
                 count_translated_before += 1
 
-            row = self._row_builder.build(
+            row = ExistsItem.from_row(
                 title=title,
                 counter=numb,
                 target_tab=target_tab,
+                user_coord=self._row_builder.user_coord,
+                endpoint=self._row_builder.endpoint,
             )
 
             rows.append(row)
