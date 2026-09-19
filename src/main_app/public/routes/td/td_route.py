@@ -177,16 +177,26 @@ class TDRoutes:
 
         parsed = self._parse_request_args(campaigns)
 
+        # Identity / coordinator / full-translator flags — mirrors src/index.php.
+        user = get_current_user()
+        full_tr_user = bool(user and self.full_service.is_full_translator(user.username))
+
+        form_data = {
+            "langs": langs,
+            "campaigns": campaigns,
+            "full_tr_user": full_tr_user,
+            "args": {
+                "code": parsed["code"],
+                "camp": parsed["camp"],
+                "cat": parsed["cat"],
+                "type": parsed["tra_type"],
+            },
+        }
+
         return render_template(
             "td/index.html",
             settings=parsed["settings"],
-            langs=langs,
-            campaigns=campaigns,
-            args={
-                "code": parsed["code"],
-                "camp": parsed["camp"],
-                "type": parsed["tra_type"],
-            },
+            form_data=form_data,
         )
 
     def missing(self):
