@@ -297,17 +297,24 @@ anonymous (`login_url` set) and missing params.
 
 The PHP page interpolates `$url` directly into single-quoted HTML attributes
 and a `<meta http-equiv="refresh">` tag, so a crafted `title`/`camp`/`coden`
-can inject markup (attribute breakout via `'`, or `">` in the meta tag).
-
-The Python port must **not** replicate that:
+can inject markup (attribute breakout via `'`, or `">` in the meta tag). The
+302 port removes that whole surface — there is no template rendering on the
+happy path:
 
 - `content_translation_url()` runs every component through
-  `urlencode(…, quote_via=quote)`, so the URL itself is well-formed.
-- Render with plain Jinja (`{{ url }}`) — **no `|safe`** — so autoescaping
-  neutralizes any residual `&`/`'`/`"` in the value inside both the `href`
-  attribute and the meta tag.
-- Keep `target="_blank"` with `rel="noopener"` on the link (the PHP markup
-  omits it; harmless to add).
+  `urlencode(…, quote_via=quote)`, so the `Location` value is well-formed and
+  cannot smuggle CR/LF (header injection) or markup.
+- Werkzeug escapes the target URL inside the small redirect body it renders,
+  so nothing from the query string reaches the response as raw HTML.
+- The endpoint is an **intentional** open redirect: its only job is to send the
+  user to `Special:ContentTranslation`. `get_endpoint()` is a hardcoded
+  `mdwikicx.toolforge.org` constant
+  ([wiki_links.py:148](../../src/main_app/services/utils/wiki_links.py#L148))
+  and `content_translation_url()` assembles the URL from it, so a request
+  cannot point the redirect at an arbitrary host — keep that constant the sole
+  source of the host.
+- If the intermediate page is ever reintroduced, render `{{ url }}` with plain
+  Jinja (**no `|safe`**) and add `rel="noopener"` to any `target="_blank"` link.
 
 ---
 
@@ -323,14 +330,13 @@ Cases to cover:
 | Case | Assertion |
 |---|---|
 | Anonymous request | 200; response contains a link to the auth login URL; **no** `in_process` row created. |
-| Missing `title` or `langcode` | 200; page renders without a redirect block; no `in_process` row. |
-| Logged-in, valid params | 200; body contains the `mdwikicx.toolforge.org` URL with `page=<title>`, `to=<langcode>`, `campaign=<camp>`; exactly one `in_process` row for (title, user, lang). |
+| Missing `title` or `langcode` | Non-3xx response (current code returns the string `"Invalid request"`); no `in_process` row, no `Location` header. |
+| Logged-in, valid params | **302**; `Location` header contains `mdwikicx.toolforge.org` with `page=<title>`, `to=<langcode>`, `campaign=<camp>`; exactly one `in_process` row for (title, user, lang). |
 | Repeated request (same title/user/lang) | Still one row — idempotent insert. |
 | `cat` given, `camp` omitted | Campaign resolved from the seeded category. |
 | `word` negative or non-numeric | Clamped/fallback to 0; no 500. |
-| `test=1` | Page renders the link but **no** `window.open` / meta refresh. |
-| Active `users_no_inprocess` user | No `in_process` row inserted; redirect page still rendered. |
-| Injected markup in `title` (e.g. `'"><script>`) | Escaped in output; no raw `<script>` from the title in the body. |
+| Active `users_no_inprocess` user | No `in_process` row inserted; 302 still issued. |
+| Injected markup in `title` (e.g. `'"><script>` or `%0d%0a`) | No header injection, no raw `<script>` in the redirect body; the title stays percent-encoded inside `Location`. |
 
 Route wiring is already covered by the blueprint registration; no changes to
 `public/__init__.py` are expected.
@@ -352,10 +358,12 @@ Route wiring is already covered by the blueprint registration; no changes to
 
 ### Phase 2 — Response
 
-- [ ] Create `src/templates/td/translate_med.html` with the three states
-      (login card / empty / redirect page).
-- [ ] Wire `auto_redirect` to the absence of the `test` flag.
-- [ ] Return a value from every branch — no implicit `None`.
+- [x] End `index()` with `redirect(content_translation_url(...))`.
+- [ ] Return a value from every branch — the `None` fall-through is gone, but
+      the two string branches (`"Not logged in"`, `"Invalid request"`) still
+      diverge from the PHP login card / error markup.
+- [ ] (Optional) Add `src/templates/td/translate_med.html` for the login-card
+      and invalid-request branches only — not for the redirect path.
 
 ### Phase 3 — Tests
 
@@ -367,7 +375,7 @@ Route wiring is already covered by the blueprint registration; no changes to
 ### Phase 4 — Verification
 
 - [ ] Click a Translate/Lead/Full button on the local dashboard and confirm
-      the `in_process` row appears and the browser lands on
-      `Special:ContentTranslation`.
+      a single 302 hop lands the browser on `Special:ContentTranslation`, with
+      the `in_process` row created.
 - [ ] Compare a side-by-side URL dump from the PHP and Python endpoints for
       the same input tuple (`title`, `code`, `cat`, `camp`, `type`, `word`).
