@@ -5,6 +5,20 @@ from __future__ import annotations
 from typing import Any
 
 
+def _format_inprocess_date(value: Any) -> str:
+    """Mirror of PHP ``if (strpos($_date_, ':') !== false) explode(' ', $_date_)[0]``."""
+    if value is None:
+        return ""
+    if hasattr(value, "isoformat"):
+        # datetime → ISO; PHP receives "YYYY-MM-DD HH:MM:SS".
+        text = value.isoformat(sep=" ")
+    else:
+        text = str(value)
+    if ":" in text:
+        return text.split(" ", 1)[0]
+    return text
+
+
 def _is_video(title: str) -> bool:
     """PHP ``str_starts_with(strtolower($title), "video:")``."""
     return title.lower().startswith("video:")
@@ -27,3 +41,10 @@ def _row_metrics(title_data: dict, tra_type: str) -> tuple[int, int, str, Any, s
     en_views = title_data.get("en_views") if title_data.get("en_views") is not None else ""
     qid = title_data.get("qid") or ""
     return int(words or 0), int(refs or 0), importance, en_views, qid
+
+
+__all__ = [
+    "_is_video",
+    "_row_metrics",
+    "_format_inprocess_date",
+]
