@@ -10,10 +10,9 @@ from __future__ import annotations
 from typing import Any
 
 from ..rows import ExistsRowBuilder
-from .abstract_results_table import AbstractResultsTable
 
 
-class ExistsTable(AbstractResultsTable):
+class ExistsTable:
     """Builds the rows of the Exists (already translated) table."""
 
     def __init__(

@@ -9,10 +9,9 @@ from __future__ import annotations
 from typing import Any
 
 from ..rows import MissingRowBuilder
-from .abstract_results_table import AbstractResultsTable
 
 
-class MissingTable(AbstractResultsTable):
+class MissingTable:
     """Builds the rows of the Results (missing) table."""
 
     def __init__(

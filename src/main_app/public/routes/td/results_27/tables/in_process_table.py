@@ -10,10 +10,9 @@ from __future__ import annotations
 from typing import Any
 
 from ..rows import InProcessRowBuilder
-from .abstract_results_table import AbstractResultsTable
 
 
-class InProcessTable(AbstractResultsTable):
+class InProcessTable:
     """Builds the rows of the In-process table."""
 
     def __init__(
