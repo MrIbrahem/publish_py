@@ -106,7 +106,13 @@ class InProcessItem(ItemBase):
         is_authenticated: bool,
         show_translation_button: bool,
     ) -> Markup:
-        row_links = self.translate_html(langcode, camp, full_tr_user, is_authenticated, show_translation_button,)
+        row_links = self.translate_html(
+            langcode,
+            camp,
+            full_tr_user,
+            is_authenticated,
+            show_translation_button,
+        )
         return Markup("""
             <tr>
                 <th class="num" scope="row">
