@@ -51,6 +51,7 @@ class ExistsRowBuilder:
         counter: int,
         target_tab: dict,
     ) -> dict[str, Any]:
+        title = title.replace("_", " ")
         via = target_tab.get("via", "")
         target = target_tab.get("target") or ""
 
