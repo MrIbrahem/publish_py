@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 
 from .....services.utils.wiki_links import get_endpoint
-from .bundle import ResultsBundle
+from .bundle import ResultsBundle, ResultsCounts, ResultsRows
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
 from .tables import ExistsTable, InProcessTable, MissingTable
@@ -116,15 +116,19 @@ class ResultsLoader:
         )
 
         return ResultsBundle(
+            rows=ResultsRows(
+                missing_rows=missing_rows,
+                inprocess_rows=inprocess_rows,
+                exists_rows=exists_rows,
+            ),
+            counts=ResultsCounts(
+                summary_count=len(bucket["missing"]),
+                inprocess_count=len(bucket["inprocess"]),
+                exists_count=len(bucket["exists"]),
+                exists_translated_count=exists_translated_count,
+                exists_translated_before_count=exists_translated_before_count,
+            ),
             summary_data=bucket["summary_data"],
-            summary_count=len(bucket["missing"]),
-            missing_rows=missing_rows,
-            inprocess_rows=inprocess_rows,
-            inprocess_count=len(bucket["inprocess"]),
-            exists_rows=exists_rows,
-            exists_count=len(bucket["exists"]),
-            exists_translated_count=exists_translated_count,
-            exists_translated_before_count=exists_translated_before_count,
             show_translation_button=inprocess_button,
             code=code,
             camp=camp,

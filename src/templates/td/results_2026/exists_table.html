@@ -5,15 +5,15 @@
             <th class="num">#</th>
             <th class="spannowrap" style="text-align: center">Title</th>
             <th><span>Translate</span></th>
-            <th>Translated ({{ results.exists_translated_count }})</th>
-            <th>Translated before ({{ results.exists_translated_before_count }})</th>
+            <th>Translated ({{ results.counts.exists_translated_count }})</th>
+            <th>Translated before ({{ results.counts.exists_translated_before_count }})</th>
             <th class="spannowrap" style="text-align: center">
                 <span data-bs-toggle="tooltip" data-bs-title="Wikidata identifier">Qid</span>
             </th>
         </tr>
     </thead>
     <tbody>
-        {% for row in results.exists_rows %}
+        {% for row in results.rows.exists_rows %}
         <tr>
             <th scope="row" style="text-align: center">{{ row.n }}</th>
             <td class="link_container spannowrap">

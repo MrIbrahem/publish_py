@@ -14,18 +14,18 @@ Found {{ data.total }} pages in
 <br>
 <div class="card">
     <div class="card-header">
-        {{ card_header("Results: (" ~ results.summary_count ~ ")", results_summary(results.summary_data)) }}
+        {{ card_header("Results: (" ~ results.counts.summary_count ~ ")", results_summary(results.summary_data)) }}
     </div>
     <div class="card-body1 card2">
         {% include "td/results_2026/missing_table.html" %}
     </div>
 </div>
 
-{% if results.inprocess_count > 0 %}
+{% if results.counts.inprocess_count > 0 %}
 <br>
 <div class="card">
     <div class="card-header">
-        {{ card_header("In process: (" ~ results.inprocess_count ~ ")") }}
+        {{ card_header("In process: (" ~ results.counts.inprocess_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
         {% include "td/results_2026/inprocess_table.html" %}
@@ -33,11 +33,11 @@ Found {{ data.total }} pages in
 </div>
 {% endif %}
 
-{% if settings and settings.show_exists_table == True and results.exists_count > 1 %}
+{% if settings and settings.show_exists_table == True and results.counts.exists_count > 1 %}
 <br>
 <div class="card">
     <div class="card-header">
-        {{ card_header("Exists: (" ~ results.exists_count ~ ")") }}
+        {{ card_header("Exists: (" ~ results.counts.exists_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
         {% include "td/results_2026/exists_table.html" %}
