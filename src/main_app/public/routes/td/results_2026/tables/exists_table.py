@@ -15,21 +15,27 @@ from ..rows import ExistsRowBuilder
 class ExistsTable:
     """Builds a single row for the Exists results table."""
 
-    def build(
+    def __init__(
         self,
         *,
-        items: dict[str, dict],
         langcode: str,
         cat: str,
         camp: str,
         user_coord: bool,
         endpoint: str,
         user_is_logged_in: bool,
-    ) -> tuple[list[dict[str, Any]], int, int]:
-        """Mirror of PHP ``make_results_table_exists_2026``.
+    ) -> None:
+        self._row_builder = ExistsRowBuilder(
+            langcode=langcode,
+            cat=cat,
+            camp=camp,
+            user_coord=user_coord,
+            endpoint=endpoint,
+            user_is_logged_in=user_is_logged_in,
+        )
 
-        Returns ``(rows, count_translated, count_translated_before)``.
-        """
+    def build(self, items: dict[str, dict]) -> tuple[list[dict[str, Any]], int, int]:
+        """Returns ``(rows, count_translated, count_translated_before)``."""
         rows: list[dict[str, Any]] = []
         numb = 1
         count_translated = 0
@@ -47,15 +53,10 @@ class ExistsTable:
             else:
                 count_translated_before += 1
 
-            row = ExistsRowBuilder().build(
-                langcode,
-                camp,
-                user_coord,
-                endpoint,
-                numb,
-                target_tab,
-                display_title,
-                via,
+            row = self._row_builder.build(
+                title=display_title,
+                counter=numb,
+                target_tab=target_tab,
             )
 
             rows.append(row)

@@ -1,4 +1,10 @@
-""" """
+"""
+Port of ``ResultsFetcher.php``.
+
+Responsible for fetching and preparing all result data (exists, missing,
+in-process) for a given category and language. Mirrors PHP
+``ResultsFetcher::get()``; produces no HTML.
+"""
 
 from __future__ import annotations
 
@@ -14,7 +20,7 @@ from ......database.services import (
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# get_results_2026 — data fetcher
+# data fetcher
 # ---------------------------------------------------------------------------
 
 
@@ -22,8 +28,7 @@ class ResultsFetcher:
     """Fetch and partition the exists/missing/in-process data for one category."""
 
     def get(self, cat: str, code: str) -> dict[str, Any]:
-        """Mirror of PHP ``get_results_2026($cat, $code)``.
-
+        """
         Returns ``{"summary_data", "inprocess", "exists", "missing"}`` where:
         - ``inprocess`` is a dict[title -> in_process row dict]
         - ``exists``    is a dict[title -> exists row dict] with ``via`` set
@@ -73,7 +78,12 @@ class ResultsFetcher:
         }
 
     def get_inprocess_for_missing(self, missing_titles: set[str], code: str) -> dict[str, dict]:
-        """Mirror of PHP ``getinprocess_n($missing, $code)``."""
+        """
+        Mirror of PHP ``getinprocess_n($missing, $code)``.
+
+        Keeps only the in-process records whose title is still in the missing
+        list.
+        """
         service = InProcessService()
         records = service.list_in_process_by_lang(code)
         result: dict[str, dict] = {}

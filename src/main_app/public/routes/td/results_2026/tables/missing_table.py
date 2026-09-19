@@ -1,32 +1,26 @@
-""" """
+"""
+Port of ``Tables/MissingTable.php``.
+
+Renders the table of missing pages. Mirrors PHP ``MissingTable::render()``,
+but builds row dicts for the Jinja partial instead of an HTML string.
+"""
 
 from __future__ import annotations
 
 import logging
 from typing import Any
 
-from flask import url_for
-
-from ......services.utils.wiki_links import (
-    tr_link_medwiki,
-    wikidata_link,
-)
-from ..rows._common import _is_video, _row_metrics
+from ..rows import MissingRowBuilder
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Row builders
-# ---------------------------------------------------------------------------
-
 
 class MissingTable:
-    """Builds a single row for the Missing results table."""
+    """Builds the rows of the Results (missing) table."""
 
-    def build(
+    def __init__(
         self,
         *,
-        missing: list[dict],
         langcode: str,
         cat: str,
         camp: str,
@@ -35,12 +29,25 @@ class MissingTable:
         nolead_titles: set[str],
         full_titles: set[str],
         user_is_logged_in: bool,
-    ) -> list[dict[str, Any]]:
-        """Mirror of PHP ``make_results_table_2026``."""
-        do_full = (tra_type or "lead") != "all"
+    ) -> None:
+        self._tra_type = tra_type
+        self._full_tr_user = full_tr_user
+        self._nolead_titles = nolead_titles
+        self._full_titles = full_titles
+
+        self._row_builder = MissingRowBuilder(
+            langcode=langcode,
+            cat=cat,
+            camp=camp,
+            full_tr_user=full_tr_user,
+            user_is_logged_in=user_is_logged_in,
+        )
+
+    def build(self, items: list[dict]) -> list[dict[str, Any]]:
+        do_full = (self._tra_type or "lead") != "all"
 
         # PHP usort by en_views desc.
-        sorted_items = sorted(missing, key=lambda r: int(r.get("en_views") or 0), reverse=True)
+        sorted_items = sorted(items, key=lambda r: int(r.get("en_views") or 0), reverse=True)
 
         # PHP array_column($items, null, 'title') — keep last entry per title.
         items_by_title: dict[str, dict] = {}
@@ -58,27 +65,22 @@ class MissingTable:
             # PHP str_replace('_', ' ', $title)
             display_title = title.replace("_", " ")
 
-            primary_row = self._make_missing_row_dict(
+            primary_row = self._row_builder.build(
                 title=display_title,
                 title_data=title_data,
-                count=numb,
+                counter=numb,
                 is_full_row=False,
-                tra_type=tra_type,
-                langcode=langcode,
-                cat=cat,
-                camp=camp,
-                full_tr_user=full_tr_user,
-                user_is_logged_in=user_is_logged_in,
+                tra_type=self._tra_type,
             )
 
             # PHP: "if (!$do_full || $full_tr_user) { emit and continue; }"
-            if not do_full or full_tr_user:
+            if not do_full or self._full_tr_user:
                 rows.append(primary_row)
                 numb += 1
                 continue
 
-            no_lead = display_title in nolead_titles
-            is_full_eligible = display_title in full_titles
+            no_lead = display_title in self._nolead_titles
+            is_full_eligible = display_title in self._full_titles
 
             # PHP: "if ($no_lead && !$full) continue;"
             if no_lead and not is_full_eligible:
@@ -89,101 +91,18 @@ class MissingTable:
 
             if is_full_eligible:
                 rows.append(
-                    self._make_missing_row_dict(
+                    self._row_builder.build(
                         title=display_title,
                         title_data=title_data,
-                        count=numb,
+                        counter=numb,
                         is_full_row=True,
                         tra_type="all",
-                        langcode=langcode,
-                        cat=cat,
-                        camp=camp,
-                        full_tr_user=full_tr_user,
-                        user_is_logged_in=user_is_logged_in,
                     )
                 )
 
             numb += 1
 
         return rows
-
-    def _translate_html(
-        self,
-        *,
-        title: str,
-        langcode: str,
-        cat: str,
-        camp: str,
-        tra_type: str,
-        words: int,
-        full_tr_user: bool,
-        is_video_title: bool,
-        user_is_logged_in: bool,
-    ) -> str:
-        """PHP ``_make_one_row_results`` — translate column HTML."""
-        # logic from results_table.php — anonymous user
-        if not user_is_logged_in:
-            login_url = url_for("auth.login")
-            return f"<a href='{login_url}' class='btn btn-outline-primary btn-sm'>Login</a>"
-
-        full_url = tr_link_medwiki(title, langcode, cat, camp, "all", words)
-        lead_url = tr_link_medwiki(title, langcode, cat, camp, tra_type, words)
-
-        if full_tr_user and not is_video_title:
-            return (
-                "<div class='inline'>"
-                f"<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
-                f"<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
-                "</div>"
-            )
-
-        return f"<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
-
-    def _make_missing_row_dict(
-        self,
-        *,
-        title: str,
-        title_data: dict,
-        count: int,
-        is_full_row: bool,
-        tra_type: str,
-        langcode: str,
-        cat: str,
-        camp: str,
-        full_tr_user: bool,
-        user_is_logged_in: bool,
-    ) -> dict[str, Any]:
-        """Build one row dict for the Results table (PHP _make_one_row_results)."""
-        is_video_title = _is_video(title)
-        effective_tra_type = "all" if is_video_title else (tra_type or "lead")
-        words, refs, importance, en_views, qid = _row_metrics(title_data, effective_tra_type)
-
-        translate_html = self._translate_html(
-            title=title,
-            langcode=langcode,
-            cat=cat,
-            camp=camp,
-            tra_type=effective_tra_type,
-            words=words,
-            full_tr_user=full_tr_user,
-            is_video_title=is_video_title,
-            user_is_logged_in=user_is_logged_in,
-        )
-
-        # PHP "$count = $full && (substr != 'video:') ? '$count.Full' : $count"
-        display_n: str = f"{count}.Full" if is_full_row and not is_video_title else str(count)
-
-        return {
-            "n": display_n,
-            "title": title,
-            "translate_html": translate_html,
-            "en_views": en_views,
-            "importance": importance,
-            "words": words,
-            "refs": refs,
-            "qid_html": wikidata_link(qid),
-            "is_full_row": is_full_row,
-        }
 
 
 __all__ = [

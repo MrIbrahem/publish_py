@@ -54,7 +54,7 @@ class Doc:
     # Write
     # ----------------
     def add_textblock_item(self, item: TextBlock) -> Doc:
-        self.items.append(DocTextBlock(item))
+        self.items.append(DocTextBlock(item, item_type="textblock"))
         return self
 
     def add_dict_item(self, item_type: ITEM_TYPES_STR, item: dict[str, Any]) -> Doc:

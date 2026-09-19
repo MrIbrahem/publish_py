@@ -49,7 +49,6 @@ class ResultsLoader:
         """
         Build the results bundle for the index page.
 
-        Mirrors PHP ``results_loader_2026($data)`` + ``Results_tables_2026(...)``.
         Returns a :class:`ResultsBundle` with the data the Jinja templates need;
         produces no HTML side effects of its own.
         """
@@ -80,9 +79,7 @@ class ResultsLoader:
 
         inprocess_button = "1" if (show_btn and user_coord) else "0"
 
-        missing_table = MissingTable()
-        missing_rows = missing_table.build(
-            missing=bucket["missing"],
+        missing_table = MissingTable(
             langcode=code,
             cat=cat,
             camp=camp,
@@ -92,29 +89,30 @@ class ResultsLoader:
             full_titles=full_titles,
             user_is_logged_in=user_is_logged_in,
         )
+        missing_rows = missing_table.build(bucket["missing"])
 
-        inprocess_table = InProcessTable()
-        inprocess_rows = inprocess_table.build(
-            inprocess=bucket["inprocess"],
+        inprocess_table = InProcessTable(
             langcode=code,
             cat=cat,
             camp=camp,
-            tra_btn=inprocess_button,
+            inprocess_button=inprocess_button,
             full_tr_user=full_tr_user,
             titles_infos=titles_infos,
             endpoint=endpoint,
             user_is_logged_in=user_is_logged_in,
         )
+        inprocess_rows = inprocess_table.build(bucket["inprocess"])
 
-        exists_table = ExistsTable()
-        exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
-            items=bucket["exists"],
+        exists_table = ExistsTable(
             langcode=code,
             cat=cat,
             camp=camp,
             user_coord=user_coord,
             endpoint=endpoint,
             user_is_logged_in=user_is_logged_in,
+        )
+        exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
+            items=bucket["exists"],
         )
 
         return ResultsBundle(

@@ -1,5 +1,5 @@
 {# In-process table — port of src/backend/results_2026/results_table_inprocess.php #}
-{# Header mirrors make_table_start with inprocess=true (extra user/date columns; Translate header collapses to empty when tra_btn != '1'). #}
+{# Header mirrors make_table_start with inprocess=true (extra user/date columns; Translate header collapses to empty when inprocess_button != '1'). #}
 {% set show_translate_header = settings and settings.show_translation_button == True %}
 <table class="table compact table-striped table_100 table_text_left display table_responsive_main">
     <thead>

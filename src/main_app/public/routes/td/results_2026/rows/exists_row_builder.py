@@ -1,21 +1,15 @@
 """
-Python port of the PHP ``Results\\GetResults2026`` module.
+Port of ``results_27/Rows/ExistsRowBuilder.php``.
 
-Reference PHP files:
-  - src/backend/results_2026/index.php           (results_loader_2026, Results_tables_2026, load_translate_type)
-  - src/backend/results_2026/get_results_2026.php (get_results_2026, getinprocess_n)
-  - src/backend/results_2026/results_table.php   (_make_one_row_results, make_results_table_2026)
-  - src/backend/results_2026/results_table_exists.php (make_one_row_exists_2026, make_results_table_exists_2026)
-  - src/backend/results_2026/results_table_inprocess.php (make_one_row_new_inprocess, make_results_table_inprocess)
-  - src/results/helps.php                        (make_translate_urls)
-
-The orchestrator returns a :class:`ResultsBundle` (the "results bundle") that
-``templates/index.html`` consumes via three Jinja partials.
+Builds one row dict for the Exists (already translated) table. Mirrors PHP
+``ExistsRowBuilder::build()``, but returns data for the Jinja partial
+instead of an HTML string.
 """
 
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from ......services.utils.wiki_links import (
     content_translation_url,
@@ -33,24 +27,39 @@ logger = logging.getLogger(__name__)
 class ExistsRowBuilder:
     """Builds a single row for the Exists results table."""
 
+    def __init__(
+        self,
+        *,
+        langcode: str,
+        cat: str,
+        camp: str,
+        user_is_logged_in: bool,
+        user_coord: bool,
+        endpoint: str,
+    ) -> None:
+        self.langcode = langcode
+        self.cat = cat
+        self.camp = camp
+        self.user_is_logged_in = user_is_logged_in
+        self.user_coord = user_coord
+        self.endpoint = endpoint
+
     def build(
         self,
-        langcode,
-        camp,
-        user_coord,
-        endpoint,
-        numb,
-        target_tab,
-        display_title,
-        via,
-    ):
+        *,
+        title: str,
+        counter: int,
+        target_tab: dict,
+    ) -> dict[str, Any]:
+        via = target_tab.get("via", "")
         target = target_tab.get("target") or ""
-        translated_html = wikipedia_link(target, langcode) if (target and via == "td") else ""
-        translated_before_html = wikipedia_link(target, langcode) if (target and via != "td") else ""
+
+        translated_html = wikipedia_link(target, self.langcode) if (target and via == "td") else ""
+        translated_before_html = wikipedia_link(target, self.langcode) if (target and via != "td") else ""
 
         # PHP: $tab is shown only when user_coord
-        if user_coord:
-            translate_url = content_translation_url(display_title, langcode, camp, "lead", endpoint)
+        if self.user_coord:
+            translate_url = content_translation_url(title, self.langcode, self.camp, "lead", self.endpoint)
             translate_html = (
                 "<div class='inline'>"
                 f"<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
@@ -59,16 +68,14 @@ class ExistsRowBuilder:
         else:
             translate_html = ""
 
-        row = {
-            "n": str(numb),
-            "display_title": display_title,
+        return {
+            "n": str(counter),
+            "display_title": title,
             "translate_html": translate_html,
             "translated_html": translated_html,
             "translated_before_html": translated_before_html,
             "qid_html": wikidata_link(target_tab.get("qid") or ""),
         }
-
-        return row
 
 
 __all__ = [

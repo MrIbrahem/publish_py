@@ -13,7 +13,6 @@ from ._common import _is_video, _row_metrics
 
 logger = logging.getLogger(__name__)
 
-
 # ---------------------------------------------------------------------------
 # In-process rows
 # ---------------------------------------------------------------------------
@@ -36,101 +35,87 @@ def _format_inprocess_date(value: Any) -> str:
 class InProcessRowBuilder:
     """Builds a single row for the In-process results table."""
 
-    def build(
+    def __init__(
         self,
         *,
-        inprocess: dict[str, dict],
         langcode: str,
         cat: str,
         camp: str,
-        tra_btn: str,
-        full_tr_user: bool,
-        titles_infos: dict[str, dict],
-        endpoint: str,
         user_is_logged_in: bool,
-    ) -> list[dict[str, Any]]:
-        """Mirror of PHP ``make_results_table_inprocess``."""
-        rows: list[dict[str, Any]] = []
-        numb = 1
+        full_tr_user: bool,
+        endpoint: str,
+        inprocess_button: str,
+    ) -> None:
+        self.langcode = langcode
+        self.cat = cat
+        self.camp = camp
+        self.full_tr_user = full_tr_user
+        self.user_is_logged_in = user_is_logged_in
+        self.endpoint = endpoint
+        self.inprocess_button = inprocess_button
 
-        for title, title_tab in inprocess.items():
-            if not title:
-                continue
+    def build(
+        self,
+        *,
+        title_tab: dict[str, Any],
+        title: str,
+        counter: int,
+        title_data: dict[str, Any],
+    ) -> dict[str, Any]:
+        tra_type = title_tab.get("translate_type") or "lead"
+        is_video_title = _is_video(title)
+        if is_video_title:
+            tra_type = "all"
 
-            display_title = title.replace("_", " ")
-            title_data = titles_infos.get(title) or titles_infos.get(display_title) or {}
+        words, refs, importance, en_views, qid = _row_metrics(title_data, tra_type)
 
-            tra_type = title_tab.get("translate_type") or ""
-            is_video_title = _is_video(display_title)
-            if is_video_title:
-                tra_type = "all"
+        user = title_tab.get("user") or ""
 
-            words, refs, importance, en_views, qid = _row_metrics(title_data, tra_type or "lead")
+        translate_html = self._translate_html(
+            title=title,
+            tra_type=tra_type,
+            words=words,
+            is_video_title=is_video_title,
+        )
 
-            user = title_tab.get("user") or ""
-
-            translate_html = self._translate_html(
-                title=display_title,
-                tra_type=tra_type,
-                langcode=langcode,
-                cat=cat,
-                camp=camp,
-                words=words,
-                tra_btn=tra_btn,
-                full_tr_user=full_tr_user,
-                is_video_title=is_video_title,
-                endpoint=endpoint,
-            )
-
-            rows.append(
-                {
-                    "n": str(numb),
-                    "title": display_title,
-                    "translate_html": translate_html,
-                    "en_views": en_views,
-                    "importance": importance,
-                    "words": words,
-                    "refs": refs,
-                    "qid_html": wikidata_link(qid),
-                    "user": user,
-                    "date": _format_inprocess_date(title_tab.get("add_date") or title_tab.get("date")),
-                    "is_full_row": False,
-                }
-            )
-
-            numb += 1
-
-        return rows
+        return {
+            "n": str(counter),
+            "title": title,
+            "translate_html": translate_html,
+            "en_views": en_views,
+            "importance": importance,
+            "words": words,
+            "refs": refs,
+            "qid_html": wikidata_link(qid),
+            "user": user,
+            "date": _format_inprocess_date(title_tab.get("add_date") or title_tab.get("date")),
+            "is_full_row": False,
+        }
 
     def _translate_html(
         self,
         *,
         title: str,
         tra_type: str,
-        langcode: str,
-        cat: str,
-        camp: str,
         words: int,
-        tra_btn: str,
-        full_tr_user: bool,
         is_video_title: bool,
-        endpoint: str,
     ) -> str:
-        """Mirror of PHP ``make_translate_urls`` — inprocess branch only.
+        """
+        PHP ``make_translate_urls`` — inprocess branch only.
 
         Returns the HTML for the Translate column. When the button is disabled
         or no user is logged in, returns an empty string (the column then
         renders blank).
         """
-        if tra_btn != "1":
+        if self.inprocess_button != "1":
             return ""
 
         effective_type = "all" if is_video_title else (tra_type or "lead")
-        full_url = content_translation_url(title, langcode, camp, "all", endpoint)
-        lead_url = content_translation_url(title, langcode, camp, effective_type, endpoint)
+        full_url = content_translation_url(title, self.langcode, self.camp, "all", self.endpoint)
+        lead_url = content_translation_url(title, self.langcode, self.camp, effective_type, self.endpoint)
 
         tab = f"<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
-        if full_tr_user and not is_video_title:
+        if self.full_tr_user and not is_video_title:
             tab = (
                 "<div class='inline'>"
                 f"<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
