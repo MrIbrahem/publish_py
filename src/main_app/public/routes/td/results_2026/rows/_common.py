@@ -4,6 +4,19 @@ from __future__ import annotations
 
 from typing import Any
 
+from flask import url_for
+from markupsafe import Markup
+
+
+
+def _login_html() -> Markup:
+    """Login button shown to anonymous users (PHP ``results_table*.php``)."""
+    return Markup(
+        "<a class='btn btn-outline-primary' href='{login_url}'>"
+        "<i class='bi bi-box-arrow-in-right'></i> <span class='navtitles'>Login</span>"
+        "</a>"
+    ).format(login_url=url_for("auth.login"))
+
 
 def _format_inprocess_date(value: Any) -> str:
     """Mirror of PHP ``if (strpos($_date_, ':') !== false) explode(' ', $_date_)[0]``."""
@@ -45,6 +58,7 @@ def _row_metrics(title_data: dict, tra_type: str) -> tuple[int, int, str, Any, s
 
 __all__ = [
     "_is_video",
+    "_login_html",
     "_row_metrics",
     "_format_inprocess_date",
 ]

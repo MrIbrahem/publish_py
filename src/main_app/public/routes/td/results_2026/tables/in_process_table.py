@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from ..rows.mapping import InProcessItem
+from ..rows.inprocess_mapping import InProcessItem
 
 logger = logging.getLogger(__name__)
 

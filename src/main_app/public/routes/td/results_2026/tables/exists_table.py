@@ -7,7 +7,7 @@ partial instead of an HTML string.
 
 from __future__ import annotations
 
-from ..rows.mapping import ExistsItem
+from ..rows import ExistsItem
 
 
 class ExistsTable:
