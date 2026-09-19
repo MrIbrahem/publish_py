@@ -1,42 +1,30 @@
 """Port of ``results_27/Tables/ExistsTable.php``.
 
 Renders the table of already-existing pages. Mirrors PHP
-``ExistsTable::render()``, but builds row dicts for the Jinja partial instead
-of an HTML string.
+``ExistsTable::render()``, but builds :class:`ExistsItem` rows for the Jinja
+partial instead of an HTML string.
 """
 
 from __future__ import annotations
 
-from typing import Any
-
-from ..rows import ExistsRowBuilder
+from ..rows.mapping import ExistsItem
 
 
 class ExistsTable:
-    """Builds a single row for the Exists results table."""
+    """Builds the rows of the Exists results table."""
 
     def __init__(
         self,
         *,
-        langcode: str,
-        cat: str,
-        camp: str,
         user_coord: bool,
         endpoint: str,
-        user_is_logged_in: bool,
     ) -> None:
-        self._row_builder = ExistsRowBuilder(
-            langcode=langcode,
-            cat=cat,
-            camp=camp,
-            user_coord=user_coord,
-            endpoint=endpoint,
-            user_is_logged_in=user_is_logged_in,
-        )
+        self._user_coord = user_coord
+        self._endpoint = endpoint
 
-    def build(self, items: dict[str, dict]) -> tuple[list[dict[str, Any]], int, int]:
+    def build(self, items: dict[str, dict]) -> tuple[list[ExistsItem], int, int]:
         """Returns ``(rows, count_translated, count_translated_before)``."""
-        rows: list[dict[str, Any]] = []
+        rows: list[ExistsItem] = []
         numb = 1
         count_translated = 0
         count_translated_before = 0
@@ -52,13 +40,15 @@ class ExistsTable:
             else:
                 count_translated_before += 1
 
-            row = self._row_builder.build(
-                title=title,
-                counter=numb,
-                target_tab=target_tab,
+            rows.append(
+                ExistsItem.from_row(
+                    title=title,
+                    counter=numb,
+                    target_tab=target_tab,
+                    endpoint=self._endpoint,
+                    user_coord=self._user_coord,
+                )
             )
-
-            rows.append(row)
 
             numb += 1
 

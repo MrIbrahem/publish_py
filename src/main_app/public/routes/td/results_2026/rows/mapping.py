@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Literal
+from urllib.parse import quote
 
 from flask import url_for
 from markupsafe import Markup, escape
@@ -170,7 +171,7 @@ class MissingItem:
         """).format(
             full_note="(Full text)" if (self.is_full_row and not self.is_video) else "",
             n=self.counter,
-            encoded_title=escape(self.title),
+            encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
             row_links=row_links,
             en_views=self.en_views,
@@ -270,7 +271,7 @@ class ExistsItem:
             </tr>
         """).format(
             counter=self.counter,
-            encoded_title=escape(self.display_title),
+            encoded_title=quote(self.display_title.replace(" ", "_")),
             display_title=self.display_title,
             row_links=self.translate_html(langcode, camp, is_authenticated),
             translated_html=Markup(wikipedia_link(translated, langcode)),
@@ -411,7 +412,7 @@ class InProcessItem:
             </tr>
         """).format(
             counter=self.counter,
-            encoded_title=escape(self.title),
+            encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
             row_links=self.translate_html(langcode, camp, is_authenticated),
             en_views=self.en_views,
