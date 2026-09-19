@@ -16,6 +16,7 @@ The orchestrator returns a :class:`ResultsBundle` (the "results bundle") that
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle, ResultsCounts, ResultsRows
@@ -72,12 +73,15 @@ class ResultsLoader:
 
         endpoint = get_endpoint()
 
-        show_btn = settings["show_translation_button"]
+        def to_bool(val: Any) -> bool:
+            if isinstance(val, str):
+                return val.lower() in ("1", "true", "yes", "on")
+            return bool(val)
 
-        if isinstance(show_btn, str):
-            show_btn = show_btn.lower() in ("1", "true", "yes", "on")
+        show_btn = to_bool(settings["show_translation_button"])
 
-        show_translation_button = "1" if (show_btn and user_coord) else "0"
+        # Under testing
+        # show_translation_button = show_btn and user_coord
 
         missing_table = MissingTable(
             tra_type=tra_type,
@@ -116,7 +120,7 @@ class ResultsLoader:
                 exists_translated_before_count=exists_translated_before_count,
             ),
             summary_data=bucket["summary_data"],
-            show_translation_button=show_translation_button,
+            show_translation_button=show_btn,
             tra_type=tra_type or "lead",
             code_lang_name=code_lang_name,
             full_tr_user=full_tr_user,

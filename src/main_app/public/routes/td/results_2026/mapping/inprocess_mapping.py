@@ -70,9 +70,9 @@ class InProcessItem(ItemBase):
         camp: str,
         full_tr_user: bool,
         is_authenticated: bool,
-        show_translation_button: str,
+        show_translation_button: bool,
     ) -> Markup:
-        if show_translation_button != "1":
+        if show_translation_button is False:
             return Markup("")
 
         # logic from results_table.php — anonymous user
@@ -104,9 +104,9 @@ class InProcessItem(ItemBase):
         camp: str,
         full_tr_user: bool,
         is_authenticated: bool,
-        show_translation_button: str,
+        show_translation_button: bool,
     ) -> Markup:
-        row_links = self.translate_html(langcode, camp, full_tr_user, is_authenticated, show_translation_button)
+        row_links = self.translate_html(langcode, camp, full_tr_user, is_authenticated, show_translation_button,)
         return Markup("""
             <tr>
                 <th class="num" scope="row">
@@ -162,7 +162,7 @@ class InProcessItem(ItemBase):
         camp: str,
         full_tr_user: bool,
         is_authenticated: bool,
-        show_translation_button: str,
+        show_translation_button: bool,
     ) -> Markup:
         no_lead = self.translate_type_info["tt_lead"] == 0
         is_full_eligible = self.translate_type_info["tt_full"] == 1

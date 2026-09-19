@@ -198,7 +198,7 @@ class TestInProcessItem:
                     "ar",
                     "RTT",
                     is_authenticated=True,
-                    show_translation_button="1",
+                    show_translation_button=True,
                     full_tr_user=True,
                 )
             )
@@ -218,7 +218,7 @@ class TestInProcessItem:
                     "ar",
                     "RTT",
                     is_authenticated=True,
-                    show_translation_button="1",
+                    show_translation_button=True,
                     full_tr_user=False,
                 )
             )
@@ -234,7 +234,7 @@ class TestInProcessItem:
                     "ar",
                     "RTT",
                     is_authenticated=True,
-                    show_translation_button="0",
+                    show_translation_button=False,
                     full_tr_user=True,
                 )
             )
@@ -252,7 +252,7 @@ class TestInProcessItem:
                     "ar",
                     "RTT",
                     is_authenticated=False,
-                    show_translation_button="1",
+                    show_translation_button=True,
                     full_tr_user=True,
                 )
             )
