@@ -45,7 +45,6 @@ class ExistsTable:
             if not title:
                 continue
 
-            display_title = title.replace("_", " ")
             via = target_tab.get("via", "")
 
             if via == "td":
@@ -54,7 +53,7 @@ class ExistsTable:
                 count_translated_before += 1
 
             row = self._row_builder.build(
-                title=display_title,
+                title=title,
                 counter=numb,
                 target_tab=target_tab,
             )
@@ -64,6 +63,21 @@ class ExistsTable:
             numb += 1
 
         return rows, count_translated, count_translated_before
+
+    def count_status(self, items: dict[str, dict]) -> tuple[int, int]:
+        """Returns ``(count_translated, count_translated_before)``."""
+        count_translated = 0
+        count_translated_before = 0
+
+        for target_tab in items.values():
+            via = target_tab.get("via", "")
+
+            if via == "td":
+                count_translated += 1
+            else:
+                count_translated_before += 1
+
+        return count_translated, count_translated_before
 
 
 __all__ = [
