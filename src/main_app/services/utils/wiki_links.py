@@ -92,7 +92,7 @@ def tr_link_medwiki(title: str, langcode: str, cat: str, camp: str, tra_type: st
         "word": str(word),
         "tra_type": tra_type,
     }
-    translate_med_url = url_for("td.translate_med.index", **params, _external=False)
+    translate_med_url = url_for("translate_med.index", **params, _external=False)
     return translate_med_url
 
 
