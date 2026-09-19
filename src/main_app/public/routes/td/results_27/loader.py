@@ -19,14 +19,35 @@ templates.
 from __future__ import annotations
 
 from .bundle import ResultsBundle
-from .data import ResultsFetcher, get_results_27
 from .results_loader import ResultsLoader
-from .loader import results_loader_27
+
+
+def results_loader_27(
+    *,
+    code: str,
+    camp: str,
+    cat: str,
+    tra_type: str,
+    code_lang_name: str,
+    user_coord: bool,
+    settings: dict[str, bool],
+    full_tr_user: bool,
+    user_is_logged_in: bool,
+) -> ResultsBundle:
+    """Public entry point — mirrors PHP ``results_loader_27(array $data)``."""
+    return ResultsLoader().load(
+        code=code,
+        camp=camp,
+        cat=cat,
+        tra_type=tra_type,
+        code_lang_name=code_lang_name,
+        user_coord=user_coord,
+        settings=settings,
+        full_tr_user=full_tr_user,
+        user_is_logged_in=user_is_logged_in,
+    )
+
 
 __all__ = [
     "results_loader_27",
-    "ResultsLoader",
-    "ResultsBundle",
-    "ResultsFetcher",
-    "get_results_27",
 ]
