@@ -88,7 +88,7 @@ def tr_link_medwiki(title: str, code: str, cat: str, camp: str, tra_type: str, w
         "cat": quote(cat),
         "camp": quote(camp),
         "word": str(word),
-        "type": tra_type,
+        "tra_type": tra_type,
     }
     # Match PHP http_build_query(..., PHP_QUERY_RFC3986) — encodes via rawurlencode, joins with `&`.
     return "translate_med/index.php?" + urlencode(params, quote_via=quote)

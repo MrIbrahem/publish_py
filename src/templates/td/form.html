@@ -39,12 +39,12 @@
                 <div class='form-control'>
                     <div class='form-check form-check-inline'>
                         <input type='radio' class='form-check-input' id='customRadio' name='type' value='lead'
-                            {{ 'checked' if form_data.args.type == 'lead' or not form_data.args.type else '' }}>
+                            {{ 'checked' if form_data.args.tra_type == 'lead' or not form_data.args.tra_type else '' }}>
                         <label class='form-check-label' for='customRadio'>The lead only</label>
                     </div>
                     <div class='form-check form-check-inline'>
                         <input type='radio' class='form-check-input' id='customRadio2' name='type' value='all'
-                            {{ 'checked' if form_data.args.type == 'all' else '' }}>
+                            {{ 'checked' if form_data.args.tra_type == 'all' else '' }}>
                         <label class='form-check-label' for='customRadio2'>The whole article</label>
                     </div>
                 </div>

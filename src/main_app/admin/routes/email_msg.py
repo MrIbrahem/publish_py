@@ -10,6 +10,7 @@ from flask import (
     Blueprint,
     render_template,
     request,
+    url_for,
 )
 
 from ...database.services import PagesService, UserPagesService, UsersService, ViewsNewService
@@ -33,10 +34,11 @@ def make_translate_link(sugust: str, langcode: str) -> str:
     params = {
         "code": langcode,
         "cat": "RTT",
-        "type": "lead",
+        "tra_type": "lead",
         "title": sugust,
     }
-    here_url = "https://mdwiki.toolforge.org/Translation_Dashboard/translate_med/index.php?" + urlencode(params)
+    # here_url = "https://mdwiki.toolforge.org/Translation_Dashboard/translate_med/index.php?" + urlencode(params)
+    here_url = url_for("td.translate.index", **params, _external=True)
     return here_url
 
 

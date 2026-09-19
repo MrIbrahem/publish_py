@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from ..database.models.category_members import CategoryMemberRecord
 from ..database.models.dashboard import (
     CategoryRecord,
     ProjectRecord,
@@ -88,6 +89,7 @@ categories: list[AdminCategory] = [
         name="Pages",
         icon_value="fa-file-alt",
         models=[
+            CategoryMemberRecord,
             InProcessRecord,
             PageRecord,
             PagesUsersToMainRecord,

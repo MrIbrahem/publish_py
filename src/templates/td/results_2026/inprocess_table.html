@@ -40,7 +40,8 @@
                 langcode=form_data.args.code,
                 camp=form_data.args.camp,
                 is_authenticated=is_authenticated,
-                inprocess_button=show_translate_header
+                inprocess_button=show_translate_header,
+                full_tr_user=form_data.full_tr_user
             )
         }}
         {% endfor %}

@@ -152,7 +152,7 @@ class TDRoutes:
                 "code": parsed["code"],
                 "camp": parsed["camp"],
                 "cat": parsed["cat"],
-                "type": parsed["tra_type"],
+                "tra_type": parsed["tra_type"],
             },
         }
 
@@ -189,7 +189,7 @@ class TDRoutes:
                 "code": parsed["code"],
                 "camp": parsed["camp"],
                 "cat": parsed["cat"],
-                "type": parsed["tra_type"],
+                "tra_type": parsed["tra_type"],
             },
         }
 
