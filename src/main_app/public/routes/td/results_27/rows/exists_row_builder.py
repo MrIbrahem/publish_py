@@ -7,9 +7,20 @@ instead of an HTML string.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
-from ......services.utils.wiki_links import content_translation_url, wikidata_link, wikipedia_link
+from ......services.utils.wiki_links import (
+    content_translation_url,
+    wikidata_link,
+    wikipedia_link,
+)
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Exists rows
+# ---------------------------------------------------------------------------
 
 
 class ExistsRowBuilder:

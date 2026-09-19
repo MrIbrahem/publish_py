@@ -21,7 +21,7 @@ from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
-from .rows import build_exists_rows, build_inprocess_rows, build_missing_rows
+from .rows import ExistsRowBuilder, InProcessRowBuilder, MissingRowBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ class ResultsLoader:
 
         inprocess_button = "1" if (show_btn and user_coord) else "0"
 
-        missing_rows = build_missing_rows(
+        missing_rows = MissingRowBuilder().build(
             missing=bucket["missing"],
             langcode=code,
             cat=cat,
@@ -91,7 +91,7 @@ class ResultsLoader:
             user_is_logged_in=user_is_logged_in,
         )
 
-        inprocess_rows = build_inprocess_rows(
+        inprocess_rows = InProcessRowBuilder().build(
             inprocess=bucket["inprocess"],
             langcode=code,
             cat=cat,
@@ -103,7 +103,7 @@ class ResultsLoader:
             user_is_logged_in=user_is_logged_in,
         )
 
-        exists_rows, exists_translated_count, exists_translated_before_count = build_exists_rows(
+        exists_rows, exists_translated_count, exists_translated_before_count = ExistsRowBuilder().build(
             exists=bucket["exists"],
             langcode=code,
             cat=cat,
