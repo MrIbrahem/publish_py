@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ..rows import MissingItem
+from ..mapping import MissingItem
 
 logger = logging.getLogger(__name__)
 

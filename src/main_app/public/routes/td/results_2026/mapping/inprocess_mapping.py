@@ -12,7 +12,7 @@ from markupsafe import Markup, escape
 from ......services.utils.wiki_links import (
     content_translation_url,
 )
-from ._common import _format_inprocess_date, _is_video, _login_html, _row_metrics
+from ..rows._common import _format_inprocess_date, _is_video, _login_html, _row_metrics
 
 logger = logging.getLogger(__name__)
 

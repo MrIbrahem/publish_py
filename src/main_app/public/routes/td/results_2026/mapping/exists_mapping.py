@@ -13,7 +13,7 @@ from ......services.utils.wiki_links import (
     content_translation_url,
     wikipedia_link,
 )
-from ._common import _login_html
+from ..rows._common import _login_html
 
 logger = logging.getLogger(__name__)
 
