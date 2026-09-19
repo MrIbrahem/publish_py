@@ -7,6 +7,8 @@ partial instead of an HTML string.
 
 from __future__ import annotations
 
+from typing import Any
+
 from ..mapping import ExistsItem
 
 
@@ -16,10 +18,10 @@ class ExistsTable:
     def __init__(
         self,
         *,
-        user_coord: bool,
         endpoint: str,
+        translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
-        self._user_coord = user_coord
+        self.translate_type_data = translate_type_data
         self._endpoint = endpoint
 
     def build(self, items: dict[str, dict]) -> tuple[list[ExistsItem], int, int]:
@@ -33,6 +35,9 @@ class ExistsTable:
             if not title:
                 continue
 
+            display_title = title.replace("_", " ")
+            translate_type_info = self.translate_type_data.get(display_title) or {"tt_lead": None, "tt_full": None}
+
             via = target_tab.get("via", "")
 
             if via == "td":
@@ -44,9 +49,9 @@ class ExistsTable:
                 ExistsItem.from_row(
                     title=title,
                     counter=numb,
-                    target_tab=target_tab,
+                    row=target_tab,
                     endpoint=self._endpoint,
-                    user_coord=self._user_coord,
+                    translate_type_info=translate_type_info,
                 )
             )
 

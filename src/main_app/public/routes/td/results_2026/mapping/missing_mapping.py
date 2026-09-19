@@ -4,44 +4,21 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Literal
 from urllib.parse import quote
 
-from flask import url_for
-from markupsafe import Markup
+from markupsafe import Markup, escape
 
 from ......services.utils.wiki_links import (
     tr_link_medwiki,
 )
+from ..rows._common import _login_html
+from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class Stats:
-    lead: int
-    all: int
-
-    @classmethod
-    def from_row(cls, row: dict, stat_type: Literal["words", "refs"]) -> Stats:
-        if stat_type == "words":
-            return cls(lead=row.get("w_lead_words") or 0, all=row.get("w_all_words") or 0)
-        else:
-            return cls(lead=row.get("r_lead_refs") or 0, all=row.get("r_all_refs") or 0)
-
-
-@dataclass
-class MissingItem:
-    counter: int
-
-    words: Stats
-    refs: Stats
-
-    title: str
-    en_views: str
-    importance: str
-    tra_type: str
-    qid: str
+class MissingItem(ItemBase):
     is_full_row: bool
     translate_type_info: dict[str, int | None] = field(default_factory=dict)
 
@@ -59,7 +36,7 @@ class MissingItem:
     def from_row(
         cls,
         title: str,
-        counter,
+        counter: int,
         row: dict,
         tra_type: str,
         is_full_row: bool,
@@ -75,8 +52,8 @@ class MissingItem:
             qid=row.get("qid") or "",
             tra_type=tra_type,
             is_full_row=is_full_row,
-            words=Stats.from_row(row, "words"),
-            refs=Stats.from_row(row, "refs"),
+            words=Stats.load(row, "words"),
+            refs=Stats.load(row, "refs"),
             translate_type_info=translate_type_info,
         )
 
@@ -90,10 +67,7 @@ class MissingItem:
     ) -> Markup:
         # logic from results_table.php — anonymous user
         if not is_authenticated:
-            login_url = url_for("auth.login")
-            return Markup("<a href='{login_url}' class='btn btn-outline-primary btn-sm'>Login</a>").format(
-                login_url=login_url
-            )
+            return _login_html()
 
         lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type, self.words.lead)
 
@@ -126,11 +100,17 @@ class MissingItem:
         full_tr_user: bool,
         is_authenticated: bool,
     ) -> Markup:
-        row_links = self.translate_html(langcode, cat, camp, full_tr_user, is_authenticated)
+        row_links = self.translate_html(
+            langcode,
+            cat,
+            camp,
+            full_tr_user,
+            is_authenticated,
+        )
         return Markup("""
             <tr>
                 <th class="num" scope="row">
-                    {n}
+                    {counter}
                 </th>
                 <td class="link_container">
                     <a target="_blank" href="https://mdwiki.org/wiki/{encoded_title}">
@@ -157,8 +137,8 @@ class MissingItem:
                 </td>
             </tr>
         """).format(
+            counter=self.counter,
             full_note="(Full text)" if (self.is_full_row and not self.is_video) else "",
-            n=self.counter,
             encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
             row_links=row_links,
@@ -166,7 +146,7 @@ class MissingItem:
             importance=self.importance,
             words=self.words.all if self.tra_type == "all" else self.words.lead,
             refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
-            qid=self.qid,
+            qid=escape(self.qid),
         )
 
     def render(

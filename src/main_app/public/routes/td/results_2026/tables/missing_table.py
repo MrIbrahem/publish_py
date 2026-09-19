@@ -22,17 +22,13 @@ class MissingTable:
     def __init__(
         self,
         *,
-        langcode: str,
-        cat: str,
-        camp: str,
         tra_type: str,
         full_tr_user: bool,
-        user_is_logged_in: bool,
         translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
+        self.translate_type_data = translate_type_data
         self._tra_type = tra_type or "lead"
         self._full_tr_user = full_tr_user
-        self.translate_type_data = translate_type_data
 
     def build(self, items: list[dict]) -> list[MissingItem]:
         is_full_mode = self._tra_type == "all"
@@ -55,7 +51,6 @@ class MissingTable:
                 continue
 
             display_title = title.replace("_", " ")
-
             translate_type_info = self.translate_type_data.get(display_title) or {"tt_lead": None, "tt_full": None}
 
             no_lead = translate_type_info["tt_lead"] == 0

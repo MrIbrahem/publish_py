@@ -80,27 +80,22 @@ class ResultsLoader:
         inprocess_button = "1" if (show_btn and user_coord) else "0"
 
         missing_table = MissingTable(
-            langcode=code,
-            cat=cat,
-            camp=camp,
             tra_type=tra_type,
             full_tr_user=full_tr_user,
-            user_is_logged_in=user_is_logged_in,
             translate_type_data=translation_loader.rows_data,
         )
         missing_rows = missing_table.build(bucket["missing"])
 
         inprocess_table = InProcessTable(
-            inprocess_button=inprocess_button,
-            full_tr_user=full_tr_user,
             titles_infos=titles_infos,
             endpoint=endpoint,
+            translate_type_data=translation_loader.rows_data,
         )
         inprocess_rows = inprocess_table.build(bucket["inprocess"])
 
         exists_table = ExistsTable(
-            user_coord=user_coord,
             endpoint=endpoint,
+            translate_type_data=translation_loader.rows_data,
         )
 
         exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(

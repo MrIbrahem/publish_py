@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
-from typing import Any, Literal
+from dataclasses import dataclass, field
+from typing import Any
 from urllib.parse import quote
 
 from markupsafe import Markup, escape
@@ -12,26 +12,14 @@ from markupsafe import Markup, escape
 from ......services.utils.wiki_links import (
     content_translation_url,
 )
-from ..rows._common import _format_inprocess_date, _is_video, _login_html, _row_metrics
+from ..rows._common import _format_inprocess_date, _login_html
+from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class Stats:
-    lead: int
-    all: int
-
-    @classmethod
-    def from_row(cls, row: dict, stat_type: Literal["words", "refs"]) -> Stats:
-        if stat_type == "words":
-            return cls(lead=row.get("w_lead_words") or 0, all=row.get("w_all_words") or 0)
-        else:
-            return cls(lead=row.get("r_lead_refs") or 0, all=row.get("r_all_refs") or 0)
-
-
-@dataclass
-class InProcessItem:
+class InProcessItem(ItemBase):
     """One row of the In-process table.
 
     Port of ``results_2026/results_table_inprocess.php`` — like
@@ -39,25 +27,12 @@ class InProcessItem:
     supplies the request context to :meth:`render`.
     """
 
-    counter: int
-
-    title: str
-    en_views: Any
-    importance: str
-    words: int
-    refs: int
-    qid: str
-
     user: str
     date: str
 
-    tra_type: str
-    is_video: bool
-
     # Request-level config supplied by the table (not available in the template).
     endpoint: str = ""
-    inprocess_button: str = "0"
-    full_tr_user: bool = False
+    translate_type_info: dict[str, int | None] = field(default_factory=dict)
 
     @classmethod
     def from_row(
@@ -65,51 +40,50 @@ class InProcessItem:
         *,
         title: str,
         counter: int,
+        row: dict[str, Any],
         title_tab: dict[str, Any],
-        title_data: dict[str, Any],
         endpoint: str = "",
-        inprocess_button: str = "0",
-        full_tr_user: bool = False,
+        translate_type_info: dict[str, int | None] | None = None,
     ) -> InProcessItem:
         """ """
+        translate_type_info = translate_type_info or {"tt_lead": None, "tt_full": None}
         tra_type = title_tab.get("translate_type") or "lead"
-        is_video_title = _is_video(title)
-        if is_video_title:
-            tra_type = "all"
-
-        words, refs, importance, en_views, qid = _row_metrics(title_data, tra_type)
 
         return cls(
             counter=counter,
-            title=title,
-            en_views=en_views,
-            importance=importance,
-            words=words,
-            refs=refs,
-            qid=qid,
+            title=title or row.get("title") or "",
+            en_views=row.get("en_views") or "",
+            importance=row.get("importance") or "Unknown",
+            qid=row.get("qid") or "",
             user=title_tab.get("user") or "",
             date=_format_inprocess_date(title_tab.get("add_date") or title_tab.get("date")),
             tra_type=tra_type,
-            is_video=is_video_title,
             endpoint=endpoint,
-            inprocess_button=inprocess_button,
-            full_tr_user=full_tr_user,
+            words=Stats.load(row, "words"),
+            refs=Stats.load(row, "refs"),
+            translate_type_info=translate_type_info,
         )
 
-    def translate_html(self, langcode: str, camp: str, is_authenticated: bool) -> Markup:
-        """PHP ``make_translate_urls`` — inprocess branch only."""
-        # logic from results_table_inprocess.php — anonymous user
+    def translate_html(
+        self,
+        langcode: str,
+        camp: str,
+        full_tr_user: bool,
+        is_authenticated: bool,
+        inprocess_button: str,
+    ) -> Markup:
+        if inprocess_button != "1":
+            return Markup("")
+
+        # logic from results_table.php — anonymous user
         if not is_authenticated:
             return _login_html()
 
-        if self.inprocess_button != "1":
-            return Markup("")
-
         effective_type = "all" if self.is_video else (self.tra_type or "lead")
-        full_url = content_translation_url(self.title, langcode, camp, "all", self.endpoint)
         lead_url = content_translation_url(self.title, langcode, camp, effective_type, self.endpoint)
 
-        if self.full_tr_user and not self.is_video:
+        if full_tr_user and not self.is_video:
+            full_url = content_translation_url(self.title, langcode, camp, "all", self.endpoint)
             return Markup(
                 "<div class='inline'>"
                 "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
@@ -124,7 +98,15 @@ class InProcessItem:
             "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
         ).format(lead_url=lead_url)
 
-    def render(self, langcode: str, camp: str, is_authenticated: bool) -> Markup:
+    def _render(
+        self,
+        langcode: str,
+        camp: str,
+        full_tr_user: bool,
+        is_authenticated: bool,
+        inprocess_button: str,
+    ) -> Markup:
+        row_links = self.translate_html(langcode, camp, full_tr_user, is_authenticated, inprocess_button)
         return Markup("""
             <tr>
                 <th class="num" scope="row">
@@ -164,14 +146,33 @@ class InProcessItem:
             counter=self.counter,
             encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
-            row_links=self.translate_html(langcode, camp, is_authenticated),
+            row_links=row_links,
             en_views=self.en_views,
             importance=self.importance,
-            words=self.words,
-            refs=self.refs,
+            words=self.words.all if self.tra_type == "all" else self.words.lead,
+            refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
             qid=escape(self.qid),
             user=self.user,
             date=self.date,
+        )
+
+    def render(
+        self,
+        langcode: str,
+        camp: str,
+        full_tr_user: bool,
+        is_authenticated: bool,
+        inprocess_button: str,
+    ) -> Markup:
+        no_lead = self.translate_type_info["tt_lead"] == 0
+        is_full_eligible = self.translate_type_info["tt_full"] == 1
+
+        return self._render(
+            langcode=langcode,
+            camp=camp,
+            full_tr_user=full_tr_user,
+            is_authenticated=is_authenticated,
+            inprocess_button=inprocess_button,
         )
 
 
