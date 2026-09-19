@@ -10,8 +10,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ..rows import MissingRowBuilder
-from ..rows.mapping import MissingItem
+from ..rows import MissingItem, MissingRowBuilder
 
 logger = logging.getLogger(__name__)
 

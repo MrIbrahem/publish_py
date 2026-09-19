@@ -5,11 +5,14 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from typing import Literal
+from urllib.parse import quote
 
 from flask import url_for
-from markupsafe import Markup, escape
+from markupsafe import Markup
 
-from ......services.utils.wiki_links import tr_link_medwiki
+from ......services.utils.wiki_links import (
+    tr_link_medwiki,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +159,7 @@ class MissingItem:
         """).format(
             full_note="(Full text)" if (self.is_full_row and not self.is_video) else "",
             n=self.counter,
-            encoded_title=escape(self.title),
+            encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
             row_links=row_links,
             en_views=self.en_views,
