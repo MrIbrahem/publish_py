@@ -1,12 +1,7 @@
-{# Orchestrator partial — port of src/backend/results_2026/index.php (Results_tables_2026 + card_result). #}
-{# `results` is the bundle returned by results_loader_2026(). #}
 {% from "_macros.html" import card_header %}
 
 {% macro results_summary(data) %}
-{#
-   Generates a summary string with links based on the provided summary data.
-   Expects a dictionary with keys: total, cat, len_exists, len_missing, code, len_inprocess
-#}
+
 {% set category_href = "https://mdwiki.org/wiki/Category:" ~ (data.cat | replace(" ", "_") | urlencode) %}
 {% set wiki_href = "https://" ~ data.code ~ ".wikipedia.org" %}
 Found {{ data.total }} pages in
@@ -16,18 +11,16 @@ Found {{ data.total }} pages in
 {{ data.len_inprocess }} In process.
 {% endmacro %}
 
-{# logic from results_2026/index.php — Results card (always rendered when bundle is present). #}
 <br>
 <div class="card">
     <div class="card-header">
         {{ card_header("Results: (" ~ results.summary_count ~ ")", results_summary(results.summary_data)) }}
     </div>
     <div class="card-body1 card2">
-        {% include "results_2026/_results_table.html" %}
+        {% include "td/results_2026/missing_table.html" %}
     </div>
 </div>
 
-{# logic from results_2026/index.php — In-process card (rendered when count > 0). #}
 {% if results.inprocess_count > 0 %}
 <br>
 <div class="card">
@@ -35,12 +28,11 @@ Found {{ data.total }} pages in
         {{ card_header("In process: (" ~ results.inprocess_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
-        {% include "results_2026/_inprocess_table.html" %}
+        {% include "td/results_2026/inprocess_table.html" %}
     </div>
 </div>
 {% endif %}
 
-{# logic from results_2026/index.php — Exists card (count > 1 AND show_exists_table, matching PHP). #}
 {% if settings and settings.show_exists_table == True and results.exists_count > 1 %}
 <br>
 <div class="card">
@@ -48,7 +40,7 @@ Found {{ data.total }} pages in
         {{ card_header("Exists: (" ~ results.exists_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
-        {% include "results_2026/_exists_table.html" %}
+        {% include "td/results_2026/exists_table.html" %}
     </div>
 </div>
 {% endif %}
