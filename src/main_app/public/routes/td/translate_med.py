@@ -38,8 +38,8 @@ def _normalize(name: str) -> str:
     (``htmlspecialchars`` + ``trim``, plus the explicit ``undefined`` → ``''``
     fallback seen in ``load_request.php``).
     """
-    raw = (request.args.get(name) or "").strip()
-    if raw == "undefined":
+    raw = (request.args.get(name, type=str) or "").strip()
+    if raw.lower() in ("undefined", "all"):
         return ""
     return raw
 

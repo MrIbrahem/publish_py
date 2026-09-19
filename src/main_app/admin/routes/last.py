@@ -58,7 +58,7 @@ def last_translations_dashboard(
         "admins/last/index.html",
         rows=last_rows,
         languages=languages,
-        current_lang=lang,
+        current_lang=lang or "All",
         last_table=last_table,
         count=len(last_rows),
     )
