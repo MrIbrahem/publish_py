@@ -12,10 +12,9 @@ from flask import (
     request,
 )
 
-from ....services.utils.wiki_links import content_translation_url, get_endpoint
-
 from ....database.services import InProcessService
 from ....services.auth import get_current_user
+from ....services.utils.wiki_links import content_translation_url, get_endpoint
 
 logger = logging.getLogger(__name__)
 
@@ -65,13 +64,16 @@ class TranslateRoutes:
                 word=word,
             )
 
-        return redirect(content_translation_url(
-            title=title,
-            code=langcode,
-            campaign=camp,
-            tra_type=tra_type,
-            endpoint=get_endpoint(),
-        ))
+        return redirect(
+            content_translation_url(
+                title=title,
+                code=langcode,
+                campaign=camp,
+                tra_type=tra_type,
+                endpoint=get_endpoint(),
+            )
+        )
+
 
 __all__ = [
     "TranslateRoutes",
