@@ -122,12 +122,12 @@ class LeaderBoardRoutes:
         users_data = users_res.to_json()
 
         result = {
-            "langs": langs_data.get("results") or [],
-            "users": users_data.get("results") or [],
+            "langs": langs_data["results"] or [],
+            "users": users_data["results"] or [],
             "users_top_langs": {},
         }
 
-        if users_data.get("results"):
+        if users_data["results"]:
             # {row["user"]: {"lang": row["lang"], "count": row["count"]} for row in result_list}
             users_top_langs: list[dict[Any, Any]] = self.lederboard_service.top_lang_of_users()
             result["users_top_langs"] = {row["user"]: row for row in users_top_langs}
