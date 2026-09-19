@@ -24,8 +24,8 @@ from .helpers import TranslateTypeLoader
 from .results_loader import (
     build_exists_rows,
     build_inprocess_rows,
-    build_missing_rows,
 )
+from .rows.missing_row_builder import build_missing_rows
 
 logger = logging.getLogger(__name__)
 
