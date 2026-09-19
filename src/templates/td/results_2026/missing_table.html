@@ -35,7 +35,7 @@
             <td class="link_container">
                 <a target="_blank" href="https://mdwiki.org/wiki/{{ row.title | replace(' ', '_') | urlencode }}">
                     {{ row.title }}
-                </a>
+                </a> {{ '(Full text)' if row.is_full_row else '' }}
             </td>
             <th>
                 {% if is_authenticated %}
