@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from .results_fetcher import get_results_2026
+from .results_fetcher import ResultsFetcher
 
 __all__ = [
-    "get_results_2026",
+    "ResultsFetcher",
 ]

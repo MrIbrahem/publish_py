@@ -19,7 +19,7 @@ import logging
 
 from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle
-from .data import get_results_2026
+from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
 from .rows import build_exists_rows, build_inprocess_rows, build_missing_rows
 
@@ -53,7 +53,7 @@ class ResultsLoader:
         produces no HTML side effects of its own.
         """
         # logic from results_2026/get_results_2026.php
-        bucket = get_results_2026(cat, code)
+        bucket = ResultsFetcher().get(cat, code)
 
         # logic from results_2026/index.php — load_translate_type('no'|'full')
         nolead_titles = TranslateTypeLoader.load("no")

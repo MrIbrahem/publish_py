@@ -1,4 +1,5 @@
-r"""Port of ``results_27/Data/ResultsFetcher.php``.
+r"""
+Port of ``results_27/Data/ResultsFetcher.php``.
 
 Responsible for fetching and preparing all result data (exists, missing,
 in-process) for a given category and language. Mirrors PHP
@@ -45,7 +46,7 @@ class ResultsFetcher:
 
         # logic from results_2026/get_results_2026.php — getinprocess_n
         missing_titles = {row["title"] for row in items_missing}
-        inprocess = self._get_in_process(missing_titles, code)
+        inprocess = self.get_inprocess_for_missing(missing_titles, code)
 
         # Remove inprocess titles from missing.
         if inprocess:
@@ -70,7 +71,7 @@ class ResultsFetcher:
             "missing": items_missing,
         }
 
-    def _get_in_process(self, missing_titles: set[str], code: str) -> dict[str, dict]:
+    def get_inprocess_for_missing(self, missing_titles: set[str], code: str) -> dict[str, dict]:
         """Mirror of PHP ``getinprocess_n($missing, $code)``.
 
         Keeps only the in-process records whose title is still in the missing
