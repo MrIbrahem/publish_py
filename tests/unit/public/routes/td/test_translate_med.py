@@ -354,9 +354,10 @@ class TestInjection:
 
         assert response.status_code == 302
         location = response.headers["Location"]
+        # The CR/LF is percent-encoded, so the value cannot split the header.
         assert "\r" not in location
         assert "\n" not in location
-        assert "Set-Cookie" not in location
+        assert "page=Foo%0D%0ASet-Cookie" in location
 
     def test_redirect_body_is_escaped(self, mock_client: FlaskClient, logged_in):
         response = mock_client.get(
