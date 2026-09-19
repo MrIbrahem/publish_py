@@ -21,6 +21,7 @@ from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
+from .tables import ExistsTable, InProcessTable, MissingTable
 from .rows import ExistsRowBuilder, InProcessRowBuilder, MissingRowBuilder
 
 logger = logging.getLogger(__name__)
@@ -106,7 +107,7 @@ class ResultsLoader:
             user_is_logged_in=user_is_logged_in,
         )
 
-        exists_table = ExistsRowBuilder()
+        exists_table = ExistsTable()
         exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
             items=bucket["exists"],
             langcode=code,
