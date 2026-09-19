@@ -22,7 +22,6 @@ from flask import url_for
 
 from .....database.services import (
     InProcessService,
-    TranslateTypeService,
 )
 from .....services.utils.wiki_links import (
     content_translation_url,
@@ -53,32 +52,6 @@ def get_inprocess_for_missing(missing_titles: set[str], code: str) -> dict[str, 
             "add_date": r.add_date,  # datetime or None
         }
     return result
-
-
-# ---------------------------------------------------------------------------
-# load_translate_type — partition translate_type rows into the two sets
-# ---------------------------------------------------------------------------
-
-
-def load_translate_type_sets() -> tuple[set[str], set[str]]:
-    """Mirror of PHP ``load_translate_type('no')`` + ``load_translate_type('full')``.
-
-    Returns ``(nolead_titles, full_titles)``.
-    """
-    nolead: set[str] = set()
-    full: set[str] = set()
-    try:
-        service = TranslateTypeService()
-        rows = service.list_translate_types()
-    except Exception:
-        logger.exception("Failed to load translate_type rows")
-        return nolead, full
-    for row in rows:
-        if row.tt_full == 1:
-            full.add(row.tt_title)
-        if row.tt_lead == 0:
-            nolead.add(row.tt_title)
-    return nolead, full
 
 
 # ---------------------------------------------------------------------------
@@ -461,5 +434,4 @@ __all__ = [
     "build_inprocess_rows",
     "build_missing_rows",
     "get_inprocess_for_missing",
-    "load_translate_type_sets",
 ]
