@@ -61,7 +61,6 @@ class FullTranslators:
             return redirect(url_for("adminpanel.full_translators.dashboard"))
 
         try:
-
             record = self.service.add_full_translator(username)
         except ValueError as exc:
             logger.exception("Unable to add full translator")
