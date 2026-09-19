@@ -21,7 +21,8 @@ from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle, ResultsCounts, ResultsRows
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
-from .tables import ExistsTable, InProcessTable, MissingTable
+from .tables import ExistsTable, InProcessTable
+from .tables.missing_table_test import MissingTable
 
 logger = logging.getLogger(__name__)
 

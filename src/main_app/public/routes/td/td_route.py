@@ -144,18 +144,22 @@ class TDRoutes:
         if results_bundle and results_bundle.summary_data:
             results_bundle.summary_data["code_lang_name"] = parsed["code_lang_name"]
 
+        form_data = {
+            "langs": langs,
+            "campaigns": campaigns,
+            "full_tr_user": full_tr_user,
+            "args": {
+                "code": parsed["code"],
+                "camp": parsed["camp"],
+                "cat": parsed["cat"],
+                "type": parsed["tra_type"],
+            },
+        }
+
         return render_template(
             "td/index.html",
             settings=parsed_settings,
-            form_data={
-                "langs": langs,
-                "campaigns": campaigns,
-                "args": {
-                    "code": parsed["code"],
-                    "camp": parsed["camp"],
-                    "type": parsed["tra_type"],
-                },
-            },
+            form_data = form_data,
             results=results_bundle,
         )
 

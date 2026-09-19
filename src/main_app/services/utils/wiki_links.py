@@ -75,7 +75,7 @@ def wikidata_link(qid: str, name: str = "", default: str = "") -> str:
     return f"<a class='inline' target='_blank' href='https://wikidata.org/wiki/{encoded}'>{display}</a>"
 
 
-def tr_link_medwiki(title: str, cod: str, cat: str, camp: str, tra_type: str, word: int | str) -> str:
+def tr_link_medwiki(title: str, code: str, cat: str, camp: str, tra_type: str, word: int | str) -> str:
     """Relative URL to ``translate_med/index.php`` (PHP make_tr_link_medwiki).
 
     The target endpoint is hosted by the PHP Translation-Dashboard. The
@@ -84,7 +84,7 @@ def tr_link_medwiki(title: str, cod: str, cat: str, camp: str, tra_type: str, wo
     """
     params = {
         "title": quote(title),  # PHP encodes the title twice (rawurlEncode + http_build_query RFC 3986)
-        "code": cod,
+        "code": code,
         "cat": quote(cat),
         "camp": quote(camp),
         "word": str(word),
@@ -96,7 +96,7 @@ def tr_link_medwiki(title: str, cod: str, cat: str, camp: str, tra_type: str, wo
 
 def content_translation_url(
     title: str,
-    cod: str,
+    code: str,
     campaign: str,
     tra_type: str,
     endpoint: str,
@@ -113,7 +113,7 @@ def content_translation_url(
         "title": "Special:ContentTranslation",
         "tr_type": tra_type,
         "from": "mdwiki",
-        "to": cod,
+        "to": code,
         "campaign": campaign,
         "page": title,
     }

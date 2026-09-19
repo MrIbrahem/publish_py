@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from .rows.mapping import MissingItem
+
 
 @dataclass
 class ResultsCounts:
@@ -22,10 +24,9 @@ class ResultsCounts:
 
 @dataclass
 class ResultsRows:
-    missing_rows: list[dict[str, Any]]
+    missing_rows: list[MissingItem]
     inprocess_rows: list[dict[str, Any]]
     exists_rows: list[dict[str, Any]]
-
 
 @dataclass
 class ResultsBundle:
@@ -34,7 +35,6 @@ class ResultsBundle:
     Consumed by the ``results_2026`` Jinja partials (and enriched with
     ``code_lang_name`` by the route). Mirrors PHP ``Results_tables_2026``.
     """
-
     counts: ResultsCounts
     rows: ResultsRows
     summary_data: dict[str, Any]

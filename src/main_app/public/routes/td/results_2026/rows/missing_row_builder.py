@@ -7,6 +7,8 @@ from typing import Any
 
 from flask import url_for
 
+from .mapping import MissingItem
+
 from ......services.utils.wiki_links import (
     tr_link_medwiki,
     wikidata_link,
@@ -18,7 +20,6 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Row builders
 # ---------------------------------------------------------------------------
-
 
 class MissingRowBuilder:
     """Builds a single row for the Missing results table."""
@@ -104,6 +105,22 @@ class MissingRowBuilder:
         return f"<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
 
 
+    def build_item(
+        self,
+        *,
+        title: str,
+        counter: int,
+        is_full_row: bool,
+        title_data: dict,
+        tra_type: str,
+    ) -> MissingItem:
+        return MissingItem.from_row(
+            title=title,
+            counter=counter,
+            row=title_data,
+            tra_type=tra_type,
+            is_full_row=is_full_row,
+        )
 __all__ = [
     "MissingRowBuilder",
 ]
