@@ -94,16 +94,6 @@ class ResultsFetcher:
             }
         return result
 
-
-def get_results_27(cat: str, code: str) -> dict[str, Any]:
-    """Backward-compatible wrapper around :class:`ResultsFetcher`.
-
-    Mirrors PHP ``get_results_27($cat, $code)``.
-    """
-    return ResultsFetcher().get(cat, code)
-
-
 __all__ = [
     "ResultsFetcher",
-    "get_results_27",
 ]
