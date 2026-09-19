@@ -10,7 +10,6 @@ from __future__ import annotations
 from typing import Any
 
 from ......services.utils.wiki_links import content_translation_url, wikidata_link
-
 from ._common import _is_video, _row_metrics
 
 

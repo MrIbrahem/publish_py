@@ -11,7 +11,6 @@ from __future__ import annotations
 import logging
 
 from .....services.utils.wiki_links import get_endpoint
-
 from .bundle import ResultsBundle
 from .data import get_results_27
 from .helpers import TranslateTypeLoader

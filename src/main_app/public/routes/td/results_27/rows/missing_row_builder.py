@@ -12,7 +12,6 @@ from typing import Any
 from flask import url_for
 
 from ......services.utils.wiki_links import tr_link_medwiki, wikidata_link
-
 from ._common import _is_video, _row_metrics
 
 
