@@ -70,19 +70,20 @@ Line-by-line reading of [translate_med.php](../../src/main_app/public/routes/td/
 
 ## Gap Analysis of the Current Stub
 
-What [translate_med.py](../../src/main_app/public/routes/td/translate_med.py) does today, versus the PHP flow:
+State of [translate_med.py](../../src/main_app/public/routes/td/translate_med.py) versus the PHP flow,
+after the `redirect(...)` return was added:
 
-| # | Gap | Impact |
+| # | Gap | Status |
 |---|---|---|
-| 1 | `index()` **returns `None`** after the `add_in_process` call. | Flask raises `TypeError: The view function did not return a valid response`. The route is broken end-to-end. |
-| 2 | No `camp` parameter and no `cat → campaign` resolution. | The CX URL is never built; PHP lines 200–209 have no counterpart. |
-| 3 | `users_no_inprocess` gate missing. | Every logged-in user gets an `in_process` row; PHP skips active members of that table. |
-| 4 | Required-args check rejects missing `tra_type`/`cat`. | PHP defaults `type` to `lead` and tolerates an empty `cat`; the stub 404s valid links. |
-| 5 | `word` read with `type=int` but no `min_range` clamp. | Negative values pass through; PHP clamps to 0. |
-| 6 | No `test` flag. | The debug/preview mode of `go_to_translate_url()` cannot be exercised. |
-| 7 | Anonymous user returns the bare string `"Not logged in"`. | PHP renders a login card with a link to the login page. |
-| 8 | `get_current_user` imported from `....services.auth` (package) while [td_route.py:26](../../src/main_app/public/routes/td/td_route.py#L26) imports from `....services.auth.utils`. | Both work; standardize on `.utils` for consistency. |
-| 9 | No use of the already-ported `content_translation_url()` / `get_endpoint()` helpers. | Duplicated logic risk; `wiki_links.py` already mirrors `make_ContentTranslation_url` and `get_endpoint`. |
+| 1 | `index()` fell through and returned `None`. | **Fixed** — now ends in `redirect(content_translation_url(...))` at [translate_med.py:68](../../src/main_app/public/routes/td/translate_med.py#L68). |
+| 2 | No `cat → campaign` resolution when `camp` is omitted. | Open — PHP lines 207–209 have no counterpart. |
+| 3 | `users_no_inprocess` gate missing. | Open — every logged-in user gets an `in_process` row; PHP skips active members of that table. |
+| 4 | Required-args check rejects a missing `tra_type`/`cat`. | Open — PHP defaults `type` to `lead` and tolerates an empty `cat`; the current check 404s valid links. |
+| 5 | `word` read with `type=int` but no `min_range` clamp. | Open — negative values pass through; PHP clamps to 0. |
+| 6 | `test` flag. | **Dropped** — meaningless with a 302 (see [Deviations](#deviations-and-rationale)); the PHP preview mode has no intermediate page to render. |
+| 7 | Anonymous user returns the bare string `"Not logged in"`; invalid args return `"Invalid request"`. | Open — both are valid Flask responses, but neither renders the PHP login card / error markup. |
+| 8 | `get_current_user` imported from `....services.auth` (package) while [td_route.py:26](../../src/main_app/public/routes/td/td_route.py#L26) imports from `....services.auth.utils`. | Open — both work; standardize on `.utils` for consistency. |
+| 9 | No use of the already-ported `content_translation_url()` / `get_endpoint()` helpers. | **Fixed** — both are now imported and used at [translate_med.py:15](../../src/main_app/public/routes/td/translate_med.py#L15). |
 
 ---
 
@@ -160,7 +161,6 @@ class TranslateRoutes:
         camp = _normalize(request.args.get("camp"))
         tra_type = _normalize(request.args.get("tra_type")) or _DEFAULT_TRA_TYPE
         word = _word(request.args.get("word"))
-        test = _as_bool(request.args.get("test"))
 
         # PHP lines 207-209: resolve the campaign from the category.
         if not camp and cat:
@@ -176,18 +176,16 @@ class TranslateRoutes:
                 word=word,
             )
 
-        url = content_translation_url(
-            title=title,
-            code=langcode,
-            campaign=camp,
-            tra_type=tra_type,
-            endpoint=get_endpoint(),
-        )
-
-        return render_template(
-            "td/translate_med.html",
-            url=url,
-            auto_redirect=not test,
+        # PHP prints an intermediate page with a "Click here" link plus a
+        # JS/meta auto-redirect; this port issues a straight 302 instead.
+        return redirect(
+            content_translation_url(
+                title=title,
+                code=langcode,
+                campaign=camp,
+                tra_type=tra_type,
+                endpoint=get_endpoint(),
+            )
         )
 ```
 
@@ -199,7 +197,7 @@ class TranslateRoutes:
 | `filter_input(INPUT_GET, 'title')` | `_normalize(request.args.get("title"))` | `_normalize` = `strip()`; mirrors the PHP `trim()` calls (lines 195–197). |
 | `$_GET['type'] ?? 'lead'` | `tra_type or _DEFAULT_TRA_TYPE` | PHP default is `"lead"`. |
 | `FILTER_VALIDATE_INT, min_range 0, default 0` | `_word()` helper: `max(int(value or 0), 0)` with `try/except ValueError` | Clamp negative values to 0. |
-| `$_GET['test'] ?? ''` (truthy = keep the page) | `_as_bool(request.args.get("test"))` | Reuse the `_as_bool` shape from [td_route.py:45](../../src/main_app/public/routes/td/td_route.py#L45). |
+| `$_GET['test'] ?? ''` (truthy = keep the page) | — | **Dropped.** The 302 has no intermediate page to preview, so the flag serves no purpose. |
 
 ### Service / helper reuse map
 
@@ -219,9 +217,13 @@ class TranslateRoutes:
 
 ## Template
 
-New file [src/templates/td/translate_med.html](../../src/templates/td/translate_med.html),
-extending the existing TD base layout ([td_base.html](../../src/templates/td/td_base.html),
-which provides `{% block content %}`):
+**No longer required for the happy path.** With the 302 in place, the redirect
+branch produces no HTML of its own, so `td/translate_med.html` is only relevant
+to the two non-redirect branches — which currently return bare strings
+(`"Not logged in"`, `"Invalid request"`). Porting the PHP login card is
+optional polish; if added, extend the existing TD base layout
+([td_base.html](../../src/templates/td/td_base.html), which provides
+`{% block content %}`):
 
 ```html
 {% extends "td/td_base.html" %}
@@ -238,26 +240,17 @@ which provides `{% block content %}`):
         </a>
       </div>
     </div>
-  {% elif url %}
-    <br>
-    <h2><a target="_blank" href="{{ url }}">Click here to go to ContentTranslation in mdwiki</a></h2>
-    {% if auto_redirect %}
-      <script type="text/javascript">
-        window.open('{{ url }}', '_self');
-      </script>
-      <meta http-equiv="refresh" content="0; url={{ url }}">
-      <noscript>
-        <meta http-equiv="refresh" content="0; url={{ url }}">
-      </noscript>
-    {% endif %}
+  {% else %}
+    <div class="alert alert-warning">
+      Invalid request — <code>title</code> and <code>langcode</code> are required.
+    </div>
   {% endif %}
 </div>
 {% endblock %}
 ```
 
-The three mutually exclusive states of the page map 1:1 to the PHP branches:
-anonymous (`login_url` set), missing params (neither set), ready to redirect
-(`url` set).
+The two mutually exclusive states map to the remaining PHP branches:
+anonymous (`login_url` set) and missing params.
 
 ---
 
@@ -283,12 +276,16 @@ anonymous (`login_url` set), missing params (neither set), ready to redirect
    sequences. Documented deviation — flag for review if a legacy link is found
    that relies on the double decode.
 
-4. **Response is a rendered page, not an HTTP 302.**
-   PHP prints an intermediate page with a "Click here" link plus JS/meta
-   auto-redirect, which is the fallback when JS is unavailable. The mirror
-   keeps that. A plain `redirect(url, code=302)` is the idiomatic Flask
-   alternative and can live behind the `test` flag if a clean redirect is ever
-   wanted; do not silently change the default behavior.
+4. **Response is an HTTP 302, not the PHP intermediate page.**
+   `index()` ends with `redirect(content_translation_url(...))`
+   ([translate_med.py:68](../../src/main_app/public/routes/td/translate_med.py#L68))
+   instead of echoing an intermediate page that carries a "Click here" link
+   plus `window.open(..., '_self')` and `<meta http-equiv="refresh">` tags.
+   The 302 needs no JavaScript, so the PHP fallback markup and the `test`
+   preview flag that gated it are dropped. *(This supersedes the earlier
+   revision of this plan, which recommended the rendered page; the 302 is now
+   the chosen behavior.)* The intermediate page can still be reproduced later,
+   e.g. behind `test=1`, if a debug view is ever wanted.
 
 5. **No `insertPage()` port.**
    The function is defined but never invoked by this PHP file. Port it into
