@@ -8,7 +8,6 @@ but builds row dicts for the Jinja partial instead of an HTML string.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from ..rows.mapping import MissingItem
 
@@ -67,9 +66,9 @@ class MissingTable:
             # PHP str_replace('_', ' ', $title)
             display_title = title.replace("_", " ")
 
-            primary_row = self._row_builder.build_item(
+            primary_row = MissingItem.from_row(
                 title=display_title,
-                title_data=title_data,
+                row=title_data,
                 counter=numb,
                 is_full_row=False,
                 tra_type=self._tra_type,
@@ -93,9 +92,9 @@ class MissingTable:
 
             if is_full_eligible:
                 rows.append(
-                    self._row_builder.build_item(
+                    MissingItem.from_row(
                         title=display_title,
-                        title_data=title_data,
+                        row=title_data,
                         counter=numb,
                         is_full_row=True,
                         tra_type="all",

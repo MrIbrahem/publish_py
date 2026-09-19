@@ -159,7 +159,7 @@ class TDRoutes:
         return render_template(
             "td/index.html",
             settings=parsed_settings,
-            form_data = form_data,
+            form_data=form_data,
             results=results_bundle,
         )
 

@@ -113,7 +113,7 @@ class MissingItem:
                 <td class="link_container">
                     <a target="_blank" href="https://mdwiki.org/wiki/{encoded_title}">
                         {title}
-                    </a>
+                    </a> {full_note}
                 </td>
                 <th>
                     {row_links}
@@ -136,6 +136,7 @@ class MissingItem:
             </tr>
         """
         ).format(
+            full_note="(Full text)" if self.is_full_row else "",
             n=self.n,
             encoded_title=escape(self.title),
             title=self.title,
