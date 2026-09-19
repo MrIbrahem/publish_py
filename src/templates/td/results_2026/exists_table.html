@@ -15,16 +15,22 @@
     <tbody>
         {% for row in results.rows.exists_rows %}
         <tr>
-            <th scope="row" style="text-align: center">{{ row.n }}</th>
+            <th scope="row" style="text-align: center">{{ loop.index }}</th>
             <td class="link_container spannowrap">
                 <a href="https://mdwiki.org/wiki/{{ row.display_title | replace(' ', '_') | urlencode }}"
                     target="_blank">
                     {{ row.display_title }}
                 </a>
             </td>
-            <td>
+            <th>
+                {% if is_authenticated %}
                 {{ row.translate_html|safe }}
-            </td>
+                {% else %}
+                <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}">
+                    <i class="bi bi-box-arrow-in-right"></i> <span class="navtitles">Login</span>
+                </a>
+                {% endif %}
+            </th>
             <td>
                 {{ row.translated_html|safe }}
             </td>
