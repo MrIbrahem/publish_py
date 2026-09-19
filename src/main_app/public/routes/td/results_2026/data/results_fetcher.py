@@ -7,7 +7,7 @@ from typing import Any
 
 from ......database.services import PagesService
 from ......database.services.pages import Results2026Service
-from ..results import get_inprocess_for_missing
+from ..results_loader import get_inprocess_for_missing
 
 logger = logging.getLogger(__name__)
 

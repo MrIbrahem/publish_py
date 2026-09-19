@@ -21,7 +21,7 @@ from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle
 from .data import get_results_2026
 from .helpers import load_translate_type_sets
-from .results import (
+from .results_loader import (
     build_exists_rows,
     build_inprocess_rows,
     build_missing_rows,
