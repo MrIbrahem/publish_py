@@ -19,19 +19,6 @@ from ..api.top_stats_routes import get_top_langs, get_top_users
 logger = logging.getLogger(__name__)
 
 
-def _normalize(name: str) -> str:
-    """Read a GET param, strip whitespace, treat ``undefined`` as empty.
-
-    Mirrors the ``load_request`` normalization used across the PHP dashboard
-    (``htmlspecialchars`` + ``trim``, plus the explicit ``undefined`` → ``''``
-    fallback seen in ``load_request.php``).
-    """
-    raw = (request.args.get(name, type=str) or "").strip()
-    if raw.lower() in ("undefined", "all"):
-        return ""
-    return raw
-
-
 class LeaderBoardRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
@@ -54,14 +41,13 @@ class LeaderBoardRoutes:
     def index_js(self) -> str:
         year = request.args.get("year", type=int)
         # month = request.args.get("month", type=int)
-        camp = _normalize("camp")
+        camp = request.args.get("camp", type=str)
         campaign_to_cats = self.category_service.get_camp_to_cats()
 
         form_data = self._load_form_data(list(campaign_to_cats.keys()), year)
 
-        cat = campaign_to_cats.get(camp) if camp else None
-        user_group = _normalize("user_group")
-        chart_data = self._load_chart_data(cat, year, camp, user_group)
+        cat = campaign_to_cats.get(camp) if camp and camp != "all" else None
+        chart_data = self._load_chart_data(cat, year, camp)
 
         numbers_summary = {
             "users": 0,
@@ -84,14 +70,13 @@ class LeaderBoardRoutes:
     def index(self) -> str:
         year = request.args.get("year", type=int)
         # month = request.args.get("month", type=int)
-        camp = _normalize("camp")
+        camp = request.args.get("camp", type=str)
         campaign_to_cats = self.category_service.get_camp_to_cats()
 
         form_data = self._load_form_data(list(campaign_to_cats.keys()), year)
 
-        cat = campaign_to_cats.get(camp) if camp else None
-        user_group = _normalize("user_group")
-        chart_data = self._load_chart_data(cat, year, camp, user_group)
+        cat = campaign_to_cats.get(camp) if camp and camp != "all" else None
+        chart_data = self._load_chart_data(cat, year, camp)
 
         form_selected_data = request.args
 
@@ -158,7 +143,7 @@ class LeaderBoardRoutes:
 
     def users(self, username: str) -> str:
         selected_year = request.args.get("year", type=int)
-        selected_lang = _normalize("lang")
+        selected_lang = request.args.get("lang", type=str)
 
         user_years: list[int] = self.lederboard_service.get_pages_years(user=username)
         user_langs = self.lederboard_service.top_lang_of_user(username)
@@ -199,15 +184,15 @@ class LeaderBoardRoutes:
 
     def _load_chart_data(
         self,
-        cat: str | None,
-        year: int | None,
-        camp: str | None,
-        user_group: str | None,
-    ) -> dict[str, list[Any]]:
+        cat,
+        year,
+        camp,
+    ):
+        user_group = request.args.get("user_group", type=str)
         chart_data = self.lederboard_service.get_chart_data_formatted(
-            camp=camp if camp else None,
+            camp=camp if camp != "all" else None,
             cat=cat,
-            user_group=user_group,
+            user_group=user_group if user_group != "all" else None,
             year=year,
             # month=month, # dont filter chart by month
         )

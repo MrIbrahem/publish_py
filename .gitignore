@@ -58,3 +58,4 @@ tests/**/*.php
 /tests/unit/services/new_html_services/wikitext_fixes/fixtures/output
 src/main_app/public/routes/td/translate_med.php
 fix_tmp.py
+src/main_app/public/routes/td/leaderboard2.py
