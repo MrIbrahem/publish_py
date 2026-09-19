@@ -115,7 +115,7 @@ class MissingItem:
             tra_type=self.tra_type,
         )
 
-    def render(
+    def _render(
         self,
         langcode: str,
         cat: str,
@@ -164,6 +164,25 @@ class MissingItem:
             words=self.words.all if self.tra_type == "all" else self.words.lead,
             refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
             qid=self.qid,
+        )
+
+    def render(
+        self,
+        langcode: str,
+        cat: str,
+        camp: str,
+        full_tr_user: bool,
+        is_authenticated: bool,
+    ) -> Markup:
+        no_lead = self.translate_type_info["tt_lead"] == 0
+        is_full_eligible = self.translate_type_info["tt_full"] == 1
+
+        return self._render(
+            langcode=langcode,
+            cat=cat,
+            camp=camp,
+            full_tr_user=full_tr_user,
+            is_authenticated=is_authenticated,
         )
 
 
