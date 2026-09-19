@@ -6,6 +6,7 @@ from typing import Any
 
 from ...services.auth.utils import get_current_user
 from ...templates_markups import td_navbar
+from ..routes.td.results_2026.tables import ExistsTable, InProcessTable, MissingTable
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,9 @@ def context_data(
         "tool_title": tool_title,
         "username": username,
         "yesterday": (date.today() - timedelta(days=1)).isoformat(),
+        "MissingTable": MissingTable,
+        "InProcessTable": InProcessTable,
+        "ExistsTable": ExistsTable,
     }
 
 

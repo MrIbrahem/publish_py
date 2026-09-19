@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from markupsafe import Markup
+
 from ..rows import ExistsItem, ExistsRowBuilder
 
 
@@ -80,6 +82,45 @@ class ExistsTable:
                 count_translated_before += 1
 
         return count_translated, count_translated_before
+
+    @staticmethod
+    def render(
+        rows: list[ExistsItem],
+        translated_count: int,
+        translated_before_count: int,
+        code: str,
+        cat: str,
+        camp: str,
+        full_tr_user: bool,
+        is_authenticated: bool,
+    ) -> Markup:
+        """Renders the existing titles HTML table directly."""
+        tbody_html = Markup("").join(
+            row.render(code, cat, camp, full_tr_user, is_authenticated) for row in rows
+        )
+        return Markup("""
+            <table class="table compact table-striped table_100 table_text_left display table_responsive">
+                <thead>
+                    <tr>
+                        <th class="num">#</th>
+                        <th class="spannowrap" style="text-align: center">Title</th>
+                        <th><span>Translate</span></th>
+                        <th>Translated ({translated_count})</th>
+                        <th>Translated before ({translated_before_count})</th>
+                        <th class="spannowrap" style="text-align: center">
+                            <span data-bs-toggle="tooltip" data-bs-title="Wikidata identifier">Qid</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {tbody_html}
+                </tbody>
+            </table>
+        """).format(
+            translated_count=translated_count,
+            translated_before_count=translated_before_count,
+            tbody_html=tbody_html,
+        )
 
 
 __all__ = [

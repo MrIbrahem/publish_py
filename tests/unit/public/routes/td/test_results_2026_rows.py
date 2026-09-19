@@ -1,4 +1,4 @@
-"""Unit tests for BaseItem, MissingItem, ExistsItem, and InProcessItem mapping classes."""
+"""Unit tests for BaseItem, MissingItem, ExistsItem, InProcessItem, and table renderers."""
 
 import pytest
 from flask import Flask
@@ -9,6 +9,11 @@ from src.main_app.public.routes.td.results_2026.rows.mapping import (
     InProcessItem,
     MissingItem,
     Stats,
+)
+from src.main_app.public.routes.td.results_2026.tables import (
+    ExistsTable,
+    InProcessTable,
+    MissingTable,
 )
 
 
@@ -37,7 +42,7 @@ def test_base_item_properties():
 
 def test_missing_item_rendering(test_app):
     item = MissingItem.from_row(
-        title="COVID-19_pandemic",
+        title="COVID-19 pandemic",
         counter=1,
         row={
             "w_lead_words": 100,
@@ -73,7 +78,7 @@ def test_missing_item_rendering(test_app):
 
     # Full row formatting
     full_item = MissingItem.from_row(
-        title="COVID-19_pandemic",
+        title="COVID-19 pandemic",
         counter=1,
         row={"w_lead_words": 100, "w_all_words": 500, "r_lead_refs": 5, "r_all_refs": 20},
         tra_type="all",
@@ -190,6 +195,74 @@ def test_in_process_item_rendering(test_app):
         disabled_html = str(disabled_item.render("ar", "Medicine", "mdwiki", True, is_authenticated=True))
         assert "Translate" not in disabled_html
         assert "Lead" not in disabled_html
+
+
+def test_table_renderers(test_app):
+    missing_item = MissingItem.from_row(
+        title="COVID-19 pandemic",
+        counter=1,
+        row={"w_lead_words": 100, "w_all_words": 500, "r_lead_refs": 5, "r_all_refs": 20, "qid": "Q842631"},
+        tra_type="lead",
+        is_full_row=False,
+    )
+    inprocess_item = InProcessItem.from_row(
+        title="Asthma",
+        counter=1,
+        title_tab={"user": "UserA", "date": "2026-01-01"},
+        title_data={"qid": "Q35865"},
+        inprocess_button="1",
+        endpoint="https://mdwikicx.toolforge.org/w/index.php",
+    )
+    exists_item = ExistsItem.from_row(
+        title="Diabetes",
+        counter=1,
+        target_tab={"target": "السكري", "via": "td", "qid": "Q12206"},
+        user_coord=True,
+        endpoint="https://mdwikicx.toolforge.org/w/index.php",
+    )
+
+    with test_app.test_request_context():
+        missing_table_html = str(
+            MissingTable.render(
+                rows=[missing_item],
+                code="ar",
+                cat="Medicine",
+                camp="mdwiki",
+                full_tr_user=False,
+                is_authenticated=True,
+            )
+        )
+        assert "<table" in missing_table_html
+        assert "COVID-19 pandemic" in missing_table_html
+
+        inprocess_table_html = str(
+            InProcessTable.render(
+                rows=[inprocess_item],
+                code="ar",
+                cat="Medicine",
+                camp="mdwiki",
+                full_tr_user=False,
+                is_authenticated=True,
+            )
+        )
+        assert "<table" in inprocess_table_html
+        assert "Asthma" in inprocess_table_html
+
+        exists_table_html = str(
+            ExistsTable.render(
+                rows=[exists_item],
+                translated_count=1,
+                translated_before_count=0,
+                code="ar",
+                cat="Medicine",
+                camp="mdwiki",
+                full_tr_user=False,
+                is_authenticated=True,
+            )
+        )
+        assert "<table" in exists_table_html
+        assert "Diabetes" in exists_table_html
+        assert "Translated (1)" in exists_table_html
 
 
 def test_stats_from_row():

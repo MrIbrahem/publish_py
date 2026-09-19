@@ -10,6 +10,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from markupsafe import Markup
+
 from ..rows import MissingRowBuilder
 from ..rows.mapping import MissingItem
 
@@ -110,6 +112,52 @@ class MissingTable:
             numb += 1
 
         return rows
+
+    @staticmethod
+    def render(
+        rows: list[MissingItem],
+        code: str,
+        cat: str,
+        camp: str,
+        full_tr_user: bool,
+        is_authenticated: bool,
+    ) -> Markup:
+        """Renders the missing titles HTML table directly."""
+        tbody_html = Markup("").join(
+            row.render(code, cat, camp, full_tr_user, is_authenticated) for row in rows
+        )
+        return Markup("""
+            <table class="table compact table-striped table_100 table_text_left display table_responsive_main">
+                <thead>
+                    <tr>
+                        <th class="num">#</th>
+                        <th class="spannowrap" style="text-align: center">Title</th>
+                        <th><span>Translate</span></th>
+                        <th class="spannowrap" style="text-align: center">
+                            <span data-bs-toggle="tooltip"
+                                data-bs-title="Page views in last month in English Wikipedia">Views</span>
+                        </th>
+                        <th class="spannowrap" style="text-align: center">
+                            <span data-bs-toggle="tooltip"
+                                data-bs-title="Page importance from medicine project in English Wikipedia">Importance</span>
+                        </th>
+                        <th class="spannowrap" style="text-align: center">
+                            <span data-bs-toggle="tooltip" data-bs-title="Number of words of the article in mdwiki.org">Words</span>
+                        </th>
+                        <th class="spannowrap" style="text-align: center">
+                            <span data-bs-toggle="tooltip"
+                                data-bs-title="Number of references of the article in mdwiki.org">Refs.</span>
+                        </th>
+                        <th class="spannowrap" style="text-align: center">
+                            <span data-bs-toggle="tooltip" data-bs-title="Wikidata identifier">Qid</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {tbody_html}
+                </tbody>
+            </table>
+        """).format(tbody_html=tbody_html)
 
 
 __all__ = [

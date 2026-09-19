@@ -17,7 +17,7 @@ Found {{ data.total }} pages in
         {{ card_header("Results: (" ~ results.counts.summary_count ~ ")", results_summary(results.summary_data)) }}
     </div>
     <div class="card-body1 card2">
-        {% include "td/results_2026/missing_table.html" %}
+        {{ MissingTable.render(results.rows.missing_rows, form_data.args.code, form_data.args.cat, form_data.args.camp, form_data.full_tr_user, is_authenticated) }}
     </div>
 </div>
 
@@ -28,7 +28,7 @@ Found {{ data.total }} pages in
         {{ card_header("In process: (" ~ results.counts.inprocess_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
-        {% include "td/results_2026/inprocess_table.html" %}
+        {{ InProcessTable.render(results.rows.inprocess_rows, form_data.args.code, form_data.args.cat, form_data.args.camp, form_data.full_tr_user, is_authenticated, is_admin or (settings and settings.show_translation_button == True)) }}
     </div>
 </div>
 {% endif %}
@@ -40,7 +40,7 @@ Found {{ data.total }} pages in
         {{ card_header("Exists: (" ~ results.counts.exists_count ~ ")") }}
     </div>
     <div class="card-body1 card2">
-        {% include "td/results_2026/exists_table.html" %}
+        {{ ExistsTable.render(results.rows.exists_rows, results.counts.exists_translated_count, results.counts.exists_translated_before_count, form_data.args.code, form_data.args.cat, form_data.args.camp, form_data.full_tr_user, is_authenticated) }}
     </div>
 </div>
 {% endif %}
