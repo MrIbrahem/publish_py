@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass, field
 from typing import Literal
-from markupsafe import Markup, escape
+
 from flask import url_for
+from markupsafe import Markup, escape
+
 from ......services.utils.wiki_links import tr_link_medwiki
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class Stats:
@@ -22,6 +25,7 @@ class Stats:
             return cls(lead=row.get("w_lead_words") or 0, all=row.get("w_all_words") or 0)
         else:
             return cls(lead=row.get("r_lead_refs") or 0, all=row.get("r_all_refs") or 0)
+
 
 @dataclass
 class MissingItem:
@@ -36,7 +40,9 @@ class MissingItem:
     tra_type: str
     qid: str
     is_full_row: bool
+    translate_type_info: dict[str, int | None] = field(default_factory=dict)
 
+    @property
     def is_video(self) -> bool:
         """PHP ``str_starts_with(strtolower($title), "video:")``."""
         return self.title.lower().startswith("video:")
@@ -47,18 +53,28 @@ class MissingItem:
         return f"{self.counter}.Full" if self.is_full_row and not self.is_video else str(self.counter)
 
     @classmethod
-    def from_row(cls, title:str, counter, row: dict, tra_type: str, is_full_row: bool) -> MissingItem:
+    def from_row(
+        cls,
+        title: str,
+        counter,
+        row: dict,
+        tra_type: str,
+        is_full_row: bool,
+        translate_type_info: dict[str, int | None] | None = None,
+    ) -> MissingItem:
         """ """
+        translate_type_info = translate_type_info or {"tt_lead": None, "tt_full": None}
         return cls(
             counter=counter,
-            title = title or row.get("title") or "",
-            en_views = row.get("en_views") or "",
-            importance = row.get("importance") or "Unknown",
-            qid = row.get("qid") or "",
-            tra_type = tra_type,
+            title=title or row.get("title") or "",
+            en_views=row.get("en_views") or "",
+            importance=row.get("importance") or "Unknown",
+            qid=row.get("qid") or "",
+            tra_type=tra_type,
             is_full_row=is_full_row,
-            words = Stats.from_row(row, "words"),
-            refs = Stats.from_row(row, "refs"),
+            words=Stats.from_row(row, "words"),
+            refs=Stats.from_row(row, "refs"),
+            translate_type_info=translate_type_info,
         )
 
     def translate_html(
@@ -76,23 +92,27 @@ class MissingItem:
                 login_url=login_url
             )
 
-        full_url = tr_link_medwiki(self.title, langcode, cat, camp, "all", self.words.all)
         lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type, self.words.lead)
 
         if full_tr_user and not self.is_video:
-            return Markup("""
-                <div class='inline'>
-                    <a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>
-                    <a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>
-                </div>
-            """
+            full_url = tr_link_medwiki(self.title, langcode, cat, camp, "all", self.words.all)
+            return Markup(
+                "<div class='inline'>"
+                "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
+                "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
+                "</div>"
             ).format(
                 lead_url=lead_url,
                 full_url=full_url,
             )
 
-        return Markup("<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>").format(
-            lead_url=lead_url
+        return Markup(
+            "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tra_type}'>"
+            "Translate"
+            "</a>"
+        ).format(
+            lead_url=lead_url,
+            tra_type=self.tra_type,
         )
 
     def render(
@@ -104,8 +124,7 @@ class MissingItem:
         is_authenticated: bool,
     ) -> Markup:
         row_links = self.translate_html(langcode, cat, camp, full_tr_user, is_authenticated)
-        return Markup(
-            """
+        return Markup("""
             <tr>
                 <th class="num" scope="row">
                     {n}
@@ -134,10 +153,9 @@ class MissingItem:
                     <a class='inline' target='_blank' href='https://wikidata.org/wiki/{qid}'>{qid}</a>
                 </td>
             </tr>
-        """
-        ).format(
-            full_note="(Full text)" if self.is_full_row else "",
-            n=self.n,
+        """).format(
+            full_note="(Full text)" if (self.is_full_row and not self.is_video) else "",
+            n=self.counter,
             encoded_title=escape(self.title),
             title=self.title,
             row_links=row_links,
@@ -147,6 +165,7 @@ class MissingItem:
             refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
             qid=self.qid,
         )
+
 
 __all__ = [
     "MissingItem",

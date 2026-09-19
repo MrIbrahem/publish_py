@@ -7,8 +7,6 @@ from typing import Any
 
 from flask import url_for
 
-from .mapping import MissingItem
-
 from ......services.utils.wiki_links import (
     tr_link_medwiki,
     wikidata_link,
@@ -20,6 +18,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Row builders
 # ---------------------------------------------------------------------------
+
 
 class MissingRowBuilder:
     """Builds a single row for the Missing results table."""
@@ -62,11 +61,8 @@ class MissingRowBuilder:
             is_video_title=is_video_title,
         )
 
-        # PHP "$count = $full && (substr != 'video:') ? '$count.Full' : $count"
-        display_n: str = f"{counter}.Full" if is_full_row and not is_video_title else str(counter)
-
         return {
-            "n": display_n,
+            "n": str(counter),
             "title": title,
             "translate_html": translate_html,
             "en_views": en_views,
@@ -103,6 +99,7 @@ class MissingRowBuilder:
             )
 
         return f"<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
+
 
 __all__ = [
     "MissingRowBuilder",

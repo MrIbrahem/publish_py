@@ -28,6 +28,7 @@ class ResultsRows:
     inprocess_rows: list[dict[str, Any]]
     exists_rows: list[dict[str, Any]]
 
+
 @dataclass
 class ResultsBundle:
     """The results bundle returned by ``results_loader_27()``.
@@ -35,6 +36,7 @@ class ResultsBundle:
     Consumed by the ``results_2026`` Jinja partials (and enriched with
     ``code_lang_name`` by the route). Mirrors PHP ``Results_tables_2026``.
     """
+
     counts: ResultsCounts
     rows: ResultsRows
     summary_data: dict[str, Any]

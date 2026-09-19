@@ -117,6 +117,9 @@ class TranslateTypeRecord(db.Model):
             "tt_full": self.tt_full,
         }
 
+    def __rep__(self) -> str:
+        return f"TranslateTypeRecord(tt_title={self.tt_title}, tt_lead={self.tt_lead}, tt_full={self.tt_full})"
+
 
 __all__ = [
     "LangRecord",

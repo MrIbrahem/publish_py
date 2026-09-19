@@ -21,8 +21,7 @@ from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle, ResultsCounts, ResultsRows
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
-from .tables import ExistsTable, InProcessTable
-from .tables.missing_table_test import MissingTable
+from .tables import ExistsTable, InProcessTable, MissingTable
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +56,8 @@ class ResultsLoader:
         bucket = ResultsFetcher().get(cat, code)
 
         # logic from results_2026/index.php — load_translate_type('no'|'full')
-        nolead_titles = TranslateTypeLoader.load("no")
-        full_titles = TranslateTypeLoader.load("full")
+        translation_loader = TranslateTypeLoader()
+        translation_loader._load()
 
         # logic from results_2026/index.php — Results_tables_2026
         # Build a lookup of per-title metrics so the inprocess rows can reuse the
@@ -86,9 +85,8 @@ class ResultsLoader:
             camp=camp,
             tra_type=tra_type,
             full_tr_user=full_tr_user,
-            nolead_titles=nolead_titles,
-            full_titles=full_titles,
             user_is_logged_in=user_is_logged_in,
+            translate_type_data=translation_loader.rows_data,
         )
         missing_rows = missing_table.build(bucket["missing"])
 
