@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 # get_results_2026 — data fetcher
 # ---------------------------------------------------------------------------
 
+
 class ResultsFetcher:
     """Fetch and partition the exists/missing/in-process data for one category."""
 
