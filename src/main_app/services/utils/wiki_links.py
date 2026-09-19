@@ -33,14 +33,9 @@ _DEFAULT_ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
 _MDWIKICX_ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
 
 
-def _php_rawurlencode(value: str) -> str:
-    """PHP ``rawurlencode`` — RFC 3986 percent-encoding."""
-    return quote(value, safe="")
-
-
 def _wiki_path(title: str) -> str:
     """PHP-equivalent ``rawurlencode(str_replace(' ', '_', $title))``."""
-    return _php_rawurlencode(title.replace(" ", "_"))
+    return quote(title.replace(" ", "_"))
 
 
 def mdwiki_cat_link(category: str, name: str | None = None) -> str:
@@ -49,7 +44,7 @@ def mdwiki_cat_link(category: str, name: str | None = None) -> str:
         return category or ""
     clean = category.replace("Category:", "")
     display = escape(name if name else clean)
-    encoded = _php_rawurlencode(clean.replace(" ", "_"))
+    encoded = quote(clean.replace(" ", "_"))
     return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
 
 
@@ -76,7 +71,7 @@ def wikidata_link(qid: str, name: str = "", default: str = "") -> str:
     if not qid:
         return default or ""
     display = escape(name if name else qid)
-    encoded = _php_rawurlencode(qid.replace(" ", "_"))
+    encoded = quote(qid.replace(" ", "_"))
     return f"<a class='inline' target='_blank' href='https://wikidata.org/wiki/{encoded}'>{display}</a>"
 
 
@@ -88,10 +83,10 @@ def tr_link_medwiki(title: str, cod: str, cat: str, camp: str, tra_type: str, wo
     publish_py templates so the existing dashboard handles the request.
     """
     params = {
-        "title": _php_rawurlencode(title),  # PHP encodes the title twice (rawurlEncode + http_build_query RFC 3986)
+        "title": quote(title),  # PHP encodes the title twice (rawurlEncode + http_build_query RFC 3986)
         "code": cod,
-        "cat": _php_rawurlencode(cat),
-        "camp": _php_rawurlencode(camp),
+        "cat": quote(cat),
+        "camp": quote(camp),
         "word": str(word),
         "type": tra_type,
     }
