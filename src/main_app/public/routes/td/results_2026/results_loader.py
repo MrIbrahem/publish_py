@@ -22,7 +22,6 @@ from .bundle import ResultsBundle
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
 from .tables import ExistsTable, InProcessTable, MissingTable
-from .rows import ExistsRowBuilder, InProcessRowBuilder, MissingRowBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +80,7 @@ class ResultsLoader:
 
         inprocess_button = "1" if (show_btn and user_coord) else "0"
 
-        missing_table = MissingRowBuilder()
+        missing_table = MissingTable()
         missing_rows = missing_table.build(
             missing=bucket["missing"],
             langcode=code,
@@ -94,7 +93,7 @@ class ResultsLoader:
             user_is_logged_in=user_is_logged_in,
         )
 
-        inprocess_table = InProcessRowBuilder()
+        inprocess_table = InProcessTable()
         inprocess_rows = inprocess_table.build(
             inprocess=bucket["inprocess"],
             langcode=code,

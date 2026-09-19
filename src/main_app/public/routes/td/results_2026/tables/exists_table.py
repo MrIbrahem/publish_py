@@ -47,7 +47,7 @@ class ExistsTable:
             else:
                 count_translated_before += 1
 
-            row = self.build_row(
+            row = ExistsRowBuilder().build(
                 langcode,
                 camp,
                 user_coord,
@@ -66,5 +66,5 @@ class ExistsTable:
 
 
 __all__ = [
-    "ExistsRowBuilder",
+    "ExistsTable",
 ]
