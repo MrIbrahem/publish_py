@@ -56,3 +56,4 @@ test.php
 tests/**/*.php
 /00
 /tests/unit/services/new_html_services/wikitext_fixes/fixtures/output
+src/main_app/public/routes/td/translate_med.php

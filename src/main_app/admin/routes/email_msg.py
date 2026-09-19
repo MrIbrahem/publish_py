@@ -4,18 +4,17 @@ from __future__ import annotations
 
 import logging
 from typing import Any
-from urllib.parse import urlencode
 
 from flask import (
     Blueprint,
     render_template,
     request,
-    url_for,
 )
 
 from ...database.services import PagesService, UserPagesService, UsersService, ViewsNewService
 from ...public.routes.td.results_api import results_api_result
 from ...services.auth.utils import get_current_user
+from ...services.utils.wiki_links import tr_link_medwiki
 from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
@@ -28,18 +27,6 @@ def send_msg(
     msg_title: str,
     cc_to: str | None,
 ): ...
-
-
-def make_translate_link(sugust: str, langcode: str) -> str:
-    params = {
-        "code": langcode,
-        "cat": "RTT",
-        "tra_type": "lead",
-        "title": sugust,
-    }
-    # here_url = "https://mdwiki.toolforge.org/Translation_Dashboard/translate_med/index.php?" + urlencode(params)
-    here_url = url_for("td.translate.index", **params, _external=True)
-    return here_url
 
 
 def make_sugustion(langcode: str | None, title: str | None) -> str | None:
@@ -104,7 +91,17 @@ def create_email_msg(page_data: dict[str, Any], sugust: str | None) -> str:
     title_link = create_blank_link(f"https://mdwiki.org/wiki/{title}", title)
     sugust_link = create_blank_link(f"https://mdwiki.org/wiki/{sugust}", sugust)
     target_link = create_blank_link(f"https://{langcode}.wikipedia.org/wiki/{target}", langname)
-    translate_link = create_blank_link(make_translate_link(sugust, langcode), "HERE")
+    translate_link = create_blank_link(
+        tr_link_medwiki(
+            title=sugust,
+            langcode=langcode,
+            cat="RTT",
+            camp="Main",
+            tra_type="lead",
+            word=0,
+        ),
+        "HERE",
+    )
 
     msg = (
         "<font color='#0000ff'>Thank you</font>"

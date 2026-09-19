@@ -25,6 +25,8 @@ from __future__ import annotations
 from html import escape
 from urllib.parse import quote, urlencode
 
+from flask import url_for
+
 from ...database.services import SettingsService
 
 # Mirrors PHP make_ContentTranslation_url's default. The setting key
@@ -75,23 +77,23 @@ def wikidata_link(qid: str, name: str = "", default: str = "") -> str:
     return f"<a class='inline' target='_blank' href='https://wikidata.org/wiki/{encoded}'>{display}</a>"
 
 
-def tr_link_medwiki(title: str, code: str, cat: str, camp: str, tra_type: str, word: int | str) -> str:
-    """Relative URL to ``translate_med/index.php`` (PHP make_tr_link_medwiki).
+def tr_link_medwiki(title: str, langcode: str, cat: str, camp: str, tra_type: str, word: int | str = 0) -> str:
+    """Relative URL to ``translate_med.php`` (PHP make_tr_link_medwiki).
 
     The target endpoint is hosted by the PHP Translation-Dashboard. The
     Python port preserves the exact relative path used elsewhere in the
     publish_py templates so the existing dashboard handles the request.
     """
     params = {
-        "title": quote(title),  # PHP encodes the title twice (rawurlEncode + http_build_query RFC 3986)
-        "code": code,
-        "cat": quote(cat),
-        "camp": quote(camp),
+        "title": title,
+        "langcode": langcode,
+        "cat": cat,
+        "camp": camp,
         "word": str(word),
         "tra_type": tra_type,
     }
-    # Match PHP http_build_query(..., PHP_QUERY_RFC3986) — encodes via rawurlencode, joins with `&`.
-    return "translate_med/index.php?" + urlencode(params, quote_via=quote)
+    translate_med_url = url_for("td.translate_med.index", **params, _external=False)
+    return translate_med_url
 
 
 def content_translation_url(
