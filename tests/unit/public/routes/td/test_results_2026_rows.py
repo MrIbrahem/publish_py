@@ -1,9 +1,15 @@
-"""Unit tests for ExistsItem and InProcessItem row builders and mapping."""
+"""Unit tests for BaseItem, MissingItem, ExistsItem, and InProcessItem mapping classes."""
 
 import pytest
 from flask import Flask
 
-from src.main_app.public.routes.td.results_2026.rows.mapping import ExistsItem, InProcessItem, Stats
+from src.main_app.public.routes.td.results_2026.rows.mapping import (
+    BaseItem,
+    ExistsItem,
+    InProcessItem,
+    MissingItem,
+    Stats,
+)
 
 
 @pytest.fixture
@@ -19,7 +25,81 @@ def test_app():
     return app
 
 
-def test_exists_item_from_row_and_render(test_app):
+def test_base_item_properties():
+    item = BaseItem(counter=1, title="COVID-19_pandemic_<script>", qid="Q842631")
+    assert item.display_title == "COVID-19 pandemic <script>"
+    assert item.encoded_title == "COVID-19_pandemic_&lt;script&gt;"
+    assert not item.is_video
+
+    video_item = BaseItem(counter=2, title="video:How_vaccines_work", qid="Q123")
+    assert video_item.is_video
+
+
+def test_missing_item_rendering(test_app):
+    item = MissingItem.from_row(
+        title="COVID-19_pandemic",
+        counter=1,
+        row={
+            "w_lead_words": 100,
+            "w_all_words": 500,
+            "r_lead_refs": 5,
+            "r_all_refs": 20,
+            "en_views": "25000",
+            "importance": "Top",
+            "qid": "Q842631",
+        },
+        tra_type="lead",
+        is_full_row=False,
+    )
+
+    assert item.n == "1"
+    assert not item.is_video
+
+    with test_app.test_request_context():
+        # Unauthenticated user
+        unauth_html = str(item.render("ar", "Medicine", "mdwiki", False, is_authenticated=False))
+        assert "btn-sm" in unauth_html
+        assert "Login" in unauth_html
+
+        # Authenticated user, lead translation only
+        auth_html = str(item.render("ar", "Medicine", "mdwiki", False, is_authenticated=True))
+        assert "Translate" in auth_html
+        assert "Q842631" in auth_html
+
+        # Authenticated user, full_tr_user=True
+        full_html = str(item.render("ar", "Medicine", "mdwiki", True, is_authenticated=True))
+        assert "Lead" in full_html
+        assert "Full" in full_html
+
+    # Full row formatting
+    full_item = MissingItem.from_row(
+        title="COVID-19_pandemic",
+        counter=1,
+        row={"w_lead_words": 100, "w_all_words": 500, "r_lead_refs": 5, "r_all_refs": 20},
+        tra_type="all",
+        is_full_row=True,
+    )
+    assert full_item.n == "1.Full"
+
+
+def test_missing_item_video_suppresses_full(test_app):
+    item = MissingItem.from_row(
+        title="Video:COVID-19_prevention",
+        counter=3,
+        row={"w_lead_words": 50, "w_all_words": 50, "r_lead_refs": 2, "r_all_refs": 2},
+        tra_type="all",
+        is_full_row=True,
+    )
+    assert item.is_video
+    assert item.n == "3"  # No .Full suffix for videos
+
+    with test_app.test_request_context():
+        auth_html = str(item.render("ar", "Medicine", "mdwiki", True, is_authenticated=True))
+        assert "Translate" in auth_html
+        assert "Full" not in auth_html
+
+
+def test_exists_item_rendering(test_app):
     item = ExistsItem.from_row(
         title="COVID-19_pandemic",
         counter=1,
@@ -28,38 +108,49 @@ def test_exists_item_from_row_and_render(test_app):
         endpoint="https://mdwikicx.toolforge.org/w/index.php",
     )
 
-    assert item.counter == 1
     assert item.display_title == "COVID-19 pandemic"
-    assert item.target == "جائحة_فيروس_كورونا"
-    assert item.via == "td"
-    assert item.qid == "Q842631"
+    assert item.encoded_title == "COVID-19_pandemic"
 
     with test_app.test_request_context():
-        rendered = item.render(
-            langcode="ar",
-            cat="Medicine",
-            camp="mdwiki",
-            full_tr_user=False,
-            is_authenticated=True,
+        # Unauthenticated
+        unauth_html = str(item.render("ar", "Medicine", "mdwiki", False, is_authenticated=False))
+        assert "Login" in unauth_html
+
+        # Authenticated with user_coord=True
+        coord_html = str(item.render("ar", "Medicine", "mdwiki", False, is_authenticated=True))
+        assert "Translate" in coord_html
+        assert "ar.wikipedia.org" in coord_html
+
+        # Authenticated with user_coord=False
+        no_coord_item = ExistsItem.from_row(
+            title="COVID-19_pandemic",
+            counter=1,
+            target_tab={"target": "جائحة_فيروس_كورونا", "via": "other", "qid": "Q842631"},
+            user_coord=False,
+            endpoint="https://mdwikicx.toolforge.org/w/index.php",
         )
-        rendered_str = str(rendered)
-        assert "COVID-19 pandemic" in rendered_str
-        assert "Translate" in rendered_str
-        assert "Q842631" in rendered_str
-        assert "ar.wikipedia.org" in rendered_str
-
-        # Test unauthenticated render
-        rendered_unauth = item.render(
-            langcode="ar",
-            cat="Medicine",
-            camp="mdwiki",
-            full_tr_user=False,
-            is_authenticated=False,
-        )
-        assert "Login" in str(rendered_unauth)
+        no_coord_html = str(no_coord_item.render("ar", "Medicine", "mdwiki", False, is_authenticated=True))
+        assert "Translate" not in no_coord_html
 
 
-def test_in_process_item_from_row_and_render(test_app):
+def test_exists_item_empty_fields(test_app):
+    item = ExistsItem.from_row(
+        title="",
+        counter=1,
+        target_tab={},
+        user_coord=False,
+        endpoint="",
+    )
+    assert item.display_title == ""
+    assert item.qid == ""
+    assert item.target == ""
+
+    with test_app.test_request_context():
+        rendered = str(item.render("ar", "cat", "camp", False, is_authenticated=True))
+        assert "<tr>" in rendered
+
+
+def test_in_process_item_rendering(test_app):
     item = InProcessItem.from_row(
         title="COVID-19 pandemic",
         counter=2,
@@ -77,35 +168,35 @@ def test_in_process_item_from_row_and_render(test_app):
         endpoint="https://mdwikicx.toolforge.org/w/index.php",
     )
 
-    assert item.counter == 2
-    assert item.title == "COVID-19 pandemic"
-    assert item.importance == "Top"
-    assert item.en_views == "1000"
-    assert item.qid == "Q842631"
     assert item.user == "TestUser"
     assert item.date == "2026-01-01"
 
     with test_app.test_request_context():
-        rendered = item.render(
-            langcode="ar",
-            cat="Medicine",
-            camp="mdwiki",
-            full_tr_user=True,
-            is_authenticated=True,
-        )
-        rendered_str = str(rendered)
-        assert "COVID-19 pandemic" in rendered_str
-        assert "Lead" in rendered_str
-        assert "Full" in rendered_str
-        assert "TestUser" in rendered_str
-        assert "2026-01-01" in rendered_str
+        # Authenticated, full_tr_user=True
+        auth_html = str(item.render("ar", "Medicine", "mdwiki", True, is_authenticated=True))
+        assert "Lead" in auth_html
+        assert "Full" in auth_html
+        assert "TestUser" in auth_html
 
-        # Unauthenticated render
-        rendered_unauth = item.render(
-            langcode="ar",
-            cat="Medicine",
-            camp="mdwiki",
-            full_tr_user=True,
-            is_authenticated=False,
+        # inprocess_button != "1"
+        disabled_item = InProcessItem.from_row(
+            title="COVID-19 pandemic",
+            counter=2,
+            title_tab={"translate_type": "lead", "user": "TestUser", "date": "2026-01-01"},
+            title_data={},
+            inprocess_button="0",
+            endpoint="",
         )
-        assert "Login" in str(rendered_unauth)
+        disabled_html = str(disabled_item.render("ar", "Medicine", "mdwiki", True, is_authenticated=True))
+        assert "Translate" not in disabled_html
+        assert "Lead" not in disabled_html
+
+
+def test_stats_from_row():
+    row = {"w_lead_words": 10, "w_all_words": 50, "r_lead_refs": 2, "r_all_refs": 5}
+    words = Stats.from_row(row, "words")
+    refs = Stats.from_row(row, "refs")
+    assert words.lead == 10
+    assert words.all == 50
+    assert refs.lead == 2
+    assert refs.all == 5
