@@ -10,7 +10,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-
 @dataclass
 class ResultsCounts:
     summary_count: int
@@ -37,9 +36,6 @@ class ResultsBundle:
     rows: ResultsRows
     summary_data: dict[str, Any]
     show_translation_button: str
-    code: str
-    camp: str
-    cat: str
     tra_type: str
     code_lang_name: str
     full_tr_user: bool
