@@ -4,8 +4,8 @@ Defines the main routes for the application, such as the homepage.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 from typing import Any
 
 from flask import (
@@ -19,6 +19,7 @@ from ....database.services import CategoryService, LeaderboardService, ProjectSe
 from ..api.top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class LeaderBoardData:
@@ -35,6 +36,12 @@ class LeaderBoardData:
         month = request_args.get("month", type=int)
         camp = request_args.get("camp", type=str)
         user_group = request_args.get("user_group", type=str)
+
+        year = cls._normalize(year)
+        lang = cls._normalize(lang)
+        camp = cls._normalize(camp)
+        user_group = cls._normalize(user_group)
+
         return cls(
             lang=lang,
             camp=camp,
@@ -42,6 +49,13 @@ class LeaderBoardData:
             year=year,
             month=month,
         )
+
+    @classmethod
+    def _normalize(cls, value: str | None | int) -> Any | None:
+        if value == "all":
+            return None
+        return value
+
 
 class LeaderBoardRoutes:
     def __init__(self, bp: Blueprint) -> None:
@@ -69,7 +83,7 @@ class LeaderBoardRoutes:
 
         form_data = self._load_form_data(list(campaign_to_cats.keys()), args.year)
 
-        cat = campaign_to_cats.get(args.camp) if args.camp and args.camp != "all" else None
+        cat = campaign_to_cats.get(args.camp) if args.camp else None
         chart_data = self._load_chart_data(cat, args.year, args.camp, args.user_group)
 
         numbers_summary = {
@@ -79,13 +93,12 @@ class LeaderBoardRoutes:
             "languages": 0,
             "pageviews": 0,
         }
-        form_selected_data = request.args
 
         return render_template(
             "td/leaderboard/index-js.html",
             # data to use in form
             form_data=form_data,
-            selected_data=form_selected_data,
+            selected_data=args,
             chart_data=chart_data,
             numbers_summary=numbers_summary,
         )
@@ -97,10 +110,8 @@ class LeaderBoardRoutes:
 
         form_data = self._load_form_data(list(campaign_to_cats.keys()), args.year)
 
-        cat = campaign_to_cats.get(args.camp) if args.camp and args.camp != "all" else None
+        cat = campaign_to_cats.get(args.camp) if args.camp else None
         chart_data = self._load_chart_data(cat, args.year, args.camp, args.user_group)
-
-        form_selected_data = request.args
 
         langs_res = get_top_langs(request.args)
         users_res = get_top_users(request.args)
@@ -125,7 +136,7 @@ class LeaderBoardRoutes:
             "td/leaderboard/index.html",
             # data to use in form
             form_data=form_data,
-            selected_data=form_selected_data,
+            selected_data=args,
             chart_data=chart_data,
             numbers_summary=numbers_summary,
             result=result,  # main data
@@ -154,9 +165,7 @@ class LeaderBoardRoutes:
             form_data={
                 "years": lang_years,
             },
-            selected_data={
-                "year": args.year,
-            },
+            selected_data=args,
             words_total=words_total,
             pageviews_total=pageviews_total,
             chart_data=chart_data,
@@ -193,10 +202,7 @@ class LeaderBoardRoutes:
             username=username,
             # data to use in form
             form_data=form_data,
-            selected_data={
-                "year": args.year,
-                "lang": args.lang or "all",
-            },
+            selected_data=args,
             words_total=words_total,
             pageviews_total=pageviews_total,
             chart_data=chart_data,
@@ -211,9 +217,9 @@ class LeaderBoardRoutes:
         user_group: str | None,
     ) -> dict[str, list[Any]]:
         chart_data = self.lederboard_service.get_chart_data_formatted(
-            camp=camp if camp and camp != "all" else None,
+            camp=camp,
             cat=cat,
-            user_group=user_group if user_group and user_group != "all" else None,
+            user_group=user_group,
             year=year,
             # month=month, # dont filter chart by month
         )
