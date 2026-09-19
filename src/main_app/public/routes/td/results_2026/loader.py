@@ -21,11 +21,7 @@ from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle
 from .data import get_results_2026
 from .helpers import TranslateTypeLoader
-from .results_loader import (
-    build_exists_rows,
-    build_inprocess_rows,
-)
-from .rows.missing_row_builder import build_missing_rows
+from .rows import build_exists_rows, build_inprocess_rows, build_missing_rows
 
 logger = logging.getLogger(__name__)
 
