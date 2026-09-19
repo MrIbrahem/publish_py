@@ -44,7 +44,7 @@ class InProcessRowBuilder:
         user_is_logged_in: bool,
         full_tr_user: bool,
         endpoint: str,
-        inprocess_button: str,
+        show_translation_button: str,
     ) -> None:
         self.langcode = langcode
         self.cat = cat
@@ -52,7 +52,7 @@ class InProcessRowBuilder:
         self.full_tr_user = full_tr_user
         self.user_is_logged_in = user_is_logged_in
         self.endpoint = endpoint
-        self.inprocess_button = inprocess_button
+        self.show_translation_button = show_translation_button
 
     def build(
         self,
@@ -107,7 +107,7 @@ class InProcessRowBuilder:
         or no user is logged in, returns an empty string (the column then
         renders blank).
         """
-        if self.inprocess_button != "1":
+        if self.show_translation_button != "1":
             return ""
 
         effective_type = "all" if is_video_title else (tra_type or "lead")

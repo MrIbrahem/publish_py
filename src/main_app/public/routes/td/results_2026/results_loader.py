@@ -77,7 +77,7 @@ class ResultsLoader:
         if isinstance(show_btn, str):
             show_btn = show_btn.lower() in ("1", "true", "yes", "on")
 
-        inprocess_button = "1" if (show_btn and user_coord) else "0"
+        show_translation_button = "1" if (show_btn and user_coord) else "0"
 
         missing_table = MissingTable(
             tra_type=tra_type,
@@ -116,7 +116,7 @@ class ResultsLoader:
                 exists_translated_before_count=exists_translated_before_count,
             ),
             summary_data=bucket["summary_data"],
-            show_translation_button=inprocess_button,
+            show_translation_button=show_translation_button,
             tra_type=tra_type or "lead",
             code_lang_name=code_lang_name,
             full_tr_user=full_tr_user,
