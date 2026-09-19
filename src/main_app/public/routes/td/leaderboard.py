@@ -15,7 +15,12 @@ from flask import (
 )
 from werkzeug.datastructures import MultiDict
 
-from ....database.services import CategoryService, LeaderboardService, ProjectService
+from ....database.services import (
+    CategoryService,
+    InProcessService,
+    LeaderboardService,
+    ProjectService,
+)
 from ..api.form_utils import FormData
 from ..api.top_stats_routes import get_top_langs, get_top_users
 
@@ -64,6 +69,7 @@ class LeaderBoardRoutes:
         self.category_service = CategoryService()
         self.project_service = ProjectService()
         self.lederboard_service = LeaderboardService()
+        self.inprocess_service = InProcessService()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
@@ -160,6 +166,11 @@ class LeaderBoardRoutes:
             lang=lang_code,
             year=args.year,
         )
+
+        inprocess_pages = []
+        if not args.year:
+            inprocess_pages = [x.to_json() for x in self.inprocess_service.get_lang_in_process(lang=lang_code)]
+
         return render_template(
             "td/leaderboard/langs.html",
             lang_code=lang_code,
@@ -172,6 +183,7 @@ class LeaderBoardRoutes:
             pageviews_total=pageviews_total,
             chart_data=chart_data,
             pages=lang_pages,  # main data
+            inprocess_pages=inprocess_pages,
         )
 
     def users(self, username: str) -> str:
@@ -199,6 +211,14 @@ class LeaderBoardRoutes:
             "langs": user_langs,
         }
 
+        inprocess_pages = []
+        if not args.year:
+            inprocess_pages = [
+                x.to_json()
+                for x in self.inprocess_service.get_user_in_process(user=username)
+                if not args.lang or x.lang == args.lang
+            ]
+
         return render_template(
             "td/leaderboard/users.html",
             username=username,
@@ -209,6 +229,7 @@ class LeaderBoardRoutes:
             pageviews_total=pageviews_total,
             chart_data=chart_data,
             pages=user_pages,  # main data
+            inprocess_pages=inprocess_pages,
         )
 
     def _load_chart_data(

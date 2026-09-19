@@ -8,7 +8,7 @@
             <div class='col-lg-4 col-md-12 border_debug border rounded'>
                 <div class="d-flex align-items-center justify-content-center" style="height: 100%">
                     <div class="list-group">
-                        <h4 class='text-center'>Language: lang_name ({{ lang_code }}) <br><a target="_blank"
+                        <h4 class='text-center'>Language ({{ lang_code }}) <br><a target="_blank"
                                 href="http://uz.wikipedia.org/wiki/Category:Translated_from_MDWiki">(cat)</a>
                         </h4>
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
@@ -73,27 +73,35 @@
                             {{ loop.index }}
                         </th>
                         <td>
+                            {% if page.user %}
                             <a href="{{ url_for('leaderboard.users', username=page.user) }}">
                                 {{ page.user }}
                             </a>
+                            {% endif %}
                         </td>
                         <td>
+                            {% if page.title %}
                             <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">
                                 {{ page.title }}
                             </a>
+                            {% endif %}
                         </td>
                         <td>
+                            {% if page.campaign %}
                             <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
                                 {{ page.campaign }}
                             </a>
+                            {% endif %}
                         </td>
                         <td>
                             {{ page.word }}
                         </td>
                         <td>
+                            {% if page.target and page.lang %}
                             <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}" target="_blank">
                                 {{ page.target }}
                             </a>
+                            {% endif %}
                         </td>
                         <td>
                             {{ page.pupdate }}
@@ -121,13 +129,47 @@
                         <th data-priority="1">User</th>
                         <th data-priority="2">Title</th>
                         <th>Campaign</th>
+                        <th>Translate type</th>
                         <th>Words</th>
                         <th data-priority="3">Translated</th>
                         <th>Start date</th>
                     </tr>
                 </thead>
                 <tbody>
-
+                    {% if inprocess_pages %}
+                    {% for page in inprocess_pages %}
+                    <tr>
+                        <th> {{ loop.index }} </th>
+                        <td>
+                            {% if page.user %}
+                            <a href="{{ url_for('leaderboard.users', username=page.user) }}">
+                                {{ page.user }}
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if page.title %}
+                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">
+                                {{ page.title }}
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if page.campaign %}
+                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
+                                {{ page.campaign }}
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ page.translate_type }}
+                        </td>
+                        <td> {{ page.word }} </td>
+                        <td> Pending </td>
+                        <td> {{ page.add_date }} </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
                 </tbody>
                 <tfoot>
                 </tfoot>
