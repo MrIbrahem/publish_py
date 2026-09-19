@@ -347,7 +347,10 @@ class TestInjection:
         assert "page=%27%22%3E%3Cscript%3Ealert%281%29%3C%2Fscript%3E" in location
 
     def test_no_header_injection(self, mock_client: FlaskClient, logged_in):
-        response = mock_client.get(ROUTE, query_string={"title": "Foo\r\nSet-Cookie:[REDACTED]"})
+        response = mock_client.get(
+            ROUTE,
+            query_string={"title": "Foo\r\nSet-Cookie:[REDACTED]", "langcode": "ar"},
+        )
 
         assert response.status_code == 302
         location = response.headers["Location"]
