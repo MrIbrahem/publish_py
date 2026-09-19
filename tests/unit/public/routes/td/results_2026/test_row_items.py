@@ -219,7 +219,7 @@ class TestInProcessItem:
                     "RTT",
                     is_authenticated=True,
                     inprocess_button="1",
-                    full_tr_user=True,
+                    full_tr_user=False,
                 )
             )
 
@@ -252,7 +252,7 @@ class TestInProcessItem:
                     "ar",
                     "RTT",
                     is_authenticated=False,
-                    inprocess_button=1,
+                    inprocess_button="1",
                     full_tr_user=True,
                 )
             )
