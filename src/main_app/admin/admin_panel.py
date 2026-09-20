@@ -25,41 +25,6 @@ logger = logging.getLogger(__name__)
 class AdminPanel:
     """admin panel routes."""
 
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self._setup_routes()
-
-    def _setup_routes(self) -> None:
-
-        self.bp.app_context_processor(self.inject_sidebar)
-
-        routes = [
-            ("/", "GET", self.index),
-            ("/last", "GET", self.last_dashboard),
-            ("/last/pages/<string:lang>", "GET", self.dashboard_pages),
-            ("/last/pages_users/<string:lang>", "GET", self.dashboard_pages_users),
-            ("/reports", "GET", self.reports),
-            ("/process", "GET", self.in_process_dashboard),
-            ("/process_total", "GET", self.in_process_total_dashboard),
-            ("/edit_done", "GET", self.edit_done),
-            ("/categories", "GET", self.categories_dashboard_route),
-        ]
-        for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(admin_required(target))
-
-        self.bp.add_url_rule(
-            "/last/pages/",
-            endpoint="dashboard_pages_default",
-            view_func=admin_required(self.dashboard_pages),
-            methods=["GET"],
-        )
-        self.bp.add_url_rule(
-            "/last/pages_users/",
-            endpoint="dashboard_pages_users_default",
-            view_func=admin_required(self.dashboard_pages_users),
-            methods=["GET"],
-        )
-
     def inject_sidebar(self) -> dict[str, Any]:
         return {"create_side": create_side}
 
@@ -102,6 +67,36 @@ class AdminPanel:
 
     def categories_dashboard_route(self):
         return categories_dashboard()
+
+    def register(self, bp: Blueprint) -> None:
+        bp.app_context_processor(self.inject_sidebar)
+
+        routes = [
+            ("/", "GET", self.index),
+            ("/last", "GET", self.last_dashboard),
+            ("/last/pages/<string:lang>", "GET", self.dashboard_pages),
+            ("/last/pages_users/<string:lang>", "GET", self.dashboard_pages_users),
+            ("/reports", "GET", self.reports),
+            ("/process", "GET", self.in_process_dashboard),
+            ("/process_total", "GET", self.in_process_total_dashboard),
+            ("/edit_done", "GET", self.edit_done),
+            ("/categories", "GET", self.categories_dashboard_route),
+        ]
+        for rule, method, target in routes:
+            bp.route(rule, methods=[method])(admin_required(target))
+
+        bp.add_url_rule(
+            "/last/pages/",
+            endpoint="dashboard_pages_default",
+            view_func=admin_required(self.dashboard_pages),
+            methods=["GET"],
+        )
+        bp.add_url_rule(
+            "/last/pages_users/",
+            endpoint="dashboard_pages_users_default",
+            view_func=admin_required(self.dashboard_pages_users),
+            methods=["GET"],
+        )
 
 
 __all__ = [
