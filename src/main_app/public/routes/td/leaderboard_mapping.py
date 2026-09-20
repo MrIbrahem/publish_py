@@ -142,9 +142,9 @@ class ReadyRow(BaseRow):
             cat=row.get("cat") or "",
             deleted=bool(row.get("deleted")) or False,
             campaign=row.get("campaign") or "",
-            add_date = cls._format_inprocess_date(row.get("add_date") or ""),
-            pupdate = cls._format_inprocess_date(row.get("pupdate") or ""),
-            date = cls._format_inprocess_date(row.get("date") or ""),
+            add_date=cls._format_inprocess_date(row.get("add_date") or ""),
+            pupdate=cls._format_inprocess_date(row.get("pupdate") or ""),
+            date=cls._format_inprocess_date(row.get("date") or ""),
         )
 
     def render(
