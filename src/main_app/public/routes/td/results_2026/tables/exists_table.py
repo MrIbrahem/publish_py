@@ -18,11 +18,9 @@ class ExistsTable:
     def __init__(
         self,
         *,
-        endpoint: str,
         translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
         self.translate_type_data = translate_type_data
-        self._endpoint = endpoint
 
     def build(self, items: dict[str, dict]) -> tuple[list[ExistsItem], int, int]:
         """Returns ``(rows, count_translated, count_translated_before)``."""
@@ -50,7 +48,6 @@ class ExistsTable:
                     title=title,
                     counter=numb,
                     row=target_tab,
-                    endpoint=self._endpoint,
                     translate_type_info=translate_type_info,
                 )
             )

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from typing import Any, Literal
+from urllib.parse import quote
 
 from flask import url_for
 from markupsafe import Markup
@@ -50,6 +51,16 @@ class ItemBase:
             "<i class='bi bi-box-arrow-in-right'></i> <span class='navtitles'>Login</span>"
             "</a>"
         ).format(login_url=url_for("auth.login"))
+
+    def mdwiki_link(self) -> str:
+        if self.title:
+            return f"""<a href="https://mdwiki.org/wiki/{quote(self.title)}" target="_blank"> {self.title} </a>"""
+        return ""
+
+    def wikidata_link(self) -> str:
+        if self.qid:
+            return f"""<a class='inline' target='_blank' href='https://wikidata.org/wiki/{self.qid}'>{self.qid}</a>"""
+        return ""
 
     @staticmethod
     def _format_inprocess_date(value: Any) -> str:

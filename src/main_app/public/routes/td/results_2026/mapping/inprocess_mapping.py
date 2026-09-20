@@ -7,11 +7,9 @@ from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import quote
 
-from markupsafe import Markup, escape
+from markupsafe import Markup
 
-from ......services.utils.wiki_links import (
-    content_translation_url,
-)
+from ......services.utils.wiki_links import content_translation_url
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -30,7 +28,6 @@ class InProcessItem(ItemBase):
     date: str
 
     # Request-level config supplied by the table (not available in the template).
-    endpoint: str = ""
     translate_type_info: dict[str, int | None] = field(default_factory=dict)
 
     @classmethod
@@ -41,7 +38,6 @@ class InProcessItem(ItemBase):
         counter: int,
         row: dict[str, Any],
         title_tab: dict[str, Any],
-        endpoint: str = "",
         translate_type_info: dict[str, int | None] | None = None,
     ) -> InProcessItem:
         """ """
@@ -51,13 +47,12 @@ class InProcessItem(ItemBase):
         return cls(
             counter=counter,
             title=title or row.get("title") or "",
-            en_views=row.get("en_views") or "",
+            en_views=row.get("en_views") or row.get("views") or "",
             importance=row.get("importance") or "Unknown",
             qid=row.get("qid") or "",
             user=title_tab.get("user") or "",
             date=title_tab.get("add_date") or title_tab.get("date") or "",
             tra_type=tra_type,
-            endpoint=endpoint,
             words=Stats.load(row, "words"),
             refs=Stats.load(row, "refs"),
             translate_type_info=translate_type_info,
@@ -79,10 +74,10 @@ class InProcessItem(ItemBase):
             return self._login_html()
 
         effective_type = "all" if self.is_video else (self.tra_type or "lead")
-        lead_url = content_translation_url(self.title, langcode, camp, effective_type, self.endpoint)
+        lead_url = content_translation_url(self.title, langcode, camp, effective_type)
 
         if full_tr_user and not self.is_video:
-            full_url = content_translation_url(self.title, langcode, camp, "all", self.endpoint)
+            full_url = content_translation_url(self.title, langcode, camp, "all")
             return Markup(
                 "<div class='inline'>"
                 "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
@@ -112,53 +107,34 @@ class InProcessItem(ItemBase):
             is_authenticated,
             show_translation_button,
         )
+        mdwiki_link = self.mdwiki_link()  # mdwiki_link=Markup(mdwiki_link)
+
         return Markup("""
             <tr>
-                <th class="num" scope="row">
-                    {counter}
-                </th>
-                <td class="link_container">
-                    <a target="_blank" href="https://mdwiki.org/wiki/{encoded_title}">
-                        {title}
-                    </a>
-                </td>
-                <th>
-                    {row_links}
-                </th>
-                <td class="num" style="text-align: left">
-                    {en_views}
-                </td>
-                <td class="num" style="text-align: left">
-                    {importance}
-                </td>
-                <td class="num" style="text-align: left">
-                    {words}
-                </td>
-                <td class="num" style="text-align: left">
-                    {refs}
-                </td>
-                <td>
-                    <a class='inline' target='_blank' href='https://wikidata.org/wiki/{qid}'>{qid}</a>
-                </td>
-                <td>
-                    {user}
-                </td>
-                <td>
-                    {date}
-                </td>
+                <th class="num" scope="row"> {counter} </th>
+                <td class="link_container"> {mdwiki_link} </td>
+                <td> {row_links} </td>
+                <td class="num" style="text-align: left"> {en_views} </td>
+                <td class="num" style="text-align: left"> {importance} </td>
+                <td class="num" style="text-align: left"> {words} </td>
+                <td class="num" style="text-align: left"> {refs} </td>
+                <td> {wikidata_link} </td>
+                <td> {user} </td>
+                <td> {date} </td>
             </tr>
         """).format(
             counter=self.counter,
             encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
+            mdwiki_link=Markup(mdwiki_link),
             row_links=row_links,
             en_views=self.en_views,
             importance=self.importance,
             words=self.words.all if self.tra_type == "all" else self.words.lead,
             refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
-            qid=escape(self.qid),
             user=self.user,
             date=self.date,
+            wikidata_link=Markup(self.wikidata_link()),
         )
 
     def render(

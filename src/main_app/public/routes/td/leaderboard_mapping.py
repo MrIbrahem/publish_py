@@ -14,9 +14,7 @@ from ....services.utils.views_links import (
     build_pageviews_url,
     build_toget_api_url,
 )
-from ....services.utils.wiki_links import (
-    content_translation_url,
-)
+from ....services.utils.wiki_links import content_translation_url
 
 logger = logging.getLogger(__name__)
 
@@ -28,14 +26,24 @@ class BaseRow:
     user: str | None
     campaign: str | None
 
-    def wiki_link(self, target: str | None = None) -> str:
-        if target and self.lang:
-            return f"""<a href="https://{self.lang}.wikipedia.org/wiki/{quote(target)}" target="_blank">{target}</a>"""
-        return ""
+    def wiki_link(self, target: str | None = None, deleted: bool = False) -> str:
+        if not target or not self.lang:
+            return ""
+
+        link = f"""<a href="https://{self.lang}.wikipedia.org/wiki/{quote(target)}" target="_blank">{target}</a>"""
+        if deleted:
+            link += ' <span class="text-danger">(DELETED)</span>'
+
+        return link
 
     def mdwiki_link(self) -> str:
         if self.title:
             return f"""<a href="https://mdwiki.org/wiki/{quote(self.title)}" target="_blank"> {self.title} </a>"""
+        return ""
+
+    def wikidata_link(self, qid: str | None) -> str:
+        if qid:
+            return f"""<a class='inline' target='_blank' href='https://wikidata.org/wiki/{qid}'>{qid}</a>"""
         return ""
 
     def user_link(self) -> str:
@@ -118,7 +126,7 @@ class ReadyRow(BaseRow):
             lang=row.get("lang") or "",
             target=row.get("target") or "",
             cat=row.get("cat") or "",
-            deleted=row.get("deleted") or False,
+            deleted=bool(row.get("deleted")) or False,
             campaign=row.get("campaign") or "",
             add_date=row.get("add_date"),
             pupdate=row.get("pupdate"),
@@ -133,7 +141,7 @@ class ReadyRow(BaseRow):
     ) -> Markup:
         lang_user_link = self.lang_link() if lang_or_user_row == "lang" else self.user_link()
         campaign_link = self.campaign_link()
-        target_link = self.wiki_link(self.target)
+        target_link = self.wiki_link(self.target, self.deleted)
         views_link = self.views_link()
         mdwiki_link = self.mdwiki_link()
         translate_type_row = ""
@@ -142,9 +150,9 @@ class ReadyRow(BaseRow):
         return Markup("""
             <tr>
                 <th> {index} </th>
-                <th> {lang_user_link} </th>
-                <th> {mdwiki_link} </th>
-                <th> {campaign_link} </th>
+                <td> {lang_user_link} </td>
+                <td> {mdwiki_link} </td>
+                <td> {campaign_link} </td>
                 {translate_type_row}
                 <td> {word} </td>
                 <td> {target_link} </td>
@@ -204,9 +212,9 @@ class InProcessRow(BaseRow):
         return Markup("""
             <tr>
                 <th> {index} </th>
-                <th> {lang_user_link} </th>
-                <th> {mdwiki_link} </th>
-                <th> {campaign_link} </th>
+                <td> {lang_user_link} </td>
+                <td> {mdwiki_link} </td>
+                <td> {campaign_link} </td>
                 <td> {translate_type} </td>
                 <td> {word} </td>
                 <td> Pending </td>

@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import quote
 
-from markupsafe import Markup, escape
+from markupsafe import Markup
 
 from ......services.utils.wiki_links import (
     content_translation_url,
@@ -32,17 +32,15 @@ class ExistsItem(ItemBase):
     qid: str
 
     # Request-level config supplied by the table (not available in the template).
-    endpoint: str = ""
     translate_type_info: dict[str, int | None] = field(default_factory=dict)
 
     @classmethod
     def from_row(
         cls,
+        *,
         title: str,
         counter: int,
         row: dict[str, Any],
-        *,
-        endpoint: str = "",
         translate_type_info: dict[str, int | None] | None = None,
     ) -> ExistsItem:
         """ """
@@ -53,7 +51,6 @@ class ExistsItem(ItemBase):
             target=row.get("target") or "",
             via=row.get("via", ""),
             qid=row.get("qid") or "",
-            endpoint=endpoint,
             en_views="",
             importance="",
             tra_type="",
@@ -78,7 +75,7 @@ class ExistsItem(ItemBase):
         if not user_coord:
             return Markup("")
 
-        translate_url = content_translation_url(self.title, langcode, camp, "lead", self.endpoint)
+        translate_url = content_translation_url(self.title, langcode, camp, "lead")
         return Markup(
             "<div class='inline'>"
             "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
@@ -98,29 +95,15 @@ class ExistsItem(ItemBase):
         translated_before = self.target if (self.target and self.via != "td") else ""
 
         row_links = self.translate_html(langcode, camp, is_authenticated, user_coord)
-
+        mdwiki_link = self.mdwiki_link()
         return Markup("""
             <tr>
-                <th scope="row" style="text-align: center">
-                    {counter}
-                </th>
-                <td class="link_container spannowrap">
-                    <a target="_blank" href="https://mdwiki.org/wiki/{encoded_title}">
-                        {title}
-                    </a>
-                </td>
-                <th>
-                    {row_links}
-                </th>
-                <td>
-                    {translated_html}
-                </td>
-                <td>
-                    {translated_before_html}
-                </td>
-                <td>
-                    <a class='inline' target='_blank' href='https://wikidata.org/wiki/{qid}'>{qid}</a>
-                </td>
+                <th scope="row" style="text-align: center"> {counter} </th>
+                <td class="link_container spannowrap"> {mdwiki_link} </td>
+                <td> {row_links} </td>
+                <td> {translated_html} </td>
+                <td> {translated_before_html} </td>
+                <td> {wikidata_link} </td>
             </tr>
         """).format(
             counter=self.counter,
@@ -129,7 +112,8 @@ class ExistsItem(ItemBase):
             row_links=row_links,
             translated_html=Markup(wikipedia_link(translated, langcode)),
             translated_before_html=Markup(wikipedia_link(translated_before, langcode)),
-            qid=escape(self.qid),
+            wikidata_link=Markup(self.wikidata_link()),
+            mdwiki_link=Markup(mdwiki_link),
         )
 
     def render(

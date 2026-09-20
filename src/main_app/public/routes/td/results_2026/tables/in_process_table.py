@@ -22,12 +22,10 @@ class InProcessTable:
         self,
         *,
         titles_infos: dict[str, dict],
-        endpoint: str,
         translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
         self.translate_type_data = translate_type_data
         self._titles_infos = titles_infos
-        self._endpoint = endpoint
 
     def build(self, items: dict[str, dict]) -> list[InProcessItem]:
         rows: list[InProcessItem] = []
@@ -48,7 +46,6 @@ class InProcessTable:
                     counter=numb,
                     title_tab=title_tab,
                     row=title_data,
-                    endpoint=self._endpoint,
                     translate_type_info=translate_type_info,
                 )
             )

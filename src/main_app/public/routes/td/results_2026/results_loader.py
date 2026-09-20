@@ -18,7 +18,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle, ResultsCounts, ResultsRows
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
@@ -71,8 +70,6 @@ class ResultsLoader:
         for title, row in bucket["exists"].items():
             titles_infos.setdefault(title, row)
 
-        endpoint = get_endpoint()
-
         def to_bool(val: Any) -> bool:
             if isinstance(val, str):
                 return val.lower() in ("1", "true", "yes", "on")
@@ -92,13 +89,11 @@ class ResultsLoader:
 
         inprocess_table = InProcessTable(
             titles_infos=titles_infos,
-            endpoint=endpoint,
             translate_type_data=translation_loader.rows_data,
         )
         inprocess_rows = inprocess_table.build(bucket["inprocess"])
 
         exists_table = ExistsTable(
-            endpoint=endpoint,
             translate_type_data=translation_loader.rows_data,
         )
 
