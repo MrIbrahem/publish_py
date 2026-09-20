@@ -25,6 +25,7 @@ from .mapping import LeaderBoardData
 
 logger = logging.getLogger(__name__)
 
+
 class LeaderBoardRoutes:
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
