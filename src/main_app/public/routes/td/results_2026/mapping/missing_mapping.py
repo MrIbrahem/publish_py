@@ -11,7 +11,6 @@ from markupsafe import Markup, escape
 from ......services.utils.wiki_links import (
     tr_link_medwiki,
 )
-from ..rows._common import _login_html
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -67,7 +66,7 @@ class MissingItem(ItemBase):
     ) -> Markup:
         # logic from results_table.php — anonymous user
         if not is_authenticated:
-            return _login_html()
+            return self._login_html()
 
         lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type, self.words.lead)
 

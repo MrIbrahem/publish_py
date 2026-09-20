@@ -74,6 +74,10 @@
                 <tbody>
                     {% if pages %}
                     {% for page in pages %}
+                    {{ page.render(
+                        index=loop.index,
+                        lang_or_user_row="lang",
+                    ) }}
                     <tr>
                         <th>
                             {{ loop.index }}

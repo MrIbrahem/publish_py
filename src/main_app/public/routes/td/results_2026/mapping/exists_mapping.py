@@ -13,7 +13,6 @@ from ......services.utils.wiki_links import (
     content_translation_url,
     wikipedia_link,
 )
-from ..rows._common import _login_html
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -73,7 +72,7 @@ class ExistsItem(ItemBase):
         """PHP ``make_one_row_exists_2026`` — Translate column."""
         # logic from results_table_exists.php — anonymous user
         if not is_authenticated:
-            return _login_html()
+            return self._login_html()
 
         # PHP: the button is rendered only for coordinators ($user_coord).
         if not user_coord:

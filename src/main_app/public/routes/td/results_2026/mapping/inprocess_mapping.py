@@ -12,7 +12,6 @@ from markupsafe import Markup, escape
 from ......services.utils.wiki_links import (
     content_translation_url,
 )
-from ..rows._common import _format_inprocess_date, _login_html
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -56,7 +55,7 @@ class InProcessItem(ItemBase):
             importance=row.get("importance") or "Unknown",
             qid=row.get("qid") or "",
             user=title_tab.get("user") or "",
-            date=_format_inprocess_date(title_tab.get("add_date") or title_tab.get("date")),
+            date=title_tab.get("add_date") or title_tab.get("date") or "",
             tra_type=tra_type,
             endpoint=endpoint,
             words=Stats.load(row, "words"),
@@ -77,7 +76,7 @@ class InProcessItem(ItemBase):
 
         # logic from results_table.php — anonymous user
         if not is_authenticated:
-            return _login_html()
+            return self._login_html()
 
         effective_type = "all" if self.is_video else (self.tra_type or "lead")
         lead_url = content_translation_url(self.title, langcode, camp, effective_type, self.endpoint)
