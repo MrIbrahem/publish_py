@@ -11,10 +11,10 @@ from typing import Any
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
-from sqlalchemy.engine.row import Row
 
-from ....database.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
+from ....database.models import ReportRecord
 from ....database.services import (
+    ApiService,
     CategoryService,
     InProcessService,
     LangService,
@@ -23,7 +23,6 @@ from ....database.services import (
     ReportService,
     UsersService,
 )
-from ....extensions import db
 from ....services.core.cors import check_cors
 from ....services.schemas import PublishReportsQuerySchema
 from ....services.utils.web_utils import parse_select_fields
@@ -31,62 +30,6 @@ from .form_utils import FormData
 from .top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
-
-
-class ApiService:
-    def get_unique_languages(self) -> list[Row[tuple[str | None]]]:
-
-        results = (
-            db.session.query(PageRecord.lang)
-            .distinct()
-            .outerjoin(CategoryRecord, PageRecord.cat == CategoryRecord.category)
-            .filter(PageRecord.lang != "", PageRecord.lang.isnot(None))
-            .order_by(PageRecord.lang)
-            .all()
-        )
-
-        return results
-
-    def get_unique_report_records(self) -> list[Any]:
-        results = (
-            db.session.query(
-                db.func.extract("year", ReportRecord.date).label("year"),
-                db.func.extract("month", ReportRecord.date).label("month"),
-                ReportRecord.lang,
-                ReportRecord.user,
-                ReportRecord.result,
-            )
-            .distinct()
-            .all()
-        )
-
-        return results
-
-    def fetch_in_process_records(self, lang: str, limit: int) -> list[Any]:
-        # Perform the JOIN query using SQLAlchemy
-        query = (
-            db.session.query(
-                InProcessRecord.id,
-                InProcessRecord.title,
-                InProcessRecord.user,
-                InProcessRecord.lang,
-                InProcessRecord.cat,
-                InProcessRecord.translate_type,
-                InProcessRecord.word,
-                InProcessRecord.add_date,
-                CategoryRecord.campaign.label("campaign"),
-                LangRecord.autonym.label("autonym"),
-            )
-            .outerjoin(CategoryRecord, InProcessRecord.cat == CategoryRecord.category)
-            .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
-        )
-
-        if lang and lang.lower() != "all":
-            query = query.filter(InProcessRecord.lang == lang)
-
-        results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()
-
-        return results
 
 
 class ReportAPIHandler:

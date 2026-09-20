@@ -22,6 +22,7 @@ from .content import (
     ProjectService,
 )
 from .pages import (
+    ApiService,
     InProcessService,
     LeaderboardService,
     MissingStatsService,
@@ -70,6 +71,7 @@ __all__ = [
     "TranslateTypeService",
     "UserPagesService",
     "InProcessService",
+    "ApiService",
     "LangService",
     "ProjectService",
     "PagesUsersToMainService",
