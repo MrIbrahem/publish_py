@@ -160,29 +160,25 @@ class DeleteCoordinatorView(MethodView):
 class CoordinatorView:
     """Coordinator management routes registrar using Class-Based Views."""
 
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self._setup_routes()
-
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         # Register views on the Blueprint using as_view
-        self.bp.add_url_rule(
+        bp.add_url_rule(
             "/",
             view_func=CoordinatorDashboardView.as_view("dashboard"),
         )
-        self.bp.add_url_rule(
+        bp.add_url_rule(
             "/add",
             view_func=AddCoordinatorView.as_view("add"),
         )
-        self.bp.add_url_rule(
+        bp.add_url_rule(
             "/<int:coordinator_id>/activate",
             view_func=ActivateCoordinatorView.as_view("activate"),
         )
-        self.bp.add_url_rule(
+        bp.add_url_rule(
             "/<int:coordinator_id>/deactivate",
             view_func=DeactivateCoordinatorView.as_view("deactivate"),
         )
-        self.bp.add_url_rule(
+        bp.add_url_rule(
             "/<int:coordinator_id>/delete",
             view_func=DeleteCoordinatorView.as_view("delete"),
         )
