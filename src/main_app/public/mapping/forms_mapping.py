@@ -10,6 +10,7 @@ from werkzeug.datastructures import MultiDict
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class FormsBase:
     lang: str | None
@@ -64,6 +65,7 @@ class ApiFormData(FormsBase):
             cat=cat,
             user=user,
         )
+
 
 @dataclass
 class LeaderBoardData(FormsBase):

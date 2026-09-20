@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from .mapping import NavDropdown, NavLink
 from .nav_bar import NavigationBar
 from .navbar_list import nav_list
-from .mapping import NavDropdown, NavLink
 
 td_navbar = NavigationBar(nav_list)
 
