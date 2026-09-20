@@ -23,20 +23,17 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectsDashboard:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.project_service = ProjectService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
-
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.dashboard),
             ("/add", "POST", self.add),
             ("/update", "POST", self.update),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(admin_required(target))
+            bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         return self._projects_dashboard()
@@ -86,7 +83,6 @@ class ProjectsDashboard:
             return redirect(url_for("adminpanel.projects.dashboard"))
 
         try:
-
             self.project_service.add_project(
                 g_title=g_title,
             )
@@ -105,7 +101,6 @@ class ProjectsDashboard:
         """Update an existing project record."""
 
         try:
-
             record = self.project_service.update_project_title(record_id, g_title)
         except ValueError as exc:
             logger.exception("Unable to update project")
