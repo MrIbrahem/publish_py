@@ -26,7 +26,7 @@ from ....database.services import (
 from ....services.core.cors import check_cors
 from ....services.schemas import PublishReportsQuerySchema
 from ....services.utils.web_utils import parse_select_fields
-from .form_utils import FormData
+from .form_utils import ApiFormData
 from .top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)
@@ -414,7 +414,7 @@ class ApiRoutes(ReportAPIHandler):
             return response
 
     def get_top_langs(self) -> tuple[Response, int] | Response:
-        form = FormData.get_form(request.args)
+        form = ApiFormData.from_request(request.args)
         result = get_top_langs(form)
         data = result.to_json()
         if result.error:
@@ -423,7 +423,7 @@ class ApiRoutes(ReportAPIHandler):
         return jsonify(data)
 
     def get_top_users(self) -> tuple[Response, int] | Response:
-        form = FormData.get_form(request.args)
+        form = ApiFormData.from_request(request.args)
         result = get_top_users(form)
         data = result.to_json()
         if result.error:
@@ -444,7 +444,7 @@ class ApiRoutes(ReportAPIHandler):
         Handle leaderboard API requests.
         /api/status?camp=Video&user_group=WIKI&year=2025&month=02&cat=RTTVideo
         """
-        form = FormData.get_form(request.args)
+        form = ApiFormData.from_request(request.args)
         try:
             data = self.leaderboard_service.get_leaderboard_chart_data(
                 camp=form.camp,

@@ -5,7 +5,6 @@ Defines the main routes for the application, such as the homepage.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import Any
 
 from flask import (
@@ -13,7 +12,6 @@ from flask import (
     render_template,
     request,
 )
-from werkzeug.datastructures import MultiDict
 
 from ....database.services import (
     CategoryService,
@@ -21,47 +19,11 @@ from ....database.services import (
     LeaderboardService,
     ProjectService,
 )
-from ..api.form_utils import FormData
+from ..api.form_utils import ApiFormData
 from ..api.top_stats_routes import get_top_langs, get_top_users
+from .mapping import LeaderBoardData
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class LeaderBoardData:
-    lang: str | None
-    camp: str | None
-    user_group: str | None
-    year: int | None
-    month: int | None
-
-    @classmethod
-    def from_request(cls, request_args: MultiDict[str, str]) -> LeaderBoardData:
-        lang = request_args.get("lang", type=str)
-        year = request_args.get("year", type=int)
-        month = request_args.get("month", type=int)
-        camp = request_args.get("camp", type=str)
-        user_group = request_args.get("user_group", type=str)
-
-        year = cls._normalize(year)
-        lang = cls._normalize(lang)
-        camp = cls._normalize(camp)
-        user_group = cls._normalize(user_group)
-
-        return cls(
-            lang=lang,
-            camp=camp,
-            user_group=user_group,
-            year=year,
-            month=month,
-        )
-
-    @classmethod
-    def _normalize(cls, value: str | None | int) -> Any | None:
-        if value == "all":
-            return None
-        return value
-
 
 class LeaderBoardRoutes:
     def __init__(self, bp: Blueprint) -> None:
@@ -120,7 +82,7 @@ class LeaderBoardRoutes:
         cat = campaign_to_cats.get(args.camp) if args.camp else None
         chart_data = self._load_chart_data(cat, args.year, args.camp, args.user_group)
 
-        form = FormData.get_form(request.args)
+        form = ApiFormData.from_request(request.args)
         langs_res = get_top_langs(form)
         users_res = get_top_users(form)
 

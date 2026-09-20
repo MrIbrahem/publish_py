@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 
 from ....database.services import TopStatsService
-from .form_utils import FormData
+from .form_utils import ApiFormData
 from .objects import (
     TopLangsResult,
     TopLangStat,
@@ -22,7 +22,7 @@ from .objects import (
 logger = logging.getLogger(__name__)
 
 
-def get_top_langs(form: FormData) -> TopLangsResult:
+def get_top_langs(form: ApiFormData) -> TopLangsResult:
     """
     Handle top_langs API requests.
     Returns aggregated statistics per language.
@@ -56,7 +56,7 @@ def get_top_langs(form: FormData) -> TopLangsResult:
     return TopLangsResult(results=data, count=len(data))
 
 
-def get_top_users(form: FormData) -> TopUsersResult:
+def get_top_users(form: ApiFormData) -> TopUsersResult:
     """
     Handle top_users API requests.
     Returns aggregated statistics per user.

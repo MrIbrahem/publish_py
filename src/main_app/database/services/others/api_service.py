@@ -11,8 +11,8 @@ from typing import Any
 
 from sqlalchemy.engine.row import Row
 
-from ....database.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
 from ....extensions import db
+from ...models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
 
 logger = logging.getLogger(__name__)
 

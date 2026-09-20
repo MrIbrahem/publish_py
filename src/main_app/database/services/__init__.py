@@ -21,10 +21,13 @@ from .content import (
     LangService,
     ProjectService,
 )
-from .pages import (
+from .others import (
     ApiService,
-    InProcessService,
     LeaderboardService,
+    TopStatsService,
+)
+from .pages import (
+    InProcessService,
     MissingStatsService,
     PagesQueryService,
     PagesUsersToMainPagesService,
@@ -56,7 +59,6 @@ __all__ = [
     "Results2026Service",
     "AllQidsService",
     "PagesQueryService",
-    "LeaderboardService",
     "MdwikiRevidService",
     "EnwikiPageviewService",
     "AssessmentService",
@@ -71,7 +73,6 @@ __all__ = [
     "TranslateTypeService",
     "UserPagesService",
     "InProcessService",
-    "ApiService",
     "LangService",
     "ProjectService",
     "PagesUsersToMainService",
@@ -84,4 +85,7 @@ __all__ = [
     "UserTokenService",
     "SettingsService",
     "LanguageSettingService",
+    "TopStatsService",
+    "ApiService",
+    "LeaderboardService",
 ]

@@ -9,7 +9,7 @@ from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
 
 from ....extensions import db
-from ....public.routes.api.form_utils import FormData
+from ....public.routes.api.form_utils import ApiFormData
 from ...models import (
     CategoryRecord,
     LangRecord,
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class TopStatsService:
 
     @staticmethod
-    def apply_filters(form: FormData, query: Query) -> Query:
+    def apply_filters(form: ApiFormData, query: Query) -> Query:
         if form.cat:
             query = query.filter(PageRecord.cat == form.cat)
         elif form.camp:
@@ -48,7 +48,7 @@ class TopStatsService:
 
         return query
 
-    def query_top_users(self, form: FormData) -> list[Any]:
+    def query_top_users(self, form: ApiFormData) -> list[Any]:
         """
         Query:
             SELECT
@@ -140,7 +140,7 @@ class TopStatsService:
 
         return results
 
-    def query_top_langs(self, form: FormData):
+    def query_top_langs(self, form: ApiFormData):
         """
         Query:
             SELECT
