@@ -1,6 +1,7 @@
-r"""The results bundle produced by :class:`.results_loader.ResultsLoader`.
+"""
+The results bundle produced by :class:`.results_loader.ResultsLoader`.
 
-Port of the dict returned by PHP ``Results\GetResults27\ResultsLoader::load()``.
+Port of the dict returned by PHP ``ResultsLoader::load()``.
 The Python port keeps the bundle data-only (no HTML) — the ``results_2026``
 Jinja partials render the cards and tables from this structure.
 """
