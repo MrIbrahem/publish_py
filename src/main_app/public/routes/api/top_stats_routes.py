@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 
 from ....database.services import TopStatsService
-from .form_utils import ApiFormData
+from ...mapping import ApiFormData
 from .objects import (
     TopLangsResult,
     TopLangStat,

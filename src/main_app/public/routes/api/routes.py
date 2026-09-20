@@ -26,7 +26,7 @@ from ....database.services import (
 from ....services.core.cors import check_cors
 from ....services.schemas import PublishReportsQuerySchema
 from ....services.utils.web_utils import parse_select_fields
-from .form_utils import ApiFormData
+from ...mapping import ApiFormData
 from .top_stats_routes import get_top_langs, get_top_users
 
 logger = logging.getLogger(__name__)

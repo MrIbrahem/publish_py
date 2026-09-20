@@ -19,9 +19,8 @@ from ....database.services import (
     LeaderboardService,
     ProjectService,
 )
-from ..api.form_utils import ApiFormData
+from ...mapping import ApiFormData, LeaderBoardData
 from ..api.top_stats_routes import get_top_langs, get_top_users
-from .mapping import LeaderBoardData
 
 logger = logging.getLogger(__name__)
 

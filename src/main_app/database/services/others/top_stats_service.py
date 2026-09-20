@@ -9,7 +9,7 @@ from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
 
 from ....extensions import db
-from ....public.routes.api.form_utils import ApiFormData
+from ....public.mapping import ApiFormData
 from ...models import (
     CategoryRecord,
     LangRecord,
