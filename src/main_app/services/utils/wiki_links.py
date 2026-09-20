@@ -27,8 +27,6 @@ from urllib.parse import quote, urlencode
 
 from flask import url_for
 
-from ...database.services import SettingsService
-
 # Mirrors PHP make_ContentTranslation_url's default. The setting key
 # `use_mdwikicx` (read by `_get_endpoint`) flips this to mdwikicx.
 _DEFAULT_ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
