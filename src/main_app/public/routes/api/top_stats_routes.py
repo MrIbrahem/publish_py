@@ -1,4 +1,5 @@
-"""API endpoints for top language and user statistics.
+"""
+API endpoints for top language and user statistics.
 
 Endpoints:
 - /api/top_langs: Aggregated statistics per language
@@ -111,6 +112,7 @@ def get_top_langs(form: FormData) -> TopLangsResult:
 
     # /api/top_langs?camp=Video&user_group=all&year=all&month=All&cat=RTTVideo
 
+    # TODO: Move database query to service layer like LeaderboardService or TopStatsService
     try:
         # Build the word count expression
         word_expr = case(
@@ -232,6 +234,7 @@ def get_top_users(form: FormData) -> TopUsersResult:
         JSON response with user statistics
     """
 
+    # TODO: Move database query to service layer like LeaderboardService or TopStatsService
     try:
         # Build the word count expression
         word_expr = case(
