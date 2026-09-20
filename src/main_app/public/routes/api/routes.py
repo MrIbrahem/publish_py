@@ -11,6 +11,7 @@ from typing import Any
 
 from flask import Blueprint, Response, jsonify, request
 from marshmallow import ValidationError
+from sqlalchemy.engine.row import Row
 
 from ....database.models import CategoryRecord, InProcessRecord, LangRecord, PageRecord, ReportRecord
 from ....database.services import (
@@ -32,7 +33,73 @@ from .top_stats_routes import get_top_langs, get_top_users
 logger = logging.getLogger(__name__)
 
 
+class ApiService:
+    def get_unique_languages(self) -> list[Row[tuple[str | None]]]:
+
+        results = (
+            db.session.query(PageRecord.lang)
+            .distinct()
+            .outerjoin(CategoryRecord, PageRecord.cat == CategoryRecord.category)
+            .filter(PageRecord.lang != "", PageRecord.lang.isnot(None))
+            .order_by(PageRecord.lang)
+            .all()
+        )
+
+        return results
+
+    def get_unique_report_records(self) -> list[Any]:
+        results = (
+            db.session.query(
+                db.func.extract("year", ReportRecord.date).label("year"),
+                db.func.extract("month", ReportRecord.date).label("month"),
+                ReportRecord.lang,
+                ReportRecord.user,
+                ReportRecord.result,
+            )
+            .distinct()
+            .all()
+        )
+
+        return results
+
+    def fetch_in_process_records(self, lang: str, limit: int) -> list[Any]:
+        # Perform the JOIN query using SQLAlchemy
+        query = (
+            db.session.query(
+                InProcessRecord.id,
+                InProcessRecord.title,
+                InProcessRecord.user,
+                InProcessRecord.lang,
+                InProcessRecord.cat,
+                InProcessRecord.translate_type,
+                InProcessRecord.word,
+                InProcessRecord.add_date,
+                CategoryRecord.campaign.label("campaign"),
+                LangRecord.autonym.label("autonym"),
+            )
+            .outerjoin(CategoryRecord, InProcessRecord.cat == CategoryRecord.category)
+            .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
+        )
+
+        if lang and lang.lower() != "all":
+            query = query.filter(InProcessRecord.lang == lang)
+
+        results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()
+
+        return results
+
+
 class ReportAPIHandler:
+    def __init__(self, leaderboard_service: LeaderboardService) -> None:
+        self.leaderboard_service = leaderboard_service
+        self.api_service = ApiService()
+        self.lang_service = LangService()
+        self.pages_query_service = PagesQueryService()
+        self.reports_service = ReportService()
+        self.category_service = CategoryService()
+        self.in_process_service = InProcessService()
+        self.users_service = UsersService()
+
     def get_publish_reports(self) -> tuple[Response, int] | Response:
         """
         Handle publish_reports API requests.
@@ -74,8 +141,7 @@ class ReportAPIHandler:
 
         try:
             # Query database
-            service = ReportService()
-            records: list[ReportRecord] = service.query_reports_with_filters(filters, select_fields, limit)
+            records: list[ReportRecord] = self.reports_service.query_reports_with_filters(filters, select_fields, limit)
 
         except Exception:
             logger.exception("Error fetching publish_reports")
@@ -104,33 +170,23 @@ class ReportAPIHandler:
         """
         try:
             # Query distinct year, month, lang, user, result using SQLAlchemy
-            results = (
-                db.session.query(
-                    db.func.extract("year", ReportRecord.date).label("year"),
-                    db.func.extract("month", ReportRecord.date).label("month"),
-                    ReportRecord.lang,
-                    ReportRecord.user,
-                    ReportRecord.result,
-                )
-                .distinct()
-                .all()
-            )
-
-            # Convert results to list of dicts
-            data: list[dict[str, Any]] = [
-                {
-                    "year": int(row.year) if row.year else None,
-                    "month": int(row.month) if row.month else None,
-                    "lang": row.lang,
-                    "user": row.user,
-                    "result": row.result,
-                }
-                for row in results
-            ]
+            results = self.api_service.get_unique_report_records()
 
         except Exception:
             logger.exception("Error fetching publish_reports_stats")
             return jsonify({"error": "An internal error occurred while fetching stats"}), 500
+
+        # Convert results to list of dicts
+        data: list[dict[str, Any]] = [
+            {
+                "year": int(row.year) if row.year else None,
+                "month": int(row.month) if row.month else None,
+                "lang": row.lang,
+                "user": row.user,
+                "result": row.result,
+            }
+            for row in results
+        ]
 
         response_data = {
             "results": data,
@@ -158,49 +214,28 @@ class ReportAPIHandler:
         limit = request.args.get("limit", default=500, type=int)
         limit = max(1, min(limit, 5000))
         try:
-            # Perform the JOIN query using SQLAlchemy
-            query = (
-                db.session.query(
-                    InProcessRecord.id,
-                    InProcessRecord.title,
-                    InProcessRecord.user,
-                    InProcessRecord.lang,
-                    InProcessRecord.cat,
-                    InProcessRecord.translate_type,
-                    InProcessRecord.word,
-                    InProcessRecord.add_date,
-                    CategoryRecord.campaign.label("campaign"),
-                    LangRecord.autonym.label("autonym"),
-                )
-                .outerjoin(CategoryRecord, InProcessRecord.cat == CategoryRecord.category)
-                .outerjoin(LangRecord, InProcessRecord.lang == LangRecord.code)
-            )
-
-            if lang and lang.lower() != "all":
-                query = query.filter(InProcessRecord.lang == lang)
-
-            results = query.order_by(InProcessRecord.id.asc()).limit(limit).all()
-
-            # Convert results to list of dicts
-            data: list[dict[str, Any]] = [
-                {
-                    "id": row.id,
-                    "title": row.title,
-                    "user": row.user,
-                    "lang": row.lang,
-                    "cat": row.cat,
-                    "translate_type": row.translate_type,
-                    "word": row.word,
-                    "add_date": row.add_date.isoformat() if row.add_date else None,
-                    "campaign": row.campaign if row.campaign else row.cat,
-                    "autonym": row.autonym if row.autonym else row.lang,
-                }
-                for row in results
-            ]
+            results = self.api_service.fetch_in_process_records(lang, limit)
 
         except Exception:
             logger.exception("Error fetching in_process data")
             return jsonify({"error": "An internal error occurred while fetching in-process data"}), 500
+
+        # Convert results to list of dicts
+        data: list[dict[str, Any]] = [
+            {
+                "id": row.id,
+                "title": row.title,
+                "user": row.user,
+                "lang": row.lang,
+                "cat": row.cat,
+                "translate_type": row.translate_type,
+                "word": row.word,
+                "add_date": row.add_date.isoformat() if row.add_date else None,
+                "campaign": row.campaign if row.campaign else row.cat,
+                "autonym": row.autonym if row.autonym else row.lang,
+            }
+            for row in results
+        ]
 
         response_data = {
             "results": data,
@@ -224,8 +259,7 @@ class ReportAPIHandler:
             JSON response with user counts
         """
         try:
-            service = InProcessService()
-            data = service.get_in_process_counts_by_user()
+            data = self.in_process_service.get_in_process_counts_by_user()
 
         except Exception:
             logger.exception("Error fetching in_process_total data")
@@ -256,7 +290,7 @@ class ReportAPIHandler:
             JSON response with pages_users records
         """
         try:
-            data = PagesQueryService().list_pages_users(limit=100)
+            data = self.pages_query_service.list_pages_users(limit=100)
         except Exception:
             logger.exception("Error fetching pages_users data")
             return jsonify({"error": "An internal error occurred while fetching pages_users data"}), 500
@@ -286,7 +320,7 @@ class ReportAPIHandler:
             JSON response with pages records including views
         """
         try:
-            data = PagesQueryService().list_pages_with_views()
+            data = self.pages_query_service.list_pages_with_views()
         except Exception:
             logger.exception("Error fetching pages_with_views data")
             return jsonify({"error": "An internal error occurred while fetching pages_with_views data"}), 500
@@ -303,8 +337,7 @@ class ReportAPIHandler:
         Handle categories API requests. Returns all category records.
         """
         try:
-            category_service = CategoryService()
-            records = category_service.list_categories()
+            records = self.category_service.list_categories()
         except Exception:
             logger.exception("Error fetching categories data")
             return jsonify({"error": "An internal error occurred while fetching categories data"}), 500
@@ -326,14 +359,7 @@ class ReportAPIHandler:
         WHERE (p.lang != '' AND p.lang IS NOT NULL)
         """
         try:
-            results = (
-                db.session.query(PageRecord.lang)
-                .distinct()
-                .outerjoin(CategoryRecord, PageRecord.cat == CategoryRecord.category)
-                .filter(PageRecord.lang != "", PageRecord.lang.isnot(None))
-                .order_by(PageRecord.lang)
-                .all()
-            )
+            results = self.api_service.get_unique_languages()
             data = [{"lang": row.lang} for row in results]
         except Exception:
             logger.exception("Error fetching distinct langs data")
@@ -345,9 +371,8 @@ class ReportAPIHandler:
         """C
         Handle pages_with_views API requests.
         """
-        service = LeaderboardService()
         try:
-            data = service.list_of_users_by_translations_count()
+            data = self.leaderboard_service.list_of_users_by_translations_count()
         except Exception:
             logger.exception("Error fetching list_of_users_by_translations_count data")
             return jsonify({"error": "An internal error occurred while fetching v data"}), 500
@@ -367,8 +392,7 @@ class ReportAPIHandler:
         Handle langs API requests. Returns all language records.
         """
         try:
-            lang_service = LangService()
-            records = lang_service.list_langs()
+            records = self.lang_service.list_langs()
         except Exception:
             logger.exception("Error fetching langs data")
             return jsonify({"error": "An internal error occurred while fetching langs data"}), 500
@@ -390,8 +414,7 @@ class ReportAPIHandler:
             return jsonify({"error": "Query parameter 'userlike' is required"}), 400
 
         try:
-            service = UsersService()
-            records = service.users_search(userlike)
+            records = self.users_service.users_search(userlike)
         except Exception:
             logger.exception("Error fetching users data")
             return jsonify({"error": "An internal error occurred while fetching users data"}), 500
@@ -410,6 +433,7 @@ class ApiRoutes(ReportAPIHandler):
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
         self.leaderboard_service = LeaderboardService()
+        super().__init__(self.leaderboard_service)
         self._setup_routes()
 
     def _setup_routes(self) -> None:
