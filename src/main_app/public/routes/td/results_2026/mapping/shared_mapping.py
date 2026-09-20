@@ -54,7 +54,7 @@ class ItemBase:
 
     def mdwiki_link(self) -> str:
         if self.title:
-            return f"""<a href="https://mdwiki.org/wiki/{quote(self.title)}" target="_blank"> {self.title} </a>"""
+            return f"""<a href="https://mdwiki.org/wiki/{quote(self.title.replace(" ", "_"))}" target="_blank"> {self.title} </a>"""
         return ""
 
     def wikidata_link(self) -> str:

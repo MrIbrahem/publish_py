@@ -38,7 +38,7 @@ class BaseRow:
 
     def mdwiki_link(self) -> str:
         if self.title:
-            return f"""<a href="https://mdwiki.org/wiki/{quote(self.title)}" target="_blank"> {self.title} </a>"""
+            return f"""<a href="https://mdwiki.org/wiki/{quote(self.title.replace(" ", "_"))}" target="_blank"> {self.title} </a>"""
         return ""
 
     def wikidata_link(self, qid: str | None) -> str:
@@ -71,6 +71,20 @@ class BaseRow:
                 <a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Complete</a>
             </td>
         """
+
+    @staticmethod
+    def _format_inprocess_date(value: Any) -> str:
+        """Mirror of PHP ``if (strpos($_date_, ':') !== false) explode(' ', $_date_)[0]``."""
+        if value is None:
+            return ""
+        if hasattr(value, "isoformat"):
+            # datetime → ISO; PHP receives "YYYY-MM-DD HH:MM:SS".
+            text = value.isoformat(sep=" ")
+        else:
+            text = str(value)
+        if ":" in text:
+            return text.split(" ", 1)[0]
+        return text
 
 
 @dataclass
@@ -128,9 +142,9 @@ class ReadyRow(BaseRow):
             cat=row.get("cat") or "",
             deleted=bool(row.get("deleted")) or False,
             campaign=row.get("campaign") or "",
-            add_date=row.get("add_date"),
-            pupdate=row.get("pupdate"),
-            date=row.get("date"),
+            add_date = cls._format_inprocess_date(row.get("add_date") or ""),
+            pupdate = cls._format_inprocess_date(row.get("pupdate") or ""),
+            date = cls._format_inprocess_date(row.get("date") or ""),
         )
 
     def render(

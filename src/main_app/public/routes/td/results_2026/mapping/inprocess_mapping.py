@@ -44,6 +44,8 @@ class InProcessItem(ItemBase):
         translate_type_info = translate_type_info or {"tt_lead": None, "tt_full": None}
         tra_type = title_tab.get("translate_type") or "lead"
 
+        date = cls._format_inprocess_date(title_tab.get("date") or title_tab.get("add_date") or "")
+
         return cls(
             counter=counter,
             title=title or row.get("title") or "",
@@ -51,7 +53,7 @@ class InProcessItem(ItemBase):
             importance=row.get("importance") or "Unknown",
             qid=row.get("qid") or "",
             user=title_tab.get("user") or "",
-            date=title_tab.get("add_date") or title_tab.get("date") or "",
+            date=date,
             tra_type=tra_type,
             words=Stats.load(row, "words"),
             refs=Stats.load(row, "refs"),
