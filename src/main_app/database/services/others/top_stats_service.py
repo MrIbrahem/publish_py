@@ -103,7 +103,7 @@ class TopStatsService:
             ORDER BY
                 2 DESC
         """
-        form = TopStatsService.to_form(form_data)
+        form = self.to_form(form_data)
 
         # Build the word count expression
         word_expr = case(
@@ -198,7 +198,7 @@ class TopStatsService:
             ORDER BY
                 2 DESC
         """
-        form = TopStatsService.to_form(form_data)
+        form = self.to_form(form_data)
 
         # Build the word count expression
         word_expr = case(

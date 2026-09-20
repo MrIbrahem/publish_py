@@ -12,7 +12,7 @@ import logging
 
 from ....database.services import TopStatsService
 from ...mapping import ApiFormData
-from .objects import (
+from .mapping import (
     TopLangsResult,
     TopLangStat,
     TopUsersResult,

@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from .form_utils import ApiFormData
-from .leaderboard_mapping import LeaderBoardData
+from .forms_mapping import ApiFormData, LeaderBoardData
 
 __all__ = [
     "LeaderBoardData",

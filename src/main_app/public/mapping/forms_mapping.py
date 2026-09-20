@@ -10,17 +10,29 @@ from werkzeug.datastructures import MultiDict
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
-class ApiFormData:
+class FormsBase:
     lang: str | None
     camp: str | None
     user_group: str | None
+    year: int | None
+    month: int | None
+
+    @classmethod
+    def _normalize(cls, value: str | None | int) -> Any | None:
+        if value == "all":
+            return None
+        return value
+
+    def to_json(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class ApiFormData(FormsBase):
     user: str | None
     cat: str | None
     limit: int | None
-    year: int | None
-    month: int | None
 
     @classmethod
     def from_request(cls, request_args: MultiDict[str, str]) -> ApiFormData:
@@ -53,16 +65,33 @@ class ApiFormData:
             user=user,
         )
 
-    @classmethod
-    def _normalize(cls, value: str | None | int) -> Any | None:
-        if value == "all":
-            return None
-        return value
+@dataclass
+class LeaderBoardData(FormsBase):
 
-    def to_json(self) -> dict[str, Any]:
-        return asdict(self)
+    @classmethod
+    def from_request(cls, request_args: MultiDict[str, str]) -> LeaderBoardData:
+        year = request_args.get("year", type=int)
+        month = request_args.get("month", type=int)
+
+        lang = request_args.get("lang", type=str)
+        user_group = request_args.get("user_group", type=str)
+        camp = request_args.get("camp", type=str)
+
+        user_group = cls._normalize(user_group)
+        year = cls._normalize(year)
+        camp = cls._normalize(camp)
+        lang = cls._normalize(lang)
+
+        return cls(
+            user_group=user_group,
+            camp=camp,
+            year=year,
+            month=month,
+            lang=lang,
+        )
 
 
 __all__ = [
     "ApiFormData",
+    "LeaderBoardData",
 ]

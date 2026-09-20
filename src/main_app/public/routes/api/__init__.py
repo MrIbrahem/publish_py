@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .objects import (
+from .mapping import (
     TopLangsResult,
     TopLangStat,
     TopUsersResult,

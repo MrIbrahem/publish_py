@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .nav_bar import NavigationBar
 from .navbar_list import nav_list
-from .objects import NavDropdown, NavLink
+from .mapping import NavDropdown, NavLink
 
 td_navbar = NavigationBar(nav_list)
 
