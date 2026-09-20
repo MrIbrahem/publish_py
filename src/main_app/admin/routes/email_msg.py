@@ -147,20 +147,15 @@ def msg_dashboard(
 
 
 class EmailMsgRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self._setup_routes()
-
-    def _setup_routes(self) -> None:
-
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/dashboard/<string:last_table>/<int:id>", "GET", self.dashboard),
             ("/send", "POST", self.msg_post),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(admin_required(target))
+            bp.route(rule, methods=[method])(admin_required(target))
 
-        self.bp.add_url_rule(
+        bp.add_url_rule(
             "/dashboard/<string:last_table>/<int:id>/<string:user>",
             endpoint="dashboard_with_user",
             view_func=admin_required(self.dashboard),
