@@ -15,6 +15,7 @@ from flask import (
     request,
     url_for,
 )
+from flask.views import MethodView
 from flask.typing import ResponseReturnValue
 
 from ...database.exceptions import DuplicateRecordError, UserNotFoundError
@@ -24,11 +25,15 @@ from ..decorators import admin_required
 logger = logging.getLogger(__name__)
 
 
-class CoordinatorDashboardView:
+class CoordinatorDashboardView(MethodView):
+    """View to handle listing and rendering the coordinator management dashboard."""
+
+    decorators = [admin_required]
+
     def __init__(self) -> None:
         self.admin_service = AdminService()
 
-    def dashboard(self) -> str:
+    def get(self) -> str:
         """Render the coordinator management dashboard."""
         try:
             coordinators = self.admin_service.list_coordinators()
@@ -48,7 +53,16 @@ class CoordinatorDashboardView:
             inactive_coordinators=total - total_active,
         )
 
-    def add(self) -> ResponseReturnValue:
+
+class AddCoordinatorView(MethodView):
+    """View to handle adding a new coordinator."""
+
+    decorators = [admin_required]
+
+    def __init__(self) -> None:
+        self.admin_service = AdminService()
+
+    def post(self) -> ResponseReturnValue:
         """Create a new coordinator from the submitted username."""
         username = request.form.get("username", "").strip()
         if not username:
@@ -74,6 +88,15 @@ class CoordinatorDashboardView:
 
         return redirect(url_for("adminpanel.coordinators.dashboard"))
 
+
+class CoordinatorStatusView(MethodView):
+    """Base class for managing coordinator status updates."""
+
+    decorators = [admin_required]
+
+    def __init__(self) -> None:
+        self.admin_service = AdminService()
+
     def _set_record_active_status(self, coordinator_id: int, is_active: bool) -> ResponseReturnValue:
         """Shared helper to update coordinator is_active status."""
         try:
@@ -92,13 +115,30 @@ class CoordinatorDashboardView:
 
         return redirect(url_for("adminpanel.coordinators.dashboard"))
 
-    def activate(self, coordinator_id: int) -> ResponseReturnValue:
+
+class ActivateCoordinatorView(CoordinatorStatusView):
+    """View to activate a coordinator."""
+
+    def post(self, coordinator_id: int) -> ResponseReturnValue:
         return self._set_record_active_status(coordinator_id, True)
 
-    def deactivate(self, coordinator_id: int) -> ResponseReturnValue:
+
+class DeactivateCoordinatorView(CoordinatorStatusView):
+    """View to deactivate a coordinator."""
+
+    def post(self, coordinator_id: int) -> ResponseReturnValue:
         return self._set_record_active_status(coordinator_id, False)
 
-    def delete(self, coordinator_id: int) -> ResponseReturnValue:
+
+class DeleteCoordinatorView(MethodView):
+    """View to remove a coordinator entirely."""
+
+    decorators = [admin_required]
+
+    def __init__(self) -> None:
+        self.admin_service = AdminService()
+
+    def post(self, coordinator_id: int) -> ResponseReturnValue:
         """Remove a coordinator entirely."""
         try:
             record = self.admin_service.get_coordinator_by_id(coordinator_id)
@@ -117,27 +157,37 @@ class CoordinatorDashboardView:
         return redirect(url_for("adminpanel.coordinators.dashboard"))
 
 
-class CoordinatorsRoutes(CoordinatorDashboardView):
-    """Jobs management routes."""
+class CoordinatorView:
+    """Coordinator management routes registrar using Class-Based Views."""
 
     def __init__(self, bp: Blueprint) -> None:
         self.bp = bp
-        super().__init__()
         self._setup_routes()
 
     def _setup_routes(self) -> None:
-
-        routes = [
-            ("/", "GET", self.dashboard),
-            ("/add", "POST", self.add),
-            ("/<int:coordinator_id>/activate", "POST", self.activate),
-            ("/<int:coordinator_id>/deactivate", "POST", self.deactivate),
-            ("/<int:coordinator_id>/delete", "POST", self.delete),
-        ]
-        for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(admin_required(target))
+        # Register views on the Blueprint using as_view
+        self.bp.add_url_rule(
+            "/",
+            view_func=CoordinatorDashboardView.as_view("dashboard"),
+        )
+        self.bp.add_url_rule(
+            "/add",
+            view_func=AddCoordinatorView.as_view("add"),
+        )
+        self.bp.add_url_rule(
+            "/<int:coordinator_id>/activate",
+            view_func=ActivateCoordinatorView.as_view("activate"),
+        )
+        self.bp.add_url_rule(
+            "/<int:coordinator_id>/deactivate",
+            view_func=DeactivateCoordinatorView.as_view("deactivate"),
+        )
+        self.bp.add_url_rule(
+            "/<int:coordinator_id>/delete",
+            view_func=DeleteCoordinatorView.as_view("delete"),
+        )
 
 
 __all__ = [
-    "CoordinatorsRoutes",
+    "CoordinatorView",
 ]

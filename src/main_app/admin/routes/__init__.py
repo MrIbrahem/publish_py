@@ -7,7 +7,7 @@ from typing import Any
 
 from .add_translate import AddTranslateRoutes
 from .campaigns import CampaignsDashboard
-from .coordinators import CoordinatorsRoutes
+from .coordinators import CoordinatorView
 from .email_msg import EmailMsgRoutes
 from .errors_route import CheckErrorsRoutes
 from .full_translators import FullTranslators
@@ -34,7 +34,7 @@ class AdminRouteModule:
 
 
 ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
-    AdminRouteModule(route_cls=CoordinatorsRoutes, name="coordinators", url_prefix="/coordinators"),
+    AdminRouteModule(route_cls=CoordinatorView, name="coordinators", url_prefix="/coordinators"),
     AdminRouteModule(route_cls=TranslateTypeRoutes, name="tt", url_prefix="/tt"),
     AdminRouteModule(route_cls=TranslatedRoutes, name="translated", url_prefix="/translated"),
     AdminRouteModule(route_cls=TranslatedUsersRoutes, name="translated_users", url_prefix="/translated_users"),
