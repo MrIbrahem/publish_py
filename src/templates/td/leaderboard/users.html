@@ -78,48 +78,6 @@
                         index=loop.index,
                         lang_or_user_row="lang",
                     ) }}
-                    <tr>
-                        <th>
-                            {{ loop.index }}
-                        </th>
-                        <td>
-                            {% if page.lang %}
-                            <a href="{{ url_for('leaderboard.langs', lang_code=page.lang) }}">
-                                {{ page.lang }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if page.title %}
-                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">
-                                {{ page.title }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if page.campaign %}
-                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
-                                {{ page.campaign }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ page.word }}
-                        </td>
-                        <td>
-                            {% if page.target and page.lang %}
-                            <a href="https://{{page.lang}}.wikipedia.org/wiki/{{ page.target }}" target="_blank">
-                                {{ page.target }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ page.pupdate }}
-                        </td>
-                        <td>
-                            {{ pageviews_link(page.views, page.lang, page.target, page.pupdate, yesterday) }}
-                        </td>
-                    </tr>
                     {% endfor %}
                     {% endif %}
                 </tbody>
