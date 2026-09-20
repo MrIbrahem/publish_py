@@ -23,19 +23,17 @@ logger = logging.getLogger(__name__)
 
 
 class CampaignsDashboard:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.category_service = CategoryService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", admin_required(self.dashboard)),
             ("/add", "POST", self.add_record),
             ("/update", "POST", self.update),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def dashboard(self):
         """Render the campaigns management dashboard."""
@@ -60,7 +58,6 @@ class CampaignsDashboard:
             return redirect(url_for("adminpanel.campaigns.dashboard"))
 
         try:
-
             self.category_service.add_category(
                 category=category,
                 campaign=campaign,
@@ -126,7 +123,6 @@ class CampaignsDashboard:
     ) -> None:
         """Update an existing category record."""
         try:
-
             record = self.category_service.update_category(
                 category_id=category_id,
                 category=category,
