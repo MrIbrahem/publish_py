@@ -11,11 +11,11 @@ from .routes import register_admin_blueprints
 
 def register_bp_admin_blueprints(app: Flask) -> None:
     bp_admin = Blueprint("adminpanel", __name__, url_prefix="/adminpanel")
-    admin_model = AdminPanel(bp_admin)
+    AdminPanel().register(bp_admin)
 
-    register_admin_blueprints(admin_model.bp)
+    register_admin_blueprints(bp_admin)
 
-    app.register_blueprint(admin_model.bp)
+    app.register_blueprint(bp_admin)
 
 
 __all__ = [
