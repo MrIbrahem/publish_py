@@ -55,7 +55,7 @@ class RouteRegistrar:
         "HtmltoSegments",
     ]
     @staticmethod
-    def register(app: Flask):
+    def register(app: Flask) -> None:
         for module in PUBLIC_ROUTE_MODULES:
             bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
             route_instance = module.route_cls(bp=bp, **module.extra_kwargs)
