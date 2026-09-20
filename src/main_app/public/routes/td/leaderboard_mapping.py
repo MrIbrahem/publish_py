@@ -93,7 +93,7 @@ class ReadyRow(BaseRow):
             try:
                 str_views = f"{int(self.views):,}"
             except ValueError:
-                logger.error("ValueError: %s", type(self.views)) # <class 'decimal.Decimal'>
+                logger.error("ValueError: %s", type(self.views))  # <class 'decimal.Decimal'>
                 str_views = str(self.views)
 
             # Format views with commas (equivalent to views | commas)

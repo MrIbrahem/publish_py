@@ -65,6 +65,7 @@ class ItemBase:
             return text.split(" ", 1)[0]
         return text
 
+
 __all__ = [
     "ItemBase",
 ]
