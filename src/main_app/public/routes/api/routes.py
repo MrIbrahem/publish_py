@@ -373,15 +373,13 @@ class ReportAPIHandler:
 
 
 class ApiRoutes(ReportAPIHandler):
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.leaderboard_service = LeaderboardService()
         super().__init__(self.leaderboard_service)
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
 
-        self.bp.before_request(self.handle_options_preflight)
+        bp.before_request(self.handle_options_preflight)
 
         routes = [
             ("/status", "GET", self.leaderboard_status),
@@ -401,7 +399,7 @@ class ApiRoutes(ReportAPIHandler):
             ("/users", "GET", self.get_users),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(check_cors(target))
+            bp.route(rule, methods=[method])(check_cors(target))
 
     def handle_options_preflight(self):
         if request.method == "OPTIONS":

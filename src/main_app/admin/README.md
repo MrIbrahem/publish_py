@@ -87,6 +87,7 @@ def admin_required(view):
         if user.username not in _get_cached_active_coordinators():
             abort(403)
         return view(**kwargs)
+
     return wrapped
 ```
 

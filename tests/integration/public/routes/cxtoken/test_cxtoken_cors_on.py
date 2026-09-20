@@ -33,9 +33,9 @@ def mock_app(sqlite_db) -> Flask:
     from src.main_app.public.routes.cxtoken.routes import CxTokenRoutes
 
     bp_cxtoken = Blueprint("cxtoken", __name__, url_prefix="/cxtoken")
-    cx_model = CxTokenRoutes(bp_cxtoken)
+    CxTokenRoutes().register(bp_cxtoken)
 
-    mock_app.register_blueprint(cx_model.bp)
+    mock_app.register_blueprint(bp_cxtoken)
     return mock_app
 
 

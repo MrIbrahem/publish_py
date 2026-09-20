@@ -27,15 +27,13 @@ logger = logging.getLogger(__name__)
 
 
 class LeaderBoardRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.category_service = CategoryService()
         self.project_service = ProjectService()
         self.lederboard_service = LeaderboardService()
         self.inprocess_service = InProcessService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
 
         routes = [
             ("/users/<string:username>", "GET", self.users),
@@ -44,7 +42,7 @@ class LeaderBoardRoutes:
             ("/", "GET", self.index),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def index_js(self) -> str:
         args = LeaderBoardData.from_request(request.args)

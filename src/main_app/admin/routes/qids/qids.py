@@ -8,8 +8,6 @@ from __future__ import annotations
 
 import logging
 
-from flask import Blueprint
-
 from ....database.services import QidService
 from .qids_model import QidsSharedModel
 
@@ -17,11 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 class QidsRoutes(QidsSharedModel):
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         super().__init__(
             endpoint="qids",
-            bp=bp,
             title_label="TD Qids",
             service=QidService(),
         )

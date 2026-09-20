@@ -21,13 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 class TranslateTypeRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.translate_type_service = TranslateTypeService()
         self.category_service = CategoryService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.tt_index),
             ("/edit", "GET", self.tt_edit),
@@ -36,7 +34,7 @@ class TranslateTypeRoutes:
             ("/add", "POST", self.tt_add_post),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def tt_index(self) -> str:
         """Render the Translate Type listing."""

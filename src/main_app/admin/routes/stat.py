@@ -17,19 +17,16 @@ logger = logging.getLogger(__name__)
 
 
 class StaticsRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.user_pages_service = UserPagesService()
         self.pages_service = PagesService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
-
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.stat_index),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def stat_index(self) -> str:
         """Render a minimal statistics overview."""

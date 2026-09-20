@@ -21,14 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 class LanguageSettings:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.service = LanguageSettingService()
         self.lang_service = LangService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
-
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.dashboard),
             ("/add", "POST", self.add),
@@ -36,7 +33,7 @@ class LanguageSettings:
             ("/<int:setting_id>/delete", "POST", self.delete),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(admin_required(target))
+            bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         """Render the language settings management dashboard."""
@@ -64,7 +61,6 @@ class LanguageSettings:
         add_en_lang = 1 if request.form.get("add_en_lang") == "1" else 0
 
         try:
-
             self.service.add_language_setting(
                 lang_code=lang_code,
                 move_dots=move_dots,
@@ -92,7 +88,6 @@ class LanguageSettings:
         }
 
         try:
-
             record = self.service.update_language_setting(setting_id, **kwargs)
         except ValueError as exc:
             logger.exception("Unable to update language setting")

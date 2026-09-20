@@ -54,19 +54,17 @@ def _word(raw: str | None) -> int:
 
 
 class TranslateRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.in_process_service = InProcessService()
         self.category_service = CategoryService()
         self.no_inprocess_service = UsersNoInprocessService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.index),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def index(self):
         user = get_current_user()

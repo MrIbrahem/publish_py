@@ -34,35 +34,41 @@ class PublicRouteModule:
 
 
 PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
-    PublicRouteModule(NewHtmlRoutes, "new_html", "/new_html"),
-    PublicRouteModule(MainRoutes, "main"),
-    PublicRouteModule(AuthRoutes, "auth", "/auth"),
-    PublicRouteModule(ApiRoutes, "api", "/api"),
-    PublicRouteModule(CxTokenRoutes, "cxtoken", "/cxtoken"),
-    PublicRouteModule(FixRefsRoutes, "fixrefs", "/fixrefs"),
-    PublicRouteModule(TDRoutes, "td", "/Translation_Dashboard"),
-    PublicRouteModule(LeaderBoardRoutes, "leaderboard", "/Translation_Dashboard/leaderboard"),
-    PublicRouteModule(TranslateRoutes, "translate_med", "/Translation_Dashboard/translate_med"),
+    PublicRouteModule(route_cls=NewHtmlRoutes, name="new_html", url_prefix="/new_html"),
+    PublicRouteModule(route_cls=MainRoutes, name="main"),
+    PublicRouteModule(route_cls=AuthRoutes, name="auth", url_prefix="/auth"),
+    PublicRouteModule(route_cls=ApiRoutes, name="api", url_prefix="/api"),
+    PublicRouteModule(route_cls=CxTokenRoutes, name="cxtoken", url_prefix="/cxtoken"),
+    PublicRouteModule(route_cls=FixRefsRoutes, name="fixrefs", url_prefix="/fixrefs"),
+    PublicRouteModule(route_cls=TDRoutes, name="td", url_prefix="/Translation_Dashboard"),
+    PublicRouteModule(route_cls=LeaderBoardRoutes, name="leaderboard", url_prefix="/Translation_Dashboard/leaderboard"),
+    PublicRouteModule(
+        route_cls=TranslateRoutes, name="translate_med", url_prefix="/Translation_Dashboard/translate_med"
+    ),
+    PublicRouteModule(route_cls=PublishRoutes, name="publish", url_prefix="/publish"),
+    PublicRouteModule(route_cls=HtmltoSegmentsRoutes, name="HtmltoSegments", url_prefix="/HtmltoSegments"),
 ]
 
 
 class RouteRegistrar:
     """Registers all route blueprints on a Flask app."""
 
+    CSRF_EXEMPT_BPS = [
+        "publish",
+        "HtmltoSegments",
+    ]
+
     @staticmethod
-    def register(app: Flask):
+    def register(app: Flask) -> None:
         for module in PUBLIC_ROUTE_MODULES:
             bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
-            route_instance = module.route_cls(bp=bp, **module.extra_kwargs)
-            app.register_blueprint(route_instance.bp)
 
-        publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
-        app.register_blueprint(publish_model.bp)
-        csrf_exempt(app, publish_model.bp)
+            route_instance = module.route_cls()
+            route_instance.register(bp=bp, **module.extra_kwargs)
 
-        htmltosegments_model = HtmltoSegmentsRoutes(Blueprint("HtmltoSegments", __name__, url_prefix="/HtmltoSegments"))
-        app.register_blueprint(htmltosegments_model.bp)
-        csrf_exempt(app, htmltosegments_model.bp)
+            app.register_blueprint(bp)
+            if module.name in RouteRegistrar.CSRF_EXEMPT_BPS:
+                csrf_exempt(app, bp)
 
 
 __all__ = [

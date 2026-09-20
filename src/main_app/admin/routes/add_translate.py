@@ -6,29 +6,21 @@ import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ...database.services import CategoryService, PagesService
 
 logger = logging.getLogger(__name__)
 
 
-class AddTranslateRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+class AddTranslateView(MethodView):
+    """View for displaying and processing the translation addition dashboard."""
+
+    def __init__(self) -> None:
         self.category_service = CategoryService()
         self.pages_service = PagesService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
-
-        routes = [
-            ("/", "GET", self.add_translate),
-            ("/", "POST", self.add_translate_post),
-        ]
-        for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
-
-    def add_translate(self) -> str:
+    def get(self) -> str:
         """Render the translations add_translate dashboard."""
         categories = self.category_service.list_categories()
         return render_template(
@@ -36,7 +28,7 @@ class AddTranslateRoutes:
             categories=categories,
         )
 
-    def add_translate_post(self) -> ResponseReturnValue:
+    def post(self) -> ResponseReturnValue:
         """Process the add_translate form submission."""
         titles = request.form.getlist("mdtitle")
         cats = request.form.getlist("cat")
@@ -94,7 +86,23 @@ class AddTranslateRoutes:
 
         return redirect(url_for("adminpanel.add.add_translate"))
 
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register view routes directly on the blueprint."""
+        bp.add_url_rule("/", view_func=cls.as_view("add_translate"))
+
+
+class AddTranslateRoutes:
+    """Registrar class for AddTranslate views."""
+
+    def register(self, bp: Blueprint) -> None:
+        bp.add_url_rule(
+            "/",
+            view_func=AddTranslateView.as_view("add_translate"),
+        )
+
 
 __all__ = [
+    "AddTranslateView",
     "AddTranslateRoutes",
 ]

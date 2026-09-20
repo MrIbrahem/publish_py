@@ -56,23 +56,19 @@ class QidsSharedModel:
     def __init__(
         self,
         endpoint: str,
-        bp: Blueprint,
         title_label: str,
         service: QidService | QidOthersService,
     ) -> None:
-        self.bp = bp
         self.endpoint = endpoint
         self.title_label = title_label
         self.service = service
-        self._setup_routes()
 
     def is_valid(self, qid_id: int | bool, qid: str, title: str) -> bool:
         existing_by_qid = self.service.get_by_qid(qid)
         existing_by_title = self.service.get_by_title(title)
         return is_valid(qid_id, qid, title, existing_by_qid, existing_by_title)
 
-    def _setup_routes(self) -> None:
-
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.index),
             ("/edit", "GET", self.edit),
@@ -81,7 +77,7 @@ class QidsSharedModel:
             ("/add", "POST", self.add_post),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def index(self) -> str:
         """List of rows with optional filter (all / empty / duplicate)."""

@@ -21,13 +21,10 @@ logger = logging.getLogger(__name__)
 
 
 class FullTranslators:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.service = FullTranslatorService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
-
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.dashboard),
             ("/add", "POST", self.add),
@@ -36,7 +33,7 @@ class FullTranslators:
             ("/<int:record_id>/deactivate", "POST", self.deactivate),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(admin_required(target))
+            bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         """Render the full translator management dashboard."""
@@ -61,7 +58,6 @@ class FullTranslators:
             return redirect(url_for("adminpanel.full_translators.dashboard"))
 
         try:
-
             record = self.service.add_full_translator(username)
         except ValueError as exc:
             logger.exception("Unable to add full translator")
@@ -102,7 +98,6 @@ class FullTranslators:
         """Shared helper to update record active status."""
         action = "activate" if is_active else "deactivate"
         try:
-
             record = self.service.update_full_translator(record_id, is_active=is_active)
         except LookupError as exc:
             logger.exception(f"Unable to {action} coordinator.")

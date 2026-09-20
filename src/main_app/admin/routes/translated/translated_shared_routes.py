@@ -27,24 +27,25 @@ class SharedTranslatedRoutes:
 
     usage, e.g.::
         class TranslatedUsersRoutes(SharedTranslatedRoutes):
-            def __init__(self, bp: Blueprint) -> None:
-                self.bp = bp
+            def __init__(self) -> None:
                 super().__init__(
                     service_name="pages_users",
                     endpoint_name="translated_users",
                     table_label="User",
                 )
-                self._setup_routes()
+
+            def register(self, bp: Blueprint) -> None: ...
+
 
         class TranslatedRoutes(SharedTranslatedRoutes):
-            def __init__(self, bp: Blueprint) -> None:
-                self.bp = bp
+            def __init__(self) -> None:
                 super().__init__(
                     service_name="pages",
                     endpoint_name="translated",
                     table_label="Main",
                 )
-                self._setup_routes()
+
+            def register(self, bp: Blueprint) -> None: ...
 
     """
 
