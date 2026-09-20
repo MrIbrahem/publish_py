@@ -47,10 +47,11 @@ def csrf_app(sqlite_db) -> Flask:
     csrf = CSRFProtect(mock_app)
     from src.main_app.public.routes.publish.routes import PublishRoutes
 
-    publish_model = PublishRoutes(Blueprint("publish", __name__, url_prefix="/publish"))
+    bp = Blueprint("publish", __name__, url_prefix="/publish")
+    PublishRoutes().register(bp)
 
-    mock_app.register_blueprint(publish_model.bp)
-    csrf.exempt(publish_model.bp)
+    mock_app.register_blueprint(bp)
+    csrf.exempt(bp)
 
     return mock_app
 
