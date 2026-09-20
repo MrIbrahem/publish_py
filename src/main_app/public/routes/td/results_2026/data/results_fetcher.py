@@ -27,6 +27,11 @@ logger = logging.getLogger(__name__)
 class ResultsFetcher:
     """Fetch and partition the exists/missing/in-process data for one category."""
 
+    def __init__(self) -> None:
+        self.pages_service = PagesService()
+        self.result_2026_service = Results2026Service()
+        self.in_process_service = InProcessService()
+
     def get(self, cat: str, code: str) -> dict[str, Any]:
         """
         Returns ``{"summary_data", "inprocess", "exists", "missing"}`` where:
@@ -35,14 +40,13 @@ class ResultsFetcher:
         - ``missing``   is a list[missing row dict] (in DB order)
         """
         # logic from results_2026/get_results_2026.php — exists_via_td
-        pages_service = PagesService()
-        exists_via_td_rows = pages_service.list_pages_by_lang_cat(code, cat)
+        exists_via_td_rows = self.pages_service.list_pages_by_lang_cat(code, cat)
         exists_via_td = {p.title: p for p in exists_via_td_rows}
 
-        result_2026_service = Results2026Service()
-        items_missing = result_2026_service.missing_by_lang_and_category(code, cat)
+        items_missing = self.result_2026_service.missing_by_lang_and_category(code, cat)
         missing_by_title = {row["title"]: row for row in items_missing if row.get("title")}
-        items_exists_list = result_2026_service.exists_by_lang_and_category(code, cat)
+
+        items_exists_list = self.result_2026_service.exists_by_lang_and_category(code, cat)
         items_exists: dict[str, dict] = {row["title"]: row for row in items_exists_list}
 
         # Tag each exists row with via="td" or via="before" — PHP foreach loop.
@@ -50,8 +54,7 @@ class ResultsFetcher:
             row["via"] = "td" if title in exists_via_td else "before"
 
         # logic from results_2026/get_results_2026.php — getinprocess_n
-        missing_titles = {row["title"] for row in items_missing}
-        inprocess = self.get_inprocess_for_missing(missing_titles, code)
+        inprocess = self.get_inprocess_for_missing(missing_by_title, code)
 
         # Remove inprocess titles from missing.
         if inprocess:
@@ -77,29 +80,34 @@ class ResultsFetcher:
             "missing_by_title": missing_by_title,
         }
 
-    def get_inprocess_for_missing(self, missing_titles: set[str], code: str) -> dict[str, dict]:
+    def get_inprocess_for_missing(self, missing_by_title: dict[str, dict], code: str) -> dict[str, dict]:
         """
         Mirror of PHP ``getinprocess_n($missing, $code)``.
 
         Keeps only the in-process records whose title is still in the missing
         list.
         """
-        service = InProcessService()
-        records = service.list_in_process_by_lang(code)
+
+        records = self.in_process_service.list_in_process_by_lang(code)
         result: dict[str, dict] = {}
+
         for r in records:
-            if r.title not in missing_titles:
+            if r.title not in missing_by_title:
                 continue
-            result[r.title] = {
-                "id": r.id,
-                "title": r.title,
-                "user": r.user or "",
-                "lang": r.lang,
-                "cat": r.cat or "",
-                "translate_type": r.translate_type or "",
-                "word": r.word or 0,
-                "add_date": r.add_date,  # datetime or None
-            }
+
+            result[r.title] = r.to_json()
+            """
+            c.article_id   AS title,
+            c.category     AS category,
+            ase.importance AS importance,
+            rc.r_lead_refs AS r_lead_refs,
+            rc.r_all_refs  AS r_all_refs,
+            ep.en_views    AS en_views,
+            q.qid          AS qid,
+            w.w_lead_words AS w_lead_words,
+            w.w_all_words  AS w_all_words"""
+            result[r.title].update({x:v for x, v in missing_by_title[r.title].items() if x not in result[r.title]})
+
         return result
 
 

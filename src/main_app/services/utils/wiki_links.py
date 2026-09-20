@@ -27,8 +27,6 @@ from urllib.parse import quote, urlencode
 
 from flask import url_for
 
-from ...database.services import SettingsService
-
 # Mirrors PHP make_ContentTranslation_url's default. The setting key
 # `use_mdwikicx` (read by `_get_endpoint`) flips this to mdwikicx.
 _DEFAULT_ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
@@ -99,9 +97,9 @@ def tr_link_medwiki(title: str, langcode: str, cat: str, camp: str, tra_type: st
 def content_translation_url(
     title: str,
     code: str,
-    campaign: str,
+    campaign: str | None,
     tra_type: str,
-    endpoint: str,
+    endpoint: str = "",
 ) -> str:
     """Special:ContentTranslation URL (PHP make_ContentTranslation_url)."""
     # PHP: $title = str_replace('%20', '_', $title);
@@ -111,38 +109,18 @@ def content_translation_url(
     # Normalize both forms before query encoding so the output matches the PHP `_` form.
     title = title.replace("%20", "_").replace(" ", "_")
 
+    if not endpoint:
+        endpoint = get_endpoint()
+
     params = {
         "title": "Special:ContentTranslation",
         "tr_type": tra_type,
         "from": "mdwiki",
         "to": code,
-        "campaign": campaign,
+        "campaign": campaign or "",
         "page": title,
     }
     return endpoint + "?" + urlencode(params, quote_via=quote)
-
-
-def _get_endpoint_like_php() -> str:
-    """Return the ContentTranslation endpoint based on the ``use_mdwikicx`` setting.
-
-    The setting lookup is wrapped in a try/except so that a missing key,
-    a missing table, or a connection issue all degrade gracefully to the
-    default endpoint — matching the PHP behavior where ``get_endpoint``
-    returns the default when the setting is absent or falsy.
-    """
-    # Imported lazily to avoid pulling Flask-SQLAlchemy at import time.
-    try:
-        service = SettingsService()
-        record = service.get_setting_by_key("use_mdwikicx")
-    except Exception:
-        return _DEFAULT_ENDPOINT
-
-    if record is None:
-        return _DEFAULT_ENDPOINT
-
-    raw = (record.value or "").strip().lower()
-    truthy = raw == "1"
-    return _MDWIKICX_ENDPOINT if truthy else _DEFAULT_ENDPOINT
 
 
 def get_endpoint() -> str:

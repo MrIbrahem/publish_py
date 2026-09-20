@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Literal
+from urllib.parse import quote
+
+from flask import url_for
+from markupsafe import Markup
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +43,41 @@ class ItemBase:
     def is_video(self) -> bool:
         """PHP ``str_starts_with(strtolower($title), "video:")``."""
         return self.title.lower().startswith("video:")
+
+    def _login_html(self) -> Markup:
+        """Login button shown to anonymous users (PHP ``results_table*.php``)."""
+        return Markup(
+            "<a class='btn btn-outline-primary' href='{login_url}'>"
+            "<i class='bi bi-box-arrow-in-right'></i> <span class='navtitles'>Login</span>"
+            "</a>"
+        ).format(login_url=url_for("auth.login"))
+
+    def mdwiki_link(self) -> str:
+        if self.title:
+            return f"""<a href="https://mdwiki.org/wiki/{quote(self.title.replace(" ", "_"))}" target="_blank"> {self.title} </a>"""
+        return ""
+
+    def wikidata_link(self) -> str:
+        if self.qid:
+            return f"""<a class='inline' target='_blank' href='https://wikidata.org/wiki/{self.qid}'>{self.qid}</a>"""
+        return ""
+
+    @staticmethod
+    def _format_inprocess_date(value: Any) -> str:
+        """Mirror of PHP ``if (strpos($_date_, ':') !== false) explode(' ', $_date_)[0]``."""
+        if value is None:
+            return ""
+        if hasattr(value, "isoformat"):
+            # datetime → ISO; PHP receives "YYYY-MM-DD HH:MM:SS".
+            try:
+                text = value.isoformat(sep=" ")
+            except ValueError:
+                text = value.isoformat()
+        else:
+            text = str(value)
+        if ":" in text:
+            return text.split(" ", 1)[0]
+        return text
 
 
 __all__ = [

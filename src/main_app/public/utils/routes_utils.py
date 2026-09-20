@@ -28,6 +28,7 @@ def context_data(
 
     username = user.username if user else None
 
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
     return {
         "tool_title": tool_title,
         # "username": username,
@@ -37,7 +38,7 @@ def context_data(
         "td_navbar": td_navbar,
         "wiki_domain": wiki_domain,
         "static_server": static_server,
-        "yesterday": (date.today() - timedelta(days=1)).isoformat(),
+        "yesterday": yesterday,
     }
 
 

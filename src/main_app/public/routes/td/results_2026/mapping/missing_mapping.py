@@ -6,12 +6,11 @@ import logging
 from dataclasses import dataclass, field
 from urllib.parse import quote
 
-from markupsafe import Markup, escape
+from markupsafe import Markup
 
 from ......services.utils.wiki_links import (
     tr_link_medwiki,
 )
-from ..rows._common import _login_html
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -67,7 +66,7 @@ class MissingItem(ItemBase):
     ) -> Markup:
         # logic from results_table.php — anonymous user
         if not is_authenticated:
-            return _login_html()
+            return self._login_html()
 
         lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type, self.words.lead)
 
@@ -109,32 +108,14 @@ class MissingItem(ItemBase):
         )
         return Markup("""
             <tr>
-                <th class="num" scope="row">
-                    {counter}
-                </th>
-                <td class="link_container">
-                    <a target="_blank" href="https://mdwiki.org/wiki/{encoded_title}">
-                        {title}
-                    </a> {full_note}
-                </td>
-                <th>
-                    {row_links}
-                </th>
-                <td class="num" style="text-align: left">
-                    {en_views}
-                </td>
-                <td class="num" style="text-align: left">
-                    {importance}
-                </td>
-                <td class="num" style="text-align: left">
-                    {words}
-                </td>
-                <td class="num" style="text-align: left">
-                    {refs}
-                </td>
-                <td>
-                    <a class='inline' target='_blank' href='https://wikidata.org/wiki/{qid}'>{qid}</a>
-                </td>
+                <th class="num" scope="row"> {counter} </th>
+                <td class="link_container"> {mdwiki_link} {full_note} </td>
+                <td> {row_links} </td>
+                <td class="num" style="text-align: left"> {en_views} </td>
+                <td class="num" style="text-align: left"> {importance} </td>
+                <td class="num" style="text-align: left"> {words} </td>
+                <td class="num" style="text-align: left"> {refs} </td>
+                <td> {wikidata_link} </td>
             </tr>
         """).format(
             counter=self.counter,
@@ -146,7 +127,8 @@ class MissingItem(ItemBase):
             importance=self.importance,
             words=self.words.all if self.tra_type == "all" else self.words.lead,
             refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
-            qid=escape(self.qid),
+            wikidata_link=Markup(self.wikidata_link()),
+            mdwiki_link=Markup(self.mdwiki_link()),
         )
 
     def render(

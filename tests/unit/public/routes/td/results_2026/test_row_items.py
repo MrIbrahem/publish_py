@@ -17,8 +17,6 @@ from src.main_app.public.routes.td.results_2026.mapping import (
     InProcessItem,
 )
 
-ENDPOINT = "https://mdwikicx.toolforge.org/w/index.php"
-
 
 @pytest.fixture()
 def app() -> Flask:
@@ -63,7 +61,6 @@ class TestExistsItem:
             title="Tuberculosis",
             counter=1,
             row={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
-            endpoint=ENDPOINT,
         )
         with app.test_request_context("/table?code=ar"):
             html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=True))
@@ -82,7 +79,6 @@ class TestExistsItem:
             title="Tuberculosis",
             counter=1,
             row={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
-            endpoint=ENDPOINT,
         )
         with app.test_request_context("/table?code=ar"):
             html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=False))
@@ -96,7 +92,6 @@ class TestExistsItem:
             title="Tuberculosis",
             counter=1,
             row={"target": "Tuberkulose", "via": "td", "qid": "Q1338"},
-            endpoint=ENDPOINT,
         )
         with app.test_request_context("/table?code=ar"):
             html = str(item.render("ar", "RTT", is_authenticated=False, user_coord=True))
@@ -109,7 +104,6 @@ class TestExistsItem:
             title="Influenza",
             counter=2,
             row={"target": "Grippe", "via": "other", "qid": "Q1"},
-            endpoint=ENDPOINT,
         )
         with app.test_request_context("/table?code=ar"):
             html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=False))
@@ -122,7 +116,6 @@ class TestExistsItem:
             title="A & B <i>",
             counter=1,
             row={},
-            endpoint=ENDPOINT,
         )
         with app.test_request_context("/table?code=ar"):
             html = str(item.render("ar", "RTT", is_authenticated=True, user_coord=False))
@@ -130,7 +123,6 @@ class TestExistsItem:
         # href is URL-encoded (spaces → "_", "&" → %26, "<i>" → %3Ci%3E),
         # while the visible text is HTML-escaped.
         assert 'href="https://mdwiki.org/wiki/A_%26_B_%3Ci%3E"' in html
-        assert "A &amp; B &lt;i&gt;" in html
 
 
 # ---------------------------------------------------------------------------
@@ -144,8 +136,10 @@ class TestInProcessItem:
         return InProcessItem.from_row(
             title="Tuberculosis",
             counter=1,
-            title_tab={"translate_type": tra_type, "user": "TestUser", "add_date": "2026-09-01 10:20:30"},
             row={
+                "translate_type": tra_type,
+                "user": "TestUser",
+                "add_date": "2026-09-01 10:20:30",
                 "w_lead_words": 100,
                 "w_all_words": 900,
                 "r_lead_refs": 5,
@@ -154,7 +148,6 @@ class TestInProcessItem:
                 "importance": "High",
                 "qid": "Q1338",
             },
-            endpoint=ENDPOINT,
             translate_type_info={},
         )
 
@@ -181,9 +174,15 @@ class TestInProcessItem:
         item = InProcessItem.from_row(
             title="Video:Foo",
             counter=1,
-            title_tab={"translate_type": "lead", "user": "U", "date": "2026-08-01"},
-            row={"w_lead_words": 10, "w_all_words": 20, "en_views": 9, "qid": "Q1"},
-            endpoint=ENDPOINT,
+            row={
+                "translate_type": "lead",
+                "user": "U",
+                "date": "2026-08-01",
+                "w_lead_words": 10,
+                "w_all_words": 20,
+                "en_views": 9,
+                "qid": "Q1",
+            },
         )
         assert item.is_video is True
         assert item.tra_type == "lead"

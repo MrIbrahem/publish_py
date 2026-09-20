@@ -18,7 +18,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from .....services.utils.wiki_links import get_endpoint
 from .bundle import ResultsBundle, ResultsCounts, ResultsRows
 from .data import ResultsFetcher
 from .helpers import TranslateTypeLoader
@@ -38,14 +37,11 @@ class ResultsLoader:
         self,
         *,
         code: str,
-        camp: str,
         cat: str,
         tra_type: str,
         code_lang_name: str,
-        user_coord: bool,
         settings: dict[str, bool],
         full_tr_user: bool,
-        user_is_logged_in: bool,
     ) -> ResultsBundle:
         """
         Build the results bundle for the index page.
@@ -59,19 +55,7 @@ class ResultsLoader:
         # logic from results_2026/index.php — load_translate_type('no'|'full')
         translation_loader = TranslateTypeLoader()
         translation_loader._load()
-
-        # logic from results_2026/index.php — Results_tables_2026
-        # Build a lookup of per-title metrics so the inprocess rows can reuse the
-        # missing/exists data we already loaded (PHP gets this via
-        # get_td_or_sql_titles_infos — a separate large query we deliberately skip).
-        titles_infos: dict[str, dict] = {}
-        for row in bucket["missing"]:
-            titles_infos[row["title"]] = row
-
-        for title, row in bucket["exists"].items():
-            titles_infos.setdefault(title, row)
-
-        endpoint = get_endpoint()
+        rows_data = translation_loader.rows_data
 
         def to_bool(val: Any) -> bool:
             if isinstance(val, str):
@@ -86,25 +70,17 @@ class ResultsLoader:
         missing_table = MissingTable(
             tra_type=tra_type,
             full_tr_user=full_tr_user,
-            translate_type_data=translation_loader.rows_data,
+            translate_type_data=rows_data,
         )
         missing_rows = missing_table.build(bucket["missing"])
 
-        inprocess_table = InProcessTable(
-            titles_infos=titles_infos,
-            endpoint=endpoint,
-            translate_type_data=translation_loader.rows_data,
-        )
+        inprocess_table = InProcessTable( translate_type_data=rows_data)
         inprocess_rows = inprocess_table.build(bucket["inprocess"])
 
-        exists_table = ExistsTable(
-            endpoint=endpoint,
-            translate_type_data=translation_loader.rows_data,
-        )
+        exists_table = ExistsTable(translate_type_data=rows_data)
 
-        exists_rows, exists_translated_count, exists_translated_before_count = exists_table.build(
-            items=bucket["exists"],
-        )
+        exists_rows= exists_table.build(bucket["exists"])
+        exists_translated_count, exists_translated_before_count = exists_table.count_status(exists_rows)
 
         return ResultsBundle(
             rows=ResultsRows(

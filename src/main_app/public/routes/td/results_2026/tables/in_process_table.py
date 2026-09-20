@@ -21,34 +21,31 @@ class InProcessTable:
     def __init__(
         self,
         *,
-        titles_infos: dict[str, dict],
-        endpoint: str,
+        # titles_infos: dict[str, dict],
         translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
         self.translate_type_data = translate_type_data
-        self._titles_infos = titles_infos
-        self._endpoint = endpoint
+        # self._titles_infos = titles_infos
 
     def build(self, items: dict[str, dict]) -> list[InProcessItem]:
         rows: list[InProcessItem] = []
         numb = 1
 
-        for title, title_tab in items.items():
+        for title, row in items.items():
             if not title:
                 continue
 
             display_title = title.replace("_", " ")
             translate_type_info = self.translate_type_data.get(display_title) or {"tt_lead": None, "tt_full": None}
 
-            title_data = self._titles_infos.get(title) or self._titles_infos.get(display_title) or {}
+            # row = self._titles_infos.get(title) or self._titles_infos.get(display_title) or {}
+            # row.update({x: v for x, v in title_tab.items() if x and v and not row.get(x)})
 
             rows.append(
                 InProcessItem.from_row(
                     title=display_title,
                     counter=numb,
-                    title_tab=title_tab,
-                    row=title_data,
-                    endpoint=self._endpoint,
+                    row=row,
                     translate_type_info=translate_type_info,
                 )
             )
