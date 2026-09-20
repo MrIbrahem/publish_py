@@ -75,14 +75,14 @@ after the `redirect(...)` return was added:
 
 | # | Gap | Status |
 |---|---|---|
-| 1 | `index()` fell through and returned `None`. | **Fixed** — now ends in `redirect(content_translation_url(...))` at [translate_med.py:68](../../src/main_app/public/routes/td/translate_med.py#L68). |
-| 2 | No `cat → campaign` resolution when `camp` is omitted. | Open — PHP lines 207–209 have no counterpart. |
-| 3 | `users_no_inprocess` gate missing. | Open — every logged-in user gets an `in_process` row; PHP skips active members of that table. |
-| 4 | Required-args check rejects a missing `tra_type`/`cat`. | Open — PHP defaults `type` to `lead` and tolerates an empty `cat`; the current check 404s valid links. |
-| 5 | `word` read with `type=int` but no `min_range` clamp. | Open — negative values pass through; PHP clamps to 0. |
+| 1 | `index()` fell through and returned `None`. | **Fixed** — now ends in `redirect(content_translation_url(...))` at [translate_med.py:109](../../src/main_app/public/routes/td/translate_med.py#L109). |
+| 2 | No `cat → campaign` resolution when `camp` is omitted. | **Fixed** — `_campaign_of()` mirrors PHP lines 207–209. |
+| 3 | `users_no_inprocess` gate missing. | **Fixed** — `should_hide_from_inprocess()` wraps the insert. |
+| 4 | Required-args check rejects a missing `tra_type`/`cat`. | **Fixed** — `tra_type` defaults to `lead`; an empty `cat` is tolerated. |
+| 5 | `word` read with `type=int` but no `min_range` clamp. | **Fixed** — `_word()` clamps negatives to 0. |
 | 6 | `test` flag. | **Dropped** — meaningless with a 302 (see [Deviations](#deviations-and-rationale)); the PHP preview mode has no intermediate page to render. |
-| 7 | Anonymous user returns the bare string `"Not logged in"`; invalid args return `"Invalid request"`. | Open — both are valid Flask responses, but neither renders the PHP login card / error markup. |
-| 8 | `get_current_user` imported from `....services.auth` (package) while [td_route.py:26](../../src/main_app/public/routes/td/td_route.py#L26) imports from `....services.auth.utils`. | Open — both work; standardize on `.utils` for consistency. |
+| 7 | Anonymous user returns the bare string `"Not logged in"`; invalid args return `"Invalid request"`. | **Fixed** — both branches now render `td/translate_med.html` (login card / warning alert). |
+| 8 | `get_current_user` imported from `....services.auth` (package) while [td_route.py:26](../../src/main_app/public/routes/td/td_route.py#L26) imports from `....services.auth.utils`. | **Fixed** — import is now `....services.auth.utils`. |
 | 9 | No use of the already-ported `content_translation_url()` / `get_endpoint()` helpers. | **Fixed** — both are now imported and used at [translate_med.py:15](../../src/main_app/public/routes/td/translate_med.py#L15). |
 
 ---
@@ -217,11 +217,9 @@ class TranslateRoutes:
 
 ## Template
 
-**No longer required for the happy path.** With the 302 in place, the redirect
-branch produces no HTML of its own, so `td/translate_med.html` is only relevant
-to the two non-redirect branches — which currently return bare strings
-(`"Not logged in"`, `"Invalid request"`). Porting the PHP login card is
-optional polish; if added, extend the existing TD base layout
+**Not used on the happy path.** With the 302 in place, the redirect branch
+produces no HTML of its own, so `td/translate_med.html` only serves the two
+non-redirect branches. It has been added, extending the existing TD base layout
 ([td_base.html](../../src/templates/td/td_base.html), which provides
 `{% block content %}`):
 
@@ -347,30 +345,31 @@ Route wiring is already covered by the blueprint registration; no changes to
 
 ### Phase 1 — Route logic
 
-- [ ] Replace the argument parsing in `translate_med.py` with the six-param
-      scheme (`title`, `langcode`, `cat`, `camp`, `tra_type`, `word`) plus
-      `test`.
-- [ ] Fix the `get_current_user` import to `....services.auth.utils`.
-- [ ] Add `CategoryService` + `UsersNoInprocessService` to `__init__`.
-- [ ] Implement the `cat → campaign` fallback.
-- [ ] Implement the `users_no_inprocess` gate around the `in_process` insert.
-- [ ] Build the CX URL via `content_translation_url()` + `get_endpoint()`.
+- [x] Replace the argument parsing in `translate_med.py` with the six-param
+      scheme (`title`, `langcode`, `cat`, `camp`, `tra_type`, `word`).
+      `test` is intentionally dropped (see [Deviations](#deviations-and-rationale)).
+- [x] Fix the `get_current_user` import to `....services.auth.utils`.
+- [x] Add `CategoryService` + `UsersNoInprocessService` to `__init__`.
+- [x] Implement the `cat → campaign` fallback.
+- [x] Implement the `users_no_inprocess` gate around the `in_process` insert.
+- [x] Build the CX URL via `content_translation_url()` + `get_endpoint()`.
 
 ### Phase 2 — Response
 
 - [x] End `index()` with `redirect(content_translation_url(...))`.
-- [ ] Return a value from every branch — the `None` fall-through is gone, but
-      the two string branches (`"Not logged in"`, `"Invalid request"`) still
-      diverge from the PHP login card / error markup.
-- [ ] (Optional) Add `src/templates/td/translate_med.html` for the login-card
-      and invalid-request branches only — not for the redirect path.
+- [x] Return a value from every branch — the anonymous branch renders the login
+      card and the missing-args branch renders the warning, both via the new
+      template; the `None` fall-through and the bare-string responses are gone.
+- [x] Add `src/templates/td/translate_med.html` for the login-card and
+      invalid-request branches only — not for the redirect path.
 
 ### Phase 3 — Tests
 
-- [ ] Add `tests/unit/public/routes/td/test_translate_med.py` with the cases
-      listed above.
-- [ ] Run `pytest tests/unit/public/routes/td` and the full suite.
-- [ ] Run `ruff check` / `ruff format` / `black` / `isort` on touched files.
+- [x] Add `tests/unit/public/routes/td/test_translate_med.py` with the cases
+      listed above (24 tests across 7 classes).
+- [x] Run `pytest tests/unit/public/routes/td` and the full suite.
+      TD directory: 38 passed. Full suite: 1640 passed, 5 skipped.
+- [x] Run `ruff check` / `ruff format` / `black` / `isort` on touched files.
 
 ### Phase 4 — Verification
 

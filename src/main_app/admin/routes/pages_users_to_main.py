@@ -11,7 +11,6 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 
 from ...database.services import LangService, PagesService, PagesUsersToMainPagesService
-from ...extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -138,10 +137,9 @@ class PagesUsersMainRoutes:
         # update would silently disappear even though we just flashed success.
         # Force the commit here so the flash matches what is actually persisted.
         try:
-            db.session.commit()
+            self.pages_service.commit_pending_updates()
         except Exception:
             logger.exception("Failed to commit add_translate_row_to_db for id=%r", page_id)
-            db.session.rollback()
             flash("Failed to persist translations.", "danger")
             return redirect_to
 

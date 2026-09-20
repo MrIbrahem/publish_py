@@ -27,7 +27,7 @@ from urllib.parse import quote
 from flask import request, url_for
 from markupsafe import Markup, escape
 
-from .objects import NAV_ITEM_CLASS, NavDropdown, NavLink
+from .mapping import NAV_ITEM_CLASS, NavDropdown, NavLink
 
 logger = logging.getLogger(__name__)
 

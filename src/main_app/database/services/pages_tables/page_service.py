@@ -103,6 +103,18 @@ class PagesService(BasePagesService):
         )
         return found is not None
 
+    def commit_pending_updates(self):
+        # ``add_translate_row_to_db`` only commits on the INSERT branch; when it
+        # updates an existing row the change stays pending in the session. If the
+        # later ``delete_user_page`` call rolls the session back, that pending
+        # update would silently disappear even though we just flashed success.
+        # Force the commit here so the flash matches what is actually persisted.
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
 
 __all__ = [
     "PagesService",

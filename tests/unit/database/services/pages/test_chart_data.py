@@ -1,7 +1,7 @@
 from flask.app import Flask
 
 from src.main_app.database.models import CategoryRecord, PageRecord, UserRecord
-from src.main_app.database.services.pages import LeaderboardService
+from src.main_app.database.services.others import LeaderboardService
 from src.main_app.extensions import db
 
 

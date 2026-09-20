@@ -270,7 +270,7 @@ class TDRoutes:
         code = _normalize_arg("code")
         camp = _normalize_arg("camp")
         cat = _normalize_arg("cat")
-        tra_type = _normalize_arg("type")
+        tra_type = _normalize_arg("tra_type")
 
         filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
 

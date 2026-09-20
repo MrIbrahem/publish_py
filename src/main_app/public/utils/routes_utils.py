@@ -29,14 +29,14 @@ def context_data(
     username = user.username if user else None
 
     return {
-        "td_navbar": td_navbar,
+        "tool_title": tool_title,
+        # "username": username,
         "is_authenticated": user is not None,
         "current_username": username,
         "is_admin": _is_admin(user),
+        "td_navbar": td_navbar,
         "wiki_domain": wiki_domain,
         "static_server": static_server,
-        "tool_title": tool_title,
-        "username": username,
         "yesterday": (date.today() - timedelta(days=1)).isoformat(),
     }
 

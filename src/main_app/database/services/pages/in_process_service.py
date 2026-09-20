@@ -54,6 +54,22 @@ class InProcessService(CRUDService[InProcessRecord]):
         """Get an in_process record by title, user, and language."""
         return self.get_by(title=title, user=user, lang=lang)
 
+    def get_user_in_process(self, user: str) -> list[InProcessRecord]:
+        """Get an in_process record by user for Leaderboard."""
+        filters = {"user": user}
+        return self.list(
+            filters=filters,
+            order_by=[InProcessRecord.add_date.desc()],
+        )
+
+    def get_lang_in_process(self, lang: str) -> list[InProcessRecord]:
+        """Get an in_process record by lang for Leaderboard."""
+        filters = {"lang": lang}
+        return self.list(
+            filters=filters,
+            order_by=[InProcessRecord.add_date.desc()],
+        )
+
     def add_in_process(
         self,
         title: str,

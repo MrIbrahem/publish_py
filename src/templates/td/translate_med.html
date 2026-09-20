@@ -1,0 +1,22 @@
+{% extends "td/td_base.html" %}
+{% block title %}Translate{% endblock %}
+{% block content %}
+{# Mirror of translate_med.php: login card (lines 169-184) / empty page otherwise. #}
+{% if login_url %}
+<div class="card" style="font-weight: bold;">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-10">
+                <a role="button" class="btn btn-outline-primary" href="{{ login_url }}">
+                    <i class="fas fa-sign-in-alt fa-sm fa-fw mr-1"></i><span class="navtitles">Login</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning" role="alert">
+    Invalid request: <code>title</code> and <code>langcode</code> are required.
+</div>
+{% endif %}
+{% endblock %}
