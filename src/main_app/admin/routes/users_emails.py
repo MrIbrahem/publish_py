@@ -33,15 +33,12 @@ def filter_users(users: list[UserRecord], project_name: str) -> list[UserRecord]
 
 
 class UsersEmails:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.leaderboard_service = LeaderboardService()
         self.projects_service = ProjectService()
         self.user_service = UsersService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
-
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.dashboard),
             ("/add", "POST", self.add),
@@ -50,7 +47,7 @@ class UsersEmails:
             ("/<int:record_id>/edit", "GET", self.edit),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(admin_required(target))
+            bp.route(rule, methods=[method])(admin_required(target))
 
     def dashboard(self):
         """Render the users not in process management dashboard."""
