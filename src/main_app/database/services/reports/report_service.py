@@ -94,7 +94,7 @@ class ReportService(CRUDService[ReportRecord]):
                     # Apply a numeric ">0" predicate. For string columns,
                     # cast to integer so the comparison is meaningful in SQL.
                     # If the column type is unknown / non-comparable, raise.
-                    """col_type = getattr(column, "type", None)
+                    """col_type = getattr(column, "tra_type", None)
                     if isinstance(col_type, (SAInteger, SANumeric)):
                         query = query.filter(column > 0)
                     else:
