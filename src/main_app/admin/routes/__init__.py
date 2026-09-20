@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from flask import Blueprint
+
 from .add_translate import AddTranslateRoutes
 from .campaigns import CampaignsDashboard
 from .coordinators import CoordinatorView
@@ -54,6 +56,15 @@ ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
     AdminRouteModule(route_cls=CheckErrorsRoutes, name="errors", url_prefix="/errors"),
 ]
 
+
+def register_admin_blueprints(bp_admin: Blueprint) -> None:
+    for module in ADMIN_ROUTE_MODULES:
+        bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
+        module.route_cls(bp=bp, **module.extra_kwargs)
+        bp_admin.register_blueprint(bp)
+
+
 __all__ = [
     "ADMIN_ROUTE_MODULES",
+    "register_admin_blueprints",
 ]

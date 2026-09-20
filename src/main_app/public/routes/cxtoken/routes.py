@@ -62,17 +62,14 @@ def get_cxtoken_for_user_wiki(wiki: str, user_name: str):
 
 
 class CxTokenRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "OPTIONS", check_cors(self.index_preflight)),
             ("/", "GET", check_cors(self.index)),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def index_preflight(self) -> Response:
         """

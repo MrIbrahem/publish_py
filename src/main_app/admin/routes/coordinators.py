@@ -15,8 +15,8 @@ from flask import (
     request,
     url_for,
 )
-from flask.views import MethodView
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ...database.exceptions import DuplicateRecordError, UserNotFoundError
 from ...database.services import AdminService

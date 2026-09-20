@@ -74,12 +74,12 @@ class ResultsLoader:
         )
         missing_rows = missing_table.build(bucket["missing"])
 
-        inprocess_table = InProcessTable( translate_type_data=rows_data)
+        inprocess_table = InProcessTable(translate_type_data=rows_data)
         inprocess_rows = inprocess_table.build(bucket["inprocess"])
 
         exists_table = ExistsTable(translate_type_data=rows_data)
 
-        exists_rows= exists_table.build(bucket["exists"])
+        exists_rows = exists_table.build(bucket["exists"])
         exists_translated_count, exists_translated_before_count = exists_table.count_status(exists_rows)
 
         return ResultsBundle(

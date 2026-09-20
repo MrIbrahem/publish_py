@@ -20,12 +20,11 @@ from ...services.new_html_services import (
 
 
 class NewHtmlRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self.revisions_dir = app_settings.new_html.revisions_dir
-        self._setup_routes()
+    def __init__(self) -> None:
 
-    def _setup_routes(self) -> None:
+        self.revisions_dir = app_settings.new_html.revisions_dir
+
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/fix", ["GET", "POST"], self.fix),
             ("/index", ["GET"], self.index),
@@ -35,7 +34,7 @@ class NewHtmlRoutes:
             ("/revisions_api", ["GET"], check_cors(self.revisions_api)),
         ]
         for rule, methods, target in routes:
-            self.bp.route(rule, methods=methods)(target)
+            bp.route(rule, methods=methods)(target)
 
     def index(self) -> str:
         return render_template(

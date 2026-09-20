@@ -42,7 +42,9 @@ PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
     PublicRouteModule(route_cls=FixRefsRoutes, name="fixrefs", url_prefix="/fixrefs"),
     PublicRouteModule(route_cls=TDRoutes, name="td", url_prefix="/Translation_Dashboard"),
     PublicRouteModule(route_cls=LeaderBoardRoutes, name="leaderboard", url_prefix="/Translation_Dashboard/leaderboard"),
-    PublicRouteModule(route_cls=TranslateRoutes, name="translate_med", url_prefix="/Translation_Dashboard/translate_med"),
+    PublicRouteModule(
+        route_cls=TranslateRoutes, name="translate_med", url_prefix="/Translation_Dashboard/translate_med"
+    ),
     PublicRouteModule(route_cls=PublishRoutes, name="publish", url_prefix="/publish"),
     PublicRouteModule(route_cls=HtmltoSegmentsRoutes, name="HtmltoSegments", url_prefix="/HtmltoSegments"),
 ]
@@ -50,18 +52,23 @@ PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
 
 class RouteRegistrar:
     """Registers all route blueprints on a Flask app."""
+
     CSRF_EXEMPT_BPS = [
         "publish",
         "HtmltoSegments",
     ]
+
     @staticmethod
     def register(app: Flask) -> None:
         for module in PUBLIC_ROUTE_MODULES:
             bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
-            route_instance = module.route_cls(bp=bp, **module.extra_kwargs)
-            app.register_blueprint(route_instance.bp)
+
+            route_instance = module.route_cls()
+            route_instance.register(bp=bp, **module.extra_kwargs)
+
+            app.register_blueprint(bp)
             if module.name in RouteRegistrar.CSRF_EXEMPT_BPS:
-                csrf_exempt(app, route_instance.bp)
+                csrf_exempt(app, bp)
 
 
 __all__ = [

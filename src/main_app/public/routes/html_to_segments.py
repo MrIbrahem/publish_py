@@ -183,17 +183,14 @@ def process_text() -> tuple[Response, int]:
 
 
 class HtmltoSegmentsRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "POST", self.process_text),
             ("/", "GET", self.index),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def process_text(self):
         return process_text()

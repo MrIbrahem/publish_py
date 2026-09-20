@@ -91,17 +91,14 @@ def _handle_form(request_data) -> Response:
 
 
 class PublishRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "OPTIONS", check_cors(self.publish_preflight)),
             ("/", "POST", validate_access(self.index)),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def publish_preflight(self) -> Response:
         response = Response("", status=200)

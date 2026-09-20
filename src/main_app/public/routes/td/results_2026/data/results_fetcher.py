@@ -106,7 +106,7 @@ class ResultsFetcher:
             q.qid          AS qid,
             w.w_lead_words AS w_lead_words,
             w.w_all_words  AS w_all_words"""
-            result[r.title].update({x:v for x, v in missing_by_title[r.title].items() if x not in result[r.title]})
+            result[r.title].update({x: v for x, v in missing_by_title[r.title].items() if x not in result[r.title]})
 
         return result
 
