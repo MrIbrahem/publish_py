@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 from werkzeug.datastructures import MultiDict
@@ -58,6 +58,9 @@ class ApiFormData:
         if value == "all":
             return None
         return value
+
+    def to_json(self) -> dict[str, Any]:
+        return asdict(self)
 
 
 __all__ = [

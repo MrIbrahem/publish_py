@@ -9,7 +9,6 @@ from sqlalchemy import case, cast
 from sqlalchemy.orm.query import Query
 
 from ....extensions import db
-from ....public.mapping import ApiFormData
 from ...models import (
     CategoryRecord,
     LangRecord,
@@ -25,7 +24,18 @@ logger = logging.getLogger(__name__)
 class TopStatsService:
 
     @staticmethod
-    def apply_filters(form: ApiFormData, query: Query) -> Query:
+    def to_form(form_data) -> Any:
+        from ....public.mapping import ApiFormData
+
+        if isinstance(form_data, ApiFormData):
+            return form_data
+
+        return ApiFormData(**form_data)
+
+    @staticmethod
+    def apply_filters(form_data: dict[str, Any] | Any, query: Query) -> Query:
+        form = TopStatsService.to_form(form_data)
+
         if form.cat:
             query = query.filter(PageRecord.cat == form.cat)
         elif form.camp:
@@ -48,7 +58,7 @@ class TopStatsService:
 
         return query
 
-    def query_top_users(self, form: ApiFormData) -> list[Any]:
+    def query_top_users(self, form_data: dict[str, Any] | Any) -> list[Any]:
         """
         Query:
             SELECT
@@ -93,6 +103,8 @@ class TopStatsService:
             ORDER BY
                 2 DESC
         """
+        form = TopStatsService.to_form(form_data)
+
         # Build the word count expression
         word_expr = case(
             (
@@ -140,7 +152,7 @@ class TopStatsService:
 
         return results
 
-    def query_top_langs(self, form: ApiFormData):
+    def query_top_langs(self, form_data: dict[str, Any] | Any) -> list[Any]:
         """
         Query:
             SELECT
@@ -186,7 +198,7 @@ class TopStatsService:
             ORDER BY
                 2 DESC
         """
-        # TODO: Move database query to service layer like LeaderboardService or TopStatsService
+        form = TopStatsService.to_form(form_data)
 
         # Build the word count expression
         word_expr = case(
