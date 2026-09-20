@@ -21,6 +21,7 @@ from ....database.services import (
 )
 from ...mapping import ApiFormData, LeaderBoardData
 from ..api.top_stats_routes import get_top_langs, get_top_users
+from .leaderboard_mapping import InProcessRow
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +132,9 @@ class LeaderBoardRoutes:
 
         inprocess_pages = []
         if not args.year:
-            inprocess_pages = [x.to_json() for x in self.inprocess_service.get_lang_in_process(lang=lang_code)]
+            inprocess_pages = [
+                InProcessRow.from_row(x.to_json()) for x in self.inprocess_service.get_lang_in_process(lang=lang_code)
+            ]
 
         return render_template(
             "td/leaderboard/langs.html",
@@ -176,7 +179,7 @@ class LeaderBoardRoutes:
         inprocess_pages = []
         if not args.year:
             inprocess_pages = [
-                x.to_json()
+                InProcessRow.from_row(x.to_json())
                 for x in self.inprocess_service.get_user_in_process(user=username)
                 if not args.lang or x.lang == args.lang
             ]

@@ -155,39 +155,11 @@
                 <tbody>
                     {% if inprocess_pages %}
                     {% for page in inprocess_pages %}
-                    <tr>
-                        <th> {{ loop.index }} </th>
-                        <td>
-                            {% if page.lang %}
-                            <a href="{{ url_for('leaderboard.langs', lang_code=page.lang) }}">
-                                {{ page.lang }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if page.title %}
-                            <a href="https://mdwiki.org/wiki/{{ page.title }}" target="_blank">
-                                {{ page.title }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if page.campaign %}
-                            <a href="{{ url_for('leaderboard.index', camp=page.campaign) }}">
-                                {{ page.campaign }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ page.translate_type }}
-                        </td>
-                        <td> {{ page.word }} </td>
-                        <td> Pending </td>
-                        <td> {{ page.add_date }} </td>
-                        {% if current_username == username %}
-                        <td> </td>
-                        {% endif %}
-                    </tr>
+                    {{ page.render(
+                            index=loop.index,
+                            lang_or_user_row="lang",
+                            show_translate_row=current_username == username
+                        ) }}
                     {% endfor %}
                     {% endif %}
                 </tbody>
