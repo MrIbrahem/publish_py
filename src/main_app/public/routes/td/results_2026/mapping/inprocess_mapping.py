@@ -37,14 +37,14 @@ class InProcessItem(ItemBase):
         title: str,
         counter: int,
         row: dict[str, Any],
-        title_tab: dict[str, Any],
         translate_type_info: dict[str, int | None] | None = None,
     ) -> InProcessItem:
         """ """
         translate_type_info = translate_type_info or {"tt_lead": None, "tt_full": None}
-        tra_type = title_tab.get("translate_type") or "lead"
 
-        date = cls._format_inprocess_date(title_tab.get("date") or title_tab.get("add_date") or "")
+        tra_type = row.get("translate_type") or "lead"
+
+        date = cls._format_inprocess_date(row.get("date") or row.get("add_date") or "")
 
         return cls(
             counter=counter,
@@ -52,7 +52,7 @@ class InProcessItem(ItemBase):
             en_views=row.get("en_views") or row.get("views") or "",
             importance=row.get("importance") or "Unknown",
             qid=row.get("qid") or "",
-            user=title_tab.get("user") or "",
+            user=row.get("user") or "",
             date=date,
             tra_type=tra_type,
             words=Stats.load(row, "words"),

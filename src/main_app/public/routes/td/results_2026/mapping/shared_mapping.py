@@ -69,7 +69,10 @@ class ItemBase:
             return ""
         if hasattr(value, "isoformat"):
             # datetime → ISO; PHP receives "YYYY-MM-DD HH:MM:SS".
-            text = value.isoformat(sep=" ")
+            try:
+                text = value.isoformat(sep=" ")
+            except ValueError:
+                text = value.isoformat()
         else:
             text = str(value)
         if ":" in text:

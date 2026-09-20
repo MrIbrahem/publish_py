@@ -79,7 +79,10 @@ class BaseRow:
             return ""
         if hasattr(value, "isoformat"):
             # datetime → ISO; PHP receives "YYYY-MM-DD HH:MM:SS".
-            text = value.isoformat(sep=" ")
+            try:
+                text = value.isoformat(sep=" ")
+            except ValueError:
+                text = value.isoformat()
         else:
             text = str(value)
         if ":" in text:
@@ -144,7 +147,8 @@ class ReadyRow(BaseRow):
             campaign=row.get("campaign") or "",
             add_date=cls._format_inprocess_date(row.get("add_date") or ""),
             pupdate=cls._format_inprocess_date(row.get("pupdate") or ""),
-            date=cls._format_inprocess_date(row.get("date") or ""),
+            # date=cls._format_inprocess_date(row.get("date") or ""),
+            date=row.get("date") or "",
         )
 
     def render(

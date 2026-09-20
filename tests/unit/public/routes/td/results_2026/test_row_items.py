@@ -136,8 +136,10 @@ class TestInProcessItem:
         return InProcessItem.from_row(
             title="Tuberculosis",
             counter=1,
-            title_tab={"translate_type": tra_type, "user": "TestUser", "add_date": "2026-09-01 10:20:30"},
             row={
+                "translate_type": tra_type,
+                "user": "TestUser",
+                "add_date": "2026-09-01 10:20:30",
                 "w_lead_words": 100,
                 "w_all_words": 900,
                 "r_lead_refs": 5,
@@ -172,8 +174,15 @@ class TestInProcessItem:
         item = InProcessItem.from_row(
             title="Video:Foo",
             counter=1,
-            title_tab={"translate_type": "lead", "user": "U", "date": "2026-08-01"},
-            row={"w_lead_words": 10, "w_all_words": 20, "en_views": 9, "qid": "Q1"},
+            row={
+                "translate_type": "lead",
+                "user": "U",
+                "date": "2026-08-01",
+                "w_lead_words": 10,
+                "w_all_words": 20,
+                "en_views": 9,
+                "qid": "Q1",
+            },
         )
         assert item.is_video is True
         assert item.tra_type == "lead"

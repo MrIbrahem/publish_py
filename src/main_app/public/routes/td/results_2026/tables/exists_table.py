@@ -22,12 +22,10 @@ class ExistsTable:
     ) -> None:
         self.translate_type_data = translate_type_data
 
-    def build(self, items: dict[str, dict]) -> tuple[list[ExistsItem], int, int]:
-        """Returns ``(rows, count_translated, count_translated_before)``."""
+    def build(self, items: dict[str, dict]) -> list[ExistsItem]:
+        """Returns ``rows``."""
         rows: list[ExistsItem] = []
         numb = 1
-        count_translated = 0
-        count_translated_before = 0
 
         for title, target_tab in items.items():
             if not title:
@@ -35,13 +33,6 @@ class ExistsTable:
 
             display_title = title.replace("_", " ")
             translate_type_info = self.translate_type_data.get(display_title) or {"tt_lead": None, "tt_full": None}
-
-            via = target_tab.get("via", "")
-
-            if via == "td":
-                count_translated += 1
-            else:
-                count_translated_before += 1
 
             rows.append(
                 ExistsItem.from_row(
@@ -54,20 +45,13 @@ class ExistsTable:
 
             numb += 1
 
-        return rows, count_translated, count_translated_before
+        return rows
 
-    def count_status(self, items: dict[str, dict]) -> tuple[int, int]:
+    def count_status(self, exists_rows: list[ExistsItem]) -> tuple[int, int]:
         """Returns ``(count_translated, count_translated_before)``."""
-        count_translated = 0
-        count_translated_before = 0
 
-        for target_tab in items.values():
-            via = target_tab.get("via", "")
-
-            if via == "td":
-                count_translated += 1
-            else:
-                count_translated_before += 1
+        count_translated = len([x for x in exists_rows if x.via == "td"])
+        count_translated_before = len([x for x in exists_rows if x.via != "td"])
 
         return count_translated, count_translated_before
 
