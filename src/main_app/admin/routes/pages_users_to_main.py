@@ -23,21 +23,19 @@ def _safe_int(value: str | None, default: int) -> int:
 
 
 class PagesUsersMainRoutes:
-    def __init__(self, bp: Blueprint) -> None:
-        self.bp = bp
+    def __init__(self) -> None:
         self.pum_service = PagesUsersToMainPagesService()
         self.lang_service = LangService()
         self.pages_service = PagesService()
-        self._setup_routes()
 
-    def _setup_routes(self) -> None:
+    def register(self, bp: Blueprint) -> None:
         routes = [
             ("/", "GET", self.pages_users_to_main_index),
             ("/fix_it", "GET", self.pages_users_to_main_fix_it),
             ("/fix_it", "POST", self.pages_users_to_main_fix_it_post),
         ]
         for rule, method, target in routes:
-            self.bp.route(rule, methods=[method])(target)
+            bp.route(rule, methods=[method])(target)
 
     def pages_users_to_main_index(self) -> str:
         """List user pages flagged for promotion to main pages."""
