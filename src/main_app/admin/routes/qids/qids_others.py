@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 
-
 from ....database.services import QidOthersService
 from .qids_model import QidsSharedModel
 
