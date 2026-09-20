@@ -60,7 +60,7 @@ ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
 def register_admin_blueprints(bp_admin: Blueprint) -> None:
     for module in ADMIN_ROUTE_MODULES:
         bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
-        module.route_cls(bp=bp, **module.extra_kwargs)
+        module.route_cls(**module.extra_kwargs).register(bp)
         bp_admin.register_blueprint(bp)
 
 
