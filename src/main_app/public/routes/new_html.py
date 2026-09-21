@@ -188,3 +188,8 @@ class NewHtmlRoutes:
             return None
 
         return revid
+
+
+__all__ = [
+    "NewHtmlRoutes",
+]
