@@ -99,8 +99,10 @@ class TestIndexView:
     def test_renders_seeded_campaigns(self, mock_client: FlaskClient, anonymous, seed_langs, seed_category):
         body = mock_client.get(f"{_TD_PREFIX}/").get_data(as_text=True)
 
+        # The campaign select lists the seeded campaign; the language select
+        # renders the autonym (templates/td/form.html uses lang.autonym).
         assert "RTT" in body
-        assert "Arabic" in body
+        assert "العربية" in body
 
     def test_unknown_code_is_flashed_not_raised(
         self,
@@ -155,7 +157,7 @@ class TestTableView:
         # templates/td/form.html posts to url_for('td.table').
         body = mock_client.get(f"{_TD_PREFIX}/table").get_data(as_text=True)
 
-        assert f'action="{_TD_PREFIX}/table"' in body
+        assert "action='/Translation_Dashboard/table'" in body
 
     def test_results_loader_failure_is_flashed(
         self,
