@@ -7,6 +7,7 @@ from __future__ import annotations
 import re
 
 from flask import Blueprint, Response, abort, flash, jsonify, render_template, request
+from flask.views import MethodView
 
 from ...config.main_settings import app_settings
 from ...services.core.cors import check_cors
@@ -19,49 +20,38 @@ from ...services.new_html_services import (
 )
 
 
-class NewHtmlRoutes:
-    def __init__(self) -> None:
+def _get_revisions_dir():
+    """Return the configured directory holding cached revisions."""
+    return app_settings.new_html.revisions_dir
 
-        self.revisions_dir = app_settings.new_html.revisions_dir
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/fix", ["GET", "POST"], self.fix),
-            ("/index", ["GET"], self.index),
-            ("/", ["GET"], check_cors(self.main)),
-            ("/check", ["GET"], check_cors(self.check)),
-            ("/open", ["GET"], check_cors(self.open_file)),
-            ("/revisions_api", ["GET"], check_cors(self.revisions_api)),
-        ]
-        for rule, methods, target in routes:
-            bp.route(rule, methods=methods)(target)
+def _get_revision_id() -> str | None:
+    """Read and validate the ``revid`` query parameter.
 
-    def index(self) -> str:
-        return render_template(
-            "new_html/revisions.html",
-        )
+    Only plain digits with an optional ``_all`` suffix are accepted so the
+    value can never escape the revisions directory.
+    """
+    revid = (request.args.get("revid") or "").strip()
 
-    def fix(self) -> str:
-        """
-        Wikitext fixing test page.
+    if not revid:
+        return None
 
-        Provides a web interface for testing the wikitext fixing functionality.
-        Users can input wikitext and a title, and see the results of applying
-        various fixes.
-        """
-        title = ""
-        wikitext = ""
+    # Security: only allow specific revision patterns
+    if not re.match(r"^\d+(_all)?$", revid):
+        return None
 
-        def render(title: str | None = "", wikitext: str | None = "") -> str:
-            return render_template(
-                "new_html/fix.html",
-                wikitext=wikitext,
-                title=title,
-            )
+    return revid
 
-        if request.method != "POST":
-            return render()
 
+class NewHtmlFixView(MethodView):
+    """Wikitext fixing test page."""
+
+    def get(self) -> str:
+        """Render the empty fixing form."""
+        return self._render()
+
+    def post(self) -> str:
+        """Run the wikitext fixer over the submitted title/text."""
         title = request.form.get("title", type=str)
         wikitext = request.form.get("text", type=str)
         lead_only = request.form.get("lead_only", type=bool, default=True)
@@ -73,7 +63,7 @@ class NewHtmlRoutes:
             flash("Please enter wikitext", "danger")
 
         if not title or not wikitext:
-            return render(title, wikitext)
+            return self._render(title, wikitext)
 
         fixer = WikitextFixerService()
 
@@ -81,14 +71,39 @@ class NewHtmlRoutes:
 
         if changed_text != wikitext:
             flash("Changes made.", "success")
-            return render(title, changed_text)
+            return self._render(title, changed_text)
 
         flash("No changes made.", "warning")
-        return render(title, wikitext)
+        return self._render(title, wikitext)
 
-    def main(self) -> Response:
-        """
-        Main API endpoint.
+    @staticmethod
+    def _render(title: str | None = "", wikitext: str | None = "") -> str:
+        """Render the fix page with the given title and wikitext."""
+        return render_template(
+            "new_html/fix.html",
+            wikitext=wikitext,
+            title=title,
+        )
+
+
+class NewHtmlIndexView(MethodView):
+    """Render the revisions dashboard page."""
+
+    def get(self) -> str:
+        """Render the revisions listing page."""
+        return render_template(
+            "new_html/revisions.html",
+        )
+
+
+class NewHtmlMainView(MethodView):
+    """Main API endpoint producing segment-ready HTML for a title."""
+
+    decorators = [check_cors]
+
+    def get(self) -> Response:
+        """Process the requested title.
+
         Example: /new_html/?title=Trifluoperazine
         """
         title = (request.args.get("title") or "").strip()
@@ -113,18 +128,24 @@ class NewHtmlRoutes:
             all_flag=all_flag,
         )
 
-    def check(self) -> Response:
-        """
-        Check whether both seg.html and html.html exist for a revision.
+
+class NewHtmlCheckView(MethodView):
+    """Check whether both seg.html and html.html exist for a revision."""
+
+    decorators = [check_cors]
+
+    def get(self) -> Response:
+        """Return ``true``/``false`` as plain text.
+
         Example: /new_html/check?revid=123456
         """
-        revid = self._get_revision_id()
+        revid = _get_revision_id()
 
         if not revid:
             response = Response("false", mimetype="text/plain")
             return response
 
-        dir_path = self.revisions_dir / revid
+        dir_path = _get_revisions_dir() / revid
 
         if not dir_path.is_dir():
             response = Response("false", mimetype="text/plain")
@@ -137,12 +158,18 @@ class NewHtmlRoutes:
         response = Response(result, mimetype="text/plain")
         return response
 
-    def open_file(self) -> Response:
-        """
-        Serve a cached file (wikitext.txt | html.html | seg.html).
+
+class NewHtmlOpenFileView(MethodView):
+    """Serve a cached file (wikitext.txt | html.html | seg.html)."""
+
+    decorators = [check_cors]
+
+    def get(self) -> Response:
+        """Stream the requested revision file.
+
         Example: /new_html/open?revid=123456&file=html.html
         """
-        revid = self._get_revision_id()
+        revid = _get_revision_id()
         file_name = (request.args.get("file") or "").strip()
 
         if not revid:
@@ -152,7 +179,7 @@ class NewHtmlRoutes:
         if file_name not in allowed_files:
             abort(400, description="Invalid file parameter")
 
-        file_path = self.revisions_dir / revid / file_name
+        file_path = _get_revisions_dir() / revid / file_name
 
         if not file_path.is_file():
             abort(404, description="File not found")
@@ -168,26 +195,30 @@ class NewHtmlRoutes:
         response = Response(content, mimetype=mimetype)
         return response
 
-    def revisions_api(self) -> Response:
-        """
-        Return list of cached revisions for the dashboard.
-        """
 
-        results = list_revisions(self.revisions_dir)
+class NewHtmlRevisionsApiView(MethodView):
+    """Return the list of cached revisions for the dashboard."""
+
+    decorators = [check_cors]
+
+    def get(self) -> Response:
+        """Return the revision listing as JSON."""
+        results = list_revisions(_get_revisions_dir())
         response = jsonify({"results": results})
         return response
 
-    def _get_revision_id(self) -> str | None:
-        revid = (request.args.get("revid") or "").strip()
 
-        if not revid:
-            return None
+class NewHtmlRoutes:
+    """Registrar for the new_html views."""
 
-        # Security: only allow specific revision patterns
-        if not re.match(r"^\d+(_all)?$", revid):
-            return None
-
-        return revid
+    def register(self, bp: Blueprint) -> None:
+        """Register the new_html endpoints on the blueprint."""
+        bp.add_url_rule("/fix", view_func=NewHtmlFixView.as_view("fix"), methods=["GET", "POST"])
+        bp.add_url_rule("/index", view_func=NewHtmlIndexView.as_view("index"), methods=["GET"])
+        bp.add_url_rule("/", view_func=NewHtmlMainView.as_view("main"), methods=["GET"])
+        bp.add_url_rule("/check", view_func=NewHtmlCheckView.as_view("check"), methods=["GET"])
+        bp.add_url_rule("/open", view_func=NewHtmlOpenFileView.as_view("open_file"), methods=["GET"])
+        bp.add_url_rule("/revisions_api", view_func=NewHtmlRevisionsApiView.as_view("revisions_api"), methods=["GET"])
 
 
 __all__ = [
