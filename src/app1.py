@@ -25,6 +25,13 @@ try:
 except Exception:
     logging.warning(f"Failed to load .env file from {str(_env_file_path)}")
 
+FIX_REFS_PATH = os.getenv("FIX_REFS_PY_PATH", "")
+try:
+    from fix_refs import fix_one_page  # type: ignore  # noqa: F401
+except ImportError:
+    if FIX_REFS_PATH and os.path.isdir(FIX_REFS_PATH):
+        sys.path.insert(0, FIX_REFS_PATH)
+
 from main_app import AppFactory  # noqa: E402
 
 app = AppFactory.create()

@@ -7,19 +7,17 @@ Mirrors: php_src/text_change.php
 
 from __future__ import annotations
 
-import os
-import sys
+import logging
 from typing import Any
 
 fix_one_page = None
+logger = logging.getLogger(__name__)
 
 try:
-    from fix_refs import fix_one_page  # type: ignore
+    from fix_refs import fix_one_page
 except ImportError:
-    fix_refs_path = os.getenv("FIX_REFS_PY_PATH", "")
-    if fix_refs_path and os.path.isdir(fix_refs_path):
-        sys.path.insert(0, fix_refs_path)
-        from fix_refs import fix_one_page  # type: ignore
+    fix_one_page = None
+    logger.warning("fix_refs not found")
 
 
 def do_changes_to_text_with_settings(
