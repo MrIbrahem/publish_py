@@ -68,17 +68,6 @@ class QidsSharedModel:
         existing_by_title = self.service.get_by_title(title)
         return is_valid(qid_id, qid, title, existing_by_qid, existing_by_title)
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.index),
-            ("/edit", "GET", self.edit),
-            ("/add", "GET", self.add),
-            ("/", "POST", self.edit_post),
-            ("/add", "POST", self.add_post),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
-
     def index(self) -> str:
         """List of rows with optional filter (all / empty / duplicate)."""
         dis = request.args.get("dis", "all")
@@ -225,6 +214,17 @@ class QidsSharedModel:
         flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
 
         return edit_redirect_to
+
+    def register(self, bp: Blueprint) -> None:
+        routes = [
+            ("/", "GET", self.index),
+            ("/edit", "GET", self.edit),
+            ("/add", "GET", self.add),
+            ("/", "POST", self.edit_post),
+            ("/add", "POST", self.add_post),
+        ]
+        for rule, method, target in routes:
+            bp.route(rule, methods=[method])(target)
 
 
 __all__ = [

@@ -10,7 +10,7 @@ from typing import Any
 from flask import Blueprint, Flask
 
 from ..extensions import csrf_exempt
-from .auth.routes import AuthRoutes
+from .auth.routes import AuthView
 from .routes import (
     ApiRoutes,
     CxTokenRoutes,
@@ -36,7 +36,7 @@ class PublicRouteModule:
 PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
     PublicRouteModule(route_cls=NewHtmlRoutes, name="new_html", url_prefix="/new_html"),
     PublicRouteModule(route_cls=MainRoutes, name="main"),
-    PublicRouteModule(route_cls=AuthRoutes, name="auth", url_prefix="/auth"),
+    PublicRouteModule(route_cls=AuthView, name="auth", url_prefix="/auth"),
     PublicRouteModule(route_cls=ApiRoutes, name="api", url_prefix="/api"),
     PublicRouteModule(route_cls=CxTokenRoutes, name="cxtoken", url_prefix="/cxtoken"),
     PublicRouteModule(route_cls=FixRefsRoutes, name="fixrefs", url_prefix="/fixrefs"),
