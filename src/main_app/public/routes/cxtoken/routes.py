@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 
 from flask import Blueprint, Response, jsonify, request
+from flask.views import MethodView
 from marshmallow import ValidationError
 
 from ....config import app_settings
@@ -61,31 +62,31 @@ def get_cxtoken_for_user_wiki(wiki: str, user_name: str):
     return cxtoken, 200
 
 
-class CxTokenRoutes:
+class CxTokenPreflightView(MethodView):
+    """Answer the CORS preflight request for the token endpoint."""
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "OPTIONS", check_cors(self.index_preflight)),
-            ("/", "GET", check_cors(self.index)),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
+    decorators = [check_cors]
 
-    def index_preflight(self) -> Response:
+    def options(self) -> Response:
         """
         Handle preflight requests.
 
         Returns:
             Preflight response
         """
-
         response = Response("", status=200)
         response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
         response.headers["Access-Control-Max-Age"] = "7200"
         return response
 
-    def index(self) -> Response:
+
+class CxTokenIndexView(MethodView):
+    """Issue a Content Translation CSRF token for a logged-in user."""
+
+    decorators = [check_cors]
+
+    def get(self) -> Response:
         """Handle cxtoken requests.
 
         Query Parameters:
@@ -122,6 +123,16 @@ class CxTokenRoutes:
         response.status_code = status_code
 
         return response
+
+
+class CxTokenRoutes:
+    """Registrar for the Content Translation token views."""
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the preflight and token endpoints on the blueprint."""
+        bp.add_url_rule("/", view_func=CxTokenPreflightView.as_view("index_preflight"), methods=["OPTIONS"])
+        bp.add_url_rule("/", view_func=CxTokenIndexView.as_view("index"))
 
 
 __all__ = [

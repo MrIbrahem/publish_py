@@ -13,6 +13,7 @@ import logging
 from typing import Any
 
 from flask import Blueprint, Response, jsonify, render_template, request
+from flask.views import MethodView
 
 from ...services.segments import process_html
 
@@ -53,10 +54,10 @@ def validate_request(data: dict[str, Any] | None) -> tuple[bool, str]:
         >>> validate_request({})
         (False, 'Missing required field: html')
 
-        >>> validate_request({'html': '   '})
+        >>> validate_request({"html": "   "})
         (False, 'HTML content is empty or contains only whitespace')
 
-        >>> validate_request({'html': '<p>Hello</p>'})
+        >>> validate_request({"html": "<p>Hello</p>"})
         (True, '')
     """
     if data is None:
@@ -182,23 +183,32 @@ def process_text() -> tuple[Response, int]:
         return create_error_response("An internal error occurred while processing the HTML", 500)
 
 
-class HtmltoSegmentsRoutes:
+class HtmltoSegmentsProcessView(MethodView):
+    """Segment MediaWiki HTML through the Content Translation pipeline."""
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "POST", self.process_text),
-            ("/", "GET", self.index),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
-
-    def process_text(self):
+    def post(self) -> tuple[Response, int]:
+        """Accept Parsoid HTML and return segmented HTML with IDs/metadata."""
         return process_text()
 
-    def index(self) -> str:
+
+class HtmltoSegmentsIndexView(MethodView):
+    """Render the HTML-to-segments landing page."""
+
+    def get(self) -> str:
+        """Render the input form."""
         return render_template(
             "html_to_segments/index.html",
         )
+
+
+class HtmltoSegmentsRoutes:
+    """Registrar for the HTML-to-segments views."""
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the process and index endpoints on the blueprint."""
+        bp.add_url_rule("/", view_func=HtmltoSegmentsProcessView.as_view("process_text"), methods=["POST"])
+        bp.add_url_rule("/", view_func=HtmltoSegmentsIndexView.as_view("index"), methods=["GET"])
 
 
 __all__ = [

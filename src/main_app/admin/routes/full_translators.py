@@ -13,6 +13,7 @@ from flask import (
     url_for,
 )
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ...database.services import FullTranslatorService
 from ..decorators import admin_required
@@ -20,23 +21,42 @@ from ..decorators import admin_required
 logger = logging.getLogger(__name__)
 
 
-class FullTranslators:
+class BaseFullTranslatorsView(MethodView):
+    """Base view for the full-translator management pages.
+
+    Holds the service shared by every full-translator page and exposes
+    the activate/deactivate helper used by the toggle endpoints. All
+    full-translator pages require an administrator.
+    """
+
+    decorators = [admin_required]
+
     def __init__(self) -> None:
         self.service = FullTranslatorService()
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.dashboard),
-            ("/add", "POST", self.add),
-            ("/<int:translator_id>/delete", "POST", self.delete),
-            ("/<int:record_id>/activate", "POST", self.activate),
-            ("/<int:record_id>/deactivate", "POST", self.deactivate),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(admin_required(target))
+    def _set_record_active_status(self, record_id: int, is_active: bool) -> ResponseReturnValue:
+        """Shared helper to update record active status."""
+        action = "activate" if is_active else "deactivate"
+        try:
+            record = self.service.update_full_translator(record_id, is_active=is_active)
+        except LookupError as exc:
+            logger.exception(f"Unable to {action} coordinator.")
+            flash(str(exc), "warning")
+        except Exception:  # pragma: no cover - defensive guard
+            logger.exception(f"Unable to {action} record.")
+            flash(f"Unable to {action} record. Please try again.", "danger")
+        else:
+            state = "activated" if record.is_active else "deactivated"
+            flash(f"Record '{record.user}' {state}.", "success")
 
-    def dashboard(self):
-        """Render the full translator management dashboard."""
+        return redirect(url_for("adminpanel.full_translators.dashboard"))
+
+
+class FullTranslatorsDashboardView(BaseFullTranslatorsView):
+    """Render the full translator management dashboard."""
+
+    def get(self) -> str:
+        """Render the translators table with active/inactive counts."""
         translators = self.service.list_full_translators()
         total = len(translators)
         is_active = sum(1 for tr in translators if tr.is_active)
@@ -49,8 +69,12 @@ class FullTranslators:
             inactive_translators=total - is_active,
         )
 
-    def add(self) -> ResponseReturnValue:
-        """Create a new full translator from the submitted username."""
+
+class FullTranslatorsAddView(BaseFullTranslatorsView):
+    """Create a new full translator from the submitted username."""
+
+    def post(self) -> ResponseReturnValue:
+        """Validate the username and add the full translator."""
 
         username = request.form.get("username", "").strip()
         if not username:
@@ -70,8 +94,12 @@ class FullTranslators:
 
         return redirect(url_for("adminpanel.full_translators.dashboard"))
 
-    def delete(self, translator_id: int) -> ResponseReturnValue:
-        """Remove a full translator entirely."""
+
+class FullTranslatorsDeleteView(BaseFullTranslatorsView):
+    """Remove a full translator entirely."""
+
+    def post(self, translator_id: int) -> ResponseReturnValue:
+        """Delete the translator identified by ``translator_id``."""
 
         try:
             record = self.service.delete(translator_id)
@@ -88,28 +116,48 @@ class FullTranslators:
 
         return redirect(url_for("adminpanel.full_translators.dashboard"))
 
-    def activate(self, record_id: int) -> ResponseReturnValue:
+
+class FullTranslatorsActivateView(BaseFullTranslatorsView):
+    """Activate a full translator record."""
+
+    def post(self, record_id: int) -> ResponseReturnValue:
+        """Mark the record identified by ``record_id`` as active."""
         return self._set_record_active_status(record_id, True)
 
-    def deactivate(self, record_id: int) -> ResponseReturnValue:
+
+class FullTranslatorsDeactivateView(BaseFullTranslatorsView):
+    """Deactivate a full translator record."""
+
+    def post(self, record_id: int) -> ResponseReturnValue:
+        """Mark the record identified by ``record_id`` as inactive."""
         return self._set_record_active_status(record_id, False)
 
-    def _set_record_active_status(self, record_id: int, is_active: bool) -> ResponseReturnValue:
-        """Shared helper to update record active status."""
-        action = "activate" if is_active else "deactivate"
-        try:
-            record = self.service.update_full_translator(record_id, is_active=is_active)
-        except LookupError as exc:
-            logger.exception(f"Unable to {action} coordinator.")
-            flash(str(exc), "warning")
-        except Exception:  # pragma: no cover - defensive guard
-            logger.exception(f"Unable to {action} record.")
-            flash(f"Unable to {action} record. Please try again.", "danger")
-        else:
-            state = "activated" if record.is_active else "deactivated"
-            flash(f"Record '{record.user}' {state}.", "success")
 
-        return redirect(url_for("adminpanel.full_translators.dashboard"))
+class FullTranslators:
+    """Registrar wiring the full-translator MethodViews onto a blueprint.
+
+    Endpoint names (``dashboard``, ``add``, ``delete``, ``activate``,
+    ``deactivate``) are preserved from the legacy function-based routes
+    so existing ``url_for('adminpanel.full_translators.add')`` calls keep
+    working.
+    """
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the dashboard and the translator write endpoints."""
+        bp.add_url_rule("/", view_func=FullTranslatorsDashboardView.as_view("dashboard"), methods=["GET"])
+        bp.add_url_rule("/add", view_func=FullTranslatorsAddView.as_view("add"), methods=["POST"])
+        bp.add_url_rule(
+            "/<int:translator_id>/delete", view_func=FullTranslatorsDeleteView.as_view("delete"), methods=["POST"]
+        )
+        bp.add_url_rule(
+            "/<int:record_id>/activate", view_func=FullTranslatorsActivateView.as_view("activate"), methods=["POST"]
+        )
+        bp.add_url_rule(
+            "/<int:record_id>/deactivate",
+            view_func=FullTranslatorsDeactivateView.as_view("deactivate"),
+            methods=["POST"],
+        )
 
 
 __all__ = [

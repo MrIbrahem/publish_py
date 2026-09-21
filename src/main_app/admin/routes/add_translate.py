@@ -94,6 +94,7 @@ class AddTranslateView(MethodView):
         """Register view routes directly on the blueprint."""
         bp.add_url_rule("/", view_func=cls.as_view("add_translate"))
 
+
 __all__ = [
     "AddTranslateView",
 ]

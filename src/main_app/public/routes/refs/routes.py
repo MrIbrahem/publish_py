@@ -15,6 +15,7 @@ from flask import (
     render_template,
     request,
 )
+from flask.views import MethodView
 
 from ....public.auth import oauth_required
 from ....services.clients.text_api import get_wikitext
@@ -86,26 +87,23 @@ def _process(data) -> str:
     )
 
 
-class FixRefsRoutes:
+class FixRefsIndexView(MethodView):
+    """Render the Fix References landing page."""
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.index),
-            ("/test", "GET", self.test),
-            ("/", "POST", oauth_required(self.process_new)),
-            ("/process", "GET", oauth_required(self.process)),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
-
-    def index(self) -> str:
+    def get(self) -> str:
+        """Render the empty fix-refs form."""
         return render_template(
             "fixrefs/index.html",
             result=None,
             form={},
         )
 
-    def test(self) -> str:
+
+class FixRefsTestView(MethodView):
+    """Render the form prefilled with a random test case."""
+
+    def get(self) -> str:
+        """Pick one of the bundled test fixtures and render the form."""
         tests_data = [
             {
                 "source_title": "Decitabine/cedazuridine",
@@ -136,15 +134,46 @@ class FixRefsRoutes:
             },
         )
 
-    def process_new(self) -> str:
+
+class FixRefsProcessNewView(MethodView):
+    """Process text submitted through the form (POST body)."""
+
+    decorators = [oauth_required]
+
+    def post(self) -> str:
+        """Run the fix pipeline on the submitted form data."""
         data = request.form.to_dict()
         logger.info("Processing text with settings: %s", data)
         return _process(data)
 
-    def process(self) -> str:
+
+class FixRefsProcessView(MethodView):
+    """Process text supplied through query parameters."""
+
+    decorators = [oauth_required]
+
+    def get(self) -> str:
+        """Run the fix pipeline on the query-string data."""
         data = request.args
         logger.info("Processing text with settings: %s", data)
         return _process(data)
+
+
+class FixRefsRoutes:
+    """Registrar for the Fix References views."""
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the fix-refs endpoints on the blueprint.
+
+        Endpoint names mirror the legacy function names so existing
+        ``url_for('fixrefs.index')`` / ``url_for('fixrefs.process_new')``
+        calls keep resolving.
+        """
+        bp.add_url_rule("/", view_func=FixRefsIndexView.as_view("index"))
+        bp.add_url_rule("/test", view_func=FixRefsTestView.as_view("test"))
+        bp.add_url_rule("/", view_func=FixRefsProcessNewView.as_view("process_new"), methods=["POST"])
+        bp.add_url_rule("/process", view_func=FixRefsProcessView.as_view("process"))
 
 
 __all__ = [
