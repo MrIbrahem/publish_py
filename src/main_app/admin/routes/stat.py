@@ -10,25 +10,21 @@ from __future__ import annotations
 import logging
 
 from flask import Blueprint, render_template
+from flask.views import MethodView
 
 from ...database.services import PagesService, UserPagesService
 
 logger = logging.getLogger(__name__)
 
 
-class StaticsRoutes:
+class StaticsRoutes(MethodView):
+    """Statistics dashboard view (stub)."""
+
     def __init__(self) -> None:
         self.user_pages_service = UserPagesService()
         self.pages_service = PagesService()
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.stat_index),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
-
-    def stat_index(self) -> str:
+    def get(self) -> str:
         """Render a minimal statistics overview."""
         try:
             pages_count = self.pages_service.count_translated()
@@ -47,6 +43,11 @@ class StaticsRoutes:
             pages_count=pages_count,
             user_pages_count=user_pages_count,
         )
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the statistics dashboard route on the blueprint."""
+        bp.add_url_rule("/", view_func=cls.as_view("stat_index"))
 
 
 __all__ = [
