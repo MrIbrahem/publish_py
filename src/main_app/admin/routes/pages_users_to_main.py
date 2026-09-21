@@ -168,6 +168,33 @@ class PagesUsersToMainFixItPostView(BasePagesUsersMainView):
         return redirect_to
 
 
+class PagesUsersMainRoutes:
+    """Registrar wiring the pages-users-to-main MethodViews onto a blueprint.
+
+    Endpoint names (``pages_users_to_main_index``, ``pages_users_to_main_fix_it``,
+    ``pages_users_to_main_fix_it_post``) are preserved from the legacy
+    function-based routes so existing
+    ``url_for('adminpanel.pages_users_to_main.pages_users_to_main_fix_it_post')``
+    calls keep working.
+    """
+
+    def register(self, bp: Blueprint) -> None:
+        """Register the index page and the fix_it GET/POST endpoints."""
+        bp.add_url_rule(
+            "/", view_func=PagesUsersToMainIndexView.as_view("pages_users_to_main_index"), methods=["GET"]
+        )
+        bp.add_url_rule(
+            "/fix_it",
+            view_func=PagesUsersToMainFixItView.as_view("pages_users_to_main_fix_it"),
+            methods=["GET"],
+        )
+        bp.add_url_rule(
+            "/fix_it",
+            view_func=PagesUsersToMainFixItPostView.as_view("pages_users_to_main_fix_it_post"),
+            methods=["POST"],
+        )
+
+
 __all__ = [
     "PagesUsersMainRoutes",
 ]

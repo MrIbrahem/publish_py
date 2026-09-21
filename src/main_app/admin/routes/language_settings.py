@@ -13,6 +13,7 @@ from flask import (
     url_for,
 )
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ...database.services import LangService, LanguageSettingService
 from ..decorators import admin_required
@@ -20,24 +21,25 @@ from ..decorators import admin_required
 logger = logging.getLogger(__name__)
 
 
-class LanguageSettings:
+class BaseLanguageSettingsView(MethodView):
+    """Base view for the language-settings pages.
+
+    Holds the services shared by every language-settings page. All
+    language-settings pages require an administrator.
+    """
+
+    decorators = [admin_required]
+
     def __init__(self) -> None:
         self.service = LanguageSettingService()
         self.lang_service = LangService()
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.dashboard),
-            ("/add", "POST", self.add),
-            ("/<int:setting_id>/update", "POST", self.update),
-            ("/<int:setting_id>/delete", "POST", self.delete),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(admin_required(target))
 
-    def dashboard(self):
-        """Render the language settings management dashboard."""
+class LanguageSettingsDashboardView(BaseLanguageSettingsView):
+    """Render the language settings management dashboard."""
 
+    def get(self) -> str:
+        """Render the settings table plus the language dropdown."""
         settings = self.service.list_language_settings()
         # Also get all available languages for the "Add" dropdown
         languages = self.lang_service.list_langs()
@@ -48,8 +50,12 @@ class LanguageSettings:
             languages=languages,
         )
 
-    def add(self) -> ResponseReturnValue:
-        """Create a new language setting record."""
+
+class LanguageSettingsAddView(BaseLanguageSettingsView):
+    """Create a new language setting record."""
+
+    def post(self) -> ResponseReturnValue:
+        """Validate the language code and create the setting."""
 
         lang_code = request.form.get("lang_code", "").strip()
         if not lang_code:
@@ -78,8 +84,12 @@ class LanguageSettings:
 
         return redirect(url_for("adminpanel.language_settings.dashboard"))
 
-    def update(self, setting_id: int) -> ResponseReturnValue:
-        """Update an existing language setting record."""
+
+class LanguageSettingsUpdateView(BaseLanguageSettingsView):
+    """Update an existing language setting record."""
+
+    def post(self, setting_id: int) -> ResponseReturnValue:
+        """Apply the submitted flags to the setting ``setting_id``."""
         # Using individual fields for update
         kwargs = {
             "move_dots": 1 if request.form.get("move_dots") == "1" else 0,
@@ -100,8 +110,12 @@ class LanguageSettings:
 
         return redirect(url_for("adminpanel.language_settings.dashboard"))
 
-    def delete(self, setting_id: int) -> ResponseReturnValue:
-        """Remove a language setting record entirely."""
+
+class LanguageSettingsDeleteView(BaseLanguageSettingsView):
+    """Remove a language setting record entirely."""
+
+    def post(self, setting_id: int) -> ResponseReturnValue:
+        """Delete the setting identified by ``setting_id``."""
 
         try:
             record = self.service.delete(setting_id)
@@ -117,6 +131,27 @@ class LanguageSettings:
             flash(f"Language setting for '{setting_id}' removed.", "success")
 
         return redirect(url_for("adminpanel.language_settings.dashboard"))
+
+
+class LanguageSettings:
+    """Registrar wiring the language-settings MethodViews onto a blueprint.
+
+    Endpoint names (``dashboard``, ``add``, ``update``, ``delete``) are
+    preserved from the legacy function-based routes so existing
+    ``url_for('adminpanel.language_settings.add')`` calls keep working.
+    """
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the dashboard and the setting write endpoints."""
+        bp.add_url_rule("/", view_func=LanguageSettingsDashboardView.as_view("dashboard"), methods=["GET"])
+        bp.add_url_rule("/add", view_func=LanguageSettingsAddView.as_view("add"), methods=["POST"])
+        bp.add_url_rule(
+            "/<int:setting_id>/update", view_func=LanguageSettingsUpdateView.as_view("update"), methods=["POST"]
+        )
+        bp.add_url_rule(
+            "/<int:setting_id>/delete", view_func=LanguageSettingsDeleteView.as_view("delete"), methods=["POST"]
+        )
 
 
 __all__ = [

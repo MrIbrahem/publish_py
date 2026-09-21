@@ -13,6 +13,7 @@ from flask import (
     url_for,
 )
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ...database.models import ProjectRecord, UserRecord
 from ...database.services import LeaderboardService, ProjectService, UsersService
@@ -32,25 +33,26 @@ def filter_users(users: list[UserRecord], project_name: str) -> list[UserRecord]
     return users
 
 
-class UsersEmails:
+class BaseUsersEmailsView(MethodView):
+    """Base view for the user-emails management pages.
+
+    Holds the services shared by every user-emails page. All user-emails
+    pages require an administrator.
+    """
+
+    decorators = [admin_required]
+
     def __init__(self) -> None:
         self.leaderboard_service = LeaderboardService()
         self.projects_service = ProjectService()
         self.user_service = UsersService()
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.dashboard),
-            ("/add", "POST", self.add),
-            ("/<int:record_id>/delete", "POST", self.delete),
-            ("/<int:record_id>/update", "POST", self.update),
-            ("/<int:record_id>/edit", "GET", self.edit),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(admin_required(target))
 
-    def dashboard(self):
-        """Render the users not in process management dashboard."""
+class UsersEmailsDashboardView(BaseUsersEmailsView):
+    """Render the users not in process management dashboard."""
+
+    def get(self) -> str:
+        """Render the users table filtered by the selected project."""
         users: list[UserRecord] = self.user_service.list_users()
 
         projects: list[ProjectRecord] = self.projects_service.list_projects()
@@ -81,14 +83,23 @@ class UsersEmails:
             total_users=total,
         )
 
-    def edit(self, record_id: int) -> ResponseReturnValue:
+
+class UsersEmailsEditView(BaseUsersEmailsView):
+    """Render the edit popup for a single user."""
+
+    def get(self, record_id: int) -> ResponseReturnValue:
+        """Render the edit form for the user identified by ``record_id``."""
         user = self.user_service.get_user(record_id)
         if not user:
             flash(f"User with ID {record_id} not found.", "danger")
             return redirect(url_for("adminpanel.users_emails.dashboard"))
         return render_template("admins/users_emails/edit.html", row=user)
 
-    def add(self) -> ResponseReturnValue:
+
+class UsersEmailsAddView(BaseUsersEmailsView):
+    """Create a new user not in process record from the submitted username."""
+
+    def post(self) -> ResponseReturnValue:
         """Create a new user not in process record from the submitted username."""
 
         username = request.form.get("username", "").strip()
@@ -118,7 +129,10 @@ class UsersEmails:
 
         return redirect(url_for("adminpanel.users_emails.dashboard"))
 
-    def update(self, record_id: int) -> ResponseReturnValue:
+class UsersEmailsUpdateView(BaseUsersEmailsView):
+    """Update an existing user record."""
+
+    def post(self, record_id: int) -> ResponseReturnValue:
         """update user data"""
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip()
@@ -148,8 +162,11 @@ class UsersEmails:
 
         return redirect(url_for("adminpanel.users_emails.dashboard"))
 
-    def delete(self, record_id: int) -> ResponseReturnValue:
-        """Remove a user not in process record entirely."""
+class UsersEmailsDeleteView(BaseUsersEmailsView):
+    """Remove a user not in process record entirely."""
+
+    def post(self, record_id: int) -> ResponseReturnValue:
+        """Delete the user identified by ``record_id``."""
 
         try:
             record = self.user_service.delete(record_id)
@@ -165,6 +182,29 @@ class UsersEmails:
             flash(f"User '{record_id}' deleted", "success")
 
         return redirect(url_for("adminpanel.users_emails.dashboard"))
+
+
+class UsersEmails:
+    """Registrar wiring the user-emails MethodViews onto a blueprint.
+
+    Endpoint names (``dashboard``, ``add``, ``delete``, ``update``,
+    ``edit``) are preserved from the legacy function-based routes so
+    existing ``url_for('adminpanel.users_emails.edit')`` calls keep
+    working.
+    """
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the dashboard and the user write endpoints."""
+        bp.add_url_rule("/", view_func=UsersEmailsDashboardView.as_view("dashboard"), methods=["GET"])
+        bp.add_url_rule("/add", view_func=UsersEmailsAddView.as_view("add"), methods=["POST"])
+        bp.add_url_rule(
+            "/<int:record_id>/delete", view_func=UsersEmailsDeleteView.as_view("delete"), methods=["POST"]
+        )
+        bp.add_url_rule(
+            "/<int:record_id>/update", view_func=UsersEmailsUpdateView.as_view("update"), methods=["POST"]
+        )
+        bp.add_url_rule("/<int:record_id>/edit", view_func=UsersEmailsEditView.as_view("edit"), methods=["GET"])
 
 
 __all__ = [
