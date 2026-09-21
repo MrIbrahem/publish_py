@@ -264,12 +264,15 @@ class TestSettingsIntegration:
         seed_category,
     ):
         service = SettingsService()
-        service.create_setting("allow_type_of_translate", "Allow type of translate", value_type="boolean", value="0")
+        # Booleans are stored as the lowercase literals 'true'/'false'.
+        service.create_setting(
+            "allow_type_of_translate", "Allow type of translate", value_type="boolean", value="false"
+        )
 
         body = mock_client.get(f"{_TD_PREFIX}/table").get_data(as_text=True)
 
         # {% else %} branch: hidden input pins tra_type to "lead".
-        assert "name='tra_type' value='lead'" in body
+        assert 'name="tra_type" value="lead"' in body
         assert "id='customRadio2'" not in body
 
     def test_enabled_shows_type_widget(
@@ -280,9 +283,10 @@ class TestSettingsIntegration:
         seed_category,
     ):
         service = SettingsService()
-        service.create_setting("allow_type_of_translate", "Allow type of translate", value_type="boolean", value="1")
+        # Booleans are stored as the lowercase literals 'true'/'false'.
+        service.create_setting("allow_type_of_translate", "Allow type of translate", value_type="boolean", value="true")
 
         body = mock_client.get(f"{_TD_PREFIX}/table").get_data(as_text=True)
 
         # {% if settings.allow_type_of_translate %} branch: radio group rendered.
-        assert 'id="customRadio2"' in body
+        assert "id='customRadio2'" in body

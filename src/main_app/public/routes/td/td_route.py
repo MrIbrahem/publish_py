@@ -181,17 +181,17 @@ class TDIndexView(BaseTDView):
     def get(self) -> str:
         """Render the dashboard with the filter form and no results card."""
         langs, campaigns = self._load_langs_and_campaigns()
-
         parsed = self._parse_request_args(campaigns)
 
         # Identity / coordinator / full-translator flags — mirrors src/index.php.
         user = get_current_user()
         full_tr_user = bool(user and self.full_service.is_full_translator(user.username))
 
+        form_data = self._build_form_data(langs, campaigns, parsed, full_tr_user)
         return render_template(
             "td/index.html",
             settings=parsed["settings"],
-            form_data=self._build_form_data(langs, campaigns, parsed, full_tr_user),
+            form_data=form_data,
         )
 
 
@@ -216,10 +216,11 @@ class TDTableView(BaseTDView):
         if results_bundle and results_bundle.summary_data:
             results_bundle.summary_data["code_lang_name"] = parsed["code_lang_name"]
 
+        form_data = self._build_form_data(langs, campaigns, parsed, full_tr_user)
         return render_template(
             "td/index.html",
             settings=parsed["settings"],
-            form_data=self._build_form_data(langs, campaigns, parsed, full_tr_user),
+            form_data=form_data,
             results=results_bundle,
         )
 
