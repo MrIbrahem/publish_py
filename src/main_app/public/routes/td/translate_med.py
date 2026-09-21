@@ -17,8 +17,8 @@ from flask import (
     request,
     url_for,
 )
-from flask.views import MethodView
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ....database.services import (
     CategoryService,

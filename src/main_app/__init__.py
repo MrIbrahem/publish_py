@@ -18,7 +18,7 @@ from .extensions import csrf_init_app
 from .extensions import db as _db
 from .extensions import migrate
 from .logger_config import configure_logging
-from .public import RouteRegistrar
+from .public import PublicRouteRegister
 from .public.utils import context_data
 from .services.core import CookieHeaderClient, filters
 
@@ -99,7 +99,7 @@ class AppFactory:
 
     @staticmethod
     def _register_routes(app: Flask) -> None:
-        RouteRegistrar.register(app)
+        PublicRouteRegister.register(app)
         add_admin_dashboard(app, _db)
         register_bp_admin_blueprints(app)
 

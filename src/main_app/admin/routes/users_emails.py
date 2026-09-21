@@ -129,6 +129,7 @@ class UsersEmailsAddView(BaseUsersEmailsView):
 
         return redirect(url_for("adminpanel.users_emails.dashboard"))
 
+
 class UsersEmailsUpdateView(BaseUsersEmailsView):
     """Update an existing user record."""
 
@@ -161,6 +162,7 @@ class UsersEmailsUpdateView(BaseUsersEmailsView):
             flash(f"User '{record.username}' updated", "success")
 
         return redirect(url_for("adminpanel.users_emails.dashboard"))
+
 
 class UsersEmailsDeleteView(BaseUsersEmailsView):
     """Remove a user not in process record entirely."""
@@ -198,12 +200,8 @@ class UsersEmails:
         """Register the dashboard and the user write endpoints."""
         bp.add_url_rule("/", view_func=UsersEmailsDashboardView.as_view("dashboard"), methods=["GET"])
         bp.add_url_rule("/add", view_func=UsersEmailsAddView.as_view("add"), methods=["POST"])
-        bp.add_url_rule(
-            "/<int:record_id>/delete", view_func=UsersEmailsDeleteView.as_view("delete"), methods=["POST"]
-        )
-        bp.add_url_rule(
-            "/<int:record_id>/update", view_func=UsersEmailsUpdateView.as_view("update"), methods=["POST"]
-        )
+        bp.add_url_rule("/<int:record_id>/delete", view_func=UsersEmailsDeleteView.as_view("delete"), methods=["POST"])
+        bp.add_url_rule("/<int:record_id>/update", view_func=UsersEmailsUpdateView.as_view("update"), methods=["POST"])
         bp.add_url_rule("/<int:record_id>/edit", view_func=UsersEmailsEditView.as_view("edit"), methods=["GET"])
 
 

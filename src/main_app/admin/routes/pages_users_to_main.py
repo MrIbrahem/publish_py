@@ -180,9 +180,7 @@ class PagesUsersMainRoutes:
 
     def register(self, bp: Blueprint) -> None:
         """Register the index page and the fix_it GET/POST endpoints."""
-        bp.add_url_rule(
-            "/", view_func=PagesUsersToMainIndexView.as_view("pages_users_to_main_index"), methods=["GET"]
-        )
+        bp.add_url_rule("/", view_func=PagesUsersToMainIndexView.as_view("pages_users_to_main_index"), methods=["GET"])
         bp.add_url_rule(
             "/fix_it",
             view_func=PagesUsersToMainFixItView.as_view("pages_users_to_main_fix_it"),

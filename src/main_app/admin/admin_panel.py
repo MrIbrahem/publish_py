@@ -23,7 +23,6 @@ from .routes.last import last_translations_dashboard
 logger = logging.getLogger(__name__)
 
 
-
 class BaseAdminPanelView(MethodView):
     """Base view for the admin panel pages.
 
@@ -143,9 +142,7 @@ class AdminPanel:
             methods=["GET"],
         )
         bp.add_url_rule("/reports", view_func=AdminPanelReportsView.as_view("reports"), methods=["GET"])
-        bp.add_url_rule(
-            "/process", view_func=AdminPanelInProcessView.as_view("in_process_dashboard"), methods=["GET"]
-        )
+        bp.add_url_rule("/process", view_func=AdminPanelInProcessView.as_view("in_process_dashboard"), methods=["GET"])
         bp.add_url_rule(
             "/process_total",
             view_func=AdminPanelInProcessTotalView.as_view("in_process_total_dashboard"),

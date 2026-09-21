@@ -128,6 +128,7 @@ class CampaignsAddRecordView(BaseCampaignsView):
 
         return redirect(url_for("adminpanel.campaigns.dashboard"))
 
+
 class CampaignsUpdateView(BaseCampaignsView):
     """Apply the bulk category edits submitted from the dashboard."""
 

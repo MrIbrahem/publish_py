@@ -50,7 +50,7 @@ PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
 ]
 
 
-class RouteRegistrar:
+class PublicRouteRegister:
     """Registers all route blueprints on a Flask app."""
 
     CSRF_EXEMPT_BPS = [
@@ -67,10 +67,10 @@ class RouteRegistrar:
             route_instance.register(bp=bp, **module.extra_kwargs)
 
             app.register_blueprint(bp)
-            if module.name in RouteRegistrar.CSRF_EXEMPT_BPS:
+            if module.name in PublicRouteRegister.CSRF_EXEMPT_BPS:
                 csrf_exempt(app, bp)
 
 
 __all__ = [
-    "RouteRegistrar",
+    "PublicRouteRegister",
 ]

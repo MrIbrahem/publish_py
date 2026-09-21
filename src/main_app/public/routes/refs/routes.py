@@ -15,7 +15,6 @@ from flask import (
     render_template,
     request,
 )
-from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ....public.auth import oauth_required
