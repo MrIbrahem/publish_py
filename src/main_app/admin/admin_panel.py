@@ -129,7 +129,6 @@ class AdminPanel:
         existing ``url_for('adminpanel.edit_done')`` calls keep resolving.
         """
         bp.app_context_processor(cls.inject_sidebar)
-        # TODO: put a before_request guard on the admin blueprint. use admin_required decorators
 
         bp.add_url_rule("/", view_func=AdminPanelIndexView.as_view("index"), methods=["GET"])
         bp.add_url_rule("/last", view_func=AdminPanelLastDashboardView.as_view("last_dashboard"), methods=["GET"])
