@@ -1,21 +1,14 @@
-""" """
+"""Admin routes for email message operations using Flask MethodViews."""
 
 from __future__ import annotations
 
 import logging
 from typing import Any
 
-from flask import (
-    Blueprint,
-    render_template,
-    request,
-)
-
-from ...database.services import PagesService, UserPagesService, UsersService, ViewsNewService
-from ...public.routes.td.results_api import results_api_result
-from ...services.auth.utils import get_current_user
-from ...services.utils.wiki_links import tr_link_medwiki
-from ..decorators import admin_required
+from ....database.services import PagesService, UserPagesService, UsersService, ViewsNewService
+from ....public.routes.td.results_api import results_api_result
+from ....services.auth.utils import get_current_user
+from ....services.utils.wiki_links import tr_link_medwiki
 
 logger = logging.getLogger(__name__)
 
@@ -47,11 +40,11 @@ def get_user_email(username: str) -> str | None:
     return user_email
 
 
-def get_currect_user_email() -> str | None:
-    currect_user = get_current_user()
+def get_current_user_email() -> str | None:
+    current_user = get_current_user()
 
-    if currect_user:
-        return get_user_email(currect_user.username)
+    if current_user:
+        return get_user_email(current_user.username)
 
     return None
 
@@ -116,84 +109,12 @@ def create_email_msg(page_data: dict[str, Any], sugust: str | None) -> str:
     return msg
 
 
-def msg_dashboard(
-    last_table: str,
-    id: int,
-    user: str | None = None,
-) -> str:
-    # http://127.0.0.1:5000/adminpanel/email_msg?user=Mr.+Ibrahem&id=10653&last_table=pages
-
-    logger.info(f"user={user}, id={id}, last_table={last_table}")
-    # Fetch data based on table type
-
-    page_data = get_page_data(last_table, id)
-    username = page_data.get("user", "") or user
-
-    user_email = get_user_email(str(username))
-    currect_user_email = get_currect_user_email()
-
-    sugust = make_sugustion(page_data.get("lang"), page_data.get("title"))
-
-    # Create email message
-    msg = create_email_msg(page_data, sugust)
-
-    return render_template(
-        "admins/email_msg/index.html",
-        username=username,
-        user_email=user_email,
-        cc_me_email=currect_user_email,
-        html_mag=msg,
-    )
-
-
-class EmailMsgRoutes:
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/dashboard/<string:last_table>/<int:id>", "GET", self.dashboard),
-            ("/send", "POST", self.msg_post),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(admin_required(target))
-
-        bp.add_url_rule(
-            "/dashboard/<string:last_table>/<int:id>/<string:user>",
-            endpoint="dashboard_with_user",
-            view_func=admin_required(self.dashboard),
-            methods=["GET"],
-        )
-
-    def dashboard(
-        self,
-        last_table: str,
-        id: int,
-        user: str | None = None,
-    ) -> str:
-        return msg_dashboard(last_table, id, user=user)
-
-    def msg_post(self) -> str:
-        data = request.form
-        msg = data.get("msg", "")
-        email_to = data.get("email_to", "")
-        email_from = data.get("email_from", "mdwiki.org@gmail.com")
-        msg_title = data.get("msg_title", "Wiki Project Med Translation Dashboard")
-        ccme = data.get("ccme", "0")
-        cc_to = data.get("cc_to", "") if str(ccme) == "1" else None
-
-        send_msg(
-            msg=msg,
-            email_to=email_to,
-            email_from=email_from,
-            msg_title=msg_title,
-            cc_to=cc_to,
-        )
-        return render_template(
-            "admins/email_msg/index.html",
-            user_email=None,
-            cc_me_email=None,
-            msg=None,
-        )
-
-
 __all__ = [
-    "EmailMsgRoutes",
+    "send_msg",
+    "make_sugustion",
+    "get_user_email",
+    "get_current_user_email",
+    "get_page_data",
+    "create_blank_link",
+    "create_email_msg",
 ]

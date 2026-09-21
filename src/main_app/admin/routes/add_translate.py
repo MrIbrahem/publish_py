@@ -9,12 +9,15 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ...database.services import CategoryService, PagesService
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
 
 class AddTranslateView(MethodView):
     """View for displaying and processing the translation addition dashboard."""
+
+    decorators = [admin_required]
 
     def __init__(self) -> None:
         self.category_service = CategoryService()
@@ -91,18 +94,6 @@ class AddTranslateView(MethodView):
         """Register view routes directly on the blueprint."""
         bp.add_url_rule("/", view_func=cls.as_view("add_translate"))
 
-
-class AddTranslateRoutes:
-    """Registrar class for AddTranslate views."""
-
-    def register(self, bp: Blueprint) -> None:
-        bp.add_url_rule(
-            "/",
-            view_func=AddTranslateView.as_view("add_translate"),
-        )
-
-
 __all__ = [
     "AddTranslateView",
-    "AddTranslateRoutes",
 ]

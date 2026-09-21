@@ -9,12 +9,14 @@ from __future__ import annotations
 import logging
 
 from ....database.services import QidService
-from .qids_model import QidsSharedModel
+from .qids_model import QidsSharedModelView
 
 logger = logging.getLogger(__name__)
 
 
-class QidsRoutes(QidsSharedModel):
+class QidsView(QidsSharedModelView):
+    """Registrar for standard QIDs MethodView routes."""
+
     def __init__(self) -> None:
         super().__init__(
             endpoint="qids",
@@ -24,5 +26,5 @@ class QidsRoutes(QidsSharedModel):
 
 
 __all__ = [
-    "QidsRoutes",
+    "QidsView",
 ]

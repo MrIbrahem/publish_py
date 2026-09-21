@@ -10,7 +10,7 @@ from typing import Any
 from flask import Blueprint, Flask
 
 from ..extensions import csrf_exempt
-from .auth.routes import AuthRoutes
+from .auth.routes import AuthView
 from .routes import (
     ApiRoutes,
     CxTokenRoutes,
@@ -21,7 +21,7 @@ from .routes import (
     NewHtmlRoutes,
     PublishRoutes,
     TDRoutes,
-    TranslateRoutes,
+    TranslateMedView,
 )
 
 
@@ -36,14 +36,14 @@ class PublicRouteModule:
 PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
     PublicRouteModule(route_cls=NewHtmlRoutes, name="new_html", url_prefix="/new_html"),
     PublicRouteModule(route_cls=MainRoutes, name="main"),
-    PublicRouteModule(route_cls=AuthRoutes, name="auth", url_prefix="/auth"),
+    PublicRouteModule(route_cls=AuthView, name="auth", url_prefix="/auth"),
     PublicRouteModule(route_cls=ApiRoutes, name="api", url_prefix="/api"),
     PublicRouteModule(route_cls=CxTokenRoutes, name="cxtoken", url_prefix="/cxtoken"),
     PublicRouteModule(route_cls=FixRefsRoutes, name="fixrefs", url_prefix="/fixrefs"),
     PublicRouteModule(route_cls=TDRoutes, name="td", url_prefix="/Translation_Dashboard"),
     PublicRouteModule(route_cls=LeaderBoardRoutes, name="leaderboard", url_prefix="/Translation_Dashboard/leaderboard"),
     PublicRouteModule(
-        route_cls=TranslateRoutes, name="translate_med", url_prefix="/Translation_Dashboard/translate_med"
+        route_cls=TranslateMedView, name="translate_med", url_prefix="/Translation_Dashboard/translate_med"
     ),
     PublicRouteModule(route_cls=PublishRoutes, name="publish", url_prefix="/publish"),
     PublicRouteModule(route_cls=HtmltoSegmentsRoutes, name="HtmltoSegments", url_prefix="/HtmltoSegments"),

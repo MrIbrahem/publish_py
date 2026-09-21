@@ -1,13 +1,14 @@
 """
-Admin services routes for translated pages from (``pages``/``pages_users`` table).
+Admin services and shared MethodViews for translated pages (``pages`` / ``pages_users`` tables).
 """
 
 from __future__ import annotations
 
 import logging
 
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ....database.services import LangService, PagesService, UserPagesService
 
@@ -21,46 +22,32 @@ def _safe_int(value: str | None, default: int) -> int:
         return default
 
 
-class SharedTranslatedRoutes:
-    """
-    Generic service class for pages_users/pages routes.
+class BaseTranslatedView(MethodView):
+    """Base class for translated pages views supplying database services."""
 
-    usage, e.g.::
-        class TranslatedUsersRoutes(SharedTranslatedRoutes):
-            def __init__(self) -> None:
-                super().__init__(
-                    service_name="pages_users",
-                    endpoint_name="translated_users",
-                    table_label="User",
-                )
-
-            def register(self, bp: Blueprint) -> None: ...
-
-
-        class TranslatedRoutes(SharedTranslatedRoutes):
-            def __init__(self) -> None:
-                super().__init__(
-                    service_name="pages",
-                    endpoint_name="translated",
-                    table_label="Main",
-                )
-
-            def register(self, bp: Blueprint) -> None: ...
-
-    """
-
-    def __init__(self, service_name: str, endpoint_name: str, table_label: str) -> None:
+    def __init__(
+        self,
+        service_name: str,
+        endpoint_name: str,
+        table_label: str,
+    ) -> None:
         if service_name == "pages":
             self.service = PagesService()
         elif service_name == "pages_users":
             self.service = UserPagesService()
+        else:
+            raise ValueError(f"Unknown service_name: {service_name}")
 
         self.lang_service = LangService()
         self.endpoint_name = endpoint_name
         self.table_label = table_label
 
-    def index(self) -> str:
-        """List translated pages with pagination."""
+
+class TranslatedIndexView(BaseTranslatedView):
+    """View to handle listing translated pages with pagination."""
+
+    def get(self) -> str:
+        """List translated pages with filter options."""
         lang = request.args.get("lang", "All")
         page = max(_safe_int(request.args.get("page"), 1), 1)
         limit = max(_safe_int(request.args.get("limit"), 500), 1)
@@ -86,11 +73,15 @@ class SharedTranslatedRoutes:
             table_label=self.table_label,
             endpoint=f"adminpanel.{self.endpoint_name}.index",
             edit_endpoint=f"adminpanel.{self.endpoint_name}.edit",
-            edit_post_endpoint=f"adminpanel.{self.endpoint_name}.edit_post",
+            edit_post_endpoint=f"adminpanel.{self.endpoint_name}.edit",
         )
 
-    def edit(self) -> str:
-        """Render the edit popup for a single row."""
+
+class TranslatedEditView(BaseTranslatedView):
+    """View to handle rendering edit popup and processing page updates/deletions."""
+
+    def get(self) -> str:
+        """Render the edit popup form for a single page record."""
         page_id = _safe_int(request.args.get("id"), 0)
         if page_id <= 0:
             abort(400, description="id is required")
@@ -102,11 +93,11 @@ class SharedTranslatedRoutes:
         return render_template(
             "admins/translated/edit.html",
             row=row,
-            post_endpoint=f"adminpanel.{self.endpoint_name}.edit_post",
+            post_endpoint=f"adminpanel.{self.endpoint_name}.edit",
         )
 
-    def edit_post(self) -> ResponseReturnValue:
-        """Update or delete a single row from the popup form."""
+    def post(self) -> ResponseReturnValue:
+        """Update or delete a page record from the popup form."""
         page_id = _safe_int(request.form.get("id"), 0)
 
         if page_id <= 0:
@@ -137,23 +128,49 @@ class SharedTranslatedRoutes:
             )
             flash(f"{self.table_label} page id {page_id} updated.", "success")
         except Exception:
-            logger.exception(f"Failed to update {self.table_label} page id=%r", page_id)
+            logger.exception("Failed to update %s page id=%r", self.table_label, page_id)
             flash(f"Failed to update {self.table_label} page id {page_id}.", "danger")
 
         return redirect(url_for("adminpanel.edit_done"))
 
     def _handle_delete(self, page_id: int) -> ResponseReturnValue:
-
+        """Process deletion of a page record."""
         deleted = self.service.delete(page_id)
         if deleted is False:
-            flash(f"Failed to delete {self.table_label} page id {page_id}")
-            logger.error(f"Failed to delete {self.table_label} page id=%r", page_id)
+            flash(f"Failed to delete {self.table_label} page id {page_id}", "danger")
+            logger.error("Failed to delete %s page id=%r", self.table_label, page_id)
         else:
             flash(f"{self.table_label} page id {page_id} deleted.", "success")
 
         return redirect(url_for("adminpanel.edit_done"))
 
 
+class SharedTranslatedView:
+    """Base routing registrar for translated page blueprints."""
+
+    def __init__(self, service_name: str, endpoint_name: str, table_label: str) -> None:
+        self.service_name = service_name
+        self.endpoint_name = endpoint_name
+        self.table_label = table_label
+
+    def register(self, bp: Blueprint) -> None:
+        """Register MethodViews for indexing and editing translated pages."""
+        args = (self.service_name, self.endpoint_name, self.table_label)
+
+        bp.add_url_rule("/", view_func=TranslatedIndexView.as_view("index", *args))
+        bp.add_url_rule("/edit", view_func=TranslatedEditView.as_view("edit", *args))
+
+        # Legacy endpoint mapping for backward compatibility
+        bp.add_url_rule(
+            "/edit",
+            endpoint="edit_post",
+            view_func=TranslatedEditView.as_view("legacy_edit_post", *args),
+            methods=["POST"],
+        )
+
+
 __all__ = [
-    "SharedTranslatedRoutes",
+    "TranslatedIndexView",
+    "TranslatedEditView",
+    "SharedTranslatedView",
 ]
