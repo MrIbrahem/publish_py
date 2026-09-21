@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from .translated_main import TranslatedRoutes
-from .translated_shared_routes import SharedTranslatedRoutes
-from .translated_users import TranslatedUsersRoutes
+from .translated_main import TranslatedView
+from .translated_shared_routes import SharedTranslatedView
+from .translated_users import TranslatedUsersView
 
 __all__ = [
-    "TranslatedRoutes",
-    "TranslatedUsersRoutes",
-    "SharedTranslatedRoutes",
+    "TranslatedView",
+    "TranslatedUsersView",
+    "SharedTranslatedView",
 ]

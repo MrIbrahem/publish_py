@@ -59,13 +59,6 @@ class TranslateRoutes:
         self.category_service = CategoryService()
         self.no_inprocess_service = UsersNoInprocessService()
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.index),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
-
     def index(self):
         user = get_current_user()
         if user is None:
@@ -148,6 +141,13 @@ class TranslateRoutes:
             )
         except ValueError:
             logger.debug("in_process row already exists for %r/%r/%r", title, user, lang)
+
+    def register(self, bp: Blueprint) -> None:
+        routes = [
+            ("/", "GET", self.index),
+        ]
+        for rule, method, target in routes:
+            bp.route(rule, methods=[method])(target)
 
 
 __all__ = [

@@ -7,7 +7,7 @@ from typing import Any
 
 from flask import Blueprint
 
-from .add_translate import AddTranslateRoutes
+from .add_translate import AddTranslateView
 from .campaigns import CampaignsDashboard
 from .coordinators import CoordinatorView
 from .errors_route import CheckErrorsdView
@@ -20,8 +20,8 @@ from .qids.qids import QidsView
 from .qids.qids_others import QidsOthersView
 from .settings import SettingsRoutes
 from .stat import StaticsRoutes
-from .translated.translated_main import TranslatedRoutes
-from .translated.translated_users import TranslatedUsersRoutes
+from .translated.translated_main import TranslatedView
+from .translated.translated_users import TranslatedUsersView
 from .tt import TranslateTypeRoutes
 from .users_emails import UsersEmails
 from .users_no_inprocess import UsersNoInprocess
@@ -38,12 +38,12 @@ class AdminRouteModule:
 ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
     AdminRouteModule(route_cls=CoordinatorView, name="coordinators", url_prefix="/coordinators"),
     AdminRouteModule(route_cls=TranslateTypeRoutes, name="tt", url_prefix="/tt"),
-    AdminRouteModule(route_cls=TranslatedRoutes, name="translated", url_prefix="/translated"),
-    AdminRouteModule(route_cls=TranslatedUsersRoutes, name="translated_users", url_prefix="/translated_users"),
+    AdminRouteModule(route_cls=TranslatedView, name="translated", url_prefix="/translated"),
+    AdminRouteModule(route_cls=TranslatedUsersView, name="translated_users", url_prefix="/translated_users"),
     AdminRouteModule(route_cls=StaticsRoutes, name="stat", url_prefix="/stat"),
     AdminRouteModule(route_cls=PagesUsersMainRoutes, name="pages_users_to_main", url_prefix="/pages_users_to_main"),
     AdminRouteModule(route_cls=EmailMsgView, name="email_msg", url_prefix="/email_msg"),
-    AdminRouteModule(route_cls=AddTranslateRoutes, name="add", url_prefix="/add"),
+    AdminRouteModule(route_cls=AddTranslateView, name="add", url_prefix="/add"),
     AdminRouteModule(route_cls=ProjectsDashboard, name="projects", url_prefix="/projects"),
     AdminRouteModule(route_cls=CampaignsDashboard, name="campaigns", url_prefix="/campaigns"),
     AdminRouteModule(route_cls=FullTranslators, name="full_translators", url_prefix="/full_translators"),
