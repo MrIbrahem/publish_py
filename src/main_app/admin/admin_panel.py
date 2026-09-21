@@ -25,6 +25,8 @@ logger = logging.getLogger(__name__)
 class AdminPanel:
     """admin panel routes."""
 
+    decorators = [admin_required]
+
     def inject_sidebar(self) -> dict[str, Any]:
         return {"create_side": create_side}
 
