@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask.views import MethodView
 from werkzeug.datastructures import ImmutableMultiDict
 
 from ...database.services import SettingsService
 from ..decorators import admin_required
+
+logger = logging.getLogger(__name__)
 
 
 def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
@@ -25,51 +29,19 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
         return raw_val, True
 
 
-class SettingsFuncs:
+class SettingsFuncs(MethodView):
+    """Base view for the application settings pages.
+
+    Holds the settings service shared by every settings page and exposes
+    the form-parsing helper used by the bulk update endpoint. All
+    settings pages require an administrator.
+    """
+
+    decorators = [admin_required]
+
     def __init__(self) -> None:
+        super().__init__()
         self.service = SettingsService()
-
-    def dashboard(self):
-        settings_list = self.service.get_all_settings_raw()
-        return render_template(
-            "admins/settings.html",
-            settings_list=settings_list,
-        )
-
-    def create(self):
-        key = request.form.get("key", "").strip()
-        title = request.form.get("title", "").strip()
-        value_type = request.form.get("value_type", "boolean").strip()
-
-        if not re.fullmatch(r"[a-z][a-z0-9_]{0,189}", key):
-            flash(
-                "Key must start with a lowercase letter and contain only lowercase letters, digits, and underscores.",
-                "danger",
-            )
-            return redirect(url_for("adminpanel.settings.dashboard"))
-
-        if key and title:
-            success = self.service.create_setting(key, title, value_type)
-            if success:
-                flash("Setting created successfully.", "success")
-            else:
-                flash("Setting could not be created or already exists.", "danger")
-        else:
-            flash("Key and Title are required.", "danger")
-
-        return redirect(url_for("adminpanel.settings.dashboard"))
-
-    def update(self):
-        failed_keys, deleted_keys = self.settings_update_form(request.form)
-        # Invalidate runtime cache only if all updates succeeded
-        if not failed_keys:
-            if deleted_keys:
-                flash(f"Deleted settings: {', '.join(deleted_keys)}. ", "success")
-
-            flash("Settings updated successfully.", "success")
-        else:
-            flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
-        return redirect(url_for("adminpanel.settings.dashboard"))
 
     def settings_update_form(self, request_form: ImmutableMultiDict) -> tuple[list[str], list[str]]:
         all_settings = self.service.get_all_settings_raw()
@@ -108,18 +80,76 @@ class SettingsFuncs:
         return failed_keys, deleted_keys
 
 
-class SettingsRoutes(SettingsFuncs):
-    def __init__(self) -> None:
-        super().__init__()
+class SettingsDashboardView(SettingsFuncs):
+    """Render the application settings dashboard."""
+
+    def get(self) -> str:
+        """Render every stored setting as an editable form."""
+        settings_list = self.service.get_all_settings_raw()
+        return render_template(
+            "admins/settings.html",
+            settings_list=settings_list,
+        )
+
+
+class SettingsCreateView(SettingsFuncs):
+    """Create a new setting key."""
+
+    def post(self):
+        """Validate the key/title and create the setting."""
+        key = request.form.get("key", "").strip()
+        title = request.form.get("title", "").strip()
+        value_type = request.form.get("value_type", "boolean").strip()
+
+        if not re.fullmatch(r"[a-z][a-z0-9_]{0,189}", key):
+            flash(
+                "Key must start with a lowercase letter and contain only lowercase letters, digits, and underscores.",
+                "danger",
+            )
+            return redirect(url_for("adminpanel.settings.dashboard"))
+
+        if key and title:
+            success = self.service.create_setting(key, title, value_type)
+            if success:
+                flash("Setting created successfully.", "success")
+            else:
+                flash("Setting could not be created or already exists.", "danger")
+        else:
+            flash("Key and Title are required.", "danger")
+
+        return redirect(url_for("adminpanel.settings.dashboard"))
+
+
+class SettingsUpdateView(SettingsFuncs):
+    """Apply the bulk settings update submitted from the dashboard."""
+
+    def post(self):
+        """Update or delete every submitted setting row."""
+        failed_keys, deleted_keys = self.settings_update_form(request.form)
+        # Invalidate runtime cache only if all updates succeeded
+        if not failed_keys:
+            if deleted_keys:
+                flash(f"Deleted settings: {', '.join(deleted_keys)}. ", "success")
+
+            flash("Settings updated successfully.", "success")
+        else:
+            flash(f"Some settings failed to update: {', '.join(failed_keys)}", "danger")
+        return redirect(url_for("adminpanel.settings.dashboard"))
+
+
+class SettingsRoutes:
+    """Registrar wiring the settings MethodViews onto a blueprint.
+
+    Endpoint names (``dashboard``, ``create``, ``update``) are preserved
+    from the legacy function-based routes so existing
+    ``url_for('adminpanel.settings.create')`` calls keep working.
+    """
 
     def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.dashboard),
-            ("/create", "POST", self.create),
-            ("/update", "POST", self.update),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(admin_required(target))
+        """Register the dashboard, create and update endpoints."""
+        bp.add_url_rule("/", view_func=SettingsDashboardView.as_view("dashboard"), methods=["GET"])
+        bp.add_url_rule("/create", view_func=SettingsCreateView.as_view("create"), methods=["POST"])
+        bp.add_url_rule("/update", view_func=SettingsUpdateView.as_view("update"), methods=["POST"])
 
 
 __all__ = [
