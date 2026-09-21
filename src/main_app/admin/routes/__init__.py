@@ -10,7 +10,7 @@ from flask import Blueprint
 from .add_translate import AddTranslateView
 from .campaigns import CampaignsDashboard
 from .coordinators import CoordinatorView
-from .errors_route import CheckErrorsdView
+from .errors_route import CheckErrorsView
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .msg import EmailMsgView
@@ -53,7 +53,7 @@ ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
     AdminRouteModule(route_cls=UsersNoInprocess, name="users_no_inprocess", url_prefix="/users_no_inprocess"),
     AdminRouteModule(route_cls=QidsView, name="qids", url_prefix="/qids"),
     AdminRouteModule(route_cls=QidsOthersView, name="qids_others", url_prefix="/qids_others"),
-    AdminRouteModule(route_cls=CheckErrorsdView, name="errors", url_prefix="/errors"),
+    AdminRouteModule(route_cls=CheckErrorsView, name="errors", url_prefix="/errors"),
 ]
 
 
