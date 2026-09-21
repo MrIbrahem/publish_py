@@ -12,6 +12,7 @@ from flask import (
     render_template,
     request,
 )
+from flask.views import MethodView
 
 from ....database.services import (
     CategoryService,
@@ -26,25 +27,76 @@ from .leaderboard_mapping import InProcessRow, ReadyRow
 logger = logging.getLogger(__name__)
 
 
-class LeaderBoardRoutes:
+class BaseLeaderBoardView(MethodView):
+    """Base view for the leaderboard pages.
+
+    Holds the services shared by every leaderboard page and exposes the
+    chart/form/summary builders used by the index views.
+    """
+
     def __init__(self) -> None:
         self.category_service = CategoryService()
         self.project_service = ProjectService()
         self.lederboard_service = LeaderboardService()
         self.inprocess_service = InProcessService()
 
-    def register(self, bp: Blueprint) -> None:
+    def _load_chart_data(
+        self,
+        cat: str | None,
+        year: int | None,
+        camp: str | None,
+        user_group: str | None,
+    ) -> dict[str, list[Any]]:
+        """Load the chart series for a campaign/category."""
+        chart_data = self.lederboard_service.get_chart_data_formatted(
+            camp=camp,
+            cat=cat,
+            user_group=user_group,
+            year=year,
+            # month=month, # dont filter chart by month
+        )
 
-        routes = [
-            ("/users/<string:username>", "GET", self.users),
-            ("/langs/<string:lang_code>", "GET", self.langs),
-            ("/js", "GET", self.index_js),
-            ("/", "GET", self.index),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
+        return chart_data
 
-    def index_js(self) -> str:
+    def _load_form_data(self, campaigns: list[str], year: int | None) -> dict[str, Any]:
+        """Assemble the filter-form context shared by the index pages."""
+        years: list[int] = self.lederboard_service.get_pages_years()
+        months: list[int] = self.lederboard_service.get_months_of_pages_years(year) if year else []
+
+        projects = self.project_service.list_projects()
+        user_groups = [x.g_title for x in projects]
+
+        form_data = {
+            "campaigns": campaigns,
+            "years": years,
+            "months": months,
+            "user_groups": user_groups,
+        }
+
+        return form_data
+
+    def _load_summary_data(
+        self,
+        result_users: list[dict[str, Any]],
+        users_total: int,
+        langs_total: int,
+    ) -> dict[str, int]:
+        """Aggregate the top-of-page number summary."""
+        summary_data = {
+            "users": users_total,
+            "languages": langs_total,
+            "articles": sum(row["targets"] for row in result_users),
+            "words": sum(row["words"] for row in result_users),
+            "pageviews": sum(row["views"] for row in result_users),
+        }
+        return summary_data
+
+
+class LeaderBoardIndexJsView(BaseLeaderBoardView):
+    """Render the JavaScript-driven leaderboard page."""
+
+    def get(self) -> str:
+        """Render the JS leaderboard with chart data and an empty summary."""
         args = LeaderBoardData.from_request(request.args)
 
         campaign_to_cats = self.category_service.get_camp_to_cats()
@@ -71,7 +123,12 @@ class LeaderBoardRoutes:
             numbers_summary=numbers_summary,
         )
 
-    def index(self) -> str:
+
+class LeaderBoardIndexView(BaseLeaderBoardView):
+    """Render the server-rendered leaderboard page."""
+
+    def get(self) -> str:
+        """Render the leaderboard with the top languages and users."""
         args = LeaderBoardData.from_request(request.args)
 
         campaign_to_cats = self.category_service.get_camp_to_cats()
@@ -111,7 +168,12 @@ class LeaderBoardRoutes:
             result=result,  # main data
         )
 
-    def langs(self, lang_code: str) -> str:
+
+class LeaderBoardLangsView(BaseLeaderBoardView):
+    """Render the per-language leaderboard page."""
+
+    def get(self, lang_code: str) -> str:
+        """Render the published pages for a single language."""
         args = LeaderBoardData.from_request(request.args)
         lang_years: list[int] = self.lederboard_service.get_pages_years(lang=lang_code)
 
@@ -151,7 +213,12 @@ class LeaderBoardRoutes:
             inprocess_pages=inprocess_pages,
         )
 
-    def users(self, username: str) -> str:
+
+class LeaderBoardUsersView(BaseLeaderBoardView):
+    """Render the per-user leaderboard page."""
+
+    def get(self, username: str) -> str:
+        """Render the published pages for a single user."""
         args = LeaderBoardData.from_request(request.args)
 
         user_years: list[int] = self.lederboard_service.get_pages_years(user=username)
@@ -199,53 +266,22 @@ class LeaderBoardRoutes:
             inprocess_pages=inprocess_pages,
         )
 
-    def _load_chart_data(
-        self,
-        cat: str | None,
-        year: int | None,
-        camp: str | None,
-        user_group: str | None,
-    ) -> dict[str, list[Any]]:
-        chart_data = self.lederboard_service.get_chart_data_formatted(
-            camp=camp,
-            cat=cat,
-            user_group=user_group,
-            year=year,
-            # month=month, # dont filter chart by month
-        )
 
-        return chart_data
+class LeaderBoardRoutes:
+    """Registrar wiring the leaderboard MethodViews onto a blueprint.
 
-    def _load_form_data(self, campaigns: list[str], year: int | None) -> dict[str, Any]:
-        years: list[int] = self.lederboard_service.get_pages_years()
-        months: list[int] = self.lederboard_service.get_months_of_pages_years(year) if year else []
+    Endpoint names (``users``, ``langs``, ``index_js``, ``index``) are
+    preserved from the legacy function-based routes so existing
+    ``url_for('leaderboard.index')`` calls keep working.
+    """
 
-        projects = self.project_service.list_projects()
-        user_groups = [x.g_title for x in projects]
-
-        form_data = {
-            "campaigns": campaigns,
-            "years": years,
-            "months": months,
-            "user_groups": user_groups,
-        }
-
-        return form_data
-
-    def _load_summary_data(
-        self,
-        result_users: list[dict[str, Any]],
-        users_total: int,
-        langs_total: int,
-    ) -> dict[str, int]:
-        summary_data = {
-            "users": users_total,
-            "languages": langs_total,
-            "articles": sum(row["targets"] for row in result_users),
-            "words": sum(row["words"] for row in result_users),
-            "pageviews": sum(row["views"] for row in result_users),
-        }
-        return summary_data
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register all leaderboard views on the blueprint."""
+        bp.add_url_rule("/users/<string:username>", view_func=LeaderBoardUsersView.as_view("users"), methods=["GET"])
+        bp.add_url_rule("/langs/<string:lang_code>", view_func=LeaderBoardLangsView.as_view("langs"), methods=["GET"])
+        bp.add_url_rule("/js", view_func=LeaderBoardIndexJsView.as_view("index_js"), methods=["GET"])
+        bp.add_url_rule("/", view_func=LeaderBoardIndexView.as_view("index"), methods=["GET"])
 
 
 __all__ = [
