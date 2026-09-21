@@ -24,29 +24,6 @@ def _safe_int(value: str | None, default: int) -> int:
 class SharedTranslatedRoutes:
     """
     Generic service class for pages_users/pages routes.
-
-    usage, e.g.::
-        class TranslatedUsersRoutes(SharedTranslatedRoutes):
-            def __init__(self) -> None:
-                super().__init__(
-                    service_name="pages_users",
-                    endpoint_name="translated_users",
-                    table_label="User",
-                )
-
-            def register(self, bp: Blueprint) -> None: ...
-
-
-        class TranslatedRoutes(SharedTranslatedRoutes):
-            def __init__(self) -> None:
-                super().__init__(
-                    service_name="pages",
-                    endpoint_name="translated",
-                    table_label="Main",
-                )
-
-            def register(self, bp: Blueprint) -> None: ...
-
     """
 
     def __init__(self, service_name: str, endpoint_name: str, table_label: str) -> None:

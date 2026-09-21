@@ -10,10 +10,10 @@ from flask import Blueprint
 from .add_translate import AddTranslateRoutes
 from .campaigns import CampaignsDashboard
 from .coordinators import CoordinatorView
-from .email_msg import EmailMsgRoutes
 from .errors_route import CheckErrorsdView
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
+from .msg import EmailMsgView
 from .pages_users_to_main import PagesUsersMainRoutes
 from .projects import ProjectsDashboard
 from .qids.qids import QidsView
@@ -42,7 +42,7 @@ ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
     AdminRouteModule(route_cls=TranslatedUsersRoutes, name="translated_users", url_prefix="/translated_users"),
     AdminRouteModule(route_cls=StaticsRoutes, name="stat", url_prefix="/stat"),
     AdminRouteModule(route_cls=PagesUsersMainRoutes, name="pages_users_to_main", url_prefix="/pages_users_to_main"),
-    AdminRouteModule(route_cls=EmailMsgRoutes, name="email_msg", url_prefix="/email_msg"),
+    AdminRouteModule(route_cls=EmailMsgView, name="email_msg", url_prefix="/email_msg"),
     AdminRouteModule(route_cls=AddTranslateRoutes, name="add", url_prefix="/add"),
     AdminRouteModule(route_cls=ProjectsDashboard, name="projects", url_prefix="/projects"),
     AdminRouteModule(route_cls=CampaignsDashboard, name="campaigns", url_prefix="/campaigns"),

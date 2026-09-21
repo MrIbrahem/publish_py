@@ -8,6 +8,8 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
+from ..decorators import admin_required
+
 from ...database.services import CategoryService, PagesService
 
 logger = logging.getLogger(__name__)
@@ -15,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 class AddTranslateView(MethodView):
     """View for displaying and processing the translation addition dashboard."""
+
+    decorators = [admin_required]
 
     def __init__(self) -> None:
         self.category_service = CategoryService()

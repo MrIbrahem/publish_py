@@ -10,6 +10,8 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 from werkzeug.wrappers.response import Response
 
+from ...decorators import admin_required
+
 from ....database.models import QidOthersRecord, QidRecord
 from ....database.services import QidOthersService, QidService
 
@@ -55,6 +57,8 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
 
 class BaseQidView(MethodView):
     """Base view class providing shared service and validation utilities."""
+
+    decorators = [admin_required]
 
     def __init__(
         self,
