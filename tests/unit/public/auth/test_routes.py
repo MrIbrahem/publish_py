@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import Mock
 
+
 class TestClientKey:
     def test_uses_forwarded_for(self, monkeypatch):
         mock_req = Mock()
@@ -31,4 +32,3 @@ class TestClientKey:
         from src.main_app.public.auth.routes import _client_key
 
         assert _client_key() == "anonymous"
-

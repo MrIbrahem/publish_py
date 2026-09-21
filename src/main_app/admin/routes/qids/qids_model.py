@@ -1,4 +1,4 @@
-"""s"""
+"""Shared MethodViews and route handler logic for QID management tables."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from typing import TypeVar
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 from werkzeug.wrappers.response import Response
 
 from ....database.models import QidOthersRecord, QidRecord
@@ -52,7 +53,9 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
     return True
 
 
-class QidsSharedModel:
+class BaseQidView(MethodView):
+    """Base view class providing shared service and validation utilities."""
+
     def __init__(
         self,
         endpoint: str,
@@ -63,13 +66,18 @@ class QidsSharedModel:
         self.title_label = title_label
         self.service = service
 
-    def is_valid(self, qid_id: int | bool, qid: str, title: str) -> bool:
+    def is_valid_qid(self, qid_id: int | bool, qid: str, title: str) -> bool:
+        """Validate QID uniqueness across title and qid columns."""
         existing_by_qid = self.service.get_by_qid(qid)
         existing_by_title = self.service.get_by_title(title)
         return is_valid(qid_id, qid, title, existing_by_qid, existing_by_title)
 
-    def index(self) -> str:
-        """List of rows with optional filter (all / empty / duplicate)."""
+
+class QidIndexView(BaseQidView):
+    """View to handle listing QID records with optional filtering."""
+
+    def get(self) -> str:
+        """Render list of QID records."""
         dis = request.args.get("dis", "all")
         if dis not in VALID_DIS:
             dis = "all"
@@ -88,13 +96,16 @@ class QidsSharedModel:
             title_label=self.title_label,
             index_endpoint=f"adminpanel.{self.endpoint}.index",
             edit_endpoint=f"adminpanel.{self.endpoint}.edit",
-            post_endpoint=f"adminpanel.{self.endpoint}.edit_post",
+            post_endpoint=f"adminpanel.{self.endpoint}.edit",
             add_endpoint=f"adminpanel.{self.endpoint}.add",
         )
 
-    def edit(self) -> Response | str:
-        """Render the add/edit popup for a single row."""
-        qid_id = None
+
+class QidEditView(BaseQidView):
+    """View to render edit popup and process updates for an existing QID record."""
+
+    def get(self) -> Response | str:
+        """Render edit modal popup."""
         qid_id_raw = request.args.get("id", "")
         try:
             qid_id = int(qid_id_raw)
@@ -113,29 +124,17 @@ class QidsSharedModel:
             title=record.title,
             qid=record.qid,
             qid_table=self.endpoint,
-            post_endpoint=f"adminpanel.{self.endpoint}.edit_post",
+            post_endpoint=f"adminpanel.{self.endpoint}.edit",
         )
 
-    def add(self) -> str:
-        """Render the add popup for a single qids row."""
-        return render_template(
-            "admins/qids/edit.html",
-            new=1,
-            title="",
-            qid="",
-            qid_table=self.endpoint,
-            post_endpoint=f"adminpanel.{self.endpoint}.add_post",
-        )
-
-    def edit_post(self) -> ResponseReturnValue:
-        """update a row."""
+    def post(self) -> ResponseReturnValue:
+        """Process update request for a record."""
         qid_id_raw = (request.form.get("id") or "").strip()
         title = (request.form.get("title") or "").strip()
         qid = (request.form.get("qid") or "").strip()
 
         edit_done_ep = redirect(url_for("adminpanel.edit_done"))
 
-        qid_id: int | None = None
         try:
             qid_id = int(qid_id_raw)
         except ValueError:
@@ -153,9 +152,8 @@ class QidsSharedModel:
             return edit_redirect_to
 
         try:
-            if not self.is_valid(qid_id, qid, title):
+            if not self.is_valid_qid(qid_id, qid, title):
                 return edit_redirect_to
-
         except Exception:
             logger.exception("Failed to save qids row id=%r title=%r qid=%r", qid_id, title, qid)
             flash(f"Failed to check data for title: {title}, Qid: {qid}.", "danger")
@@ -172,16 +170,29 @@ class QidsSharedModel:
             return edit_done_ep
 
         flash(f"Failed to save data for title: {title}, Qid: {qid}.", "danger")
-
         return edit_redirect_to
 
-    def add_post(self) -> ResponseReturnValue:
-        """Insert a qid row"""
+
+class QidAddView(BaseQidView):
+    """View to render creation popup and insert new QID record."""
+
+    def get(self) -> str:
+        """Render add record modal popup."""
+        return render_template(
+            "admins/qids/edit.html",
+            new=1,
+            title="",
+            qid="",
+            qid_table=self.endpoint,
+            post_endpoint=f"adminpanel.{self.endpoint}.add",
+        )
+
+    def post(self) -> ResponseReturnValue:
+        """Process insertion request for new record."""
         title = (request.form.get("title") or "").strip()
         qid = (request.form.get("qid") or "").strip()
 
         edit_done_ep = redirect(url_for("adminpanel.edit_done"))
-
         edit_redirect_to = redirect(url_for(f"adminpanel.{self.endpoint}.add"))
 
         if not title:
@@ -193,7 +204,7 @@ class QidsSharedModel:
             return edit_redirect_to
 
         try:
-            if not self.is_valid(False, qid, title):
+            if not self.is_valid_qid(False, qid, title):
                 return edit_redirect_to
 
         except Exception:
@@ -215,18 +226,45 @@ class QidsSharedModel:
 
         return edit_redirect_to
 
+
+class QidsSharedModelView:
+    """Base class for registering shared QID MethodViews on a Blueprint."""
+
+    def __init__(
+        self,
+        endpoint: str,
+        title_label: str,
+        service: QidService | QidOthersService,
+    ) -> None:
+        self.endpoint = endpoint
+        self.title_label = title_label
+        self.service = service
+
     def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.index),
-            ("/edit", "GET", self.edit),
-            ("/add", "GET", self.add),
-            ("/", "POST", self.edit_post),
-            ("/add", "POST", self.add_post),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
+        """Register URL rules for QID management views on the provided blueprint."""
+        view_args = (self.endpoint, self.title_label, self.service)
+
+        bp.add_url_rule("/", view_func=QidIndexView.as_view("index", *view_args))
+        bp.add_url_rule("/edit", view_func=QidEditView.as_view("edit", *view_args))
+        bp.add_url_rule("/add", view_func=QidAddView.as_view("add", *view_args))
+
+        # ------------------------------------------------------------------
+        # TODO: Backward Compatibility / Temporary Aliases
+        # Legacy POST endpoints 'edit_post' and 'add_post' have been merged
+        # into QidEditView and QidAddView POST handlers. Remove these temporary
+        # rules once all template forms and url_for calls are updated.
+        # ------------------------------------------------------------------
+        bp.add_url_rule(
+            "/", endpoint="edit_post", view_func=QidEditView.as_view("legacy_edit_post", *view_args), methods=["POST"]
+        )
+        bp.add_url_rule(
+            "/add", endpoint="add_post", view_func=QidAddView.as_view("legacy_add_post", *view_args), methods=["POST"]
+        )
 
 
 __all__ = [
-    "QidsSharedModel",
+    "QidIndexView",
+    "QidEditView",
+    "QidAddView",
+    "QidsSharedModelView",
 ]

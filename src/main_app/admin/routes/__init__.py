@@ -16,8 +16,8 @@ from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .pages_users_to_main import PagesUsersMainRoutes
 from .projects import ProjectsDashboard
-from .qids.qids import QidsRoutes
-from .qids.qids_others import QidsOthersRoutes
+from .qids.qids import QidsView
+from .qids.qids_others import QidsOthersView
 from .settings import SettingsRoutes
 from .stat import StaticsRoutes
 from .translated.translated_main import TranslatedRoutes
@@ -51,8 +51,8 @@ ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
     AdminRouteModule(route_cls=SettingsRoutes, name="settings", url_prefix="/settings"),
     AdminRouteModule(route_cls=UsersEmails, name="users_emails", url_prefix="/users_emails"),
     AdminRouteModule(route_cls=UsersNoInprocess, name="users_no_inprocess", url_prefix="/users_no_inprocess"),
-    AdminRouteModule(route_cls=QidsRoutes, name="qids", url_prefix="/qids"),
-    AdminRouteModule(route_cls=QidsOthersRoutes, name="qids_others", url_prefix="/qids_others"),
+    AdminRouteModule(route_cls=QidsView, name="qids", url_prefix="/qids"),
+    AdminRouteModule(route_cls=QidsOthersView, name="qids_others", url_prefix="/qids_others"),
     AdminRouteModule(route_cls=CheckErrorsdView, name="errors", url_prefix="/errors"),
 ]
 
