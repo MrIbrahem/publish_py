@@ -269,8 +269,8 @@ class TestSettingsIntegration:
         body = mock_client.get(f"{_TD_PREFIX}/table").get_data(as_text=True)
 
         # {% else %} branch: hidden input pins tra_type to "lead".
-        assert 'name="tra_type" value="lead"' in body
-        assert 'id="customRadio2"' not in body
+        assert "name='tra_type' value='lead'" in body
+        assert "id='customRadio2'" not in body
 
     def test_enabled_shows_type_widget(
         self,
