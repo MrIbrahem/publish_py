@@ -150,7 +150,7 @@ class EmailMsgRoutes:
     def register(self, bp: Blueprint) -> None:
         routes = [
             ("/dashboard/<string:last_table>/<int:id>", "GET", self.dashboard),
-            ("/send", "POST", self.msg_post),
+            ("/send", "POST", self.send),
         ]
         for rule, method, target in routes:
             bp.route(rule, methods=[method])(admin_required(target))
@@ -170,7 +170,7 @@ class EmailMsgRoutes:
     ) -> str:
         return msg_dashboard(last_table, id, user=user)
 
-    def msg_post(self) -> str:
+    def send(self) -> str:
         data = request.form
         msg = data.get("msg", "")
         email_to = data.get("email_to", "")
