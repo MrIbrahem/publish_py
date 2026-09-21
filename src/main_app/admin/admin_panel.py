@@ -60,7 +60,7 @@ class AdminPanelLastDashboardView(BaseAdminPanelView):
 class AdminPanelPagesView(BaseAdminPanelView):
     """Render the last-translated pages table."""
 
-    def get(self, lang: str | None = None) -> Response:
+    def get(self, lang: str | None = None) -> str:
         """Render the ``pages`` last-translations dashboard."""
         return last_translations_dashboard("pages", lang)
 
@@ -68,7 +68,7 @@ class AdminPanelPagesView(BaseAdminPanelView):
 class AdminPanelPagesUsersView(BaseAdminPanelView):
     """Render the last-translated userspace pages table."""
 
-    def get(self, lang: str | None = None) -> Response:
+    def get(self, lang: str | None = None) -> str:
         """Render the ``pages_users`` last-translations dashboard."""
         return last_translations_dashboard("pages_users", lang)
 
@@ -112,7 +112,7 @@ class AdminPanelEditDoneView(BaseAdminPanelView):
 class AdminPanelCategoriesView(BaseAdminPanelView):
     """Render the categories dashboard."""
 
-    def get(self) -> Response:
+    def get(self) -> str:
         """Render the categories dashboard page."""
         return categories_dashboard()
 
