@@ -17,6 +17,8 @@ from flask import (
     request,
     url_for,
 )
+from flask.views import MethodView
+from flask.typing import ResponseReturnValue
 
 from ....database.services import (
     CategoryService,
@@ -53,13 +55,16 @@ def _word(raw: str | None) -> int:
     return max(value, 0)
 
 
-class TranslateRoutes:
+class TranslateMedView(MethodView):
+    """MethodView to process translation redirection and in-process record registration."""
+
     def __init__(self) -> None:
         self.in_process_service = InProcessService()
         self.category_service = CategoryService()
         self.no_inprocess_service = UsersNoInprocessService()
 
-    def index(self):
+    def get(self) -> ResponseReturnValue:
+        """Handle translation redirection for logged-in users."""
         user = get_current_user()
         if user is None:
             # PHP lines 169-184: render a login card, then exit.
@@ -142,14 +147,12 @@ class TranslateRoutes:
         except ValueError:
             logger.debug("in_process row already exists for %r/%r/%r", title, user, lang)
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.index),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register translation routes on the provided blueprint."""
+        bp.add_url_rule("/", view_func=cls.as_view("index"))
 
 
 __all__ = [
-    "TranslateRoutes",
+    "TranslateMedView",
 ]

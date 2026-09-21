@@ -21,7 +21,7 @@ from .routes import (
     NewHtmlRoutes,
     PublishRoutes,
     TDRoutes,
-    TranslateRoutes,
+    TranslateMedView,
 )
 
 
@@ -43,7 +43,7 @@ PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
     PublicRouteModule(route_cls=TDRoutes, name="td", url_prefix="/Translation_Dashboard"),
     PublicRouteModule(route_cls=LeaderBoardRoutes, name="leaderboard", url_prefix="/Translation_Dashboard/leaderboard"),
     PublicRouteModule(
-        route_cls=TranslateRoutes, name="translate_med", url_prefix="/Translation_Dashboard/translate_med"
+        route_cls=TranslateMedView, name="translate_med", url_prefix="/Translation_Dashboard/translate_med"
     ),
     PublicRouteModule(route_cls=PublishRoutes, name="publish", url_prefix="/publish"),
     PublicRouteModule(route_cls=HtmltoSegmentsRoutes, name="HtmltoSegments", url_prefix="/HtmltoSegments"),
