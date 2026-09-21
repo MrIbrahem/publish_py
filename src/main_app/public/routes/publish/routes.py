@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 
 from flask import Blueprint, Response, jsonify, request
+from flask.views import MethodView
 from marshmallow import ValidationError
 
 from ....database.services import UserTokenService
@@ -90,23 +91,25 @@ def _handle_form(request_data) -> Response:
     return response
 
 
-class PublishRoutes:
+class PublishPreflightView(MethodView):
+    """Answer the CORS preflight request for the publish endpoint."""
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "OPTIONS", check_cors(self.publish_preflight)),
-            ("/", "POST", validate_access(self.index)),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
+    decorators = [check_cors]
 
-    def publish_preflight(self) -> Response:
+    def options(self) -> Response:
+        """Handle preflight requests."""
         response = Response("", status=200)
         response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Secret-Key"
         return response
 
-    def index(self) -> Response:
+
+class PublishIndexView(MethodView):
+    """Publish a translated page to the target wiki."""
+
+    decorators = [validate_access]
+
+    def post(self) -> Response:
         """Handle post/publish requests.
 
         Request Body (JSON):
@@ -138,6 +141,15 @@ class PublishRoutes:
                 return response
 
         return _handle_form(request_data)
+
+
+class PublishRoutes:
+    """Registrar for the publish endpoint views."""
+
+    def register(self, bp: Blueprint) -> None:
+        """Register the preflight and publish endpoints on the blueprint."""
+        bp.add_url_rule("/", view_func=PublishPreflightView.as_view("publish_preflight"), methods=["OPTIONS"])
+        bp.add_url_rule("/", view_func=PublishIndexView.as_view("index"), methods=["POST"])
 
 
 __all__ = [
