@@ -54,10 +54,10 @@ def validate_request(data: dict[str, Any] | None) -> tuple[bool, str]:
         >>> validate_request({})
         (False, 'Missing required field: html')
 
-        >>> validate_request({'html': '   '})
+        >>> validate_request({"html": "   "})
         (False, 'HTML content is empty or contains only whitespace')
 
-        >>> validate_request({'html': '<p>Hello</p>'})
+        >>> validate_request({"html": "<p>Hello</p>"})
         (True, '')
     """
     if data is None:
