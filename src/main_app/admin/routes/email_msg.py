@@ -1,4 +1,4 @@
-""" """
+"""Admin email message routes using Flask MethodViews."""
 
 from __future__ import annotations
 
@@ -116,34 +116,6 @@ def create_email_msg(page_data: dict[str, Any], sugust: str | None) -> str:
     return msg
 
 
-def msg_dashboard(
-    last_table: str,
-    id: int,
-    user: str | None = None,
-) -> str:
-    # http://127.0.0.1:5000/adminpanel/email_msg?user=Mr.+Ibrahem&id=10653&last_table=pages
-
-    logger.info(f"user={user}, id={id}, last_table={last_table}")
-    # Fetch data based on table type
-
-    page_data = get_page_data(last_table, id)
-    username = page_data.get("user", "") or user
-
-    user_email = get_user_email(str(username))
-    currect_user_email = get_currect_user_email()
-
-    sugust = make_sugustion(page_data.get("lang"), page_data.get("title"))
-
-    # Create email message
-    msg = create_email_msg(page_data, sugust)
-
-    return render_template(
-        "admins/email_msg/index.html",
-        username=username,
-        user_email=user_email,
-        cc_me_email=currect_user_email,
-        html_mag=msg,
-    )
 
 
 class EmailMsgRoutes:
@@ -154,7 +126,29 @@ class EmailMsgRoutes:
         id: int,
         user: str | None = None,
     ) -> str:
-        return msg_dashboard(last_table, id, user=user)
+        # http://127.0.0.1:5000/adminpanel/email_msg?user=Mr.+Ibrahem&id=10653&last_table=pages
+
+        logger.info(f"user={user}, id={id}, last_table={last_table}")
+        # Fetch data based on table type
+
+        page_data = get_page_data(last_table, id)
+        username = page_data.get("user", "") or user
+
+        user_email = get_user_email(str(username))
+        currect_user_email = get_currect_user_email()
+
+        sugust = make_sugustion(page_data.get("lang"), page_data.get("title"))
+
+        # Create email message
+        msg = create_email_msg(page_data, sugust)
+
+        return render_template(
+            "admins/email_msg/index.html",
+            username=username,
+            user_email=user_email,
+            cc_me_email=currect_user_email,
+            html_mag=msg,
+        )
 
     def send(self) -> str:
         data = request.form
