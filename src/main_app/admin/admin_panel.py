@@ -70,6 +70,7 @@ class AdminPanel:
 
     def register(self, bp: Blueprint) -> None:
         bp.app_context_processor(self.inject_sidebar)
+        # TODO: put a before_request guard on the admin blueprint. use admin_required
 
         routes = [
             ("/", "GET", self.index),
