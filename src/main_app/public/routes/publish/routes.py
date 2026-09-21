@@ -146,7 +146,8 @@ class PublishIndexView(MethodView):
 class PublishRoutes:
     """Registrar for the publish endpoint views."""
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the preflight and publish endpoints on the blueprint."""
         bp.add_url_rule("/", view_func=PublishPreflightView.as_view("publish_preflight"), methods=["OPTIONS"])
         bp.add_url_rule("/", view_func=PublishIndexView.as_view("index"), methods=["POST"])

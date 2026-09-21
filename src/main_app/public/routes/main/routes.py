@@ -49,7 +49,8 @@ class MainFaviconView(MethodView):
 class MainRoutes:
     """Registrar for the main application views."""
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the homepage, reports and favicon views."""
         bp.add_url_rule("/", view_func=MainIndexView.as_view("index"))
         bp.add_url_rule("/reports", view_func=MainReportsView.as_view("reports"))

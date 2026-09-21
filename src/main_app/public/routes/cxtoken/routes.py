@@ -128,7 +128,8 @@ class CxTokenIndexView(MethodView):
 class CxTokenRoutes:
     """Registrar for the Content Translation token views."""
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the preflight and token endpoints on the blueprint."""
         bp.add_url_rule("/", view_func=CxTokenPreflightView.as_view("index_preflight"), methods=["OPTIONS"])
         bp.add_url_rule("/", view_func=CxTokenIndexView.as_view("index"))

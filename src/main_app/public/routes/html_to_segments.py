@@ -204,7 +204,8 @@ class HtmltoSegmentsIndexView(MethodView):
 class HtmltoSegmentsRoutes:
     """Registrar for the HTML-to-segments views."""
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the process and index endpoints on the blueprint."""
         bp.add_url_rule("/", view_func=HtmltoSegmentsProcessView.as_view("process_text"), methods=["POST"])
         bp.add_url_rule("/", view_func=HtmltoSegmentsIndexView.as_view("index"), methods=["GET"])

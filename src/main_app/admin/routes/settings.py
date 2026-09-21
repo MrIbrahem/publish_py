@@ -145,7 +145,8 @@ class SettingsRoutes:
     ``url_for('adminpanel.settings.create')`` calls keep working.
     """
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the dashboard, create and update endpoints."""
         bp.add_url_rule("/", view_func=SettingsDashboardView.as_view("dashboard"), methods=["GET"])
         bp.add_url_rule("/create", view_func=SettingsCreateView.as_view("create"), methods=["POST"])

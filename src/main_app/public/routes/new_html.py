@@ -211,7 +211,8 @@ class NewHtmlRevisionsApiView(MethodView):
 class NewHtmlRoutes:
     """Registrar for the new_html views."""
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the new_html endpoints on the blueprint."""
         bp.add_url_rule("/fix", view_func=NewHtmlFixView.as_view("fix"), methods=["GET", "POST"])
         bp.add_url_rule("/index", view_func=NewHtmlIndexView.as_view("index"), methods=["GET"])

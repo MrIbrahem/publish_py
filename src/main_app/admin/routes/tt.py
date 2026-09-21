@@ -197,7 +197,8 @@ class TranslateTypeRoutes:
     working.
     """
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the listing, edit and add endpoints."""
         bp.add_url_rule("/", view_func=TTIndexView.as_view("tt_index"), methods=["GET"])
         bp.add_url_rule("/edit", view_func=TTEditView.as_view("tt_edit"), methods=["GET"])

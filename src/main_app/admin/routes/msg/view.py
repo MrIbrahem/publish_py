@@ -95,7 +95,8 @@ class EmailSendView(MethodView):
 class EmailMsgView:
     """Registrar class for binding Email MethodViews to a Flask Blueprint."""
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register routes and endpoints on the given Blueprint with admin permissions."""
         dashboard_view = EmailDashboardView.as_view("dashboard")
 

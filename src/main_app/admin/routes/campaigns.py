@@ -178,7 +178,8 @@ class CampaignsDashboard:
     ``url_for('adminpanel.campaigns.add_record')`` calls keep working.
     """
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the dashboard, add and update endpoints."""
         bp.add_url_rule("/", view_func=CampaignsDashboardView.as_view("dashboard"), methods=["GET"])
         bp.add_url_rule("/add", view_func=CampaignsAddRecordView.as_view("add_record"), methods=["POST"])

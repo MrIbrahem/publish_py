@@ -163,7 +163,8 @@ class FixRefsProcessView(MethodView):
 class FixRefsRoutes:
     """Registrar for the Fix References views."""
 
-    def register(self, bp: Blueprint) -> None:
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
         """Register the fix-refs endpoints on the blueprint.
 
         Endpoint names mirror the legacy function names so existing

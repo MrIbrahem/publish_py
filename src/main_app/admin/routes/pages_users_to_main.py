@@ -9,6 +9,7 @@ import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ...database.services import LangService, PagesService, PagesUsersToMainPagesService
 
@@ -22,23 +23,25 @@ def _safe_int(value: str | None, default: int) -> int:
         return default
 
 
-class PagesUsersMainRoutes:
+class BasePagesUsersMainView(MethodView):
+    """Base view for the pages-users-to-main pages.
+
+    Holds the services shared by every page of this feature. Note that
+    these endpoints are intentionally left unguarded to match the
+    legacy behavior.
+    """
+
     def __init__(self) -> None:
         self.pum_service = PagesUsersToMainPagesService()
         self.lang_service = LangService()
         self.pages_service = PagesService()
 
-    def register(self, bp: Blueprint) -> None:
-        routes = [
-            ("/", "GET", self.pages_users_to_main_index),
-            ("/fix_it", "GET", self.pages_users_to_main_fix_it),
-            ("/fix_it", "POST", self.pages_users_to_main_fix_it_post),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(target)
 
-    def pages_users_to_main_index(self) -> str:
-        """List user pages flagged for promotion to main pages."""
+class PagesUsersToMainIndexView(BasePagesUsersMainView):
+    """List the user pages flagged for promotion to main pages."""
+
+    def get(self) -> str:
+        """Render the pending promotions table for a language."""
         lang = request.args.get("lang", "All")
 
         try:
@@ -54,8 +57,12 @@ class PagesUsersMainRoutes:
             languages=self.lang_service.list_langs(),
         )
 
-    def pages_users_to_main_fix_it(self) -> str:
-        """Render the fix_it form to promote a user page to main."""
+
+class PagesUsersToMainFixItView(BasePagesUsersMainView):
+    """Render the fix_it form used to promote a single user page."""
+
+    def get(self) -> str:
+        """Render the promotion form for the page identified by ``id``."""
         page_id = _safe_int(request.args.get("id"), 0)
         new_user = (request.args.get("new_user") or "").strip()
         new_target = (request.args.get("new_target") or "").strip()
@@ -82,7 +89,11 @@ class PagesUsersMainRoutes:
             duplicate_page=duplicate_page,
         )
 
-    def pages_users_to_main_fix_it_post(self) -> ResponseReturnValue:
+
+class PagesUsersToMainFixItPostView(BasePagesUsersMainView):
+    """Promote a user page to main and remove the source rows."""
+
+    def post(self) -> ResponseReturnValue:
         """Promote a user page to main and delete the source rows."""
         page_id = _safe_int(request.form.get("id"), 0)
         title = (request.form.get("title") or "").strip()
