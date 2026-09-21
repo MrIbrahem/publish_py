@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-
 from ....database.services import PagesService, UserPagesService, UsersService, ViewsNewService
 from ....public.routes.td.results_api import results_api_result
 from ....services.auth.utils import get_current_user

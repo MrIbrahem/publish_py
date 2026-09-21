@@ -10,10 +10,9 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 from werkzeug.wrappers.response import Response
 
-from ...decorators import admin_required
-
 from ....database.models import QidOthersRecord, QidRecord
 from ....database.services import QidOthersService, QidService
+from ...decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

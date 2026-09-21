@@ -8,9 +8,8 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
-from ..decorators import admin_required
-
 from ...database.services import CategoryService, PagesService
+from ..decorators import admin_required
 
 logger = logging.getLogger(__name__)
 

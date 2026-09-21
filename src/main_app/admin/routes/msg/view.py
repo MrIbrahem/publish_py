@@ -9,6 +9,8 @@ from flask import (
     render_template,
     request,
 )
+from flask.typing import ResponseReturnValue
+from flask.views import MethodView
 
 from ...decorators import admin_required
 from .email_msg import (
@@ -19,8 +21,6 @@ from .email_msg import (
     make_sugustion,
     send_msg,
 )
-from flask.views import MethodView
-from flask.typing import ResponseReturnValue
 
 logger = logging.getLogger(__name__)
 
