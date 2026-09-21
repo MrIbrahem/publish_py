@@ -10,6 +10,7 @@ import logging
 from typing import Any
 
 from flask import Blueprint, Response, jsonify, request
+from flask.views import MethodView
 from marshmallow import ValidationError
 
 from ....database.models import ReportRecord
@@ -32,9 +33,31 @@ from .top_stats_routes import get_top_langs, get_top_users
 logger = logging.getLogger(__name__)
 
 
-class ReportAPIHandler:
-    def __init__(self, leaderboard_service: LeaderboardService) -> None:
-        self.leaderboard_service = leaderboard_service
+def _handle_options_preflight():
+    """Answer the CORS preflight for every API route (blueprint-wide)."""
+    if request.method == "OPTIONS":
+        response = Response("", status=200)
+        requested_method = request.headers.get("Access-Control-Request-Method", "GET")
+        response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
+        # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        response.headers["Access-Control-Max-Age"] = "7200"
+        return response
+    return None
+
+
+class BaseReportApiView(MethodView):
+    """Base view for the report API endpoints.
+
+    Holds the services shared by every API route and implements the
+    handlers each endpoint view delegates to. ``check_cors`` is applied
+    here so every subclass inherits it.
+    """
+
+    decorators = [check_cors]
+
+    def __init__(self) -> None:
+        self.leaderboard_service = LeaderboardService()
         self.api_service = ApiService()
         self.lang_service = LangService()
         self.pages_query_service = PagesQueryService()
@@ -43,7 +66,61 @@ class ReportAPIHandler:
         self.in_process_service = InProcessService()
         self.users_service = UsersService()
 
-    def get_publish_reports(self) -> tuple[Response, int] | Response:
+    def leaderboard_status(self) -> tuple[Response, int] | Response:
+        """
+        Handle leaderboard API requests.
+        /api/status?camp=Video&user_group=WIKI&year=2025&month=02&cat=RTTVideo
+        """
+        form = ApiFormData.from_request(request.args)
+        try:
+            data = self.leaderboard_service.get_leaderboard_chart_data(
+                camp=form.camp,
+                cat=form.cat,
+                user_group=form.user_group,
+                year=form.year,
+                month=form.month,
+                lang=form.lang,
+                user=form.user,
+            )
+        except Exception:
+            logger.exception("Error fetching leaderboard status data")
+            return jsonify({"error": "An internal error occurred"}), 500
+        response_data = {
+            "results": data,
+            "count": len(data),
+        }
+        return jsonify(response_data)
+
+    def top_langs(self) -> tuple[Response, int] | Response:
+        """Handle top_langs API requests."""
+        form = ApiFormData.from_request(request.args)
+        result = get_top_langs(form)
+        data = result.to_json()
+        if result.error:
+            return jsonify(data), 500
+
+        return jsonify(data)
+
+    def top_users(self) -> tuple[Response, int] | Response:
+        """Handle top_users API requests."""
+        form = ApiFormData.from_request(request.args)
+        result = get_top_users(form)
+        data = result.to_json()
+        if result.error:
+            return jsonify(data), 500
+
+        return jsonify(data)
+
+    def top_lang_of_users(self) -> tuple[Response, int] | Response:
+        """Handle top_lang_of_users API requests."""
+        try:
+            data = self.leaderboard_service.top_lang_of_users()
+        except Exception:
+            logger.exception("Error fetching top_lang_of_users data")
+            return jsonify({"error": "An internal error occurred"}), 500
+        return jsonify(data)
+
+    def publish_reports(self) -> tuple[Response, int] | Response:
         """
         Handle publish_reports API requests.
 
@@ -138,7 +215,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_in_process(self) -> tuple[Response, int] | Response:
+    def in_process(self) -> tuple[Response, int] | Response:
         """
         Handle in_process API requests.
         Returns in-process translations with joined category and language data.
@@ -187,7 +264,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_in_process_total(self) -> tuple[Response, int] | Response:
+    def in_process_total(self) -> tuple[Response, int] | Response:
         """
         Handle in_process_total API requests.
         Returns aggregated counts of in-process translations per user.
@@ -215,7 +292,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_pages_users(self) -> tuple[Response, int] | Response:
+    def pages_users(self) -> tuple[Response, int] | Response:
         """
         Handle pages_users API requests.
         Returns pages_users records with joined category campaign data.
@@ -245,7 +322,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_pages_with_views(self) -> tuple[Response, int] | Response:
+    def pages_with_views(self) -> tuple[Response, int] | Response:
         """
         Handle pages_with_views API requests.
         Returns pages records with views from views_new_all.
@@ -275,7 +352,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_categories(self) -> tuple[Response, int] | Response:
+    def categories(self) -> tuple[Response, int] | Response:
         """
         Handle categories API requests. Returns all category records.
         """
@@ -293,7 +370,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_distinct_langs(self) -> tuple[Response, int] | Response:
+    def distinct_langs(self) -> tuple[Response, int] | Response:
         """
         Return distinct languages from pages joined with categories.
 
@@ -311,9 +388,7 @@ class ReportAPIHandler:
         return jsonify({"results": data, "count": len(data)})
 
     def users_by_translations_count(self) -> tuple[Response, int] | Response:
-        """C
-        Handle pages_with_views API requests.
-        """
+        """Handle users_by_translations_count API requests."""
         try:
             data = self.leaderboard_service.list_of_users_by_translations_count()
         except Exception:
@@ -330,7 +405,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_langs(self) -> tuple[Response, int] | Response:
+    def langs(self) -> tuple[Response, int] | Response:
         """
         Handle langs API requests. Returns all language records.
         """
@@ -348,7 +423,7 @@ class ReportAPIHandler:
 
         return jsonify(response_data)
 
-    def get_users(self) -> tuple[Response, int] | Response:
+    def users(self) -> tuple[Response, int] | Response:
         """
         Handle users API requests. Returns all users names.
         """
@@ -372,95 +447,172 @@ class ReportAPIHandler:
         return jsonify(response_data)
 
 
-class ApiRoutes(ReportAPIHandler):
-    def __init__(self) -> None:
-        self.leaderboard_service = LeaderboardService()
-        super().__init__(self.leaderboard_service)
+class ApiStatusView(BaseReportApiView):
+    """Leaderboard status endpoint."""
 
-    def register(self, bp: Blueprint) -> None:
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the leaderboard chart data for the given filters."""
+        return self.leaderboard_status()
 
-        bp.before_request(self.handle_options_preflight)
 
-        routes = [
-            ("/status", "GET", self.leaderboard_status),
-            ("/top_langs", "GET", self.get_top_langs),
-            ("/top_users", "GET", self.get_top_users),
-            ("/top_lang_of_users", "GET", self.get_top_lang_of_users),
-            ("/publish_reports", "GET", self.get_publish_reports),
-            ("/publish_reports/stats", "GET", self.publish_reports_stats),
-            ("/in_process", "GET", self.get_in_process),
-            ("/in_process_total", "GET", self.get_in_process_total),
-            ("/pages_users", "GET", self.get_pages_users),
-            ("/pages_with_views", "GET", self.get_pages_with_views),
-            ("/categories", "GET", self.get_categories),
-            ("/distinct_langs", "GET", self.get_distinct_langs),
-            ("/users_by_translations_count", "GET", self.users_by_translations_count),
-            ("/langs", "GET", self.get_langs),
-            ("/users", "GET", self.get_users),
-        ]
-        for rule, method, target in routes:
-            bp.route(rule, methods=[method])(check_cors(target))
+class ApiTopLangsView(BaseReportApiView):
+    """Top languages endpoint."""
 
-    def handle_options_preflight(self):
-        if request.method == "OPTIONS":
-            response = Response("", status=200)
-            requested_method = request.headers.get("Access-Control-Request-Method", "GET")
-            response.headers["Access-Control-Allow-Methods"] = f"{requested_method}, OPTIONS"
-            # response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-            response.headers["Access-Control-Max-Age"] = "7200"
-            return response
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the top languages for the given filters."""
+        return self.top_langs()
 
-    def get_top_langs(self) -> tuple[Response, int] | Response:
-        form = ApiFormData.from_request(request.args)
-        result = get_top_langs(form)
-        data = result.to_json()
-        if result.error:
-            return jsonify(data), 500
 
-        return jsonify(data)
+class ApiTopUsersView(BaseReportApiView):
+    """Top users endpoint."""
 
-    def get_top_users(self) -> tuple[Response, int] | Response:
-        form = ApiFormData.from_request(request.args)
-        result = get_top_users(form)
-        data = result.to_json()
-        if result.error:
-            return jsonify(data), 500
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the top users for the given filters."""
+        return self.top_users()
 
-        return jsonify(data)
 
-    def get_top_lang_of_users(self) -> tuple[Response, int] | Response:
-        try:
-            data = self.leaderboard_service.top_lang_of_users()
-        except Exception:
-            logger.exception("Error fetching top_lang_of_users data")
-            return jsonify({"error": "An internal error occurred"}), 500
-        return jsonify(data)
+class ApiTopLangOfUsersView(BaseReportApiView):
+    """Top language per user endpoint."""
 
-    def leaderboard_status(self) -> tuple[Response, int] | Response:
-        """
-        Handle leaderboard API requests.
-        /api/status?camp=Video&user_group=WIKI&year=2025&month=02&cat=RTTVideo
-        """
-        form = ApiFormData.from_request(request.args)
-        try:
-            data = self.leaderboard_service.get_leaderboard_chart_data(
-                camp=form.camp,
-                cat=form.cat,
-                user_group=form.user_group,
-                year=form.year,
-                month=form.month,
-                lang=form.lang,
-                user=form.user,
-            )
-        except Exception:
-            logger.exception("Error fetching leaderboard status data")
-            return jsonify({"error": "An internal error occurred"}), 500
-        response_data = {
-            "results": data,
-            "count": len(data),
-        }
-        return jsonify(response_data)
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the top language of every user."""
+        return self.top_lang_of_users()
+
+
+class ApiPublishReportsView(BaseReportApiView):
+    """Publish reports endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the report records matching the query filters."""
+        return self.publish_reports()
+
+
+class ApiPublishReportsStatsView(BaseReportApiView):
+    """Publish reports stats endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the distinct filter values used by the reports UI."""
+        return self.publish_reports_stats()
+
+
+class ApiInProcessView(BaseReportApiView):
+    """In-process translations endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the in-process translation records."""
+        return self.in_process()
+
+
+class ApiInProcessTotalView(BaseReportApiView):
+    """In-process totals per user endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the per-user in-process counts."""
+        return self.in_process_total()
+
+
+class ApiPagesUsersView(BaseReportApiView):
+    """pages_users records endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the latest published userspace pages."""
+        return self.pages_users()
+
+
+class ApiPagesWithViewsView(BaseReportApiView):
+    """Pages with pageviews endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the published pages together with their pageviews."""
+        return self.pages_with_views()
+
+
+class ApiCategoriesView(BaseReportApiView):
+    """Categories endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return every category record."""
+        return self.categories()
+
+
+class ApiDistinctLangsView(BaseReportApiView):
+    """Distinct languages endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the distinct languages present in published pages."""
+        return self.distinct_langs()
+
+
+class ApiUsersByTranslationsCountView(BaseReportApiView):
+    """Users ranked by translations count endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return every user keyed by their translation count."""
+        return self.users_by_translations_count()
+
+
+class ApiLangsView(BaseReportApiView):
+    """Languages endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return every language record."""
+        return self.langs()
+
+
+class ApiUsersView(BaseReportApiView):
+    """Users search endpoint."""
+
+    def get(self) -> tuple[Response, int] | Response:
+        """Return the users matching the ``userlike`` query parameter."""
+        return self.users()
+
+
+class ApiRoutes:
+    """Registrar wiring the report API MethodViews onto a blueprint.
+
+    Endpoint names mirror the legacy handler method names so existing
+    ``url_for('api.get_distinct_langs')`` / ``url_for('api.get_users')``
+    calls keep resolving.
+    """
+
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        """Register the preflight hook and every API endpoint."""
+        bp.before_request(_handle_options_preflight)
+
+        bp.add_url_rule("/status", view_func=ApiStatusView.as_view("leaderboard_status"), methods=["GET"])
+        bp.add_url_rule("/top_langs", view_func=ApiTopLangsView.as_view("get_top_langs"), methods=["GET"])
+        bp.add_url_rule("/top_users", view_func=ApiTopUsersView.as_view("get_top_users"), methods=["GET"])
+        bp.add_url_rule(
+            "/top_lang_of_users", view_func=ApiTopLangOfUsersView.as_view("get_top_lang_of_users"), methods=["GET"]
+        )
+        bp.add_url_rule(
+            "/publish_reports", view_func=ApiPublishReportsView.as_view("get_publish_reports"), methods=["GET"]
+        )
+        bp.add_url_rule(
+            "/publish_reports/stats",
+            view_func=ApiPublishReportsStatsView.as_view("publish_reports_stats"),
+            methods=["GET"],
+        )
+        bp.add_url_rule("/in_process", view_func=ApiInProcessView.as_view("get_in_process"), methods=["GET"])
+        bp.add_url_rule(
+            "/in_process_total", view_func=ApiInProcessTotalView.as_view("get_in_process_total"), methods=["GET"]
+        )
+        bp.add_url_rule("/pages_users", view_func=ApiPagesUsersView.as_view("get_pages_users"), methods=["GET"])
+        bp.add_url_rule(
+            "/pages_with_views", view_func=ApiPagesWithViewsView.as_view("get_pages_with_views"), methods=["GET"]
+        )
+        bp.add_url_rule("/categories", view_func=ApiCategoriesView.as_view("get_categories"), methods=["GET"])
+        bp.add_url_rule(
+            "/distinct_langs", view_func=ApiDistinctLangsView.as_view("get_distinct_langs"), methods=["GET"]
+        )
+        bp.add_url_rule(
+            "/users_by_translations_count",
+            view_func=ApiUsersByTranslationsCountView.as_view("users_by_translations_count"),
+            methods=["GET"],
+        )
+        bp.add_url_rule("/langs", view_func=ApiLangsView.as_view("get_langs"), methods=["GET"])
+        bp.add_url_rule("/users", view_func=ApiUsersView.as_view("get_users"), methods=["GET"])
 
 
 __all__ = [
