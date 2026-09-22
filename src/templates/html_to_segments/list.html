@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content_fluid %}
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header">
+        </div>
+        <div class="card-body">
+            <table class="table compact table-striped" id="main_table">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const IsAdmin = "{{ is_admin }}";
+
+    function make_badge(exists) {
+        return exists ? '' : " <span class='badge bg-danger'>Missing</span>";
+    }
+
+    const columns = [
+        {
+            data: 'number',
+            title: '#',
+            className: 'dt-center'
+        },
+        {
+            data: 'lastModified',
+            title: 'lastModified'
+        },
+        {
+            data: 'title',
+            title: 'Title',
+            render: function (data, type, row) {
+                return `<a class="card-link" href="https://mdwiki.org/wiki/index.php?title=${encodeURIComponent(data)}" target="_blank">${data}</a>`;
+            }
+        }
+    ];
+
+    if (IsAdmin) {
+        columns.push({
+            data: null,
+            title: 'Re create',
+            render: function (data, type, row) {
+                return `<a class="card-link" href="/new_html/?new=1&title=${encodeURIComponent(row.title)}" target="_blank">Re create</a>`;
+            }
+        });
+    }
+
+    columns.push(
+        {
+            data: 'dir_path',
+            title: 'Revision',
+            render: function (data, type, row) {
+                return `<a class="card-link" href="https://mdwiki.org/wiki/index.php?oldid=${row.oldid_number}" target="_blank">${data}</a>`;
+            }
+        },
+        {
+            data: 'wikitext_exists',
+            title: 'Wikitext',
+            render: function (data, type, row) {
+                const url = `/new_html/open?revid=${row.dir_path}&file=wikitext.txt`;
+                return `<a class="card-link" href="${url}" target="_blank">Wikitext</a> ${make_badge(data)}`;
+            }
+        },
+        {
+            data: 'html_exists',
+            title: 'Html',
+            render: function (data, type, row) {
+                const url = `/new_html/open?revid=${row.dir_path}&file=html.html`;
+                return `<a class="card-link" href="${url}" target="_blank">Html</a> ${make_badge(data)}`;
+            }
+        },
+        {
+            data: 'seg_exists',
+            title: 'Segments',
+            render: function (data, type, row) {
+                const url = `/new_html/open?revid=${row.dir_path}&file=seg.html`;
+                return `<a class="card-link" href="${url}" target="_blank">Segments</a> ${make_badge(data)}`;
+            }
+        }
+    );
+
+    $('#main_table').DataTable({
+        stateSave: true,
+        paging: false,
+        info: true,
+        searching: true,
+        ajax: {
+            url: '/new_html/revisions_api',
+            dataSrc: 'results'
+        },
+        columns: columns
+    });
+</script>
+{% endblock %}

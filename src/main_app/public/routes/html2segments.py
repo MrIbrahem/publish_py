@@ -200,6 +200,13 @@ class HtmltoSegmentsIndexView(MethodView):
             "html_to_segments/index.html",
         )
 
+class ListView(MethodView):
+
+    def get(self) -> str:
+        return render_template(
+            "html_to_segments/list.html",
+        )
+
 
 class HtmltoSegmentsRoutes:
     """Registrar for the HTML-to-segments views."""
@@ -207,6 +214,7 @@ class HtmltoSegmentsRoutes:
     @classmethod
     def register(cls, bp: Blueprint) -> None:
         """Register the process and index endpoints on the blueprint."""
+        bp.add_url_rule("/list", view_func=ListView.as_view("list"), methods=["GET"])
         bp.add_url_rule("/", view_func=HtmltoSegmentsProcessView.as_view("process_text"), methods=["POST"])
         bp.add_url_rule("/", view_func=HtmltoSegmentsIndexView.as_view("index"), methods=["GET"])
 
