@@ -1,7 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/contextualizer.py module.
-
-Classes to test: Contextualizer
+Unit tests for lib/lineardoc/contextualizer.py module.
 """
 
 from src.main_app.services.segments.lib.lineardoc.contextualizer import (

@@ -1,10 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/normalizer.py module.
-
-Classes to test: Normalizer
-Functions to test: normalize
-
-
+Unit tests for lib/lineardoc/normalizer.py module.
 """
 
 from src.main_app.services.segments.lib.lineardoc.normalizer import Normalizer, normalize

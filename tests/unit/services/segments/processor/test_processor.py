@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/processor.py module.
+Unit tests for lib/processor.py module.
 
 Functions to test: process_html
 """

@@ -69,8 +69,14 @@ if sys:
     python_src_path = project_root  # / "python_src"
     sys.path.insert(0, str(python_src_path))
 
-# Import after environment setup
+    # Initialize environment variables and imports before tests run
+    from src.main_app.bootstrap import init_app_environment as _init_app_environment
+
+    _init_app_environment()
+
 from src.main_app import AppFactory
+
+# Import after environment setup
 from src.main_app.config import TestingConfig
 from src.main_app.database.create_helper import create_tables, create_views
 from src.main_app.extensions import db as _db

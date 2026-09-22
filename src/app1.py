@@ -4,26 +4,25 @@ WSGI development entry point for the app.
 """
 
 from __future__ import annotations
-import sys
+
 import os
-import logging
-import pymysql
+import sys
 from pathlib import Path
+import pymysql
 
-from dotenv import load_dotenv
-
+# Set environment mode
 os.environ["FLASK_ENV"] = "development"
 
+# Ensure current directory is in sys.path
 sys.path.insert(0, str(Path(__file__).parent))
+
+# Register PyMySQL driver
 pymysql.install_as_MySQLdb()
 
-# Load environment variables before any other imports
+# Initialize environment variables and external module paths before application setup
+from main_app.bootstrap import init_app_environment  # Adjust import based on module location  # noqa: E402
 
-_env_file_path = str(Path(__file__).parent.parent.parent / ".env")
-try:
-    load_dotenv(_env_file_path)
-except Exception:
-    logging.warning(f"Failed to load .env file from {str(_env_file_path)}")
+init_app_environment()
 
 from main_app import AppFactory  # noqa: E402
 

@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/doc.py module.
+Unit tests for lib/lineardoc/doc.py module.
 
 Classes to test: Doc
 

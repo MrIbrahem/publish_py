@@ -1,6 +1,6 @@
 # ruff: noqa: F401
 """
-Unit tests for src/main_app/public/routes/html_to_segments/__init__.py module.
+Unit tests for src/main_app/public/routes/html2segments/__init__.py module.
 
 Classes to test: ProcessingError, HtmltoSegmentsRoutes
 Functions to test: validate_request, create_error_response, create_success_response, process_text
@@ -8,7 +8,7 @@ Functions to test: validate_request, create_error_response, create_success_respo
 TODO: write tests
 """
 
-from src.main_app.public.routes.html_to_segments import (
+from src.main_app.public.routes.html2segments import (
     HtmltoSegmentsRoutes,
     ProcessingError,
     create_error_response,

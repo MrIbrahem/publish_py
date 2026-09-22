@@ -1,7 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/text_block.py module.
-
-Classes to test: TextBlock
+Unit tests for lib/lineardoc/text_block.py module.
 """
 
 from src.main_app.services.segments.lib.lineardoc.text_block import TextBlock

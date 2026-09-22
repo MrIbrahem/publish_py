@@ -52,23 +52,28 @@ waitress-serve --threads=4 --host=localhost --port=8080 src.app:app
 ## Architecture
 
 ### Entry point & Application Factory
+
 -   `src/app.py` calls `create_app()` from `src/main_app/__init__.py`
 
 ### Key Directories & Blueprints
+
 -   `src/main_app/public/routes/`: `bp_api`, `bp_auth`, `bp_cxtoken`, `bp_main`, `bp_publish`, `bp_fixrefs`, `bp_leaderboard`
 -   `src/main_app/admin/routes/`: `bp_admin`
 -   `src/main_app/db/`: Database models and services
 -   `src/main_app/shared/`: Shared utilities, clients (mediawiki_api, wikidata_client, oauth_client, text_processor), and core logic.
 
 ### Configuration
+
 -   Frozen dataclasses with `@lru_cache` singletons in `src/main_app/config.py`.
 -   Access via `from main_app.config import settings`.
 
 ### Database Pattern
+
 -   Uses Flask-SQLAlchemy for ORM.
 -   Legacy database layer in `src/main_app/db/` provides retry logic and connection pooling.
 
 ### OAuth Flow
+
 1. `/login` -> MediaWiki OAuth -> `/callback`
 2. Tokens encrypted with Fernet (cryptography library), stored in database
 3. Used for authenticated MediaWiki API calls

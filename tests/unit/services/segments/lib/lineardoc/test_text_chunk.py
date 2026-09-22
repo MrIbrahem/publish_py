@@ -1,7 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/text_chunk.py module.
-
-Classes to test: TextChunk
+Unit tests for lib/lineardoc/text_chunk.py module.
 """
 
 from src.main_app.services.segments.lib.lineardoc.text_chunk import (
