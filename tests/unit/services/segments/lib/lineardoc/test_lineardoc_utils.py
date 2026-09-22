@@ -1,5 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/utils.py module.
+Unit tests for lib/lineardoc/utils.py module.
 """
 
 from pathlib import Path

@@ -1,10 +1,6 @@
 # ruff: noqa: F401
 """
-Unit tests for src/main_app/services/segments/lib/segmentation/cx_segmenter.py module.
-
-Classes to test: CXSegmenter
-
-TODO: write tests
+Unit tests for lib/segmentation/cx_segmenter.py module.
 """
 
 from src.main_app.services.segments.lib.lineardoc import Doc, MwContextualizer, Parser

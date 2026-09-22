@@ -1,7 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/builder.py module.
-
-Classes to test: Builder
+Unit tests for lib/lineardoc/builder.py module.
 """
 
 import pytest

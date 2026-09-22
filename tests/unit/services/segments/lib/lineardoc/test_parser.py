@@ -1,9 +1,5 @@
 """
-Unit tests for src/main_app/services/segments/lib/lineardoc/parser.py module.
-
-Classes to test: Parser
-
-
+Unit tests for lib/lineardoc/parser.py module.
 """
 
 from src.main_app.services.segments.lib.lineardoc.contextualizer import Contextualizer
