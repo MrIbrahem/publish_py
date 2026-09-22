@@ -14,8 +14,8 @@ process_html(
 
 from __future__ import annotations
 
-from .lib.processor import process_html
 from .lib.mw.mw_page_loader import MWPageLoader
+from .lib.processor import process_html
 
 run_process_html = process_html
 
