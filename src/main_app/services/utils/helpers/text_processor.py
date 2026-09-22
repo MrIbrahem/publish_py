@@ -19,6 +19,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 def do_changes_to_text_with_settings(
     text: str | Any,
     title: str,
@@ -31,6 +32,7 @@ def do_changes_to_text_with_settings(
     add_category: bool = False,
 ) -> str:
     if fix_one_page is None:
+        logger.error("fix_refs library is not installed")
         return text
 
     if not isinstance(text, str):

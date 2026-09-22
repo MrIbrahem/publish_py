@@ -4,3 +4,9 @@ pytest-cov
 pytest-mock
 pytest-xdist
 pywikibot
+
+# install fix_refs
+git+https://github.com/MrIbrahem/fix_refs_new_py.git
+
+# install html_to_segments
+git+https://github.com/MrIbrahem/mdwikicxpy.git

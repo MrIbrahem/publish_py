@@ -71,9 +71,11 @@ if sys:
 
     # Initialize environment variables and imports before tests run
     from src.main_app.bootstrap import init_app_environment as _init_app_environment
+
     _init_app_environment()
 
 from src.main_app import AppFactory
+
 # Import after environment setup
 from src.main_app.config import TestingConfig
 from src.main_app.database.create_helper import create_tables, create_views

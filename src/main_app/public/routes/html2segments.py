@@ -15,7 +15,8 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, render_template, request
 from flask.views import MethodView
 
-from ...services.segments_wraper import process_html
+# from ...services.segments_wraper import process_html
+from ...services.segments import process_html
 
 logger = logging.getLogger(__name__)
 

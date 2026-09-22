@@ -5,7 +5,8 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from ...segments_wraper import process_html
+# from ...segments_wraper import run_process_html
+from ...segments import run_process_html
 from ..storage import read_file
 from ..utils import remove_data_parsoid
 
@@ -28,7 +29,7 @@ def get_segments(source_html: str, file_seg: Path, force_new: bool) -> tuple[str
         return "", from_cache
 
     try:
-        seg_text = process_html(source_html)  # Process the HTML content
+        seg_text = run_process_html(source_html)  # Process the HTML content
     except Exception as e:
         logger.error("Segment processing failed: %s", e)
         return "", from_cache

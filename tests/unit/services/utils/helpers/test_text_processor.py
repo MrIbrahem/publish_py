@@ -2,7 +2,11 @@
 Tests for clients.text_processor module.
 """
 
-from src.main_app.services.utils.helpers.text_processor import fix_one_page, do_changes_to_text_with_settings  # noqa: F401
+from src.main_app.services.utils.helpers.text_processor import (  # noqa: F401
+    do_changes_to_text_with_settings,
+    fix_one_page,
+)
+
 
 class TestFixOnePage:
     """Tests for fix_one_page function."""
