@@ -69,6 +69,10 @@ if sys:
     python_src_path = project_root  # / "python_src"
     sys.path.insert(0, str(python_src_path))
 
+    # Initialize environment variables and imports before tests run
+    from src.bootstrap import init_app_environment
+    init_app_environment()
+
 # Import after environment setup
 from src.main_app import AppFactory
 from src.main_app.config import TestingConfig

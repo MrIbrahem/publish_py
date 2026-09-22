@@ -29,5 +29,3 @@ validators>=0.35.0
 Werkzeug>=3.1.8
 wikitextparser>=2.0.0
 sentencex>=1.0.30
-
-git+https://github.com/MrIbrahem/fix_refs_new_py.git
