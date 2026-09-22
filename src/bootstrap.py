@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
@@ -44,16 +45,25 @@ class EnvironmentInitializer:
         except Exception as exc:
             logger.warning("Failed to load .env file from %s: %s", env_path, exc)
 
-    @staticmethod
-    def _setup_fix_refs_path() -> None:
+    @classmethod
+    def _setup_fix_refs_path(cls, retry: bool = True) -> None:
         """Check for fix_refs availability and dynamically append its path if configured."""
         try:
             import fix_refs  # noqa: F401
+            return None
         except ImportError:
-            fix_refs_path = os.getenv("FIX_REFS_PY_PATH", "")
-            if fix_refs_path and os.path.isdir(fix_refs_path):
-                if fix_refs_path not in sys.path:
-                    sys.path.insert(0, fix_refs_path)
+            if not retry:
+                logger.warning("fix_refs not found")
+                return None
+
+        fix_refs_path = os.getenv("FIX_REFS_PY_PATH", "")
+        if not fix_refs_path or not os.path.isdir(fix_refs_path):
+            return None
+
+        if fix_refs_path not in sys.path:
+            sys.path.insert(0, fix_refs_path)
+            if retry:
+                return cls._setup_fix_refs_path(retry=False)
 
 
 def init_app_environment(env_path: Path | str | None = None) -> None:

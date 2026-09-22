@@ -59,3 +59,4 @@ tests/**/*.php
 src/main_app/public/routes/td/translate_med.php
 .claude/skills/flask-methodview-refactoring/SKILL.md
 src/main_app/services/segments_wraper/*.html
+/src/main_app/services/segments_1

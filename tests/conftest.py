@@ -71,6 +71,7 @@ if sys:
 
     # Initialize environment variables and imports before tests run
     from src.bootstrap import init_app_environment
+
     init_app_environment()
 
 # Import after environment setup

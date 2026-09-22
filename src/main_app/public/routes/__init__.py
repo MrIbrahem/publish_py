@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from .api.routes import ApiRoutes
 from .cxtoken.routes import CxTokenRoutes
-from .html_to_segments import HtmltoSegmentsRoutes
+from .html2segments import HtmltoSegmentsRoutes
 from .main import MainRoutes
 from .new_html import NewHtmlRoutes
 from .publish.routes import PublishRoutes

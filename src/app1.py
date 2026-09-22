@@ -21,6 +21,7 @@ pymysql.install_as_MySQLdb()
 
 # Initialize environment variables and external module paths before application setup
 from bootstrap import init_app_environment  # Adjust import based on module location  # noqa: E402
+
 init_app_environment()
 
 from main_app import AppFactory  # noqa: E402
