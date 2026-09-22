@@ -11,14 +11,13 @@ import logging
 from typing import Any
 
 fix_one_page = None
-logger = logging.getLogger(__name__)
 
 try:
     from fix_refs import fix_one_page
 except ImportError:
     fix_one_page = None
-    logger.warning("fix_refs not found")
 
+logger = logging.getLogger(__name__)
 
 def do_changes_to_text_with_settings(
     text: str | Any,
