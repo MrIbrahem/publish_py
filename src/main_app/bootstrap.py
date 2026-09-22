@@ -69,9 +69,9 @@ class EnvironmentInitializer:
         except ImportError:
             logger.warning("html_to_segments library not found")
             msg = """
-            Please install html_to_segments from https://github.com/MrIbrahem/mdwikicxpy
-                - `pip install git+https://github.com/MrIbrahem/mdwikicxpy.git -U`
-            or clone html_to_segments into your workspace and inside `mdwikicxpy` folder run:
+            Please install html_to_segments from https://github.com/MrIbrahem/html_to_segments
+                - `pip install git+https://github.com/MrIbrahem/html_to_segments.git -U`
+            or clone html_to_segments into your workspace and inside `html_to_segments` folder run:
                 - `pip install -e .`
             """
             logger.error(msg)

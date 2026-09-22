@@ -12,7 +12,7 @@
 | `/api`                              | GET       | API                          | [Mdwiki-TD/TD_API](https://github.com/Mdwiki-TD/TD_API)                                                                                              | php         |
 | `/new_html`                         | GET       | -                            | [mdwikicx/new_html](https://github.com/mdwikicx/new_html)                                                                                            | php         |
 | `/admin`                            | GET       | -                            | [Mdwiki-TD/tdc](https://github.com/Mdwiki-TD/tdc/)                                                                                                   | php         |
-| `/HtmltoSegments`                   | GET, POST | -                            | [MrIbrahem/mdwikicxpy](https://github.com/MrIbrahem/mdwikicxpy) & [mdwikicx/cxsever](https://github.com/mdwikicx/cxsever/blob/main/www/js/server.js) | js          |
+| `/HtmltoSegments`                   | GET, POST | -                            | [MrIbrahem/html_to_segments](https://github.com/MrIbrahem/html_to_segments) & [mdwikicx/cxsever](https://github.com/mdwikicx/cxsever/blob/main/www/js/server.js) | js          |
 
 # End points
 
