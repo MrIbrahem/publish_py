@@ -20,26 +20,26 @@ The **MDWiki Translation Dashboard** is a Flask web application that publishes W
 
 ## Project Health Assessment
 
-| Dimension | Rating | Assessment |
-|-----------|--------|------------|
-| **Overall Code Quality** | 6.5/10 | Good patterns exist (factory, service layer, frozen config) but undermined by duplication and copy-paste bugs |
-| **Maintainability** | 5.5/10 | High duplication (4+ service pairs at 90%+ similarity) makes changes risky; a single edit often needs to be replicated in 2-4 files |
-| **Scalability** | 6/10 | Connection pooling configured (pool_size=5, max_overflow=10); but `active_coordinators()` DB call on every request and unbounded result sets are concerns |
-| **Security Posture** | 4/10 | 8+ admin routes unprotected; XSS in HTML builders; rate limit bypass; hardcoded PHP credentials; OAuth state token reuse |
-| **Production Readiness** | Partial | Core publishing workflow works; admin dashboard has critical access control gaps; PHP code not deployable standalone |
+| Dimension                | Rating  | Assessment                                                                                                                                                |
+| ------------------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Overall Code Quality** | 6.5/10  | Good patterns exist (factory, service layer, frozen config) but undermined by duplication and copy-paste bugs                                             |
+| **Maintainability**      | 5.5/10  | High duplication (4+ service pairs at 90%+ similarity) makes changes risky; a single edit often needs to be replicated in 2-4 files                       |
+| **Scalability**          | 6/10    | Connection pooling configured (pool_size=5, max_overflow=10); but `active_coordinators()` DB call on every request and unbounded result sets are concerns |
+| **Security Posture**     | 4/10    | 8+ admin routes unprotected; XSS in HTML builders; rate limit bypass; hardcoded PHP credentials; OAuth state token reuse                                  |
+| **Production Readiness** | Partial | Core publishing workflow works; admin dashboard has critical access control gaps; PHP code not deployable standalone                                      |
 
 ### Per-Module Scores
 
-| Module | Score | Key Issue |
-|--------|-------|-----------|
-| `src/` (entry points) | 8/10 | Clean, minimal -- minor naming issue |
-| `main_app/` (factory) | 7.5/10 | CSRF exemption needs documentation |
-| `config/` | 8.5/10 | Excellent frozen dataclass design |
-| `db/` | 6.5/10 | Massive duplication, broken `_main_service.py` |
-| `admin/` | 5/10 | **Critical**: missing `@admin_required` on 8+ files |
-| `public/` | 7/10 | XSS in HTML builders, rate limit bypass |
-| `shared/` | 7/10 | Thread-safety concern in crypto, good patterns |
-| `results_api_php_code/` | 4/10 | Hardcoded credentials, SQL error exposure |
+| Module                  | Score  | Key Issue                                           |
+| ----------------------- | ------ | --------------------------------------------------- |
+| `src/` (entry points)   | 8/10   | Clean, minimal -- minor naming issue                |
+| `main_app/` (factory)   | 7.5/10 | CSRF exemption needs documentation                  |
+| `config/`               | 8.5/10 | Excellent frozen dataclass design                   |
+| `db/`                   | 6.5/10 | Massive duplication, broken `_main_service.py`      |
+| `admin/`                | 5/10   | **Critical**: missing `@admin_required` on 8+ files |
+| `public/`               | 7/10   | XSS in HTML builders, rate limit bypass             |
+| `shared/`               | 7/10   | Thread-safety concern in crypto, good patterns      |
+| `results_api_php_code/` | 4/10   | Hardcoded credentials, SQL error exposure           |
 
 ---
 
@@ -58,15 +58,15 @@ The codebase follows consistent patterns across modules:
 
 ### Repeated Weaknesses
 
-| Weakness | Affected Modules | Frequency |
-|----------|-----------------|-----------|
-| Code duplication (90%+ similarity) | `db/`, `admin/`, `public/` | 8+ file pairs |
-| Missing `@admin_required` decorator | `admin/` | 8 route files |
-| XSS via raw HTML string interpolation | `public/`, `admin/` | 4+ functions |
-| f-string in logging calls | All modules | 20+ instances |
-| Copy-paste log messages | `admin/` | 3 files |
-| Dead imports | `admin/`, `public/` | 5+ files |
-| Inconsistent error types (`ValueError` vs `LookupError`) | `db/services/` | All 25 services |
+| Weakness                                                 | Affected Modules           | Frequency       |
+| -------------------------------------------------------- | -------------------------- | --------------- |
+| Code duplication (90%+ similarity)                       | `db/`, `admin/`, `public/` | 8+ file pairs   |
+| Missing `@admin_required` decorator                      | `admin/`                   | 8 route files   |
+| XSS via raw HTML string interpolation                    | `public/`, `admin/`        | 4+ functions    |
+| f-string in logging calls                                | All modules                | 20+ instances   |
+| Copy-paste log messages                                  | `admin/`                   | 3 files         |
+| Dead imports                                             | `admin/`, `public/`        | 5+ files        |
+| Inconsistent error types (`ValueError` vs `LookupError`) | `db/services/`             | All 25 services |
 
 ### Common Technical Debt
 
@@ -80,12 +80,12 @@ The codebase follows consistent patterns across modules:
 
 ### Dependency Issues
 
-| Dependency | Concern |
-|------------|---------|
-| `fix_refs` | External module loaded via `sys.path` manipulation from `FIX_REFS_PY_PATH` env var; graceful fallback exists but removes core functionality |
-| `pymysql` | Installed as MySQLdb shim via `pymysql.install_as_MySQLdb()` -- works but is a compatibility hack |
-| `mwoauth` | Third-party MediaWiki OAuth library; no version pinning documented |
-| `cachetools` | TTL cache for CX tokens; no eviction monitoring |
+| Dependency   | Concern                                                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fix_refs`   | External module loaded via `sys.path` manipulation from `FIX_REFS_PY_PATH` env var; graceful fallback exists but removes core functionality |
+| `pymysql`    | Installed as MySQLdb shim via `pymysql.install_as_MySQLdb()` -- works but is a compatibility hack                                           |
+| `mwoauth`    | Third-party MediaWiki OAuth library; no version pinning documented                                                                          |
+| `cachetools` | TTL cache for CX tokens; no eviction monitoring                                                                                             |
 
 ### Integration Concerns
 
@@ -103,15 +103,15 @@ The codebase follows consistent patterns across modules:
 
 **8+ admin route files lack `@admin_required`**, allowing unauthenticated users to:
 
-| Route | Impact |
-|-------|--------|
-| `POST /admin/add/` | Add arbitrary translation records to the database |
-| `POST /admin/pages_users_to_main/fix_it` | Promote user pages to main namespace |
-| `POST /admin/translated/edit` | Edit or delete published translation records |
-| `POST /admin/translated_users/edit` | Edit or delete user-space translations |
-| `POST /admin/tt/` and `POST /admin/tt/add` | Modify translate type configurations |
-| `POST /admin/qids/` and `POST /admin/qids_others/` | Modify Wikidata QID mappings |
-| `GET /admin/reports`, `/process`, `/process_total` | Access admin data without authentication |
+| Route                                              | Impact                                            |
+| -------------------------------------------------- | ------------------------------------------------- |
+| `POST /admin/add/`                                 | Add arbitrary translation records to the database |
+| `POST /admin/pages_users_to_main/fix_it`           | Promote user pages to main namespace              |
+| `POST /admin/translated/edit`                      | Edit or delete published translation records      |
+| `POST /admin/translated_users/edit`                | Edit or delete user-space translations            |
+| `POST /admin/tt/` and `POST /admin/tt/add`         | Modify translate type configurations              |
+| `POST /admin/qids/` and `POST /admin/qids_others/` | Modify Wikidata QID mappings                      |
+| `GET /admin/reports`, `/process`, `/process_total` | Access admin data without authentication          |
 
 **Severity**: Critical. Any internet user can modify application data.
 
@@ -191,11 +191,11 @@ If `int(tt_id_raw)` raises, the except block references `tt_id` which was never 
 
 ### Good Development Practices
 
-- pytest with fixtures, markers (`@pytest.mark.unit`, `@pytest.mark.network`), and coverage
-- Black + isort + ruff for formatting and linting
-- Application factory enables test isolation
-- CSRF protection via Flask-WTF
-- Graceful degradation when `fix_refs` is not installed
+-   pytest with fixtures, markers (`@pytest.mark.unit`, `@pytest.mark.network`), and coverage
+-   Black + isort + ruff for formatting and linting
+-   Application factory enables test isolation
+-   CSRF protection via Flask-WTF
+-   Graceful degradation when `fix_refs` is not installed
 
 ---
 
@@ -203,75 +203,75 @@ If `int(tt_id_raw)` raises, the except block references `tt_id` which was never 
 
 ### Immediate Fixes (Security Blockers -- Do Before Next Deploy)
 
-| # | Fix | Effort | Impact |
-|---|-----|--------|--------|
-| 1 | **Add `@admin_required` to all unprotected admin routes** (8 files) | 1 hour | Closes critical access control gap |
-| 2 | **Add `html.escape()` to `_make_summary()` and `_make_mdwiki_cat_url()`** | 30 min | Eliminates XSS vulnerability |
-| 3 | **Remove hardcoded credentials from `load_env.php`** | 15 min | Prevents credential exposure |
-| 4 | **Replace `echo "sql error:"` with logging in `mdwiki_sql.php`** | 15 min | Stops SQL detail leakage |
-| 5 | **Remove `$_COOKIE['test']` debug checks in PHP** | 30 min | Prevents debug info exposure |
-| 6 | **Fix rate limiting to use `request.remote_addr`** | 30 min | Closes rate limit bypass |
+| #   | Fix                                                                       | Effort | Impact                             |
+| --- | ------------------------------------------------------------------------- | ------ | ---------------------------------- |
+| 1   | **Add `@admin_required` to all unprotected admin routes** (8 files)       | 1 hour | Closes critical access control gap |
+| 2   | **Add `html.escape()` to `_make_summary()` and `_make_mdwiki_cat_url()`** | 30 min | Eliminates XSS vulnerability       |
+| 3   | **Remove hardcoded credentials from `load_env.php`**                      | 15 min | Prevents credential exposure       |
+| 4   | **Replace `echo "sql error:"` with logging in `mdwiki_sql.php`**          | 15 min | Stops SQL detail leakage           |
+| 5   | **Remove `$_COOKIE['test']` debug checks in PHP**                         | 30 min | Prevents debug info exposure       |
+| 6   | **Fix rate limiting to use `request.remote_addr`**                        | 30 min | Closes rate limit bypass           |
 
 ### Short-term Improvements (1-2 Weeks)
 
-| # | Improvement | Effort | Impact |
-|---|-------------|--------|--------|
-| 7 | Fix `page_service.py` string key bug (`"word"` -> `PageRecord.word`) | 5 min | Prevents potential SQLAlchemy error |
-| 8 | Add try/except with rollback to `report_service.py` | 30 min | Prevents session corruption |
-| 9 | Fix `UnboundLocalError` in `tt.py` | 15 min | Prevents admin crash |
-| 10 | Fix duplicate flash messages in logout handler | 15 min | Correct user feedback |
-| 11 | Fix copy-paste log messages in `full_translators.py` and `users_no_inprocess.py` | 10 min | Correct error reporting |
-| 12 | Change `app_context_processor` to `bp_admin.context_processor` | 5 min | Eliminates unnecessary work on non-admin requests |
-| 13 | Change 404 handler log level from `ERROR` to `WARNING` | 5 min | Correct log severity |
-| 14 | Add 405 Method Not Allowed handler | 15 min | Consistent error responses |
-| 15 | Delete stale `routes/admin.py` duplicate | 5 min | Eliminate confusion |
-| 16 | Remove dead code: `_main_service.py`, unused imports, commented blocks | 30 min | Reduce noise |
-| 17 | Implement separate TTL for OAuth state tokens (5-10 min) | 30 min | Prevents replay attacks |
-| 18 | Mask password in `DbConfig.to_dict()` | 5 min | Prevents accidental credential logging |
+| #   | Improvement                                                                      | Effort | Impact                                            |
+| --- | -------------------------------------------------------------------------------- | ------ | ------------------------------------------------- |
+| 7   | Fix `page_service.py` string key bug (`"word"` -> `PageRecord.word`)             | 5 min  | Prevents potential SQLAlchemy error               |
+| 8   | Add try/except with rollback to `report_service.py`                              | 30 min | Prevents session corruption                       |
+| 9   | Fix `UnboundLocalError` in `tt.py`                                               | 15 min | Prevents admin crash                              |
+| 10  | Fix duplicate flash messages in logout handler                                   | 15 min | Correct user feedback                             |
+| 11  | Fix copy-paste log messages in `full_translators.py` and `users_no_inprocess.py` | 10 min | Correct error reporting                           |
+| 12  | Change `app_context_processor` to `bp_admin.context_processor`                   | 5 min  | Eliminates unnecessary work on non-admin requests |
+| 13  | Change 404 handler log level from `ERROR` to `WARNING`                           | 5 min  | Correct log severity                              |
+| 14  | Add 405 Method Not Allowed handler                                               | 15 min | Consistent error responses                        |
+| 15  | Delete stale `routes/admin.py` duplicate                                         | 5 min  | Eliminate confusion                               |
+| 16  | Remove dead code: `_main_service.py`, unused imports, commented blocks           | 30 min | Reduce noise                                      |
+| 17  | Implement separate TTL for OAuth state tokens (5-10 min)                         | 30 min | Prevents replay attacks                           |
+| 18  | Mask password in `DbConfig.to_dict()`                                            | 5 min  | Prevents accidental credential logging            |
 
 ### Medium-term Improvements (1-2 Months)
 
-| # | Improvement | Effort | Impact |
-|---|-------------|--------|--------|
-| 19 | **Implement generic `CrudService[ModelT]`** to eliminate 4+ duplicate service pairs | 2-3 days | Eliminates ~2000 lines of duplication |
-| 20 | **Refactor `translated.py` / `translated_users.py`** into parameterized class (like `QidsModel`) | 1 day | Eliminates admin route duplication |
-| 21 | **Extract shared `_set_record_active_status` pattern** for coordinator/full_translator/users_no_inprocess | 1 day | Eliminates user-role service duplication |
-| 22 | **Merge `results_2026.py` and `results_api.py` shared logic** | 1 day | Eliminates results duplication |
-| 23 | Split `results_2026.py` (622 lines) into focused modules | 1 day | Improves readability |
-| 24 | Standardize exception types across all services (`ValueError` for domain, `LookupError` for not-found) | 1 day | Consistent error handling |
-| 25 | Uncomment thread-safety lock in `crypto.py` | 15 min | Thread-safe Fernet initialization |
-| 26 | Add pagination to `users_emails.py` dashboard | 2 hours | Prevents memory issues at scale |
-| 27 | Add `pyproject.toml` to eliminate `sys.path` manipulation | 2 hours | Proper Python packaging |
-| 28 | Add health check endpoint (`/health`) | 30 min | Enables monitoring |
-| 29 | Cache `active_coordinators()` per-request using Flask `g` | 30 min | Eliminates per-request DB query |
+| #   | Improvement                                                                                               | Effort   | Impact                                   |
+| --- | --------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------- |
+| 19  | **Implement generic `CrudService[ModelT]`** to eliminate 4+ duplicate service pairs                       | 2-3 days | Eliminates ~2000 lines of duplication    |
+| 20  | **Refactor `translated.py` / `translated_users.py`** into parameterized class (like `QidsModel`)          | 1 day    | Eliminates admin route duplication       |
+| 21  | **Extract shared `_set_record_active_status` pattern** for coordinator/full_translator/users_no_inprocess | 1 day    | Eliminates user-role service duplication |
+| 22  | **Merge `results_2026.py` and `results_api.py` shared logic**                                             | 1 day    | Eliminates results duplication           |
+| 23  | Split `results_2026.py` (622 lines) into focused modules                                                  | 1 day    | Improves readability                     |
+| 24  | Standardize exception types across all services (`ValueError` for domain, `LookupError` for not-found)    | 1 day    | Consistent error handling                |
+| 25  | Uncomment thread-safety lock in `crypto.py`                                                               | 15 min   | Thread-safe Fernet initialization        |
+| 26  | Add pagination to `users_emails.py` dashboard                                                             | 2 hours  | Prevents memory issues at scale          |
+| 27  | Add `pyproject.toml` to eliminate `sys.path` manipulation                                                 | 2 hours  | Proper Python packaging                  |
+| 28  | Add health check endpoint (`/health`)                                                                     | 30 min   | Enables monitoring                       |
+| 29  | Cache `active_coordinators()` per-request using Flask `g`                                                 | 30 min   | Eliminates per-request DB query          |
 
 ### Long-term Strategic Refactoring (3-6 Months)
 
-| # | Initiative | Effort | Impact |
-|---|-----------|--------|--------|
-| 30 | **Complete Python port of PHP results functionality** and deprecate PHP code | 2-3 weeks | Eliminates dual codebase maintenance |
-| 31 | **Add database migration scripts (Alembic)** for schema versioning | 1 week | Enables safe schema evolution |
-| 32 | **Add comprehensive test coverage** for admin routes and publish workflow | 2 weeks | Prevents regressions |
-| 33 | Implement server-side caching for results (Redis or in-memory with TTL) | 1 week | Improves results page performance |
-| 34 | Add OpenAPI/Swagger documentation for all `/api/` endpoints | 1 week | Enables frontend integration |
-| 35 | Add audit logging for admin mutations | 1 week | Accountability and debugging |
-| 36 | Consider SQLAlchemy 2.0 style (`select()` instead of `query()`) | 2 weeks | Future-proofs ORM usage |
-| 37 | Add circuit breakers for external API calls (mdwiki.org, wikidata.org) | 1 week | Improves resilience |
+| #   | Initiative                                                                   | Effort    | Impact                               |
+| --- | ---------------------------------------------------------------------------- | --------- | ------------------------------------ |
+| 30  | **Complete Python port of PHP results functionality** and deprecate PHP code | 2-3 weeks | Eliminates dual codebase maintenance |
+| 31  | **Add database migration scripts (Alembic)** for schema versioning           | 1 week    | Enables safe schema evolution        |
+| 32  | **Add comprehensive test coverage** for admin routes and publish workflow    | 2 weeks   | Prevents regressions                 |
+| 33  | Implement server-side caching for results (Redis or in-memory with TTL)      | 1 week    | Improves results page performance    |
+| 34  | Add OpenAPI/Swagger documentation for all `/api/` endpoints                  | 1 week    | Enables frontend integration         |
+| 35  | Add audit logging for admin mutations                                        | 1 week    | Accountability and debugging         |
+| 36  | Consider SQLAlchemy 2.0 style (`select()` instead of `query()`)              | 2 weeks   | Future-proofs ORM usage              |
+| 37  | Add circuit breakers for external API calls (mdwiki.org, wikidata.org)       | 1 week    | Improves resilience                  |
 
 ### Security Hardening Priorities
 
-| Priority | Action | Current State |
-|----------|--------|---------------|
-| **P0** | Add `@admin_required` to all admin routes | 8+ files unprotected |
-| **P0** | Add `html.escape()` to HTML builders | 4+ functions with XSS |
-| **P0** | Remove PHP hardcoded credentials | Plaintext in repository |
-| **P1** | Fix rate limit bypass | `X-Forwarded-For` trusted |
-| **P1** | Shorten OAuth state token TTL | Uses cookie max_age |
-| **P1** | Mask password in `DbConfig.to_dict()` | Exposed in dict |
-| **P2** | Remove SQL error echo in PHP | Leaks to browser |
-| **P2** | Remove cookie-gated debug output | Anyone can enable |
-| **P2** | Document CSRF exemption rationale | Undocumented |
-| **P3** | Add CSRF exemption to specific routes only | Entire blueprint exempt |
+| Priority | Action                                     | Current State             |
+| -------- | ------------------------------------------ | ------------------------- |
+| **P0**   | Add `@admin_required` to all admin routes  | 8+ files unprotected      |
+| **P0**   | Add `html.escape()` to HTML builders       | 4+ functions with XSS     |
+| **P0**   | Remove PHP hardcoded credentials           | Plaintext in repository   |
+| **P1**   | Fix rate limit bypass                      | `X-Forwarded-For` trusted |
+| **P1**   | Shorten OAuth state token TTL              | Uses cookie max_age       |
+| **P1**   | Mask password in `DbConfig.to_dict()`      | Exposed in dict           |
+| **P2**   | Remove SQL error echo in PHP               | Leaks to browser          |
+| **P2**   | Remove cookie-gated debug output           | Anyone can enable         |
+| **P2**   | Document CSRF exemption rationale          | Undocumented              |
+| **P3**   | Add CSRF exemption to specific routes only | Entire blueprint exempt   |
 
 ### DevOps and Testing Recommendations
 
@@ -289,13 +289,13 @@ If `int(tt_id_raw)` raises, the except block references `tt_id` which was never 
 
 ## Final Evaluation
 
-| Metric | Score | Notes |
-|--------|-------|-------|
-| **Overall Project Score** | **6/10** | Functional architecture with critical security gaps and heavy duplication |
-| **Risk Level** | **High** | Unprotected admin routes allow unauthorized data modification |
-| **Technical Debt Level** | **High** | 8+ duplicate file pairs, broken dead code, inconsistent patterns |
-| **Production Readiness** | **Conditional** | Core publishing works; admin dashboard needs security hardening before production use |
-| **Estimated Effort to Production-Ready** | **2-3 weeks** | P0 security fixes (1 day) + short-term improvements (1 week) + testing (1-2 weeks) |
+| Metric                                   | Score           | Notes                                                                                 |
+| ---------------------------------------- | --------------- | ------------------------------------------------------------------------------------- |
+| **Overall Project Score**                | **6/10**        | Functional architecture with critical security gaps and heavy duplication             |
+| **Risk Level**                           | **High**        | Unprotected admin routes allow unauthorized data modification                         |
+| **Technical Debt Level**                 | **High**        | 8+ duplicate file pairs, broken dead code, inconsistent patterns                      |
+| **Production Readiness**                 | **Conditional** | Core publishing works; admin dashboard needs security hardening before production use |
+| **Estimated Effort to Production-Ready** | **2-3 weeks**   | P0 security fixes (1 day) + short-term improvements (1 week) + testing (1-2 weeks)    |
 
 ### Recommended Next Steps
 

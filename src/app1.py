@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 pymysql.install_as_MySQLdb()
 
 # Initialize environment variables and external module paths before application setup
-from bootstrap import init_app_environment  # Adjust import based on module location  # noqa: E402
+from main_app.bootstrap import init_app_environment  # Adjust import based on module location  # noqa: E402
 
 init_app_environment()
 

@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
-
 class EnvironmentInitializer:
     """Handles environment variable loading and dynamic path registrations."""
 
@@ -22,8 +21,8 @@ class EnvironmentInitializer:
         Ensures execution happens only once per runtime.
         """
         if cls._initialized:
+            logger.warning("Environment already initialized")
             return
-
         cls._load_environment(env_path)
         cls._setup_fix_refs_path()
         cls._initialized = True
@@ -34,6 +33,7 @@ class EnvironmentInitializer:
         if env_path is None:
             # Default location: 3 levels up from this file or root directory
             env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+            logger.error("No .env file specified, using default path: %s", env_path)
         else:
             env_path = Path(env_path)
 
@@ -49,22 +49,11 @@ class EnvironmentInitializer:
     def _setup_fix_refs_path(cls, retry: bool = True) -> None:
         """Check for fix_refs availability and dynamically append its path if configured."""
         try:
-            import fix_refs  # noqa: F401
-            return None
+            from fix_refs import fix_one_page # noqa: F401
         except ImportError:
-            if not retry:
-                logger.warning("fix_refs not found")
-                return None
-
-        fix_refs_path = os.getenv("FIX_REFS_PY_PATH", "")
-        if not fix_refs_path or not os.path.isdir(fix_refs_path):
-            return None
-
-        if fix_refs_path not in sys.path:
-            sys.path.insert(0, fix_refs_path)
-            if retry:
-                return cls._setup_fix_refs_path(retry=False)
-
+            logger.warning("fix_refs not found")
+            pip_url = "pip install git+https://github.com/MrIbrahem/fix_refs_new_py.git -U"
+            logger.warning("Please run: %s", pip_url)
 
 def init_app_environment(env_path: Path | str | None = None) -> None:
     """Helper function to trigger environment initialization."""
