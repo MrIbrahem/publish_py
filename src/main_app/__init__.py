@@ -69,6 +69,12 @@ class AppFactory:
             use_colorlog=use_color,
             daily_rotation=daily_rotation,
         )
+        configure_logging(
+            level=level,
+            name="fix_refs",
+            use_colorlog=use_color,
+            daily_rotation=False,
+        )
 
     @staticmethod
     def _init_extensions(app: Flask):

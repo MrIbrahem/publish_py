@@ -110,18 +110,28 @@ class FixRefsTestView(MethodView):
                 "title": "Decitabina/cedazuridina",
                 "lang": "es",
                 "mdwiki_revid": 1478161,
+                "text": "",
             },
             {
                 "source_title": "Tropicamide",
                 "title": "Usuario:Mr. Ibrahem/Tropicamida",
                 "lang": "es",
                 "mdwiki_revid": 1408734,
+                "text": "",
             },
             {
                 "source_title": "Fatty liver disease",
                 "title": "Մասնակից:Mr. Ibrahem/Լյարդի ճարպային հիվանդություն",
                 "lang": "hy",
                 "mdwiki_revid": 1458412,
+                "text": "",
+            },
+            {
+                "source_title": "Malnutrition",
+                "title": "مستخدم:Mr. Ibrahem/سوء التغذية",
+                "lang": "ar",
+                "mdwiki_revid": 1503213,
+                "text": "zz.<ref name=Bh2013/>",
             },
         ]
         item = random.choice(tests_data)
