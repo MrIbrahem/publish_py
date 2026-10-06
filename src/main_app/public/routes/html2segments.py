@@ -200,6 +200,7 @@ class HtmltoSegmentsIndexView(MethodView):
             "html_to_segments/index.html",
         )
 
+
 class ListView(MethodView):
 
     def get(self) -> str:

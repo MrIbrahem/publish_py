@@ -75,7 +75,14 @@ def wikidata_link(qid: str, name: str = "", default: str = "") -> str:
     return f"<a class='inline' target='_blank' href='https://wikidata.org/wiki/{encoded}'>{display}</a>"
 
 
-def tr_link_medwiki(title: str, langcode: str, cat: str, camp: str, tra_type: str, word: int | str = 0) -> str:
+def tr_link_medwiki(
+    title: str,
+    langcode: str,
+    cat: str,
+    camp: str,
+    tra_type: str,
+    word: int | str = 0,
+) -> str:
     """Relative URL to ``translate_med.php`` (PHP make_tr_link_medwiki).
 
     The target endpoint is hosted by the PHP Translation-Dashboard. The
