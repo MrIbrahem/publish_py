@@ -31,9 +31,6 @@ class ExistsItem(ItemBase):
     via: str
     qid: str
 
-    # Request-level config supplied by the table (not available in the template).
-    translate_type_info: dict[str, int | None] = field(default_factory=dict)
-
     @classmethod
     def from_row(
         cls,

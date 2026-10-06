@@ -27,9 +27,6 @@ class InProcessItem(ItemBase):
     user: str
     date: str
 
-    # Request-level config supplied by the table (not available in the template).
-    translate_type_info: dict[str, int | None] = field(default_factory=dict)
-
     @classmethod
     def from_row(
         cls,

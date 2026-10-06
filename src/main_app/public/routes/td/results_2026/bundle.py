@@ -30,7 +30,11 @@ class ResultsRows:
     exists_rows: list[ExistsItem]
 
     def to_json(self) -> dict[str, Any]:
-        return asdict(self)
+        return {
+            "missing": [x.to_json() for x in self.missing_rows],
+            "inprocess": [x.to_json() for x in self.inprocess_rows],
+            "exists": [x.to_json() for x in self.exists_rows],
+        }
 
 
 @dataclass

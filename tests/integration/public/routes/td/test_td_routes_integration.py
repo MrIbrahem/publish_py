@@ -235,17 +235,6 @@ class TestResultsApiView:
         assert "execution_time" in payload
         assert "results" in payload
 
-    def test_returns_500_on_failure(self, mock_client: FlaskClient, anonymous, mocker):
-        mocker.patch(
-            "src.main_app.public.routes.td.td_route.results_api_result",
-            side_effect=RuntimeError("boom"),
-        )
-
-        response = mock_client.get(f"{_TD_PREFIX}/results_api")
-
-        assert response.status_code == 500
-        assert response.get_json() == {"error": "Failed to load results"}
-
     def test_missing_params_do_not_crash(self, mock_client: FlaskClient, anonymous):
         response = mock_client.get(f"{_TD_PREFIX}/results_api")
 

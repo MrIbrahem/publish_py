@@ -32,7 +32,6 @@ from ....database.services import (
 )
 from ....services.auth.utils import get_current_user
 from .results_2026 import ResultsBundle, ResultsLoader
-from .results_api import results_api_result
 
 logger = logging.getLogger(__name__)
 
@@ -224,7 +223,6 @@ class TDTableView(BaseTDView):
     def get(self) -> str:
         """Render the dashboard and load the results bundle when valid."""
         langs, campaigns = self._load_langs_and_campaigns()
-
         parsed = self._parse_request_args(campaigns)
 
         # Identity / coordinator / full-translator flags — mirrors src/index.php.
@@ -313,8 +311,8 @@ class TDResultsApiView(BaseTDView):
 
     def get(self) -> ResponseReturnValue:
         """Return the results for a code/campaign triple as JSON."""
-
-        parsed = self._parse_request_args([])
+        _, campaigns = self._load_langs_and_campaigns()
+        parsed = self._parse_request_args(campaigns)
 
         start = time.time()
 

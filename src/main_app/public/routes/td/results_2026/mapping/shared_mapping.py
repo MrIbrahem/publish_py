@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 from urllib.parse import quote
 
@@ -39,10 +39,21 @@ class ItemBase:
     tra_type: str
     qid: str
 
+    # Request-level config supplied by the table (not available in the template).
+    translate_type_info: dict[str, int | None]# = field(default_factory=dict)
+
     @property
     def is_video(self) -> bool:
         """PHP ``str_starts_with(strtolower($title), "video:")``."""
         return self.title.lower().startswith("video:")
+
+    def to_json(self) -> dict[str, Any]:
+        data = asdict(self)
+        data["is_video"] = self.is_video
+
+        data.pop("translate_type_info", None)
+
+        return data
 
     def _login_html(self) -> Markup:
         """Login button shown to anonymous users (PHP ``results_table*.php``)."""

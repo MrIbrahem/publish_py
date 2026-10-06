@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
+from typing import Any
 from urllib.parse import quote
 
 from markupsafe import Markup
@@ -17,12 +18,6 @@ logger = logging.getLogger(__name__)
 @dataclass
 class MissingItem(ItemBase):
     is_full_row: bool
-    translate_type_info: dict[str, int | None] = field(default_factory=dict)
-
-    @property
-    def is_video(self) -> bool:
-        """PHP ``str_starts_with(strtolower($title), "video:")``."""
-        return self.title.lower().startswith("video:")
 
     @property
     def n(self) -> str:
@@ -160,6 +155,7 @@ class MissingItem(ItemBase):
             refs=Stats.load(row, "refs"),
             translate_type_info=translate_type_info,
         )
+
 
 
 __all__ = [
