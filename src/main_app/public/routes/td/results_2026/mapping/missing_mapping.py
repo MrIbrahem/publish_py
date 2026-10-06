@@ -43,8 +43,8 @@ class MissingItem(ItemBase):
             "Translate"
             "</a>"
         )
-        # 1. if its video, render `full_url` only. no mater if full_tr_user or not
-        if self.is_video:
+        # 1. if is_full_only, render `full_url` only. no mater if full_tr_user or not
+        if self.is_full_only:
             return Markup(html_translate_button).format(translate_url=full_url, tra_type='all')
 
         lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type)
@@ -90,7 +90,7 @@ class MissingItem(ItemBase):
             </tr>
         """).format(
             counter=self.n,
-            full_note="(Full text)" if (self.is_full_row and not self.is_video) else "",
+            full_note="(Full text)" if (self.is_full_row and not self.is_full_only) else "",
             encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
             row_links=row_links,
@@ -112,8 +112,6 @@ class MissingItem(ItemBase):
         full_tr_user: bool,
         is_authenticated: bool,
     ) -> Markup:
-        no_lead = self.translate_type_info["tt_lead"] == 0
-        is_full_eligible = self.translate_type_info["tt_full"] == 1
 
         return self._render(
             langcode=langcode,

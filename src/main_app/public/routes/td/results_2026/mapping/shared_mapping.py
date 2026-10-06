@@ -25,6 +25,8 @@ class Stats:
         else:
             return cls(lead=row.get("r_lead_refs") or 0, all=row.get("r_all_refs") or 0)
 
+    def to_json(self) -> dict[str, Any]:
+        return asdict(self)
 
 @dataclass
 class ItemBase:
@@ -42,8 +44,15 @@ class ItemBase:
     # Request-level config supplied by the table (not available in the template).
     translate_type_info: dict[str, int | None]# = field(default_factory=dict)
 
+    @property
+    def is_full_only(self) -> bool:
+        if self.is_video:
+            return True
+
+        return self.translate_type_info.get("tt_lead") == 0 and self.translate_type_info.get("tt_full") == 1
+
     def pick_stat_value(self, stat: Stats) -> int:
-        return stat.all if (self.is_video or self.tra_type == "all") else stat.lead
+        return stat.all if (self.tra_type == "all" or self.is_full_only) else stat.lead
 
     @property
     def is_video(self) -> bool:
@@ -53,6 +62,7 @@ class ItemBase:
     def to_json(self) -> dict[str, Any]:
         data = asdict(self)
         data["is_video"] = self.is_video
+        data["is_full_only"] = self.is_full_only
 
         data.pop("translate_type_info", None)
         data.pop("is_full_row", None)    # used in MissingItem

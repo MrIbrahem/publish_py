@@ -79,8 +79,8 @@ class InProcessItem(ItemBase):
             "Translate"
             "</a>"
         )
-        # 1. if its video, render `full_url` only. no mater if full_tr_user or not
-        if self.is_video:
+        # 1. if is_full_only, render `full_url` only. no mater if full_tr_user or not
+        if self.is_full_only:
             return Markup(html_translate_button).format(translate_url=full_url, tra_type='all')
 
         lead_url = content_translation_url(self.title, langcode, camp, self.tra_type)
@@ -151,9 +151,6 @@ class InProcessItem(ItemBase):
         is_authenticated: bool,
         show_translation_button: bool,
     ) -> Markup:
-        no_lead = self.translate_type_info["tt_lead"] == 0
-        is_full_eligible = self.translate_type_info["tt_full"] == 1
-
         return self._render(
             langcode=langcode,
             camp=camp,

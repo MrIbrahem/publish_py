@@ -122,9 +122,6 @@ class ExistsItem(ItemBase):
         is_authenticated: bool,
         user_coord: bool,
     ) -> Markup:
-        no_lead = self.translate_type_info["tt_lead"] == 0
-        is_full_eligible = self.translate_type_info["tt_full"] == 1
-
         return self._render(
             langcode=langcode,
             camp=camp,
