@@ -36,28 +36,31 @@ class MissingItem(ItemBase):
         if not is_authenticated:
             return self._login_html()
 
-        lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type, self.words.lead)
+        full_url = tr_link_medwiki(self.title, langcode, cat, camp, "all")
 
-        if full_tr_user and not self.is_video:
-            full_url = tr_link_medwiki(self.title, langcode, cat, camp, "all", self.words.all)
-            return Markup(
-                "<div class='inline'>"
-                "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
-                "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
-                "</div>"
-            ).format(
-                lead_url=lead_url,
-                full_url=full_url,
-            )
-
-        return Markup(
-            "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tra_type}'>"
+        html_translate_button = (
+            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tra_type}'>"
             "Translate"
             "</a>"
-        ).format(
-            lead_url=lead_url,
-            tra_type=self.tra_type,
         )
+        # 1. if its video, render `full_url` only. no mater if full_tr_user or not
+        if self.is_video:
+            return Markup(html_translate_button).format(translate_url=full_url, tra_type='all')
+
+        lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type)
+
+        # 2. if not `full_tr_user`, render only lead url
+        if not full_tr_user:
+            return Markup(html_translate_button).format(translate_url=lead_url, tra_type=self.tra_type)
+
+        # 3. if full_tr_user, render both lead and full urls
+        return Markup(
+            "<div class='inline'>"
+            "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
+            "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
+            "</div>"
+        ).format( lead_url=lead_url, full_url=full_url )
+
 
     def _render(
         self,
@@ -86,15 +89,17 @@ class MissingItem(ItemBase):
                 <td> {wikidata_link} </td>
             </tr>
         """).format(
-            counter=self.counter,
+            counter=self.n,
             full_note="(Full text)" if (self.is_full_row and not self.is_video) else "",
             encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
             row_links=row_links,
             en_views=self.en_views,
             importance=self.importance,
-            words=self.words.all if self.tra_type == "all" else self.words.lead,
-            refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
+
+            words=self.pick_stat_value(self.words),
+            refs=self.pick_stat_value(self.refs),
+
             wikidata_link=Markup(self.wikidata_link()),
             mdwiki_link=Markup(self.mdwiki_link()),
         )

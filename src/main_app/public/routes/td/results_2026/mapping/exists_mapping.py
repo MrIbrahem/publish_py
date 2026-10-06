@@ -72,12 +72,14 @@ class ExistsItem(ItemBase):
         if not user_coord:
             return Markup("")
 
+        html_translate_button = (
+            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tra_type}'>"
+            "Translate"
+            "</a>"
+        )
+
         translate_url = content_translation_url(self.title, langcode, camp, "lead")
-        return Markup(
-            "<div class='inline'>"
-            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
-            "</div>"
-        ).format(translate_url=translate_url)
+        return Markup(html_translate_button).format(translate_url=translate_url, tra_type="lead")
 
     def _render(
         self,

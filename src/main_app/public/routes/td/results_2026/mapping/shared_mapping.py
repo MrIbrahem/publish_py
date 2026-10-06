@@ -42,6 +42,9 @@ class ItemBase:
     # Request-level config supplied by the table (not available in the template).
     translate_type_info: dict[str, int | None]# = field(default_factory=dict)
 
+    def pick_stat_value(self, stat: Stats) -> int:
+        return stat.all if (self.is_video or self.tra_type == "all") else stat.lead
+
     @property
     def is_video(self) -> bool:
         """PHP ``str_starts_with(strtolower($title), "video:")``."""
@@ -52,6 +55,7 @@ class ItemBase:
         data["is_video"] = self.is_video
 
         data.pop("translate_type_info", None)
+        data.pop("is_full_row", None)    # used in MissingItem
 
         return data
 

@@ -72,24 +72,31 @@ class InProcessItem(ItemBase):
         if not is_authenticated:
             return self._login_html()
 
-        effective_type = "all" if self.is_video else (self.tra_type or "lead")
-        lead_url = content_translation_url(self.title, langcode, camp, effective_type)
+        full_url = content_translation_url(self.title, langcode, camp, "all")
 
-        if full_tr_user and not self.is_video:
-            full_url = content_translation_url(self.title, langcode, camp, "all")
-            return Markup(
-                "<div class='inline'>"
-                "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
-                "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
-                "</div>"
-            ).format(
-                lead_url=lead_url,
-                full_url=full_url,
-            )
+        html_translate_button = (
+            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tra_type}'>"
+            "Translate"
+            "</a>"
+        )
+        # 1. if its video, render `full_url` only. no mater if full_tr_user or not
+        if self.is_video:
+            return Markup(html_translate_button).format(translate_url=full_url, tra_type='all')
 
+        lead_url = content_translation_url(self.title, langcode, camp, self.tra_type)
+
+        # 2. if not `full_tr_user`, render only lead url
+        if not full_tr_user:
+            return Markup(html_translate_button).format(translate_url=lead_url, tra_type=self.tra_type)
+
+        # 3. if full_tr_user, render both lead and full urls
         return Markup(
-            "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
-        ).format(lead_url=lead_url)
+            "<div class='inline'>"
+            "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
+            "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
+            "</div>"
+        ).format( lead_url=lead_url, full_url=full_url )
+
 
     def _render(
         self,
@@ -129,8 +136,8 @@ class InProcessItem(ItemBase):
             row_links=row_links,
             en_views=self.en_views,
             importance=self.importance,
-            words=self.words.all if self.tra_type == "all" else self.words.lead,
-            refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
+            words=self.pick_stat_value(self.words),
+            refs=self.pick_stat_value(self.refs),
             user=self.user,
             date=self.date,
             wikidata_link=Markup(self.wikidata_link()),
