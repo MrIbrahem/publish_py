@@ -8,9 +8,7 @@ from urllib.parse import quote
 
 from markupsafe import Markup
 
-from ......services.utils.wiki_links import (
-    tr_link_medwiki,
-)
+from ......services.utils.wiki_links import tr_link_medwiki
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -30,31 +28,6 @@ class MissingItem(ItemBase):
     def n(self) -> str:
         # PHP "$count = $full && (substr != 'video:') ? '$count.Full' : $count"
         return f"{self.counter}.Full" if self.is_full_row and not self.is_video else str(self.counter)
-
-    @classmethod
-    def from_row(
-        cls,
-        title: str,
-        counter: int,
-        row: dict,
-        tra_type: str,
-        is_full_row: bool,
-        translate_type_info: dict[str, int | None] | None = None,
-    ) -> MissingItem:
-        """ """
-        translate_type_info = translate_type_info or {"tt_lead": None, "tt_full": None}
-        return cls(
-            counter=counter,
-            title=title or row.get("title") or "",
-            en_views=row.get("en_views") or "",
-            importance=row.get("importance") or "Unknown",
-            qid=row.get("qid") or "",
-            tra_type=tra_type,
-            is_full_row=is_full_row,
-            words=Stats.load(row, "words"),
-            refs=Stats.load(row, "refs"),
-            translate_type_info=translate_type_info,
-        )
 
     def translate_html(
         self,
@@ -148,6 +121,44 @@ class MissingItem(ItemBase):
             camp=camp,
             full_tr_user=full_tr_user,
             is_authenticated=is_authenticated,
+        )
+
+    def translate_url(self, lang: str, cat: str, camp: str) -> str:
+        return tr_link_medwiki(
+            title=self.title,
+            langcode=lang,
+            cat=cat,
+            camp=camp,
+            tra_type=self.tra_type,
+        )
+
+    # -------------------------------------
+    # Factory
+    # -------------------------------------
+    @classmethod
+    def from_row(
+        cls,
+        title: str,
+        counter: int,
+        row: dict,
+        tra_type: str,
+        is_full_row: bool = False,
+        translate_type_info: dict[str, int | None] | None = None,
+    ) -> MissingItem:
+        """ """
+        translate_type_info = translate_type_info or {"tt_lead": None, "tt_full": None}
+
+        return cls(
+            counter=counter,
+            title=title or row.get("title") or "",
+            en_views=row.get("en_views") or "",
+            importance=row.get("importance") or "Unknown",
+            qid=row.get("qid") or "",
+            tra_type=tra_type,
+            is_full_row=is_full_row,
+            words=Stats.load(row, "words"),
+            refs=Stats.load(row, "refs"),
+            translate_type_info=translate_type_info,
         )
 
 

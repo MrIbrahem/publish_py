@@ -136,6 +136,7 @@ class BaseTDView(MethodView):
         # logic from load_request.php — cross-resolve cat <-> camp.
         if not cat and camp:
             cat = camps_data.get(camp, {}).get("category", "") or cat
+
         if cat and not camp:
             camp = cats_data.get(cat, "") or camp
 
@@ -173,6 +174,28 @@ class BaseTDView(MethodView):
                 "show_translation_button": show_translation_button,
             },
         }
+
+    def _load_results(self, parsed: dict[str, Any], full_tr_user: bool) -> ResultsBundle | None:
+        """Load the results bundle, flashing a warning on failure."""
+        try:
+            return ResultsLoader().load(
+                code=parsed["code"],
+                cat=parsed["cat"],
+                tra_type=parsed["tra_type"],
+                code_lang_name=parsed["code_lang_name"],
+                settings=parsed["settings"],
+                full_tr_user=full_tr_user,
+            )
+        except Exception:
+            logger.exception(
+                "results_loader_27 failed for code=%r camp=%r cat=%r",
+                parsed["code"],
+                parsed["camp"],
+                parsed["cat"],
+            )
+            flash("Failed to load results — please try again.", "danger")
+            return None
+
 
 
 class TDIndexView(BaseTDView):
@@ -223,28 +246,6 @@ class TDTableView(BaseTDView):
             form_data=form_data,
             results=results_bundle,
         )
-
-    def _load_results(self, parsed: dict[str, Any], full_tr_user: bool) -> ResultsBundle | None:
-        """Load the results bundle, flashing a warning on failure."""
-        try:
-            return ResultsLoader().load(
-                code=parsed["code"],
-                cat=parsed["cat"],
-                tra_type=parsed["tra_type"],
-                code_lang_name=parsed["code_lang_name"],
-                settings=parsed["settings"],
-                full_tr_user=full_tr_user,
-            )
-        except Exception:
-            logger.exception(
-                "results_loader_27 failed for code=%r camp=%r cat=%r",
-                parsed["code"],
-                parsed["camp"],
-                parsed["cat"],
-            )
-            flash("Failed to load results — please try again.", "danger")
-            return None
-
 
 class TDMissingView(BaseTDView):
     """Render the "top languages by missing articles" overview."""
@@ -311,23 +312,21 @@ class TDResultsApiView(BaseTDView):
     """Expose the results bundle as JSON for AJAX clients."""
 
     def get(self) -> ResponseReturnValue:
-        """Return the results for a code/campaign/depth triple as JSON."""
-        code = request.args.get("code")
-        camp = request.args.get("camp")
-        depth = request.args.get("depth")
+        """Return the results for a code/campaign triple as JSON."""
+
+        parsed = self._parse_request_args([])
 
         start = time.time()
 
-        try:
-            result_dict = results_api_result(code, camp, depth)
-        except Exception:
-            logger.exception(
-                "results_api_result failed for code=%r camp=%r depth=%r",
-                code,
-                camp,
-                depth,
-            )
-            return jsonify({"error": "Failed to load results"}), 500
+        # PHP: only invoke results_loader_27 when both code and camp are valid.
+        results_bundle: ResultsBundle | None = None
+        if parsed["code"] and parsed["camp"] and parsed["code_lang_name"]:
+            results_bundle = self._load_results(parsed, False)
+
+        if results_bundle:
+            result_dict = results_bundle.to_api_json()
+        else:
+            result_dict = {"rows": {}, "summary_data": {}}
 
         elapsed = time.time() - start
 

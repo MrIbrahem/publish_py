@@ -26,7 +26,7 @@ def make_sugustion(langcode: str | None, title: str | None) -> str | None:
     if not langcode or not title:
         return None
 
-    data = results_api_result(langcode, "Main", 0)
+    data = results_api_result(langcode, "Main")
 
     missing = [x for x in data.get("missing", []) if x != title]
     return missing[0] if missing else None
