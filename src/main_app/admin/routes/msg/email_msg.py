@@ -8,7 +8,6 @@ from typing import Any
 from ....database.services import PagesService, UserPagesService, UsersService, ViewsNewService
 from ....public.routes.td.results_api import results_api_result
 from ....services.auth.utils import get_current_user
-from ....services.utils.wiki_links import tr_link_medwiki
 
 logger = logging.getLogger(__name__)
 
@@ -71,9 +70,14 @@ def create_blank_link(url: str, title: str) -> str:
     return f"<a target='_blank' href='{url}'>{title}</a>"
 
 
-def create_email_msg(page_data: dict[str, Any], sugust: str | None) -> str:
+def create_email_msg(
+    page_data: dict[str, Any],
+    translate_url: str,
+    sugust: str | None,
+) -> str:
     if not sugust:
         return ""
+
     title = page_data.get("title", "")
     langcode = page_data.get("lang", "")
     langname = page_data.get("langname", "") or langcode
@@ -84,17 +88,8 @@ def create_email_msg(page_data: dict[str, Any], sugust: str | None) -> str:
     title_link = create_blank_link(f"https://mdwiki.org/wiki/{title}", title)
     sugust_link = create_blank_link(f"https://mdwiki.org/wiki/{sugust}", sugust)
     target_link = create_blank_link(f"https://{langcode}.wikipedia.org/wiki/{target}", langname)
-    translate_link = create_blank_link(
-        tr_link_medwiki(
-            title=sugust,
-            langcode=langcode,
-            cat="RTT",
-            camp="Main",
-            tra_type="lead",
-            word=0,
-        ),
-        "HERE",
-    )
+
+    translate_link = create_blank_link(translate_url, "HERE")
 
     msg = (
         "<font color='#0000ff'>Thank you</font>"

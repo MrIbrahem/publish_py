@@ -70,7 +70,7 @@ if sys:
     sys.path.insert(0, str(python_src_path))
 
     # Initialize environment variables and imports before tests run
-    from src.main_app.bootstrap import init_app_environment as _init_app_environment
+    from src.bootstrap import init_app_environment as _init_app_environment
 
     _init_app_environment()
 

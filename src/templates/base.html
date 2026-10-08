@@ -41,6 +41,7 @@
 </head>
 
 {%- from "_macros.html" import flash_messages -%}
+
 <body>
     {% block _navbar %}
     {% include "_navbar.html" %}
@@ -86,6 +87,18 @@
                 responsive: {
                     details: true
                     // display: $.fn.dataTable.Responsive.display.modal()
+                }
+            });
+            $('.table_responsive_main').DataTable({
+                stateSave: false,
+                paging: false,
+                info: false,
+                searching: false,
+                order: [
+                    [3, 'desc']
+                ],
+                responsive: {
+                    details: true
                 }
             });
             $('.DataTable').DataTable({
