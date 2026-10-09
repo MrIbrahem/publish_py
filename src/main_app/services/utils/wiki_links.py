@@ -80,7 +80,7 @@ def tr_link_medwiki(
     langcode: str,
     cat: str,
     camp: str,
-    tra_type: str,
+    tr_type: str,
     word: int | str = 0,
 ) -> str:
     """Relative URL to ``translate_med.php`` (PHP make_tr_link_medwiki).
@@ -95,7 +95,7 @@ def tr_link_medwiki(
         "cat": cat,
         "camp": camp,
         "word": str(word),
-        "tra_type": tra_type,
+        "tr_type": tr_type,
     }
     translate_med_url = url_for("translate_med.index", **params, _external=False)
     return translate_med_url
@@ -105,7 +105,7 @@ def content_translation_url(
     title: str,
     code: str,
     campaign: str | None,
-    tra_type: str,
+    tr_type: str,
     endpoint: str = "",
 ) -> str:
     """Special:ContentTranslation URL (PHP make_ContentTranslation_url)."""
@@ -121,7 +121,7 @@ def content_translation_url(
 
     params = {
         "title": "Special:ContentTranslation",
-        "tr_type": tra_type,
+        "tr_type": tr_type,
         "from": "mdwiki",
         "to": code,
         "campaign": campaign or "",

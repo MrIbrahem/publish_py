@@ -132,12 +132,12 @@ class TestExistsItem:
 
 class TestInProcessItem:
     @staticmethod
-    def _make(tra_type: str = "lead") -> InProcessItem:
+    def _make(tr_type: str = "lead") -> InProcessItem:
         return InProcessItem.from_row(
             title="Tuberculosis",
             counter=1,
             row={
-                "translate_type": tra_type,
+                "translate_type": tr_type,
                 "user": "TestUser",
                 "add_date": "2026-09-01 10:20:30",
                 "w_lead_words": 100,
@@ -153,7 +153,7 @@ class TestInProcessItem:
 
     def test_from_row_picks_lead_metrics(self):
         item = self._make("lead")
-        assert item.tra_type == "lead"
+        assert item.tr_type == "lead"
         assert item.words.lead == 100
         assert item.refs.lead == 5
         assert item.en_views == 1234
@@ -166,7 +166,7 @@ class TestInProcessItem:
 
     def test_from_row_picks_all_metrics_when_tra_type_all(self):
         item = self._make("all")
-        assert item.tra_type == "all"
+        assert item.tr_type == "all"
         assert item.words.all == 900
         assert item.refs.all == 40
 
@@ -185,7 +185,7 @@ class TestInProcessItem:
             },
         )
         assert item.is_video is True
-        assert item.tra_type == "lead"
+        assert item.tr_type == "lead"
         # Date without a time component is kept as-is.
         assert item.date == "2026-08-01"
 

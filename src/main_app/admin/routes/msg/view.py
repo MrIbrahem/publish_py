@@ -59,7 +59,7 @@ class EmailDashboardView(MethodView):
                 langcode=lang,
                 cat="RTT",
                 camp="Main",
-                tra_type="lead",
+                tr_type="lead",
             )
 
             msg = create_email_msg(page_data, translate_url, suggestion)

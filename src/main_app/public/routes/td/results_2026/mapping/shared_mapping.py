@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from typing import Any, Literal
 from urllib.parse import quote
 
@@ -28,6 +28,7 @@ class Stats:
     def to_json(self) -> dict[str, Any]:
         return asdict(self)
 
+
 @dataclass
 class ItemBase:
     counter: int
@@ -38,11 +39,11 @@ class ItemBase:
     title: str
     en_views: str
     importance: str
-    tra_type: str
+    tr_type: str
     qid: str
 
     # Request-level config supplied by the table (not available in the template).
-    translate_type_info: dict[str, int | None]# = field(default_factory=dict)
+    translate_type_info: dict[str, int | None]  # = field(default_factory=dict)
 
     @property
     def is_full_only(self) -> bool:
@@ -52,7 +53,7 @@ class ItemBase:
         return self.translate_type_info.get("tt_lead") == 0 and self.translate_type_info.get("tt_full") == 1
 
     def pick_stat_value(self, stat: Stats) -> int:
-        return stat.all if (self.tra_type == "all" or self.is_full_only) else stat.lead
+        return stat.all if (self.tr_type == "all" or self.is_full_only) else stat.lead
 
     @property
     def is_video(self) -> bool:
@@ -65,7 +66,7 @@ class ItemBase:
         data["is_full_only"] = self.is_full_only
 
         data.pop("translate_type_info", None)
-        data.pop("is_full_row", None)    # used in MissingItem
+        data.pop("is_full_row", None)  # used in MissingItem
 
         return data
 

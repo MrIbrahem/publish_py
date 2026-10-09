@@ -99,7 +99,7 @@ class BaseTDView(MethodView):
                 "code": parsed["code"],
                 "camp": parsed["camp"],
                 "cat": parsed["cat"],
-                "tra_type": parsed["tra_type"],
+                "tr_type": parsed["tr_type"],
             },
         }
 
@@ -118,7 +118,7 @@ class BaseTDView(MethodView):
         code = _normalize_arg("code")
         camp = _normalize_arg("camp")
         cat = _normalize_arg("cat")
-        tra_type = _normalize_arg("tra_type")
+        tr_type = _normalize_arg("tr_type")
 
         filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
 
@@ -158,14 +158,14 @@ class BaseTDView(MethodView):
         show_exists_table = to_bool(all_settings.get("show_exists_table", False))
 
         if not allow_type_of_translate:
-            tra_type = "lead"
+            tr_type = "lead"
 
         return {
             "code": code,
             "code_lang_name": code_lang_name,
             "camp": camp,
             "cat": cat,
-            "tra_type": tra_type,
+            "tr_type": tr_type,
             "settings": {
                 "filter_sparql": filter_sparql,
                 "show_exists_table": show_exists_table,
@@ -180,7 +180,7 @@ class BaseTDView(MethodView):
             return ResultsLoader().load(
                 code=parsed["code"],
                 cat=parsed["cat"],
-                tra_type=parsed["tra_type"],
+                tr_type=parsed["tr_type"],
                 code_lang_name=parsed["code_lang_name"],
                 settings=parsed["settings"],
                 full_tr_user=full_tr_user,
@@ -194,7 +194,6 @@ class BaseTDView(MethodView):
             )
             flash("Failed to load results — please try again.", "danger")
             return None
-
 
 
 class TDIndexView(BaseTDView):
@@ -244,6 +243,7 @@ class TDTableView(BaseTDView):
             form_data=form_data,
             results=results_bundle,
         )
+
 
 class TDMissingView(BaseTDView):
     """Render the "top languages by missing articles" overview."""

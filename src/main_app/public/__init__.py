@@ -17,6 +17,7 @@ from .routes import (
     FixRefsRoutes,
     HtmltoSegmentsRoutes,
     LeaderBoardRoutes,
+    LegacyRoutes,
     MainRoutes,
     NewHtmlRoutes,
     PublishRoutes,
@@ -47,6 +48,7 @@ PUBLIC_ROUTE_MODULES: list[PublicRouteModule] = [
     ),
     PublicRouteModule(route_cls=PublishRoutes, name="publish", url_prefix="/publish"),
     PublicRouteModule(route_cls=HtmltoSegmentsRoutes, name="HtmltoSegments", url_prefix="/HtmltoSegments"),
+    PublicRouteModule(route_cls=LegacyRoutes, name="legacy_compat", url_prefix="/Translation_Dashboard"),
 ]
 
 

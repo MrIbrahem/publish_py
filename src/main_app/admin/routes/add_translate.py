@@ -35,7 +35,7 @@ class AddTranslateView(MethodView):
         """Process the add_translate form submission."""
         titles = request.form.getlist("mdtitle")
         cats = request.form.getlist("cat")
-        types = request.form.getlist("tra_type")
+        types = request.form.getlist("tr_type")
         users = request.form.getlist("user")
         langs = request.form.getlist("lang")
         targets = request.form.getlist("target")

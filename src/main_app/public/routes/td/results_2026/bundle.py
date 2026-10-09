@@ -8,7 +8,7 @@ Jinja partials render the cards and tables from this structure.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Any
 
 from .mapping import ExistsItem, InProcessItem, MissingItem
@@ -49,7 +49,7 @@ class ResultsBundle:
     rows: ResultsRows
     summary_data: dict[str, Any]
     show_translation_button: bool
-    tra_type: str
+    tr_type: str
     code_lang_name: str
     full_tr_user: bool
 
@@ -58,6 +58,7 @@ class ResultsBundle:
             "rows": self.rows.to_json(),
             "summary_data": self.summary_data,
         }
+
 
 __all__ = [
     "ResultsRows",

@@ -25,7 +25,12 @@ class LeaderboardService:
         """
         SELECT DISTINCT YEAR(pupdate) AS year FROM pages WHERE pupdate <> ''
         """
-        query = self.session.query(func.year(PageRecord.pupdate).label("year")).filter(PageRecord.pupdate != "")
+        if db.engine.name == "sqlite":
+            year_expr = func.strftime("%Y", PageRecord.pupdate)
+        else:
+            year_expr = func.year(PageRecord.pupdate)
+
+        query = self.session.query(year_expr.label("year")).filter(PageRecord.pupdate != "")
         if user is not None:
             query = query.filter(PageRecord.user == user)
 
@@ -33,7 +38,7 @@ class LeaderboardService:
             query = query.filter(PageRecord.lang == lang)
 
         rows = query.distinct().all()
-        years: list[int] = [row.year for row in rows if row.year is not None]
+        years: list[int] = [int(row.year) for row in rows if row.year is not None and str(row.year).isdigit()]
         years.sort(reverse=True)
         return years
 
@@ -43,16 +48,23 @@ class LeaderboardService:
         WHERE pupdate <> ''
         AND YEAR(pupdate) = :year
         """
+        if db.engine.name == "sqlite":
+            month_expr = func.strftime("%m", PageRecord.pupdate)
+            year_filter = func.strftime("%Y", PageRecord.pupdate) == str(year)
+        else:
+            month_expr = func.month(PageRecord.pupdate)
+            year_filter = func.year(PageRecord.pupdate) == year
+
         rows = (
             self.session.query(
-                func.month(PageRecord.pupdate).label("month"),
+                month_expr.label("month"),
             )
             .filter(PageRecord.pupdate != "")
-            .filter(func.year(PageRecord.pupdate) == year)
+            .filter(year_filter)
             .distinct()
             .all()
         )
-        months: list[int] = [row.month for row in rows if row.month is not None]
+        months: list[int] = [int(row.month) for row in rows if row.month is not None and str(row.month).isdigit()]
         months.sort(reverse=True)
         return months
 

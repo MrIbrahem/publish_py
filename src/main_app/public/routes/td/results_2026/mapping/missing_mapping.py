@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import asdict, dataclass, field
-from typing import Any
+from dataclasses import dataclass
 from urllib.parse import quote
 
 from markupsafe import Markup
@@ -39,19 +38,19 @@ class MissingItem(ItemBase):
         full_url = tr_link_medwiki(self.title, langcode, cat, camp, "all")
 
         html_translate_button = (
-            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tra_type}'>"
+            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tr_type}'>"
             "Translate"
             "</a>"
         )
         # 1. if is_full_only, render `full_url` only. no mater if full_tr_user or not
         if self.is_full_only:
-            return Markup(html_translate_button).format(translate_url=full_url, tra_type='all')
+            return Markup(html_translate_button).format(translate_url=full_url, tr_type="all")
 
-        lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tra_type)
+        lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tr_type)
 
         # 2. if not `full_tr_user`, render only lead url
         if not full_tr_user:
-            return Markup(html_translate_button).format(translate_url=lead_url, tra_type=self.tra_type)
+            return Markup(html_translate_button).format(translate_url=lead_url, tr_type=self.tr_type)
 
         # 3. if full_tr_user, render both lead and full urls
         return Markup(
@@ -59,8 +58,7 @@ class MissingItem(ItemBase):
             "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
             "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
             "</div>"
-        ).format( lead_url=lead_url, full_url=full_url )
-
+        ).format(lead_url=lead_url, full_url=full_url)
 
     def _render(
         self,
@@ -96,10 +94,8 @@ class MissingItem(ItemBase):
             row_links=row_links,
             en_views=self.en_views,
             importance=self.importance,
-
             words=self.pick_stat_value(self.words),
             refs=self.pick_stat_value(self.refs),
-
             wikidata_link=Markup(self.wikidata_link()),
             mdwiki_link=Markup(self.mdwiki_link()),
         )
@@ -127,7 +123,7 @@ class MissingItem(ItemBase):
             langcode=lang,
             cat=cat,
             camp=camp,
-            tra_type=self.tra_type,
+            tr_type=self.tr_type,
         )
 
     # -------------------------------------
@@ -139,7 +135,7 @@ class MissingItem(ItemBase):
         title: str,
         counter: int,
         row: dict,
-        tra_type: str,
+        tr_type: str,
         is_full_row: bool = False,
         translate_type_info: dict[str, int | None] | None = None,
     ) -> MissingItem:
@@ -152,13 +148,12 @@ class MissingItem(ItemBase):
             en_views=row.get("en_views") or "",
             importance=row.get("importance") or "Unknown",
             qid=row.get("qid") or "",
-            tra_type=tra_type,
+            tr_type=tr_type,
             is_full_row=is_full_row,
             words=Stats.load(row, "words"),
             refs=Stats.load(row, "refs"),
             translate_type_info=translate_type_info,
         )
-
 
 
 __all__ = [

@@ -9,7 +9,7 @@ import logging
 from sqlalchemy.exc import IntegrityError
 
 from ....extensions import UniqueError, db
-from ...models import CategoryMemberRecord, PageRecord, QidRecord, TranslateTypeRecord
+from ...models import CategoryMemberRecord, QidRecord, TranslateTypeRecord
 from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,11 @@ class TranslateTypeService(CRUDService[TranslateTypeRecord]):
         if cat and cat.lower() != "all":
 
             # titles_in_cat = self.session.query(PageRecord.title).filter(PageRecord.cat == cat).distinct()
-            titles_in_cat = self.session.query(CategoryMemberRecord.article_id).filter(CategoryMemberRecord.category == cat).distinct()
+            titles_in_cat = (
+                self.session.query(CategoryMemberRecord.article_id)
+                .filter(CategoryMemberRecord.category == cat)
+                .distinct()
+            )
 
             query = query.filter(TranslateTypeRecord.tt_title.in_(titles_in_cat))
         return query.order_by(TranslateTypeRecord.tt_id.asc()).all()
