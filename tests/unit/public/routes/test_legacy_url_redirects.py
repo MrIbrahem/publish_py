@@ -55,7 +55,7 @@ class TestLegacyUrlRedirects:
         assert res2.status_code == 200
 
     def test_translate_shortcut_redirects(self, test_client: FlaskClient):
-        for path in ["/translate.php", "/translate/medwiki.php", "/translate_med/medwiki.php"]:
+        for path in ["translate.php", "translate/medwiki.php", "translate_med/medwiki.php"]:
             res = test_client.get(f"Translation_Dashboard/{path}?title=TestPage&code=es")
             assert res.status_code == 301
             assert "/Translation_Dashboard/translate_med/" in res.location
