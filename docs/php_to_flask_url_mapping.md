@@ -1,174 +1,269 @@
-# PHP → Flask URL Migration Mapping & Analysis
+# PHP → Flask URL Migration Mapping & Architecture Specification
 
 ## Executive Summary
-This document provides a complete, auditable mapping between the legacy PHP repository ([Translation-Dashboard](https://github.com/MrIbrahem/Translation-Dashboard)) and the current Flask repository (`publish_py`).
+This document provides a complete, production-grade specification and mapping matrix between the legacy PHP repository ([Translation-Dashboard](https://github.com/MrIbrahem/Translation-Dashboard)) and the current Flask repository (`publish_py`).
 
-All source files, controllers, templates, JavaScript files, forms, and redirects from both repositories were analyzed to ensure no endpoint or parameter combination was overlooked.
+This updated revision incorporates critical architectural guidelines to guarantee **100% backward compatibility**, prevent silent feature loss, prevent query-string pollution through parameter whitelisting (`allowed_args`), handle special characters/URL encoding properly, and mandate two-stage integration test assertions (`301 Redirect → 200 OK`).
+
+---
+
+## Machine-Readable Route Configuration Matrix (`LEGACY_ROUTES`)
+
+To maintain a single source of truth for both implementation and test suites, legacy routes are defined via the machine-readable data dictionary below:
+
+```python
+LEGACY_ROUTES = {
+    "/index.php": {
+        "target_endpoint": "td.index",
+        "allowed_params": {"camp", "code", "cat", "type", "filter_sparql", "exists", "doit", "nonav"},
+        "methods": ["GET"],
+    },
+    "/missing.php": {
+        "target_endpoint": "td.missing",
+        "allowed_params": {"cat", "depth", "code", "project"},
+        "methods": ["GET"],
+    },
+    "/sitelinks.php": {
+        "target_endpoint": "td.table",
+        "allowed_params": {"site", "title", "qid", "items_with_no_links"},
+        "methods": ["GET"],
+    },
+    "/translate_med/index.php": {
+        "target_endpoint": "translate_med.index",
+        "allowed_params": {"title", "code", "cat", "camp", "type", "tr_type", "word"},
+        "methods": ["GET"],
+    },
+    "/translate.php": {
+        "target_endpoint": "translate_med.index",
+        "allowed_params": {"title", "code", "cat", "camp", "type", "tr_type", "word"},
+        "methods": ["GET"],
+    },
+    "/translate/medwiki.php": {
+        "target_endpoint": "translate_med.index",
+        "allowed_params": {"title", "code", "cat", "camp", "type", "tr_type", "word"},
+        "methods": ["GET"],
+    },
+    "/translate_med/medwiki.php": {
+        "target_endpoint": "translate_med.index",
+        "allowed_params": {"title", "code", "cat", "camp", "type", "tr_type", "word"},
+        "methods": ["GET"],
+    },
+    "/auth.php": {
+        "target_endpoint": "auth.login",
+        "allowed_params": set(),
+        "methods": ["GET"],
+    },
+    "/auth/login.php": {
+        "target_endpoint": "auth.login",
+        "allowed_params": set(),
+        "methods": ["GET"],
+    },
+    "/coordinator.php": {
+        "target_endpoint": "adminpanel.index",
+        "allowed_params": set(),
+        "methods": ["GET"],
+    },
+    "/tools.php": {
+        "target_endpoint": "adminpanel.index",
+        "allowed_params": set(),
+        "methods": ["GET"],
+    },
+    "/leaderboard_js.php": {
+        "target_endpoint": "leaderboard.index_js",
+        "allowed_params": set(),
+        "methods": ["GET"],
+    },
+}
+```
 
 ---
 
 ## Complete PHP → Flask URL Mapping Matrix
 
-| PHP URL | PHP Purpose | Flask URL | HTTP Method | Migration Status | Recommended Action |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `/` or `/index.php` | Main search/filter form & translation table loader | `/Translation_Dashboard/` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/index.php` and `/` → `/Translation_Dashboard/` (preserve query params `camp`, `code`, `cat`, `type`, `filter_sparql`, `exists`, `doit`, `nonav`) |
-| `/leaderboard.php` | Default leaderboard page (all stats / main view) | `/Translation_Dashboard/leaderboard/` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/leaderboard.php` (no `get` param, no `camps`/`graph`/`graph_api`) → `/Translation_Dashboard/leaderboard/` (preserve query params `year`, `month`, `camp`, `user_group`/`project`) |
-| `/leaderboard.php?get=users&user={user}` | User-specific translation statistics | `/Translation_Dashboard/leaderboard/users/<username>` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/leaderboard.php?get=users&user=<user>` → `/Translation_Dashboard/leaderboard/users/<user>` (preserve optional `langcode`/`lang`, `year`, `camp`) |
-| `/leaderboard.php?user={user}` | User-specific translation statistics (fallback without `get=users`) | `/Translation_Dashboard/leaderboard/users/<username>` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/leaderboard.php?user=<user>` → `/Translation_Dashboard/leaderboard/users/<user>` |
-| `/leaderboard.php?get=langs&langcode={code}` | Language-specific translation statistics | `/Translation_Dashboard/leaderboard/langs/<lang_code>` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/leaderboard.php?get=langs&langcode=<code>` (or `lang=<code>`) → `/Translation_Dashboard/leaderboard/langs/<code>` (preserve optional `year`, `camp`) |
-| `/leaderboard.php?langcode={code}` or `?lang={code}` | Language-specific translation statistics (fallback) | `/Translation_Dashboard/leaderboard/langs/<lang_code>` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/leaderboard.php?langcode=<code>` → `/Translation_Dashboard/leaderboard/langs/<code>` |
-| `/leaderboard.php?camps=1` | Campaign & article statistics tables view | `/Translation_Dashboard/leaderboard/` (or dedicated query view) | GET | 🛠️ Needs a new Flask route / param handling | Implement `camps` parameter handling in `/Translation_Dashboard/leaderboard/` or redirect `/leaderboard.php?camps=1` to `/Translation_Dashboard/leaderboard/?camps=1` |
-| `/leaderboard.php?graph=1` | Server-rendered translation timeline graph | `/Translation_Dashboard/leaderboard/` | GET | ❌ No equivalent functionality | Support via client-side chart / graph component or redirect to `/Translation_Dashboard/leaderboard/` |
-| `/leaderboard.php?graph_api=1` | API-driven JS translation timeline graph | `/Translation_Dashboard/leaderboard/` | GET | ❌ No equivalent functionality | Support via `/api/status` or client-side chart on leaderboard |
-| `/leaderboard_js.php` | Leaderboard dynamic JS endpoint | `/Translation_Dashboard/leaderboard/js` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/leaderboard_js.php` → `/Translation_Dashboard/leaderboard/js` |
-| `/missing.php` | Missing articles list viewer | `/Translation_Dashboard/missing` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/missing.php` → `/Translation_Dashboard/missing` (preserve query params `cat`, `depth`, `code`, `project`) |
-| `/sitelinks.php` | Sitelinks lookup by Wikidata QID or page title | `/Translation_Dashboard/table` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/sitelinks.php` → `/Translation_Dashboard/table` (preserve query params `site`, `title`, `qid`, `items_with_no_links`) |
-| `/translate_med/index.php` | Record translation in-progress & redirect to CX | `/Translation_Dashboard/translate_med/` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/translate_med/index.php` (and `/translate_med/`) → `/Translation_Dashboard/translate_med/` (preserve query params `title`, `code`, `cat`, `camp`, `type`/`tr_type`, `word`) |
-| `/translate.php` | Deprecated shortcut to `translate_med` | `/Translation_Dashboard/translate_med/` | GET | ↪️ Should redirect to Flask URL | 301 Redirect `/translate.php` → `/Translation_Dashboard/translate_med/` (preserve query params) |
-| `/translate/medwiki.php` | Deprecated shortcut to `translate_med` | `/Translation_Dashboard/translate_med/` | GET | ↪️ Should redirect to Flask URL | 301 Redirect `/translate/medwiki.php` → `/Translation_Dashboard/translate_med/` (preserve query params) |
-| `/translate_med/medwiki.php` | Deprecated shortcut to `translate_med/index.php` | `/Translation_Dashboard/translate_med/` | GET | ↪️ Should redirect to Flask URL | 301 Redirect `/translate_med/medwiki.php` → `/Translation_Dashboard/translate_med/` (preserve query params) |
-| `/auth.php` | Deprecated shortcut to `/auth/index.php` | `/auth/login` | GET | ↪️ Should redirect to Flask URL | 301 Redirect `/auth.php` → `/auth/login` |
-| `/auth/login.php` | OAuth login entry point | `/auth/login` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/auth/login.php` or `/auth/index.php` → `/auth/login` |
-| `/coordinator.php` | Deprecated shortcut to `/tdc/index.php` | `/adminpanel/` | GET | ↪️ Should redirect to Flask URL | 301 Redirect `/coordinator.php` → `/adminpanel/` |
-| `/tools.php` | Deprecated shortcut to `/tdc/index.php` | `/adminpanel/` | GET | ↪️ Should redirect to Flask URL | 301 Redirect `/tools.php` → `/adminpanel/` |
-| `/404.php` | PHP 404 error page | Flask custom 404 handler | GET | ✅ Exact Flask equivalent | Standard Flask `@app.errorhandler(404)` |
-| `/include_all.php` | Internal PHP bootstrap include | N/A (Internal PHP include) | N/A | ❌ No equivalent functionality | Do not expose in Flask (internal file only) |
+| PHP URL | PHP Purpose | Flask Target Route | HTTP Method | Migration Status | Recommended Action | Whitelisted Query Params |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `/index.php` | Main search & translation table | `/Translation_Dashboard/` | GET | 🔄 Flask equivalent with different URL | 301 Redirect to `/Translation_Dashboard/` | `camp`, `code`, `cat`, `type`, `filter_sparql`, `exists`, `doit`, `nonav` |
+| `/` | Application root entry | `/` or `/Translation_Dashboard/` | GET | ✅ Direct Flask Route | Direct view or dedicated redirect rule (separate from `/index.php`) | N/A |
+| `/leaderboard.php` | Main Leaderboard | `/Translation_Dashboard/leaderboard/` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect to `/Translation_Dashboard/leaderboard/` | `year`, `month`, `camp`, `user_group`, `project` |
+| `/leaderboard.php?get=users&user={user}` | User Stats | `/Translation_Dashboard/leaderboard/users/<username>` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect extracting `user` to path | `year`, `month`, `camp`, `langcode`, `lang` |
+| `/leaderboard.php?user={user}` | User Stats (fallback) | `/Translation_Dashboard/leaderboard/users/<username>` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect extracting `user` to path | `year`, `month`, `camp`, `langcode`, `lang` |
+| `/leaderboard.php?get=langs&langcode={code}` | Language Stats | `/Translation_Dashboard/leaderboard/langs/<lang_code>` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect extracting `langcode`/`lang` to path | `year`, `month`, `camp` |
+| `/leaderboard.php?langcode={code}` or `?lang={code}` | Language Stats (fallback) | `/Translation_Dashboard/leaderboard/langs/<lang_code>` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect extracting `langcode`/`lang` to path | `year`, `month`, `camp` |
+| `/leaderboard.php?camps=1` | Campaign & Article Tables | `/Translation_Dashboard/leaderboard/camps` | GET | 🛠️ Needs new Flask route | Implement `/leaderboard/camps` sub-route before issuing 301 redirect | `year`, `month` |
+| `/leaderboard.php?graph=1` | Server-rendered graph | `/Translation_Dashboard/leaderboard/graph` | GET | 🛠️ Needs new Flask route | Implement client-side or server graph endpoint before issuing 301 redirect | `year`, `camp` |
+| `/leaderboard.php?graph_api=1` | API-driven JS graph | `/Translation_Dashboard/leaderboard/graph_api` | GET | 🛠️ Needs new Flask route | Implement API-driven chart handler before issuing 301 redirect | `year`, `camp` |
+| `/leaderboard_js.php` | Leaderboard dynamic JS | `/Translation_Dashboard/leaderboard/js` | GET | 🔄 Flask equivalent with different URL | 301 Redirect to `/Translation_Dashboard/leaderboard/js` | None |
+| `/missing.php` | Missing articles list | `/Translation_Dashboard/missing` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect | `cat`, `depth`, `code`, `project` |
+| `/sitelinks.php` | Sitelinks lookup | `/Translation_Dashboard/table` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect | `site`, `title`, `qid`, `items_with_no_links` |
+| `/translate_med/index.php` | CX Translate Trigger | `/Translation_Dashboard/translate_med/` | GET | 🔄 Flask equivalent with different URL | Whitelisted 301 Redirect | `title`, `code`, `cat`, `camp`, `type`, `tr_type`, `word` |
+| `/translate.php` | Legacy alias to CX | `/Translation_Dashboard/translate_med/` | GET | ↪️ Shortcut 301 Redirect | Whitelisted 301 Redirect | `title`, `code`, `cat`, `camp`, `type`, `tr_type`, `word` |
+| `/translate/medwiki.php` | Legacy alias to CX | `/Translation_Dashboard/translate_med/` | GET | ↪️ Shortcut 301 Redirect | Whitelisted 301 Redirect | `title`, `code`, `cat`, `camp`, `type`, `tr_type`, `word` |
+| `/translate_med/medwiki.php` | Legacy alias to CX | `/Translation_Dashboard/translate_med/` | GET | ↪️ Shortcut 301 Redirect | Whitelisted 301 Redirect | `title`, `code`, `cat`, `camp`, `type`, `tr_type`, `word` |
+| `/auth.php` | Legacy login alias | `/auth/login` | GET | ↪️ Shortcut 301 Redirect | 301 Redirect to `/auth/login` | None |
+| `/auth/login.php` | OAuth Login | `/auth/login` | GET | 🔄 Flask equivalent with different URL | 301 Redirect to `/auth/login` | None |
+| `/coordinator.php` | Admin alias | `/adminpanel/` | GET | ↪️ Shortcut 301 Redirect | 301 Redirect to `/adminpanel/` | None |
+| `/tools.php` | Admin alias | `/adminpanel/` | GET | ↪️ Shortcut 301 Redirect | 301 Redirect to `/adminpanel/` | None |
+| `/404.php` | PHP 404 handler | Flask errorhandler(404) | GET | ✅ Exact Flask equivalent | Custom Flask 404 handler | None |
+| `/include_all.php` | Internal PHP include | N/A | N/A | ❌ No equivalent functionality | Do not expose in Flask | None |
 
 ---
 
-## Source File Discovery & Analysis Details
+## Architectural Guidelines & Implementation Requirements
 
-### PHP Repository Source Locations
-1. `src/index.php` (Line 1-10) & `src/app/Controllers/AppRouter.php` (Lines 40-380):
-   - Entry point for main dashboard page. Handles query parameters: `cat`, `camp`, `code`, `type`, `filter_sparql`, `exists`, `doit`, `nonav`.
-2. `src/leaderboard.php` (Line 1-10) & `src/app/Controllers/LeaderboardController.php` (Lines 25-110):
-   - Entry point for leaderboard statistics. Handles query parameters: `get` (`users` | `langs`), `user`, `langcode`/`lang`, `year`, `month`, `camp`, `user_group`/`project`, `camps`, `graph`, `graph_api`.
-3. `src/leaderboard_js.php` (Line 1-10) & `src/app/Controllers/LeaderboardJsController.php`:
-   - Renders dynamic leaderboard scripts.
-4. `src/missing.php` & `src/app/Controllers/MissingController.php`:
-   - Handles missing articles queries (`cat`, `depth`, `code`, `project`).
-5. `src/sitelinks.php` & `src/app/Controllers/SiteLinksController.php`:
-   - Sitelinks lookup (`site`, `title`, `qid`, `items_with_no_links`).
-6. `src/translate_med/index.php` (Lines 40-120):
-   - Handles translation workflow and in-process tracking (`title`, `code`, `cat`, `camp`, `type`/`tr_type`, `word`).
-7. Deprecated Redirect Files (`src/translate.php`, `src/coordinator.php`, `src/tools.php`, `src/auth.php`, `src/translate/medwiki.php`, `src/translate_med/medwiki.php`):
-   - Contained immediate `header("Location: ...")` redirects preserving query strings via `http_build_query($_GET)`.
-
----
-
-## Detailed Parameter Transformation Rules & Edge Cases
-
-### 1. Leaderboard URLs
-- **PHP Path / Query:** `/leaderboard.php?get=users&user=Mr.%20Ibrahem`
-- **Flask Path:** `/Translation_Dashboard/leaderboard/users/Mr.%20Ibrahem`
-- **Conversion Rule:** Extract `user` parameter, raw-url-decode (handling spaces `%20` or `+` and special characters), and move to path variable `<username>`. Retain remaining query parameters (`langcode`, `year`, `camp`).
-- **PHP Path / Query:** `/leaderboard.php?get=langs&langcode=ar` (or `lang=ar`)
-- **Flask Path:** `/Translation_Dashboard/leaderboard/langs/ar`
-- **Conversion Rule:** Extract `langcode` or `lang` parameter and move to path variable `<lang_code>`. Retain remaining query parameters (`year`, `camp`).
-
-### 2. Main Index & Search
-- **PHP Path / Query:** `/index.php?camp=COVID&code=ar&type=lead`
-- **Flask Path:** `/Translation_Dashboard/?camp=COVID&code=ar&type=lead`
-- **Conversion Rule:** Maintain query parameter names and values intact.
-
-### 3. Translate Med
-- **PHP Path / Query:** `/translate_med/index.php?title=COVID-19&code=ar&cat=RTTCovid`
-- **Flask Path:** `/Translation_Dashboard/translate_med/?title=COVID-19&code=ar&cat=RTTCovid`
-- **Conversion Rule:** Support alias parameter `tr_type` -> `type`.
-
----
-
-## Missing Mappings & New Endpoint Inventory
-
-### PHP URLs with No Flask Equivalent (Identified Gaps)
-1. `/leaderboard.php?camps=1`: Displays campaign/article breakdown tables in legacy PHP (`CampsText::echo_html()`). Flask currently lacks a dedicated `/leaderboard/camps` sub-route.
-2. `/leaderboard.php?graph=1` / `graph_api=1`: Server-rendered / dynamic timeline graph views.
-
-### Flask URLs with No PHP Predecessor (New Features in Flask)
-1. `/fixrefs/` & `/fixrefs/process`: Refinement service for reference links.
-2. `/new_html/`, `/new_html/check`, `/new_html/fix`, `/new_html/revisions_api`: WMF REST HTML transformation and revision analysis tool.
-3. `/HtmltoSegments/`, `/HtmltoSegments/list`: WMF HTML to translation segments engine.
-4. `/cxtoken/`: Content Translation token preflight and issuance endpoint.
-5. `/publish/`: Content publishing pipeline.
-6. `/reports`: Application publishing and daily stats report dashboard.
-
----
-
-## Proposed Flask Implementation Plan
-
-To guarantee 100% backward compatibility and seamless 301 redirects for indexed search engines, existing bookmarks, and external links, add a legacy compatibility class to `src/main_app/public/routes/legacy_compat.py`:
+### 1. Query Parameter Whitelisting (`allowed_args`)
+To prevent query string pollution, invalid key collisions, and `url_for()` parameter mismatch errors, all redirects MUST filter incoming `request.args` against an allowed whitelist:
 
 ```python
-from flask import Blueprint, request, redirect, url_for
+def allowed_args(args: dict, allowed_keys: set) -> dict:
+    return {k: v for k, v in args.items() if k in allowed_keys and v != ""}
+```
+
+### 2. Separation of Root `/` and `/index.php`
+- `/` is the modern application root endpoint handled directly by `main.index` or `td.index`. It MUST NOT be grouped in legacy wildcard redirect logic.
+- `/index.php` is explicitly a legacy PHP page route and MUST issue a 301 redirect to `/Translation_Dashboard/` with whitelisted query parameters.
+
+### 3. Gap Endpoints Handling (`camps=1`, `graph=1`, `graph_api=1`)
+To prevent **silent feature loss**, legacy URLs requesting specialized views MUST NOT be blindly redirected to the generic leaderboard index.
+- `/leaderboard.php?camps=1`: Must route to a dedicated campaign view endpoint (e.g., `/Translation_Dashboard/leaderboard/camps`) or return campaign table HTML once implemented.
+- `/leaderboard.php?graph=1` & `?graph_api=1`: Must route to dedicated graph views once ported, or abort with clear notice rather than serving wrong content under 301.
+
+### 4. URL Encoding & Special Characters
+Path parameters extracted from query strings (such as usernames and language codes) must be processed carefully:
+- `Mr.%20Ibrahem` / `Mr.+Ibrahem`: Extracted by Flask's `request.args.get('user')` automatically unquotes to `Mr. Ibrahem`.
+- Passing `username="Mr. Ibrahem"` to `url_for("leaderboard.users", username=user)` formats it safely to `/Translation_Dashboard/leaderboard/users/Mr.%20Ibrahem` without double-encoding (`%2520`).
+- Usernames containing slashes (`/` or `%2F`) must use Werkzeug path converters `<path:username>` if permitted or be safely sanitized.
+
+### 5. Modular Flask Blueprint Registration Class (`LegacyRoutes`)
+
+```python
+from flask import Blueprint, request, redirect, url_for, abort, Response
+from typing import Dict, Any, Set
+
+def allowed_args(args: Any, allowed_keys: Set[str]) -> Dict[str, str]:
+    return {k: v for k, v in args.items() if k in allowed_keys and v != ""}
 
 class LegacyRoutes:
 
     @classmethod
     def register(cls, bp: Blueprint) -> None:
-        bp.add_url_rule("/leaderboard.php", view_func=cls.redirect_leaderboard)
+        bp.add_url_rule("/leaderboard.php", view_func=cls.legacy_leaderboard, methods=["GET"])
+        bp.add_url_rule("/index.php", view_func=cls.legacy_index, methods=["GET"])
+        bp.add_url_rule("/missing.php", view_func=cls.legacy_missing, methods=["GET"])
+        bp.add_url_rule("/sitelinks.php", view_func=cls.legacy_sitelinks, methods=["GET"])
 
-        legacy_paths = [
-            "/index.php",
-            "/missing.php",
-            "/sitelinks.php",
-            "/translate_med/index.php",
-            "/translate.php",
-            "/translate/medwiki.php",
-            "/translate_med/medwiki.php",
-            "/auth.php",
-            "/coordinator.php",
-            "/tools.php",
-        ]
-        for path in legacy_paths:
-            bp.add_url_rule(path, view_func=cls.redirect_php_pages)
+        for path in ["/translate_med/index.php", "/translate.php", "/translate/medwiki.php", "/translate_med/medwiki.php"]:
+            bp.add_url_rule(path, view_func=cls.legacy_translate, methods=["GET"])
+
+        for path in ["/auth.php", "/auth/login.php"]:
+            bp.add_url_rule(path, view_func=cls.legacy_auth, methods=["GET"])
+
+        for path in ["/coordinator.php", "/tools.php"]:
+            bp.add_url_rule(path, view_func=cls.legacy_admin, methods=["GET"])
+
+        bp.add_url_rule("/leaderboard_js.php", view_func=cls.legacy_leaderboard_js, methods=["GET"])
 
     @staticmethod
-    def redirect_leaderboard():
+    def legacy_leaderboard() -> Response:
         get_type = request.args.get("get", "").strip().lower()
         user = request.args.get("user", "").strip()
-        langcode = (request.args.get("langcode") or request.args.get("lang") or "").strip()
+        lang = (request.args.get("langcode") or request.args.get("lang") or "").strip()
+        camps = request.args.get("camps", "").strip()
+        graph = request.args.get("graph", "").strip()
+        graph_api = request.args.get("graph_api", "").strip()
 
-        args = request.args.copy()
+        # Handle specialized views (camps / graph)
+        if camps == "1":
+            params = allowed_args(request.args, {"year", "month"})
+            return redirect(url_for("leaderboard.camps", **params), code=301)
 
+        if graph == "1" or graph_api == "1":
+            params = allowed_args(request.args, {"year", "camp"})
+            return redirect(url_for("leaderboard.graph", **params), code=301)
+
+        # User Leaderboard
         if get_type == "users" or user:
-            args.pop("get", None)
-            args.pop("user", None)
-            return redirect(url_for("leaderboard.users", username=user, **args), code=301)
+            if not user:
+                abort(400, description="User parameter is required for user leaderboard")
+            params = allowed_args(request.args, {"year", "month", "camp", "langcode", "lang"})
+            return redirect(url_for("leaderboard.users", username=user, **params), code=301)
 
-        if get_type == "langs" or langcode:
-            args.pop("get", None)
-            args.pop("langcode", None)
-            args.pop("lang", None)
-            return redirect(url_for("leaderboard.langs", lang_code=langcode, **args), code=301)
+        # Language Leaderboard
+        if get_type == "langs" or lang:
+            if not lang:
+                abort(400, description="Language parameter is required for language leaderboard")
+            params = allowed_args(request.args, {"year", "month", "camp"})
+            return redirect(url_for("leaderboard.langs", lang_code=lang, **params), code=301)
 
-        return redirect(url_for("leaderboard.index", **args), code=301)
+        # Main Leaderboard
+        params = allowed_args(request.args, {"year", "month", "camp", "user_group", "project"})
+        return redirect(url_for("leaderboard.index", **params), code=301)
 
     @staticmethod
-    def redirect_php_pages():
-        path = request.path
-        args = request.args
-        if path in ("/index.php", "/"):
-            return redirect(url_for("td.index", **args), code=301)
-        elif path == "/missing.php":
-            return redirect(url_for("td.missing", **args), code=301)
-        elif path == "/sitelinks.php":
-            return redirect(url_for("td.table", **args), code=301)
-        elif path in ("/translate_med/index.php", "/translate.php", "/translate/medwiki.php", "/translate_med/medwiki.php"):
-            return redirect(url_for("translate_med.index", **args), code=301)
-        elif path == "/auth.php":
-            return redirect(url_for("auth.login", **args), code=301)
-        elif path in ("/coordinator.php", "/tools.php"):
-            return redirect(url_for("adminpanel.index", **args), code=301)
-        return redirect(url_for("td.index"), code=301)
+    def legacy_index() -> Response:
+        params = allowed_args(request.args, {"camp", "code", "cat", "type", "filter_sparql", "exists", "doit", "nonav"})
+        return redirect(url_for("td.index", **params), code=301)
+
+    @staticmethod
+    def legacy_missing() -> Response:
+        params = allowed_args(request.args, {"cat", "depth", "code", "project"})
+        return redirect(url_for("td.missing", **params), code=301)
+
+    @staticmethod
+    def legacy_sitelinks() -> Response:
+        params = allowed_args(request.args, {"site", "title", "qid", "items_with_no_links"})
+        return redirect(url_for("td.table", **params), code=301)
+
+    @staticmethod
+    def legacy_translate() -> Response:
+        params = allowed_args(request.args, {"title", "code", "cat", "camp", "type", "tr_type", "word"})
+        return redirect(url_for("translate_med.index", **params), code=301)
+
+    @staticmethod
+    def legacy_auth() -> Response:
+        return redirect(url_for("auth.login"), code=301)
+
+    @staticmethod
+    def legacy_admin() -> Response:
+        return redirect(url_for("adminpanel.index"), code=301)
+
+    @staticmethod
+    def legacy_leaderboard_js() -> Response:
+        return redirect(url_for("leaderboard.index_js"), code=301)
 ```
 
 ---
 
-## Verification & Test Plan
+## Two-Stage Redirect Verification Strategy (`301 Redirect → 200 OK`)
 
-Create `tests/unit/test_legacy_url_redirects.py` to test every legacy PHP URL redirect:
+To verify that legacy PHP URLs are properly migrated and that destination endpoints exist and respond correctly, test cases MUST assert both HTTP status codes in sequence:
 
-1. `test_redirect_leaderboard_user()`: Verify `/leaderboard.php?get=users&user=Mr.%20Ibrahem` yields 301 to `/Translation_Dashboard/leaderboard/users/Mr.%20Ibrahem`.
-2. `test_redirect_leaderboard_lang()`: Verify `/leaderboard.php?get=langs&langcode=ar` yields 301 to `/Translation_Dashboard/leaderboard/langs/ar`.
-3. `test_redirect_missing()`: Verify `/missing.php?cat=RTT` yields 301 to `/Translation_Dashboard/missing?cat=RTT`.
-4. `test_redirect_sitelinks()`: Verify `/sitelinks.php?qid=Q1234` yields 301 to `/Translation_Dashboard/table?qid=Q1234`.
+1. Request legacy PHP URL -> Assert status `301 Moved Permanently` and location header.
+2. Request redirected destination URL -> Assert status `200 OK` (or `302` for auth redirects).
+
+### Example Test Suite (`tests/unit/test_legacy_url_redirects.py`)
+
+```python
+import pytest
+from flask.testing import FlaskClient
+
+class TestLegacyUrlRedirects:
+
+    def test_leaderboard_user_two_stage_redirect(self, client: FlaskClient):
+        # Stage 1: Legacy PHP URL -> 301
+        res1 = client.get("/leaderboard.php?get=users&user=Mr.%20Ibrahem&foo=bar")
+        assert res1.status_code == 301
+        assert "/Translation_Dashboard/leaderboard/users/Mr.%20Ibrahem" in res1.location
+        assert "foo=bar" not in res1.location  # Whitelist verification
+
+        # Stage 2: Destination URL -> 200 OK
+        res2 = client.get(res1.location)
+        assert res2.status_code == 200
+
+    def test_missing_two_stage_redirect(self, client: FlaskClient):
+        res1 = client.get("/missing.php?cat=RTT&depth=1")
+        assert res1.status_code == 301
+        assert "/Translation_Dashboard/missing?cat=RTT&depth=1" in res1.location
+
+        res2 = client.get(res1.location)
+        assert res2.status_code == 200
+```
