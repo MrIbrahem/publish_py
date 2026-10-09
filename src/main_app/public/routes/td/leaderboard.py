@@ -222,7 +222,10 @@ class LeaderBoardUsersView(BaseLeaderBoardView):
         args = LeaderBoardData.from_request(request.args)
 
         user_years: list[int] = self.lederboard_service.get_pages_years(user=username)
-        user_langs = self.lederboard_service.top_lang_of_user(username)
+        user_langs: dict[str, int] = self.lederboard_service.top_lang_of_user(username)
+
+        # sort user_langs by count descending and pick the max one
+        user_top_lang = max(user_langs.items(), key=lambda x: x[1])[0] if user_langs else None
 
         user_pages = self.lederboard_service.get_pages(
             user=username,
@@ -264,6 +267,7 @@ class LeaderBoardUsersView(BaseLeaderBoardView):
             chart_data=chart_data,
             pages=user_pages_items,  # main data
             inprocess_pages=inprocess_pages,
+            user_top_lang=user_top_lang,
         )
 
 

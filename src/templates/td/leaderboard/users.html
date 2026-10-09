@@ -1,5 +1,5 @@
 {% extends "td/td_base.html" %}
-{% from "_macros.html" import select_options, pageviews_link %}
+{% from "_macros.html" import select_options, pageviews_link, wiki_link, xtools_link %}
 
 {% block content %}
 <div class="container-fluid">
@@ -8,14 +8,21 @@
             <div class='col-lg-4 col-md-12 border_debug border rounded'>
                 <div class="d-flex align-items-center justify-content-center" style="height: 100%">
                     <div class="list-group">
-                        <h4 class='text-center'>User: {{ username }} <br><a target="_blank"
-                                href="http://uz.wikipedia.org/wiki/Category:Translated_from_MDWiki">(cat)</a>
+                        <h4 class='text-center'>User:
+                            {% if user_top_lang %}
+                            {{ wiki_link('User:' ~ username, user_top_lang, username) }}
+                            {% else %}
+                            {{ username }}
+                            {% endif %}
+                            <br>
+                            {{ xtools_link(username) }}
                         </h4>
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
                             <div class="text-muted">
-                                Articles: <strong>{{ pages | length }}</strong> &nbsp;
-                                Words: <strong>{{ words_total }}</strong> &nbsp;
-                                Pageviews: <strong><span id="hrefjsontoadd">{{ pageviews_total }}</span></strong>
+                                Articles: <strong>{{ pages | length | commas }}</strong> &nbsp;
+                                Words: <strong>{{ words_total | commas }}</strong> &nbsp;
+                                Pageviews: <strong><span
+                                        id="hrefjsontoadd_xx">{{ pageviews_total | commas }}</span></strong>
                             </div>
                         </div>
                     </div>
