@@ -33,21 +33,6 @@ All source files, controllers, templates, JavaScript files, forms, and redirects
 | `/tools.php` | Deprecated shortcut to `/tdc/index.php` | `/adminpanel/` | GET | ↪️ Should redirect to Flask URL | 301 Redirect `/tools.php` → `/adminpanel/` |
 | `/404.php` | PHP 404 error page | Flask custom 404 handler | GET | ✅ Exact Flask equivalent | Standard Flask `@app.errorhandler(404)` |
 | `/include_all.php` | Internal PHP bootstrap include | N/A (Internal PHP include) | N/A | ❌ No equivalent functionality | Do not expose in Flask (internal file only) |
-| `/api.php?get=categories` | Fetch category list | `/api/categories` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=categories` → `/api/categories` |
-| `/api.php?get=top_users` | Fetch top user statistics | `/api/top_users` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=top_users` → `/api/top_users` (preserve query params `year`, `user_group`/`project`, `cat`/`camp`) |
-| `/api.php?get=top_langs` | Fetch top language statistics | `/api/top_langs` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=top_langs` → `/api/top_langs` (preserve query params `year`, `user_group`/`project`, `cat`/`camp`) |
-| `/api.php?get=top_lang_of_users` | Fetch top languages per user | `/api/top_lang_of_users` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=top_lang_of_users` → `/api/top_lang_of_users` |
-| `/api.php?get=status` | Fetch status summary | `/api/status` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=status` → `/api/status` |
-| `/api.php?get=langs` | Fetch language list | `/api/langs` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=langs` → `/api/langs` |
-| `/api.php?get=distinct_langs` | Fetch distinct active languages | `/api/distinct_langs` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=distinct_langs` → `/api/distinct_langs` |
-| `/api.php?get=in_process` | Fetch in-process translations | `/api/in_process` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=in_process` → `/api/in_process` |
-| `/api.php?get=in_process_total` | Fetch total in-process count | `/api/in_process_total` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=in_process_total` → `/api/in_process_total` |
-| `/api.php?get=pages_users` | Fetch pages & users data | `/api/pages_users` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=pages_users` → `/api/pages_users` |
-| `/api.php?get=pages_with_views` | Fetch pages with view counts | `/api/pages_with_views` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=pages_with_views` → `/api/pages_with_views` |
-| `/api.php?get=users` | Fetch user list | `/api/users` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=users` → `/api/users` |
-| `/api.php?get=users_by_translations_count` | Fetch user translation counts | `/api/users_by_translations_count` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=users_by_translations_count` → `/api/users_by_translations_count` |
-| `/api.php?get=publish_reports` | Fetch publishing reports | `/api/publish_reports` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=publish_reports` → `/api/publish_reports` |
-| `/api.php?get=publish_reports_stats` | Fetch publishing report stats | `/api/publish_reports/stats` | GET | 🔄 Flask equivalent with a different URL | 301 Redirect `/api.php?get=publish_reports_stats` → `/api/publish_reports/stats` |
 
 ---
 
@@ -68,8 +53,6 @@ All source files, controllers, templates, JavaScript files, forms, and redirects
    - Handles translation workflow and in-process tracking (`title`, `code`, `cat`, `camp`, `type`/`tr_type`, `word`).
 7. Deprecated Redirect Files (`src/translate.php`, `src/coordinator.php`, `src/tools.php`, `src/auth.php`, `src/translate/medwiki.php`, `src/translate_med/medwiki.php`):
    - Contained immediate `header("Location: ...")` redirects preserving query strings via `http_build_query($_GET)`.
-8. JavaScript & AJAX endpoints (`src/js/autocomplate.js`, `src/js/graph_api.js`, `src/js/leaderboard_index_js.js`):
-   - Fetch targets: `/api.php?get=categories`, `/api.php?get=top_users`, `/api.php?get=top_langs`, `/api.php?get=status`.
 
 ---
 
@@ -93,10 +76,6 @@ All source files, controllers, templates, JavaScript files, forms, and redirects
 - **Flask Path:** `/Translation_Dashboard/translate_med/?title=COVID-19&code=ar&cat=RTTCovid`
 - **Conversion Rule:** Support alias parameter `tr_type` -> `type`.
 
-### 4. Legacy API Query Parameter Routing (`/api.php?get=...`)
-- **PHP Path:** `/api.php?get={action}`
-- **Flask Route:** `/api/{action}` (e.g., `/api.php?get=top_users` → `/api/top_users`).
-
 ---
 
 ## Missing Mappings & New Endpoint Inventory
@@ -117,88 +96,70 @@ All source files, controllers, templates, JavaScript files, forms, and redirects
 
 ## Proposed Flask Implementation Plan
 
-To guarantee 100% backward compatibility and seamless 301 redirects for indexed search engines, existing bookmarks, and external links, add a legacy compatibility Blueprint to `src/main_app/public/routes/legacy_compat.py`:
+To guarantee 100% backward compatibility and seamless 301 redirects for indexed search engines, existing bookmarks, and external links, add a legacy compatibility class to `src/main_app/public/routes/legacy_compat.py`:
 
 ```python
 from flask import Blueprint, request, redirect, url_for
-from urllib.parse import quote
 
-legacy_bp = Blueprint("legacy_compat", __name__)
+class LegacyRoutes:
 
-@legacy_bp.route("/leaderboard.php")
-def redirect_leaderboard():
-    get_type = request.args.get("get", "").strip().lower()
-    user = request.args.get("user", "").strip()
-    langcode = (request.args.get("langcode") or request.args.get("lang") or "").strip()
+    @classmethod
+    def register(cls, bp: Blueprint) -> None:
+        bp.add_url_rule("/leaderboard.php", view_func=cls.redirect_leaderboard)
 
-    args = request.args.copy()
+        legacy_paths = [
+            "/index.php",
+            "/missing.php",
+            "/sitelinks.php",
+            "/translate_med/index.php",
+            "/translate.php",
+            "/translate/medwiki.php",
+            "/translate_med/medwiki.php",
+            "/auth.php",
+            "/coordinator.php",
+            "/tools.php",
+        ]
+        for path in legacy_paths:
+            bp.add_url_rule(path, view_func=cls.redirect_php_pages)
 
-    if get_type == "users" or user:
-        args.pop("get", None)
-        args.pop("user", None)
-        return redirect(url_for("leaderboard.users", username=user, **args), code=301)
+    @staticmethod
+    def redirect_leaderboard():
+        get_type = request.args.get("get", "").strip().lower()
+        user = request.args.get("user", "").strip()
+        langcode = (request.args.get("langcode") or request.args.get("lang") or "").strip()
 
-    if get_type == "langs" or langcode:
-        args.pop("get", None)
-        args.pop("langcode", None)
-        args.pop("lang", None)
-        return redirect(url_for("leaderboard.langs", lang_code=langcode, **args), code=301)
+        args = request.args.copy()
 
-    return redirect(url_for("leaderboard.index", **args), code=301)
+        if get_type == "users" or user:
+            args.pop("get", None)
+            args.pop("user", None)
+            return redirect(url_for("leaderboard.users", username=user, **args), code=301)
 
-@legacy_bp.route("/index.php")
-@legacy_bp.route("/missing.php")
-@legacy_bp.route("/sitelinks.php")
-@legacy_bp.route("/translate_med/index.php")
-@legacy_bp.route("/translate.php")
-@legacy_bp.route("/auth.php")
-@legacy_bp.route("/coordinator.php")
-@legacy_bp.route("/tools.php")
-def redirect_php_pages():
-    path = request.path
-    args = request.args
-    if path in ("/index.php", "/"):
-        return redirect(url_for("td.index", **args), code=301)
-    elif path == "/missing.php":
-        return redirect(url_for("td.missing", **args), code=301)
-    elif path == "/sitelinks.php":
-        return redirect(url_for("td.table", **args), code=301)
-    elif path in ("/translate_med/index.php", "/translate.php"):
-        return redirect(url_for("translate_med.index", **args), code=301)
-    elif path == "/auth.php":
-        return redirect(url_for("auth.login", **args), code=301)
-    elif path in ("/coordinator.php", "/tools.php"):
-        return redirect(url_for("adminpanel.index", **args), code=301)
-    return redirect(url_for("td.index"), code=301)
+        if get_type == "langs" or langcode:
+            args.pop("get", None)
+            args.pop("langcode", None)
+            args.pop("lang", None)
+            return redirect(url_for("leaderboard.langs", lang_code=langcode, **args), code=301)
 
-@legacy_bp.route("/api.php")
-def redirect_api_php():
-    get_action = request.args.get("get", "").strip()
-    args = request.args.copy()
-    args.pop("get", None)
+        return redirect(url_for("leaderboard.index", **args), code=301)
 
-    endpoint_map = {
-        "categories": "api.get_categories",
-        "top_users": "api.get_top_users",
-        "top_langs": "api.get_top_langs",
-        "top_lang_of_users": "api.get_top_lang_of_users",
-        "status": "api.leaderboard_status",
-        "langs": "api.get_langs",
-        "distinct_langs": "api.get_distinct_langs",
-        "in_process": "api.get_in_process",
-        "in_process_total": "api.get_in_process_total",
-        "pages_users": "api.get_pages_users",
-        "pages_with_views": "api.get_pages_with_views",
-        "users": "api.get_users",
-        "users_by_translations_count": "api.users_by_translations_count",
-        "publish_reports": "api.get_publish_reports",
-        "publish_reports_stats": "api.publish_reports_stats",
-    }
-
-    if get_action in endpoint_map:
-        return redirect(url_for(endpoint_map[get_action], **args), code=301)
-
-    return redirect(url_for("td.index"), code=301)
+    @staticmethod
+    def redirect_php_pages():
+        path = request.path
+        args = request.args
+        if path in ("/index.php", "/"):
+            return redirect(url_for("td.index", **args), code=301)
+        elif path == "/missing.php":
+            return redirect(url_for("td.missing", **args), code=301)
+        elif path == "/sitelinks.php":
+            return redirect(url_for("td.table", **args), code=301)
+        elif path in ("/translate_med/index.php", "/translate.php", "/translate/medwiki.php", "/translate_med/medwiki.php"):
+            return redirect(url_for("translate_med.index", **args), code=301)
+        elif path == "/auth.php":
+            return redirect(url_for("auth.login", **args), code=301)
+        elif path in ("/coordinator.php", "/tools.php"):
+            return redirect(url_for("adminpanel.index", **args), code=301)
+        return redirect(url_for("td.index"), code=301)
 ```
 
 ---
@@ -211,4 +172,3 @@ Create `tests/unit/test_legacy_url_redirects.py` to test every legacy PHP URL re
 2. `test_redirect_leaderboard_lang()`: Verify `/leaderboard.php?get=langs&langcode=ar` yields 301 to `/Translation_Dashboard/leaderboard/langs/ar`.
 3. `test_redirect_missing()`: Verify `/missing.php?cat=RTT` yields 301 to `/Translation_Dashboard/missing?cat=RTT`.
 4. `test_redirect_sitelinks()`: Verify `/sitelinks.php?qid=Q1234` yields 301 to `/Translation_Dashboard/table?qid=Q1234`.
-5. `test_redirect_api_php()`: Verify `/api.php?get=top_users&year=2024` yields 301 to `/api/top_users?year=2024`.
