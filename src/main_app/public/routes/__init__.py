@@ -11,6 +11,7 @@ from .main import MainRoutes
 from .new_html import NewHtmlRoutes
 from .publish.routes import PublishRoutes
 from .refs.routes import FixRefsRoutes
+from .legacy_compat import LegacyRoutes
 from .td import LeaderBoardRoutes, TDRoutes, TranslateMedView
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "LeaderBoardRoutes",
     "HtmltoSegmentsRoutes",
     "TranslateMedView",
+    "LegacyRoutes",
 ]
