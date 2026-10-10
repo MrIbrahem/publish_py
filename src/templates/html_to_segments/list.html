@@ -20,7 +20,7 @@
 {% block extra_js %}
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const IsAdmin = "{{ is_admin }}";
+    const IsCoordinator = "{{ is_coordinator }}";
 
     function make_badge(exists) {
         return exists ? '' : " <span class='badge bg-danger'>Missing</span>";
@@ -45,7 +45,7 @@
         }
     ];
 
-    if (IsAdmin) {
+    if (IsCoordinator) {
         columns.push({
             data: null,
             title: 'Re create',

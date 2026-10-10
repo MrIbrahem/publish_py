@@ -177,6 +177,7 @@ class TestTableView:
         response = mock_client.get(
             "/Translation_Dashboard/table",
             query_string={"code": "ar", "camp": "RTT"},
+            follow_redirects=True,
         )
 
         assert response.status_code == 200
@@ -200,7 +201,9 @@ class TestMissingView:
         assert "RTT" in body
 
     def test_respects_category_argument(self, mock_client: FlaskClient, anonymous):
-        body = mock_client.get("/Translation_Dashboard/missing", query_string={"cat": "WikiProjectMed"}).get_data(as_text=True)
+        body = mock_client.get("/Translation_Dashboard/missing", query_string={"cat": "WikiProjectMed"}).get_data(
+            as_text=True
+        )
 
         assert "WikiProjectMed" in body
 

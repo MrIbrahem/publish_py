@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 
 from ...database.services import (
-    AdminService,
+    CoordinatorService,
     UsersService,
     UserTokenService,
 )
@@ -21,7 +21,7 @@ class TokenManager:
     def __init__(self) -> None:
         self.users_service = UsersService()
         self.user_token_service = UserTokenService()
-        self.admin_service = AdminService()
+        self.coordinator_service = CoordinatorService()
         self._crypto = CryptoService()
 
     def save_token(
@@ -57,7 +57,7 @@ class TokenManager:
 
             return CurrentUser.from_authenticated(
                 token=token,
-                is_active_admin=self.admin_service.is_active_coordinator(token.user.username),
+                is_active_coordinator=self.coordinator_service.is_active_coordinator(token.user.username),
             )
         except Exception as e:
             logger.error("Error loading user for ID %s: %s", user_id, e)

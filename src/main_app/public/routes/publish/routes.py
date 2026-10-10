@@ -153,7 +153,9 @@ class PublishRoutes:
         bp.add_url_rule("/", view_func=PublishIndexView.as_view("index"), methods=["POST"])
 
         # Legacy support for old endpoint path
-        bp.add_url_rule("/index.php", view_func=PublishPreflightView.as_view("publish_preflight_old"), methods=["OPTIONS"])
+        bp.add_url_rule(
+            "/index.php", view_func=PublishPreflightView.as_view("publish_preflight_old"), methods=["OPTIONS"]
+        )
         bp.add_url_rule("/index.php", view_func=PublishIndexView.as_view("index_old"), methods=["POST"])
 
 

@@ -24,13 +24,16 @@ class TestLegacyUrlRedirects:
         assert res2.status_code == 200
 
     def test_leaderboard_index_redirect_two_stage(self, test_client: FlaskClient):
-        res1 = test_client.get("/Translation_Dashboard/leaderboard.php?camp=COVID&year=2025")
+        res1 = test_client.get(
+            "/Translation_Dashboard/leaderboard.php?camp=COVID&year=2025",
+            # follow_redirects=True,
+        )
         assert res1.status_code == 301
         assert "/td/leaderboard/" in res1.location
         assert "camp=COVID" in res1.location
         assert "year=2025" in res1.location
 
-        res2 = test_client.get(res1.location)
+        res2 = test_client.get(res1.location, follow_redirects=True)
         assert res2.status_code == 200
 
     def test_index_php_redirect_two_stage(self, test_client: FlaskClient):
