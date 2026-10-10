@@ -110,7 +110,7 @@ class TestAdminRouteAccess:
 
         mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
 
-        with patch("src.main_app.admin.decorators.get_current_user", return_value=mock_user):
+        with patch("src.main_app.coordinators.decorators.get_current_user", return_value=mock_user):
             response = auth_client.get("/adminpanel/", follow_redirects=False)
 
             # Should return 403 Forbidden (not a redirect)
@@ -121,7 +121,7 @@ class TestAdminRouteAccess:
         # Mock get_current_user to return a non-admin user
 
         mock_user = CurrentUser(user_id=12345, username="TestUser", access_token="", access_secret="")
-        with patch("src.main_app.admin.decorators.get_current_user", return_value=mock_user):
+        with patch("src.main_app.coordinators.decorators.get_current_user", return_value=mock_user):
 
             response = auth_client.get("/adminpanel/", follow_redirects=False)
             # Should return 403 Forbidden (not a redirect)

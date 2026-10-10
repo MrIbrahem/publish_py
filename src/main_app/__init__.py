@@ -9,8 +9,8 @@ from typing import Any
 
 from flask import Flask, render_template, request
 
-from .admin import add_admin_dashboard, register_bp_admin_blueprints
 from .config import Config, ConfigLoader, app_settings, ensure_directories
+from .coordinators import add_admin_dashboard, register_bp_admin_blueprints
 from .database import init_db
 from .database.exceptions import DatabaseInitError
 from .error_pages import register_error_pages

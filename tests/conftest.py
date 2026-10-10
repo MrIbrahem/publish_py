@@ -293,4 +293,4 @@ def mock_coordinator_required(mocker):
     mock_user = CurrentUser(
         user_id=0, username="ADMIN_USER", access_token="", access_secret="", is_active_coordinator=True
     )
-    mocker.patch("src.main_app.admin.decorators.get_current_user", return_value=mock_user)
+    mocker.patch("src.main_app.coordinators.decorators.get_current_user", return_value=mock_user)
