@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from .mapping import NavDropdown, NavLink
 from .nav_bar import NavigationBar
-from .navbar_list import nav_list
+from .td_navbar_list import td_nav_list
 
-td_navbar = NavigationBar(nav_list)
+td_navbar = NavigationBar(td_nav_list)
 
 __all__ = [
     "td_navbar",

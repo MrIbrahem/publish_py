@@ -1,5 +1,5 @@
 """
-Admin routes for translated main pages (``pages`` table).
+Coordinator routes for translated main pages (``pages`` table).
 """
 
 from __future__ import annotations

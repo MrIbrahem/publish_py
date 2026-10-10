@@ -1,4 +1,4 @@
-"""Admin-only routes for managing coordinator access."""
+"""Coordinator-only routes for managing coordinator access."""
 
 from __future__ import annotations
 
@@ -23,38 +23,38 @@ FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
 
 
 def coordinator_required(view: FuncType) -> FuncType:  # noqa: UP047
-    """Decorator enforcing that the current user is an administrator."""
+    """Decorator enforcing that the current user is coordinator."""
 
     @wraps(view)
     def wrapped(*args, **kwargs):
         user: CurrentUser | None = get_current_user()
         if not user:
             return redirect(url_for("auth.login"))
-        if not user.is_active_coordinator:
-            logger.warning("User %s tried to access admin-only route", user.username)
+        if not user.is_active_coordinator and not user.is_active_admin:
+            logger.warning("User %s tried to access coordinator-only route", user.username)
             abort(403)
         return view(*args, **kwargs)
 
     return cast(FuncType, wrapped)
 
 
-def admin_guard() -> ResponseReturnValue | None:
-    """Blueprint-level guard rejecting any non-admin request to the admin area.
+def coordinator_guard() -> ResponseReturnValue | None:
+    """Blueprint-level guard rejecting any non-coordinator request to the coordinator area.
 
     Applies the same checks as :func:`coordinator_required` but as a ``before_request``
-    hook, so it covers every endpoint registered under the admin blueprint —
+    hook, so it covers every endpoint registered under the coordinator blueprint —
     including the nested sub-blueprints — even when a view forgets the decorator.
     """
     user: CurrentUser | None = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
-    if not user.is_active_coordinator:
-        logger.warning("User %s tried to access admin-only route", user.username)
+    if not user.is_active_coordinator and not user.is_active_admin:
+        logger.warning("User %s tried to access coordinator-only route", user.username)
         abort(403)
     return None
 
 
 __all__ = [
-    "admin_guard",
+    "coordinator_guard",
     "coordinator_required",
 ]

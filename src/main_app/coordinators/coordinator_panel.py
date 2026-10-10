@@ -1,4 +1,4 @@
-"""Admin-only routes for the admin dashboard, built on MethodView."""
+"""Coordinator-only routes for the admin dashboard, built on MethodView."""
 
 from __future__ import annotations
 
@@ -23,25 +23,25 @@ from .routes.last import last_translations_dashboard
 logger = logging.getLogger(__name__)
 
 
-class BaseAdminPanelView(MethodView):
-    """Base view for the admin panel pages.
+class BaseCoordinatorPanelView(MethodView):
+    """Base view for the Coordinator Panel pages.
 
-    Every admin panel page requires an authenticated administrator, so
+    Every Coordinator Panel page requires an authenticated administrator, so
     ``coordinator_required`` is declared here and inherited by all subclasses.
     """
 
     decorators = [coordinator_required]
 
 
-class AdminPanelIndexView(BaseAdminPanelView):
+class CoordinatorPanelIndexView(BaseCoordinatorPanelView):
     """Redirect the panel root to the last-translations dashboard."""
 
     def get(self) -> Response:
         """Redirect to the last dashboard."""
-        return redirect(url_for("adminpanel.last_dashboard"))
+        return redirect(url_for("coordinators_panel.last_dashboard"))
 
 
-class AdminPanelLastDashboardView(BaseAdminPanelView):
+class CoordinatorPanelLastDashboardView(BaseCoordinatorPanelView):
     """Dispatch the "last translations" landing page to the right table."""
 
     def get(self) -> Response:
@@ -52,12 +52,12 @@ class AdminPanelLastDashboardView(BaseAdminPanelView):
 
         # Validate last_table
         if last_table == "pages_users":
-            return redirect(url_for("adminpanel.dashboard_pages_users", lang=lang))
+            return redirect(url_for("coordinators_panel.dashboard_pages_users", lang=lang))
         else:
-            return redirect(url_for("adminpanel.dashboard_pages", lang=lang))
+            return redirect(url_for("coordinators_panel.dashboard_pages", lang=lang))
 
 
-class AdminPanelPagesView(BaseAdminPanelView):
+class CoordinatorPanelPagesView(BaseCoordinatorPanelView):
     """Render the last-translated pages table."""
 
     def get(self, lang: str | None = None) -> str:
@@ -65,7 +65,7 @@ class AdminPanelPagesView(BaseAdminPanelView):
         return last_translations_dashboard("pages", lang)
 
 
-class AdminPanelPagesUsersView(BaseAdminPanelView):
+class CoordinatorPanelPagesUsersView(BaseCoordinatorPanelView):
     """Render the last-translated userspace pages table."""
 
     def get(self, lang: str | None = None) -> str:
@@ -73,23 +73,23 @@ class AdminPanelPagesUsersView(BaseAdminPanelView):
         return last_translations_dashboard("pages_users", lang)
 
 
-class AdminPanelReportsView(BaseAdminPanelView):
+class CoordinatorPanelReportsView(BaseCoordinatorPanelView):
     """Render the admin reports page."""
 
     def get(self) -> str:
         """Render the reports page."""
-        return render_template("admins/reports.html")
+        return render_template("coordinators/reports.html")
 
 
-class AdminPanelInProcessView(BaseAdminPanelView):
+class CoordinatorPanelInProcessView(BaseCoordinatorPanelView):
     """Render the in-process translations dashboard."""
 
     def get(self) -> str:
         """Render the in-process page."""
-        return render_template("admins/in_process.html")
+        return render_template("coordinators/in_process.html")
 
 
-class AdminPanelInProcessTotalView(BaseAdminPanelView):
+class CoordinatorPanelInProcessTotalView(BaseCoordinatorPanelView):
     """Render the in-process totals dashboard."""
 
     def get(self) -> str:
@@ -98,18 +98,18 @@ class AdminPanelInProcessTotalView(BaseAdminPanelView):
 
         This route load data using DataTable ajax to API endpoint: `/api/in_process_total`
         """
-        return render_template("admins/in_process_total.html")
+        return render_template("coordinators/in_process_total.html")
 
 
-class AdminPanelEditDoneView(BaseAdminPanelView):
+class CoordinatorPanelEditDoneView(BaseCoordinatorPanelView):
     """Render the "edit done" confirmation fragment."""
 
     def get(self) -> str:
         """Render the close-button fragment."""
-        return render_template("admins/close_btn.html")
+        return render_template("coordinators/close_btn.html")
 
 
-class AdminPanelCategoriesView(BaseAdminPanelView):
+class CoordinatorPanelCategoriesView(BaseCoordinatorPanelView):
     """Render the categories dashboard."""
 
     def get(self) -> str:
@@ -117,39 +117,43 @@ class AdminPanelCategoriesView(BaseAdminPanelView):
         return categories_dashboard()
 
 
-class AdminPanel:
-    """Admin panel routes registrar using class-based views."""
+class CoordinatorPanel:
+    """Coordinator Panel routes registrar using class-based views."""
 
     @classmethod
     def register(cls, bp: Blueprint) -> None:
-        """Register the admin panel views on the blueprint.
+        """Register the Coordinator Panel views on the blueprint.
 
         Endpoint names (``index``, ``last_dashboard``, ``dashboard_pages``,
         ...) are preserved from the legacy function-based routes so
-        existing ``url_for('adminpanel.edit_done')`` calls keep resolving.
+        existing ``url_for('coordinators_panel.edit_done')`` calls keep resolving.
         """
         bp.app_context_processor(cls.inject_sidebar)
 
-        bp.add_url_rule("/", view_func=AdminPanelIndexView.as_view("index"), methods=["GET"])
-        bp.add_url_rule("/last", view_func=AdminPanelLastDashboardView.as_view("last_dashboard"), methods=["GET"])
+        bp.add_url_rule("/", view_func=CoordinatorPanelIndexView.as_view("index"), methods=["GET"])
+        bp.add_url_rule("/last", view_func=CoordinatorPanelLastDashboardView.as_view("last_dashboard"), methods=["GET"])
         bp.add_url_rule(
-            "/last/pages/<string:lang>", view_func=AdminPanelPagesView.as_view("dashboard_pages"), methods=["GET"]
+            "/last/pages/<string:lang>", view_func=CoordinatorPanelPagesView.as_view("dashboard_pages"), methods=["GET"]
         )
         bp.add_url_rule(
             "/last/pages_users/<string:lang>",
-            view_func=AdminPanelPagesUsersView.as_view("dashboard_pages_users"),
+            view_func=CoordinatorPanelPagesUsersView.as_view("dashboard_pages_users"),
             methods=["GET"],
         )
-        bp.add_url_rule("/reports", view_func=AdminPanelReportsView.as_view("reports"), methods=["GET"])
-        bp.add_url_rule("/process", view_func=AdminPanelInProcessView.as_view("in_process_dashboard"), methods=["GET"])
+        bp.add_url_rule("/reports", view_func=CoordinatorPanelReportsView.as_view("reports"), methods=["GET"])
+        bp.add_url_rule(
+            "/process", view_func=CoordinatorPanelInProcessView.as_view("in_process_dashboard"), methods=["GET"]
+        )
         bp.add_url_rule(
             "/process_total",
-            view_func=AdminPanelInProcessTotalView.as_view("in_process_total_dashboard"),
+            view_func=CoordinatorPanelInProcessTotalView.as_view("in_process_total_dashboard"),
             methods=["GET"],
         )
-        bp.add_url_rule("/edit_done", view_func=AdminPanelEditDoneView.as_view("edit_done"), methods=["GET"])
+        bp.add_url_rule("/edit_done", view_func=CoordinatorPanelEditDoneView.as_view("edit_done"), methods=["GET"])
         bp.add_url_rule(
-            "/categories", view_func=AdminPanelCategoriesView.as_view("categories_dashboard_route"), methods=["GET"]
+            "/categories",
+            view_func=CoordinatorPanelCategoriesView.as_view("categories_dashboard_route"),
+            methods=["GET"],
         )
 
         # ------------------------------------------------------------------
@@ -161,13 +165,13 @@ class AdminPanel:
         bp.add_url_rule(
             "/last/pages/",
             endpoint="dashboard_pages_default",
-            view_func=AdminPanelPagesView.as_view("legacy_dashboard_pages_default"),
+            view_func=CoordinatorPanelPagesView.as_view("legacy_dashboard_pages_default"),
             methods=["GET"],
         )
         bp.add_url_rule(
             "/last/pages_users/",
             endpoint="dashboard_pages_users_default",
-            view_func=AdminPanelPagesUsersView.as_view("legacy_dashboard_pages_users_default"),
+            view_func=CoordinatorPanelPagesUsersView.as_view("legacy_dashboard_pages_users_default"),
             methods=["GET"],
         )
 
@@ -178,5 +182,5 @@ class AdminPanel:
 
 
 __all__ = [
-    "AdminPanel",
+    "CoordinatorPanel",
 ]

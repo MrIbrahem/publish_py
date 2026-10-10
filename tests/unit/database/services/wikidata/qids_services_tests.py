@@ -162,7 +162,7 @@ class GetTitleToQidTest(TestInit):
 
 
 # ---------------------------------------------------------------------------
-# Tests for new service functions added with admin/qids work:
+# Tests for new service functions added with coordinators/qids work:
 #   - self.service.list_records(dis=)  (empty / duplicate filters)
 #   - self.service.get_by_qid(qid)
 #   - self.service.get_by_title(title)
@@ -239,7 +239,7 @@ class GetByTitleTest(TestInit):
 
 
 class InsertTest(TestInit):
-    """Tests for the insert helper used by the admin/qids POST handler."""
+    """Tests for the insert helper used by the coordinators/qids POST handler."""
 
     def test_inserts_new_row(self):
         ok = self.service.insert("Brand_new", "Q300")

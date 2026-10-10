@@ -1,4 +1,4 @@
-"""Admin route for the statistics dashboard (stub).
+"""Coordinator route for the statistics dashboard (stub).
 
 No PHP source exists for this dashboard; this implementation provides a
 placeholder index page that displays simple counts of ``pages`` and
@@ -39,7 +39,7 @@ class StaticsRoutes(MethodView):
             user_pages_count = None
 
         return render_template(
-            "admins/stat.html",
+            "coordinators/stat.html",
             pages_count=pages_count,
             user_pages_count=user_pages_count,
         )

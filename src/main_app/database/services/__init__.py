@@ -43,6 +43,7 @@ from .reports import (
     ReportService,
 )
 from .users import (
+    AdminService,
     CoordinatorService,
     FullTranslatorService,
     UsersNoInprocessService,
@@ -80,6 +81,7 @@ __all__ = [
     "QidOthersService",
     "MissingStatsService",
     "CategoryService",
+    "AdminService",
     "CoordinatorService",
     "UsersService",
     "UserTokenService",

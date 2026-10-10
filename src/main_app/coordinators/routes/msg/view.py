@@ -1,4 +1,4 @@
-"""Admin view handlers for email message composition and dispatching."""
+"""Coordinator view handlers for email message composition and dispatching."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ class EmailDashboardView(MethodView):
         user: str | None = None,
     ) -> str:
         """Render the email composition interface with pre-populated data."""
-        # http://127.0.0.1:5000/adminpanel/email_msg?user=Mr.+Ibrahem&id=10653&last_table=pages
+        # http://127.0.0.1:5000/coordinators_panel/email_msg?user=Mr.+Ibrahem&id=10653&last_table=pages
         logger.info("Email dashboard requested: user=%s, id=%s, last_table=%s", user, id, last_table)
 
         # Fetch underlying page metadata
@@ -65,7 +65,7 @@ class EmailDashboardView(MethodView):
             msg = create_email_msg(page_data, translate_url, suggestion)
 
         return render_template(
-            "admins/email_msg/index.html",
+            "coordinators/email_msg/index.html",
             username=username,
             user_email=user_email,
             cc_me_email=current_user_email,
@@ -97,7 +97,7 @@ class EmailSendView(MethodView):
         )
 
         return render_template(
-            "admins/email_msg/index.html",
+            "coordinators/email_msg/index.html",
             user_email=None,
             cc_me_email=None,
             msg=None,

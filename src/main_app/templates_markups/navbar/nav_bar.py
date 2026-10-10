@@ -7,7 +7,7 @@ live in navbar.html.
 
 Usage in the template after registering via init_app(app):
 
-    {{ main_navbar.render_main_links(is_coordinator=is_coordinator) }}
+    {{ main_navbar.render_main_links(is_coordinator, is_admin) }}
     {{
         main_navbar.render_user_links(
             profile_url = url_for("leaderboard.users", username=current_username),
@@ -37,7 +37,7 @@ class NavigationBar:
     def __init__(self, links=None) -> None:
         # A single ordered list holds NavLink and NavDropdown entries
         # (regular, admin-only, or grouped); order in this list is render order.
-        self.links = []
+        self.links: list[NavLink | NavDropdown] = []
         for link in links or []:
             if isinstance(link, NavLink | NavDropdown):
                 self.links.append(link)
@@ -49,14 +49,14 @@ class NavigationBar:
         return Markup('<li class="{cls}">{inner}</li>').format(cls=NAV_ITEM_CLASS, inner=inner_html)
 
     # ---------- main links (replaces nav_link / nav_link_with_args) ----------
-    def render_main_links(self, is_coordinator=False) -> Markup:
+    def render_main_links(self, is_coordinator=False, is_admin=False) -> Markup:
         parts = []
 
         for link in self.links:
             if link.disabled:
                 continue
 
-            if link.for_admin and not is_coordinator:
+            if link.for_coordinators and not is_coordinator and not is_admin:
                 continue
 
             if isinstance(link, NavDropdown):

@@ -1,6 +1,6 @@
-"""Unit tests for the ``pages_users_to_main_service`` admin helpers.
+"""Unit tests for the ``pages_users_to_main_service`` coordinators helpers.
 
-Mirrors the PHP ``coordinator/admin/pages_users_to_main/*.php`` flow:
+Mirrors the PHP ``coordinator/coordinators/pages_users_to_main/*.php`` flow:
 - ``list_pending(lang)`` -> joined view of pages_users + pages_users_to_main
 - ``get_user_page(id)``
 - ``check_main_page_exists(title, lang)``

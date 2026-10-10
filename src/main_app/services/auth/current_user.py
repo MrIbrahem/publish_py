@@ -30,6 +30,7 @@ class CurrentUser:
     access_token: bytes = field(repr=False)
     access_secret: bytes = field(repr=False)
     is_active_coordinator: bool = False
+    is_active_admin: bool = False
 
     def __init__(self, **kwargs: Any) -> None:
         fields = self.__dataclass_fields__
@@ -50,6 +51,7 @@ class CurrentUser:
         cls,
         token: UserTokenRecord,
         is_active_coordinator: bool,
+        is_active_admin: bool,
     ) -> CurrentUser:
         return cls(
             user_id=token.user_id,
@@ -57,6 +59,7 @@ class CurrentUser:
             access_token=token.access_token,
             access_secret=token.access_secret,
             is_active_coordinator=is_active_coordinator,
+            is_active_admin=is_active_admin,
         )
 
 

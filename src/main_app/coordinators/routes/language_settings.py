@@ -1,4 +1,4 @@
-"""Admin-only routes for managing language-specific settings."""
+"""Coordinator-only routes for managing language-specific settings."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ class LanguageSettingsDashboardView(BaseLanguageSettingsView):
         languages = self.lang_service.list_langs()
 
         return render_template(
-            "admins/language_settings.html",
+            "coordinators/language_settings.html",
             settings=settings,
             languages=languages,
         )
@@ -60,7 +60,7 @@ class LanguageSettingsAddView(BaseLanguageSettingsView):
         lang_code = request.form.get("lang_code", "").strip()
         if not lang_code:
             flash("Language code is required.", "danger")
-            return redirect(url_for("adminpanel.language_settings.dashboard"))
+            return redirect(url_for("coordinators_panel.language_settings.dashboard"))
 
         move_dots = 1 if request.form.get("move_dots") == "1" else 0
         expend = 1 if request.form.get("expend") == "1" else 0
@@ -82,7 +82,7 @@ class LanguageSettingsAddView(BaseLanguageSettingsView):
         else:
             flash(f"Language setting for '{lang_code}' added.", "success")
 
-        return redirect(url_for("adminpanel.language_settings.dashboard"))
+        return redirect(url_for("coordinators_panel.language_settings.dashboard"))
 
 
 class LanguageSettingsUpdateView(BaseLanguageSettingsView):
@@ -108,7 +108,7 @@ class LanguageSettingsUpdateView(BaseLanguageSettingsView):
         else:
             flash(f"Language setting for '{record.lang_code}' updated.", "success")
 
-        return redirect(url_for("adminpanel.language_settings.dashboard"))
+        return redirect(url_for("coordinators_panel.language_settings.dashboard"))
 
 
 class LanguageSettingsDeleteView(BaseLanguageSettingsView):
@@ -130,7 +130,7 @@ class LanguageSettingsDeleteView(BaseLanguageSettingsView):
         else:
             flash(f"Language setting for '{setting_id}' removed.", "success")
 
-        return redirect(url_for("adminpanel.language_settings.dashboard"))
+        return redirect(url_for("coordinators_panel.language_settings.dashboard"))
 
 
 class LanguageSettings:
@@ -138,7 +138,7 @@ class LanguageSettings:
 
     Endpoint names (``dashboard``, ``add``, ``update``, ``delete``) are
     preserved from the legacy function-based routes so existing
-    ``url_for('adminpanel.language_settings.add')`` calls keep working.
+    ``url_for('coordinators_panel.language_settings.add')`` calls keep working.
     """
 
     @classmethod
