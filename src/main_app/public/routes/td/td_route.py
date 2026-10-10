@@ -370,8 +370,8 @@ class TDRoutes:
         """Register all translation dashboard views on the blueprint."""
         bp.add_url_rule("/", view_func=TDIndexView.as_view("index"))
 
-        bp.add_url_rule("/<string:camp>", view_func=TDLangView.as_view("camp_table"))
-        bp.add_url_rule("/<string:camp>/<string:lang>", view_func=TDLangView.as_view("lang_camp_table"))
+        bp.add_url_rule("/table/<string:camp>", view_func=TDLangView.as_view("camp_table"))
+        bp.add_url_rule("/table/<string:camp>/<string:lang>", view_func=TDLangView.as_view("lang_camp_table"))
 
         bp.add_url_rule("/table", view_func=TDTableView.as_view("table"))
         bp.add_url_rule("/missing", view_func=TDMissingView.as_view("missing"))

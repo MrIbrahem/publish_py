@@ -177,6 +177,7 @@ class TestTableView:
         response = mock_client.get(
             "/Translation_Dashboard/table",
             query_string={"code": "ar", "camp": "RTT"},
+            follow_redirects=True,
         )
 
         assert response.status_code == 200

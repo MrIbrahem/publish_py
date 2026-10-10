@@ -9,11 +9,14 @@ from typing import Any
 
 from flask import (
     Blueprint,
+    redirect,
     render_template,
     request,
+    url_for,
 )
 from flask.views import MethodView
 
+from werkzeug.datastructures import MultiDict
 from ....database.services import (
     CategoryService,
     InProcessService,
@@ -124,12 +127,24 @@ class LeaderBoardIndexJsView(BaseLeaderBoardView):
         )
 
 
-class LeaderBoardIndexView(BaseLeaderBoardView):
+class LeaderBoardTableView(BaseLeaderBoardView):
     """Render the server-rendered leaderboard page."""
 
-    def get(self) -> str:
+    def get(self, camp: str | None = None, user_group: str | None = None, year: str | None = None, month: str | None = None) -> str:
+        args = request.args.copy()
+        if user_group:
+            args.add("user_group", user_group)
+        if camp:
+            args.add("camp", camp)
+        if year:
+            args.add("year", year)
+        if month:
+            args.add("month", month)
+        return self._load(args)
+
+    def _load(self, request_args: MultiDict[str, str]) -> str:
         """Render the leaderboard with the top languages and users."""
-        args = LeaderBoardData.from_request(request.args)
+        args = LeaderBoardData.from_request(request_args)
 
         campaign_to_cats = self.category_service.get_camp_to_cats()
 
@@ -138,7 +153,7 @@ class LeaderBoardIndexView(BaseLeaderBoardView):
         cat = campaign_to_cats.get(args.camp) if args.camp else None
         chart_data = self._load_chart_data(cat, args.year, args.camp, args.user_group)
 
-        form = ApiFormData.from_request(request.args)
+        form = ApiFormData.from_request(request_args)
         langs_res = get_top_langs(form)
         users_res = get_top_users(form)
 
@@ -168,6 +183,38 @@ class LeaderBoardIndexView(BaseLeaderBoardView):
             result=result,  # main data
         )
 
+
+class LeaderBoardIndexView(BaseLeaderBoardView):
+    """Render the server-rendered leaderboard page."""
+
+    def get(self):
+        """
+        """
+        camp = request.args.get("camp", type=str) or "all"
+        user_group = request.args.get("user_group", type=str) or "all"
+        year = request.args.get("year", type=str) or "all"
+        month = request.args.get("month", type=str) or "all"
+
+        if not request.args:
+            return LeaderBoardTableView()._load(MultiDict())
+
+        args = {
+            "camp":camp,
+            "user_group":user_group,
+            "year":year,
+        }
+
+        endpoint = "leaderboard.index_camp_user_group_year"
+
+        if month and month != "all":
+            args["month"] = month
+            endpoint = "leaderboard.table_all"
+
+        url = url_for(
+            endpoint,
+            **args,  # pyright: ignore[reportArgumentType]
+        )
+        return redirect(url)
 
 class LeaderBoardLangsView(BaseLeaderBoardView):
     """Render the per-language leaderboard page."""
@@ -282,10 +329,16 @@ class LeaderBoardRoutes:
     @classmethod
     def register(cls, bp: Blueprint) -> None:
         """Register all leaderboard views on the blueprint."""
+        bp.add_url_rule("/js", view_func=LeaderBoardIndexJsView.as_view("index_js"), methods=["GET"])
+
         bp.add_url_rule("/users/<string:username>", view_func=LeaderBoardUsersView.as_view("users"), methods=["GET"])
         bp.add_url_rule("/langs/<string:lang_code>", view_func=LeaderBoardLangsView.as_view("langs"), methods=["GET"])
-        bp.add_url_rule("/js", view_func=LeaderBoardIndexJsView.as_view("index_js"), methods=["GET"])
+
         bp.add_url_rule("/", view_func=LeaderBoardIndexView.as_view("index"), methods=["GET"])
+        bp.add_url_rule("/<string:camp>", view_func=LeaderBoardTableView.as_view("index_camp"))
+        bp.add_url_rule("/<string:camp>/<string:user_group>", view_func=LeaderBoardTableView.as_view("index_camp_user_group"))
+        bp.add_url_rule("/<string:camp>/<string:user_group>/<string:year>", view_func=LeaderBoardTableView.as_view("index_camp_user_group_year"))
+        bp.add_url_rule("/<string:camp>/<string:user_group>/<string:year>/<string:month>", view_func=LeaderBoardTableView.as_view("table_all"))
 
 
 __all__ = [
