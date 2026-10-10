@@ -140,13 +140,6 @@ def load_groups_menu() -> list[SidebarGroup]:
         icon="bi-people",
         items=[
             SidebarItem(
-                id="coordinators",
-                requires_coordinator=True,
-                fallback_href="/coordinators_panel/coordinators",
-                title="Coordinators",
-                icon="bi-person-gear",
-            ),
-            SidebarItem(
                 id="users_emails",
                 requires_coordinator=True,
                 fallback_href="/coordinators_panel/users_emails",
@@ -190,26 +183,12 @@ def load_groups_menu() -> list[SidebarGroup]:
                 icon="bi-megaphone",
             ),
             SidebarItem(
-                id="settings",
-                requires_coordinator=True,
-                fallback_href="/coordinators_panel/settings",
-                title="Settings",
-                icon="bi-gear",
-            ),
-            SidebarItem(
                 id="categories",
                 requires_coordinator=False,
                 fallback_href="/coordinators_panel/categories",
                 title="Categories",
                 icon="bi-tags",
-            ),
-            SidebarItem(
-                id="errors",
-                requires_coordinator=True,
-                fallback_href="/coordinators_panel/errors",
-                title="App Errors",
-                icon="bi-exclamation-triangle",
-            ),
+            )
         ],
     )
 
@@ -240,12 +219,41 @@ def load_groups_menu() -> list[SidebarGroup]:
                 link_target="_blank",
                 icon="bi-wrench",
             ),
+        ],
+    )
+
+    admin_tools = SidebarGroup(
+        id="admin_tools",
+        title="For Admins",
+        icon="bi-tools",
+        items=[
+            SidebarItem(
+                id="coordinators",
+                requires_coordinator=True,
+                fallback_href="/coordinators_panel/coordinators",
+                title="Coordinators",
+                icon="bi-person-gear",
+            ),
+            SidebarItem(
+                id="settings",
+                requires_coordinator=True,
+                fallback_href="/coordinators_panel/settings",
+                title="Settings",
+                icon="bi-gear",
+            ),
             SidebarItem(
                 id="db_admin",
                 requires_coordinator=True,
                 fallback_href="/coordinators_panel/db_admin",
                 title="DB admin",
                 icon="bi-database",
+            ),
+            SidebarItem(
+                id="errors",
+                requires_coordinator=True,
+                fallback_href="/coordinators_panel/errors",
+                title="App Errors",
+                icon="bi-exclamation-triangle",
             ),
         ],
     )
@@ -256,6 +264,7 @@ def load_groups_menu() -> list[SidebarGroup]:
         users,
         others,
         tools,
+        admin_tools,
     ]
 
 
