@@ -41,7 +41,9 @@ ADMIN_ROUTE_MODULES: list[CoordinatorRouteModule] = [
     CoordinatorRouteModule(route_cls=TranslatedView, name="translated", url_prefix="/translated"),
     CoordinatorRouteModule(route_cls=TranslatedUsersView, name="translated_users", url_prefix="/translated_users"),
     CoordinatorRouteModule(route_cls=StaticsRoutes, name="stat", url_prefix="/stat"),
-    CoordinatorRouteModule(route_cls=PagesUsersMainRoutes, name="pages_users_to_main", url_prefix="/pages_users_to_main"),
+    CoordinatorRouteModule(
+        route_cls=PagesUsersMainRoutes, name="pages_users_to_main", url_prefix="/pages_users_to_main"
+    ),
     CoordinatorRouteModule(route_cls=EmailMsgView, name="email_msg", url_prefix="/email_msg"),
     CoordinatorRouteModule(route_cls=AddTranslateView, name="add", url_prefix="/add"),
     CoordinatorRouteModule(route_cls=ProjectsDashboard, name="projects", url_prefix="/projects"),

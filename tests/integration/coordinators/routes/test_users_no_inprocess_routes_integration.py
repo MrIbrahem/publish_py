@@ -16,7 +16,9 @@ from src.main_app.database.services import UsersNoInprocessService
 class TestUsersNoInprocessDashboard:
     """Integration tests for users no inprocess dashboard."""
 
-    def test_users_no_inprocess_dashboard_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_users_no_inprocess_dashboard_requires_coordinator(
+        self, mock_coordinator_required, mock_client: FlaskClient
+    ):
         """Test that users no inprocess dashboard requires admin access."""
         response = mock_client.get("/coordinators_panel/users_no_inprocess/")
 
@@ -105,7 +107,9 @@ class TestActivateDeactivateUserNoInprocess:
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/users_no_inprocess/"
 
-    def test_deactivate_user_no_inprocess_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_deactivate_user_no_inprocess_requires_coordinator(
+        self, mock_coordinator_required, mock_client: FlaskClient
+    ):
         """Test that deactivating user requires admin access."""
         response = mock_client.post("/coordinators_panel/users_no_inprocess/1/deactivate")
 

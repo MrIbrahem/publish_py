@@ -16,7 +16,9 @@ from src.main_app.database.services import LangService, LanguageSettingService
 class TestLanguageSettingsDashboard:
     """Integration tests for language settings dashboard."""
 
-    def test_language_settings_dashboard_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_language_settings_dashboard_requires_coordinator(
+        self, mock_coordinator_required, mock_client: FlaskClient
+    ):
         """Test that language settings dashboard requires admin access."""
         response = mock_client.get("/coordinators_panel/language_settings/")
 
