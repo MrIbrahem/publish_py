@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from .admin_users import (
+    AdminRecord,
+    CoordinatorRecord,
+)
 from .category_members import CategoryMemberRecord
 from .dashboard import (
     CategoryRecord,
@@ -33,7 +37,6 @@ from .setting import (
     SettingRecord,
 )
 from .users import (
-    CoordinatorRecord,
     FullTranslatorRecord,
     UserRecord,
     UsersNoInprocessRecord,
@@ -51,6 +54,7 @@ __all__ = [
     "AssessmentRecord",
     "CategoryMemberRecord",
     "CategoryRecord",
+    "AdminRecord",
     "CoordinatorRecord",
     "EnwikiPageviewRecord",
     "FullTranslatorRecord",

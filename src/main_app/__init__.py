@@ -9,8 +9,9 @@ from typing import Any
 
 from flask import Flask, render_template, request
 
+from .admin import add_admin_dashboard
 from .config import Config, ConfigLoader, app_settings, ensure_directories
-from .coordinators import add_admin_dashboard, register_bp_admin_blueprints
+from .coordinators import register_bp_coordinators_blueprints
 from .database import init_db
 from .database.exceptions import DatabaseInitError
 from .error_pages import register_error_pages
@@ -107,7 +108,7 @@ class AppFactory:
     def _register_routes(app: Flask) -> None:
         PublicRouteRegister.register(app)
         add_admin_dashboard(app, _db)
-        register_bp_admin_blueprints(app)
+        register_bp_coordinators_blueprints(app)
 
     @staticmethod
     def db_error_fallback():

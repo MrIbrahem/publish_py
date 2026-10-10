@@ -1,4 +1,4 @@
-"""Admin route for Translations add_translate dashboard."""
+"""Coordinator route for Translations add_translate dashboard."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ class AddTranslateView(MethodView):
         """Render the translations add_translate dashboard."""
         categories = self.category_service.list_categories()
         return render_template(
-            "admins/add_translate.html",
+            "coordinators/add_translate.html",
             categories=categories,
         )
 
@@ -43,7 +43,7 @@ class AddTranslateView(MethodView):
 
         if not titles:
             flash("No translation data submitted.", "danger")
-            return redirect(url_for("adminpanel.add.add_translate"))
+            return redirect(url_for("coordinators_panel.add.add_translate"))
 
         texts: list[str] = []
         errors: list[str] = []
@@ -87,7 +87,7 @@ class AddTranslateView(MethodView):
         for e in errors:
             flash(e, "danger")
 
-        return redirect(url_for("adminpanel.add.add_translate"))
+        return redirect(url_for("coordinators_panel.add.add_translate"))
 
     @classmethod
     def register(cls, bp: Blueprint) -> None:

@@ -1,4 +1,4 @@
-"""Admin-only routes for managing user emails and groups."""
+"""Coordinator-only routes for managing user emails and groups."""
 
 from __future__ import annotations
 
@@ -76,7 +76,7 @@ class UsersEmailsDashboardView(BaseUsersEmailsView):
         users_data = sorted(users_data, key=lambda x: x["live"], reverse=True)
 
         return render_template(
-            "admins/users_emails/index.html",
+            "coordinators/users_emails/index.html",
             users=users_data,
             projects=projects,
             project_selected=project_name,
@@ -92,8 +92,8 @@ class UsersEmailsEditView(BaseUsersEmailsView):
         user = self.user_service.get_user(record_id)
         if not user:
             flash(f"User with ID {record_id} not found.", "danger")
-            return redirect(url_for("adminpanel.users_emails.dashboard"))
-        return render_template("admins/users_emails/edit.html", row=user)
+            return redirect(url_for("coordinators_panel.users_emails.dashboard"))
+        return render_template("coordinators/users_emails/edit.html", row=user)
 
 
 class UsersEmailsAddView(BaseUsersEmailsView):
@@ -109,7 +109,7 @@ class UsersEmailsAddView(BaseUsersEmailsView):
 
         if not username:
             flash("Username is required to add a user.", "danger")
-            return redirect(url_for("adminpanel.users_emails.dashboard"))
+            return redirect(url_for("coordinators_panel.users_emails.dashboard"))
 
         try:
             record = self.user_service.create_user(
@@ -127,7 +127,7 @@ class UsersEmailsAddView(BaseUsersEmailsView):
         else:
             flash(f"User '{record.username}' added to 'not in process' list.", "success")
 
-        return redirect(url_for("adminpanel.users_emails.dashboard"))
+        return redirect(url_for("coordinators_panel.users_emails.dashboard"))
 
 
 class UsersEmailsUpdateView(BaseUsersEmailsView):
@@ -142,7 +142,7 @@ class UsersEmailsUpdateView(BaseUsersEmailsView):
 
         if not username:
             flash("Username is required to add a user.", "danger")
-            return redirect(url_for("adminpanel.users_emails.dashboard"))
+            return redirect(url_for("coordinators_panel.users_emails.dashboard"))
 
         try:
             record = self.user_service.update_user(
@@ -161,7 +161,7 @@ class UsersEmailsUpdateView(BaseUsersEmailsView):
         else:
             flash(f"User '{record.username}' updated", "success")
 
-        return redirect(url_for("adminpanel.users_emails.dashboard"))
+        return redirect(url_for("coordinators_panel.users_emails.dashboard"))
 
 
 class UsersEmailsDeleteView(BaseUsersEmailsView):
@@ -183,7 +183,7 @@ class UsersEmailsDeleteView(BaseUsersEmailsView):
         else:
             flash(f"User '{record_id}' deleted", "success")
 
-        return redirect(url_for("adminpanel.users_emails.dashboard"))
+        return redirect(url_for("coordinators_panel.users_emails.dashboard"))
 
 
 class UsersEmails:
@@ -191,7 +191,7 @@ class UsersEmails:
 
     Endpoint names (``dashboard``, ``add``, ``delete``, ``update``,
     ``edit``) are preserved from the legacy function-based routes so
-    existing ``url_for('adminpanel.users_emails.edit')`` calls keep
+    existing ``url_for('coordinators_panel.users_emails.edit')`` calls keep
     working.
     """
 

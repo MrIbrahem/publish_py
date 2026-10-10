@@ -1,5 +1,5 @@
 """
-Admin services and shared MethodViews for translated pages (``pages`` / ``pages_users`` tables).
+Coordinator services and shared MethodViews for translated pages (``pages`` / ``pages_users`` tables).
 """
 
 from __future__ import annotations
@@ -63,7 +63,7 @@ class TranslatedIndexView(BaseTranslatedView):
         langs = self.lang_service.list_langs()
 
         return render_template(
-            "admins/translated/index.html",
+            "coordinators/translated/index.html",
             rows=rows,
             total_count=total_count,
             lang=lang,
@@ -71,9 +71,9 @@ class TranslatedIndexView(BaseTranslatedView):
             limit=limit,
             languages=langs,
             table_label=self.table_label,
-            endpoint=f"adminpanel.{self.endpoint_name}.index",
-            edit_endpoint=f"adminpanel.{self.endpoint_name}.edit",
-            edit_post_endpoint=f"adminpanel.{self.endpoint_name}.edit",
+            endpoint=f"coordinators_panel.{self.endpoint_name}.index",
+            edit_endpoint=f"coordinators_panel.{self.endpoint_name}.edit",
+            edit_post_endpoint=f"coordinators_panel.{self.endpoint_name}.edit",
         )
 
 
@@ -91,9 +91,9 @@ class TranslatedEditView(BaseTranslatedView):
             abort(404)
 
         return render_template(
-            "admins/translated/edit.html",
+            "coordinators/translated/edit.html",
             row=row,
-            post_endpoint=f"adminpanel.{self.endpoint_name}.edit",
+            post_endpoint=f"coordinators_panel.{self.endpoint_name}.edit",
         )
 
     def post(self) -> ResponseReturnValue:
@@ -102,7 +102,7 @@ class TranslatedEditView(BaseTranslatedView):
 
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         if "delete" in request.form:
             return self._handle_delete(page_id)
@@ -115,7 +115,7 @@ class TranslatedEditView(BaseTranslatedView):
 
         if not title or not target or not lang or not user or not pupdate:
             flash("All fields (title, target, lang, user, pupdate) are required.", "danger")
-            return redirect(url_for(f"adminpanel.{self.endpoint_name}.edit", id=page_id))
+            return redirect(url_for(f"coordinators_panel.{self.endpoint_name}.edit", id=page_id))
 
         try:
             self.service.update_page(
@@ -131,7 +131,7 @@ class TranslatedEditView(BaseTranslatedView):
             logger.exception("Failed to update %s page id=%r", self.table_label, page_id)
             flash(f"Failed to update {self.table_label} page id {page_id}.", "danger")
 
-        return redirect(url_for("adminpanel.edit_done"))
+        return redirect(url_for("coordinators_panel.edit_done"))
 
     def _handle_delete(self, page_id: int) -> ResponseReturnValue:
         """Process deletion of a page record."""
@@ -142,7 +142,7 @@ class TranslatedEditView(BaseTranslatedView):
         else:
             flash(f"{self.table_label} page id {page_id} deleted.", "success")
 
-        return redirect(url_for("adminpanel.edit_done"))
+        return redirect(url_for("coordinators_panel.edit_done"))
 
 
 class SharedTranslatedView:

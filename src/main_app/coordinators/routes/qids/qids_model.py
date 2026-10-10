@@ -92,15 +92,15 @@ class QidIndexView(BaseQidView):
             rows = []
 
         return render_template(
-            "admins/qids/index.html",
+            "coordinators/qids/index.html",
             rows=rows,
             dis=dis,
             qid_table=self.endpoint,
             title_label=self.title_label,
-            index_endpoint=f"adminpanel.{self.endpoint}.index",
-            edit_endpoint=f"adminpanel.{self.endpoint}.edit",
-            post_endpoint=f"adminpanel.{self.endpoint}.edit",
-            add_endpoint=f"adminpanel.{self.endpoint}.add",
+            index_endpoint=f"coordinators_panel.{self.endpoint}.index",
+            edit_endpoint=f"coordinators_panel.{self.endpoint}.edit",
+            post_endpoint=f"coordinators_panel.{self.endpoint}.edit",
+            add_endpoint=f"coordinators_panel.{self.endpoint}.add",
         )
 
 
@@ -114,20 +114,20 @@ class QidEditView(BaseQidView):
             qid_id = int(qid_id_raw)
         except (ValueError, TypeError):
             flash(f"Invalid ID: {qid_id_raw}", "danger")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         record: QidRecord | QidOthersRecord | None = self.service.get_by_id(qid_id)
         if not record:
             flash(f"Record not found. id={qid_id}", "danger")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         return render_template(
-            "admins/qids/edit.html",
+            "coordinators/qids/edit.html",
             id=qid_id,
             title=record.title,
             qid=record.qid,
             qid_table=self.endpoint,
-            post_endpoint=f"adminpanel.{self.endpoint}.edit",
+            post_endpoint=f"coordinators_panel.{self.endpoint}.edit",
         )
 
     def post(self) -> ResponseReturnValue:
@@ -136,7 +136,7 @@ class QidEditView(BaseQidView):
         title = (request.form.get("title") or "").strip()
         qid = (request.form.get("qid") or "").strip()
 
-        edit_done_ep = redirect(url_for("adminpanel.edit_done"))
+        edit_done_ep = redirect(url_for("coordinators_panel.edit_done"))
 
         try:
             qid_id = int(qid_id_raw)
@@ -144,7 +144,7 @@ class QidEditView(BaseQidView):
             flash(f"Invalid id: {qid_id_raw}", "danger")
             return edit_done_ep
 
-        edit_redirect_to = redirect(url_for(f"adminpanel.{self.endpoint}.edit", id=qid_id))
+        edit_redirect_to = redirect(url_for(f"coordinators_panel.{self.endpoint}.edit", id=qid_id))
 
         if not title:
             flash(f"Title is required. qid=({qid})", "danger")
@@ -182,12 +182,12 @@ class QidAddView(BaseQidView):
     def get(self) -> str:
         """Render add record modal popup."""
         return render_template(
-            "admins/qids/edit.html",
+            "coordinators/qids/edit.html",
             new=1,
             title="",
             qid="",
             qid_table=self.endpoint,
-            post_endpoint=f"adminpanel.{self.endpoint}.add",
+            post_endpoint=f"coordinators_panel.{self.endpoint}.add",
         )
 
     def post(self) -> ResponseReturnValue:
@@ -195,8 +195,8 @@ class QidAddView(BaseQidView):
         title = (request.form.get("title") or "").strip()
         qid = (request.form.get("qid") or "").strip()
 
-        edit_done_ep = redirect(url_for("adminpanel.edit_done"))
-        edit_redirect_to = redirect(url_for(f"adminpanel.{self.endpoint}.add"))
+        edit_done_ep = redirect(url_for("coordinators_panel.edit_done"))
+        edit_redirect_to = redirect(url_for(f"coordinators_panel.{self.endpoint}.add"))
 
         if not title:
             flash(f"Title is required. qid=({qid})", "danger")

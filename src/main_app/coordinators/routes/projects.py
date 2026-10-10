@@ -1,5 +1,5 @@
 """
-Admin-only routes for managing projects.
+Coordinator-only routes for managing projects.
 """
 
 from __future__ import annotations
@@ -41,7 +41,7 @@ class BaseProjectsView(MethodView):
         g_title = request.form.get("g_title", "").strip()
         if not g_title:
             flash("Title is required.", "danger")
-            return redirect(url_for("adminpanel.projects.dashboard"))
+            return redirect(url_for("coordinators_panel.projects.dashboard"))
 
         try:
             self.project_service.add_project(
@@ -56,7 +56,7 @@ class BaseProjectsView(MethodView):
         else:
             flash(f"project for '{g_title}' added.", "success")
 
-        return redirect(url_for("adminpanel.projects.dashboard"))
+        return redirect(url_for("coordinators_panel.projects.dashboard"))
 
     def _update_project(self, record_id: int, g_title: str) -> None:
         """Update an existing project record."""
@@ -97,7 +97,7 @@ class ProjectsDashboardView(BaseProjectsView):
         projects = self.project_service.list_projects()
 
         return render_template(
-            "admins/projects.html",
+            "coordinators/projects.html",
             projects=projects,
         )
 
@@ -136,7 +136,7 @@ class ProjectsUpdateView(BaseProjectsView):
             elif g_title != g_title_original:
                 self._update_project(record_id, g_title)
 
-        return redirect(url_for("adminpanel.projects.dashboard"))
+        return redirect(url_for("coordinators_panel.projects.dashboard"))
 
 
 class ProjectsDashboard:
@@ -144,7 +144,7 @@ class ProjectsDashboard:
 
     Endpoint names (``dashboard``, ``add``, ``update``) are preserved from
     the legacy function-based routes so existing
-    ``url_for('adminpanel.projects.add')`` calls keep working.
+    ``url_for('coordinators_panel.projects.add')`` calls keep working.
     """
 
     @classmethod

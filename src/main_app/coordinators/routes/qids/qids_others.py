@@ -1,5 +1,5 @@
 """
-Admin routes for the ``qids_others`` table.
+Coordinator routes for the ``qids_others`` table.
 
 Same shape as ``qids.py`` but targets ``qids_others``.
 """

@@ -1,4 +1,4 @@
-"""Admin-only routes for managing users not in process."""
+"""Coordinator-only routes for managing users not in process."""
 
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ class BaseUsersNoInprocessView(MethodView):
             state = "activated" if record.is_active else "deactivated"
             flash(f"Record '{record.user}' {state}.", "success")
 
-        return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
+        return redirect(url_for("coordinators_panel.users_no_inprocess.dashboard"))
 
 
 class UsersNoInprocessDashboardView(BaseUsersNoInprocessView):
@@ -62,7 +62,7 @@ class UsersNoInprocessDashboardView(BaseUsersNoInprocessView):
         is_active = sum(1 for u in users if u.is_active)
 
         return render_template(
-            "admins/users_no_inprocess.html",
+            "coordinators/users_no_inprocess.html",
             users=users,
             total_users=total,
             active_users=is_active,
@@ -79,7 +79,7 @@ class UsersNoInprocessAddView(BaseUsersNoInprocessView):
         username = request.form.get("username", "").strip()
         if not username:
             flash("Username is required to add a user.", "danger")
-            return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
+            return redirect(url_for("coordinators_panel.users_no_inprocess.dashboard"))
 
         try:
             record = self.service.add_users_no_inprocess(username)
@@ -92,7 +92,7 @@ class UsersNoInprocessAddView(BaseUsersNoInprocessView):
         else:
             flash(f"User '{record.user}' added to 'not in process' list.", "success")
 
-        return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
+        return redirect(url_for("coordinators_panel.users_no_inprocess.dashboard"))
 
 
 class UsersNoInprocessDeleteView(BaseUsersNoInprocessView):
@@ -114,7 +114,7 @@ class UsersNoInprocessDeleteView(BaseUsersNoInprocessView):
         else:
             flash(f"User '{record_id}' removed from 'not in process' list.", "success")
 
-        return redirect(url_for("adminpanel.users_no_inprocess.dashboard"))
+        return redirect(url_for("coordinators_panel.users_no_inprocess.dashboard"))
 
 
 class UsersNoInprocessActivateView(BaseUsersNoInprocessView):
@@ -138,7 +138,7 @@ class UsersNoInprocess:
 
     Endpoint names (``dashboard``, ``add``, ``delete``, ``activate``,
     ``deactivate``) are preserved from the legacy function-based routes
-    so existing ``url_for('adminpanel.users_no_inprocess.add')`` calls
+    so existing ``url_for('coordinators_panel.users_no_inprocess.add')`` calls
     keep working.
     """
 

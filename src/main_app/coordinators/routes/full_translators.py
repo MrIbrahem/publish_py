@@ -1,4 +1,4 @@
-"""Admin-only routes for managing full translators."""
+"""Coordinator-only routes for managing full translators."""
 
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ class BaseFullTranslatorsView(MethodView):
             state = "activated" if record.is_active else "deactivated"
             flash(f"Record '{record.user}' {state}.", "success")
 
-        return redirect(url_for("adminpanel.full_translators.dashboard"))
+        return redirect(url_for("coordinators_panel.full_translators.dashboard"))
 
 
 class FullTranslatorsDashboardView(BaseFullTranslatorsView):
@@ -62,7 +62,7 @@ class FullTranslatorsDashboardView(BaseFullTranslatorsView):
         is_active = sum(1 for tr in translators if tr.is_active)
 
         return render_template(
-            "admins/full_translators.html",
+            "coordinators/full_translators.html",
             translators=translators,
             total_translators=total,
             active_translators=is_active,
@@ -79,7 +79,7 @@ class FullTranslatorsAddView(BaseFullTranslatorsView):
         username = request.form.get("username", "").strip()
         if not username:
             flash("Username is required to add a full translator.", "danger")
-            return redirect(url_for("adminpanel.full_translators.dashboard"))
+            return redirect(url_for("coordinators_panel.full_translators.dashboard"))
 
         try:
             record = self.service.add_full_translator(username)
@@ -92,7 +92,7 @@ class FullTranslatorsAddView(BaseFullTranslatorsView):
         else:
             flash(f"Full translator '{record.user}' added.", "success")
 
-        return redirect(url_for("adminpanel.full_translators.dashboard"))
+        return redirect(url_for("coordinators_panel.full_translators.dashboard"))
 
 
 class FullTranslatorsDeleteView(BaseFullTranslatorsView):
@@ -114,7 +114,7 @@ class FullTranslatorsDeleteView(BaseFullTranslatorsView):
         else:
             flash(f"Full translator '{translator_id}' removed.", "success")
 
-        return redirect(url_for("adminpanel.full_translators.dashboard"))
+        return redirect(url_for("coordinators_panel.full_translators.dashboard"))
 
 
 class FullTranslatorsActivateView(BaseFullTranslatorsView):
@@ -138,7 +138,7 @@ class FullTranslators:
 
     Endpoint names (``dashboard``, ``add``, ``delete``, ``activate``,
     ``deactivate``) are preserved from the legacy function-based routes
-    so existing ``url_for('adminpanel.full_translators.add')`` calls keep
+    so existing ``url_for('coordinators_panel.full_translators.add')`` calls keep
     working.
     """
 

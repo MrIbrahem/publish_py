@@ -1,5 +1,5 @@
 """
-Admin-only routes for recent translations (last).
+Coordinator-only routes for recent translations (last).
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ def last_translations_dashboard(
     languages = lang_service.list_langs()
 
     return render_template(
-        "admins/last/index.html",
+        "coordinators/last/index.html",
         rows=last_rows,
         languages=languages,
         current_lang=lang or "All",

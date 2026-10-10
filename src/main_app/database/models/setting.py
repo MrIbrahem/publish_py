@@ -1,5 +1,5 @@
 """
-Admin domain models.
+Coordinator domain models.
 """
 
 from __future__ import annotations

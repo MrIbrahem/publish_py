@@ -70,50 +70,6 @@ class UserRecord(db.Model):
         return data
 
 
-class CoordinatorRecord(TimestampMixin, db.Model):
-    """
-    Coordinator role — username references users.username.
-    """
-
-    __tablename__ = "coordinators"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-
-    # Modern approach for defining foreign keys
-    username: Mapped[str] = mapped_column(
-        ForeignKey("users.username", ondelete="CASCADE", onupdate="CASCADE"), unique=True, nullable=False
-    )
-
-    # Python application default and database-level server default configuration
-    is_active: Mapped[bool] = mapped_column(nullable=False, default=True, server_default=text("1"))
-
-    def __init__(self, **kwargs: Any) -> None:
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
-    def to_json(self) -> dict[str, Any]:
-        """Serializes the pure model instance into a dictionary."""
-        data: dict[str, Any] = {}
-        table_keys = [
-            "id",
-            "username",
-            "is_active",
-            "created_at",
-            "updated_at",
-        ]
-        for column in table_keys:
-            value = getattr(self, column)
-            if hasattr(value, "isoformat"):
-                value = value.isoformat()
-            data[column] = value
-
-        return data
-
-    def __repr__(self) -> str:
-        return f"<Coordinator id={self.id} username={self.username!r} is_active={self.is_active}>"
-
-
 class UserTokenRecord(TimestampMixin, db.Model):
     """
     OAuth credentials — child of users table.
@@ -243,7 +199,6 @@ class FullTranslatorRecord(db.Model):
 
 
 __all__ = [
-    "CoordinatorRecord",
     "UserTokenRecord",
     "UserRecord",
     "FullTranslatorRecord",

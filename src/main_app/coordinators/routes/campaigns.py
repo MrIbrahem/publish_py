@@ -1,5 +1,5 @@
 """
-Admin-only routes for managing campaigns.
+Coordinator-only routes for managing campaigns.
 """
 
 from __future__ import annotations
@@ -92,7 +92,7 @@ class CampaignsDashboardView(BaseCampaignsView):
         campaigns = self.category_service.list_categories()
 
         return render_template(
-            "admins/campaigns.html",
+            "coordinators/campaigns.html",
             campaigns=campaigns,
         )
 
@@ -106,11 +106,11 @@ class CampaignsAddRecordView(BaseCampaignsView):
         campaign = request.form.get("campaign", "").strip()
         if not category:
             flash("Category is required.", "danger")
-            return redirect(url_for("adminpanel.campaigns.dashboard"))
+            return redirect(url_for("coordinators_panel.campaigns.dashboard"))
 
         if not campaign:
             flash("Campaign is required.", "danger")
-            return redirect(url_for("adminpanel.campaigns.dashboard"))
+            return redirect(url_for("coordinators_panel.campaigns.dashboard"))
 
         try:
             self.category_service.add_category(
@@ -126,7 +126,7 @@ class CampaignsAddRecordView(BaseCampaignsView):
         else:
             flash(f"category for '{category}' added.", "success")
 
-        return redirect(url_for("adminpanel.campaigns.dashboard"))
+        return redirect(url_for("coordinators_panel.campaigns.dashboard"))
 
 
 class CampaignsUpdateView(BaseCampaignsView):
@@ -168,7 +168,7 @@ class CampaignsUpdateView(BaseCampaignsView):
                     is_default=is_default,
                 )
 
-        return redirect(url_for("adminpanel.campaigns.dashboard"))
+        return redirect(url_for("coordinators_panel.campaigns.dashboard"))
 
 
 class CampaignsDashboard:
@@ -176,7 +176,7 @@ class CampaignsDashboard:
 
     Endpoint names (``dashboard``, ``add_record``, ``update``) are
     preserved from the legacy function-based routes so existing
-    ``url_for('adminpanel.campaigns.add_record')`` calls keep working.
+    ``url_for('coordinators_panel.campaigns.add_record')`` calls keep working.
     """
 
     @classmethod

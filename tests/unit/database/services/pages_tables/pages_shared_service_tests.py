@@ -141,7 +141,7 @@ class InsertPageTargetTests(TestInit):
 
 
 # ---------------------------------------------------------------------------
-# Tests for new service functions added with the admin/translated work:
+# Tests for new service functions added with the coordinators/translated work:
 #   - self.service.list_translated(lang, limit, offset)
 #   - self.service.count_translated(lang)
 #   - self.service.get_by_id(page_id)
