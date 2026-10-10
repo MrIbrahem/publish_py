@@ -4,7 +4,26 @@ from __future__ import annotations
 
 from .mapping import NavLink
 
-nav_list = [
+main_nav_list = [
+    NavLink(
+        text="Publish Reports",
+        icon="bi-list-task",
+        url_endpoint="main.reports",
+        title="Publish Reports",
+        path="/reports",
+        disabled=True,
+    ),
+    NavLink(
+        text="Fix Refs",
+        icon="bi-list-task",
+        url_endpoint="fixrefs.index",
+        title="Fix Refs",
+        path="/fixrefs",
+        disabled=True,
+    ),
+]
+
+td_nav_list = [
     NavLink(
         text="Leaderboard",
         icon="bi-bar-chart-line",
@@ -29,20 +48,6 @@ nav_list = [
         path="/Translation_Dashboard/missing",
     ),
     NavLink(
-        text="Fix Refs",
-        icon="bi-list-task",
-        url_endpoint="fixrefs.index",
-        title="Fix Refs",
-        path="/fixrefs",
-    ),
-    NavLink(
-        text="Publish Reports",
-        icon="bi-list-task",
-        url_endpoint="main.reports",
-        title="Publish Reports",
-        path="/reports",
-    ),
-    NavLink(
         text="Coordinator Tools",
         icon="bi-people-fill",
         url_endpoint="coordinators_panel.index",
@@ -59,5 +64,6 @@ nav_list = [
 ]
 
 __all__ = [
-    "nav_list",
+    "main_nav_list",
+    "td_nav_list",
 ]

@@ -28,7 +28,17 @@
                     </li>
                     <li class="{{ nav_item_class }}">
                         <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('leaderboard.index') }}" target="_blank">
-                            <span class="navtitles">Leaderboard</span>
+                            <i class="bi-bar-chart-line"></i> <span class="navtitles">Leaderboard</span>
+                        </a>
+                    </li>
+                    <li class="{{ nav_item_class }}">
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('fixrefs.index') }}" target="_blank">
+                            <i class="bi-list-task"></i> <span class="navtitles">Fix Refs</span>
+                        </a>
+                    </li>
+                    <li class="{{ nav_item_class }}">
+                        <a class="nav-link py-2 px-0 px-lg-2" href="{{ url_for('main.reports') }}" target="_blank">
+                            <i class="bi-list-task"></i> <span class="navtitles">Publish Reports</span>
                         </a>
                     </li>
                     <li class="{{ nav_item_class }}">
