@@ -9,7 +9,7 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ...database.services import CategoryService, PagesService
-from ..decorators import admin_required
+from ..decorators import coordinator_required
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class AddTranslateView(MethodView):
     """View for displaying and processing the translation addition dashboard."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
         self.category_service = CategoryService()

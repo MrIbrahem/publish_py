@@ -1,7 +1,7 @@
 """
 Integration tests for src/main_app/admin/routes/language_settings.py module.
 
-TODO: should mock admin_required decorator
+TODO: should mock coordinator_required decorator
 """
 
 from __future__ import annotations
@@ -16,14 +16,14 @@ from src.main_app.database.services import LangService, LanguageSettingService
 class TestLanguageSettingsDashboard:
     """Integration tests for language settings dashboard."""
 
-    def test_language_settings_dashboard_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
+    def test_language_settings_dashboard_requires_admin(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that language settings dashboard requires admin access."""
         response = mock_client.get("/adminpanel/language_settings/")
 
-        # With mock_admin_required, should render successfully
+        # With mock_coordinator_required, should render successfully
         assert response.status_code == 200
 
-    def test_language_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
+    def test_language_settings_dashboard_lists_settings(self, mock_coordinator_required, auth_client: FlaskClient):
         """Test that language settings dashboard lists settings."""
 
         langs_service = LangService()
@@ -44,14 +44,14 @@ class TestLanguageSettingsDashboard:
 class TestAddLanguageSetting:
     """Integration tests for adding language settings."""
 
-    def test_add_language_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
+    def test_add_language_setting_requires_admin(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that adding language setting requires admin access."""
         response = mock_client.post("/adminpanel/language_settings/add", data={"lang_code": "fr"})
 
         assert response.status_code == 302
         assert response.location == "/adminpanel/language_settings/"
 
-    def test_add_language_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
+    def test_add_language_setting_with_valid_data(self, mock_coordinator_required, auth_client: FlaskClient):
         """Test adding language setting with valid data."""
         langs_service = LangService()
         langs_service.add_lang("fr", "French", "Francais")
@@ -70,7 +70,7 @@ class TestAddLanguageSetting:
         assert response.status_code == 302
         assert response.location == "/adminpanel/language_settings/"
 
-    def test_add_language_setting_without_lang_code_fails(self, mock_admin_required, auth_client: FlaskClient):
+    def test_add_language_setting_without_lang_code_fails(self, mock_coordinator_required, auth_client: FlaskClient):
         """Test that adding language setting without lang_code fails."""
 
         response = auth_client.post(
@@ -87,14 +87,14 @@ class TestAddLanguageSetting:
 class TestUpdateLanguageSetting:
     """Integration tests for updating language settings."""
 
-    def test_update_language_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
+    def test_update_language_setting_requires_admin(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that updating language setting requires admin access."""
         response = mock_client.post("/adminpanel/language_settings/1/update", data={"move_dots": "1"})
 
         assert response.status_code == 302
         assert response.location == "/adminpanel/language_settings/"
 
-    def test_update_language_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
+    def test_update_language_setting_with_valid_data(self, mock_coordinator_required, auth_client: FlaskClient):
         """Test updating language setting with valid data."""
         lang_setting_service = LanguageSettingService()
         record = lang_setting_service.add_language_setting(lang_code="en", move_dots=0, expend=0, add_en_lang=0)
@@ -117,14 +117,14 @@ class TestUpdateLanguageSetting:
 class TestDeleteLanguageSetting:
     """Integration tests for deleting language settings."""
 
-    def test_delete_language_setting_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
+    def test_delete_language_setting_requires_admin(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that deleting language setting requires admin access."""
         response = mock_client.post("/adminpanel/language_settings/1/delete")
 
         assert response.status_code == 302
         assert response.location == "/adminpanel/language_settings/"
 
-    def test_delete_language_setting_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
+    def test_delete_language_setting_with_valid_id(self, mock_coordinator_required, auth_client: FlaskClient):
         """Test deleting language setting with valid ID."""
         lang_setting_service = LanguageSettingService()
         record = lang_setting_service.add_language_setting(lang_code="en", move_dots=1, expend=0, add_en_lang=1)

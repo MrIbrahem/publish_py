@@ -37,7 +37,7 @@ from ..database.models.setting import (
     SettingRecord,
 )
 from ..database.models.users import (
-    AdminUserRecord,
+    CoordinatorRecord,
     FullTranslatorRecord,
     UserRecord,
     UsersNoInprocessRecord,
@@ -109,7 +109,7 @@ categories: list[AdminCategory] = [
         name="Users",
         icon_value="fa-users",
         models=[
-            AdminUserRecord,
+            CoordinatorRecord,
             FullTranslatorRecord,
             UserRecord,
             UsersNoInprocessRecord,

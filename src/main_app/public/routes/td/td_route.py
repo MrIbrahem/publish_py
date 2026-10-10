@@ -197,6 +197,7 @@ class BaseTDView(MethodView):
             flash("Failed to load results — please try again.", "danger")
             return None
 
+
 class TDIndexView(BaseTDView):
 
     def get(self) -> str:
@@ -215,6 +216,7 @@ class TDIndexView(BaseTDView):
             settings=parsed["settings"],
             form_data=form_data,
         )
+
 
 class TDLangView(BaseTDView):
     """Render the translation dashboard landing page."""
@@ -262,7 +264,6 @@ class TDTableView(BaseTDView):
             return redirect(url_for("td.lang_camp_table", lang=args["code"], camp=args["camp"]))
 
         return TDLangView()._load(args)
-
 
 
 class TDMissingView(BaseTDView):

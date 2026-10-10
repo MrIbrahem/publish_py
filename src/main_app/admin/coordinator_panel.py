@@ -16,7 +16,7 @@ from flask.views import MethodView
 from werkzeug.wrappers.response import Response
 
 from ..templates_markups import create_side
-from .decorators import admin_required
+from .decorators import coordinator_required
 from .routes.categories import categories_dashboard
 from .routes.last import last_translations_dashboard
 
@@ -27,10 +27,10 @@ class BaseAdminPanelView(MethodView):
     """Base view for the admin panel pages.
 
     Every admin panel page requires an authenticated administrator, so
-    ``admin_required`` is declared here and inherited by all subclasses.
+    ``coordinator_required`` is declared here and inherited by all subclasses.
     """
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
 
 class AdminPanelIndexView(BaseAdminPanelView):

@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 from flask import Flask
 
-from src.main_app.database.services import AdminService, UsersService, UserTokenService
+from src.main_app.database.services import CoordinatorService, UsersService, UserTokenService
 from src.main_app.services.auth.token_manager import TokenManager
 
 
@@ -38,7 +38,7 @@ class TestUserService:
     def _seed_admin(self, username: str) -> None:
         """Create an active coordinator record."""
         with self.app.app_context():
-            AdminService().add_coordinator(username)
+            CoordinatorService().add_coordinator(username)
 
     # ── save_token ──
 
@@ -57,7 +57,7 @@ class TestUserService:
         assert res is not None
         assert res.user_id == user_id
         assert res.username == "testuser"
-        assert res.is_active_admin is True
+        assert res.is_active_coordinator is True
 
     def test_save_and_get_user_new_user(self):
         """A user with no token yet should get one upserted and non-admin status returned.
@@ -74,7 +74,7 @@ class TestUserService:
         assert res is not None
         assert res.user_id == user_id
         assert res.username == "brand_new_user"
-        assert res.is_active_admin is False
+        assert res.is_active_coordinator is False
 
         # Verify the token was persisted
         with self.app.app_context():
@@ -124,7 +124,7 @@ class TestUserService:
 
         assert res is not None
         assert res.username == "authuser"
-        assert res.is_active_admin is True
+        assert res.is_active_coordinator is True
 
     def test_get_authenticated_user_not_found(self):
         """Non-existent user_id should return None (no token in DB)."""

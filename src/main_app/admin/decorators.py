@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
 
 
-def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
+def coordinator_required(view: FuncType) -> FuncType:  # noqa: UP047
     """Decorator enforcing that the current user is an administrator."""
 
     @wraps(view)
@@ -30,7 +30,7 @@ def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
         user: CurrentUser | None = get_current_user()
         if not user:
             return redirect(url_for("auth.login"))
-        if not user.is_active_admin:
+        if not user.is_active_coordinator:
             logger.warning("User %s tried to access admin-only route", user.username)
             abort(403)
         return view(*args, **kwargs)
@@ -41,14 +41,14 @@ def admin_required(view: FuncType) -> FuncType:  # noqa: UP047
 def admin_guard() -> ResponseReturnValue | None:
     """Blueprint-level guard rejecting any non-admin request to the admin area.
 
-    Applies the same checks as :func:`admin_required` but as a ``before_request``
+    Applies the same checks as :func:`coordinator_required` but as a ``before_request``
     hook, so it covers every endpoint registered under the admin blueprint —
     including the nested sub-blueprints — even when a view forgets the decorator.
     """
     user: CurrentUser | None = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
-    if not user.is_active_admin:
+    if not user.is_active_coordinator:
         logger.warning("User %s tried to access admin-only route", user.username)
         abort(403)
     return None
@@ -56,5 +56,5 @@ def admin_guard() -> ResponseReturnValue | None:
 
 __all__ = [
     "admin_guard",
-    "admin_required",
+    "coordinator_required",
 ]

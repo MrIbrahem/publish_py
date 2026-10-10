@@ -16,7 +16,7 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ...database.services import FullTranslatorService
-from ..decorators import admin_required
+from ..decorators import coordinator_required
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class BaseFullTranslatorsView(MethodView):
     full-translator pages require an administrator.
     """
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
         self.service = FullTranslatorService()

@@ -18,7 +18,7 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ...database.services import ProjectService
-from ..decorators import admin_required
+from ..decorators import coordinator_required
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class BaseProjectsView(MethodView):
     project pages require an administrator.
     """
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
         self.project_service = ProjectService()

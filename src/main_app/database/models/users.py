@@ -70,9 +70,9 @@ class UserRecord(db.Model):
         return data
 
 
-class AdminUserRecord(TimestampMixin, db.Model):
+class CoordinatorRecord(TimestampMixin, db.Model):
     """
-    Coordinator/admin role — username references users.username.
+    Coordinator role — username references users.username.
     """
 
     __tablename__ = "coordinators"
@@ -243,7 +243,7 @@ class FullTranslatorRecord(db.Model):
 
 
 __all__ = [
-    "AdminUserRecord",
+    "CoordinatorRecord",
     "UserTokenRecord",
     "UserRecord",
     "FullTranslatorRecord",

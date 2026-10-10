@@ -1,7 +1,7 @@
 """
 <div class="div_menu navbar-collapse">
     {% if create_side %}
-    {{ create_side(request.path, is_admin) | safe }}
+    {{ create_side(request.path, is_coordinator) | safe }}
     {% endif %}
 </div>
 """
@@ -81,7 +81,7 @@ class Sidebar:
 
         return "", ""
 
-    def render(self, path: str, is_admin: bool = True) -> str:
+    def render(self, path: str, is_coordinator: bool = True) -> str:
         """Generate sidebar HTML structure based on menu definitions.
 
         This method constructs a responsive sidebar with collapsible groups and
@@ -91,7 +91,7 @@ class Sidebar:
 
         Args:
             path: The current request path, used to highlight the active item.
-            is_admin: Whether the current user may see admin-only items
+            is_coordinator: Whether the current user may see admin-only items
                 (items with `requires_admin=True`).
 
         Returns:
@@ -108,7 +108,7 @@ class Sidebar:
                 if item.disabled:
                     continue
 
-                if item.requires_admin and not is_admin:
+                if item.requires_admin and not is_coordinator:
                     continue
 
                 css_class = "active" if item.id == active_id else ""
@@ -180,7 +180,7 @@ class Sidebar:
         return "\n".join(sidebar_parts)
 
 
-def create_side(path: str, is_admin: bool = False) -> str:
+def create_side(path: str, is_coordinator: bool = False) -> str:
     """
     Generate sidebar HTML structure based on menu definitions.
 
@@ -188,7 +188,7 @@ def create_side(path: str, is_admin: bool = False) -> str:
     """
     main_menu = load_groups_menu()
     sidebar = Sidebar(main_menu)
-    return sidebar.render(path, is_admin=is_admin)
+    return sidebar.render(path, is_coordinator=is_coordinator)
 
 
 __all__ = [

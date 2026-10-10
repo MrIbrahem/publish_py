@@ -17,7 +17,7 @@ from flask.views import MethodView
 
 from ...database.models import ProjectRecord, UserRecord
 from ...database.services import LeaderboardService, ProjectService, UsersService
-from ..decorators import admin_required
+from ..decorators import coordinator_required
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class BaseUsersEmailsView(MethodView):
     pages require an administrator.
     """
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
         self.leaderboard_service = LeaderboardService()

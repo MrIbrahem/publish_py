@@ -12,7 +12,7 @@ from werkzeug.wrappers.response import Response
 
 from ....database.models import QidOthersRecord, QidRecord
 from ....database.services import QidOthersService, QidService
-from ...decorators import admin_required
+from ...decorators import coordinator_required
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ def is_valid(qid_id: int | bool, qid: str, title: str, existing_by_qid, existing
 class BaseQidView(MethodView):
     """Base view class providing shared service and validation utilities."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(
         self,

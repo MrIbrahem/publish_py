@@ -18,7 +18,7 @@ from .flask_admin_panel_models import ModelItem, categories
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self) -> bool:
         user = get_current_user()
-        return bool(user and user.is_active_admin)
+        return bool(user and user.is_active_coordinator)
 
     def inaccessible_callback(self, name: str, **kwargs: Any) -> Any:
         user = get_current_user()
@@ -41,7 +41,7 @@ class WrapModelView(ModelView):
 
     def is_accessible(self) -> bool:
         user = get_current_user()
-        return bool(user and user.is_active_admin)
+        return bool(user and user.is_active_coordinator)
 
     def inaccessible_callback(self, name: str, **kwargs: Any) -> Any:
         user = get_current_user()

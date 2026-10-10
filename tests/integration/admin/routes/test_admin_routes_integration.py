@@ -1,7 +1,7 @@
 """
 Integration tests for src/main_app/admin/routes/admin.py module.
 
-TODO: should mock admin_required decorator
+TODO: should mock coordinator_required decorator
 """
 
 from __future__ import annotations
@@ -18,14 +18,16 @@ from src.main_app.services.auth.current_user import CurrentUser
 class TestAdminIndex:
     """Integration tests for the admin index route."""
 
-    def test_admin_index_requires_admin(self, mock_admin_required, mock_client: FlaskClient):
+    def test_admin_index_requires_admin(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that admin index redirects to last dashboard."""
         response = mock_client.get("/adminpanel/")
 
         assert response.status_code == 302
         assert response.location.endswith("/adminpanel/last")
 
-    def test_admin_index_renders_dashboard_no_follow_redirects(self, mock_admin_required, auth_client: FlaskClient):
+    def test_admin_index_renders_dashboard_no_follow_redirects(
+        self, mock_coordinator_required, auth_client: FlaskClient
+    ):
         """Test that admin index renders dashboard."""
 
         response = auth_client.get("/adminpanel/")
@@ -33,7 +35,7 @@ class TestAdminIndex:
         assert response.status_code == 302
         assert response.location.endswith("/adminpanel/last")
 
-    def test_admin_index_renders_dashboard(self, mock_admin_required, auth_client: FlaskClient):
+    def test_admin_index_renders_dashboard(self, mock_coordinator_required, auth_client: FlaskClient):
         """Test that admin index renders dashboard."""
         response = auth_client.get("/adminpanel/", follow_redirects=True)
         assert response.status_code == 200
@@ -43,7 +45,7 @@ class TestAdminIndex:
 class TestAdminSidebar:
     """Integration tests for admin sidebar."""
 
-    def test_sidebar_injected_in_context(self, mock_admin_required, auth_client: FlaskClient):
+    def test_sidebar_injected_in_context(self, mock_coordinator_required, auth_client: FlaskClient):
         """Test that sidebar is injected in template context."""
         response = auth_client.get("/adminpanel/")
 
@@ -57,7 +59,7 @@ class TestAdminSidebar:
 class TestAdminBlueprints:
     """Integration tests for registered admin blueprints."""
 
-    def test_coordinators_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
+    def test_coordinators_routes_registered(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that coordinators routes are registered."""
         # Check that the coordinators route exists
         response = mock_client.get("/adminpanel/coordinators/")
@@ -65,25 +67,25 @@ class TestAdminBlueprints:
         # Route should exist and be accessible with mocked admin
         assert response.status_code == 200
 
-    def test_full_translators_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
+    def test_full_translators_routes_registered(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that full translators routes are registered."""
         response = mock_client.get("/adminpanel/full_translators/")
 
         assert response.status_code == 200
 
-    def test_users_no_inprocess_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
+    def test_users_no_inprocess_routes_registered(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that users no inprocess routes are registered."""
         response = mock_client.get("/adminpanel/users_no_inprocess/")
 
         assert response.status_code == 200
 
-    def test_language_settings_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
+    def test_language_settings_routes_registered(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that language settings routes are registered."""
         response = mock_client.get("/adminpanel/language_settings/")
 
         assert response.status_code == 200
 
-    def test_settings_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
+    def test_settings_routes_registered(self, mock_coordinator_required, mock_client: FlaskClient):
         """Test that settings routes are registered."""
         response = mock_client.get("/adminpanel/settings/")
 

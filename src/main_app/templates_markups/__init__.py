@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .admin_sidebar import create_side
+from .coordinator_sidebar import create_side
 from .navbar import td_navbar
 
 __all__ = [

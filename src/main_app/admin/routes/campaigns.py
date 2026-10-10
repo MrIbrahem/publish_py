@@ -18,7 +18,7 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ...database.services import CategoryService
-from ..decorators import admin_required
+from ..decorators import coordinator_required
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class BaseCampaignsView(MethodView):
 
     Holds the category service shared by every campaign page. Note that
     only the dashboard requires an administrator; the write endpoints
-    declare ``admin_required`` themselves to match the legacy behavior.
+    declare ``coordinator_required`` themselves to match the legacy behavior.
     """
 
     def __init__(self) -> None:
@@ -84,7 +84,7 @@ class BaseCampaignsView(MethodView):
 class CampaignsDashboardView(BaseCampaignsView):
     """Render the campaigns management dashboard."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def get(self) -> str:
         """Render the campaigns management dashboard."""

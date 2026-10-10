@@ -19,8 +19,8 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ...database.exceptions import DuplicateRecordError, UserNotFoundError
-from ...database.services import AdminService
-from ..decorators import admin_required
+from ...database.services import CoordinatorService
+from ..decorators import coordinator_required
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +28,15 @@ logger = logging.getLogger(__name__)
 class CoordinatorDashboardView(MethodView):
     """View to handle listing and rendering the coordinator management dashboard."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
-        self.admin_service = AdminService()
+        self.coordinator_service = CoordinatorService()
 
     def get(self) -> str:
         """Render the coordinator management dashboard."""
         try:
-            coordinators = self.admin_service.list_coordinators()
+            coordinators = self.coordinator_service.list_coordinators()
         except Exception as e:  # pragma: no cover - defensive guard
             logger.error("Unable to list coordinators: %s", e)
             flash("Unable to list coordinators.", "danger")
@@ -57,10 +57,10 @@ class CoordinatorDashboardView(MethodView):
 class AddCoordinatorView(MethodView):
     """View to handle adding a new coordinator."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
-        self.admin_service = AdminService()
+        self.coordinator_service = CoordinatorService()
 
     def post(self) -> ResponseReturnValue:
         """Create a new coordinator from the submitted username."""
@@ -70,7 +70,7 @@ class AddCoordinatorView(MethodView):
             return redirect(url_for("adminpanel.coordinators.dashboard"))
 
         try:
-            record = self.admin_service.add_coordinator(username)
+            record = self.coordinator_service.add_coordinator(username)
         except UserNotFoundError as exc:
             logger.error("UserNotFoundError: %s", exc)
             flash(f"User '{username}' does not exist", "warning")
@@ -92,15 +92,15 @@ class AddCoordinatorView(MethodView):
 class CoordinatorStatusView(MethodView):
     """Base class for managing coordinator status updates."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
-        self.admin_service = AdminService()
+        self.coordinator_service = CoordinatorService()
 
     def _set_record_active_status(self, coordinator_id: int, is_active: bool) -> ResponseReturnValue:
         """Shared helper to update coordinator is_active status."""
         try:
-            record = self.admin_service.set_coordinator_active(coordinator_id, is_active)
+            record = self.coordinator_service.set_coordinator_active(coordinator_id, is_active)
             if record is None:
                 raise LookupError(f"Coordinator with id {coordinator_id} not found")
         except LookupError:
@@ -133,18 +133,18 @@ class DeactivateCoordinatorView(CoordinatorStatusView):
 class DeleteCoordinatorView(MethodView):
     """View to remove a coordinator entirely."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def __init__(self) -> None:
-        self.admin_service = AdminService()
+        self.coordinator_service = CoordinatorService()
 
     def post(self, coordinator_id: int) -> ResponseReturnValue:
         """Remove a coordinator entirely."""
         try:
-            record = self.admin_service.get_coordinator_by_id(coordinator_id)
+            record = self.coordinator_service.get_coordinator_by_id(coordinator_id)
             if record is None:
                 raise LookupError(f"Coordinator with id {coordinator_id} not found")
-            self.admin_service.delete(coordinator_id)
+            self.coordinator_service.delete(coordinator_id)
         except LookupError:
             logger.exception("Unable to delete coordinator.")
             flash(f"Coordinator id {coordinator_id} was not found", "warning")

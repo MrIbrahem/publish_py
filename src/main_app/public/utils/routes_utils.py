@@ -10,9 +10,9 @@ from ...templates_markups import td_navbar
 logger = logging.getLogger(__name__)
 
 
-def _is_admin(user: Any) -> bool:
-    """Check if user is an active coordinator (admin)."""
-    return bool(user and getattr(user, "is_active_admin", False))
+def _is_coordinator(user: Any) -> bool:
+    """Check if user is an active coordinator."""
+    return bool(user and getattr(user, "is_active_coordinator", False))
 
 
 def context_data(
@@ -34,7 +34,7 @@ def context_data(
         # "username": username,
         "is_authenticated": user is not None,
         "current_username": username,
-        "is_admin": _is_admin(user),
+        "is_coordinator": _is_coordinator(user),
         "td_navbar": td_navbar,
         "wiki_domain": wiki_domain,
         "static_server": static_server,

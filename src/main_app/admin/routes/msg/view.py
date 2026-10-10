@@ -13,7 +13,7 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
 from ....services.utils.wiki_links import tr_link_medwiki
-from ...decorators import admin_required
+from ...decorators import coordinator_required
 from .email_msg import (
     create_email_msg,
     get_current_user_email,
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 class EmailDashboardView(MethodView):
     """View to handle fetching email context and rendering the composition dashboard."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def get(
         self,
@@ -76,7 +76,7 @@ class EmailDashboardView(MethodView):
 class EmailSendView(MethodView):
     """View to handle sending composed email messages."""
 
-    decorators = [admin_required]
+    decorators = [coordinator_required]
 
     def post(self) -> ResponseReturnValue:
         """Process email submission form and send the email."""

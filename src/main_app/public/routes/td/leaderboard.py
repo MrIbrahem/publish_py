@@ -15,8 +15,8 @@ from flask import (
     url_for,
 )
 from flask.views import MethodView
-
 from werkzeug.datastructures import MultiDict
+
 from ....database.services import (
     CategoryService,
     InProcessService,
@@ -130,7 +130,9 @@ class LeaderBoardIndexJsView(BaseLeaderBoardView):
 class LeaderBoardTableView(BaseLeaderBoardView):
     """Render the server-rendered leaderboard page."""
 
-    def get(self, camp: str | None = None, user_group: str | None = None, year: str | None = None, month: str | None = None) -> str:
+    def get(
+        self, camp: str | None = None, user_group: str | None = None, year: str | None = None, month: str | None = None
+    ) -> str:
         args = request.args.copy()
         if user_group:
             args.add("user_group", user_group)
@@ -188,8 +190,7 @@ class LeaderBoardIndexView(BaseLeaderBoardView):
     """Render the server-rendered leaderboard page."""
 
     def get(self):
-        """
-        """
+        """ """
         camp = request.args.get("camp", type=str) or "all"
         user_group = request.args.get("user_group", type=str) or "all"
         year = request.args.get("year", type=str) or "all"
@@ -199,9 +200,9 @@ class LeaderBoardIndexView(BaseLeaderBoardView):
             return LeaderBoardTableView()._load(MultiDict())
 
         args = {
-            "camp":camp,
-            "user_group":user_group,
-            "year":year,
+            "camp": camp,
+            "user_group": user_group,
+            "year": year,
         }
 
         endpoint = "leaderboard.index_camp_user_group_year"
@@ -215,6 +216,7 @@ class LeaderBoardIndexView(BaseLeaderBoardView):
             **args,  # pyright: ignore[reportArgumentType]
         )
         return redirect(url)
+
 
 class LeaderBoardLangsView(BaseLeaderBoardView):
     """Render the per-language leaderboard page."""
@@ -336,9 +338,17 @@ class LeaderBoardRoutes:
 
         bp.add_url_rule("/", view_func=LeaderBoardIndexView.as_view("index"), methods=["GET"])
         bp.add_url_rule("/<string:camp>", view_func=LeaderBoardTableView.as_view("index_camp"))
-        bp.add_url_rule("/<string:camp>/<string:user_group>", view_func=LeaderBoardTableView.as_view("index_camp_user_group"))
-        bp.add_url_rule("/<string:camp>/<string:user_group>/<string:year>", view_func=LeaderBoardTableView.as_view("index_camp_user_group_year"))
-        bp.add_url_rule("/<string:camp>/<string:user_group>/<string:year>/<string:month>", view_func=LeaderBoardTableView.as_view("table_all"))
+        bp.add_url_rule(
+            "/<string:camp>/<string:user_group>", view_func=LeaderBoardTableView.as_view("index_camp_user_group")
+        )
+        bp.add_url_rule(
+            "/<string:camp>/<string:user_group>/<string:year>",
+            view_func=LeaderBoardTableView.as_view("index_camp_user_group_year"),
+        )
+        bp.add_url_rule(
+            "/<string:camp>/<string:user_group>/<string:year>/<string:month>",
+            view_func=LeaderBoardTableView.as_view("table_all"),
+        )
 
 
 __all__ = [

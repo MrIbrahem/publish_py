@@ -1,8 +1,8 @@
-"""Unit tests for src/main_app/templates_markups/admin_sidebar.py."""
+"""Unit tests for src/main_app/templates_markups/coordinator_sidebar.py."""
 
 from __future__ import annotations
 
-from src.main_app.templates_markups.admin_sidebar import (
+from src.main_app.templates_markups.coordinator_sidebar import (
     SidebarItem,
     create_side,
     generate_list_item,
@@ -24,7 +24,7 @@ class TestSidebarItem:
         item = SidebarItem(id="x", title="X", fallback_href="/x", icon="bi-gear")
         assert item.icon == "bi-gear"
 
-    def test_requires_admin_defaults_to_true(self):
+    def test_requires_coordinator_defaults_to_true(self):
         item = SidebarItem(id="x", title="X", fallback_href="/x")
         assert item.requires_admin is True
 
@@ -162,22 +162,22 @@ class TestGenerateListItem:
 class TestCreateSide:
     def test_returns_html_string(self, mock_app):
         with mock_app.test_request_context():
-            html = create_side("admins", is_admin=True)
+            html = create_side("admins", is_coordinator=True)
             assert isinstance(html, str)
             assert "<ul" in html
 
     def test_contains_coordinators_link(self, mock_app):
         with mock_app.test_request_context():
-            html = create_side("admins", is_admin=True)
+            html = create_side("admins", is_coordinator=True)
             assert "Coordinators" in html
 
     def test_contains_users_link(self, mock_app):
         with mock_app.test_request_context():
-            html = create_side("admins", is_admin=True)
+            html = create_side("admins", is_coordinator=True)
             assert "Users" in html
 
     def test_create_side_marks_active_item(self) -> None:
-        html = create_side("/adminpanel/coordinators/", is_admin=True)
+        html = create_side("/adminpanel/coordinators/", is_coordinator=True)
 
         assert "Coordinators" in html
         assert "active" in html
@@ -187,19 +187,19 @@ class TestCreateSide:
         """
         Tests sidebar creation with an active item.
         """
-        result = create_side("admins", is_admin=True)
+        result = create_side("admins", is_coordinator=True)
         assert 'aria-expanded="true"' in result
         assert 'class="collapse show"' in result
 
 
-class TestCreateSideIsAdmin:
-    """Tests for the new `is_admin` filtering behavior."""
+class TestCreateSideIsCoordinator:
+    """Tests for the new `is_coordinator` filtering behavior."""
 
-    def test_admin_items_hidden_for_non_admin(self) -> None:
-        result = create_side("/adminpanel/coordinators/", is_admin=False)
+    def test_coordinator_items_hidden_for_non_admin(self) -> None:
+        result = create_side("/adminpanel/coordinators/", is_coordinator=False)
         assert "Templates" not in result
 
-    def test_non_admin_still_returns_valid_shell(self) -> None:
-        result = create_side("/adminpanel/coordinators/", is_admin=False)
+    def test_non_coordinator_still_returns_valid_shell(self) -> None:
+        result = create_side("/adminpanel/coordinators/", is_coordinator=False)
         assert isinstance(result, str)
         assert "<ul" in result
