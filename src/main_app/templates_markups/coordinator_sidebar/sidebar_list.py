@@ -214,7 +214,7 @@ def load_groups_menu() -> list[SidebarGroup]:
             SidebarItem(
                 id="fixwikirefs",
                 requires_coordinator=False,
-                fallback_href="/coordinators_panel//fixrefs",
+                fallback_href="/fixrefs",
                 title="Fixwikirefs",
                 link_target="_blank",
                 icon="bi-wrench",
