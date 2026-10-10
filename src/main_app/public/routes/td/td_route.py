@@ -17,8 +17,10 @@ from flask import (
     Blueprint,
     flash,
     jsonify,
+    redirect,
     render_template,
     request,
+    url_for,
 )
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
@@ -36,13 +38,13 @@ from .results_2026 import ResultsBundle, ResultsLoader
 logger = logging.getLogger(__name__)
 
 
-def _normalize_arg(name: str) -> str:
+def _normalize_arg(name: str, args: dict[str, Any]) -> str:
     """Read a GET param, strip whitespace, treat 'undefined' as empty.
 
     Mirrors the PHP load_request normalization (htmlspecialchars + the
     explicit `if ($code == "undefined") $code = "";`).
     """
-    raw = (request.args.get(name) or "").strip()
+    raw = (args.get(name) or "").strip()
     if raw == "undefined":
         return ""
     return raw
@@ -103,7 +105,7 @@ class BaseTDView(MethodView):
             },
         }
 
-    def _parse_request_args(self, campaigns: list[dict]) -> dict[str, Any]:
+    def _parse_request_args(self, campaigns: list[dict], request_args: dict[str, Any]) -> dict[str, Any]:
         """Mirror of src/backend/loaders/load_request.php — load_request().
 
         Returns a dict with the resolved request parameters. ``code_lang_name``
@@ -115,12 +117,12 @@ class BaseTDView(MethodView):
         camps_data: dict[str, dict] = {c["campaign"]: c for c in campaigns if c.get("campaign")}
         cats_data: dict[str, str] = {c["category"]: c.get("campaign", "") for c in campaigns if c.get("category")}
 
-        code = _normalize_arg("code")
-        camp = _normalize_arg("camp")
-        cat = _normalize_arg("cat")
-        tr_type = _normalize_arg("tr_type")
+        code = _normalize_arg("code", request_args)
+        camp = _normalize_arg("camp", request_args)
+        cat = _normalize_arg("cat", request_args)
+        tr_type = _normalize_arg("tr_type", request_args)
 
-        filter_sparql = _as_bool(_normalize_arg("filter_sparql"))
+        filter_sparql = _as_bool(_normalize_arg("filter_sparql", request_args))
 
         code_lang_name = ""
 
@@ -195,14 +197,13 @@ class BaseTDView(MethodView):
             flash("Failed to load results — please try again.", "danger")
             return None
 
-
 class TDIndexView(BaseTDView):
-    """Render the translation dashboard landing page."""
 
     def get(self) -> str:
         """Render the dashboard with the filter form and no results card."""
+        args = request.args
         langs, campaigns = self._load_langs_and_campaigns()
-        parsed = self._parse_request_args(campaigns)
+        parsed = self._parse_request_args(campaigns, args)
 
         # Identity / coordinator / full-translator flags — mirrors src/index.php.
         user = get_current_user()
@@ -215,14 +216,14 @@ class TDIndexView(BaseTDView):
             form_data=form_data,
         )
 
+class TDLangView(BaseTDView):
+    """Render the translation dashboard landing page."""
 
-class TDTableView(BaseTDView):
-    """Render the dashboard with the results table for a code/campaign pair."""
-
-    def get(self) -> str:
+    def _load(self, args) -> str:
         """Render the dashboard and load the results bundle when valid."""
         langs, campaigns = self._load_langs_and_campaigns()
-        parsed = self._parse_request_args(campaigns)
+        # args = request.args
+        parsed = self._parse_request_args(campaigns, args)
 
         # Identity / coordinator / full-translator flags — mirrors src/index.php.
         user = get_current_user()
@@ -243,6 +244,25 @@ class TDTableView(BaseTDView):
             form_data=form_data,
             results=results_bundle,
         )
+
+    def get(self, camp: str | None = None, lang: str | None = None) -> str:
+        args: dict[str, Any] = {str(x): str(v) for x, v in request.args.items()}
+        args["code"] = lang
+        args["camp"] = camp or "Main"
+        return self._load(args)
+
+
+class TDTableView(BaseTDView):
+    """Render the dashboard with the results table for a code/campaign pair."""
+
+    def get(self):
+        """Render the dashboard with the filter form and no results card."""
+        args = request.args
+        if args.get("code") and args.get("camp"):
+            return redirect(url_for("td.lang_camp_table", lang=args["code"], camp=args["camp"]))
+
+        return TDLangView()._load(args)
+
 
 
 class TDMissingView(BaseTDView):
@@ -312,7 +332,8 @@ class TDResultsApiView(BaseTDView):
     def get(self) -> ResponseReturnValue:
         """Return the results for a code/campaign triple as JSON."""
         _, campaigns = self._load_langs_and_campaigns()
-        parsed = self._parse_request_args(campaigns)
+        args = request.args
+        parsed = self._parse_request_args(campaigns, args)
 
         start = time.time()
 
@@ -348,6 +369,10 @@ class TDRoutes:
     def register(cls, bp: Blueprint) -> None:
         """Register all translation dashboard views on the blueprint."""
         bp.add_url_rule("/", view_func=TDIndexView.as_view("index"))
+
+        bp.add_url_rule("/<string:camp>", view_func=TDLangView.as_view("camp_table"))
+        bp.add_url_rule("/<string:camp>/<string:lang>", view_func=TDLangView.as_view("lang_camp_table"))
+
         bp.add_url_rule("/table", view_func=TDTableView.as_view("table"))
         bp.add_url_rule("/missing", view_func=TDMissingView.as_view("missing"))
         bp.add_url_rule("/results_api", view_func=TDResultsApiView.as_view("results_api"))
