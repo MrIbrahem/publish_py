@@ -29,6 +29,13 @@ class ResultsRows:
     inprocess_rows: list[InProcessItem]
     exists_rows: list[ExistsItem]
 
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "missing": [x.to_json() for x in self.missing_rows],
+            "inprocess": [x.to_json() for x in self.inprocess_rows],
+            "exists": [x.to_json() for x in self.exists_rows],
+        }
+
 
 @dataclass
 class ResultsBundle:
@@ -42,9 +49,15 @@ class ResultsBundle:
     rows: ResultsRows
     summary_data: dict[str, Any]
     show_translation_button: bool
-    tra_type: str
+    tr_type: str
     code_lang_name: str
     full_tr_user: bool
+
+    def to_api_json(self) -> dict[str, dict[str, Any]]:
+        return {
+            "rows": self.rows.to_json(),
+            "summary_data": self.summary_data,
+        }
 
 
 __all__ = [

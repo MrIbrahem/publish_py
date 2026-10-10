@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 from urllib.parse import quote
 
@@ -27,9 +27,6 @@ class InProcessItem(ItemBase):
     user: str
     date: str
 
-    # Request-level config supplied by the table (not available in the template).
-    translate_type_info: dict[str, int | None] = field(default_factory=dict)
-
     @classmethod
     def from_row(
         cls,
@@ -42,7 +39,7 @@ class InProcessItem(ItemBase):
         """ """
         translate_type_info = translate_type_info or {"tt_lead": None, "tt_full": None}
 
-        tra_type = row.get("translate_type") or "lead"
+        tr_type = row.get("translate_type") or "lead"
 
         date = cls._format_inprocess_date(row.get("date") or row.get("add_date") or "")
 
@@ -54,7 +51,7 @@ class InProcessItem(ItemBase):
             qid=row.get("qid") or "",
             user=row.get("user") or "",
             date=date,
-            tra_type=tra_type,
+            tr_type=tr_type,
             words=Stats.load(row, "words"),
             refs=Stats.load(row, "refs"),
             translate_type_info=translate_type_info,
@@ -75,24 +72,30 @@ class InProcessItem(ItemBase):
         if not is_authenticated:
             return self._login_html()
 
-        effective_type = "all" if self.is_video else (self.tra_type or "lead")
-        lead_url = content_translation_url(self.title, langcode, camp, effective_type)
+        full_url = content_translation_url(self.title, langcode, camp, "all")
 
-        if full_tr_user and not self.is_video:
-            full_url = content_translation_url(self.title, langcode, camp, "all")
-            return Markup(
-                "<div class='inline'>"
-                "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
-                "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
-                "</div>"
-            ).format(
-                lead_url=lead_url,
-                full_url=full_url,
-            )
+        html_translate_button = (
+            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tr_type}'>"
+            "Translate"
+            "</a>"
+        )
+        # 1. if is_full_only, render `full_url` only. no mater if full_tr_user or not
+        if self.is_full_only:
+            return Markup(html_translate_button).format(translate_url=full_url, tr_type="all")
 
+        lead_url = content_translation_url(self.title, langcode, camp, self.tr_type)
+
+        # 2. if not `full_tr_user`, render only lead url
+        if not full_tr_user:
+            return Markup(html_translate_button).format(translate_url=lead_url, tr_type=self.tr_type)
+
+        # 3. if full_tr_user, render both lead and full urls
         return Markup(
-            "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
-        ).format(lead_url=lead_url)
+            "<div class='inline'>"
+            "<a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Lead</a>"
+            "<a href='{full_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Full</a>"
+            "</div>"
+        ).format(lead_url=lead_url, full_url=full_url)
 
     def _render(
         self,
@@ -132,8 +135,8 @@ class InProcessItem(ItemBase):
             row_links=row_links,
             en_views=self.en_views,
             importance=self.importance,
-            words=self.words.all if self.tra_type == "all" else self.words.lead,
-            refs=self.refs.all if self.tra_type == "all" else self.refs.lead,
+            words=self.pick_stat_value(self.words),
+            refs=self.pick_stat_value(self.refs),
             user=self.user,
             date=self.date,
             wikidata_link=Markup(self.wikidata_link()),
@@ -147,9 +150,6 @@ class InProcessItem(ItemBase):
         is_authenticated: bool,
         show_translation_button: bool,
     ) -> Markup:
-        no_lead = self.translate_type_info["tt_lead"] == 0
-        is_full_eligible = self.translate_type_info["tt_full"] == 1
-
         return self._render(
             langcode=langcode,
             camp=camp,

@@ -34,7 +34,7 @@ function graph_js(_labels, _data, _id) {
     }
 
     var len = _labels.length - 2
-    var colors = new Array(len).fill('#007bff').concat(new Array(2).fill('#bcbcbc'));
+    // var colors = new Array(len).fill('#007bff').concat(new Array(2).fill('#bcbcbc'));
 
     var areaChartOptions = {
         title: {

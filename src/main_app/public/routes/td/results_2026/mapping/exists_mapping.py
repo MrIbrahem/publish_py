@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 from urllib.parse import quote
 
@@ -31,9 +31,6 @@ class ExistsItem(ItemBase):
     via: str
     qid: str
 
-    # Request-level config supplied by the table (not available in the template).
-    translate_type_info: dict[str, int | None] = field(default_factory=dict)
-
     @classmethod
     def from_row(
         cls,
@@ -53,7 +50,7 @@ class ExistsItem(ItemBase):
             qid=row.get("qid") or "",
             en_views="",
             importance="",
-            tra_type="",
+            tr_type="",
             words=Stats.load(row, "words"),
             refs=Stats.load(row, "refs"),
             translate_type_info=translate_type_info,
@@ -75,12 +72,14 @@ class ExistsItem(ItemBase):
         if not user_coord:
             return Markup("")
 
+        html_translate_button = (
+            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tr_type}'>"
+            "Translate"
+            "</a>"
+        )
+
         translate_url = content_translation_url(self.title, langcode, camp, "lead")
-        return Markup(
-            "<div class='inline'>"
-            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Translate</a>"
-            "</div>"
-        ).format(translate_url=translate_url)
+        return Markup(html_translate_button).format(translate_url=translate_url, tr_type="lead")
 
     def _render(
         self,
@@ -123,9 +122,6 @@ class ExistsItem(ItemBase):
         is_authenticated: bool,
         user_coord: bool,
     ) -> Markup:
-        no_lead = self.translate_type_info["tt_lead"] == 0
-        is_full_eligible = self.translate_type_info["tt_full"] == 1
-
         return self._render(
             langcode=langcode,
             camp=camp,

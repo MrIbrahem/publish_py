@@ -12,6 +12,7 @@ import logging
 
 from flask import (
     Blueprint,
+    flash,
     redirect,
     render_template,
     request,
@@ -79,11 +80,15 @@ class TranslateMedView(MethodView):
         # PHP lines 186-190: both title and code are required; anything else
         # renders an empty page rather than an error.
         if not title or not langcode:
+            if not title:
+                flash("Invalid request: `title` is required", "warning")
+            if not langcode:
+                flash("Invalid request: `langcode` is required", "warning")
             return render_template("td/translate_med.html")
 
         cat = _normalize("cat")
         camp = _normalize("camp")
-        tra_type = _normalize("tra_type") or _DEFAULT_TRA_TYPE
+        tr_type = _normalize("tr_type") or _DEFAULT_TRA_TYPE
         word = _word(request.args.get("word"))
 
         # PHP lines 207-209: $camp = $cats_data[$cat] ?? ""
@@ -96,7 +101,7 @@ class TranslateMedView(MethodView):
                 user=user.username,
                 lang=langcode,
                 cat=cat,
-                tra_type=tra_type,
+                tr_type=tr_type,
                 word=word,
             )
 
@@ -107,7 +112,7 @@ class TranslateMedView(MethodView):
                 title=title,
                 code=langcode,
                 campaign=camp,
-                tra_type=tra_type,
+                tr_type=tr_type,
                 endpoint=get_endpoint(),
             )
         )
@@ -124,7 +129,7 @@ class TranslateMedView(MethodView):
         user: str,
         lang: str,
         cat: str,
-        tra_type: str,
+        tr_type: str,
         word: int,
     ) -> None:
         """PHP ``insertPage_inprocess()`` — idempotent ``INSERT ... WHERE NOT EXISTS``.
@@ -141,7 +146,7 @@ class TranslateMedView(MethodView):
                 user=user,
                 lang=lang,
                 cat=cat,
-                translate_type=tra_type,
+                translate_type=tr_type,
                 word=word,
             )
         except ValueError:

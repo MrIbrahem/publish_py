@@ -8,7 +8,25 @@
     </div>
 </div>
 {% endmacro %}
-{# Shared Jinja macros. #}
+
+{%- macro xtools_link(title) -%}
+<a href='https://xtools.wmflabs.org/globalcontribs/{{ title | replace(' ', '_') | urlencode }}' target='_blank'>
+    <img class="splash-logo" src="/static/xtools.svg" alt="XTools" width="80" height="35"
+        title="Xtools">
+</a>
+{%- endmacro -%}
+
+{%- macro wiki_link(title, lang_code, label="") -%}
+<a href="https://{{ lang_code }}.wikipedia.org/wiki/{{ title | replace(' ', '_') | urlencode }}" target="_blank"
+    rel="noopener noreferrer">
+    {% if label %}
+    {{ label }}
+    {% else %}
+    {{ title }}
+    {% endif %}
+</a>
+{%- endmacro -%}
+
 {%- macro commons_file_link(filename, label="") -%}
 {% if filename %}
 {% set striped_name = filename | replace('File:', '') %}

@@ -139,7 +139,7 @@ class TestValidRequest:
                 "langcode": "AR",
                 "cat": "RTT",
                 "camp": "RTT",
-                "tra_type": "lead",
+                "tr_type": "lead",
                 "word": "1200",
             },
         )

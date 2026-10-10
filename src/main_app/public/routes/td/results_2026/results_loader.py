@@ -38,7 +38,7 @@ class ResultsLoader:
         *,
         code: str,
         cat: str,
-        tra_type: str,
+        tr_type: str,
         code_lang_name: str,
         settings: dict[str, bool],
         full_tr_user: bool,
@@ -68,7 +68,7 @@ class ResultsLoader:
         # show_translation_button = show_btn and user_coord
 
         missing_table = MissingTable(
-            tra_type=tra_type,
+            tr_type=tr_type,
             full_tr_user=full_tr_user,
             translate_type_data=rows_data,
         )
@@ -97,7 +97,7 @@ class ResultsLoader:
             ),
             summary_data=bucket["summary_data"],
             show_translation_button=show_btn,
-            tra_type=tra_type or "lead",
+            tr_type=tr_type or "lead",
             code_lang_name=code_lang_name,
             full_tr_user=full_tr_user,
         )

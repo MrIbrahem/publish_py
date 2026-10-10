@@ -1,7 +1,7 @@
 import pytest
 
 from src.main_app.database.exceptions import UniqueError
-from src.main_app.database.models import PageRecord, QidRecord, TranslateTypeRecord
+from src.main_app.database.models import CategoryMemberRecord, QidRecord, TranslateTypeRecord
 from src.main_app.database.services.pages.translate_type_service import TranslateTypeService
 
 
@@ -215,24 +215,11 @@ class TestListTranslateTypesByCategory(TestSetup):
     def test_filters_by_category_membership(self, sqlite_db):
         self.service.add_translate_type("In_RTT")
         self.service.add_translate_type("Not_In_RTT")
+        sqlite_db.session.add(CategoryMemberRecord(article_id="In_RTT", category="RTT"))
         sqlite_db.session.add(
-            PageRecord(
-                title="In_RTT",
-                translate_type="lead",
-                cat="RTT",
-                lang="en",
-                user="u",
-                target="t",
-            )
-        )
-        sqlite_db.session.add(
-            PageRecord(
-                title="Not_In_RTT",
-                translate_type="lead",
-                cat="OTHER",
-                lang="en",
-                user="u",
-                target="t",
+            CategoryMemberRecord(
+                article_id="Not_In_RTT",
+                category="OTHER",
             )
         )
         sqlite_db.session.commit()

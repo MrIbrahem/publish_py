@@ -13,9 +13,10 @@
                         </h4>
                         <div class="d-flex align-items-center justify-content-center " style="height: 100%">
                             <div class="text-muted">
-                                Articles: <strong>{{ pages | length }}</strong> &nbsp;
-                                Words: <strong>{{ words_total }}</strong> &nbsp;
-                                Pageviews: <strong><span id="hrefjsontoadd">{{ pageviews_total }}</span></strong>
+                                Articles: <strong>{{ pages | length | commas }}</strong> &nbsp;
+                                Words: <strong>{{ words_total | commas }}</strong> &nbsp;
+                                Pageviews: <strong><span
+                                        id="hrefjsontoadd_xx">{{ pageviews_total | commas }}</span></strong>
                             </div>
                         </div>
                     </div>

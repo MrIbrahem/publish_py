@@ -44,6 +44,7 @@ class EmailDashboardView(MethodView):
         # Fetch underlying page metadata
         page_data = get_page_data(last_table, id)
         username = page_data.get("user") or user or ""
+        lang = page_data.get("lang") or ""
 
         user_email = get_user_email(str(username))
         current_user_email = get_current_user_email()
@@ -52,16 +53,15 @@ class EmailDashboardView(MethodView):
 
         # Generate standard email body template
         msg = ""
-
         if suggestion:
             translate_url = tr_link_medwiki(
                 title=suggestion,
-                langcode=page_data.get("lang", ""),
+                langcode=lang,
                 cat="RTT",
                 camp="Main",
-                tra_type="lead",
-                word=0,
+                tr_type="lead",
             )
+
             msg = create_email_msg(page_data, translate_url, suggestion)
 
         return render_template(

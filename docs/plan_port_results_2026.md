@@ -115,8 +115,8 @@ All HTML/URL helpers go into `src/main_app/shared/utils/wiki_links.py`. They pro
 | `make_mdwiki_cat_url($category, $name=null)`                         | `mdwiki_cat_link(category: str, name: str \| None = None) -> str`                      |
 | `make_wikipedia_url_blank($target, $lang, $name='', $deleted=false)` | `wikipedia_link(target: str, lang: str, name: str = "", deleted: bool = False) -> str` |
 | `make_wikidata_url_blank($qid, $name='', $default='')`               | `wikidata_link(qid: str, name: str = "", default: str = "") -> str`                    |
-| `make_tr_link_medwiki(...)`                                          | `tr_link_medwiki(title, lang, cat, camp, tra_type, word) -> str`                       |
-| `make_ContentTranslation_url(...)`                                   | `content_translation_url(title, lang, cat, camp, tra_type, endpoint) -> str`           |
+| `make_tr_link_medwiki(...)`                                          | `tr_link_medwiki(title, lang, cat, camp, tr_type, word) -> str`                       |
+| `make_ContentTranslation_url(...)`                                   | `content_translation_url(title, lang, cat, camp, tr_type, endpoint) -> str`           |
 | `get_endpoint()`                                                     | `_get_endpoint() -> str` (private to `wiki_links.py`)                                  |
 
 All builders use `urllib.parse.quote` (with `safe=""`) which is the closest Python equivalent of PHP `rawurlencode`, and replace spaces with `_` before encoding (matches PHP behavior exactly).
@@ -201,7 +201,7 @@ WHERE c.category = :cat
 | `code`          | string | `load_request.php`                        | language code; validated via `get_lang_by_code(code)`; sets a flash error and skips results when invalid                                                                       |
 | `camp`          | string | `load_request.php`                        | campaign name; cross-resolved to `cat` via the `categories` table                                                                                                              |
 | `cat`           | string | `load_request.php`                        | category; if missing, resolved from `camp`; if both missing → no results card rendered                                                                                         |
-| `type`          | string | `load_request.php` (mapped to `tra_type`) | `'lead'` or `'all'`; if `allow_type_of_translate == "0"` from settings, force `'lead'`                                                                                         |
+| `type`          | string | `load_request.php` (mapped to `tr_type`) | `'lead'` or `'all'`; if `allow_type_of_translate == "0"` from settings, force `'lead'`                                                                                         |
 | `doit`          | any    | `load_request.php`                        | "submit" marker; PHP renders results when present, the Python port renders results when both `code` AND `camp` are resolved (matches PHP `if ($camp && $code)` final dispatch) |
 | `exists`        | any    | `src/index.php`                           | when present, force `show_exists = True` even for non-coordinator users                                                                                                        |
 | `test`          | any    | `load_request.php`                        | toggles a small debug line above the results (kept for parity but not exposed in UI)                                                                                           |
@@ -253,7 +253,7 @@ The PHP `results_loader_2026` always returns the same string shape and lets the 
   "code": str,
   "camp": str,
   "cat": str,
-  "tra_type": str,
+  "tr_type": str,
   "code_lang_name": str,
   "global_username": str,
   "full_tr_user": bool,
@@ -287,7 +287,7 @@ The `_html` suffixes signal that the value is already-built safe HTML produced b
 
 Mirroring PHP:
 
-1. **Inputs:** `code`, `camp`, `cat`, `tra_type`, `show_exists`, `translation_button`, `global_username`, `user_coord`, `test`, `code_lang_name`, `full_tr_user`, `endpoint`.
+1. **Inputs:** `code`, `camp`, `cat`, `tr_type`, `show_exists`, `translation_button`, `global_username`, `user_coord`, `test`, `code_lang_name`, `full_tr_user`, `endpoint`.
 2. Call `get_results_2026(cat, code)`:
     1. `pages_via_td = list_pages_by_lang_cat(code, cat)` and index by `title`.
     2. `items_missing = missing_by_lang_and_category(code, cat)`.
@@ -304,14 +304,14 @@ Mirroring PHP:
 4. Sort `missing` by `en_views` desc (PHP `usort`); cap to a reasonable number? **No — PHP doesn't cap, so neither do we.**
 5. Build per-row dicts:
     - **Missing rows** (PHP `_make_one_row_results`):
-        - Detect `is_video = title.lower().startswith("video:")`. If video, force `tra_type='all'`.
-        - Compute `words/refs` from row data, switching to `w_all_words/r_all_refs` when `tra_type=='all'`.
+        - Detect `is_video = title.lower().startswith("video:")`. If video, force `tr_type='all'`.
+        - Compute `words/refs` from row data, switching to `w_all_words/r_all_refs` when `tr_type=='all'`.
         - Build `mdwiki_url`, `qid_html`, `translate_html` per the four PHP branches:
             1. No user → "Login" button linking to `auth.login`.
             2. `full_tr_user and not is_video` → two buttons (Lead + Full) using `tr_link_medwiki`.
             3. Default → single "Translate" button using `tr_link_medwiki`.
         - Apply the lead/full filter logic from PHP:
-            - If `do_full = (tra_type != 'all')` AND title in `nolead_titles` AND title not in `full_titles` → skip row entirely.
+            - If `do_full = (tr_type != 'all')` AND title in `nolead_titles` AND title not in `full_titles` → skip row entirely.
             - If `do_full` AND title in `full_titles` → emit an extra "Full" version of the row right after the lead row (PHP appends `cnt2.Full` numbering).
     - **In-process rows** (PHP `make_one_row_new_inprocess` + `make_translate_urls`):
         - Look up auxiliary metrics by joining the inprocess row with the missing/exists data already loaded (we **do not** re-query `assessments`/`words`/`refs_counts` per row; we build a single `titles_infos_by_title` dict from the union of `items_missing` and `items_exists` once). This avoids the N+1 query problem that PHP avoids via in-memory `array_column`.
@@ -374,7 +374,7 @@ Each table partial uses the existing Bootstrap 5 + DataTables CSS classes (`tabl
 | 8   | PHP loops emit "extra" Full row for some titles                                                           | Python emits two row dicts in sequence with `is_full_row=True` on the second; the template renders them identically.                                                                                                                                                                                                                                                                                                                                     |
 | 9   | PHP timestamps display `add_date` truncated at first space                                                | Mirror via Python `date_str.split(" ")[0] if ":" in date_str else date_str`.                                                                                                                                                                                                                                                                                                                                                                             |
 | 10  | Empty `importance` shown as "Unknown"                                                                     | Same default in Python row prep.                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 11  | `Video:` prefix forces `tra_type='all'` and disables Full button                                          | Same logic in Python row prep.                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 11  | `Video:` prefix forces `tr_type='all'` and disables Full button                                          | Same logic in Python row prep.                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 12  | PHP `if ($camp && $code)` to dispatch results                                                             | Python: only call `results_loader_2026()` when both resolved AND `code_lang_name` is non-empty (matches the PHP path that requires a valid lang).                                                                                                                                                                                                                                                                                                        |
 | 13  | Anonymous users see "Login" button instead of "Translate"                                                 | Same — emitted by `wiki_links.login_button(url_for('auth.login'))` (or rendered directly in the template since it has no parameters).                                                                                                                                                                                                                                                                                                                    |
 | 14  | PHP `make_tr_link_medwiki` produces `translate_med/index.php?…`                                           | Python `tr_link_medwiki` produces the **same relative URL string** (`translate_med/index.php?…`) for parity, even though publish_py may not yet host that endpoint. The link target is the Translation-Dashboard PHP app, which is the same behavior the existing `index.html` form references via `?cat=RTT&depth=1&code=ceb&doit=1`. **Decision:** keep the relative path identical; revisit only if the user later requests a Python-side equivalent. |

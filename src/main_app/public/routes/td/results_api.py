@@ -22,14 +22,13 @@ def _resolve_campaign_to_category(camp: str) -> str:
 def _get_cat_exists_and_missing(
     pages_by_title: dict[str, Any],
     cat: str,
-    depth: int,
     code: str,
 ) -> tuple[dict, list]:
     if not pages_by_title:
         pages_service = PagesService()
         pages_by_title = {p.title: p for p in pages_service.list_pages_by_lang_cat(code, cat)}
 
-    members = get_mdwiki_cat_members(cat, depth, use_cache=True)
+    members = get_mdwiki_cat_members(cat, 0, use_cache=True)
     member_set = set(members)
 
     exists = {}
@@ -118,15 +117,10 @@ def _make_mdwiki_cat_url(category: str, name: str | None = None) -> str:
 def results_api_result(
     code: str | None,
     camp: str | None,
-    depth: str | int | None,
     cat2: str | None = None,
 ) -> dict[str, Any]:
     code = code or "ar"
     camp = camp or "Hearing"
-    try:
-        depth_int = max(0, int(depth)) if depth else 1
-    except (ValueError, TypeError):
-        depth_int = 1
 
     cat = _resolve_campaign_to_category(camp)
 
@@ -134,7 +128,7 @@ def results_api_result(
     pages = pages_service.list_pages_by_lang_cat(code, cat)
     pages_by_title = {p.title: p for p in pages}
 
-    items_exists, items_missing = _get_cat_exists_and_missing(pages_by_title, cat, depth_int, code)
+    items_exists, items_missing = _get_cat_exists_and_missing(pages_by_title, cat, code)
 
     targets = _get_exists_targets_by_lang(code)
     extra_exists = _exists_expends(items_missing, targets)
