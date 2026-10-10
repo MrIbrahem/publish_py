@@ -85,7 +85,7 @@ class TestCoordinatorsBlueprints:
 
         assert response.status_code == 200
 
-    def test_settings_routes_registered(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_settings_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that settings routes are registered."""
         response = mock_client.get("/coordinators_panel/settings/")
 

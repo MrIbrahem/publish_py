@@ -173,7 +173,7 @@ class TestCreateSide:
 
     def test_contains_coordinators_link(self, mock_app):
         with mock_app.test_request_context():
-            html = create_side("coordinators", is_coordinator=True)
+            html = create_side("coordinators", is_admin=True)
             assert "Coordinators" in html
 
     def test_contains_users_link(self, mock_app):
@@ -182,7 +182,7 @@ class TestCreateSide:
             assert "Users" in html
 
     def test_create_side_marks_active_item(self) -> None:
-        html = create_side("/coordinators_panel/coordinators/", is_coordinator=True)
+        html = create_side("/coordinators_panel/coordinators/", is_admin=True)
 
         assert "Coordinators" in html
         assert "active" in html
