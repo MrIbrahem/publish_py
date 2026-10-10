@@ -11,18 +11,42 @@ from marshmallow import Schema, fields, post_load, validate
 
 
 class PublishRequestSchema(Schema):
-    """Schema for /publish/ endpoint request validation."""
+    """
+    Schema for /publish/ endpoint request validation..
 
-    user = fields.Str(required=True, validate=validate.Length(min=1, max=120))
-    title = fields.Str(required=True, validate=validate.Length(min=1, max=255))
-    text = fields.Str(required=True, validate=validate.Length(min=1))
-    target = fields.Str(required=True, validate=validate.Length(min=2, max=10))
-    sourcetitle = fields.Str(validate=validate.Length(max=255))
+    php source code that send post request:
+    $postParams = [
+        'campaign' => $params['campaign'] ?? '',
+        'revid' => $sourceRevisionId,
+        'sourcetitle' => $params['sourcetitle'],
+        'summary' => $summary,
+        'target' => $params['to'],
+        'text' => $wikitext,
+        'title' => $title->getPrefixedDBkey(),
+        'user' => $user_name,
+    ];
+
+    // wpCaptchaId, wpCaptchaWord
+    if (isset($params['wpCaptchaId'])) {
+        $postParams['wpCaptchaId'] = $params['wpCaptchaId'];
+        $postParams['wpCaptchaWord'] = $params['wpCaptchaWord'];
+    }
+
+    """
+
+    campaign = fields.Str(validate=validate.Length(max=100))
     revid = fields.Str(validate=validate.Length(max=50))
     revision = fields.Str(validate=validate.Length(max=50))
-    campaign = fields.Str(validate=validate.Length(max=100))
-    # translate_type = fields.Str(validate=validate.Length(max=50))
+    sourcetitle = fields.Str(validate=validate.Length(max=255))
+    target = fields.Str(required=True, validate=validate.Length(min=2, max=10))
+    text = fields.Str(required=True, validate=validate.Length(min=1))
+    title = fields.Str(required=True, validate=validate.Length(min=1, max=255))
+
     translate_type = fields.Str(validate=validate.OneOf(["lead", "all"]))
+    # translate_type = fields.Str(validate=validate.Length(max=50))
+
+    user = fields.Str(required=True, validate=validate.Length(min=1, max=120))
+
     wpCaptchaId = fields.Str(validate=validate.Length(max=100))  # noqa: N815
     wpCaptchaWord = fields.Str(validate=validate.Length(max=50))  # noqa: N815
 

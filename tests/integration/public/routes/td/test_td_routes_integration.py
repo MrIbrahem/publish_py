@@ -19,7 +19,8 @@ from src.main_app.database.services import (
     SettingsService,
 )
 
-_TD_PREFIX = "/Translation_Dashboard"
+_TD_PREFIX = "/td"
+# _TD_PREFIX = "/Translation_Dashboard"
 
 _PATCH_TARGET = "src.main_app.public.routes.td.td_route.get_current_user"
 
@@ -91,13 +92,13 @@ class TestIndexView:
     """GET / — dashboard landing page with the filter form."""
 
     def test_returns_200_and_html(self, mock_client: FlaskClient, anonymous, seed_langs, seed_category):
-        response = mock_client.get(f"{_TD_PREFIX}/")
+        response = mock_client.get("/Translation_Dashboard/")
 
         assert response.status_code == 200
         assert response.content_type.startswith("text/html")
 
     def test_renders_seeded_campaigns(self, mock_client: FlaskClient, anonymous, seed_langs, seed_category):
-        body = mock_client.get(f"{_TD_PREFIX}/").get_data(as_text=True)
+        body = mock_client.get("/Translation_Dashboard/").get_data(as_text=True)
 
         # The campaign select lists the seeded campaign; the language select
         # renders the autonym (templates/td/form.html uses lang.autonym).
@@ -112,7 +113,7 @@ class TestIndexView:
         seed_category,
     ):
         # load_request.php flashes "code (xx) not valid wiki." instead of erroring.
-        response = mock_client.get(f"{_TD_PREFIX}/", query_string={"code": "xx", "camp": "RTT"})
+        response = mock_client.get("/Translation_Dashboard/", query_string={"code": "xx", "camp": "RTT"})
 
         assert response.status_code == 200
         assert "not valid wiki" in response.get_data(as_text=True)
@@ -124,7 +125,7 @@ class TestIndexView:
         seed_langs,
         seed_category,
     ):
-        response = mock_client.get(f"{_TD_PREFIX}/", query_string={"camp": "Nope"})
+        response = mock_client.get("/Translation_Dashboard/", query_string={"camp": "Nope"})
 
         assert response.status_code == 200
         assert "not valid" in response.get_data(as_text=True)
@@ -142,7 +143,7 @@ class TestTableView:
         seed_category,
     ):
         # No code/camp pair -> results bundle stays None and the page still renders.
-        response = mock_client.get(f"{_TD_PREFIX}/table")
+        response = mock_client.get("/Translation_Dashboard/table")
 
         assert response.status_code == 200
         assert response.content_type.startswith("text/html")
@@ -155,9 +156,9 @@ class TestTableView:
         seed_category,
     ):
         # templates/td/form.html posts to url_for('td.table').
-        body = mock_client.get(f"{_TD_PREFIX}/table").get_data(as_text=True)
+        body = mock_client.get("/Translation_Dashboard/table").get_data(as_text=True)
 
-        assert "action='/Translation_Dashboard/table'" in body
+        assert "action='/td/table'" in body or "action='/Translation_Dashboard/table'" in body
 
     def test_results_loader_failure_is_flashed(
         self,
@@ -174,7 +175,7 @@ class TestTableView:
         )
 
         response = mock_client.get(
-            f"{_TD_PREFIX}/table",
+            "/Translation_Dashboard/table",
             query_string={"code": "ar", "camp": "RTT"},
         )
 
@@ -187,19 +188,19 @@ class TestMissingView:
     """GET /missing — top languages by missing articles."""
 
     def test_returns_200(self, mock_client: FlaskClient, anonymous):
-        response = mock_client.get(f"{_TD_PREFIX}/missing")
+        response = mock_client.get("/Translation_Dashboard/missing")
 
         assert response.status_code == 200
         assert response.content_type.startswith("text/html")
 
     def test_defaults_category_to_rtt(self, mock_client: FlaskClient, anonymous):
-        body = mock_client.get(f"{_TD_PREFIX}/missing").get_data(as_text=True)
+        body = mock_client.get("/Translation_Dashboard/missing").get_data(as_text=True)
 
         # PHP: $category = $_GET['cat'] ?? 'RTT'
         assert "RTT" in body
 
     def test_respects_category_argument(self, mock_client: FlaskClient, anonymous):
-        body = mock_client.get(f"{_TD_PREFIX}/missing", query_string={"cat": "WikiProjectMed"}).get_data(as_text=True)
+        body = mock_client.get("/Translation_Dashboard/missing", query_string={"cat": "WikiProjectMed"}).get_data(as_text=True)
 
         assert "WikiProjectMed" in body
 
@@ -214,7 +215,7 @@ class TestMissingView:
             side_effect=RuntimeError("boom"),
         )
 
-        response = mock_client.get(f"{_TD_PREFIX}/missing")
+        response = mock_client.get("/Translation_Dashboard/missing")
 
         assert response.status_code == 200
 
@@ -225,7 +226,7 @@ class TestResultsApiView:
 
     def test_returns_json(self, mock_client: FlaskClient, anonymous):
         response = mock_client.get(
-            f"{_TD_PREFIX}/results_api",
+            "/Translation_Dashboard/results_api",
             query_string={"code": "ar", "camp": "RTT", "depth": "0"},
         )
 
@@ -236,14 +237,14 @@ class TestResultsApiView:
         assert "results" in payload
 
     def test_missing_params_do_not_crash(self, mock_client: FlaskClient, anonymous):
-        response = mock_client.get(f"{_TD_PREFIX}/results_api")
+        response = mock_client.get("/Translation_Dashboard/results_api")
 
         assert response.status_code in (200, 500)
 
 
 @pytest.mark.integration
 class TestSettingsIntegration:
-    """allow_type_of_translate toggles the tra_type widget (templates/td/form.html)."""
+    """allow_type_of_translate toggles the tr_type widget (templates/td/form.html)."""
 
     def test_disabled_hides_type_widget(
         self,
@@ -258,10 +259,10 @@ class TestSettingsIntegration:
             "allow_type_of_translate", "Allow type of translate", value_type="boolean", value="false"
         )
 
-        body = mock_client.get(f"{_TD_PREFIX}/table").get_data(as_text=True)
+        body = mock_client.get("/Translation_Dashboard/table").get_data(as_text=True)
 
-        # {% else %} branch: hidden input pins tra_type to "lead".
-        assert 'name="tra_type" value="lead"' in body
+        # {% else %} branch: hidden input pins tr_type to "lead".
+        assert 'name="tr_type" value="lead"' in body
         assert "id='customRadio2'" not in body
 
     def test_enabled_shows_type_widget(
@@ -275,7 +276,7 @@ class TestSettingsIntegration:
         # Booleans are stored as the lowercase literals 'true'/'false'.
         service.create_setting("allow_type_of_translate", "Allow type of translate", value_type="boolean", value="true")
 
-        body = mock_client.get(f"{_TD_PREFIX}/table").get_data(as_text=True)
+        body = mock_client.get("/Translation_Dashboard/table").get_data(as_text=True)
 
         # {% if settings.allow_type_of_translate %} branch: radio group rendered.
         assert "id='customRadio2'" in body

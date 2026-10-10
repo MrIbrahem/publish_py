@@ -22,12 +22,12 @@ class MissingTable:
     def __init__(
         self,
         *,
-        tra_type: str,
+        tr_type: str,
         full_tr_user: bool,
         translate_type_data: dict[str, dict[str, Any]],
     ) -> None:
         self.translate_type_data = translate_type_data
-        self._tra_type = tra_type or "lead"
+        self._tra_type = tr_type or "lead"
         self._full_tr_user = full_tr_user
 
     def build(self, items: list[dict]) -> list[MissingItem]:
@@ -61,7 +61,7 @@ class MissingTable:
                 row=title_data,
                 counter=numb,
                 is_full_row=False,
-                tra_type=self._tra_type,
+                tr_type=self._tra_type,
                 translate_type_info=translate_type_info,
             )
             # Default stats of item: TranslateTypeRecord(tt_title=title, tt_lead=1, tt_full=0)
@@ -89,7 +89,7 @@ class MissingTable:
                         row=title_data,
                         counter=numb,
                         is_full_row=True,
-                        tra_type="all",
+                        tr_type="all",
                         translate_type_info=translate_type_info,
                     )
                 )

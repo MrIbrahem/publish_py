@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 from urllib.parse import quote
 
@@ -50,7 +50,7 @@ class ExistsItem(ItemBase):
             qid=row.get("qid") or "",
             en_views="",
             importance="",
-            tra_type="",
+            tr_type="",
             words=Stats.load(row, "words"),
             refs=Stats.load(row, "refs"),
             translate_type_info=translate_type_info,
@@ -73,13 +73,13 @@ class ExistsItem(ItemBase):
             return Markup("")
 
         html_translate_button = (
-            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tra_type}'>"
+            "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tr_type}'>"
             "Translate"
             "</a>"
         )
 
         translate_url = content_translation_url(self.title, langcode, camp, "lead")
-        return Markup(html_translate_button).format(translate_url=translate_url, tra_type="lead")
+        return Markup(html_translate_button).format(translate_url=translate_url, tr_type="lead")
 
     def _render(
         self,
