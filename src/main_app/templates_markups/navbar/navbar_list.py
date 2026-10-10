@@ -10,7 +10,7 @@ nav_list = [
         icon="bi-bar-chart-line",
         url_endpoint="leaderboard.index",
         title="Leaderboard",
-        path="/Translation_Dashboard/leaderboard",
+        path="/td/leaderboard",
     ),
     NavLink(
         text="Prior",
@@ -26,7 +26,7 @@ nav_list = [
         icon="bi-card-list",
         url_endpoint="td.missing",
         title="Missing",
-        path="/Translation_Dashboard/missing",
+        path="/td/missing",
     ),
     NavLink(
         text="Fix Refs",
