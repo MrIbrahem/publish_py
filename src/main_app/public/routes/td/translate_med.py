@@ -12,6 +12,7 @@ import logging
 
 from flask import (
     Blueprint,
+    flash,
     redirect,
     render_template,
     request,
@@ -79,6 +80,10 @@ class TranslateMedView(MethodView):
         # PHP lines 186-190: both title and code are required; anything else
         # renders an empty page rather than an error.
         if not title or not langcode:
+            if not title:
+                flash("Invalid request: `title` is required", "warning")
+            if not langcode:
+                flash("Invalid request: `langcode` is required", "warning")
             return render_template("td/translate_med.html")
 
         cat = _normalize("cat")
