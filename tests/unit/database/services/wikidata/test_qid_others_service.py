@@ -75,4 +75,4 @@ class TestGetByTitle(GetByTitleTest, TestSetup):
 
 
 class TestInsert(InsertTest, TestSetup):
-    """Tests for the insert helper used by the admin/qids POST handler."""
+    """Tests for the insert helper used by the coordinators/qids POST handler."""

@@ -43,11 +43,11 @@ nav_list = [
         path="/reports",
     ),
     NavLink(
-        text="Admins",
+        text="Coordinator Tools",
         icon="bi-people-fill",
-        url_endpoint="adminpanel.index",
-        path="/adminpanel",
-        for_admin=True,
+        url_endpoint="coordinators_panel.index",
+        path="/coordinators_panel",
+        for_coordinators=True,
     ),
     NavLink(
         text="GitHub",

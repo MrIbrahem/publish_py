@@ -11,9 +11,9 @@ from src.main_app.templates_markups.coordinator_sidebar import (
 
 class TestSidebarItem:
     def test_create(self):
-        item = SidebarItem(id="test", title="Test", fallback_href="/test", requires_admin=False)
+        item = SidebarItem(id="test", title="Test", fallback_href="/test", requires_coordinator=False)
         assert item.id == "test"
-        assert item.requires_admin is False
+        assert item.requires_coordinator is False
         assert item.fallback_href == "/test"
         assert item.title == "Test"
         assert item.icon is None
@@ -26,41 +26,41 @@ class TestSidebarItem:
 
     def test_requires_coordinator_defaults_to_true(self):
         item = SidebarItem(id="x", title="X", fallback_href="/x")
-        assert item.requires_admin is True
+        assert item.requires_coordinator is True
 
     def test_resolve_href_uses_fallback_without_endpoint(self):
         item = SidebarItem(id="x", title="X", fallback_href="/x")
         assert item.resolve_href() == "/x"
 
     def test_resolve_href_uses_endpoint_within_request_context(self, mock_app):
-        # mock_app.add_url_rule("/adminpanel/settings/", endpoint="adminpanel.settings.dashboard")
+        # mock_app.add_url_rule("/coordinators_panel/settings/", endpoint="coordinators_panel.settings.dashboard")
         item = SidebarItem(
             id="settings",
             title="Settings",
-            endpoint="adminpanel.settings.dashboard",
-            fallback_href="/adminpanel/settings/",
+            endpoint="coordinators_panel.settings.dashboard",
+            fallback_href="/coordinators_panel/settings/",
         )
         with mock_app.test_request_context():
-            assert item.resolve_href() == "/adminpanel/settings/"
+            assert item.resolve_href() == "/coordinators_panel/settings/"
 
     def test_resolve_href_falls_back_on_missing_endpoint(self, mock_app):
         item = SidebarItem(
             id="missing",
             title="Missing",
             endpoint="does.not.exist",
-            fallback_href="/adminpanel/missing",
+            fallback_href="/coordinators_panel/missing",
         )
         with mock_app.test_request_context():
-            assert item.resolve_href() == "/adminpanel/missing"
+            assert item.resolve_href() == "/coordinators_panel/missing"
 
     def test_resolve_href_uses_fallback_outside_request_context(self):
         item = SidebarItem(
             id="settings",
             title="Settings",
-            endpoint="adminpanel.settings.dashboard",
-            fallback_href="/adminpanel/settings/",
+            endpoint="coordinators_panel.settings.dashboard",
+            fallback_href="/coordinators_panel/settings/",
         )
-        assert item.resolve_href() == "/adminpanel/settings/"
+        assert item.resolve_href() == "/coordinators_panel/settings/"
 
 
 class TestGenerateListItem:
@@ -111,10 +111,15 @@ class TestGenerateListItem:
 
     def test_generate_list_item_basic(self) -> None:
         item = SidebarItem(
-            id="home", fallback_href="/adminpanel/home", title="Home", icon=None, link_target=None, disabled=False
+            id="home",
+            fallback_href="/coordinators_panel/home",
+            title="Home",
+            icon=None,
+            link_target=None,
+            disabled=False,
         )
         result = generate_list_item(item)
-        assert "/adminpanel/home" in result
+        assert "/coordinators_panel/home" in result
         assert "title='Home'" in result
         assert "<i class" not in result
         assert "target=" not in result
@@ -123,14 +128,14 @@ class TestGenerateListItem:
     def test_generate_list_item_with_icon(self) -> None:
         item = SidebarItem(
             id="home",
-            fallback_href="/adminpanel/home",
+            fallback_href="/coordinators_panel/home",
             title="Home",
             icon="bi-house",
             link_target=None,
             disabled=False,
         )
         result = generate_list_item(item)
-        assert "/adminpanel/home" in result
+        assert "/coordinators_panel/home" in result
         assert "title='Home'" in result
         assert "<i class='bi bi-house me-1'></i>" in result
         assert "target=" not in result
@@ -162,22 +167,22 @@ class TestGenerateListItem:
 class TestCreateSide:
     def test_returns_html_string(self, mock_app):
         with mock_app.test_request_context():
-            html = create_side("admins", is_coordinator=True)
+            html = create_side("coordinators", is_coordinator=True)
             assert isinstance(html, str)
             assert "<ul" in html
 
     def test_contains_coordinators_link(self, mock_app):
         with mock_app.test_request_context():
-            html = create_side("admins", is_coordinator=True)
+            html = create_side("coordinators", is_coordinator=True)
             assert "Coordinators" in html
 
     def test_contains_users_link(self, mock_app):
         with mock_app.test_request_context():
-            html = create_side("admins", is_coordinator=True)
+            html = create_side("coordinators", is_coordinator=True)
             assert "Users" in html
 
     def test_create_side_marks_active_item(self) -> None:
-        html = create_side("/adminpanel/coordinators/", is_coordinator=True)
+        html = create_side("/coordinators_panel/coordinators/", is_coordinator=True)
 
         assert "Coordinators" in html
         assert "active" in html
@@ -187,7 +192,7 @@ class TestCreateSide:
         """
         Tests sidebar creation with an active item.
         """
-        result = create_side("admins", is_coordinator=True)
+        result = create_side("coordinators", is_coordinator=True)
         assert 'aria-expanded="true"' in result
         assert 'class="collapse show"' in result
 
@@ -196,10 +201,10 @@ class TestCreateSideIsCoordinator:
     """Tests for the new `is_coordinator` filtering behavior."""
 
     def test_coordinator_items_hidden_for_non_admin(self) -> None:
-        result = create_side("/adminpanel/coordinators/", is_coordinator=False)
+        result = create_side("/coordinators_panel/coordinators/", is_coordinator=False)
         assert "Templates" not in result
 
     def test_non_coordinator_still_returns_valid_shell(self) -> None:
-        result = create_side("/adminpanel/coordinators/", is_coordinator=False)
+        result = create_side("/coordinators_panel/coordinators/", is_coordinator=False)
         assert isinstance(result, str)
         assert "<ul" in result

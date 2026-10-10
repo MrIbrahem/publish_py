@@ -1,6 +1,6 @@
-"""Admin routes for the Translate Type (``tt``) blueprint.
+"""Coordinator routes for the Translate Type (``tt``) blueprint.
 
-Mirrors the PHP code under ``coordinator/admin/tt/*.php``:
+Mirrors the PHP code under ``coordinator/coordinators/tt/*.php``:
 - ``index.php`` -> ``GET /``
 - ``edit_translate_type.php`` -> ``GET /edit``
 - ``post.php`` -> ``POST /``
@@ -48,7 +48,7 @@ class TTIndexView(BaseTranslateTypeView):
         categories = self.category_service.list_categories()
 
         return render_template(
-            "admins/tt/index.html",
+            "coordinators/tt/index.html",
             translate_types=translate_types,
             # new_titles=new_titles,
             categories=categories,
@@ -64,7 +64,7 @@ class TTEditView(BaseTranslateTypeView):
         tt_id_raw = request.args.get("id", "")
         if not tt_id_raw:
             flash("Invalid id.", "danger")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
         try:
             tt_id = int(tt_id_raw)
             translate_types = self.translate_type_service.get_translate_type(tt_id)
@@ -74,11 +74,11 @@ class TTEditView(BaseTranslateTypeView):
 
         if not translate_types:
             flash(f"Failed to load translate_type tt_id_raw={tt_id_raw}", "danger")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         return render_template(
-            "admins/tt/edit.html",
-            post_endpoint="adminpanel.tt.tt_edit_post",
+            "coordinators/tt/edit.html",
+            post_endpoint="coordinators_panel.tt.tt_edit_post",
             id=translate_types.tt_id,
             title=translate_types.tt_title,
             lead=translate_types.tt_lead,
@@ -98,7 +98,7 @@ class TTEditPostView(BaseTranslateTypeView):
 
         if not title:
             flash("Title is required.", "danger")
-            return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
+            return redirect(url_for("coordinators_panel.tt.tt_edit", id=tt_id_raw))
 
         tt_id: int | None = None
         if tt_id_raw:
@@ -106,11 +106,11 @@ class TTEditPostView(BaseTranslateTypeView):
                 tt_id = int(tt_id_raw)
             except ValueError:
                 flash(f"Invalid id: {tt_id_raw}", "danger")
-                return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
+                return redirect(url_for("coordinators_panel.tt.tt_edit", id=tt_id_raw))
 
         if not tt_id:
             flash(f"Failed to load translate_type id={tt_id}", "danger")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         try:
             translate_types = self.translate_type_service.get_translate_type(tt_id)
@@ -120,14 +120,14 @@ class TTEditPostView(BaseTranslateTypeView):
 
         if not translate_types:
             flash(f"Failed to load translate_type id={tt_id}", "danger")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         try:
             result = self.translate_type_service.update_translate_type(tt_id, title, lead, full)
         except UniqueError:
             logger.warning("Failed to update translate_type, duplicate item with title=%r", title)
             flash(f"Failed, title: {title} is used in other item.", "danger")
-            return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
+            return redirect(url_for("coordinators_panel.tt.tt_edit", id=tt_id_raw))
 
         except Exception:
             logger.exception("Failed to upsert translate_type id=%r title=%r", tt_id, title)
@@ -135,10 +135,10 @@ class TTEditPostView(BaseTranslateTypeView):
 
         if result:
             flash(f"Translate type saved successfully, title: {title}.", "success")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         flash(f"Failed to save translate type, title: {title}.", "danger")
-        return redirect(url_for("adminpanel.tt.tt_edit", id=tt_id_raw))
+        return redirect(url_for("coordinators_panel.tt.tt_edit", id=tt_id_raw))
 
 
 class TTAddView(BaseTranslateTypeView):
@@ -147,8 +147,8 @@ class TTAddView(BaseTranslateTypeView):
     def get(self) -> str:
         """Render the empty edit form configured for creation."""
         return render_template(
-            "admins/tt/edit.html",
-            post_endpoint="adminpanel.tt.tt_add_post",
+            "coordinators/tt/edit.html",
+            post_endpoint="coordinators_panel.tt.tt_add_post",
             id="",
             title="",
             lead=1,
@@ -168,24 +168,24 @@ class TTAddPostView(BaseTranslateTypeView):
 
         if not title:
             flash("Title is required.", "danger")
-            return redirect(url_for("adminpanel.tt.add"))
+            return redirect(url_for("coordinators_panel.tt.add"))
 
         try:
             result = self.translate_type_service.add_translate_type(tt_title=title, tt_lead=lead, tt_full=full)
         except UniqueError:
             logger.warning("Failed to insert translate_type, duplicate item with title=%r", title)
             flash(f"Failed, title: {title} is used in other item.", "danger")
-            return redirect(url_for("adminpanel.tt.add"))
+            return redirect(url_for("coordinators_panel.tt.add"))
         except Exception:
             logger.exception("Failed to insert translate_type title=%r", title)
             result = False
 
         if result:
             flash(f"Translate type saved successfully, title: {title}.", "success")
-            return redirect(url_for("adminpanel.edit_done"))
+            return redirect(url_for("coordinators_panel.edit_done"))
 
         flash(f"Failed to save translate type, title: {title}.", "danger")
-        return redirect(url_for("adminpanel.tt.add"))
+        return redirect(url_for("coordinators_panel.tt.add"))
 
 
 class TranslateTypeRoutes:
@@ -193,7 +193,7 @@ class TranslateTypeRoutes:
 
     Endpoint names (``tt_index``, ``tt_edit``, ``tt_edit_post``, ``add``,
     ``tt_add_post``) are preserved from the legacy function-based routes
-    so existing ``url_for('adminpanel.tt.tt_edit_post')`` calls keep
+    so existing ``url_for('coordinators_panel.tt.tt_edit_post')`` calls keep
     working.
     """
 

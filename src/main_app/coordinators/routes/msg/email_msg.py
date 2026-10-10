@@ -1,4 +1,4 @@
-"""Admin routes for email message operations using Flask MethodViews."""
+"""Coordinator routes for email message operations using Flask MethodViews."""
 
 from __future__ import annotations
 

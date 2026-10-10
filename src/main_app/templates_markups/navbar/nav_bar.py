@@ -56,7 +56,7 @@ class NavigationBar:
             if link.disabled:
                 continue
 
-            if link.for_admin and not is_coordinator:
+            if link.for_coordinators and not is_coordinator:
                 continue
 
             if isinstance(link, NavDropdown):

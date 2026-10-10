@@ -92,7 +92,7 @@ class Sidebar:
         Args:
             path: The current request path, used to highlight the active item.
             is_coordinator: Whether the current user may see admin-only items
-                (items with `requires_admin=True`).
+                (items with `requires_coordinator=True`).
 
         Returns:
             str: A string containing the formatted HTML structure of the sidebar.
@@ -108,7 +108,7 @@ class Sidebar:
                 if item.disabled:
                     continue
 
-                if item.requires_admin and not is_coordinator:
+                if item.requires_coordinator and not is_coordinator:
                     continue
 
                 css_class = "active" if item.id == active_id else ""

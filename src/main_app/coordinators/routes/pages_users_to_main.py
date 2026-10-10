@@ -1,6 +1,6 @@
-"""Admin routes for moving user pages to main pages.
+"""Coordinator routes for moving user pages to main pages.
 
-Mirrors PHP under ``coordinator/admin/pages_users_to_main/*.php``.
+Mirrors PHP under ``coordinator/coordinators/pages_users_to_main/*.php``.
 """
 
 from __future__ import annotations
@@ -51,7 +51,7 @@ class PagesUsersToMainIndexView(BasePagesUsersMainView):
             rows = []
 
         return render_template(
-            "admins/pages_users_to_main.html",
+            "coordinators/pages_users_to_main.html",
             rows=rows,
             lang=lang,
             languages=self.lang_service.list_langs(),
@@ -78,7 +78,7 @@ class PagesUsersToMainFixItView(BasePagesUsersMainView):
             duplicate_page = self.pum_service.check_main_page_exists(title, lang)
 
         return render_template(
-            "admins/pages_users_to_main_fix_it.html",
+            "coordinators/pages_users_to_main_fix_it.html",
             id=page_id,
             title=title,
             lang=lang,
@@ -102,7 +102,7 @@ class PagesUsersToMainFixItPostView(BasePagesUsersMainView):
         new_user = (request.form.get("new_user") or "").strip()
         pupdate = (request.form.get("pupdate") or "").strip()
 
-        redirect_to = redirect(url_for("adminpanel.pages_users_to_main.pages_users_to_main_index"))
+        redirect_to = redirect(url_for("coordinators_panel.pages_users_to_main.pages_users_to_main_index"))
 
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")
@@ -174,7 +174,7 @@ class PagesUsersMainRoutes:
     Endpoint names (``pages_users_to_main_index``, ``pages_users_to_main_fix_it``,
     ``pages_users_to_main_fix_it_post``) are preserved from the legacy
     function-based routes so existing
-    ``url_for('adminpanel.pages_users_to_main.pages_users_to_main_fix_it_post')``
+    ``url_for('coordinators_panel.pages_users_to_main.pages_users_to_main_fix_it_post')``
     calls keep working.
     """
 

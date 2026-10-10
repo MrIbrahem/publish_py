@@ -1,4 +1,4 @@
-"""Admin blueprint package."""
+"""Coordinator blueprint package."""
 
 from __future__ import annotations
 
@@ -28,46 +28,46 @@ from .users_no_inprocess import UsersNoInprocess
 
 
 @dataclass(frozen=True)
-class AdminRouteModule:
+class CoordinatorRouteModule:
     route_cls: type
     name: str
     url_prefix: str = ""
     extra_kwargs: dict[str, Any] = field(default_factory=dict)
 
 
-ADMIN_ROUTE_MODULES: list[AdminRouteModule] = [
-    AdminRouteModule(route_cls=CoordinatorView, name="coordinators", url_prefix="/coordinators"),
-    AdminRouteModule(route_cls=TranslateTypeRoutes, name="tt", url_prefix="/tt"),
-    AdminRouteModule(route_cls=TranslatedView, name="translated", url_prefix="/translated"),
-    AdminRouteModule(route_cls=TranslatedUsersView, name="translated_users", url_prefix="/translated_users"),
-    AdminRouteModule(route_cls=StaticsRoutes, name="stat", url_prefix="/stat"),
-    AdminRouteModule(route_cls=PagesUsersMainRoutes, name="pages_users_to_main", url_prefix="/pages_users_to_main"),
-    AdminRouteModule(route_cls=EmailMsgView, name="email_msg", url_prefix="/email_msg"),
-    AdminRouteModule(route_cls=AddTranslateView, name="add", url_prefix="/add"),
-    AdminRouteModule(route_cls=ProjectsDashboard, name="projects", url_prefix="/projects"),
-    AdminRouteModule(route_cls=CampaignsDashboard, name="campaigns", url_prefix="/campaigns"),
-    AdminRouteModule(route_cls=FullTranslators, name="full_translators", url_prefix="/full_translators"),
-    AdminRouteModule(route_cls=LanguageSettings, name="language_settings", url_prefix="/language_settings"),
-    AdminRouteModule(route_cls=SettingsRoutes, name="settings", url_prefix="/settings"),
-    AdminRouteModule(route_cls=UsersEmails, name="users_emails", url_prefix="/users_emails"),
-    AdminRouteModule(route_cls=UsersNoInprocess, name="users_no_inprocess", url_prefix="/users_no_inprocess"),
-    AdminRouteModule(route_cls=QidsView, name="qids", url_prefix="/qids"),
-    AdminRouteModule(route_cls=QidsOthersView, name="qids_others", url_prefix="/qids_others"),
-    AdminRouteModule(route_cls=CheckErrorsView, name="errors", url_prefix="/errors"),
+ADMIN_ROUTE_MODULES: list[CoordinatorRouteModule] = [
+    CoordinatorRouteModule(route_cls=CoordinatorView, name="coordinators", url_prefix="/coordinators"),
+    CoordinatorRouteModule(route_cls=TranslateTypeRoutes, name="tt", url_prefix="/tt"),
+    CoordinatorRouteModule(route_cls=TranslatedView, name="translated", url_prefix="/translated"),
+    CoordinatorRouteModule(route_cls=TranslatedUsersView, name="translated_users", url_prefix="/translated_users"),
+    CoordinatorRouteModule(route_cls=StaticsRoutes, name="stat", url_prefix="/stat"),
+    CoordinatorRouteModule(route_cls=PagesUsersMainRoutes, name="pages_users_to_main", url_prefix="/pages_users_to_main"),
+    CoordinatorRouteModule(route_cls=EmailMsgView, name="email_msg", url_prefix="/email_msg"),
+    CoordinatorRouteModule(route_cls=AddTranslateView, name="add", url_prefix="/add"),
+    CoordinatorRouteModule(route_cls=ProjectsDashboard, name="projects", url_prefix="/projects"),
+    CoordinatorRouteModule(route_cls=CampaignsDashboard, name="campaigns", url_prefix="/campaigns"),
+    CoordinatorRouteModule(route_cls=FullTranslators, name="full_translators", url_prefix="/full_translators"),
+    CoordinatorRouteModule(route_cls=LanguageSettings, name="language_settings", url_prefix="/language_settings"),
+    CoordinatorRouteModule(route_cls=SettingsRoutes, name="settings", url_prefix="/settings"),
+    CoordinatorRouteModule(route_cls=UsersEmails, name="users_emails", url_prefix="/users_emails"),
+    CoordinatorRouteModule(route_cls=UsersNoInprocess, name="users_no_inprocess", url_prefix="/users_no_inprocess"),
+    CoordinatorRouteModule(route_cls=QidsView, name="qids", url_prefix="/qids"),
+    CoordinatorRouteModule(route_cls=QidsOthersView, name="qids_others", url_prefix="/qids_others"),
+    CoordinatorRouteModule(route_cls=CheckErrorsView, name="errors", url_prefix="/errors"),
 ]
 
 
-class AdminRouteRegister:
+class CoordinatorRouteRegister:
 
     @staticmethod
-    def register(bp_admin: Blueprint) -> None:
+    def register(bp_coordinators: Blueprint) -> None:
         for module in ADMIN_ROUTE_MODULES:
             bp = Blueprint(module.name, __name__, url_prefix=module.url_prefix)
             instance = module.route_cls(**module.extra_kwargs)
             instance.register(bp)
-            bp_admin.register_blueprint(bp)
+            bp_coordinators.register_blueprint(bp)
 
 
 __all__ = [
-    "AdminRouteRegister",
+    "CoordinatorRouteRegister",
 ]

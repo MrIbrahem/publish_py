@@ -1,5 +1,5 @@
 """
-Admin-only routes for checking errors.
+Coordinator-only routes for checking errors.
 """
 
 from __future__ import annotations
@@ -67,7 +67,7 @@ class ErrorDashboardView(MethodView):
         file_content = self._read_text(error_file)
 
         return render_template(
-            "admins/errors.html",
+            "coordinators/errors.html",
             files=files,
             selected_file=selected_file,
             file_content=file_content,

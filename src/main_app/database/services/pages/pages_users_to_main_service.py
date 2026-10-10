@@ -1,7 +1,7 @@
 """
-SQLAlchemy-based service for the ``pages_users_to_main`` admin workflow.
+SQLAlchemy-based service for the ``pages_users_to_main`` coordinators workflow.
 
-Mirrors the PHP code under ``coordinator/admin/pages_users_to_main/*.php``:
+Mirrors the PHP code under ``coordinator/coordinators/pages_users_to_main/*.php``:
 - Lists user pages awaiting promotion to main pages (with proposed new
   ``target`` / ``user`` / ``qid`` overrides).
 - Provides the helpers used by the "fix it" form to validate the move and
