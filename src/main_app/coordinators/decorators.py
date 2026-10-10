@@ -30,7 +30,7 @@ def coordinator_required(view: FuncType) -> FuncType:  # noqa: UP047
         user: CurrentUser | None = get_current_user()
         if not user:
             return redirect(url_for("auth.login"))
-        if not user.is_active_coordinator:
+        if not user.is_active_coordinator and not user.is_active_admin:
             logger.warning("User %s tried to access coordinator-only route", user.username)
             abort(403)
         return view(*args, **kwargs)
@@ -48,7 +48,7 @@ def coordinator_guard() -> ResponseReturnValue | None:
     user: CurrentUser | None = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
-    if not user.is_active_coordinator:
+    if not user.is_active_coordinator and not user.is_active_admin:
         logger.warning("User %s tried to access coordinator-only route", user.username)
         abort(403)
     return None

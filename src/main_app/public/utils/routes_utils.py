@@ -15,6 +15,11 @@ def _is_coordinator(user: Any) -> bool:
     return bool(user and getattr(user, "is_active_coordinator", False))
 
 
+def _is_admin(user: Any) -> bool:
+    """Check if user is an active admin."""
+    return bool(user and getattr(user, "is_active_admin", False))
+
+
 def context_data(
     wiki_domain: str,
     static_server: str,
@@ -35,6 +40,7 @@ def context_data(
         "is_authenticated": user is not None,
         "current_username": username,
         "is_coordinator": _is_coordinator(user),
+        "is_admin": _is_admin(user),
         "td_navbar": td_navbar,
         "wiki_domain": wiki_domain,
         "static_server": static_server,

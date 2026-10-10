@@ -81,7 +81,7 @@ class Sidebar:
 
         return "", ""
 
-    def render(self, path: str, is_coordinator: bool = True) -> str:
+    def render(self, path: str, is_coordinator: bool = True, is_admin: bool = True) -> str:
         """Generate sidebar HTML structure based on menu definitions.
 
         This method constructs a responsive sidebar with collapsible groups and
@@ -91,8 +91,8 @@ class Sidebar:
 
         Args:
             path: The current request path, used to highlight the active item.
-            is_coordinator: Whether the current user may see admin-only items
-                (items with `requires_coordinator=True`).
+            is_coordinator: Whether the current user may see coordinator-only items (items with `requires_coordinator=True`).
+            is_admin: Whether the current user may see /coordinator/admin-only items (items with `requires_admin=True`).
 
         Returns:
             str: A string containing the formatted HTML structure of the sidebar.
@@ -108,7 +108,10 @@ class Sidebar:
                 if item.disabled:
                     continue
 
-                if item.requires_coordinator and not is_coordinator:
+                if item.requires_coordinator and not is_coordinator and not is_admin:
+                    continue
+
+                if item.requires_admin and not is_admin:
                     continue
 
                 css_class = "active" if item.id == active_id else ""
@@ -180,7 +183,7 @@ class Sidebar:
         return "\n".join(sidebar_parts)
 
 
-def create_side(path: str, is_coordinator: bool = False) -> str:
+def create_side(path: str, is_coordinator: bool = False, is_admin: bool = False) -> str:
     """
     Generate sidebar HTML structure based on menu definitions.
 
@@ -188,7 +191,7 @@ def create_side(path: str, is_coordinator: bool = False) -> str:
     """
     main_menu = load_groups_menu()
     sidebar = Sidebar(main_menu)
-    return sidebar.render(path, is_coordinator=is_coordinator)
+    return sidebar.render(path, is_coordinator, is_admin)
 
 
 __all__ = [

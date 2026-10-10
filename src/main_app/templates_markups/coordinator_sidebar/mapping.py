@@ -30,6 +30,7 @@ class SidebarItem:
     link_target: str | None = None
     disabled: bool = False
     requires_coordinator: bool = True
+    requires_admin: bool = False
 
     def resolve_href(self) -> str:
         """Resolve this item's URL. Falls back to a static path when there's

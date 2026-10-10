@@ -188,7 +188,7 @@ def load_groups_menu() -> list[SidebarGroup]:
                 fallback_href="/coordinators_panel/categories",
                 title="Categories",
                 icon="bi-tags",
-            )
+            ),
         ],
     )
 
@@ -229,28 +229,28 @@ def load_groups_menu() -> list[SidebarGroup]:
         items=[
             SidebarItem(
                 id="coordinators",
-                requires_coordinator=True,
+                requires_admin=True,
                 fallback_href="/coordinators_panel/coordinators",
                 title="Coordinators",
                 icon="bi-person-gear",
             ),
             SidebarItem(
                 id="settings",
-                requires_coordinator=True,
+                requires_admin=True,
                 fallback_href="/coordinators_panel/settings",
                 title="Settings",
                 icon="bi-gear",
             ),
             SidebarItem(
                 id="db_admin",
-                requires_coordinator=True,
+                requires_admin=True,
                 fallback_href="/coordinators_panel/db_admin",
                 title="DB admin",
                 icon="bi-database",
             ),
             SidebarItem(
                 id="errors",
-                requires_coordinator=True,
+                requires_admin=True,
                 fallback_href="/coordinators_panel/errors",
                 title="App Errors",
                 icon="bi-exclamation-triangle",

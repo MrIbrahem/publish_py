@@ -5,6 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from ..database.models.admin_users import (
+    AdminRecord,
+    CoordinatorRecord,
+)
 from ..database.models.category_members import CategoryMemberRecord
 from ..database.models.dashboard import (
     CategoryRecord,
@@ -37,7 +41,6 @@ from ..database.models.setting import (
     SettingRecord,
 )
 from ..database.models.users import (
-    CoordinatorRecord,
     FullTranslatorRecord,
     UserRecord,
     UsersNoInprocessRecord,
@@ -110,6 +113,7 @@ categories: list[AdminCategory] = [
         icon_value="fa-users",
         models=[
             CoordinatorRecord,
+            AdminRecord,
             FullTranslatorRecord,
             UserRecord,
             UsersNoInprocessRecord,
