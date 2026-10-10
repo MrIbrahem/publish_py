@@ -59,7 +59,7 @@ class TestCoordinatorsSidebar:
 class TestCoordinatorsBlueprints:
     """Integration tests for registered coordinators blueprints."""
 
-    def test_coordinators_routes_registered(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_coordinators_routes_registered(self, mock_admin_required, mock_client: FlaskClient):
         """Test that coordinators routes are registered."""
         # Check that the coordinators route exists
         response = mock_client.get("/coordinators_panel/coordinators/")

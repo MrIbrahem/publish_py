@@ -1,5 +1,5 @@
 """
-Coordinator-only routes for checking errors.
+Admin-only routes for checking errors.
 """
 
 from __future__ import annotations
@@ -10,8 +10,8 @@ from pathlib import Path
 from flask import Blueprint, flash, render_template, request
 from flask.views import MethodView
 
-from ...config import app_settings
-from ..decorators import coordinator_required
+from ..config import app_settings
+from .decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ def get_log_dir() -> Path:
 class ErrorDashboardView(MethodView):
     """View to display log files and render selected file content."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     @staticmethod
     def _list_log_files(log_dir: Path) -> list[str]:

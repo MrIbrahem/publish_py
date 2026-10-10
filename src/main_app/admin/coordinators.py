@@ -18,9 +18,9 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
-from ...database.exceptions import DuplicateRecordError, UserNotFoundError
-from ...database.services import CoordinatorService
-from ..decorators import coordinator_required
+from ..database.exceptions import DuplicateRecordError, UserNotFoundError
+from ..database.services import CoordinatorService
+from .decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class CoordinatorDashboardView(MethodView):
     """View to handle listing and rendering the coordinator management dashboard."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def __init__(self) -> None:
         self.coordinator_service = CoordinatorService()
@@ -57,7 +57,7 @@ class CoordinatorDashboardView(MethodView):
 class AddCoordinatorView(MethodView):
     """View to handle adding a new coordinator."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def __init__(self) -> None:
         self.coordinator_service = CoordinatorService()
@@ -92,7 +92,7 @@ class AddCoordinatorView(MethodView):
 class CoordinatorStatusView(MethodView):
     """Base class for managing coordinator status updates."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def __init__(self) -> None:
         self.coordinator_service = CoordinatorService()
@@ -133,7 +133,7 @@ class DeactivateCoordinatorView(CoordinatorStatusView):
 class DeleteCoordinatorView(MethodView):
     """View to remove a coordinator entirely."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def __init__(self) -> None:
         self.coordinator_service = CoordinatorService()

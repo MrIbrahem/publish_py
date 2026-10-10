@@ -1,4 +1,4 @@
-"""Coordinator-only routes for managing application settings, built on MethodView."""
+"""Admin-only routes for managing application settings, built on MethodView."""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 from werkzeug.datastructures import ImmutableMultiDict
 
-from ...database.services import SettingsService
-from ..decorators import coordinator_required
+from ..database.services import SettingsService
+from .decorators import admin_required
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def _parse_setting_value(v_type: str, raw_val: str) -> tuple[Any, bool]:
 class SettingsFuncs:
     """Shared service access and form-processing logic for the settings views."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def __init__(self) -> None:
         self.service = SettingsService()
@@ -86,7 +86,7 @@ class SettingsFuncs:
 class SettingsDashboardView(SettingsFuncs, MethodView):
     """View rendering the settings dashboard."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def get(self) -> str:
         """List every stored setting as a raw table."""
@@ -100,7 +100,7 @@ class SettingsDashboardView(SettingsFuncs, MethodView):
 class SettingsCreateView(SettingsFuncs, MethodView):
     """View creating a single new setting from the submitted form."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def post(self) -> ResponseReturnValue:
         """Validate the key and store the setting, then redirect to the dashboard."""
@@ -130,7 +130,7 @@ class SettingsCreateView(SettingsFuncs, MethodView):
 class SettingsUpdateView(SettingsFuncs, MethodView):
     """View applying the bulk settings update form."""
 
-    decorators = [coordinator_required]
+    decorators = [admin_required]
 
     def post(self) -> ResponseReturnValue:
         """Apply every changed setting, then redirect to the dashboard."""

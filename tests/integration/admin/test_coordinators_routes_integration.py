@@ -16,14 +16,14 @@ from src.main_app.database.services import CoordinatorService, UsersService
 class TestCoordinatorsDashboard:
     """Integration tests for coordinators dashboard."""
 
-    def test_coordinators_dashboard_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_coordinators_dashboard_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that coordinators dashboard requires admin access."""
         response = mock_client.get("/coordinators_panel/coordinators/")
 
-        # With mock_coordinator_required, should render successfully
+        # With mock_admin_required, should render successfully
         assert response.status_code == 200
 
-    def test_coordinators_dashboard_lists_coordinators(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_coordinators_dashboard_lists_coordinators(self, mock_admin_required, auth_client: FlaskClient):
         """Test that coordinators dashboard lists coordinators."""
         users_service = UsersService()
         users_service.create_user("Coordinator1")
@@ -43,14 +43,14 @@ class TestCoordinatorsDashboard:
 class TestAddCoordinator:
     """Integration tests for adding coordinators."""
 
-    def test_add_coordinator_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_add_coordinator_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that adding coordinator requires admin access."""
         response = mock_client.post("/coordinators_panel/coordinators/add", data={"username": "NewCoordinator"})
 
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/coordinators/"
 
-    def test_add_coordinator_with_valid_data(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_add_coordinator_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test adding coordinator with valid data."""
         users_service = UsersService()
         users_service.create_user("NewCoordinator")
@@ -65,7 +65,7 @@ class TestAddCoordinator:
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/coordinators/"
 
-    def test_add_coordinator_without_username_fails(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_add_coordinator_without_username_fails(self, mock_admin_required, auth_client: FlaskClient):
         """Test that adding coordinator without username fails."""
         response = auth_client.post(
             "/coordinators_panel/coordinators/add",
@@ -82,14 +82,14 @@ class TestAddCoordinator:
 class TestDeleteCoordinator:
     """Integration tests for deleting coordinators."""
 
-    def test_delete_coordinator_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_delete_coordinator_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deleting coordinator requires admin access."""
         response = mock_client.post("/coordinators_panel/coordinators/1/delete")
 
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/coordinators/"
 
-    def test_delete_coordinator_with_valid_id(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_delete_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting coordinator with valid ID."""
         users_service = UsersService()
         users_service.create_user("DeletedCoordinator")
@@ -110,21 +110,21 @@ class TestDeleteCoordinator:
 class TestActivateDeactivateCoordinator:
     """Integration tests for activating/deactivating coordinators."""
 
-    def test_activate_coordinator_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_activate_coordinator_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that activating coordinator requires admin access."""
         response = mock_client.post("/coordinators_panel/coordinators/1/activate")
 
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/coordinators/"
 
-    def test_deactivate_coordinator_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_deactivate_coordinator_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that deactivating coordinator requires admin access."""
         response = mock_client.post("/coordinators_panel/coordinators/1/deactivate")
 
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/coordinators/"
 
-    def test_activate_coordinator_with_valid_id(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_activate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test activating coordinator with valid ID."""
         users_service = UsersService()
         users_service.create_user("ActivateCoordinator")
@@ -141,7 +141,7 @@ class TestActivateDeactivateCoordinator:
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/coordinators/"
 
-    def test_deactivate_coordinator_with_valid_id(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_deactivate_coordinator_with_valid_id(self, mock_admin_required, auth_client: FlaskClient):
         """Test deactivating coordinator with valid ID."""
         users_service = UsersService()
         users_service.create_user("DeactivateCoordinator")

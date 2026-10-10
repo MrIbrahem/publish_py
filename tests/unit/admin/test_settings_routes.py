@@ -1,10 +1,10 @@
 """
-Unit tests for src/main_app/coordinators/routessettings.py module.
+Unit tests for src/main_app/admin/settings.py module.
 """
 
 from __future__ import annotations
 
-from src.main_app.coordinators.routes.settings import _parse_setting_value
+from src.main_app.admin.settings import _parse_setting_value
 
 
 class TestParseSettingValue:

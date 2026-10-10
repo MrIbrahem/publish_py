@@ -16,14 +16,14 @@ from src.main_app.database.services import SettingsService
 class TestSettingsDashboard:
     """Integration tests for settings dashboard."""
 
-    def test_settings_dashboard_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_settings_dashboard_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that settings dashboard requires admin access."""
         response = mock_client.get("/coordinators_panel/settings/")
 
-        # With mock_coordinator_required, should render successfully
+        # With mock_admin_required, should render successfully
         assert response.status_code == 200
 
-    def test_settings_dashboard_lists_settings(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_settings_dashboard_lists_settings(self, mock_admin_required, auth_client: FlaskClient):
         """Test that settings dashboard lists settings."""
         settings_service = SettingsService()
         settings_service.create_setting("test_setting", "Test Title", "boolean")
@@ -38,7 +38,7 @@ class TestSettingsDashboard:
 class TestCreateSetting:
     """Integration tests for creating settings."""
 
-    def test_create_setting_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_create_setting_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that creating setting requires admin access."""
         response = mock_client.post(
             "/coordinators_panel/settings/create",
@@ -48,7 +48,7 @@ class TestCreateSetting:
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/settings/"
 
-    def test_create_setting_with_valid_data(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_create_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test creating setting with valid data."""
         response = auth_client.post(
             "/coordinators_panel/settings/create",
@@ -63,7 +63,7 @@ class TestCreateSetting:
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/settings/"
 
-    def test_create_setting_invalid_key_format(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_create_setting_invalid_key_format(self, mock_admin_required, auth_client: FlaskClient):
         """Test that creating setting with invalid key format fails."""
 
         response = auth_client.post(
@@ -85,14 +85,14 @@ class TestCreateSetting:
 class TestUpdateSetting:
     """Integration tests for updating settings."""
 
-    def test_update_setting_requires_coordinator(self, mock_coordinator_required, mock_client: FlaskClient):
+    def test_update_setting_requires_coordinator(self, mock_admin_required, mock_client: FlaskClient):
         """Test that updating settings requires admin access."""
         response = mock_client.post("/coordinators_panel/settings/update", data={"setting_test": "value"})
 
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/settings/"
 
-    def test_update_setting_with_valid_data(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_update_setting_with_valid_data(self, mock_admin_required, auth_client: FlaskClient):
         """Test updating setting with valid data."""
         settings_service = SettingsService()
         settings_service.create_setting("test_setting", "Test Title", "boolean")
@@ -106,7 +106,7 @@ class TestUpdateSetting:
         assert response.status_code == 302
         assert response.location == "/coordinators_panel/settings/"
 
-    def test_delete_setting_via_update(self, mock_coordinator_required, auth_client: FlaskClient):
+    def test_delete_setting_via_update(self, mock_admin_required, auth_client: FlaskClient):
         """Test deleting setting via update form."""
         settings_service = SettingsService()
         settings_service.create_setting("test_setting", "Test Title", "boolean")

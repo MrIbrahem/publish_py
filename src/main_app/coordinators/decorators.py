@@ -23,7 +23,7 @@ FuncType = TypeVar("FuncType", bound=Callable[..., ResponseReturnValue])
 
 
 def coordinator_required(view: FuncType) -> FuncType:  # noqa: UP047
-    """Decorator enforcing that the current user is an coordinatoristrator."""
+    """Decorator enforcing that the current user is coordinator."""
 
     @wraps(view)
     def wrapped(*args, **kwargs):

@@ -7,10 +7,11 @@ from typing import Any
 
 from flask import Blueprint
 
+from ...admin.coordinators import CoordinatorView
+from ...admin.errors_route import CheckErrorsView
+from ...admin.settings import SettingsRoutes
 from .add_translate import AddTranslateView
 from .campaigns import CampaignsDashboard
-from .coordinators import CoordinatorView
-from .errors_route import CheckErrorsView
 from .full_translators import FullTranslators
 from .language_settings import LanguageSettings
 from .msg import EmailMsgView
@@ -18,7 +19,6 @@ from .pages_users_to_main import PagesUsersMainRoutes
 from .projects import ProjectsDashboard
 from .qids.qids import QidsView
 from .qids.qids_others import QidsOthersView
-from .settings import SettingsRoutes
 from .stat import StaticsRoutes
 from .translated.translated_main import TranslatedView
 from .translated.translated_users import TranslatedUsersView
