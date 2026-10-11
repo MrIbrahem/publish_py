@@ -7,9 +7,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from ....database.services import AllQidsService, CategoryService, InProcessService, PagesService
-from ....services.clients import get_mdwiki_cat_members
-
+from ....database.services import (
+    CategoryMemberService, AllQidsService, CategoryService, InProcessService, PagesService,
+)
 logger = logging.getLogger(__name__)
 
 
@@ -28,8 +28,9 @@ def _get_cat_exists_and_missing(
         pages_service = PagesService()
         pages_by_title = {p.title: p for p in pages_service.list_pages_by_lang_cat(code, cat)}
 
-    members = get_mdwiki_cat_members(cat, 0, use_cache=True)
-    member_set = set(members)
+    categories_service = CategoryMemberService()
+    members = categories_service.get_members_by_category(cat)
+    member_set = {x.article_id for x in members}
 
     exists = {}
     for title, page in pages_by_title.items():

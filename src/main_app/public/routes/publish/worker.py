@@ -16,6 +16,7 @@ from ....database.services import (
     MdwikiRevidService,
     ReportService,
     UserTokenService,
+    WordService,
 )
 from ....services.clients import (
     get_title_info,
@@ -25,13 +26,31 @@ from ....services.clients import (
 from ....services.utils.helpers import (
     determine_hashtag,
     do_changes_to_text_with_settings,
-    get_word_count,
     make_summary,
     to_do,
 )
 from .to_db import add_to_db
 
 logger = logging.getLogger(__name__)
+
+
+def get_word_count(title: str) -> int:
+    """Get word count for an article title.
+
+    Mirrors PHP:
+    ```php
+    $word = $Words_table[$title] ?? 0;
+    ```
+
+    Args:
+        title: Article title
+
+    Returns:
+        Word count for the title, or 0 if not found
+    """
+    word_service = WordService()
+    lead_words, _ = word_service.get_word_counts_for_title(title)
+    return lead_words or 0
 
 
 def load_language_settings(lang: str) -> LanguageSettingRecord:
@@ -259,10 +278,10 @@ def _process_edit(
     tab["words"] = get_word_count(sourcetitle)
 
     # Get revision ID
-    mdwiki_revid = _get_revid(sourcetitle)
+    mdwiki_revid = get_revid(sourcetitle)
 
     if not mdwiki_revid:
-        tab["empty revid"] = "Can not get revid from all_pages_revids.json"
+        tab["empty revid"] = "Can not get revid"
         mdwiki_revid = tab.get("request_revid", "")
 
     tab["revid"] = mdwiki_revid

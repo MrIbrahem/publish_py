@@ -39,7 +39,6 @@ def ensure_directories() -> None:
         Path(dir_name).mkdir(parents=True, exist_ok=True)
 
     for file_name in [
-        app_settings.paths.words_json_path,
         app_settings.paths.revids_file_path,
     ]:
         Path(file_name).parent.mkdir(parents=True, exist_ok=True)

@@ -17,6 +17,7 @@ from .config import (
     SettingsService,
 )
 from .content import (
+    CategoryMemberService,
     CategoryService,
     LangService,
     ProjectService,
@@ -85,6 +86,7 @@ __all__ = [
     "CoordinatorService",
     "UsersService",
     "UserTokenService",
+    "CategoryMemberService",
     "SettingsService",
     "LanguageSettingService",
     "TopStatsService",

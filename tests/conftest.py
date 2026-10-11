@@ -33,8 +33,6 @@ if sys:
     os.environ["MAIN_DIR"] = str(system_temp_dir / "test")
 
     os.environ.setdefault("PUBLISH_REPORTS_DIR", f"{system_temp_dir}/publish_reports/reports_by_day")
-    os.environ.setdefault("WORDS_JSON_PATH", f"{system_temp_dir}/words.json")
-    os.environ.setdefault("ALL_PAGES_REVIDS_PATH", f"{system_temp_dir}/revids.json")
 
     # Make the src/ directory importable as `main_app`. The repo's prod
     # entrypoint src/app.py does the same trick.
