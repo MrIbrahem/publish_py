@@ -10,6 +10,7 @@ from typing import Any
 
 from ....config import app_settings
 from ....database.models import LanguageSettingRecord
+
 from ....database.services import (
     LanguageSettingService,
     MdwikiRevidService,
@@ -18,7 +19,6 @@ from ....database.services import (
 )
 from ....services.clients import (
     get_revid,
-    get_revid_db,
     get_title_info,
     link_to_wikidata,
     publish_do_edit,
@@ -51,14 +51,11 @@ def load_language_settings(lang: str) -> LanguageSettingRecord:
 def _get_revid(sourcetitle) -> str | int:
     service = MdwikiRevidService()
     # title is the primary_key for MdwikiRevidRecord
-    mdwiki_revid_record = service.get_record_by_id(sourcetitle)
+    mdwiki_revid_record = service.get_mdwiki_revid_by_title(sourcetitle)
     if mdwiki_revid_record:
         return mdwiki_revid_record.revid
 
     revid = get_revid(sourcetitle)
-
-    if not revid:
-        revid = get_revid_db(sourcetitle)
 
     return revid
 

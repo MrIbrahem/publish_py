@@ -115,7 +115,6 @@ class OtherConfig:
     wiki_domain: str
     static_server: str
     tool_title: str
-    revids_api_url: str
     wikidata_domain: str
 
     @classmethod
@@ -133,7 +132,6 @@ class OtherConfig:
             "USER_AGENT",
             "mdwikipy/1.0 (https://mdwikipy.toolforge.org; tools.mdwikipy@toolforge.org)",
         )
-        revids_api_url = os.getenv("REVIDS_API_URL") or "https://mdwiki.toolforge.org/api.php"
         wikidata_domain = os.getenv("WIKIDATA_DOMAIN") or "www.wikidata.org"
 
         tool_title = os.getenv("TOOL_TITLE") or "mdwikipy tools"
@@ -144,7 +142,6 @@ class OtherConfig:
             wiki_domain=wiki_domain,
             static_server=static_server,
             tool_title=tool_title,
-            revids_api_url=revids_api_url,
             wikidata_domain=wikidata_domain,
         )
 
@@ -201,7 +198,7 @@ class Paths:
         publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR") or f"{flask_data_dir}/publish_reports/reports_by_day"
         words_json_path = os.getenv("WORDS_JSON_PATH") or f"{flask_data_dir}/td/Tables/jsons/words.json"
 
-        revids_file_path = os.getenv("ALL_PAGES_REVIDS_PATH") or "~/public_html/all_pages_revids.json"
+        revids_file_path = os.getenv("ALL_PAGES_REVIDS_PATH") or "~/data/all_pages_revids.json"
 
         # Ensure log directory exists
         Path(resolve_path(log_dir)).mkdir(parents=True, exist_ok=True)

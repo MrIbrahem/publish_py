@@ -43,37 +43,6 @@ def get_revid(sourcetitle: str) -> str:
 
     return ""
 
-
-def get_revid_db(sourcetitle: str) -> str:
-    """Get revision ID from database API.
-
-    Args:
-        sourcetitle: Source page title
-
-    Returns:
-        Revision ID as string, or empty string if not found
-    """
-    params = {
-        "get": "revids",
-        "title": sourcetitle,
-    }
-
-    if not app_settings.other.revids_api_url:
-        logger.warning("other.revids_api_url not set in config")
-        return ""
-
-    headers = {"User-Agent": app_settings.other.user_agent}
-    try:
-        response = requests.get(app_settings.other.revids_api_url, headers=headers, params=params, timeout=30)
-        data = response.json()
-        results = {r["title"]: str(r["revid"]) for r in data.get("results", [])}
-        return results.get(sourcetitle, "")
-    except Exception as e:
-        logger.error(f"Error fetching revid from API: {e}")
-        return ""
-
-
 __all__ = [
     "get_revid",
-    "get_revid_db",
 ]

@@ -34,7 +34,7 @@ class MdwikiRevidService(CRUDService[MdwikiRevidRecord]):
 
     def get_mdwiki_revid_by_title(self, title: str) -> MdwikiRevidRecord | None:
         """Get an mdwiki_revid record by title."""
-        return self.get(title)
+        return self.get_by(title=title)
 
     def add_mdwiki_revid(self, title: str, revid: int) -> MdwikiRevidRecord:
         """Add a new mdwiki_revid record."""

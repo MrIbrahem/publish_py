@@ -53,7 +53,6 @@ if sys:
     os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test-consumer-secret")
 
     os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
     os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
     os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
     os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")

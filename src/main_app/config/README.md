@@ -34,7 +34,7 @@ Settings (root frozen dataclass)
 ├── CorsConfig        -- allowed CORS domains
 ├── UsersConfig       -- special user mappings, fallback user
 ├── SecurityConfig    -- Flask 3.1+ secret key settings
-└── Top-level fields  -- publish_secret_code, user_agent, revids_api_url, etc.
+└── Top-level fields  -- publish_secret_code, user_agent, etc.
 ```
 
 ### Loading Flow

@@ -166,7 +166,6 @@ class BasePublishTest:
         """Patch the external API calls and expose mocks as a dict."""
         with (
             patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.main_app.public.routes.publish.worker.get_revid_db") as mock_get_revid_db,
             patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
             patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
             patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
@@ -177,7 +176,6 @@ class BasePublishTest:
             patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category"),
         ):
             mock_get_revid.return_value = "12345"
-            mock_get_revid_db.return_value = "12345"
             mock_changes.return_value = None
             mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
             mock_link.return_value = {"result": "success", "qid": "Q123"}
@@ -186,7 +184,6 @@ class BasePublishTest:
 
             yield {
                 "get_revid": mock_get_revid,
-                "get_revid_db": mock_get_revid_db,
                 "changes": mock_changes,
                 "edit": mock_edit,
                 "link": mock_link,
@@ -245,7 +242,6 @@ class TestSuccessFlows(BasePublishTest):
 
     def test_revid_resolution(self, csrf_client, common_patches):
         common_patches["get_revid"].return_value = "67890"
-        common_patches["get_revid_db"].return_value = "12345"
 
         response = self._post(csrf_client, self._default_payload())
 
@@ -292,7 +288,6 @@ class TestMetadataLogic(BasePublishTest):
 
     def test_empty_revid_fallback(self, csrf_client, common_patches):
         common_patches["get_revid"].return_value = ""
-        common_patches["get_revid_db"].return_value = ""
 
         response = self._post(csrf_client, self._default_payload(revid="99999"))
 
