@@ -9,7 +9,6 @@ from __future__ import annotations
 from .mdwiki_api import get_mdwiki_cat_members
 from .mediawiki_api import get_title_info, publish_do_edit
 from .oauth_client import get_csrf_token, get_cxtoken, get_oauth_client, post_params
-from .revids_client import get_revid
 from .wikidata_client import get_qid_for_mdtitle, link_to_wikidata
 
 __all__ = [
@@ -19,7 +18,6 @@ __all__ = [
     "get_cxtoken",
     "get_mdwiki_cat_members",
     "publish_do_edit",
-    "get_revid",
     "get_qid_for_mdtitle",
     "get_title_info",
     "link_to_wikidata",

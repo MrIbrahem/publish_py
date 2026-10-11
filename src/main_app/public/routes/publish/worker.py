@@ -18,7 +18,6 @@ from ....database.services import (
     UserTokenService,
 )
 from ....services.clients import (
-    get_revid,
     get_title_info,
     link_to_wikidata,
     publish_do_edit,
@@ -48,16 +47,14 @@ def load_language_settings(lang: str) -> LanguageSettingRecord:
     return service.get_language_setting_by_code(lang) or LanguageSettingRecord()
 
 
-def _get_revid(sourcetitle) -> str | int:
+def get_revid(sourcetitle) -> str | int:
     service = MdwikiRevidService()
     # title is the primary_key for MdwikiRevidRecord
     mdwiki_revid_record = service.get_mdwiki_revid_by_title(sourcetitle)
     if mdwiki_revid_record:
         return mdwiki_revid_record.revid
 
-    revid = get_revid(sourcetitle)
-
-    return revid
+    return ""
 
 
 def should_added_to_wikidata(lang: str, title: str) -> bool:
@@ -391,7 +388,6 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
 
 
 __all__ = [
-    "_get_revid",
     "_handle_no_access",
     "_process_edit",
 ]
