@@ -21,9 +21,11 @@ class MediaWikiApiClient:
     def __init__(
         self,
         http_client: HttpClient | None = None,
+        oauth_client: OAuthClient | None = None,
     ) -> None:
         """Initialize the checker with an HTTP client instance."""
         self.http_client = http_client or HttpClient()
+        self.oauth_client = oauth_client or OAuthClient(self.http_client)
 
     def get_title_info(self, targettitle: str, lang: str) -> dict[str, Any] | None:
         """Get page information from Wikipedia API.
@@ -75,7 +77,7 @@ class MediaWikiApiClient:
             Edit result as dictionary
         """
         https_domain = f"https://{wiki}.wikipedia.org"
-        response = OAuthClient().post_params(api_params, https_domain, access_key, access_secret)
+        response = self.oauth_client.post_params(api_params, https_domain, access_key, access_secret)
 
         try:
             result = json.loads(response) if response else {}
@@ -85,27 +87,6 @@ class MediaWikiApiClient:
 
         return result
 
-
-def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
-    return MediaWikiApiClient().get_title_info(targettitle, lang)
-
-
-def publish_do_edit(
-    api_params: dict[str, Any],
-    wiki: str,
-    access_key: str,
-    access_secret: str,
-) -> dict[str, Any]:
-    return MediaWikiApiClient().publish_do_edit(
-        api_params,
-        wiki,
-        access_key,
-        access_secret,
-    )
-
-
 __all__ = [
     "MediaWikiApiClient",
-    "get_title_info",
-    "publish_do_edit",
 ]

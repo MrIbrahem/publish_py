@@ -19,41 +19,43 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+class TextProcessor:
 
-def do_changes_to_text_with_settings(
-    text: str | Any,
-    title: str,
-    lang: str,
-    source_title: str = "",
-    mdwiki_revid: int | str = 0,
-    move_dots: bool = True,
-    expend_infobox: bool = True,
-    add_en_lang: bool = False,
-    add_category: bool = False,
-) -> str:
-    if fix_one_page is None:
-        logger.error("fix_refs library is not installed")
-        return text
+    @staticmethod
+    def do_changes_to_text_with_settings(
+        text: str | Any,
+        title: str,
+        lang: str,
+        source_title: str = "",
+        mdwiki_revid: int | str = 0,
+        move_dots: bool = True,
+        expend_infobox: bool = True,
+        add_en_lang: bool = False,
+        add_category: bool = False,
+    ) -> str:
+        if fix_one_page is None:
+            logger.error("fix_refs library is not installed")
+            return text
 
-    if not isinstance(text, str):
-        return text
+        if not isinstance(text, str):
+            return text
 
-    if not text.strip():
-        return text
+        if not text.strip():
+            return text
 
-    return fix_one_page(
-        text=text,
-        title=title,
-        lang=lang,
-        source_title=source_title,
-        mdwiki_revid=mdwiki_revid,
-        move_dots=move_dots,
-        expend_infobox=expend_infobox,
-        add_en_lang=add_en_lang,
-        add_category=add_category,
-    )
+        return fix_one_page(
+            text=text,
+            title=title,
+            lang=lang,
+            source_title=source_title,
+            mdwiki_revid=mdwiki_revid,
+            move_dots=move_dots,
+            expend_infobox=expend_infobox,
+            add_en_lang=add_en_lang,
+            add_category=add_category,
+        )
 
 
 __all__ = [
-    "do_changes_to_text_with_settings",
+    "TextProcessor",
 ]

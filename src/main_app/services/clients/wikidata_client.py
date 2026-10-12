@@ -20,8 +20,12 @@ logger = logging.getLogger(__name__)
 class WikidataClient:
     """Client for Wikidata API operations and database lookups."""
 
-    def __init__(self) -> None:
-        self.oauth_client = OAuthClient()
+    def __init__(
+        self,
+        oauth_client: OAuthClient | None = None,
+    ) -> None:
+        """Initialize the checker with an HTTP client instance."""
+        self.oauth_client = oauth_client or OAuthClient()
 
     @staticmethod
     def get_record_by_title(title: str) -> QidRecord | None:
@@ -132,28 +136,6 @@ class WikidataClient:
 
         return link_result
 
-def get_record_by_title(title: str) -> QidRecord | None:
-    return WikidataClient.get_record_by_title(title)
-
-
-def get_qid_for_mdtitle(title: str) -> str | None:
-    return WikidataClient.get_qid_for_mdtitle(title)
-
-
-def link_to_wikidata(
-    sourcetitle: str,
-    lang: str,
-    user: str,
-    targettitle: str,
-    access_key: str,
-    access_secret: str,
-) -> dict[str, Any]:
-    return WikidataClient().link_to_wikidata(sourcetitle, lang, user, targettitle, access_key, access_secret)
-
-
 __all__ = [
     "WikidataClient",
-    "get_record_by_title",
-    "get_qid_for_mdtitle",
-    "link_to_wikidata",
 ]

@@ -64,11 +64,7 @@ class TextApiClient:
         return ""
 
 
-def get_wikitext(title: str, project: str = "commons.wikimedia.org") -> str:
-    return TextApiClient().get_wikitext(title, project)
-
 
 __all__ = [
     "TextApiClient",
-    "get_wikitext",
 ]

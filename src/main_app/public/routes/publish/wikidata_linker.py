@@ -31,14 +31,17 @@ class WikidataLinker:
         self,
         recorder: ReportRecorder,
         token_service: UserTokenService | None = None,
+        wikidata_client: WikidataClient | None = None,
+        mediawiki_api: MediaWikiApiClient | None = None,
     ) -> None:
         self.recorder = recorder
         self.token_service = token_service or UserTokenService()
+        self.wikidata_client = wikidata_client or WikidataClient()
+        self.mediawiki_api = mediawiki_api or MediaWikiApiClient()
 
-    @staticmethod
-    def _should_link(lang: str, title: str) -> bool:
+    def _should_link(self, lang: str, title: str) -> bool:
         """Return False if the page is missing or is a user page (ns 2)."""
-        page_information = MediaWikiApiClient().get_title_info(title, lang)
+        page_information = self.mediawiki_api.get_title_info(title, lang)
         if not page_information:
             return False
 
@@ -63,7 +66,7 @@ class WikidataLinker:
             return {}
 
         fallback_access_key, fallback_access_secret = fallback_token.decrypted()
-        link_result = WikidataClient.link_to_wikidata(
+        link_result = self.wikidata_client.link_to_wikidata(
             sourcetitle,
             lang,
             fallback_user,
@@ -134,7 +137,7 @@ class WikidataLinker:
             # skip link to wd for user pages
             return {"error": "skip link to wd for user pages"}
 
-        link_result = WikidataClient.link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
+        link_result = self.wikidata_client.link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret,)
 
         # Check if the error is get_csrftoken failure and user is not already the fallback user
         fallback_user = app_settings.users.fallback_user

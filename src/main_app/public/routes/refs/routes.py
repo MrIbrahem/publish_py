@@ -1,7 +1,7 @@
 """
 Routes for the 'Fix References' feature.
 This blueprint provides a user interface for processing text to fix references
-using the `do_changes_to_text_with_settings` service.
+using the `TextProcessor.do_changes_to_text_with_settings` service.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from flask.views import MethodView
 from ....public.auth import oauth_required
 from ....services.clients.text_api import TextApiClient
 from ....services.utils.helpers.text_processor import (
-    do_changes_to_text_with_settings,
+    TextProcessor,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,10 +46,10 @@ def _process(data) -> str:
     # add_category = data.get("add_category", "").lower() in {"1", "true", "on", "yes"}
 
     if not text and lang and title:
-        text = TextApiClient.get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
+        text = TextApiClient().get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
 
     try:
-        result = do_changes_to_text_with_settings(
+        result = TextProcessor.do_changes_to_text_with_settings(
             text=text,
             title=title,
             lang=lang,

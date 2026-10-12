@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 import requests
 
-from src.main_app.services.clients.oauth_client import OAuthClient, get_oauth_client
+from src.main_app.services.clients.oauth_client import OAuthClient
 
 _CLIENT_MODULE = "src.main_app.services.clients.oauth_client"
 
@@ -84,10 +84,10 @@ def fake_settings(monkeypatch: pytest.MonkeyPatch) -> FakeSettings:
 
 
 class TestGetOauthClient:
-    """Tests for get_oauth_client function."""
+    """Tests for OAuthClient.get_oauth_client function."""
 
     def test_creates_oauth1_object(self):
-        result = get_oauth_client("access_key", "access_secret", "en.wikipedia.org")
+        result = OAuthClient.get_oauth_client("access_key", "access_secret", "en.wikipedia.org")
 
         assert result is not None
         assert result.client.client_key == "test_consumer_key"

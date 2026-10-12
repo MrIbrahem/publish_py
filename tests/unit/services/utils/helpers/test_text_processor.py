@@ -3,10 +3,13 @@ Tests for clients.text_processor module.
 """
 
 from src.main_app.services.utils.helpers.text_processor import (  # noqa: F401
-    do_changes_to_text_with_settings,
+    TextProcessor,
     fix_one_page,
 )
 
+
+class TestTextProcessor:
+    """Tests for TextProcessor.do_changes_to_text_with_settings function."""
 
 class TestFixOnePage:
     """Tests for fix_one_page function."""
