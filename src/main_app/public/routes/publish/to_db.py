@@ -39,10 +39,10 @@ def _find_exists_or_update_user_page(
 
 
 def add_to_db(
+    wd_result: dict[str, Any],
     target: str,
     lang: str,
     user: str,
-    wd_result: dict[str, Any],
     campaign: str,
     sourcetitle: str,
     mdwiki_revid: str | int,
@@ -144,6 +144,21 @@ def add_to_db(
     return result
 
 
+def add_to_db_tab(link_to_wd: dict[str, Any], tab: dict[str, Any]) -> dict[str, Any]:
+
+    return add_to_db(
+        link_to_wd,
+        tab["title"],
+        tab["lang"],
+        tab["user"],
+        tab["campaign"],
+        tab["sourcetitle"],
+        tab["revid"],
+        translate_type=tab["translate_type"],
+        words=tab["words"],
+    )
+
+
 __all__ = [
-    "add_to_db",
+    "add_to_db_tab",
 ]

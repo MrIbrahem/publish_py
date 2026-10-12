@@ -3,7 +3,7 @@ Tests for app_routes.publish.worker module.
 """
 
 from src.main_app.public.routes.publish.worker import (
-    _get_errors_file,
+    ErrorFileResolver,
 )
 
 
@@ -13,20 +13,20 @@ class TestGetErrorsFile:
     def test_returns_placeholder_for_unknown_error(self):
         """Test that placeholder is returned for unknown errors."""
 
-        result = _get_errors_file({"some": "error"}, "errors")
+        result = ErrorFileResolver.resolve({"some": "error"}, "errors")
 
         assert result == "errors"
 
     def test_returns_protectedpage_for_protected_error(self):
         """Test that protectedpage is returned for protected page error."""
 
-        result = _get_errors_file({"error": {"code": "protectedpage"}}, "errors")
+        result = ErrorFileResolver.resolve({"error": {"code": "protectedpage"}}, "errors")
 
         assert result == "protectedpage"
 
     def test_returns_ratelimited_for_rate_limit_error(self):
         """Test that ratelimited is returned for rate limit error."""
 
-        result = _get_errors_file({"error": {"info": "ratelimited"}}, "errors")
+        result = ErrorFileResolver.resolve({"error": {"info": "ratelimited"}}, "errors")
 
         assert result == "ratelimited"

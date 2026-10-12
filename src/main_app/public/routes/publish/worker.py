@@ -1,5 +1,14 @@
 """
 Post/Publish endpoint worker for Content Translation.
+
+Structure:
+    RequestValidator  : filters + validates the incoming request (marshmallow)
+    ErrorFileResolver : decides which "to_do" file a result belongs to
+    ReportRecorder    : writes the to_do file + inserts the report row
+    WikidataLinker    : links the new page to Wikidata (with fallback user)
+    PublishWorker     : one instance per request, runs the whole workflow
+
+The only public entry point is `handle_form`.
 """
 
 from __future__ import annotations
@@ -33,80 +42,64 @@ from ....services.utils.helpers import (
     to_do,
 )
 from ....services.utils.helpers.format import format_title, format_user
-from .to_db import add_to_db
+from .to_db import add_to_db_tab
 
 logger = logging.getLogger(__name__)
 
 
-def _get_word_count(title: str) -> int:
-    """Get word count for an article title.
+# --------------------------------------------------------------------------- #
+# Request validation
+# --------------------------------------------------------------------------- #
+class RequestValidator:
+    """Filters request data and validates it with the marshmallow schema."""
 
-    Mirrors PHP:
-    ```php
-    $word = $Words_table[$title] ?? 0;
-    ```
+    @staticmethod
+    def filter_request_data(request_data: dict[str, Any]) -> dict[str, Any]:
+        raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
 
-    Args:
-        title: Article title
+        # translate_type can be "all" - only include if present in request
+        translate_type = request_data.get("translate_type", "")
+        if translate_type:
+            raw["translate_type"] = translate_type
+        return raw
 
-    Returns:
-        Word count for the title, or 0 if not found
-    """
-    word_service = WordService()
-    lead_words, _ = word_service.get_word_counts_for_title(title)
-    return lead_words or 0
+    @staticmethod
+    def _error_response(info: Any) -> Response:
+        response = jsonify({"error": {"code": "validation_error", "info": info}})
+        response.status_code = 400
+        return response
 
+    def validate(
+        self,
+        request_data: dict[str, Any],
+    ) -> tuple[dict[str, Any] | None, Response | None]:
+        """Validate the request.
 
-def _load_language_settings(lang: str) -> LanguageSettingRecord:
-    """Load language settings for the given language.
+        Returns:
+            (validated_dict, None) on success, (None, error_response) on failure.
+        """
+        raw = self.filter_request_data(request_data)
 
-    Args:
-        lang: Language code
+        try:
+            validated_data = PublishRequestSchema().load(raw, unknown="exclude")
+        except ValidationError as err:
+            return None, self._error_response(err.messages)
 
-    Returns:
-        LanguageSettingRecord object
-    """
-    service = LanguageSettingService()
-    return service.get_language_setting_by_code(lang) or LanguageSettingRecord()
+        if validated_data is None:
+            return None, self._error_response("")
 
+        validated_dict = {k: v for k, v in validated_data.items() if v is not None}  # type: ignore
 
-def _get_revid(sourcetitle) -> str | int:
-    service = MdwikiRevidService()
-    # title is the primary_key for MdwikiRevidRecord
-    mdwiki_revid_record = service.get_mdwiki_revid_by_title(sourcetitle)
-    if mdwiki_revid_record:
-        return mdwiki_revid_record.revid
-
-    return ""
-
-
-def _should_added_to_wikidata(lang: str, title: str) -> bool:
-    """ """
-    page_information = get_title_info(title, lang)
-    if not page_information:
-        return False
-
-    page_namespace = page_information.get("ns", None)
-
-    if page_namespace == 2:
-        # skip link to wd for user pages
-        return False
-
-    return True
+        return validated_dict, None
 
 
-def _get_errors_file(editit: dict[str, Any], placeholder: str) -> str:
-    """Determine the appropriate error file based on error content.
+# --------------------------------------------------------------------------- #
+# Error file resolution
+# --------------------------------------------------------------------------- #
+class ErrorFileResolver:
+    """Maps edit / Wikidata results to the name of the to_do file."""
 
-    Args:
-        editit: Edit result dictionary
-        placeholder: Default placeholder value
-
-    Returns:
-        Error file name
-    """
-    to_do_file = placeholder
-    errs_main = [
+    MAIN_ERRORS: tuple[str, ...] = (
         "protectedpage",
         "titleblacklist",
         "ratelimited",
@@ -114,109 +107,141 @@ def _get_errors_file(editit: dict[str, Any], placeholder: str) -> str:
         "spam filter",
         "abusefilter",
         "mwoauth-invalid-authorization",
-    ]
-    errs_wd = {
+    )
+    WIKIDATA_ERRORS: dict[str, str] = {
         "Links to user pages": "wd_user_pages",
         "get_csrftoken": "wd_csrftoken",
         "protectedpage": "wd_protectedpage",
     }
 
-    errs = errs_main if placeholder == "errors" else errs_wd
-    c_text = json.dumps(editit)
+    @classmethod
+    def resolve(cls, editit: Any, placeholder: str) -> str:
+        """Determine the appropriate error file based on error content.
 
-    if isinstance(errs, list):
-        for err in errs:
-            if err in c_text:
-                to_do_file = err
-                break
-    else:
-        for err, file_name in errs.items():
-            if err in c_text:
-                to_do_file = file_name
-                break
+        Args:
+            editit: Edit (or link) result
+            placeholder: Default file name ("errors" for edits, else Wikidata)
+        """
+        c_text = json.dumps(editit)
 
-    return to_do_file
+        if placeholder == "errors":
+            for err in cls.MAIN_ERRORS:
+                if err in c_text:
+                    return err
+        else:
+            for err, file_name in cls.WIKIDATA_ERRORS.items():
+                if err in c_text:
+                    return file_name
 
+        return placeholder
 
-def _retry_with_fallback_user(
-    sourcetitle: str,
-    lang: str,
-    title: str,
-    user: str,
-) -> dict[str, Any]:
-    """Retry Wikidata linking with fallback user credentials.
-
-    Args:
-        sourcetitle: Source page title
-        lang: Target language code
-        title: Target page title
-        user: Original user
-
-    Returns:
-        Link result dictionary
-    """
-    fallback_user = app_settings.users.fallback_user
-    logger.debug(f"get_csrftoken failed for user: {user}, retrying with {fallback_user}")
-
-    # Retry with fallback user credentials
-    token_service = UserTokenService()
-    fallback_token = token_service.get_user_token_by_username(fallback_user)
-
-    if fallback_token is None:
-        return {}
-
-    fallback_access_key, fallback_access_secret = fallback_token.decrypted()
-    link_result = link_to_wikidata(
-        sourcetitle,
-        lang,
-        fallback_user,
-        title,
-        fallback_access_key,
-        fallback_access_secret,
-    )
-
-    if "error" not in link_result:
-        link_result["fallback_user"] = fallback_user
-        link_result["original_user"] = user
-        logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
-    return link_result
+    @classmethod
+    def for_edit(cls, editit: dict[str, Any]) -> str:
+        """Pick the to_do file for the result of the edit request."""
+        edit = editit.get("edit", {})
+        if edit.get("result", "") == "Success":
+            return "success"
+        if edit.get("captcha"):
+            return "captcha"
+        return cls.resolve(editit, "errors")
 
 
-def _handle_successful_edit(
-    sourcetitle: str,
-    lang: str,
-    user: str,
-    title: str,
-    access_key: str,
-    access_secret: str,
-) -> dict[str, Any]:
-    """Handle post-edit operations for successful edits.
+# --------------------------------------------------------------------------- #
+# Reporting
+# --------------------------------------------------------------------------- #
+class ReportRecorder:
+    """Saves an operation to the to_do file and to the reports table."""
 
-    Args:
-        sourcetitle: Source page title
-        lang: Target language code
-        user: Username
-        title: Target page title
-        access_key: OAuth access key
-        access_secret: OAuth access secret
+    def __init__(self, report_service: ReportService | None = None) -> None:
+        self.report_service = report_service or ReportService()
 
-    Returns:
-        Wikidata link result
-    """
-    link_result: dict[str, Any] = {}
+    def record(
+        self,
+        data: dict[str, Any],
+        file_name: str,
+        *,
+        title: str,
+        user: str,
+        lang: str,
+        sourcetitle: str,
+    ) -> None:
+        to_do(data, file_name)
 
-    if not _should_added_to_wikidata(lang, title):
+        self.report_service.add_report(
+            title=title,
+            user=user,
+            lang=lang,
+            sourcetitle=sourcetitle,
+            result=file_name,
+            data=json.dumps(data),
+        )
+
+
+# --------------------------------------------------------------------------- #
+# Wikidata
+# --------------------------------------------------------------------------- #
+class WikidataLinker:
+    """Links a published page to Wikidata, retrying with a fallback user."""
+
+    def __init__(
+        self,
+        recorder: ReportRecorder,
+        token_service: UserTokenService | None = None,
+    ) -> None:
+        self.recorder = recorder
+        self.token_service = token_service or UserTokenService()
+
+    @staticmethod
+    def _should_link(lang: str, title: str) -> bool:
+        """Return False if the page is missing or is a user page (ns 2)."""
+        page_information = get_title_info(title, lang)
+        if not page_information:
+            return False
+
         # skip link to wd for user pages
-        return {"error": "skip link to wd for user pages"}
+        return page_information.get("ns", None) != 2
 
-    link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
+    def _retry_with_fallback_user(
+        self,
+        sourcetitle: str,
+        lang: str,
+        title: str,
+        user: str,
+    ) -> dict[str, Any]:
+        """Retry Wikidata linking with fallback user credentials."""
+        fallback_user = app_settings.users.fallback_user
+        logger.debug(f"get_csrftoken failed for user: {user}, retrying with {fallback_user}")
 
-    # Check if the error is get_csrftoken failure and user is not already the fallback user
-    fallback_user = app_settings.users.fallback_user
-    if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
-        link_result["fallback"] = _retry_with_fallback_user(sourcetitle, lang, title, user)
+        # Retry with fallback user credentials
+        fallback_token = self.token_service.get_user_token_by_username(fallback_user)
 
-    if "error" in link_result:
+        if fallback_token is None:
+            return {}
+
+        fallback_access_key, fallback_access_secret = fallback_token.decrypted()
+        link_result = link_to_wikidata(
+            sourcetitle,
+            lang,
+            fallback_user,
+            title,
+            fallback_access_key,
+            fallback_access_secret,
+        )
+
+        if "error" not in link_result:
+            link_result["fallback_user"] = fallback_user
+            link_result["original_user"] = user
+            logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
+        return link_result
+
+    def _record_error(
+        self,
+        link_result: dict[str, Any],
+        sourcetitle: str,
+        lang: str,
+        user: str,
+        title: str,
+    ) -> None:
         tab3 = {
             "error": link_result["error"],
             "qid": link_result.get("qid", ""),
@@ -226,260 +251,309 @@ def _handle_successful_edit(
             "lang": lang,
             "username": user,
         }
-        file_name = _get_errors_file(link_result.get("error", {}), "wd_errors")
-        to_do(tab3, file_name)
+        file_name = ErrorFileResolver.resolve(link_result.get("error", {}), "wd_errors")
 
         # Insert to reports
-        report_service = ReportService()
-        report_service.add_report(
+        self.recorder.record(
+            tab3,
+            file_name,
             title=title,
             user=user,
             lang=lang,
             sourcetitle=sourcetitle,
-            result=file_name,
-            data=json.dumps(tab3),
         )
 
-    return link_result
+    def link(
+        self,
+        sourcetitle: str,
+        lang: str,
+        user: str,
+        title: str,
+        access_key: str,
+        access_secret: str,
+    ) -> dict[str, Any]:
+        """
+        Run the post-edit Wikidata linking and record any error.
+
+        Args:
+            sourcetitle: Source page title
+            lang: Target language code
+            user: Username
+            title: Target page title
+            access_key: OAuth access key
+            access_secret: OAuth access secret
+
+        Returns:
+            Wikidata link result
+        """
+        if not self._should_link(lang, title):
+            # skip link to wd for user pages
+            return {"error": "skip link to wd for user pages"}
+
+        link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
+
+        # Check if the error is get_csrftoken failure and user is not already the fallback user
+        fallback_user = app_settings.users.fallback_user
+        if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
+            link_result["fallback"] = self._retry_with_fallback_user(sourcetitle, lang, title, user)
+
+        if "error" in link_result:
+            self._record_error(link_result, sourcetitle, lang, user, title)
+
+        return link_result
 
 
-def _load_to_do_file(editit) -> str:
-    if editit.get("edit", {}).get("result", "") == "Success":
-        to_do_file = "success"
-    elif editit.get("edit", {}).get("captcha"):
-        to_do_file = "captcha"
-    else:
-        to_do_file = _get_errors_file(editit, "errors")
+# --------------------------------------------------------------------------- #
+# Main worker
+# --------------------------------------------------------------------------- #
+class PublishWorker:
+    """Handles one publish request end-to-end (one instance per request)."""
 
-    return to_do_file
+    def __init__(
+        self,
+        request_data: dict[str, Any],
+        *,
+        validator: RequestValidator | None = None,
+        token_service: UserTokenService | None = None,
+        recorder: ReportRecorder | None = None,
+        wikidata_linker: WikidataLinker | None = None,
+    ) -> None:
+        self.request_data = request_data
+        self.token_service = token_service or UserTokenService()
+        self.recorder = recorder or ReportRecorder()
 
+        self.validator = validator or RequestValidator()
+        self.wikidata_linker = wikidata_linker or WikidataLinker(self.recorder, self.token_service)
 
-def _process_edit(
-    access_key: str,
-    access_secret: str,
-    text: str,
-    tab: dict[str, Any],
-) -> dict[str, Any]:
-    """Process the edit request.
+        # Per-request state (filled while running)
+        self.text: str = ""
+        self.tab: dict[str, Any] = {}
+        self.access_key: str = ""
+        self.access_secret: str = ""
 
-    Args:
-        access_key: OAuth access key
-        access_secret: OAuth access secret
-        text: Page text content
-        tab: Operation metadata
+    # ------------------------------------------------------------------ #
+    # Entry point
+    # ------------------------------------------------------------------ #
+    def run(self) -> Response:
+        validated_dict, error_response = self.validator.validate(self.request_data)
 
-    Returns:
-        Edit result dictionary
-    """
-    sourcetitle = tab["sourcetitle"]
-    lang = tab["lang"]
-    campaign = tab["campaign"]
-    title = tab["title"]
-    user = tab["user"]
-    translate_type = tab["translate_type"]
+        if error_response is not None:
+            return error_response
 
-    # Get word count (mirrors PHP $tab['words'] = $Words_table[$title] ?? 0)
-    tab["words"] = _get_word_count(sourcetitle)
+        if validated_dict is None:
+            return self.validator._error_response("")
 
-    # Get revision ID
-    mdwiki_revid = _get_revid(sourcetitle)
+        self.text = validated_dict.get("text", "")
 
-    if not mdwiki_revid:
-        tab["empty revid"] = "Can not get revid"
-        mdwiki_revid = tab.get("request_revid", "")
+        # Build operation metadata
+        self.tab = self._build_tab(validated_dict)
 
-    tab["revid"] = mdwiki_revid
+        # Get access credentials
+        user_token = self.token_service.get_user_token_by_username(self.tab["user"])
 
-    # Apply text changes (fix references)
+        if user_token is None:
+            response = jsonify(self._handle_no_access())
+            response.status_code = 403
+            return response
 
-    language_setting = _load_language_settings(lang)
+        # Get credentials
+        self.access_key, self.access_secret = user_token.decrypted()
 
-    newtext = do_changes_to_text_with_settings(
-        text=text,
-        title=title,
-        lang=lang,
-        source_title=sourcetitle,
-        mdwiki_revid=mdwiki_revid,
-        move_dots=bool(language_setting.move_dots),
-        expend_infobox=bool(language_setting.expend),
-        add_en_lang=bool(language_setting.add_en_lang),
-        # add_category=add_category,
-    )
+        # Add captcha parameters if present
+        self._add_captcha_params(validated_dict)
 
-    if newtext:
-        tab["fix_refs"] = "yes" if newtext != text else "no"
-        text = newtext
+        return jsonify(self.process())
 
-    # Generate summary
-    hashtag = determine_hashtag(tab["title"], user)
+    # ------------------------------------------------------------------ #
+    # Request preparation
+    # ------------------------------------------------------------------ #
+    @staticmethod
+    def _build_tab(validated_dict: dict[str, Any]) -> dict[str, Any]:
+        """Build operation metadata from the validated request."""
+        return {
+            "title": format_title(validated_dict.get("title", "")),
+            "summary": "",
+            "lang": validated_dict.get("target", ""),
+            "user": format_user(validated_dict.get("user", "")),
+            "campaign": validated_dict.get("campaign", ""),
+            "result": "",
+            "edit": {},
+            "sourcetitle": validated_dict.get("sourcetitle", ""),
+            "request_revid": validated_dict.get("revid", "") or validated_dict.get("revision", ""),
+            "translate_type": validated_dict.get("translate_type", "lead"),
+            "words": 0,
+        }
 
-    tab["summary"] = make_summary(mdwiki_revid, sourcetitle, lang, hashtag)
+    def _add_captcha_params(self, validated_dict: dict[str, Any]) -> None:
+        if validated_dict.get("wpCaptchaId") and validated_dict.get("wpCaptchaWord"):
+            self.tab["wp_captcha_params"] = {
+                "wpCaptchaId": validated_dict["wpCaptchaId"],
+                "wpCaptchaWord": validated_dict["wpCaptchaWord"],
+            }
 
-    # Prepare API parameters
-    api_params = {
-        "action": "edit",
-        "title": title,
-        "summary": tab["summary"],
-        "text": text,
-        "format": "json",
-    }
+    # ------------------------------------------------------------------ #
+    # Workflow steps
+    # ------------------------------------------------------------------ #
+    def _resolve_revision_info(self) -> None:
+        """Fill `words` and `revid` in tab (mirrors PHP $tab['words'])."""
+        self.tab["words"] = self._get_word_count(self.tab["sourcetitle"])
 
-    # Add captcha parameters if present
-    if tab.get("wp_captcha_params"):
-        api_params.update(tab["wp_captcha_params"])
+        # Get revision ID
+        mdwiki_revid = self._get_revid(self.tab["sourcetitle"])
 
-    # Perform the edit
-    editit = publish_do_edit(api_params, lang, access_key, access_secret)
+        if not mdwiki_revid:
+            self.tab["empty revid"] = "Can not get revid"
+            mdwiki_revid = self.tab.get("request_revid", "")
 
-    success = editit.get("edit", {}).get("result", "")
+        self.tab["revid"] = mdwiki_revid
 
-    tab["result"] = success
+    def _fix_text(self) -> None:
+        """Apply text changes (fix references etc.) according to language settings."""
+        language_setting = self._load_language_settings(self.tab["lang"])
 
-    if success == "Success":
-        link_to_wd = _handle_successful_edit(
-            sourcetitle,
-            lang,
-            user,
-            title,
-            access_key,
-            access_secret,
+        newtext = do_changes_to_text_with_settings(
+            text=self.text,
+            title=self.tab["title"],
+            lang=self.tab["lang"],
+            source_title=self.tab["sourcetitle"],
+            mdwiki_revid=self.tab["revid"],
+            move_dots=bool(language_setting.move_dots),
+            expend_infobox=bool(language_setting.expend),
+            add_en_lang=bool(language_setting.add_en_lang),
+            # add_category=add_category,
         )
 
-        sql_result = add_to_db(
-            title,
-            lang,
-            user,
+        if newtext:
+            self.tab["fix_refs"] = "yes" if newtext != self.text else "no"
+            self.text = newtext
+
+    def _build_api_params(self) -> dict[str, Any]:
+        hashtag = determine_hashtag(self.tab["title"], self.tab["user"])
+        self.tab["summary"] = make_summary(
+            self.tab["revid"],
+            self.tab["sourcetitle"],
+            self.tab["lang"],
+            hashtag,
+        )
+
+        # Prepare API parameters
+        api_params = {
+            "action": "edit",
+            "title": self.tab["title"],
+            "summary": self.tab["summary"],
+            "text": self.text,
+            "format": "json",
+        }
+
+        # Add captcha parameters if present
+        if self.tab.get("wp_captcha_params"):
+            api_params.update(self.tab["wp_captcha_params"])
+
+        return api_params
+
+    def _after_success(self, editit: dict[str, Any]) -> None:
+        """Link to Wikidata and save to the database after a successful edit."""
+        link_to_wd = self.wikidata_linker.link(
+            self.tab["sourcetitle"],
+            self.tab["lang"],
+            self.tab["user"],
+            self.tab["title"],
+            self.access_key,
+            self.access_secret,
+        )
+
+        sql_result = add_to_db_tab(
             link_to_wd,
-            campaign,
-            sourcetitle,
-            mdwiki_revid,
-            translate_type=translate_type,
-            words=tab["words"],
+            self.tab,
         )
 
         editit["LinkToWikidata"] = link_to_wd
         editit["sql_result"] = sql_result
 
-    to_do_file = _load_to_do_file(editit)
+    def _record(self, to_do_file: str) -> None:
+        self.recorder.record(
+            self.tab,
+            to_do_file,
+            title=self.tab["title"],
+            user=self.tab["user"],
+            lang=self.tab["lang"],
+            sourcetitle=self.tab["sourcetitle"],
+        )
 
-    tab["result_to_cx"] = editit
-    to_do(tab, to_do_file)
+    def process(self) -> dict[str, Any]:
+        """Run the edit workflow and return the edit result."""
+        self._resolve_revision_info()
+        self._fix_text()
+        api_params = self._build_api_params()
 
-    report_service = ReportService()
-    report_service.add_report(
-        title=title,
-        user=user,
-        lang=lang,
-        sourcetitle=sourcetitle,
-        result=to_do_file,
-        data=json.dumps(tab),
-    )
+        # Perform the edit
+        editit = publish_do_edit(
+            api_params,
+            self.tab["lang"],
+            self.access_key,
+            self.access_secret,
+        )
 
-    return editit
+        success = editit.get("edit", {}).get("result", "")
+        self.tab["result"] = success
 
+        if success == "Success":
+            self._after_success(editit)
 
-def _handle_no_access(tab: dict[str, Any]) -> dict:
-    """Handle case when user has no access credentials.
+        self.tab["result_to_cx"] = editit
 
-    Args:
-        tab: Operation metadata
+        to_do_file = ErrorFileResolver.for_edit(editit)
+        self._record(to_do_file)
 
-    Returns:
-        JSON error response
-    """
-    user = tab["user"]
-    error = {"code": "noaccess", "info": "noaccess"}
-    editit = {
-        "error": error,
-        "edit": {"error": error, "username": user},
-        "username": user,
-    }
-    tab["result_to_cx"] = editit
-    to_do(tab, "noaccess")
+        return editit
 
-    report_service = ReportService()
-    report_service.add_report(
-        title=tab["title"],
-        user=user,
-        lang=tab["lang"],
-        sourcetitle=tab["sourcetitle"],
-        result="noaccess",
-        data=json.dumps(tab),
-    )
-
-    return editit
-
-def filter_request_data(request_data):
-    raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
-
-    # translate_type can be "all" - only include if present in request
-    translate_type = request_data.get("translate_type", "")
-    if translate_type:
-        raw["translate_type"] = translate_type
-    return raw
-
-def handle_form(request_data: dict[str, Any]) -> Response:
-    # Validate using marshmallow schema
-    raw = filter_request_data(request_data)
-
-    try:
-        validated_data = PublishRequestSchema().load(raw, unknown="exclude")
-    except ValidationError as err:
-        response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
-        response.status_code = 400
-        return response
-
-    if validated_data is None:
-        response = jsonify({"error": {"code": "validation_error", "info": ""}})
-        response.status_code = 400
-        return response
-
-    validated_dict = {x: v for x, v in validated_data.items() if v is not None}  # type: ignore
-
-    # Format inputs
-    user = format_user(validated_dict.get("user", ""))
-    title = format_title(validated_dict.get("title", ""))
-    text = validated_dict.get("text", "")
-
-    # Build operation metadata
-    tab = {
-        "title": title,
-        "summary": "",
-        "lang": validated_dict.get("target", ""),
-        "user": user,
-        "campaign": validated_dict.get("campaign", ""),
-        "result": "",
-        "edit": {},
-        "sourcetitle": validated_dict.get("sourcetitle", ""),
-        "request_revid": validated_dict.get("revid", "") or validated_dict.get("revision", ""),
-        "translate_type": validated_dict.get("translate_type", "lead"),
-        "words": 0,
-    }
-
-    # Get access credentials
-    token_service = UserTokenService()
-    user_token = token_service.get_user_token_by_username(user)
-
-    if user_token is None:
-        response = jsonify(_handle_no_access(tab))
-        response.status_code = 403
-        return response
-
-    # Get credentials
-    access_key, access_secret = user_token.decrypted()
-
-    # Add captcha parameters if present
-    if validated_dict.get("wpCaptchaId") and validated_dict.get("wpCaptchaWord"):
-        tab["wp_captcha_params"] = {
-            "wpCaptchaId": validated_dict["wpCaptchaId"],
-            "wpCaptchaWord": validated_dict["wpCaptchaWord"],
+    def _handle_no_access(self) -> dict[str, Any]:
+        """Handle the case when the user has no access credentials."""
+        user = self.tab["user"]
+        error = {"code": "noaccess", "info": "noaccess"}
+        editit = {
+            "error": error,
+            "edit": {"error": error, "username": user},
+            "username": user,
         }
+        self.tab["result_to_cx"] = editit
+        self._record("noaccess")
 
-    # Process the edit
-    editit = _process_edit(access_key, access_secret, text, tab)
+        return editit
 
-    response = jsonify(editit)
-    return response
+    # ------------------------------------------------------------------ #
+    # Data lookups
+    # ------------------------------------------------------------------ #
+    @staticmethod
+    def _get_word_count(title: str) -> int:
+        """Get word count for an article title (0 if not found).
+
+        Mirrors PHP: `$word = $Words_table[$title] ?? 0;`
+        """
+        lead_words, _ = WordService().get_word_counts_for_title(title)
+        return lead_words or 0
+
+    @staticmethod
+    def _load_language_settings(lang: str) -> LanguageSettingRecord:
+        """Load language settings for the given language."""
+        service = LanguageSettingService()
+        return service.get_language_setting_by_code(lang) or LanguageSettingRecord()
+
+    @staticmethod
+    def _get_revid(sourcetitle: str) -> str | int:
+        # title is the primary_key for MdwikiRevidRecord
+        record = MdwikiRevidService().get_mdwiki_revid_by_title(sourcetitle)
+        if record:
+            return record.revid
+        return ""
+
+
+# --------------------------------------------------------------------------- #
+# Public API (the only function used from outside)
+# --------------------------------------------------------------------------- #
+def handle_form(request_data: dict[str, Any]) -> Response:
+    return PublishWorker(request_data).run()
+
 
 __all__ = [
     "handle_form",
