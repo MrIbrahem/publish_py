@@ -2,7 +2,6 @@
 
 from unittest.mock import MagicMock, patch
 
-
 from src.main_app.services.clients.http_client import HttpClient
 
 

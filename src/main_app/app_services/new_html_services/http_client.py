@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from __future__ import annotations
 
@@ -11,6 +10,7 @@ import requests
 from ...services.clients.http_client import http_client
 
 logger = logging.getLogger(__name__)
+
 
 class HttpClient:
 
@@ -83,6 +83,7 @@ class HttpClient:
             return result
 
         return result
+
 
 __all__ = [
     "HttpClient",
