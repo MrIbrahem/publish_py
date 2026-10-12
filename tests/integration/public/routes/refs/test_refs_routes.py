@@ -4,12 +4,27 @@ Integration tests for src/main_app/public/routes/refs/routes.py module.
 
 from __future__ import annotations
 
-from unittest.mock import patch
+from dataclasses import dataclass
+from unittest.mock import MagicMock
 
 import pytest
 from flask.testing import FlaskClient
 
 from src.main_app.services.auth.current_user import CurrentUser
+
+
+@dataclass
+class MockRefsDeps:
+    do_changes_to_text: MagicMock
+
+
+@pytest.fixture
+def mock_refs_deps(monkeypatch: pytest.MonkeyPatch) -> MockRefsDeps:
+    """Fixture to bundle and set up common patches for refs route tests."""
+    _target = "src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings"
+    _mock = MagicMock()
+    monkeypatch.setattr(_target, _mock)
+    return MockRefsDeps(do_changes_to_text=_mock)
 
 
 @pytest.mark.integration
@@ -48,74 +63,70 @@ class TestRefsProcess:
             lambda: user,
         )
 
-    def test_fixrefs_process_post_returns_200(self, auth_client: FlaskClient):
+    def test_fixrefs_process_post_returns_200(self, auth_client: FlaskClient, mock_refs_deps: MockRefsDeps):
         """Test that POST to fixrefs process returns 200."""
-        with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
-            mock_do_changes.return_value = "Processed text with fixed references"
+        mock_refs_deps.do_changes_to_text.return_value = "Processed text with fixed references"
 
-            response = auth_client.post(
-                "/fixrefs/",
-                data={
-                    "source_title": "Source Title",
-                    "title": "Target Title",
-                    "text": "Text to process",
-                    "lang": "en",
-                    "mdwiki_revid": "12345",
-                },
-            )
+        response = auth_client.post(
+            "/fixrefs/",
+            data={
+                "source_title": "Source Title",
+                "title": "Target Title",
+                "text": "Text to process",
+                "lang": "en",
+                "mdwiki_revid": "12345",
+            },
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
-    def test_fixrefs_process_calls_do_changes_to_text(self, auth_client: FlaskClient):
+    def test_fixrefs_process_calls_do_changes_to_text(self, auth_client: FlaskClient, mock_refs_deps: MockRefsDeps):
         """Test that fixrefs process calls do_changes_to_text_with_settings."""
-        with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
-            mock_do_changes.return_value = "Processed text"
+        mock_refs_deps.do_changes_to_text.return_value = "Processed text"
 
-            auth_client.post(
-                "/fixrefs/",
-                data={
-                    "source_title": "Source Title",
-                    "title": "Target Title",
-                    "text": "Text to process",
-                    "lang": "en",
-                    "mdwiki_revid": "12345",
-                },
-            )
+        auth_client.post(
+            "/fixrefs/",
+            data={
+                "source_title": "Source Title",
+                "title": "Target Title",
+                "text": "Text to process",
+                "lang": "en",
+                "mdwiki_revid": "12345",
+            },
+        )
 
-            mock_do_changes.assert_called_once()
+        mock_refs_deps.do_changes_to_text.assert_called_once()
 
-    def test_fixrefs_process_handles_error(self, auth_client: FlaskClient):
+    def test_fixrefs_process_handles_error(self, auth_client: FlaskClient, mock_refs_deps: MockRefsDeps):
         """Test that fixrefs process handles errors gracefully."""
-        with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
-            mock_do_changes.side_effect = Exception("Processing error")
+        mock_refs_deps.do_changes_to_text.side_effect = Exception("Processing error")
 
-            response = auth_client.post(
-                "/fixrefs/",
-                data={
-                    "source_title": "Source Title",
-                    "title": "Target Title",
-                    "text": "Text to process",
-                    "lang": "en",
-                },
-            )
+        response = auth_client.post(
+            "/fixrefs/",
+            data={
+                "source_title": "Source Title",
+                "title": "Target Title",
+                "text": "Text to process",
+                "lang": "en",
+            },
+        )
 
-            # Should not crash, should return error message in template
-            assert response.status_code == 200
+        # Should not crash, should return error message in template
+        assert response.status_code == 200
 
-    def test_fixrefs_process_preserves_form_data(self, auth_client: FlaskClient):
+    def test_fixrefs_process_preserves_form_data(self, auth_client: FlaskClient, mock_refs_deps: MockRefsDeps):
         """Test that fixrefs process preserves form data in template."""
-        with patch("src.main_app.public.routes.refs.routes.do_changes_to_text_with_settings") as mock_do_changes:
-            mock_do_changes.return_value = "Processed"
+        mock_refs_deps.do_changes_to_text.return_value = "Processed"
 
-            response = auth_client.post(
-                "/fixrefs/",
-                data={
-                    "source_title": "My Source",
-                    "title": "My Title",
-                    "text": "My Text",
-                    "lang": "ar",
-                    "mdwiki_revid": "54321",
-                },
-            )
+        response = auth_client.post(
+            "/fixrefs/",
+            data={
+                "source_title": "My Source",
+                "title": "My Title",
+                "text": "My Text",
+                "lang": "ar",
+                "mdwiki_revid": "54321",
+            },
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
