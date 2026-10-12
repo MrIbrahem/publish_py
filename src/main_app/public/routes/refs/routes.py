@@ -18,7 +18,7 @@ from flask import (
 from flask.views import MethodView
 
 from ....public.auth import oauth_required
-from ....services.clients.text_api import get_wikitext
+from ....services.clients.text_api import TextApiClient
 from ....services.utils.helpers.text_processor import (
     do_changes_to_text_with_settings,
 )
@@ -46,7 +46,7 @@ def _process(data) -> str:
     # add_category = data.get("add_category", "").lower() in {"1", "true", "on", "yes"}
 
     if not text and lang and title:
-        text = get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
+        text = TextApiClient.get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
 
     try:
         result = do_changes_to_text_with_settings(

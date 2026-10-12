@@ -17,7 +17,7 @@ import re
 
 import wikitextparser as wtp
 
-from ...clients import HttpClientService
+from ...clients import HttpClient
 from ...parser import template_helpers as th
 
 _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
@@ -26,9 +26,12 @@ _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
 class ImageExistenceChecker:
     """Equivalent of the PHP ``ImageExistenceChecker`` service to check image existence via MediaWiki API."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClientService()
+        self.http_client = http_client or HttpClient()
 
     def image_exists(self, filename: str) -> bool:
         """Check if an image exists on Wikimedia Commons.
@@ -55,7 +58,7 @@ class ImageExistenceChecker:
 
         url = "https://commons.wikimedia.org/w/api.php"
 
-        response_array = self.http_client.request(url, "GET", params)
+        response_array = self.http_client.safe_request(url, "GET", params)
 
         # Handle API or request errors (fallback to assuming the image exists)
         if response_array.get("error_code") or response_array.get("error"):
@@ -83,11 +86,15 @@ class ImageExistenceChecker:
 class RemoveMissingImagesService:
     """Removes image references that don't exist on Commons from wikitext."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """
         :param image_service: Service used to check whether an image file exists.
         """
-        self._image_service = ImageExistenceChecker()
+        self.http_client = http_client or HttpClient()
+        self._image_service = ImageExistenceChecker(self.http_client)
 
     def remove_missing_infobox_images(self, text: str) -> str:
         """Remove infobox images that don't exist on Commons.

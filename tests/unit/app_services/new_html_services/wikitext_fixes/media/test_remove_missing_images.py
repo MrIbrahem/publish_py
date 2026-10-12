@@ -337,13 +337,17 @@ class TestImages:
 
 
 class _FakeHttpClient:
-    """Minimal stand-in for HttpClientService used by ImageExistenceChecker."""
+    """Minimal stand-in for HttpClient used by ImageExistenceChecker."""
 
     def __init__(self, response_array):
         self._response_array = response_array
         self.last_params = None
 
     def request(self, url: str, method, params):
+        self.last_params = params
+        return self._response_array
+
+    def safe_request(self, url: str, method, params):
         self.last_params = params
         return self._response_array
 

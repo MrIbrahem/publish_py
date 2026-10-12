@@ -37,6 +37,7 @@ def _wiki_path(title: str) -> str:
     """PHP-equivalent ``rawurlencode(str_replace(' ', '_', $title))``."""
     return quote(title.replace(" ", "_"))
 
+
 def get_endpoint() -> str:
     """ """
     return _MDWIKICX_ENDPOINT
@@ -58,7 +59,6 @@ class WikiLinks:
         encoded = quote(clean.replace(" ", "_"))
         return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
 
-
     @staticmethod
     def wikipedia_link(
         target: str,
@@ -77,7 +77,6 @@ class WikiLinks:
             link += ' <span class="text-danger">(DELETED)</span>'
         return link
 
-
     @staticmethod
     def wikidata_link(qid: str, name: str = "", default: str = "") -> str:
         """``<a target="_blank">`` for a Wikidata QID (PHP make_wikidata_url_blank)."""
@@ -86,7 +85,6 @@ class WikiLinks:
         display = escape(name if name else qid)
         encoded = quote(qid.replace(" ", "_"))
         return f"<a class='inline' target='_blank' href='https://wikidata.org/wiki/{encoded}'>{display}</a>"
-
 
     @staticmethod
     def tr_link_medwiki(
@@ -113,7 +111,6 @@ class WikiLinks:
         }
         translate_med_url = url_for("translate_med.index", **params, _external=False)
         return translate_med_url
-
 
     @staticmethod
     def content_translation_url(

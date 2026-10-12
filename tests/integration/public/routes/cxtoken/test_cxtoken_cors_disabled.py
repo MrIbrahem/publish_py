@@ -109,7 +109,7 @@ class TestCxtokenEndpoint:
             access_secret=encrypted_secret,
         )
 
-        with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
+        with patch("src.main_app.public.routes.cxtoken.routes.OAuthClient.get_cxtoken") as mock_get_cxtoken:
             mock_get_cxtoken.return_value = {"cxtoken": "test_cx_token_123"}
 
             response = mock_client.get("/cxtoken?wiki=en&user=SuccessUser")
@@ -144,7 +144,7 @@ class TestCxtokenEndpoint:
             access_secret=encrypted_secret,
         )
 
-        with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
+        with patch("src.main_app.public.routes.cxtoken.routes.OAuthClient.get_cxtoken") as mock_get_cxtoken:
             mock_get_cxtoken.return_value = {
                 "csrftoken_data": {"error": {"code": "mwoauth-invalid-authorization-invalid-user"}}
             }

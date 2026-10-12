@@ -12,7 +12,9 @@ from __future__ import annotations
 import json
 import logging
 import re
-from .http_client import HttpClientService
+
+from ...config.main_settings import app_settings
+from ...services.clients.http_client import HttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,7 @@ def normalize_title_for_url(title: str) -> str:
     title = title.replace("/", "%2F")
     return title
 
+
 class MdwikiApi:
     """
     Service for fetching wikitext content from mdwiki.org
@@ -39,9 +42,12 @@ class MdwikiApi:
     REST_BASE = "https://mdwiki.org/w/rest.php/v1"
     API_BASE = "https://mdwiki.org/w/api.php"
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClientService()
+        self.http_client = http_client or HttpClient()
 
         # Fallback to Action API
         self.fallback_to_action_api = False
@@ -51,7 +57,7 @@ class MdwikiApi:
 
         url = f"{self.REST_BASE}/page/{title_encoded}"
 
-        response = self.http_client.request(url, method="GET")
+        response = self.http_client.safe_request(url, method="GET")
 
         output = response.get("output")
         error = response.get("error")
@@ -87,7 +93,7 @@ class MdwikiApi:
             "formatversion": "2",
             "rvprop": "content|ids",
         }
-        response = self.http_client.request(self.API_BASE, method="GET", params=params)
+        response = self.http_client.safe_request(self.API_BASE, method="GET", params=params)
 
         output = response.get("output")
         error = response.get("error")
@@ -137,9 +143,12 @@ class MdwikiApi:
 class TransformApi:
     """Convert wikitext to HTML using English Wikipedia REST API."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClientService()
+        self.http_client = http_client or HttpClient()
 
     def convert(self, wikitext: str, title: str) -> dict[str, str]:
         """
@@ -148,14 +157,12 @@ class TransformApi:
         if not wikitext:
             return {"error": "Empty wikitext"}
 
-        from ...config.main_settings import app_settings
-
         base_url = app_settings.new_html.transform_base_url
 
         title_encoded = normalize_title_for_url(title)
         url = f"{base_url}/transform/wikitext/to/html/{title_encoded}"
 
-        response = self.http_client.request(
+        response = self.http_client.safe_request(
             url,
             method="POST",
             data={"wikitext": wikitext},

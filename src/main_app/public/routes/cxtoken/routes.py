@@ -16,7 +16,7 @@ from marshmallow import ValidationError
 
 from ....config import app_settings
 from ....database.services import UserTokenService
-from ....services.clients.oauth_client import get_cxtoken
+from ....services.clients.oauth_client import OAuthClient
 from ....services.core.cors import check_cors
 from ....services.schemas import CXTokenRequestSchema
 from .cache import get_from_store, store_jwt
@@ -43,7 +43,7 @@ def get_cxtoken_for_user_wiki(wiki: str, user_name: str):
     access_key, access_secret = user_token.decrypted()
 
     # Get cxtoken
-    cxtoken = get_cxtoken(wiki, access_key, access_secret)
+    cxtoken = OAuthClient().get_cxtoken(wiki, access_key, access_secret)
 
     if isinstance(cxtoken, str):
         logger.warning("cxtoken error")

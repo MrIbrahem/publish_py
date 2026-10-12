@@ -31,13 +31,13 @@ class MockCxTokenGetDeps:
 @pytest.fixture
 def mock_cxtoken_get_deps(monkeypatch: pytest.MonkeyPatch) -> MockCxTokenGetDeps:
     """Bundle common dependencies for cxtoken GET endpoint tests."""
-    _base = "src.main_app.public.routes.cxtoken.routes"
+    _base = "src.main_app.public.routes.cxtoken.routes.OAuthClient"
 
     mock_get_cxtoken = MagicMock(return_value={"csrftoken": "test_token_123"})
     mock_store_jwt = MagicMock()
 
     monkeypatch.setattr(f"{_base}.get_cxtoken", mock_get_cxtoken)
-    monkeypatch.setattr(f"{_base}.store_jwt", mock_store_jwt)
+    monkeypatch.setattr("src.main_app.public.routes.cxtoken.routes.store_jwt", mock_store_jwt)
 
     return MockCxTokenGetDeps(
         get_cxtoken=mock_get_cxtoken,

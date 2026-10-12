@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from ....services.clients import HttpClient
+
 from ..parser.lead_section_parser import get_lead_section
 from .media import RemoveMissingImagesService, remove_videos
 from .references import (
@@ -16,7 +18,12 @@ from .templates import (
 
 
 class WikitextFixerService:
-    def __init__(self) -> None: ...
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
+        self.http_client = http_client or HttpClient()
+        self.refs_service = RemoveMissingImagesService(self.http_client)
 
     def strip_text_into_lead_section(self, text: str) -> str:
         """
@@ -65,8 +72,7 @@ class WikitextFixerService:
         text = remove_categories(text)
 
         # Handle missing images and add title
-        service = RemoveMissingImagesService()
-        text = service.remove_missing_images(text)
+        text = self.refs_service.remove_missing_images(text)
 
         # Add a missing title parameter to infobox templates.
         text = add_missing_title(text, title)
