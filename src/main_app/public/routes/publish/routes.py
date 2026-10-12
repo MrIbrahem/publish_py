@@ -11,85 +11,10 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 from flask.views import MethodView
-from marshmallow import ValidationError
-
-from ....database.services import UserTokenService
 from ....services.core.cors import check_cors, validate_access
-from ....services.schemas import PublishRequestSchema
-from ....services.utils.helpers.format import format_title, format_user
-from .worker import _handle_no_access, _process_edit
+from .worker import _handle_form
 
 logger = logging.getLogger(__name__)
-
-
-def _handle_form(request_data) -> Response:
-    # Validate using marshmallow schema
-    raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
-
-    # translate_type can be "all" - only include if present in request
-    translate_type = request_data.get("translate_type", "")
-    if translate_type:
-        raw["translate_type"] = translate_type
-
-    try:
-        validated_data = PublishRequestSchema().load(raw, unknown="exclude")
-    except ValidationError as err:
-        response = jsonify({"error": {"code": "validation_error", "info": err.messages}})
-        response.status_code = 400
-        return response
-
-    if validated_data is None:
-        response = jsonify({"error": {"code": "validation_error", "info": ""}})
-        response.status_code = 400
-        return response
-
-    validated_dict = {x: v for x, v in validated_data.items() if v is not None}  # type: ignore
-
-    # Format inputs
-    user = format_user(validated_dict.get("user", ""))
-    title = format_title(validated_dict.get("title", ""))
-    text = validated_dict.get("text", "")
-
-    # Build operation metadata
-    tab = {
-        "title": title,
-        "summary": "",
-        "lang": validated_dict.get("target", ""),
-        "user": user,
-        "campaign": validated_dict.get("campaign", ""),
-        "result": "",
-        "edit": {},
-        "sourcetitle": validated_dict.get("sourcetitle", ""),
-        "request_revid": validated_dict.get("revid", "") or validated_dict.get("revision", ""),
-        "translate_type": validated_dict.get("translate_type", "lead"),
-        "words": 0,
-    }
-
-    # Get access credentials
-    token_service = UserTokenService()
-    user_token = token_service.get_user_token_by_username(user)
-
-    if user_token is None:
-        response = jsonify(_handle_no_access(tab))
-        response.status_code = 403
-        return response
-
-    # Get credentials
-    access_key, access_secret = user_token.decrypted()
-
-    # Add captcha parameters if present
-    if validated_dict.get("wpCaptchaId") and validated_dict.get("wpCaptchaWord"):
-        tab["wp_captcha_params"] = {
-            "wpCaptchaId": validated_dict["wpCaptchaId"],
-            "wpCaptchaWord": validated_dict["wpCaptchaWord"],
-        }
-
-    # Process the edit
-    editit = _process_edit(access_key, access_secret, text, tab)
-
-    response = jsonify(editit)
-    return response
-
 
 class PublishPreflightView(MethodView):
     """Answer the CORS preflight request for the publish endpoint."""
@@ -110,13 +35,15 @@ class PublishIndexView(MethodView):
     decorators = [validate_access]  # Check for `X-Secret-Key` headers
 
     def post(self) -> Response:
-        """Handle post/publish requests.
+        """
+        Handle post/publish requests.
 
         Request Body (JSON):
             user: Username
             title: Target page title
             target: Target language code
             sourcetitle: Source page title
+            summary: Edit summary
             text: Page content
             revid: Source revision ID (optional)
             campaign: Campaign name (optional)
