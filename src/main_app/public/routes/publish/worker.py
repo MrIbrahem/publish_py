@@ -410,7 +410,7 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
     return editit
 
 
-def _handle_form(request_data) -> Response:
+def handle_form(request_data) -> Response:
     # Validate using marshmallow schema
     raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
 
@@ -480,5 +480,5 @@ def _handle_form(request_data) -> Response:
 
 
 __all__ = [
-    "_handle_form",
+    "handle_form",
 ]

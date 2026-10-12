@@ -13,7 +13,7 @@ from flask import Blueprint, Response, jsonify, request
 from flask.views import MethodView
 
 from ....services.core.cors import check_cors, validate_access
-from .worker import _handle_form
+from .worker import handle_form
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ class PublishIndexView(MethodView):
                 response.status_code = 400
                 return response
 
-        return _handle_form(request_data)
+        return handle_form(request_data)
 
 
 class PublishRoutes:

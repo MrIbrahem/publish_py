@@ -40,9 +40,9 @@ def real_user_token():
 
 @pytest.fixture
 def mock_handle_form(monkeypatch: pytest.MonkeyPatch):
-    """Mock `_handle_form` used across publish route integration tests."""
+    """Mock `handle_form` used across publish route integration tests."""
     _mock = MagicMock()
-    monkeypatch.setattr("src.main_app.public.routes.publish.routes._handle_form", _mock)
+    monkeypatch.setattr("src.main_app.public.routes.publish.routes.handle_form", _mock)
     return _mock
 
 
