@@ -38,7 +38,7 @@ from .to_db import add_to_db
 logger = logging.getLogger(__name__)
 
 
-def get_word_count(title: str) -> int:
+def _get_word_count(title: str) -> int:
     """Get word count for an article title.
 
     Mirrors PHP:
@@ -57,7 +57,7 @@ def get_word_count(title: str) -> int:
     return lead_words or 0
 
 
-def load_language_settings(lang: str) -> LanguageSettingRecord:
+def _load_language_settings(lang: str) -> LanguageSettingRecord:
     """Load language settings for the given language.
 
     Args:
@@ -70,7 +70,7 @@ def load_language_settings(lang: str) -> LanguageSettingRecord:
     return service.get_language_setting_by_code(lang) or LanguageSettingRecord()
 
 
-def get_revid(sourcetitle) -> str | int:
+def _get_revid(sourcetitle) -> str | int:
     service = MdwikiRevidService()
     # title is the primary_key for MdwikiRevidRecord
     mdwiki_revid_record = service.get_mdwiki_revid_by_title(sourcetitle)
@@ -80,7 +80,7 @@ def get_revid(sourcetitle) -> str | int:
     return ""
 
 
-def should_added_to_wikidata(lang: str, title: str) -> bool:
+def _should_added_to_wikidata(lang: str, title: str) -> bool:
     """ """
     page_information = get_title_info(title, lang)
     if not page_information:
@@ -205,7 +205,7 @@ def _handle_successful_edit(
     """
     link_result: dict[str, Any] = {}
 
-    if not should_added_to_wikidata(lang, title):
+    if not _should_added_to_wikidata(lang, title):
         # skip link to wd for user pages
         return {"error": "skip link to wd for user pages"}
 
@@ -243,7 +243,7 @@ def _handle_successful_edit(
     return link_result
 
 
-def load_to_do_file(editit) -> str:
+def _load_to_do_file(editit) -> str:
     if editit.get("edit", {}).get("result", "") == "Success":
         to_do_file = "success"
     elif editit.get("edit", {}).get("captcha"):
@@ -279,10 +279,10 @@ def _process_edit(
     translate_type = tab["translate_type"]
 
     # Get word count (mirrors PHP $tab['words'] = $Words_table[$title] ?? 0)
-    tab["words"] = get_word_count(sourcetitle)
+    tab["words"] = _get_word_count(sourcetitle)
 
     # Get revision ID
-    mdwiki_revid = get_revid(sourcetitle)
+    mdwiki_revid = _get_revid(sourcetitle)
 
     if not mdwiki_revid:
         tab["empty revid"] = "Can not get revid"
@@ -292,7 +292,7 @@ def _process_edit(
 
     # Apply text changes (fix references)
 
-    language_setting = load_language_settings(lang)
+    language_setting = _load_language_settings(lang)
 
     newtext = do_changes_to_text_with_settings(
         text=text,
@@ -360,7 +360,7 @@ def _process_edit(
         editit["LinkToWikidata"] = link_to_wd
         editit["sql_result"] = sql_result
 
-    to_do_file = load_to_do_file(editit)
+    to_do_file = _load_to_do_file(editit)
 
     tab["result_to_cx"] = editit
     to_do(tab, to_do_file)
@@ -409,15 +409,18 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
 
     return editit
 
-
-def handle_form(request_data) -> Response:
-    # Validate using marshmallow schema
+def filter_request_data(request_data):
     raw = {k: v for k, v in request_data.items() if v != "" and str(v).lower() != "all"}
 
     # translate_type can be "all" - only include if present in request
     translate_type = request_data.get("translate_type", "")
     if translate_type:
         raw["translate_type"] = translate_type
+    return raw
+
+def handle_form(request_data: dict[str, Any]) -> Response:
+    # Validate using marshmallow schema
+    raw = filter_request_data(request_data)
 
     try:
         validated_data = PublishRequestSchema().load(raw, unknown="exclude")
@@ -477,7 +480,6 @@ def handle_form(request_data) -> Response:
 
     response = jsonify(editit)
     return response
-
 
 __all__ = [
     "handle_form",

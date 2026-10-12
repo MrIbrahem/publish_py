@@ -41,12 +41,12 @@ def common_patches(monkeypatch: pytest.MonkeyPatch) -> MockPublishWorkerDeps:
     mock_find_exists = MagicMock()
     mock_user_find_exists = MagicMock()
 
-    monkeypatch.setattr("src.main_app.public.routes.publish.worker.get_revid", mock_get_revid)
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker._get_revid", mock_get_revid)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings", mock_changes)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.publish_do_edit", mock_edit)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.link_to_wikidata", mock_link)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.to_do", mock_to_do)
-    monkeypatch.setattr("src.main_app.public.routes.publish.worker.should_added_to_wikidata", mock_should_add)
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker._should_added_to_wikidata", mock_should_add)
     monkeypatch.setattr("src.main_app.public.routes.publish.to_db.find_exists_or_update_page", mock_find_exists)
     monkeypatch.setattr(
         "src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page", mock_user_find_exists
@@ -288,7 +288,7 @@ class TestMetadataLogic(BasePublishTest):
         self, csrf_client, common_patches: MockPublishWorkerDeps, monkeypatch: pytest.MonkeyPatch
     ):
         mock_word_count = MagicMock(return_value=500)
-        monkeypatch.setattr("src.main_app.public.routes.publish.worker.get_word_count", mock_word_count)
+        monkeypatch.setattr("src.main_app.public.routes.publish.worker._get_word_count", mock_word_count)
 
         response = self._post(csrf_client, self._default_payload())
 
@@ -367,7 +367,7 @@ class TestComplexWorkflows(BasePublishTest):
         )
 
         mock_should_add = MagicMock(return_value=True)
-        monkeypatch.setattr("src.main_app.public.routes.publish.worker.should_added_to_wikidata", mock_should_add)
+        monkeypatch.setattr("src.main_app.public.routes.publish.worker._should_added_to_wikidata", mock_should_add)
 
         common_patches.link.side_effect = [
             {"error": "get_csrftoken failed", "qid": "Q123"},
