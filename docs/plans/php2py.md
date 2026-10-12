@@ -883,7 +883,6 @@ def index():
     if not revid:
         revid = get_revid_db(tab["sourcetitle"])
     if not revid:
-        tab["empty revid"] = "Can not get revid from all_pages_revids.json"
         revid = request_data.get("revid") or request_data.get("revision", "")
 
     tab["revid"] = revid

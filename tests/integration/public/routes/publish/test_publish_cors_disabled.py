@@ -2,7 +2,8 @@
 
 import json
 import os
-from unittest.mock import patch
+from dataclasses import dataclass
+from unittest.mock import MagicMock
 
 import pytest
 from flask import Flask
@@ -47,6 +48,54 @@ def real_user_token():
         access_secret=encrypted_secret,
     )
     return user
+
+
+@dataclass
+class MockPostEndpointDeps:
+    get_revid: MagicMock
+    changes: MagicMock
+    edit: MagicMock
+    link: MagicMock
+    to_do: MagicMock
+    should_add: MagicMock
+    find_exists: MagicMock
+    get_campaign_category: MagicMock
+
+
+@pytest.fixture
+def mock_post_deps(monkeypatch: pytest.MonkeyPatch) -> MockPostEndpointDeps:
+    """Fixture to bundle and set up all common patches for the post endpoint."""
+    _worker = "src.main_app.public.routes.publish.worker"
+    _db = "src.main_app.public.routes.publish.to_db"
+
+    mock_get_revid = MagicMock()
+    mock_changes = MagicMock()
+    mock_edit = MagicMock()
+    mock_link = MagicMock()
+    mock_to_do = MagicMock()
+    mock_should_add = MagicMock()
+    mock_find_exists = MagicMock()
+    mock_get_campaign_category = MagicMock()
+
+    monkeypatch.setattr(f"{_worker}.PublishWorker._get_revid", mock_get_revid)
+    monkeypatch.setattr(f"{_worker}.do_changes_to_text_with_settings", mock_changes)
+    monkeypatch.setattr(f"{_worker}.publish_do_edit", mock_edit)
+    monkeypatch.setattr("src.main_app.public.routes.publish.wikidata_linker.link_to_wikidata", mock_link)
+    monkeypatch.setattr("src.main_app.public.routes.publish.report_recorder.ToDoLogger.log", mock_to_do)
+    monkeypatch.setattr(f"{_worker}.WikidataLinker._should_link", mock_should_add)
+    monkeypatch.setattr(f"{_db}.PageDataSaver._update_if_exists", mock_find_exists)
+    monkeypatch.setattr(f"{_db}.CategoryService.get_campaign_category", mock_get_campaign_category)
+
+    return MockPostEndpointDeps(
+        get_revid=mock_get_revid,
+        changes=mock_changes,
+        edit=mock_edit,
+        link=mock_link,
+        to_do=mock_to_do,
+        should_add=mock_should_add,
+        find_exists=mock_find_exists,
+        get_campaign_category=mock_get_campaign_category,
+    )
 
 
 class TestPostEndpoint:
@@ -100,68 +149,51 @@ class TestPostEndpoint:
         assert response.status_code == 200
         assert "Access-Control-Allow-Methods" in response.headers
 
-    def test_successful_edit_returns_success(self, real_user_token, client):
+    def test_successful_edit_returns_success(self, real_user_token, client, mock_post_deps: MockPostEndpointDeps):
         """Test that successful edit returns success result."""
-        with (
-            patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.main_app.public.routes.publish.worker.get_revid_db"),
-            patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
-            patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.main_app.public.routes.publish.worker.to_do"),
-            patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
-            patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page"),
-            patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category"),
-        ):
-            mock_should_add.return_value = True
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = "Modified content"
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
+        mock_post_deps.should_add.return_value = True
+        mock_post_deps.get_revid.return_value = "12345"
+        mock_post_deps.changes.return_value = "Modified content"
+        mock_post_deps.edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
+        mock_post_deps.link.return_value = {"result": "success", "qid": "Q123"}
 
-            response = client.post(
-                "/publish",
-                data=json.dumps(
-                    {
-                        "user": "PublishUser",
-                        "title": "Test Page",
-                        "target": "ar",
-                        "sourcetitle": "Source Page",
-                        "text": "Original content",
-                    }
-                ),
-                content_type="application/json",
-            )
-            assert response.status_code == 200
+        response = client.post(
+            "/publish",
+            data=json.dumps(
+                {
+                    "user": "PublishUser",
+                    "title": "Test Page",
+                    "target": "ar",
+                    "sourcetitle": "Source Page",
+                    "text": "Original content",
+                }
+            ),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
 
-            data = response.get_json()
-            assert data["edit"]["result"] == "Success"
+        data = response.get_json()
+        assert data["edit"]["result"] == "Success"
 
-    def test_handles_captcha_response(self, real_user_token, client):
+    def test_handles_captcha_response(self, real_user_token, client, mock_post_deps: MockPostEndpointDeps):
         """Test that captcha response is handled correctly."""
-        with (
-            patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
-            patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.main_app.public.routes.publish.worker.to_do"),
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
-            mock_edit.return_value = {"edit": {"captcha": {"id": "123", "type": "image"}}}
+        mock_post_deps.get_revid.return_value = "12345"
+        mock_post_deps.changes.return_value = None
+        mock_post_deps.edit.return_value = {"edit": {"captcha": {"id": "123", "type": "image"}}}
 
-            response = client.post(
-                "/publish",
-                data=json.dumps(
-                    {
-                        "user": "PublishUser",
-                        "title": "Test Page",
-                        "target": "ar",
-                        "sourcetitle": "Source Page",
-                        "text": "Content",
-                    }
-                ),
-                content_type="application/json",
-            )
+        response = client.post(
+            "/publish",
+            data=json.dumps(
+                {
+                    "user": "PublishUser",
+                    "title": "Test Page",
+                    "target": "ar",
+                    "sourcetitle": "Source Page",
+                    "text": "Content",
+                }
+            ),
+            content_type="application/json",
+        )
 
-            data = response.get_json()
-            assert "captcha" in data["edit"]
+        data = response.get_json()
+        assert "captcha" in data["edit"]

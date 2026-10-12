@@ -5,7 +5,8 @@ with CORS_ENABLED (CORS_DISABLED=False).
 
 import json
 import os
-from unittest.mock import patch
+from dataclasses import dataclass
+from unittest.mock import MagicMock
 
 import pytest
 from flask import Blueprint, Flask
@@ -43,6 +44,20 @@ def mock_app(sqlite_db) -> Flask:
 def mock_client(mock_app: Flask) -> FlaskClient:
     """Create a test client."""
     return mock_app.test_client()
+
+
+@dataclass
+class MockSecretCodeDeps:
+    check_publish_secret_code: MagicMock
+
+
+@pytest.fixture
+def mock_secret_code(monkeypatch: pytest.MonkeyPatch) -> MockSecretCodeDeps:
+    """Fixture to mock `check_publish_secret_code`."""
+    _cors = "src.main_app.services.core.cors"
+    _mock = MagicMock(return_value=None)
+    monkeypatch.setattr(f"{_cors}.check_publish_secret_code", _mock)
+    return MockSecretCodeDeps(check_publish_secret_code=_mock)
 
 
 class TestCheckCorsOnPublish:
@@ -90,18 +105,19 @@ class TestCheckCorsOnPublish:
 class TestValidateAccessOnPublish:
     """Tests for @validate_access decorator on publish POST route with CORS_ENABLED."""
 
-    def test_post_disallowed_origin_returns_403(self, mock_is_denied, mock_client):
+    def test_post_disallowed_origin_returns_403(
+        self, mock_is_denied, mock_client, mock_secret_code: MockSecretCodeDeps
+    ):
         """POST from disallowed origin without secret key returns 403."""
-        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=None),):
-            response = mock_client.post(
-                "/publish/",
-                data=json.dumps({"user": "TestUser", "title": "Test Page"}),
-                content_type="application/json",
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "access_denied"
-            assert "Invalid or missing secret key" in data["error"]["info"]
+        response = mock_client.post(
+            "/publish/",
+            data=json.dumps({"user": "TestUser", "title": "Test Page"}),
+            content_type="application/json",
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "access_denied"
+        assert "Invalid or missing secret key" in data["error"]["info"]
 
     def test_post_allowed_origin_proceeds_past_cors(self, mock_is_allowed_medwiki, mock_client):
         """POST from allowed origin passes CORS and reaches handler logic."""
@@ -123,61 +139,67 @@ class TestValidateAccessOnPublish:
         assert data["error"]["code"] == "noaccess"
         assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
 
-    def test_post_with_valid_secret_key_bypasses_cors(self, mock_is_denied, mock_client):
+    def test_post_with_valid_secret_key_bypasses_cors(
+        self, mock_is_denied, mock_client, monkeypatch: pytest.MonkeyPatch
+    ):
         """POST with valid secret key bypasses CORS even from disallowed origin."""
-        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value="evil.com"),):
-            response = mock_client.post(
-                "/publish/",
-                headers={"X-Secret-Key": "test-secret"},
-                data=json.dumps(
-                    {
-                        "user": "UnknownUser",
-                        "title": "Test Page",
-                        "target": "en",
-                        "sourcetitle": "Source",
-                        "text": "Content",
-                    }
-                ),
-                content_type="application/json",
-            )
-            # CORS bypassed by secret key; 403 from handler because user not found
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "noaccess"
+        monkeypatch.setattr(
+            "src.main_app.services.core.cors.check_publish_secret_code", MagicMock(return_value="evil.com")
+        )
+        response = mock_client.post(
+            "/publish/",
+            headers={"X-Secret-Key": "test-secret"},
+            data=json.dumps(
+                {
+                    "user": "UnknownUser",
+                    "title": "Test Page",
+                    "target": "en",
+                    "sourcetitle": "Source",
+                    "text": "Content",
+                }
+            ),
+            content_type="application/json",
+        )
+        # CORS bypassed by secret key; 403 from handler because user not found
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "noaccess"
 
-    def test_post_allowed_origin_with_invalid_secret_key(self, mock_is_allowed_medwiki, mock_client):
+    def test_post_allowed_origin_with_invalid_secret_key(
+        self, mock_is_allowed_medwiki, mock_client, mock_secret_code: MockSecretCodeDeps
+    ):
         """POST from allowed origin succeeds even if secret key is invalid."""
-        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=None),):
-            response = mock_client.post(
-                "/publish/",
-                data=json.dumps(
-                    {
-                        "user": "UnknownUser",
-                        "title": "Test Page",
-                        "target": "en",
-                        "sourcetitle": "Source",
-                        "text": "Content",
-                    }
-                ),
-                content_type="application/json",
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "noaccess"
+        response = mock_client.post(
+            "/publish/",
+            data=json.dumps(
+                {
+                    "user": "UnknownUser",
+                    "title": "Test Page",
+                    "target": "en",
+                    "sourcetitle": "Source",
+                    "text": "Content",
+                }
+            ),
+            content_type="application/json",
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "noaccess"
 
-    def test_post_disallowed_origin_and_no_secret_key(self, mock_is_denied, mock_client):
+    def test_post_disallowed_origin_and_no_secret_key(
+        self, mock_is_denied, mock_client, mock_secret_code: MockSecretCodeDeps
+    ):
         """POST from disallowed origin without secret key returns specific error info."""
-        with (patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=None),):
-            response = mock_client.post(
-                "/publish/",
-                headers={"Origin": "https://evil.com"},
-                data=json.dumps({"user": "TestUser", "title": "Test Page"}),
-                content_type="application/json",
-            )
-            assert response.status_code == 403
-            data = response.get_json()
-            assert data["error"]["code"] == "access_denied"
-            assert "secret key" in data["error"]["info"]
+        response = mock_client.post(
+            "/publish/",
+            headers={"Origin": "https://evil.com"},
+            data=json.dumps({"user": "TestUser", "title": "Test Page"}),
+            content_type="application/json",
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"]["code"] == "access_denied"
+        assert "secret key" in data["error"]["info"]
 
 
 class TestPublishCorsOnIntegration:

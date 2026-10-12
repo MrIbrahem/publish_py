@@ -34,7 +34,7 @@ _work_files/add_all.py
 /tree
 app2.py
 coverage.xml
-/tests/unit/services/new_html_services/wikitext_fixes/fixtures/output
+/tests/**/fixtures/output/**
 src/main_app/public/routes/td/translate_med.php
 .claude/skills/flask-methodview-refactoring/SKILL.md
 src/main_app/services/segments_wraper/*.html

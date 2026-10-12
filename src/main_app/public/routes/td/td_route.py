@@ -33,7 +33,7 @@ from ....database.services import (
     SettingsService,
 )
 from ....services.auth.utils import get_current_user
-from .results_2026 import ResultsBundle, ResultsLoader
+from ....app_services.results_2026 import ResultsBundle, ResultsLoader
 
 logger = logging.getLogger(__name__)
 

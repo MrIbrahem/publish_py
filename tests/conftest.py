@@ -33,8 +33,6 @@ if sys:
     os.environ["MAIN_DIR"] = str(system_temp_dir / "test")
 
     os.environ.setdefault("PUBLISH_REPORTS_DIR", f"{system_temp_dir}/publish_reports/reports_by_day")
-    os.environ.setdefault("WORDS_JSON_PATH", f"{system_temp_dir}/words.json")
-    os.environ.setdefault("ALL_PAGES_REVIDS_PATH", f"{system_temp_dir}/revids.json")
 
     # Make the src/ directory importable as `main_app`. The repo's prod
     # entrypoint src/app.py does the same trick.
@@ -53,7 +51,6 @@ if sys:
     os.environ.setdefault("OAUTH_CONSUMER_SECRET", "test-consumer-secret")
 
     os.environ.setdefault("OAUTH_MWURI", "https://en.wikipedia.org/w/index.php")
-    os.environ.setdefault("REVIDS_API_URL", "https://mdwiki.toolforge.org/api.php")
     os.environ.setdefault("SPECIAL_USERS", "Mr. Ibrahem 1:Mr. Ibrahem,Admin:Mr. Ibrahem")
     os.environ.setdefault("FALLBACK_USER", "Mr. Ibrahem")
     os.environ.setdefault("USERS_WITHOUT_HASHTAG", "Mr. Ibrahem")
@@ -97,7 +94,7 @@ def stop_nets(request, monkeypatch):
     # mock requests library in src/main_app/services/new_html_services/clients.py
     _mock = MagicMock()
     _mock.request = MagicMock(return_value=MagicMock(text="", status_code=200))
-    monkeypatch.setattr("src.main_app.services.new_html_services.clients.requests", _mock)
+    monkeypatch.setattr("src.main_app.app_services.new_html_services.clients.requests", _mock)
 
 
 # ── app fixtures ───────────────────────────────────────────────────────────────────

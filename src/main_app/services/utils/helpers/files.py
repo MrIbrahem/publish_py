@@ -1,6 +1,13 @@
 """File logging utilities.
 
 Mirrors: php_src/bots/files_helps.php
+
+Structure:
+    SessionIdProvider : short random ID, generated once per process
+    ReportsDirectory  : builds/creates the daily reports directory
+    ToDoLogger        : writes an operation to the JSON-lines log and to a report file
+
+Public entry points: `to_do`.
 """
 
 from __future__ import annotations
@@ -16,87 +23,100 @@ from ....config import app_settings
 
 logger = logging.getLogger(__name__)
 
-# Generate a random ID for this process/session
-# This mirrors the PHP $RAND_ID behavior
-_RAND_ID: str | None = None
 
+class SessionIdProvider:
+    """Short unique ID for this process/session (mirrors PHP $RAND_ID).
 
-def _get_rand_id() -> str:
-    """Get a random session ID.
-
-    Returns a short unique ID for this process session.
     The ID is generated once per process and reused.
     """
-    global _RAND_ID
-    if _RAND_ID is None:
-        _RAND_ID = uuid.uuid4().hex[:8]
-    return _RAND_ID
+
+    _rand_id: str | None = None
+
+    @classmethod
+    def get(cls) -> str:
+        if cls._rand_id is None:
+            cls._rand_id = uuid.uuid4().hex[:8]
+        return cls._rand_id
 
 
-def get_reports_dir() -> Path:
-    """Get/create the reports directory structure.
+class ReportsDirectory:
+    """Daily reports directory: {publish_reports_dir}/YYYY/MM/DD/{rand_id}/"""
 
-    Returns the path to the reports directory for today:
-    {settings.paths.publish_reports_dir}/YYYY/MM/DD/{rand_id}/
-    """
-    publish_reports: Path = app_settings.paths.publish_reports_dir
+    @staticmethod
+    def get(now: datetime | None = None) -> Path:
+        """Get/create the reports directory for the given moment (default: now)."""
+        now = now or datetime.now()
+        publish_reports: Path = app_settings.paths.publish_reports_dir
 
-    # Create directory structure: YYYY/MM/DD/rand_id
-    now = datetime.now()
-    day_dir = publish_reports / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / _get_rand_id()
-    day_dir.mkdir(parents=True, exist_ok=True)
+        # Create directory structure: YYYY/MM/DD/rand_id
+        day_dir = publish_reports / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / SessionIdProvider.get()
+        day_dir.mkdir(parents=True, exist_ok=True)
 
-    return day_dir
+        return day_dir
 
 
-def to_do(tab: dict[str, Any], status: str) -> None:
-    """Log operation to file and save to reports_by_day directory.
+class ToDoLogger:
+    """Logs an operation to two locations:
 
-    Args:
-        tab: Operation data dictionary
-        status: Status string (e.g., "noaccess", "success", "error")
-
-    This function writes to two locations:
     1. JSON lines log file in flask_data_dir/publishes
     2. Individual JSON file in reports_by_day/YYYY/MM/DD/{rand_id}/ (PHP-style)
     """
-    now = datetime.now()
 
-    # Build log entry with explicit keys first, then add tab data
-    # Tab data is added after to allow intentional overrides of time/status
-    log_entry = dict(tab)  # Copy tab first
-    log_entry["time"] = int(now.timestamp())
-    log_entry["time_date"] = now.strftime("%Y-%m-%d %H:%M:%S")
-    log_entry["status"] = status
+    @staticmethod
+    def build_entry(tab: dict[str, Any], status: str, now: datetime) -> dict[str, Any]:
+        """Copy tab, then add time/status keys."""
+        log_entry = dict(tab)
+        log_entry["time"] = int(now.timestamp())
+        log_entry["time_date"] = now.strftime("%Y-%m-%d %H:%M:%S")
+        log_entry["status"] = status
+        return log_entry
 
-    # Write to JSON lines log file (existing behavior)
-    flask_data_dir: Path = app_settings.paths.flask_data_dir
-    today = now.strftime("%Y-%m-%d")
-    log_file = flask_data_dir / "publishes" / f"publish_{today}.json"
+    @staticmethod
+    def _write_log_line(log_entry: dict[str, Any], now: datetime) -> None:
+        """Append the entry to the daily JSON lines file."""
+        flask_data_dir: Path = app_settings.paths.flask_data_dir
+        today = now.strftime("%Y-%m-%d")
+        log_file = flask_data_dir / "publishes" / f"publish_{today}.json"
 
-    try:
-        log_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
-    except Exception as e:
-        logger.error(f"Failed to write to log file {log_file}: {e}")
+        try:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(log_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+        except Exception as e:
+            logger.error(f"Failed to write to log file {log_file}: {e}")
 
-    # Write to reports_by_day directory (PHP-style file-based reports)
-    try:
-        reports_dir = get_reports_dir()
-    except Exception as e:
-        logger.error(f"Failed to write to reports file {status}.json: {e}")
-        return
+    @staticmethod
+    def _write_report_file(log_entry: dict[str, Any], status: str, now: datetime) -> None:
+        """Write the entry as an individual JSON file (PHP-style report)."""
+        try:
+            reports_dir = ReportsDirectory.get(now)
+        except Exception as e:
+            logger.error(f"Failed to write to reports file {status}.json: {e}")
+            return
 
-    file_path = reports_dir / f"{status}.json"
-    try:
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(log_entry, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        logger.error(f"Failed to write to reports file {status}.json: {e}")
+        file_path = reports_dir / f"{status}.json"
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(log_entry, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.error(f"Failed to write to reports file {status}.json: {e}")
+
+    def log(self, tab: dict[str, Any], status: str) -> None:
+        """Log the operation.
+
+        Args:
+            tab: Operation data dictionary
+            status: Status string (e.g., "noaccess", "success", "error")
+        """
+        now = datetime.now()
+        log_entry = self.build_entry(tab, status, now)
+
+        self._write_log_line(log_entry, now)
+        self._write_report_file(log_entry, status, now)
 
 
 __all__ = [
-    "get_reports_dir",
-    "to_do",
+    "SessionIdProvider",
+    "ReportsDirectory",
+    "ToDoLogger",
 ]

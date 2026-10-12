@@ -6,27 +6,31 @@ from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
-from src.main_app.services.utils.helpers.files import _get_rand_id, get_reports_dir, to_do
+from src.main_app.services.utils.helpers.files import (
+    ReportsDirectory,
+    SessionIdProvider,
+    ToDoLogger,
+)
 
 
 class TestGetRandId:
-    """Tests for _get_rand_id function."""
+    """Tests for SessionIdProvider.get function."""
 
     def test_returns_consistent_id_within_process(self):
         """Test that the same rand_id is returned within a process."""
-        id1 = _get_rand_id()
-        id2 = _get_rand_id()
+        id1 = SessionIdProvider.get()
+        id2 = SessionIdProvider.get()
         assert id1 == id2
 
     def test_returns_8_character_string(self):
         """Test that rand_id is 8 characters long."""
-        rand_id = _get_rand_id()
+        rand_id = SessionIdProvider.get()
         assert len(rand_id) == 8
         assert isinstance(rand_id, str)
 
 
 class TestGetReportsDir:
-    """Tests for get_reports_dir function."""
+    """Tests for ReportsDirectory.get function."""
 
     def test_creates_directory_structure(self, monkeypatch):
         """Test that the reports directory structure is created."""
@@ -38,7 +42,7 @@ class TestGetReportsDir:
             mock_settings = SimpleNamespace(paths=mock_paths)
             monkeypatch.setattr("src.main_app.services.utils.helpers.files.app_settings", mock_settings)
 
-            reports_dir = get_reports_dir()
+            reports_dir = ReportsDirectory.get()
             assert reports_dir.exists()
             assert reports_dir.is_dir()
 
@@ -52,7 +56,7 @@ class TestGetReportsDir:
             mock_settings = SimpleNamespace(paths=mock_paths)
             monkeypatch.setattr("src.main_app.services.utils.helpers.files.app_settings", mock_settings)
 
-            reports_dir = get_reports_dir()
+            reports_dir = ReportsDirectory.get()
             now = datetime.now()
 
             # Check path components
@@ -65,10 +69,10 @@ class TestGetReportsDir:
 
 
 class TestToDo:
-    """Tests for to_do function."""
+    """Tests for ToDoLogger.log function."""
 
     def test_writes_to_log_file(self, monkeypatch):
-        """Test that to_do writes to the log file."""
+        """Test that ToDoLogger.log writes to the log file."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
                 flask_data_dir=Path(tmpdir),
@@ -78,7 +82,7 @@ class TestToDo:
             monkeypatch.setattr("src.main_app.services.utils.helpers.files.app_settings", mock_settings)
 
             tab = {"title": "Test Page", "user": "TestUser"}
-            to_do(tab, "success")
+            ToDoLogger().log(tab, "success")
 
             # Check log file exists
             today = datetime.now().strftime("%Y-%m-%d")
@@ -96,7 +100,7 @@ class TestToDo:
                 assert "time_date" in entry
 
     def test_writes_to_reports_directory(self, monkeypatch):
-        """Test that to_do writes to reports_by_day directory."""
+        """Test that ToDoLogger.log writes to reports_by_day directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
                 flask_data_dir=Path(tmpdir),
@@ -106,7 +110,7 @@ class TestToDo:
             monkeypatch.setattr("src.main_app.services.utils.helpers.files.app_settings", mock_settings)
 
             tab = {"title": "Test Page", "user": "TestUser"}
-            to_do(tab, "success")
+            ToDoLogger().log(tab, "success")
 
             # Check reports_by_day file exists
             reports_dir = Path(tmpdir) / "publish_reports" / "reports_by_day"
@@ -130,7 +134,7 @@ class TestToDo:
                 assert data["status"] == "success"
 
     def test_adds_timestamp_fields(self, monkeypatch):
-        """Test that to_do adds time and time_date fields."""
+        """Test that ToDoLogger.log adds time and time_date fields."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mock_paths = SimpleNamespace(
                 flask_data_dir=Path(tmpdir),
@@ -140,7 +144,7 @@ class TestToDo:
             monkeypatch.setattr("src.main_app.services.utils.helpers.files.app_settings", mock_settings)
 
             tab = {"title": "Test"}
-            to_do(tab, "test")
+            ToDoLogger().log(tab, "test")
 
             today = datetime.now().strftime("%Y-%m-%d")
             log_file = Path(tmpdir) / f"publishes/publish_{today}.json"

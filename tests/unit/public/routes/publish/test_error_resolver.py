@@ -1,0 +1,32 @@
+"""
+Tests for app_routes.publish.error_resolver module.
+"""
+
+from src.main_app.public.routes.publish.error_resolver import (
+    ErrorFileResolver,
+)
+
+
+class TestGetErrorsFile:
+    """Tests for _get_errors_file function."""
+
+    def test_returns_placeholder_for_unknown_error(self):
+        """Test that placeholder is returned for unknown errors."""
+
+        result = ErrorFileResolver.resolve({"some": "error"}, "errors")
+
+        assert result == "errors"
+
+    def test_returns_protectedpage_for_protected_error(self):
+        """Test that protectedpage is returned for protected page error."""
+
+        result = ErrorFileResolver.resolve({"error": {"code": "protectedpage"}}, "errors")
+
+        assert result == "protectedpage"
+
+    def test_returns_ratelimited_for_rate_limit_error(self):
+        """Test that ratelimited is returned for rate limit error."""
+
+        result = ErrorFileResolver.resolve({"error": {"info": "ratelimited"}}, "errors")
+
+        assert result == "ratelimited"

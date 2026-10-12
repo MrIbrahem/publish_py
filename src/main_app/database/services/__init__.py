@@ -17,6 +17,7 @@ from .config import (
     SettingsService,
 )
 from .content import (
+    CategoryMemberService,
     CategoryService,
     LangService,
     ProjectService,
@@ -38,10 +39,7 @@ from .pages_tables import (
     PagesService,
     UserPagesService,
 )
-from .reports import (
-    PagesUsersToMainService,
-    ReportService,
-)
+from .reports import ReportService
 from .users import (
     AdminService,
     CoordinatorService,
@@ -76,7 +74,6 @@ __all__ = [
     "InProcessService",
     "LangService",
     "ProjectService",
-    "PagesUsersToMainService",
     "QidService",
     "QidOthersService",
     "MissingStatsService",
@@ -85,6 +82,7 @@ __all__ = [
     "CoordinatorService",
     "UsersService",
     "UserTokenService",
+    "CategoryMemberService",
     "SettingsService",
     "LanguageSettingService",
     "TopStatsService",

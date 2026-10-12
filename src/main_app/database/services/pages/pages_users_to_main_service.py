@@ -19,14 +19,6 @@ from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
-
-def _row_to_dict(row: Any) -> dict[str, Any]:
-    """Convert a result row (tuple of columns from a join) into a dict."""
-    if hasattr(row, "_asdict"):
-        return dict(row._asdict())
-    return dict(row)
-
-
 class PagesUsersToMainPagesService(CRUDService[PagesUsersToMainRecord]):
     model = PagesUsersToMainRecord
 
@@ -36,7 +28,7 @@ class PagesUsersToMainPagesService(CRUDService[PagesUsersToMainRecord]):
     def list_pending(self, lang: str = "All") -> list[dict[str, Any]]:
         """Return user pages flagged for promotion to main pages.
 
-        Mirrors PHP ``get_pages_users_to_main($lang)``: an inner join between
+        Mirrors PHP ``list_pending($lang)``: an inner join between
         ``pages_users`` and ``pages_users_to_main`` (with the QID looked up on
         ``qids.title``), optionally filtered by language.
         """

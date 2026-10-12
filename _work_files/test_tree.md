@@ -2,28 +2,20 @@
 tests/
 ├── integration/
 │   ├── admin/
+│   │   ├── test_coordinators_routes_integration.py
+│   │   └── test_settings_routes_integration.py
+│   ├── app_services/
+│   ├── coordinators/
 │   │   └── routes/
 │   │       ├── qids/
 │   │       ├── translated/
 │   │       ├── test_admin_routes_integration.py
-│   │       ├── test_coordinators_routes_integration.py
 │   │       ├── test_full_translators_routes_integration.py
 │   │       ├── test_language_settings_routes_integration.py
-│   │       ├── test_settings_routes_integration.py
 │   │       └── test_users_no_inprocess_routes_integration.py
-│   ├── main_app/
-│   │   ├── admin/
-│   │   │   └── routes/
-│   │   │       └── qids/
-│   │   └── public/
-│   │       ├── auth/
-│   │       └── routes/
-│   │           ├── api/
-│   │           ├── cxtoken/
-│   │           ├── main/
-│   │           ├── publish/
-│   │           ├── refs/
-│   │           └── td/
+│   ├── database/
+│   │   └── services/
+│   │       └── test_pages_service_integration.py
 │   ├── public/
 │   │   ├── auth/
 │   │   └── routes/
@@ -49,29 +41,82 @@ tests/
 │   │       ├── refs/
 │   │       │   └── test_refs_routes.py
 │   │       └── td/
+│   │           ├── test_td_routes_integration.py
+│   │           └── test_translate_med_integration.py
 │   └── services/
-│       ├── core/
-│       │   └── cors/
-│       │       ├── test_is_allowed_checker.py
-│       │       └── test_main_routes_with_cors.py
-│       └── services/
-│           └── test_pages_service_integration.py
+│       └── core/
+│           └── cors/
+│               ├── test_is_allowed_checker.py
+│               └── test_main_routes_with_cors.py
 ├── unit/
 │   ├── admin/
-│   │   └── routes/
-│   │       ├── qids/
-│   │       ├── translated/
-│   │       ├── test_admin_routes.py
-│   │       ├── test_coordinators_routes.py
-│   │       ├── test_full_translators_routes.py
-│   │       ├── test_language_settings_routes.py
-│   │       ├── test_settings_routes.py
-│   │       └── test_users_no_inprocess_routes.py
+│   │   └── test_settings_routes.py
 │   ├── app_routes/
 │   │   └── auth/
 │   │       ├── test_auth_utils.py
 │   │       └── test_identity.py
+│   ├── app_services/
+│   │   ├── new_html_services/
+│   │   │   ├── parser/
+│   │   │   │   ├── data/
+│   │   │   │   │   └── source-1.wiki
+│   │   │   │   ├── test_citation.py
+│   │   │   │   ├── test_citations_parser.py
+│   │   │   │   ├── test_lead_section_parser.py
+│   │   │   │   └── test_template_helpers.py
+│   │   │   ├── process/
+│   │   │   │   ├── test_process_seg.py
+│   │   │   │   └── test_processer.py
+│   │   │   ├── utils/
+│   │   │   │   ├── test_html_utils.py
+│   │   │   │   └── test_services_utils.py
+│   │   │   ├── wikitext_fixes/
+│   │   │   │   ├── fixtures/
+│   │   │   │   │   ├── result/
+│   │   │   │   │   │   ├── abdominal_pain.wiki
+│   │   │   │   │   │   ├── obstructive_sleep_apnea.wiki
+│   │   │   │   │   │   ├── test-1.wiki
+│   │   │   │   │   │   ├── test-2.wiki
+│   │   │   │   │   │   ├── Uterine_atony.wiki
+│   │   │   │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
+│   │   │   │   │   └── source/
+│   │   │   │   │       ├── abdominal_pain.wiki
+│   │   │   │   │       ├── obstructive_sleep_apnea.wiki
+│   │   │   │   │       ├── test-1.wiki
+│   │   │   │   │       ├── test-2.wiki
+│   │   │   │   │       ├── Uterine_atony.wiki
+│   │   │   │   │       └── Wernicke–Korsakoff_syndrome.wiki
+│   │   │   │   ├── media/
+│   │   │   │   │   ├── test_fix_images.py
+│   │   │   │   │   └── test_remove_missing_images.py
+│   │   │   │   ├── references/
+│   │   │   │   │   ├── test_delete_empty_refs.py
+│   │   │   │   │   ├── test_expand_refs.py
+│   │   │   │   │   └── test_ref_worker.py
+│   │   │   │   ├── structure/
+│   │   │   │   │   ├── test_fix_categories.py
+│   │   │   │   │   └── test_fix_language_links.py
+│   │   │   │   ├── templates/
+│   │   │   │   │   ├── test_delete_templates.py
+│   │   │   │   │   └── test_fix_templates.py
+│   │   │   │   └── test_wikitext_fixer.py
+│   │   │   ├── __init__.py
+│   │   │   ├── expend_infobox.py
+│   │   │   ├── test_clients.py
+│   │   │   └── test_storage.py
+│   │   ├── results_2026/
+│   │   │   ├── __init__.py
+│   │   │   └── test_row_items.py
+│   │   └── __init__.py
 │   ├── config/
+│   ├── coordinators/
+│   │   └── routes/
+│   │       ├── qids/
+│   │       ├── translated/
+│   │       ├── test_admin_routes.py
+│   │       ├── test_full_translators_routes.py
+│   │       ├── test_language_settings_routes.py
+│   │       └── test_users_no_inprocess_routes.py
 │   ├── database/
 │   │   ├── models/
 │   │   │   ├── analytics/
@@ -103,71 +148,50 @@ tests/
 │   │   │   │   └── test_users_no_inprocess_model.py
 │   │   │   └── wikidata/
 │   │   │       └── test_qid_model.py
-│   │   └── services/
-│   │       ├── analytics/
-│   │       │   ├── test_assessment_service.py
-│   │       │   ├── test_enwiki_pageview_service.py
-│   │       │   ├── test_mdwiki_revid_service.py
-│   │       │   ├── test_refs_count_service.py
-│   │       │   ├── test_views_new_service.py
-│   │       │   └── test_word_service.py
-│   │       ├── config/
-│   │       │   ├── test_language_setting_service.py
-│   │       │   └── test_settings_service.py
-│   │       ├── content/
-│   │       │   ├── test_category_service.py
-│   │       │   ├── test_lang_service.py
-│   │       │   └── test_project_service.py
-│   │       ├── pages/
-│   │       │   ├── test_chart_data.py
-│   │       │   ├── test_in_process_service.py
-│   │       │   ├── test_page_service.py
-│   │       │   ├── test_pages_users_to_main_service_admin.py
-│   │       │   ├── test_translate_type_service.py
-│   │       │   └── test_user_page_service.py
-│   │       ├── pages_tables/
-│   │       ├── reports/
-│   │       │   ├── test_pages_users_to_main_service.py
-│   │       │   └── test_report_service.py
-│   │       ├── users/
-│   │       │   ├── test_admin_service.py
-│   │       │   ├── test_full_translator_service.py
-│   │       │   ├── test_user_token_service.py
-│   │       │   ├── test_users_no_inprocess_service.py
-│   │       │   └── test_users_service.py
-│   │       ├── utils/
-│   │       └── wikidata/
-│   │           ├── test_allqid_service.py
-│   │           ├── test_qid_others_service.py
-│   │           └── test_qid_service.py
+│   │   ├── services/
+│   │   │   ├── analytics/
+│   │   │   │   ├── test_assessment_service.py
+│   │   │   │   ├── test_enwiki_pageview_service.py
+│   │   │   │   ├── test_mdwiki_revid_service.py
+│   │   │   │   ├── test_refs_count_service.py
+│   │   │   │   ├── test_views_new_service.py
+│   │   │   │   └── test_word_service.py
+│   │   │   ├── config/
+│   │   │   │   ├── test_language_setting_service.py
+│   │   │   │   └── test_settings_service.py
+│   │   │   ├── content/
+│   │   │   │   ├── test_category_service.py
+│   │   │   │   ├── test_lang_service.py
+│   │   │   │   └── test_project_service.py
+│   │   │   ├── pages/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── test_chart_data.py
+│   │   │   │   ├── test_in_process_service.py
+│   │   │   │   ├── test_pages_users_to_main_service_admin.py
+│   │   │   │   └── test_translate_type_service.py
+│   │   │   ├── pages_tables/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── pages_shared_service_tests.py
+│   │   │   │   ├── test_page_service.py
+│   │   │   │   └── test_user_page_service.py
+│   │   │   ├── reports/
+│   │   │   │   └── test_report_service.py
+│   │   │   ├── users/
+│   │   │   │   ├── test_admin_service.py
+│   │   │   │   ├── test_full_translator_service.py
+│   │   │   │   ├── test_user_token_service.py
+│   │   │   │   ├── test_users_no_inprocess_service.py
+│   │   │   │   └── test_users_service.py
+│   │   │   ├── utils/
+│   │   │   ├── wikidata/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── qids_services_tests.py
+│   │   │   │   ├── test_allqid_service.py
+│   │   │   │   ├── test_qid_others_service.py
+│   │   │   │   └── test_qid_service.py
+│   │   │   └── __init__.py
+│   │   └── __init__.py
 │   ├── extensions/
-│   ├── main_app/
-│   │   ├── admin/
-│   │   ├── config/
-│   │   ├── db/
-│   │   │   ├── models/
-│   │   │   └── services/
-│   │   │       ├── analytics/
-│   │   │       ├── config/
-│   │   │       ├── content/
-│   │   │       ├── pages/
-│   │   │       ├── reports/
-│   │   │       ├── users/
-│   │   │       ├── utils/
-│   │   │       └── wikidata/
-│   │   ├── extensions/
-│   │   ├── public/
-│   │   │   ├── auth/
-│   │   │   └── utils/
-│   │   └── shared/
-│   │       ├── auth/
-│   │       ├── clients/
-│   │       ├── core/
-│   │       │   ├── cookies/
-│   │       │   └── cors/
-│   │       ├── schemas/
-│   │       └── utils/
-│   │           └── helpers/
 │   ├── public/
 │   │   ├── auth/
 │   │   │   └── test_routes.py
@@ -180,10 +204,11 @@ tests/
 │   │   │   │   └── test_cxtoken_cache.py
 │   │   │   ├── main/
 │   │   │   ├── publish/
-│   │   │   │   └── test_publish_worker.py
+│   │   │   │   └── test_error_resolver.py
 │   │   │   ├── refs/
 │   │   │   ├── td/
-│   │   │   ├── test_html_to_segments.py
+│   │   │   ├── test_html2segments.py
+│   │   │   ├── test_legacy_url_redirects.py
 │   │   │   └── test_new_html_routes.py
 │   │   └── utils/
 │   ├── services/
@@ -191,10 +216,8 @@ tests/
 │   │   │   ├── test_auth_service.py
 │   │   │   └── test_token_manager.py
 │   │   ├── clients/
-│   │   │   ├── test_mdwiki_api.py
 │   │   │   ├── test_mediawiki_api.py
 │   │   │   ├── test_oauth_client.py
-│   │   │   ├── test_revids_client.py
 │   │   │   ├── test_text_api.py
 │   │   │   └── test_wikidata_client.py
 │   │   ├── core/
@@ -209,84 +232,18 @@ tests/
 │   │   │   │   └── test_publish_secret_checks.py
 │   │   │   ├── test_crypto.py
 │   │   │   └── test_extensions.py
-│   │   ├── new_html_services/
-│   │   │   ├── fixes/
-│   │   │   │   ├── data/
-│   │   │   │   │   ├── output-1.wiki
-│   │   │   │   │   ├── output-2.wiki
-│   │   │   │   │   ├── result-1.wiki
-│   │   │   │   │   ├── result-2.wiki
-│   │   │   │   │   ├── source-1.wiki
-│   │   │   │   │   └── source-2.wiki
-│   │   │   │   ├── media/
-│   │   │   │   │   ├── test_fix_images.py
-│   │   │   │   │   └── test_remove_missing_images.py
-│   │   │   │   ├── references/
-│   │   │   │   │   ├── test_delete_empty_refs.py
-│   │   │   │   │   ├── test_expand_refs.py
-│   │   │   │   │   └── test_ref_worker.py
-│   │   │   │   ├── structure/
-│   │   │   │   │   ├── test_fix_categories.py
-│   │   │   │   │   └── test_fix_language_links.py
-│   │   │   │   ├── templates/
-│   │   │   │   │   ├── test_delete_templates.py
-│   │   │   │   │   └── test_fix_templates.py
-│   │   │   │   ├── test_fixtures/
-│   │   │   │   │   ├── local.wiki.txt
-│   │   │   │   │   └── mwikicx.wiki.txt
-│   │   │   │   └── test_fixes_init.py
-│   │   │   ├── parser/
-│   │   │   │   ├── data/
-│   │   │   │   │   └── source-1.wiki
-│   │   │   │   ├── test_citation.py
-│   │   │   │   ├── test_citations_parser.py
-│   │   │   │   ├── test_lead_section_parser.py
-│   │   │   │   └── test_template_helpers.py
-│   │   │   ├── process/
-│   │   │   │   ├── test_process_seg.py
-│   │   │   │   └── test_processer.py
-│   │   │   ├── utils/
-│   │   │   │   ├── test_html_utils.py
-│   │   │   │   └── test_services_utils.py
-│   │   │   ├── test_clients.py
-│   │   │   └── test_storage.py
 │   │   ├── schemas/
-│   │   ├── segments/
-│   │   │   └── lib/
-│   │   │       ├── lineardoc/
-│   │   │       │   ├── data/
-│   │   │       │   │   ├── test-block-template-section-1.html
-│   │   │       │   │   ├── test-block-template-section-2.html
-│   │   │       │   │   ├── test-block-template-section-3.html
-│   │   │       │   │   └── test-block-template-section-4.html
-│   │   │       │   ├── test_builder.py
-│   │   │       │   ├── test_contextualizer.py
-│   │   │       │   ├── test_doc.py
-│   │   │       │   ├── test_doc_item.py
-│   │   │       │   ├── test_elements.py
-│   │   │       │   ├── test_lineardoc_utils.py
-│   │   │       │   ├── test_mw_contextualizer.py
-│   │   │       │   ├── test_normalizer.py
-│   │   │       │   ├── test_parser.py
-│   │   │       │   ├── test_text_block.py
-│   │   │       │   ├── test_text_chunk.py
-│   │   │       │   └── test_util.py
-│   │   │       ├── segmentation/
-│   │   │       │   └── test_cx_segmenter.py
-│   │   │       └── test_processor.py
 │   │   └── utils/
 │   │       ├── helpers/
 │   │       │   ├── test_files.py
 │   │       │   ├── test_format.py
-│   │       │   ├── test_text_processor.py
-│   │       │   ├── test_words.py
-│   │       │   └── test_words_unit.py
+│   │       │   └── test_text_processor.py
 │   │       ├── test_decode_bytes.py
 │   │       └── test_web_utils.py
-│   └── templates_markups/
-│       ├── admin_sidebar/
-│       ├── navbar/
-│       └── test_admin_sidebar.py
+│   ├── templates_markups/
+│   │   ├── navbar/
+│   │   └── test_coordinator_sidebar.py
+│   └── __init__.py
 ├── __init__.py
 ├── conftest.py
 └── README.md

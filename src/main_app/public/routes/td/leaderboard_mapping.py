@@ -10,11 +10,8 @@ from urllib.parse import quote
 from flask import url_for
 from markupsafe import Markup
 
-from ....services.utils.views_links import (
-    build_pageviews_url,
-    build_toget_api_url,
-)
-from ....services.utils.wiki_links import content_translation_url
+from ....services.utils.views_links import ViewsLinks
+from ....services.utils.wiki_links import WikiLinks
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +62,7 @@ class BaseRow:
         return ""
 
     def translate_row(self, translate_type: str) -> str:
-        lead_url = content_translation_url(self.title, self.lang, self.campaign, translate_type)
+        lead_url = WikiLinks.content_translation_url(self.title, self.lang, self.campaign, translate_type)
         return f"""
             <td>
                 <a href='{lead_url}' class='btn btn-outline-primary btn-sm' target='_blank'>Complete</a>
@@ -112,7 +109,7 @@ class ReadyRow(BaseRow):
             return ""
 
         # Generate the base Pageviews URL
-        url: str = build_pageviews_url(self.lang, self.target, self.pupdate)
+        url: str = ViewsLinks.build_pageviews_url(self.lang, self.target, self.pupdate)
 
         if self.views:
             try:
@@ -125,7 +122,7 @@ class ReadyRow(BaseRow):
             return f'<a href="{url}" target="_blank">{str_views}</a>'
 
         # Generate the API URL for 'toget'
-        url2: str = build_toget_api_url(self.lang, self.target, self.pupdate)
+        url2: str = ViewsLinks.build_toget_api_url(self.lang, self.target, self.pupdate)
         return f'<a target="_blank" name="toget" data-json-url="{url2}" href="{url}">?</a>'
 
     @classmethod

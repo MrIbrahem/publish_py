@@ -2,7 +2,88 @@
 src/
 ├── main_app/
 │   ├── admin/
+│   │   ├── __init__.py
+│   │   ├── coordinators.py
+│   │   ├── decorators.py
+│   │   ├── errors_route.py
+│   │   ├── flask_admin_panel.py
+│   │   ├── flask_admin_panel_models.py
+│   │   └── settings.py
+│   ├── app_services/
+│   │   ├── new_html_services/
+│   │   │   ├── parser/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── citation.py
+│   │   │   │   ├── citations_parser.py
+│   │   │   │   ├── lead_section_parser.py
+│   │   │   │   └── template_helpers.py
+│   │   │   ├── process/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── process_seg.py
+│   │   │   │   └── processer.py
+│   │   │   ├── utils/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── html_utils.py
+│   │   │   │   └── utils.py
+│   │   │   ├── wikitext_fixes/
+│   │   │   │   ├── media/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── fix_images.py
+│   │   │   │   │   └── remove_missing_images.py
+│   │   │   │   ├── references/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── delete_empty_refs.py
+│   │   │   │   │   ├── expand_refs.py
+│   │   │   │   │   └── ref_worker.py
+│   │   │   │   ├── structure/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── fix_categories.py
+│   │   │   │   │   └── fix_language_links.py
+│   │   │   │   ├── templates/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── delete_templates.py
+│   │   │   │   │   └── fix_templates.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── wikitext_fixer.py
+│   │   │   ├── __init__.py
+│   │   │   ├── clients.py
+│   │   │   ├── Domain_php_source.txt
+│   │   │   ├── README.md
+│   │   │   └── storage.py
+│   │   ├── results_2026/
+│   │   │   ├── data/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── results_fetcher.py
+│   │   │   ├── helpers/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── translate_type_loader.py
+│   │   │   ├── mapping/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exists_mapping.py
+│   │   │   │   ├── inprocess_mapping.py
+│   │   │   │   ├── missing_mapping.py
+│   │   │   │   └── shared_mapping.py
+│   │   │   ├── tables/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exists_table.py
+│   │   │   │   ├── in_process_table.py
+│   │   │   │   └── missing_table.py
+│   │   │   ├── __init__.py
+│   │   │   ├── bundle.py
+│   │   │   └── results_loader.py
+│   │   └── __init__.py
+│   ├── config/
+│   │   ├── __init__.py
+│   │   ├── classes.py
+│   │   ├── flask_config.py
+│   │   ├── main_settings.py
+│   │   └── README.md
+│   ├── coordinators/
 │   │   ├── routes/
+│   │   │   ├── msg/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── email_msg.py
+│   │   │   │   └── view.py
 │   │   │   ├── qids/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── qids.py
@@ -17,34 +98,22 @@ src/
 │   │   │   ├── add_translate.py
 │   │   │   ├── campaigns.py
 │   │   │   ├── categories.py
-│   │   │   ├── coordinators.py
-│   │   │   ├── email_msg.py
-│   │   │   ├── errors_route.py
 │   │   │   ├── full_translators.py
 │   │   │   ├── language_settings.py
 │   │   │   ├── last.py
 │   │   │   ├── pages_users_to_main.py
 │   │   │   ├── projects.py
-│   │   │   ├── settings.py
 │   │   │   ├── stat.py
 │   │   │   ├── tt.py
 │   │   │   ├── users_emails.py
 │   │   │   └── users_no_inprocess.py
 │   │   ├── __init__.py
-│   │   ├── admin_panel.py
-│   │   ├── decorators.py
-│   │   ├── flask_admin_panel.py
-│   │   ├── flask_admin_panel_models.py
-│   │   └── README.md
-│   ├── config/
-│   │   ├── __init__.py
-│   │   ├── classes.py
-│   │   ├── flask_config.py
-│   │   ├── main_settings.py
-│   │   └── README.md
+│   │   ├── coordinator_panel.py
+│   │   └── decorators.py
 │   ├── database/
 │   │   ├── models/
 │   │   │   ├── __init__.py
+│   │   │   ├── admin_users.py
 │   │   │   ├── base.py
 │   │   │   ├── category_members.py
 │   │   │   ├── dashboard.py
@@ -75,10 +144,14 @@ src/
 │   │   │   │   ├── category_service.py
 │   │   │   │   ├── lang_service.py
 │   │   │   │   └── project_service.py
+│   │   │   ├── others/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── api_service.py
+│   │   │   │   ├── leaderboard_service.py
+│   │   │   │   └── top_stats_service.py
 │   │   │   ├── pages/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── in_process_service.py
-│   │   │   │   ├── leaderboard_service.py
 │   │   │   │   ├── missing_stats_service.py
 │   │   │   │   ├── pages_query_service.py
 │   │   │   │   ├── pages_users_to_main_service.py
@@ -91,11 +164,11 @@ src/
 │   │   │   │   └── user_page_service.py
 │   │   │   ├── reports/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── pages_users_to_main_service.py
 │   │   │   │   └── report_service.py
 │   │   │   ├── users/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── admin_service.py
+│   │   │   │   ├── coordinator_service.py
 │   │   │   │   ├── full_translator_service.py
 │   │   │   │   ├── user_token_service.py
 │   │   │   │   ├── users_no_inprocess_service.py
@@ -126,11 +199,13 @@ src/
 │   │   │   ├── decorators.py
 │   │   │   ├── rate_limit.py
 │   │   │   └── routes.py
+│   │   ├── mapping/
+│   │   │   ├── __init__.py
+│   │   │   └── forms_mapping.py
 │   │   ├── routes/
 │   │   │   ├── api/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── form_utils.py
-│   │   │   │   ├── objects.py
+│   │   │   │   ├── mapping.py
 │   │   │   │   ├── routes.py
 │   │   │   │   └── top_stats_routes.py
 │   │   │   ├── cxtoken/
@@ -142,8 +217,11 @@ src/
 │   │   │   │   └── routes.py
 │   │   │   ├── publish/
 │   │   │   │   ├── __init__.py
+│   │   │   │   ├── error_resolver.py
+│   │   │   │   ├── report_recorder.py
 │   │   │   │   ├── routes.py
 │   │   │   │   ├── to_db.py
+│   │   │   │   ├── wikidata_linker.py
 │   │   │   │   └── worker.py
 │   │   │   ├── refs/
 │   │   │   │   ├── __init__.py
@@ -151,11 +229,13 @@ src/
 │   │   │   ├── td/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── leaderboard.py
-│   │   │   │   ├── results_2026.py
+│   │   │   │   ├── leaderboard_mapping.py
 │   │   │   │   ├── results_api.py
-│   │   │   │   └── td_route.py
+│   │   │   │   ├── td_route.py
+│   │   │   │   └── translate_med.py
 │   │   │   ├── __init__.py
-│   │   │   ├── html_to_segments.py
+│   │   │   ├── html2segments.py
+│   │   │   ├── legacy_compat.py
 │   │   │   └── new_html.py
 │   │   ├── utils/
 │   │   │   ├── __init__.py
@@ -173,10 +253,8 @@ src/
 │   │   │   └── utils.py
 │   │   ├── clients/
 │   │   │   ├── __init__.py
-│   │   │   ├── mdwiki_api.py
 │   │   │   ├── mediawiki_api.py
 │   │   │   ├── oauth_client.py
-│   │   │   ├── revids_client.py
 │   │   │   ├── text_api.py
 │   │   │   └── wikidata_client.py
 │   │   ├── core/
@@ -191,113 +269,38 @@ src/
 │   │   │   ├── __init__.py
 │   │   │   ├── crypto.py
 │   │   │   └── jinja_filters.py
-│   │   ├── new_html_services/
-│   │   │   ├── fixes/
-│   │   │   │   ├── media/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── fix_images.py
-│   │   │   │   │   └── remove_missing_images.py
-│   │   │   │   ├── references/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── delete_empty_refs.py
-│   │   │   │   │   ├── expand_refs.py
-│   │   │   │   │   └── ref_worker.py
-│   │   │   │   ├── structure/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── fix_categories.py
-│   │   │   │   │   └── fix_language_links.py
-│   │   │   │   ├── templates/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── delete_templates.py
-│   │   │   │   │   └── fix_templates.py
-│   │   │   │   └── __init__.py
-│   │   │   ├── parser/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── citation.py
-│   │   │   │   ├── citations_parser.py
-│   │   │   │   ├── lead_section_parser.py
-│   │   │   │   └── template_helpers.py
-│   │   │   ├── process/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── process_seg.py
-│   │   │   │   └── processer.py
-│   │   │   ├── utils/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── html_utils.py
-│   │   │   │   └── utils.py
-│   │   │   ├── __init__.py
-│   │   │   ├── clients.py
-│   │   │   ├── Domain_php_source.txt
-│   │   │   ├── README.md
-│   │   │   └── storage.py
 │   │   ├── schemas/
 │   │   │   └── __init__.py
-│   │   ├── segments/
-│   │   │   ├── config/
-│   │   │   │   └── MWPageLoader.yaml
-│   │   │   ├── lib/
-│   │   │   │   ├── lineardoc/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── builder.py
-│   │   │   │   │   ├── contextualizer.py
-│   │   │   │   │   ├── doc.py
-│   │   │   │   │   ├── doc_item.py
-│   │   │   │   │   ├── elements.py
-│   │   │   │   │   ├── mw_contextualizer.py
-│   │   │   │   │   ├── normalizer.py
-│   │   │   │   │   ├── parser.py
-│   │   │   │   │   ├── README.md
-│   │   │   │   │   ├── text_block.py
-│   │   │   │   │   ├── text_chunk.py
-│   │   │   │   │   ├── util.py
-│   │   │   │   │   └── utils.py
-│   │   │   │   ├── segmentation/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── cx_segmenter.py
-│   │   │   │   │   └── README.md
-│   │   │   │   ├── __init__.py
-│   │   │   │   └── processor.py
-│   │   │   ├── __init__.py
-│   │   │   ├── local.html
-│   │   │   ├── local_not_sort.html
-│   │   │   ├── local_not_sort_z.html
-│   │   │   └── ncc2c.html
+│   │   ├── segments_wraper/
+│   │   │   └── __init__.py
 │   │   ├── utils/
 │   │   │   ├── helpers/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── files.py
 │   │   │   │   ├── format.py
-│   │   │   │   ├── text_processor.py
-│   │   │   │   └── words.py
+│   │   │   │   └── text_processor.py
 │   │   │   ├── __init__.py
 │   │   │   ├── decode_bytes.py
+│   │   │   ├── views_links.py
 │   │   │   ├── web_utils.py
 │   │   │   └── wiki_links.py
 │   │   ├── __init__.py
 │   │   └── README.md
 │   ├── templates_markups/
-│   │   ├── admin_sidebar/
+│   │   ├── coordinator_sidebar/
 │   │   │   ├── __init__.py
-│   │   │   ├── objects.py
+│   │   │   ├── mapping.py
 │   │   │   ├── sidebar.py
 │   │   │   └── sidebar_list.py
 │   │   ├── navbar/
 │   │   │   ├── __init__.py
+│   │   │   ├── mapping.py
 │   │   │   ├── nav_bar.py
-│   │   │   ├── navbar_list.py
-│   │   │   └── objects.py
+│   │   │   └── td_navbar_list.py
 │   │   └── __init__.py
 │   ├── __init__.py
 │   ├── error_pages.py
 │   ├── logger_config.py
-│   └── README.md
-├── results_api_php_code/
-│   ├── backend/
-│   │   ├── api_calls/
-│   │   ├── results/
-│   │   │   ├── new_way/
-│   │   │   └── sparql_bots/
-│   │   └── results_2026/
 │   └── README.md
 ├── static/
 │   ├── css/
@@ -305,13 +308,13 @@ src/
 │   │   ├── dashboard_new1.css
 │   │   ├── mobile_format.css
 │   │   ├── navbar.css
-│   │   ├── Responsive_Table.css
 │   │   ├── sidebar-desktop.css
 │   │   ├── sidebar-mobile.css
 │   │   ├── style.css
 │   │   ├── styles.css
 │   │   ├── tdstyle.css
 │   │   └── theme.css
+│   ├── images/
 │   ├── js/
 │   │   ├── add_by_url.js
 │   │   ├── card-tools.js
@@ -324,42 +327,13 @@ src/
 │   │   ├── td_autocomplete.js
 │   │   └── views_api.js
 │   ├── favicon.ico
-│   └── favicon.svg
+│   ├── favicon.svg
+│   └── xtools.svg
 ├── templates/
 │   ├── admin/
-│   │   ├── bs4_admin/
-│   │   │   ├── file/
-│   │   │   │   ├── modals/
-│   │   │   │   │   └── form.html
-│   │   │   │   ├── form.html
-│   │   │   │   └── list.html
-│   │   │   ├── model/
-│   │   │   │   ├── modals/
-│   │   │   │   │   ├── create.html
-│   │   │   │   │   ├── details.html
-│   │   │   │   │   └── edit.html
-│   │   │   │   ├── create.html
-│   │   │   │   ├── details.html
-│   │   │   │   ├── edit.html
-│   │   │   │   ├── inline_field_list.html
-│   │   │   │   ├── inline_form.html
-│   │   │   │   ├── inline_list_base.html
-│   │   │   │   ├── layout.html
-│   │   │   │   ├── list.html
-│   │   │   │   └── row_actions.html
-│   │   │   ├── rediscli/
-│   │   │   │   ├── console.html
-│   │   │   │   └── response.html
-│   │   │   ├── actions.html
-│   │   │   ├── base.html
-│   │   │   ├── index.html
-│   │   │   ├── layout.html
-│   │   │   ├── lib.html
-│   │   │   ├── master.html
-│   │   │   └── static.html
 │   │   ├── base.html
 │   │   └── index_with_sidebar.html
-│   ├── admins/
+│   ├── coordinators/
 │   │   ├── email_msg/
 │   │   │   ├── index.html
 │   │   │   └── msg_template.html
@@ -401,25 +375,28 @@ src/
 │   ├── fixrefs/
 │   │   └── index.html
 │   ├── html_to_segments/
-│   │   └── index.html
+│   │   ├── index.html
+│   │   └── list.html
 │   ├── new_html/
 │   │   ├── fix.html
 │   │   └── revisions.html
-│   ├── results_2026/
-│   │   ├── _exists_table.html
-│   │   ├── _inprocess_table.html
-│   │   ├── _results_card.html
-│   │   └── _results_table.html
 │   ├── td/
 │   │   ├── leaderboard/
 │   │   │   ├── index-js.html
 │   │   │   ├── index.html
 │   │   │   ├── langs.html
 │   │   │   └── users.html
+│   │   ├── results_2026/
+│   │   │   ├── exists_table.html
+│   │   │   ├── inprocess_table.html
+│   │   │   ├── missing_table.html
+│   │   │   └── results_card.html
+│   │   ├── form.html
 │   │   ├── index.html
 │   │   ├── missing.html
 │   │   ├── td_base.html
-│   │   └── td_navbar.html
+│   │   ├── td_navbar.html
+│   │   └── translate_med.html
 │   ├── _macros.html
 │   ├── _navbar.html
 │   ├── base.html
@@ -429,6 +406,7 @@ src/
 │   └── reports.html
 ├── __init__.py
 ├── app.py
+├── bootstrap.py
 └── README.md
 
 ```
