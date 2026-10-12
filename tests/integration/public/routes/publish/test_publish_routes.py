@@ -4,7 +4,8 @@ Integration tests for src/main_app/public/routes/publish/routes.py module.
 
 from __future__ import annotations
 
-from unittest.mock import patch
+from dataclasses import dataclass
+from unittest.mock import MagicMock
 
 import pytest
 from flask.testing import FlaskClient
@@ -14,13 +15,10 @@ from src.main_app.services.core.crypto import CryptoService
 
 
 @pytest.fixture
-def mock_validate_access():
+def mock_validate_access(monkeypatch: pytest.MonkeyPatch):
     """Bypass CORS/secret checks performed by `validate_access` at request time."""
-    with (
-        patch("src.main_app.services.core.cors.is_allowed", return_value="https://example.com"),
-        patch("src.main_app.services.core.cors.check_publish_secret_code", return_value=True),
-    ):
-        yield
+    monkeypatch.setattr("src.main_app.services.core.cors.is_allowed", MagicMock(return_value="https://example.com"))
+    monkeypatch.setattr("src.main_app.services.core.cors.check_publish_secret_code", MagicMock(return_value=True))
 
 
 @pytest.fixture
@@ -38,6 +36,19 @@ def real_user_token():
         access_secret=encrypted_secret,
     )
     return user
+
+
+@dataclass
+class MockPublishRoutesDeps:
+    handle_form: MagicMock
+
+
+@pytest.fixture
+def mock_handle_form(monkeypatch: pytest.MonkeyPatch) -> MockPublishRoutesDeps:
+    """Mock `_handle_form` used across publish route integration tests."""
+    _mock = MagicMock()
+    monkeypatch.setattr("src.main_app.public.routes.publish.routes._handle_form", _mock)
+    return MockPublishRoutesDeps(handle_form=_mock)
 
 
 @pytest.mark.integration
@@ -94,93 +105,89 @@ class TestPublishPost:
         assert "error" in data
         assert response.status_code == 403
 
-    def test_publish_with_valid_data(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
+    def test_publish_with_valid_data(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
         """Test publishing with valid data."""
-        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
-            mock_process.return_value = {"result": "success", "edit": {"newrevid": 12345}}
+        mock_handle_form.handle_form.return_value = {"result": "success", "edit": {"newrevid": 12345}}
 
-            response = mock_client.post(
-                "/publish/",
-                data={
-                    "translate_type": "lead",
-                    "user": "PublishUser",
-                    "title": "Test Page",
-                    "target": "en",
-                    "text": "Test content",
-                    "sourcetitle": "Source Page",
-                },
-            )
+        response = mock_client.post(
+            "/publish/",
+            data={
+                "translate_type": "lead",
+                "user": "PublishUser",
+                "title": "Test Page",
+                "target": "en",
+                "text": "Test content",
+                "sourcetitle": "Source Page",
+            },
+        )
 
-            data = response.get_json()
-            assert "result" in data
-            assert response.status_code == 200
+        data = response.get_json()
+        assert "result" in data
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
 class TestPublishFormData:
     """Integration tests for publish form data handling."""
 
-    def test_publish_accepts_form_data(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
+    def test_publish_accepts_form_data(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
         """Test that publish accepts form data."""
-        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
-            mock_process.return_value = {"result": "success"}
+        mock_handle_form.handle_form.return_value = {"result": "success"}
 
-            response = mock_client.post(
-                "/publish/",
-                data={
-                    "translate_type": "lead",
-                    "user": "PublishUser",
-                    "title": "Test_Page",
-                    "target": "en",
-                    "text": "Test content",
-                },
-            )
+        response = mock_client.post(
+            "/publish/",
+            data={
+                "translate_type": "lead",
+                "user": "PublishUser",
+                "title": "Test_Page",
+                "target": "en",
+                "text": "Test content",
+            },
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
-    def test_publish_accepts_json_data(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
+    def test_publish_accepts_json_data(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
         """Test that publish accepts JSON data."""
-        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
-            mock_process.return_value = {"result": "success"}
+        mock_handle_form.handle_form.return_value = {"result": "success"}
 
-            response = mock_client.post(
-                "/publish/",
-                json={
-                    "translate_type": "lead",
-                    "user": "PublishUser",
-                    "title": "Test Page",
-                    "target": "en",
-                    "text": "Test content",
-                },
-                content_type="application/json",
-            )
+        response = mock_client.post(
+            "/publish/",
+            json={
+                "translate_type": "lead",
+                "user": "PublishUser",
+                "title": "Test Page",
+                "target": "en",
+                "text": "Test content",
+            },
+            content_type="application/json",
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
 
 @pytest.mark.integration
 class TestPublishCaptcha:
     """Integration tests for captcha handling in publish."""
 
-    def test_publish_with_captcha_params(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
+    def test_publish_with_captcha_params(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
         """Test publishing with captcha parameters."""
-        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
-            mock_process.return_value = {"result": "success"}
+        mock_handle_form.handle_form.return_value = {"result": "success"}
 
-            response = mock_client.post(
-                "/publish/",
-                data={
-                    "translate_type": "lead",
-                    "user": "PublishUser",
-                    "title": "Test Page",
-                    "target": "en",
-                    "text": "Test content",
-                    "wpCaptchaId": "123",
-                    "wpCaptchaWord": "answer",
-                },
-            )
+        response = mock_client.post(
+            "/publish/",
+            data={
+                "translate_type": "lead",
+                "user": "PublishUser",
+                "title": "Test Page",
+                "target": "en",
+                "text": "Test content",
+                "wpCaptchaId": "123",
+                "wpCaptchaWord": "answer",
+            },
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
 
 class TestPublishRouteIntegration:
