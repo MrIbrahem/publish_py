@@ -47,9 +47,9 @@ def common_patches(monkeypatch: pytest.MonkeyPatch) -> MockPublishWorkerDeps:
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.link_to_wikidata", mock_link)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.to_do", mock_to_do)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker._should_added_to_wikidata", mock_should_add)
-    monkeypatch.setattr("src.main_app.public.routes.publish.to_db.find_exists_or_update_page", mock_find_exists)
+    monkeypatch.setattr("src.main_app.public.routes.publish.to_db._find_exists_or_update_page", mock_find_exists)
     monkeypatch.setattr(
-        "src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page", mock_user_find_exists
+        "src.main_app.public.routes.publish.to_db._find_exists_or_update_user_page", mock_user_find_exists
     )
     monkeypatch.setattr("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category", MagicMock())
 

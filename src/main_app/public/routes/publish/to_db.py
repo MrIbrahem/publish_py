@@ -12,7 +12,7 @@ from ....database.services import CategoryService, PagesService, UserPagesServic
 logger = logging.getLogger(__name__)
 
 
-def find_exists_or_update_page(
+def _find_exists_or_update_page(
     sourcetitle: str,
     lang: str,
     user: str,
@@ -25,7 +25,7 @@ def find_exists_or_update_page(
     return False
 
 
-def find_exists_or_update_user_page(
+def _find_exists_or_update_user_page(
     sourcetitle: str,
     lang: str,
     user: str,
@@ -65,9 +65,12 @@ def add_to_db(
     Returns:
         Database operation result
     """
+    category_service = CategoryService()
+    user_pages_service = UserPagesService()
+    pages_service = PagesService()
+
     # Get category from campaign using database lookup
     # This mirrors the PHP retrieveCampaignCategories() function
-    category_service = CategoryService()
     cat_object = category_service.get_campaign_category(campaign)
     cat = cat_object.category if cat_object else ""
 
@@ -102,9 +105,9 @@ def add_to_db(
 
     # Check if exists and update if needed
     if to_users_table:
-        exists = find_exists_or_update_user_page(sourcetitle, lang, user, target)
+        exists = _find_exists_or_update_user_page(sourcetitle, lang, user, target)
     else:
-        exists = find_exists_or_update_page(sourcetitle, lang, user, target)
+        exists = _find_exists_or_update_page(sourcetitle, lang, user, target)
 
     if exists:
         result["exists"] = "already_in"
@@ -114,8 +117,7 @@ def add_to_db(
 
     if to_users_table:
         # Insert new record
-        service = UserPagesService()
-        add_done = service.insert_page_target(
+        add_done = user_pages_service.insert_page_target(
             sourcetitle=sourcetitle,
             translate_type=translate_type,
             cat=cat,
@@ -127,8 +129,7 @@ def add_to_db(
         )
     else:
         # Insert new record
-        service = PagesService()
-        add_done = service.insert_page_target(
+        add_done = pages_service.insert_page_target(
             sourcetitle=sourcetitle,
             translate_type=translate_type,
             cat=cat,

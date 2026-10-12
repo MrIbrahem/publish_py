@@ -83,7 +83,7 @@ def mock_post_deps(monkeypatch: pytest.MonkeyPatch) -> MockPostEndpointDeps:
     monkeypatch.setattr(f"{_worker}.link_to_wikidata", mock_link)
     monkeypatch.setattr(f"{_worker}.to_do", mock_to_do)
     monkeypatch.setattr(f"{_worker}._should_added_to_wikidata", mock_should_add)
-    monkeypatch.setattr(f"{_db}.find_exists_or_update_page", mock_find_exists)
+    monkeypatch.setattr(f"{_db}._find_exists_or_update_page", mock_find_exists)
     monkeypatch.setattr(f"{_db}.CategoryService.get_campaign_category", mock_get_campaign_category)
 
     return MockPostEndpointDeps(
