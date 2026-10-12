@@ -1,8 +1,8 @@
 """
-Tests for app_routes.publish.worker module.
+Tests for app_routes.publish.error_resolver module.
 """
 
-from src.main_app.public.routes.publish.worker import (
+from src.main_app.public.routes.publish.error_resolver import (
     ErrorFileResolver,
 )
 

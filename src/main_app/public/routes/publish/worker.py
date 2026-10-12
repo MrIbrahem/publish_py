@@ -13,25 +13,20 @@ The only public entry point is `handle_form`.
 
 from __future__ import annotations
 
-import json
 import logging
 from typing import Any
 
 from flask import Response, jsonify
 from marshmallow import ValidationError
 
-from ....config import app_settings
 from ....database.models import LanguageSettingRecord
 from ....database.services import (
     LanguageSettingService,
     MdwikiRevidService,
-    ReportService,
     UserTokenService,
     WordService,
 )
 from ....services.clients import (
-    get_title_info,
-    link_to_wikidata,
     publish_do_edit,
 )
 from ....services.schemas import PublishRequestSchema
@@ -39,10 +34,12 @@ from ....services.utils.helpers import (
     determine_hashtag,
     do_changes_to_text_with_settings,
     make_summary,
-    to_do,
 )
 from ....services.utils.helpers.format import format_title, format_user
+from .error_resolver import ErrorFileResolver
+from .report_recorder import ReportRecorder
 from .to_db import add_to_db_tab
+from .wikidata_linker import WikidataLinker
 
 logger = logging.getLogger(__name__)
 
@@ -91,216 +88,6 @@ class RequestValidator:
         validated_dict = {k: v for k, v in validated_data.items() if v is not None}  # type: ignore
 
         return validated_dict, None
-
-
-# --------------------------------------------------------------------------- #
-# Error file resolution
-# --------------------------------------------------------------------------- #
-class ErrorFileResolver:
-    """Maps edit / Wikidata results to the name of the to_do file."""
-
-    MAIN_ERRORS: tuple[str, ...] = (
-        "protectedpage",
-        "titleblacklist",
-        "ratelimited",
-        "editconflict",
-        "spam filter",
-        "abusefilter",
-        "mwoauth-invalid-authorization",
-    )
-    WIKIDATA_ERRORS: dict[str, str] = {
-        "Links to user pages": "wd_user_pages",
-        "get_csrftoken": "wd_csrftoken",
-        "protectedpage": "wd_protectedpage",
-    }
-
-    @classmethod
-    def resolve(cls, editit: Any, placeholder: str) -> str:
-        """Determine the appropriate error file based on error content.
-
-        Args:
-            editit: Edit (or link) result
-            placeholder: Default file name ("errors" for edits, else Wikidata)
-        """
-        c_text = json.dumps(editit)
-
-        if placeholder == "errors":
-            for err in cls.MAIN_ERRORS:
-                if err in c_text:
-                    return err
-        else:
-            for err, file_name in cls.WIKIDATA_ERRORS.items():
-                if err in c_text:
-                    return file_name
-
-        return placeholder
-
-    @classmethod
-    def for_edit(cls, editit: dict[str, Any]) -> str:
-        """Pick the to_do file for the result of the edit request."""
-        edit = editit.get("edit", {})
-        if edit.get("result", "") == "Success":
-            return "success"
-        if edit.get("captcha"):
-            return "captcha"
-        return cls.resolve(editit, "errors")
-
-
-# --------------------------------------------------------------------------- #
-# Reporting
-# --------------------------------------------------------------------------- #
-class ReportRecorder:
-    """Saves an operation to the to_do file and to the reports table."""
-
-    def __init__(self, report_service: ReportService | None = None) -> None:
-        self.report_service = report_service or ReportService()
-
-    def record(
-        self,
-        data: dict[str, Any],
-        file_name: str,
-        *,
-        title: str,
-        user: str,
-        lang: str,
-        sourcetitle: str,
-    ) -> None:
-        to_do(data, file_name)
-
-        self.report_service.add_report(
-            title=title,
-            user=user,
-            lang=lang,
-            sourcetitle=sourcetitle,
-            result=file_name,
-            data=json.dumps(data),
-        )
-
-
-# --------------------------------------------------------------------------- #
-# Wikidata
-# --------------------------------------------------------------------------- #
-class WikidataLinker:
-    """Links a published page to Wikidata, retrying with a fallback user."""
-
-    def __init__(
-        self,
-        recorder: ReportRecorder,
-        token_service: UserTokenService | None = None,
-    ) -> None:
-        self.recorder = recorder
-        self.token_service = token_service or UserTokenService()
-
-    @staticmethod
-    def _should_link(lang: str, title: str) -> bool:
-        """Return False if the page is missing or is a user page (ns 2)."""
-        page_information = get_title_info(title, lang)
-        if not page_information:
-            return False
-
-        # skip link to wd for user pages
-        return page_information.get("ns", None) != 2
-
-    def _retry_with_fallback_user(
-        self,
-        sourcetitle: str,
-        lang: str,
-        title: str,
-        user: str,
-    ) -> dict[str, Any]:
-        """Retry Wikidata linking with fallback user credentials."""
-        fallback_user = app_settings.users.fallback_user
-        logger.debug(f"get_csrftoken failed for user: {user}, retrying with {fallback_user}")
-
-        # Retry with fallback user credentials
-        fallback_token = self.token_service.get_user_token_by_username(fallback_user)
-
-        if fallback_token is None:
-            return {}
-
-        fallback_access_key, fallback_access_secret = fallback_token.decrypted()
-        link_result = link_to_wikidata(
-            sourcetitle,
-            lang,
-            fallback_user,
-            title,
-            fallback_access_key,
-            fallback_access_secret,
-        )
-
-        if "error" not in link_result:
-            link_result["fallback_user"] = fallback_user
-            link_result["original_user"] = user
-            logger.debug(f"Successfully linked using {fallback_user} fallback credentials")
-        return link_result
-
-    def _record_error(
-        self,
-        link_result: dict[str, Any],
-        sourcetitle: str,
-        lang: str,
-        user: str,
-        title: str,
-    ) -> None:
-        tab3 = {
-            "error": link_result["error"],
-            "qid": link_result.get("qid", ""),
-            "title": title,
-            "sourcetitle": sourcetitle,
-            "fallback": link_result.get("fallback", ""),
-            "lang": lang,
-            "username": user,
-        }
-        file_name = ErrorFileResolver.resolve(link_result.get("error", {}), "wd_errors")
-
-        # Insert to reports
-        self.recorder.record(
-            tab3,
-            file_name,
-            title=title,
-            user=user,
-            lang=lang,
-            sourcetitle=sourcetitle,
-        )
-
-    def link(
-        self,
-        sourcetitle: str,
-        lang: str,
-        user: str,
-        title: str,
-        access_key: str,
-        access_secret: str,
-    ) -> dict[str, Any]:
-        """
-        Run the post-edit Wikidata linking and record any error.
-
-        Args:
-            sourcetitle: Source page title
-            lang: Target language code
-            user: Username
-            title: Target page title
-            access_key: OAuth access key
-            access_secret: OAuth access secret
-
-        Returns:
-            Wikidata link result
-        """
-        if not self._should_link(lang, title):
-            # skip link to wd for user pages
-            return {"error": "skip link to wd for user pages"}
-
-        link_result = link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret)
-
-        # Check if the error is get_csrftoken failure and user is not already the fallback user
-        fallback_user = app_settings.users.fallback_user
-        if link_result.get("error") == "get_csrftoken failed" and user != fallback_user:
-            link_result["fallback"] = self._retry_with_fallback_user(sourcetitle, lang, title, user)
-
-        if "error" in link_result:
-            self._record_error(link_result, sourcetitle, lang, user, title)
-
-        return link_result
 
 
 # --------------------------------------------------------------------------- #

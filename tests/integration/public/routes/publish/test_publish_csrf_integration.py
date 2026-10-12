@@ -44,8 +44,8 @@ def common_patches(monkeypatch: pytest.MonkeyPatch) -> MockPublishWorkerDeps:
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.PublishWorker._get_revid", mock_get_revid)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings", mock_changes)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.publish_do_edit", mock_edit)
-    monkeypatch.setattr("src.main_app.public.routes.publish.worker.link_to_wikidata", mock_link)
-    monkeypatch.setattr("src.main_app.public.routes.publish.worker.to_do", mock_to_do)
+    monkeypatch.setattr("src.main_app.public.routes.publish.wikidata_linker", mock_link)
+    monkeypatch.setattr("src.main_app.public.routes.publish.report_recorder.to_do", mock_to_do)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.WikidataLinker._should_link", mock_should_add)
     monkeypatch.setattr("src.main_app.public.routes.publish.to_db._find_exists_or_update_page", mock_find_exists)
     monkeypatch.setattr(
