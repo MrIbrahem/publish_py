@@ -5,6 +5,7 @@ Classes to test: WikitextFixerService
 """
 
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -50,7 +51,11 @@ class TestWikitextFixerService:
         expected = self.load_fixture(file, "result")
         expected = strip_result(expected)
 
-        fixer = WikitextFixerService()
+        mock_http_client = MagicMock()
+        mock_http_client.get.return_value = {}
+
+        fixer = WikitextFixerService(http_client=mock_http_client)
+
         result = fixer.run(text=source, title="PLACEHOLDER_TEST", all_flag=all_flag)
         result = strip_result(result)
 

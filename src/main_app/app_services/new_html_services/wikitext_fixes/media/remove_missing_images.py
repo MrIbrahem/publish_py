@@ -86,11 +86,15 @@ class ImageExistenceChecker:
 class RemoveMissingImagesService:
     """Removes image references that don't exist on Commons from wikitext."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """
         :param image_service: Service used to check whether an image file exists.
         """
-        self._image_service = ImageExistenceChecker()
+        self.http_client = http_client or HttpClient()
+        self._image_service = ImageExistenceChecker(self.http_client)
 
     def remove_missing_infobox_images(self, text: str) -> str:
         """Remove infobox images that don't exist on Commons.

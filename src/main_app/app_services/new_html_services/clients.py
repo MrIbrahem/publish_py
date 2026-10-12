@@ -14,7 +14,7 @@ import logging
 import re
 
 from ...config.main_settings import app_settings
-from .http_client import HttpClient
+from ...services.clients.http_client import HttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ class MdwikiApi:
 
         url = f"{self.REST_BASE}/page/{title_encoded}"
 
-        response = self.http_client.request(url, method="GET")
+        response = self.http_client.safe_request(url, method="GET")
 
         output = response.get("output")
         error = response.get("error")
@@ -93,7 +93,7 @@ class MdwikiApi:
             "formatversion": "2",
             "rvprop": "content|ids",
         }
-        response = self.http_client.request(self.API_BASE, method="GET", params=params)
+        response = self.http_client.safe_request(self.API_BASE, method="GET", params=params)
 
         output = response.get("output")
         error = response.get("error")
@@ -162,7 +162,7 @@ class TransformApi:
         title_encoded = normalize_title_for_url(title)
         url = f"{base_url}/transform/wikitext/to/html/{title_encoded}"
 
-        response = self.http_client.request(
+        response = self.http_client.safe_request(
             url,
             method="POST",
             data={"wikitext": wikitext},
