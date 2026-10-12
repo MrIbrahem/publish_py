@@ -1,5 +1,5 @@
-from .processer import process_page
+from .processer import PageProcesser
 
 __all__ = [
-    "process_page",
+    "PageProcesser",
 ]

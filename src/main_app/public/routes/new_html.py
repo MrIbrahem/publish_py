@@ -12,7 +12,7 @@ from flask.views import MethodView
 from ...app_services.new_html_services import (
     WikitextFixerService,
     list_revisions,
-    process_page,
+    PageProcesser,
     read_file,
     remove_data_parsoid,
 )
@@ -121,7 +121,8 @@ class NewHtmlMainView(MethodView):
         if not title:
             return jsonify({"error": "title is empty"})
 
-        return process_page(
+        page_processer = PageProcesser()
+        return page_processer.process_page(
             title=title,
             printetxt=printetxt,
             force_new=force_new,
