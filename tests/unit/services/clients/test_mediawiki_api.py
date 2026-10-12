@@ -9,7 +9,7 @@ import pytest
 @dataclass
 class MockMediaWikiApiDeps:
     post_params: MagicMock
-    requests: MagicMock
+    http_client: MagicMock
 
 
 @pytest.fixture
@@ -18,14 +18,14 @@ def mock_mediawiki_deps(monkeypatch: pytest.MonkeyPatch) -> MockMediaWikiApiDeps
     _client = "src.main_app.services.clients.mediawiki_api"
 
     mock_post_params = MagicMock()
-    mock_requests = MagicMock()
+    mock_http_client = MagicMock()
 
     monkeypatch.setattr(f"{_client}.post_params", mock_post_params)
-    monkeypatch.setattr(f"{_client}.requests", mock_requests)
+    monkeypatch.setattr(f"{_client}.http_client", mock_http_client)
 
     return MockMediaWikiApiDeps(
         post_params=mock_post_params,
-        requests=mock_requests,
+        http_client=mock_http_client,
     )
 
 
@@ -123,7 +123,7 @@ class TestGetTitleInfo:
         mock_response.json.return_value = {
             "query": {"pages": [{"pageid": 123, "title": "Test Page", "missing": False}]}
         }
-        mock_mediawiki_deps.requests.get.return_value = mock_response
+        mock_mediawiki_deps.http_client.get.return_value = mock_response
 
         from src.main_app.services.clients.mediawiki_api import get_title_info
 
@@ -135,7 +135,7 @@ class TestGetTitleInfo:
 
     def test_returns_none_on_error(self, mock_mediawiki_deps: MockMediaWikiApiDeps):
         """Test that None is returned on error."""
-        mock_mediawiki_deps.requests.get.side_effect = Exception("Network error")
+        mock_mediawiki_deps.http_client.get.side_effect = Exception("Network error")
 
         from src.main_app.services.clients.mediawiki_api import get_title_info
 

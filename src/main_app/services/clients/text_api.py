@@ -3,9 +3,7 @@ from __future__ import annotations
 import logging
 import re
 
-import requests
-
-from ...config import app_settings
+from .http_client import http_client
 
 ALLOWED_WIKI_PROJECT = re.compile(r"^(?:[a-z0-9-]+\.wikipedia\.org|commons\.wikimedia\.org)$", re.IGNORECASE)
 
@@ -26,7 +24,6 @@ def get_wikitext(title: str, project: str = "commons.wikimedia.org"):
         logger.warning("Rejected unsupported wiki project: %s", project)
         return ""
 
-    headers = {"User-Agent": app_settings.other.user_agent}
     api_url = f"https://{project}/w/api.php"
     # https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=Yemen&rvprop=content&formatversion=2&rvslots=main&format=json
     params = {
@@ -40,7 +37,7 @@ def get_wikitext(title: str, project: str = "commons.wikimedia.org"):
     }
     data = {}
     try:
-        response = requests.get(api_url, params=params, headers=headers, timeout=30)
+        response = http_client.get(api_url, params=params, timeout=30)
         response.raise_for_status()
         data = response.json()
     except Exception as e:
