@@ -81,7 +81,7 @@ from src.main_app.services.auth.current_user import CurrentUser
 
 
 @pytest.fixture(autouse=True)
-def stop_nets(request, monkeypatch):
+def stop_nets(request):
     # Check if 'network' mark is present in the current test item
     if "network" in request.node.keywords:
         from pytest_socket import enable_socket
@@ -90,15 +90,6 @@ def stop_nets(request, monkeypatch):
         return
     # Otherwise, disable the socket for all other tests
     disable_socket(allow_unix_socket=True)
-
-    # Mock http_client in src/main_app/app_services/new_html_services/clients.py
-    _mock_client = MagicMock()
-    _mock_resp = MagicMock(text="", status_code=200)
-    _mock_client.request.return_value = _mock_resp
-    _mock_client.get.return_value = _mock_resp
-    _mock_client.post.return_value = _mock_resp
-    monkeypatch.setattr("src.main_app.app_services.new_html_services.clients.http_client", _mock_client)
-
 
 # ── app fixtures ───────────────────────────────────────────────────────────────────
 
