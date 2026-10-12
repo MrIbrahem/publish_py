@@ -2,9 +2,8 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
 
-from src.main_app.services.clients.http_client import HttpClient, http_client
+from src.main_app.services.clients.http_client import HttpClient
 
 
 class TestHttpClient:
@@ -26,7 +25,7 @@ class TestHttpClient:
         headers = client._prepare_headers({"User-Agent": "Override/2.0"})
         assert headers["User-Agent"] == "Override/2.0"
 
-    @patch("requests.get")
+    @patch("requests.request")
     def test_get_request(self, mock_get):
         mock_response = MagicMock()
         mock_get.return_value = mock_response
@@ -36,14 +35,15 @@ class TestHttpClient:
 
         assert resp == mock_response
         mock_get.assert_called_once_with(
-            "https://example.com/api",
-            params={"q": "test"},
+            method="GET",
+            url="https://example.com/api",
             headers={"User-Agent": "TestAgent/1.0"},
-            auth=None,
             timeout=15.0,
+            params={"q": "test"},
+            auth=None,
         )
 
-    @patch("requests.post")
+    @patch("requests.request")
     def test_post_request(self, mock_post):
         mock_response = MagicMock()
         mock_post.return_value = mock_response
@@ -53,11 +53,12 @@ class TestHttpClient:
 
         assert resp == mock_response
         mock_post.assert_called_once_with(
-            "https://example.com/api",
+            method="POST",
+            url="https://example.com/api",
+            headers={"User-Agent": "TestAgent/1.0"},
+            timeout=20.0,
             data={"key": "val"},
             json=None,
             params=None,
-            headers={"User-Agent": "TestAgent/1.0"},
             auth=None,
-            timeout=20.0,
         )

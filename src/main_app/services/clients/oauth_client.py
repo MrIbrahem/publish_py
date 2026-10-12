@@ -67,7 +67,11 @@ class OAuthClient:
             response = http_client.get(api_url, params=params, auth=client, timeout=30)
         except requests.exceptions.ConnectionError as e:
             logger.error(f"Connection error: {e}")
-            return {"error": {"code": "Connection error", "info": "Connection error"}, "exception": str(e), "response": ""}
+            return {
+                "error": {"code": "Connection error", "info": "Connection error"},
+                "exception": str(e),
+                "response": "",
+            }
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Request error: {e}")

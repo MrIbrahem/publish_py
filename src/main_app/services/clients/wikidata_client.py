@@ -12,7 +12,7 @@ from typing import Any
 from ...config import app_settings
 from ...database.models import QidRecord
 from ...database.services import QidService
-from .oauth_client import OAuthClient, post_params
+from .oauth_client import OAuthClient
 
 logger = logging.getLogger(__name__)
 

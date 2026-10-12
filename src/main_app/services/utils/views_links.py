@@ -5,6 +5,7 @@ from urllib.parse import quote
 def _fetch_yesterday_iso() -> str:
     return (date.today() - timedelta(days=1)).isoformat()
 
+
 class ViewsLinks:
     @staticmethod
     def build_pageviews_url(lang: str, target: str, pupdate: str | None = None, yesterday: str = "") -> str:
@@ -26,7 +27,6 @@ class ViewsLinks:
             f"&end={yesterday}&redirects=0&pages={formatted_target}"
         )
 
-
     @staticmethod
     def build_toget_api_url(lang: str, target: str, pupdate: str | None = None) -> str:
         """
@@ -42,7 +42,6 @@ class ViewsLinks:
             f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
             f"{lang}.wikipedia/all-access/all-agents/{formatted_target}/daily/{start2}/2030010100"
         )
-
 
     @staticmethod
     def pageviews_link(

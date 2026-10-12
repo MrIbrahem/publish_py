@@ -10,7 +10,7 @@ import logging
 from typing import Any
 
 from .http_client import http_client
-from .oauth_client import OAuthClient, post_params
+from .oauth_client import OAuthClient
 
 logger = logging.getLogger(__name__)
 

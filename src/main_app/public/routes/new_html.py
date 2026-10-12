@@ -9,8 +9,6 @@ import re
 from flask import Blueprint, Response, abort, flash, jsonify, render_template, request
 from flask.views import MethodView
 
-from ...config.main_settings import app_settings
-from ...services.core.cors import check_cors
 from ...app_services.new_html_services import (
     WikitextFixerService,
     list_revisions,
@@ -18,6 +16,8 @@ from ...app_services.new_html_services import (
     read_file,
     remove_data_parsoid,
 )
+from ...config.main_settings import app_settings
+from ...services.core.cors import check_cors
 
 
 def _get_revisions_dir():

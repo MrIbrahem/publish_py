@@ -19,6 +19,7 @@ from ..crud_service import CRUDService
 
 logger = logging.getLogger(__name__)
 
+
 class PagesUsersToMainPagesService(CRUDService[PagesUsersToMainRecord]):
     model = PagesUsersToMainRecord
 

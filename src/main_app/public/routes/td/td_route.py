@@ -25,6 +25,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
+from ....app_services.results_2026 import ResultsBundle, ResultsLoader
 from ....database.services import (
     CategoryService,
     FullTranslatorService,
@@ -33,7 +34,6 @@ from ....database.services import (
     SettingsService,
 )
 from ....services.auth.utils import get_current_user
-from ....app_services.results_2026 import ResultsBundle, ResultsLoader
 
 logger = logging.getLogger(__name__)
 
