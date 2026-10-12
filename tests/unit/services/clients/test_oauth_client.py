@@ -11,6 +11,7 @@ class MockOAuthClientDeps:
     app_settings: MagicMock
     requests: MagicMock
 
+
 def mock_attr(monkeypatch, attr_name, mock):
     _client = "src.main_app.services.clients.oauth_client"
     monkeypatch.setattr(f"{_client}.{attr_name}", mock)
@@ -71,7 +72,9 @@ class TestGetCsrfToken:
 class TestPostParams:
     """Tests for post_params function."""
 
-    def test_includes_csrf_token_in_request(self, monkeypatch: pytest.MonkeyPatch, mock_oauth_deps: MockOAuthClientDeps):
+    def test_includes_csrf_token_in_request(
+        self, monkeypatch: pytest.MonkeyPatch, mock_oauth_deps: MockOAuthClientDeps
+    ):
         """Test that CSRF token is included in POST request."""
         mock_get_token = MagicMock(return_value={"query": {"tokens": {"csrftoken": "token123"}}})
         mock_attr(monkeypatch, "get_csrf_token", mock_get_token)
