@@ -6,7 +6,7 @@ Functions to test: get_lead_section
 
 import pytest
 
-from src.main_app.services.new_html_services.parser.lead_section_parser import (
+from src.main_app.app_services.new_html_services.parser.lead_section_parser import (
     get_lead_section,
 )
 

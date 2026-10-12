@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from src.main_app.services.new_html_services.wikitext_fixes.wikitext_fixer import (
+from src.main_app.app_services.new_html_services.wikitext_fixes.wikitext_fixer import (
     WikitextFixerService,
 )
 from tests.unit.services.new_html_services.expend_infobox import expend_all_templates

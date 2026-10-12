@@ -4,7 +4,7 @@ Unit tests for src/main_app/services/new_html_services/parser/citation.py module
 
 import wikitextparser as wtp
 
-from src.main_app.services.new_html_services.parser.citation import Citation
+from src.main_app.app_services.new_html_services.parser.citation import Citation
 
 
 class TestCitation:

@@ -8,7 +8,7 @@ Ported from the PHP suite ``DelTempsTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.wikitext_fixes.templates.delete_templates import (
+from src.main_app.app_services.new_html_services.wikitext_fixes.templates.delete_templates import (
     remove_lead_templates,
     remove_templates,
 )

@@ -6,7 +6,7 @@ Functions to test: get_all_citations, get_full_refs, get_short_refs
 
 from pathlib import Path
 
-from src.main_app.services.new_html_services.parser.citations_parser import (
+from src.main_app.app_services.new_html_services.parser.citations_parser import (
     get_all_citations,
     get_full_refs,
     get_short_refs,

@@ -30,7 +30,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.main_app.services.new_html_services.wikitext_fixes.media.remove_missing_images import (
+from src.main_app.app_services.new_html_services.wikitext_fixes.media.remove_missing_images import (
     ImageExistenceChecker,
     RemoveMissingImagesService,
 )

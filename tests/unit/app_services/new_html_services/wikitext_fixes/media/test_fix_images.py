@@ -8,7 +8,7 @@ Ported from the PHP suite ``FixImagesTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.wikitext_fixes.media.fix_images import (
+from src.main_app.app_services.new_html_services.wikitext_fixes.media.fix_images import (
     remove_images,
     remove_videos,
 )

@@ -8,7 +8,7 @@ Ported from the PHP suite ``DelMtRefsTest`` (FixRefs\\Tests\\WikiTextFixes).
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.wikitext_fixes.references.delete_empty_refs import (
+from src.main_app.app_services.new_html_services.wikitext_fixes.references.delete_empty_refs import (
     del_empty_refs,
 )
 

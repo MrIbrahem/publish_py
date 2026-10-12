@@ -10,7 +10,7 @@ All PHP test cases call the function with `ljust=0`, so tests here pass
 
 from __future__ import annotations
 
-from src.main_app.services.new_html_services.wikitext_fixes.templates.fix_templates import (
+from src.main_app.app_services.new_html_services.wikitext_fixes.templates.fix_templates import (
     add_missing_title,
 )
 

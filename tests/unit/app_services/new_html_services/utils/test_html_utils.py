@@ -1,10 +1,10 @@
 """
 Unit tests for HTML post-processing utility functions.
 
-Imports the functions under test from src.main_app.services.new_html_services.utils.html_utils.
+Imports the functions under test from src.main_app.app_services.new_html_services.utils.html_utils.
 """
 
-from src.main_app.services.new_html_services.utils.html_utils import (
+from src.main_app.app_services.new_html_services.utils.html_utils import (
     del_div_error,
     fix_link_red,
     remove_data_parsoid,

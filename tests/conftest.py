@@ -94,7 +94,7 @@ def stop_nets(request, monkeypatch):
     # mock requests library in src/main_app/services/new_html_services/clients.py
     _mock = MagicMock()
     _mock.request = MagicMock(return_value=MagicMock(text="", status_code=200))
-    monkeypatch.setattr("src.main_app.services.new_html_services.clients.requests", _mock)
+    monkeypatch.setattr("src.main_app.app_services.new_html_services.clients.requests", _mock)
 
 
 # ── app fixtures ───────────────────────────────────────────────────────────────────
