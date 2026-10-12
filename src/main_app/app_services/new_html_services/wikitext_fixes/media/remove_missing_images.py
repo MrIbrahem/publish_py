@@ -17,7 +17,7 @@ import re
 
 import wikitextparser as wtp
 
-from ...clients import HttpClientService
+from ...clients import HttpClient
 from ...parser import template_helpers as th
 
 _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
@@ -28,7 +28,7 @@ class ImageExistenceChecker:
 
     def __init__(self):
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClientService()
+        self.http_client = HttpClient()
 
     def image_exists(self, filename: str) -> bool:
         """Check if an image exists on Wikimedia Commons.

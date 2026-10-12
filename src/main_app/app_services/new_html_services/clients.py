@@ -33,7 +33,7 @@ def normalize_title_for_url(title: str) -> str:
     return title
 
 
-class HttpClientService:
+class HttpClient:
 
     @staticmethod
     def request(
@@ -87,13 +87,13 @@ class HttpClientService:
         result["http_code"] = response.status_code
 
         if response.status_code != 200:
-            logging.error("HttpClientService: API returned HTTP %s", response.status_code)
+            logging.error("HttpClient: API returned HTTP %s", response.status_code)
             result["error"] = "HTTP_ERROR"
             result["error_code"] = str(response.status_code)
 
             # check Cloudflare protection
             if isinstance(output, str) and "Just a moment..." in output:
-                logging.error("HttpClientService: Cloudflare protection detected")
+                logging.error("HttpClient: Cloudflare protection detected")
                 logger.error("Cloudflare protection detected: 'Just a moment...' page returned")
                 result["error"] = "CLOUDFLARE_PROTECTION"
 
@@ -120,7 +120,7 @@ class MdwikiApi:
 
     def __init__(self):
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClientService()
+        self.http_client = HttpClient()
 
         # Fallback to Action API
         self.fallback_to_action_api = False
@@ -218,7 +218,7 @@ class TransformApi:
 
     def __init__(self):
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClientService()
+        self.http_client = HttpClient()
 
     def convert(self, wikitext: str, title: str) -> dict[str, str]:
         """
