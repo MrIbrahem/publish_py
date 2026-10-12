@@ -56,61 +56,65 @@ tests/
 │   │       ├── test_auth_utils.py
 │   │       └── test_identity.py
 │   ├── app_services/
-│   │   └── new_html_services/
-│   │       ├── parser/
-│   │       │   ├── data/
-│   │       │   │   └── source-1.wiki
-│   │       │   ├── test_citation.py
-│   │       │   ├── test_citations_parser.py
-│   │       │   ├── test_lead_section_parser.py
-│   │       │   └── test_template_helpers.py
-│   │       ├── process/
-│   │       │   ├── test_process_seg.py
-│   │       │   └── test_processer.py
-│   │       ├── utils/
-│   │       │   ├── test_html_utils.py
-│   │       │   └── test_services_utils.py
-│   │       ├── wikitext_fixes/
-│   │       │   ├── fixtures/
-│   │       │   │   ├── output/
-│   │       │   │   │   ├── abdominal_pain.wiki
-│   │       │   │   │   ├── obstructive_sleep_apnea.wiki
-│   │       │   │   │   ├── test-1.wiki
-│   │       │   │   │   ├── test-2.wiki
-│   │       │   │   │   ├── Uterine_atony.wiki
-│   │       │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
-│   │       │   │   ├── result/
-│   │       │   │   │   ├── abdominal_pain.wiki
-│   │       │   │   │   ├── obstructive_sleep_apnea.wiki
-│   │       │   │   │   ├── test-1.wiki
-│   │       │   │   │   ├── test-2.wiki
-│   │       │   │   │   ├── Uterine_atony.wiki
-│   │       │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
-│   │       │   │   └── source/
-│   │       │   │       ├── abdominal_pain.wiki
-│   │       │   │       ├── obstructive_sleep_apnea.wiki
-│   │       │   │       ├── test-1.wiki
-│   │       │   │       ├── test-2.wiki
-│   │       │   │       ├── Uterine_atony.wiki
-│   │       │   │       └── Wernicke–Korsakoff_syndrome.wiki
-│   │       │   ├── media/
-│   │       │   │   ├── test_fix_images.py
-│   │       │   │   └── test_remove_missing_images.py
-│   │       │   ├── references/
-│   │       │   │   ├── test_delete_empty_refs.py
-│   │       │   │   ├── test_expand_refs.py
-│   │       │   │   └── test_ref_worker.py
-│   │       │   ├── structure/
-│   │       │   │   ├── test_fix_categories.py
-│   │       │   │   └── test_fix_language_links.py
-│   │       │   ├── templates/
-│   │       │   │   ├── test_delete_templates.py
-│   │       │   │   └── test_fix_templates.py
-│   │       │   └── test_wikitext_fixer.py
-│   │       ├── __init__.py
-│   │       ├── expend_infobox.py
-│   │       ├── test_clients.py
-│   │       └── test_storage.py
+│   │   ├── new_html_services/
+│   │   │   ├── parser/
+│   │   │   │   ├── data/
+│   │   │   │   │   └── source-1.wiki
+│   │   │   │   ├── test_citation.py
+│   │   │   │   ├── test_citations_parser.py
+│   │   │   │   ├── test_lead_section_parser.py
+│   │   │   │   └── test_template_helpers.py
+│   │   │   ├── process/
+│   │   │   │   ├── test_process_seg.py
+│   │   │   │   └── test_processer.py
+│   │   │   ├── utils/
+│   │   │   │   ├── test_html_utils.py
+│   │   │   │   └── test_services_utils.py
+│   │   │   ├── wikitext_fixes/
+│   │   │   │   ├── fixtures/
+│   │   │   │   │   ├── output/
+│   │   │   │   │   │   ├── abdominal_pain.wiki
+│   │   │   │   │   │   ├── obstructive_sleep_apnea.wiki
+│   │   │   │   │   │   ├── test-1.wiki
+│   │   │   │   │   │   ├── test-2.wiki
+│   │   │   │   │   │   ├── Uterine_atony.wiki
+│   │   │   │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
+│   │   │   │   │   ├── result/
+│   │   │   │   │   │   ├── abdominal_pain.wiki
+│   │   │   │   │   │   ├── obstructive_sleep_apnea.wiki
+│   │   │   │   │   │   ├── test-1.wiki
+│   │   │   │   │   │   ├── test-2.wiki
+│   │   │   │   │   │   ├── Uterine_atony.wiki
+│   │   │   │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
+│   │   │   │   │   └── source/
+│   │   │   │   │       ├── abdominal_pain.wiki
+│   │   │   │   │       ├── obstructive_sleep_apnea.wiki
+│   │   │   │   │       ├── test-1.wiki
+│   │   │   │   │       ├── test-2.wiki
+│   │   │   │   │       ├── Uterine_atony.wiki
+│   │   │   │   │       └── Wernicke–Korsakoff_syndrome.wiki
+│   │   │   │   ├── media/
+│   │   │   │   │   ├── test_fix_images.py
+│   │   │   │   │   └── test_remove_missing_images.py
+│   │   │   │   ├── references/
+│   │   │   │   │   ├── test_delete_empty_refs.py
+│   │   │   │   │   ├── test_expand_refs.py
+│   │   │   │   │   └── test_ref_worker.py
+│   │   │   │   ├── structure/
+│   │   │   │   │   ├── test_fix_categories.py
+│   │   │   │   │   └── test_fix_language_links.py
+│   │   │   │   ├── templates/
+│   │   │   │   │   ├── test_delete_templates.py
+│   │   │   │   │   └── test_fix_templates.py
+│   │   │   │   └── test_wikitext_fixer.py
+│   │   │   ├── __init__.py
+│   │   │   ├── expend_infobox.py
+│   │   │   ├── test_clients.py
+│   │   │   └── test_storage.py
+│   │   ├── results_2026/
+│   │   │   ├── __init__.py
+│   │   │   └── test_row_items.py
+│   │   └── __init__.py
 │   ├── config/
 │   ├── coordinators/
 │   │   └── routes/
@@ -210,8 +214,6 @@ tests/
 │   │   │   │   └── test_error_resolver.py
 │   │   │   ├── refs/
 │   │   │   ├── td/
-│   │   │   │   └── results_2026/
-│   │   │   │       └── test_row_items.py
 │   │   │   ├── test_html2segments.py
 │   │   │   ├── test_legacy_url_redirects.py
 │   │   │   └── test_new_html_routes.py
