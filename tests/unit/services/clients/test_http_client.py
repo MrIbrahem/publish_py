@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.main_app.services.clients.http_client import HttpClient, http_client
+from src.main_app.services.clients.http_client import HttpClient
 
 
 class TestHttpClient:

@@ -97,7 +97,7 @@ def stop_nets(request, monkeypatch):
     _mock_client.request.return_value = _mock_resp
     _mock_client.get.return_value = _mock_resp
     _mock_client.post.return_value = _mock_resp
-    monkeypatch.setattr("src.main_app.app_services.new_html_services.clients.http_client", _mock_client)
+    monkeypatch.setattr("src.main_app.app_services.new_html_services.http_client.http_client", _mock_client)
 
 
 # ── app fixtures ───────────────────────────────────────────────────────────────────
