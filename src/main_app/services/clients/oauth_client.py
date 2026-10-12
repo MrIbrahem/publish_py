@@ -13,13 +13,20 @@ import requests
 from requests_oauthlib import OAuth1
 
 from ...config import app_settings
-from .http_client import http_client
+from .http_client import HttpClient
 
 logger = logging.getLogger(__name__)
 
 
 class OAuthClient:
     """Client for MediaWiki OAuth operations."""
+
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
+        """Initialize the checker with an HTTP client instance."""
+        self.http_client = http_client or HttpClient()
 
     @staticmethod
     def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wikipedia.org") -> OAuth1:
@@ -43,8 +50,7 @@ class OAuthClient:
             resource_owner_secret=access_secret,
         )
 
-    @classmethod
-    def get_csrf_token(cls, access_key: str, access_secret: str, wiki: str = "en") -> dict[str, Any]:
+    def get_csrf_token(self, access_key: str, access_secret: str, wiki: str = "en") -> dict[str, Any]:
         """Get CSRF token from MediaWiki API.
 
         Args:
@@ -61,10 +67,10 @@ class OAuthClient:
             "meta": "tokens",
             "format": "json",
         }
-        client = cls.get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
+        client = self.get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
 
         try:
-            response = http_client.get(api_url, params=params, auth=client, timeout=30)
+            response = self.http_client.get(api_url, params=params, auth=client, timeout=30)
         except requests.exceptions.ConnectionError as e:
             logger.error(f"Connection error: {e}")
             return {
@@ -86,9 +92,8 @@ class OAuthClient:
 
         return result
 
-    @classmethod
     def post_params(
-        cls,
+        self,
         api_params: dict[str, Any],
         https_domain: str,
         access_key: str,
@@ -112,7 +117,7 @@ class OAuthClient:
         wiki = domain_parts[0] if domain_parts else "en"
 
         # Get CSRF token
-        csrf_data = cls.get_csrf_token(access_key, access_secret, wiki)
+        csrf_data = self.get_csrf_token(access_key, access_secret, wiki)
 
         if "error" in csrf_data:
             logger.error(f"CSRF token error: {csrf_data}")
@@ -128,12 +133,20 @@ class OAuthClient:
 
         logger.debug(f"post_params: apiParams: {api_params}")
 
-        client = cls.get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
-        response = http_client.post(api_url, data=api_params, auth=client, timeout=60)
+        client = self.get_oauth_client(
+            access_key,
+            access_secret,
+            https_domain.replace("https://", ""),
+        )
+        response = self.http_client.post(
+            api_url,
+            data=api_params,
+            auth=client,
+            timeout=60,
+        )
         return response.text
 
-    @classmethod
-    def get_cxtoken(cls, wiki: str, access_key: str, access_secret: str) -> dict[str, Any]:
+    def get_cxtoken(self, wiki: str, access_key: str, access_secret: str) -> dict[str, Any]:
         """Get CX token for Content Translation.
 
         Args:
@@ -149,7 +162,12 @@ class OAuthClient:
             "action": "cxtoken",
         }
 
-        response = cls.post_params(api_params, https_domain, access_key, access_secret)
+        response = self.post_params(
+            api_params,
+            https_domain,
+            access_key,
+            access_secret,
+        )
 
         try:
             result = json.loads(response)
@@ -160,12 +178,8 @@ class OAuthClient:
         return result
 
 
-def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wikipedia.org") -> OAuth1:
-    return OAuthClient.get_oauth_client(access_key, access_secret, domain)
-
-
 def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dict[str, Any]:
-    return OAuthClient.get_csrf_token(access_key, access_secret, wiki)
+    return OAuthClient().get_csrf_token(access_key, access_secret, wiki)
 
 
 def post_params(
@@ -174,11 +188,24 @@ def post_params(
     access_key: str,
     access_secret: str,
 ) -> str:
-    return OAuthClient.post_params(api_params, https_domain, access_key, access_secret)
+    return OAuthClient().post_params(
+        api_params,
+        https_domain,
+        access_key,
+        access_secret,
+    )
 
 
 def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict[str, Any]:
-    return OAuthClient.get_cxtoken(wiki, access_key, access_secret)
+    return OAuthClient().get_cxtoken(
+        wiki,
+        access_key,
+        access_secret,
+    )
+
+
+def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wikipedia.org") -> OAuth1:
+    return OAuthClient.get_oauth_client(access_key, access_secret, domain)
 
 
 __all__ = [

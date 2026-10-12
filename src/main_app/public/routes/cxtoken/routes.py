@@ -43,7 +43,7 @@ def get_cxtoken_for_user_wiki(wiki: str, user_name: str):
     access_key, access_secret = user_token.decrypted()
 
     # Get cxtoken
-    cxtoken = OAuthClient.get_cxtoken(wiki, access_key, access_secret)
+    cxtoken = OAuthClient().get_cxtoken(wiki, access_key, access_secret)
 
     if isinstance(cxtoken, str):
         logger.warning("cxtoken error")

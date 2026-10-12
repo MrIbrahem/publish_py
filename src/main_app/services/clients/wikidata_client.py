@@ -77,7 +77,7 @@ class WikidataClient:
             api_params["site"] = "enwiki"
 
         try:
-            response = OAuthClient.post_params(api_params, https_domain, access_key, access_secret)
+            response = OAuthClient().post_params(api_params, https_domain, access_key, access_secret)
         except Exception:
             logger.exception("Failed to call Wikidata API")
             return {}

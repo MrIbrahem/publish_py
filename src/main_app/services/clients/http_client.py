@@ -187,10 +187,6 @@ class HttpClient:
         result["output"] = response.text
         return result
 
-
-http_client = HttpClient()
-
 __all__ = [
     "HttpClient",
-    "http_client",
 ]

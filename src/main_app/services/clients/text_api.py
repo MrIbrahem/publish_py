@@ -3,7 +3,9 @@ from __future__ import annotations
 import logging
 import re
 
-from .http_client import http_client
+from .http_client import HttpClient
+
+http_client = HttpClient()
 
 ALLOWED_WIKI_PROJECT = re.compile(r"^(?:[a-z0-9-]+\.wikipedia\.org|commons\.wikimedia\.org)$", re.IGNORECASE)
 

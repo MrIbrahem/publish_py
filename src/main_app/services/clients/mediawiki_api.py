@@ -75,7 +75,7 @@ class MediaWikiApiClient:
             Edit result as dictionary
         """
         https_domain = f"https://{wiki}.wikipedia.org"
-        response = OAuthClient.post_params(api_params, https_domain, access_key, access_secret)
+        response = OAuthClient().post_params(api_params, https_domain, access_key, access_secret)
 
         try:
             result = json.loads(response) if response else {}
