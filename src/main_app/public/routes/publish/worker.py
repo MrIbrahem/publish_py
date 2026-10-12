@@ -26,16 +26,10 @@ from ....database.services import (
     UserTokenService,
     WordService,
 )
-from ....services.clients import (
-    publish_do_edit,
-)
+from ....services.clients import publish_do_edit
 from ....services.schemas import PublishRequestSchema
-from ....services.utils.helpers import (
-    determine_hashtag,
-    do_changes_to_text_with_settings,
-    make_summary,
-)
-from ....services.utils.helpers.format import format_title, format_user
+from ....services.utils.helpers import do_changes_to_text_with_settings
+from ....services.utils.helpers.format import Formatter
 from .error_resolver import ErrorFileResolver
 from .report_recorder import ReportRecorder
 from .to_db import add_to_db_tab
@@ -158,10 +152,10 @@ class PublishWorker:
     def _build_tab(validated_dict: dict[str, Any]) -> dict[str, Any]:
         """Build operation metadata from the validated request."""
         return {
-            "title": format_title(validated_dict.get("title", "")),
+            "title": Formatter.format_title(validated_dict.get("title", "")),
             "summary": "",
             "lang": validated_dict.get("target", ""),
-            "user": format_user(validated_dict.get("user", "")),
+            "user": Formatter.format_user(validated_dict.get("user", "")),
             "campaign": validated_dict.get("campaign", ""),
             "result": "",
             "edit": {},
@@ -215,8 +209,8 @@ class PublishWorker:
             self.text = newtext
 
     def _build_api_params(self) -> dict[str, Any]:
-        hashtag = determine_hashtag(self.tab["title"], self.tab["user"])
-        self.tab["summary"] = make_summary(
+        hashtag = Formatter.determine_hashtag(self.tab["title"], self.tab["user"])
+        self.tab["summary"] = Formatter.make_summary(
             self.tab["revid"],
             self.tab["sourcetitle"],
             self.tab["lang"],

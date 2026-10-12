@@ -7,76 +7,77 @@ from __future__ import annotations
 
 from ....config import app_settings
 
+class Formatter:
+    @staticmethod
+    def format_title(title: str) -> str:
+        """Format page title.
 
-def format_title(title: str) -> str:
-    """Format page title.
+        Args:
+            title: Raw page title
 
-    Args:
-        title: Raw page title
-
-    Returns:
-        Formatted title with underscores replaced and special user paths normalized
-    """
-    title = title.replace("_", " ")
-    # Normalize special user paths based on config
-    for alt_user, canonical_user in app_settings.users.special_users.items():
-        title = title.replace(f"{alt_user}/", f"{canonical_user}/")
-    return title
-
-
-def format_user(user: str) -> str:
-    """Format username, applying special user mappings.
-
-    Args:
-        user: Raw username
-
-    Returns:
-        Formatted username with underscores replaced and special users mapped
-    """
-    user = app_settings.users.special_users.get(user, user)
-    return user.replace("_", " ")
+        Returns:
+            Formatted title with underscores replaced and special user paths normalized
+        """
+        title = title.replace("_", " ")
+        # Normalize special user paths based on config
+        for alt_user, canonical_user in app_settings.users.special_users.items():
+            title = title.replace(f"{alt_user}/", f"{canonical_user}/")
+        return title
 
 
-def determine_hashtag(title: str, user: str) -> str:
-    """Determine appropriate hashtag based on title and user.
+    @staticmethod
+    def format_user(user: str) -> str:
+        """Format username, applying special user mappings.
 
-    Args:
-        title: Page title
-        user: Username
+        Args:
+            user: Raw username
 
-    Returns:
-        Hashtag string (empty for user's own pages)
-    """
-    hashtag = "#mdwikicx"
-    # Users without hashtag on their own pages (check for user path pattern)
-    for exempt_user in app_settings.users.users_without_hashtag:
-        # Match user pages like "Username/..." or exact username match in title
-        # if exempt_user in title and user == exempt_user:
-        if (f"{exempt_user}/" in title or title == exempt_user) and user == exempt_user:
-            hashtag = ""
-            break
-    return hashtag
+        Returns:
+            Formatted username with underscores replaced and special users mapped
+        """
+        user = app_settings.users.special_users.get(user, user)
+        return user.replace("_", " ")
 
 
-def make_summary(revid: str | int, sourcetitle: str, target_lang: str, hashtag: str = "#mdwikicx") -> str:
-    """Generate edit summary for translation.
+    @staticmethod
+    def determine_hashtag(title: str, user: str) -> str:
+        """Determine appropriate hashtag based on title and user.
 
-    Args:
-        revid: Source revision ID
-        sourcetitle: Source page title
-        target_lang: Target language code
-        hashtag: Campaign hashtag
+        Args:
+            title: Page title
+            user: Username
 
-    Returns:
-        Edit summary string
-    """
-    revid = str(revid)
-    return f"Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{target_lang} {hashtag}"
+        Returns:
+            Hashtag string (empty for user's own pages)
+        """
+        hashtag = "#mdwikicx"
+        # Users without hashtag on their own pages (check for user path pattern)
+        for exempt_user in app_settings.users.users_without_hashtag:
+            # Match user pages like "Username/..." or exact username match in title
+            # if exempt_user in title and user == exempt_user:
+            if (f"{exempt_user}/" in title or title == exempt_user) and user == exempt_user:
+                hashtag = ""
+                break
+        return hashtag
+
+
+    @staticmethod
+    def make_summary(revid: str | int, sourcetitle: str, target_lang: str, hashtag: str = "#mdwikicx") -> str:
+        """Generate edit summary for translation.
+
+        Args:
+            revid: Source revision ID
+            sourcetitle: Source page title
+            target_lang: Target language code
+            hashtag: Campaign hashtag
+
+        Returns:
+            Edit summary string
+        """
+        revid = str(revid)
+        return f"Created by translating the page [[:mdwiki:Special:Redirect/revision/{revid}|{sourcetitle}]] to:{target_lang} {hashtag}"
 
 
 __all__ = [
-    "format_title",
-    "format_user",
-    "determine_hashtag",
-    "make_summary",
+    "Formatter",
 ]
