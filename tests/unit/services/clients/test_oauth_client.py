@@ -10,8 +10,10 @@ import pytest
 class MockOAuthClientDeps:
     app_settings: MagicMock
     requests: MagicMock
-    get_csrf_token: MagicMock
-    post_params: MagicMock
+
+def mock_attr(monkeypatch, attr_name, mock):
+    _client = "src.main_app.services.clients.oauth_client"
+    monkeypatch.setattr(f"{_client}.{attr_name}", mock)
 
 
 @pytest.fixture
@@ -24,19 +26,13 @@ def mock_oauth_deps(monkeypatch: pytest.MonkeyPatch) -> MockOAuthClientDeps:
     mock_settings.oauth.consumer_secret = "test_consumer_secret"
 
     mock_requests = MagicMock()
-    mock_get_csrf_token = MagicMock()
-    mock_post_params = MagicMock()
 
     monkeypatch.setattr(f"{_client}.app_settings", mock_settings)
     monkeypatch.setattr(f"{_client}.requests", mock_requests)
-    monkeypatch.setattr(f"{_client}.get_csrf_token", mock_get_csrf_token)
-    monkeypatch.setattr(f"{_client}.post_params", mock_post_params)
 
     return MockOAuthClientDeps(
         app_settings=mock_settings,
         requests=mock_requests,
-        get_csrf_token=mock_get_csrf_token,
-        post_params=mock_post_params,
     )
 
 
@@ -75,9 +71,11 @@ class TestGetCsrfToken:
 class TestPostParams:
     """Tests for post_params function."""
 
-    def test_includes_csrf_token_in_request(self, mock_oauth_deps: MockOAuthClientDeps):
+    def test_includes_csrf_token_in_request(self, monkeypatch: pytest.MonkeyPatch, mock_oauth_deps: MockOAuthClientDeps):
         """Test that CSRF token is included in POST request."""
-        mock_oauth_deps.get_csrf_token.return_value = {"query": {"tokens": {"csrftoken": "token123"}}}
+        mock_get_token = MagicMock(return_value={"query": {"tokens": {"csrftoken": "token123"}}})
+        mock_attr(monkeypatch, "get_csrf_token", mock_get_token)
+
         mock_response = MagicMock()
         mock_response.text = '{"success": true}'
         mock_oauth_deps.requests.post.return_value = mock_response
@@ -96,9 +94,10 @@ class TestPostParams:
         call_args = mock_oauth_deps.requests.post.call_args
         assert call_args[1]["data"]["token"] == "token123"
 
-    def test_returns_error_when_csrf_fails(self, mock_oauth_deps: MockOAuthClientDeps):
+    def test_returns_error_when_csrf_fails(self, monkeypatch: pytest.MonkeyPatch, mock_oauth_deps: MockOAuthClientDeps):
         """Test that error is returned when CSRF token retrieval fails."""
-        mock_oauth_deps.get_csrf_token.return_value = {"error": {"code": "mwoauth-invalid-authorization"}}
+        mock_get_token = MagicMock(return_value={"error": {"code": "mwoauth-invalid-authorization"}})
+        mock_attr(monkeypatch, "get_csrf_token", mock_get_token)
 
         from src.main_app.services.clients.oauth_client import post_params
 
@@ -116,9 +115,10 @@ class TestPostParams:
 class TestGetCxtoken:
     """Tests for get_cxtoken function."""
 
-    def test_returns_cxtoken_response(self, mock_oauth_deps: MockOAuthClientDeps):
+    def test_returns_cxtoken_response(self, monkeypatch: pytest.MonkeyPatch):
         """Test that cxtoken is retrieved successfully."""
-        mock_oauth_deps.post_params.return_value = '{"cxtoken": "some_cx_token"}'
+        mock_post = MagicMock(return_value='{"cxtoken": "some_cx_token"}')
+        mock_attr(monkeypatch, "post_params", mock_post)
 
         from src.main_app.services.clients.oauth_client import get_cxtoken
 
@@ -127,9 +127,10 @@ class TestGetCxtoken:
         assert "cxtoken" in result
         assert result["cxtoken"] == "some_cx_token"
 
-    def test_returns_error_on_invalid_json(self, mock_oauth_deps: MockOAuthClientDeps):
+    def test_returns_error_on_invalid_json(self, monkeypatch: pytest.MonkeyPatch):
         """Test that error is returned on invalid JSON response."""
-        mock_oauth_deps.post_params.return_value = "not valid json"
+        mock_post = MagicMock(return_value="not valid json")
+        mock_attr(monkeypatch, "post_params", mock_post)
 
         from src.main_app.services.clients.oauth_client import get_cxtoken
 
