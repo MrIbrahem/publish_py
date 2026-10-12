@@ -12,7 +12,7 @@ from __future__ import annotations
 import pytest
 from flask import Flask
 
-from src.main_app.public.routes.td.results_2026.mapping import (
+from src.main_app.app_services.results_2026.mapping import (
     ExistsItem,
     InProcessItem,
 )
