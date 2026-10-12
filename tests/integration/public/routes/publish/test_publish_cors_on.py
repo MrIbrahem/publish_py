@@ -3,9 +3,9 @@ Tests for check_cors and validate_access on publish routes
 with CORS_ENABLED (CORS_DISABLED=False).
 """
 
-from dataclasses import dataclass
 import json
 import os
+from dataclasses import dataclass
 from unittest.mock import MagicMock
 
 import pytest
@@ -105,7 +105,9 @@ class TestCheckCorsOnPublish:
 class TestValidateAccessOnPublish:
     """Tests for @validate_access decorator on publish POST route with CORS_ENABLED."""
 
-    def test_post_disallowed_origin_returns_403(self, mock_is_denied, mock_client, mock_secret_code: MockSecretCodeDeps):
+    def test_post_disallowed_origin_returns_403(
+        self, mock_is_denied, mock_client, mock_secret_code: MockSecretCodeDeps
+    ):
         """POST from disallowed origin without secret key returns 403."""
         response = mock_client.post(
             "/publish/",
@@ -137,9 +139,13 @@ class TestValidateAccessOnPublish:
         assert data["error"]["code"] == "noaccess"
         assert response.headers.get("Access-Control-Allow-Origin") == f"https://{ALLOWED_DOMAIN}"
 
-    def test_post_with_valid_secret_key_bypasses_cors(self, mock_is_denied, mock_client, monkeypatch: pytest.MonkeyPatch):
+    def test_post_with_valid_secret_key_bypasses_cors(
+        self, mock_is_denied, mock_client, monkeypatch: pytest.MonkeyPatch
+    ):
         """POST with valid secret key bypasses CORS even from disallowed origin."""
-        monkeypatch.setattr("src.main_app.services.core.cors.check_publish_secret_code", MagicMock(return_value="evil.com"))
+        monkeypatch.setattr(
+            "src.main_app.services.core.cors.check_publish_secret_code", MagicMock(return_value="evil.com")
+        )
         response = mock_client.post(
             "/publish/",
             headers={"X-Secret-Key": "test-secret"},
@@ -159,7 +165,9 @@ class TestValidateAccessOnPublish:
         data = response.get_json()
         assert data["error"]["code"] == "noaccess"
 
-    def test_post_allowed_origin_with_invalid_secret_key(self, mock_is_allowed_medwiki, mock_client, mock_secret_code: MockSecretCodeDeps):
+    def test_post_allowed_origin_with_invalid_secret_key(
+        self, mock_is_allowed_medwiki, mock_client, mock_secret_code: MockSecretCodeDeps
+    ):
         """POST from allowed origin succeeds even if secret key is invalid."""
         response = mock_client.post(
             "/publish/",
@@ -178,7 +186,9 @@ class TestValidateAccessOnPublish:
         data = response.get_json()
         assert data["error"]["code"] == "noaccess"
 
-    def test_post_disallowed_origin_and_no_secret_key(self, mock_is_denied, mock_client, mock_secret_code: MockSecretCodeDeps):
+    def test_post_disallowed_origin_and_no_secret_key(
+        self, mock_is_denied, mock_client, mock_secret_code: MockSecretCodeDeps
+    ):
         """POST from disallowed origin without secret key returns specific error info."""
         response = mock_client.post(
             "/publish/",
