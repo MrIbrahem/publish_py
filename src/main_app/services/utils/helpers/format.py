@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from ....config import app_settings
 
+
 class Formatter:
     @staticmethod
     def format_title(title: str) -> str:
@@ -24,7 +25,6 @@ class Formatter:
             title = title.replace(f"{alt_user}/", f"{canonical_user}/")
         return title
 
-
     @staticmethod
     def format_user(user: str) -> str:
         """Format username, applying special user mappings.
@@ -37,7 +37,6 @@ class Formatter:
         """
         user = app_settings.users.special_users.get(user, user)
         return user.replace("_", " ")
-
 
     @staticmethod
     def determine_hashtag(title: str, user: str) -> str:
@@ -59,7 +58,6 @@ class Formatter:
                 hashtag = ""
                 break
         return hashtag
-
 
     @staticmethod
     def make_summary(revid: str | int, sourcetitle: str, target_lang: str, hashtag: str = "#mdwikicx") -> str:

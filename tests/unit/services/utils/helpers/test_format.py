@@ -4,7 +4,6 @@ from src.main_app.config import app_settings
 from src.main_app.services.utils.helpers.format import Formatter
 
 
-
 class TestFormatTitle:
     """Tests for format_title function."""
 

@@ -11,9 +11,7 @@ from typing import Any
 from ....database.services import (
     ReportService,
 )
-from ....services.utils.helpers import (
-    to_do,
-)
+from ....services.utils.helpers import ToDoLogger
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +36,7 @@ class ReportRecorder:
         lang: str,
         sourcetitle: str,
     ) -> None:
-        to_do(data, file_name)
+        ToDoLogger().log(data, file_name)
 
         self.report_service.add_report(
             title=title,
