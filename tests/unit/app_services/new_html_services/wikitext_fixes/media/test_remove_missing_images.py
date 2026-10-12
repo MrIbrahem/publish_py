@@ -35,6 +35,22 @@ from src.main_app.app_services.new_html_services.wikitext_fixes.media.remove_mis
     RemoveMissingImagesService,
 )
 
+
+class _FakeHttpClient:
+    """Minimal stand-in for HttpClient used by ImageExistenceChecker."""
+
+    def __init__(self, response_array):
+        self._response_array = response_array
+        self.last_params = None
+
+    def request(self, url: str, method, params):
+        self.last_params = params
+        return self._response_array
+
+    def safe_request(self, url: str, method, params):
+        self.last_params = params
+        return self._response_array
+
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
@@ -334,22 +350,6 @@ class TestImages:
 # class, which the PHP suite mocked out entirely via
 # CommonsImageServiceInterface)
 # ---------------------------------------------------------------------------
-
-
-class _FakeHttpClient:
-    """Minimal stand-in for HttpClient used by ImageExistenceChecker."""
-
-    def __init__(self, response_array):
-        self._response_array = response_array
-        self.last_params = None
-
-    def request(self, url: str, method, params):
-        self.last_params = params
-        return self._response_array
-
-    def safe_request(self, url: str, method, params):
-        self.last_params = params
-        return self._response_array
 
 
 def _make_checker(response_array) -> ImageExistenceChecker:

@@ -29,12 +29,14 @@ class TopStatsProcessor:
         self.service = service or TopStatsService()
 
     def get_top_langs(self, form: ApiFormData) -> TopLangsResult:
-        """Handle top_langs API requests.
+        """
+        Handle top_langs API requests.
         Returns aggregated statistics per language.
 
         Returns:
             JSON response with language statistics
         """
+        # /api/top_langs?camp=Video&user_group=all&year=all&month=All&cat=RTTVideo
         try:
             results = self.service.query_top_langs(form)
         except Exception:
@@ -59,7 +61,8 @@ class TopStatsProcessor:
         return TopLangsResult(results=data, count=len(data))
 
     def get_top_users(self, form: ApiFormData) -> TopUsersResult:
-        """Handle top_users API requests.
+        """
+        Handle top_users API requests.
         Returns aggregated statistics per user.
         Returns:
             JSON response with user statistics
