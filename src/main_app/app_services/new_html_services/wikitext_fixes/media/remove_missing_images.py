@@ -58,7 +58,7 @@ class ImageExistenceChecker:
 
         url = "https://commons.wikimedia.org/w/api.php"
 
-        response_array = self.http_client.request(url, "GET", params)
+        response_array = self.http_client.safe_request(url, "GET", params)
 
         # Handle API or request errors (fallback to assuming the image exists)
         if response_array.get("error_code") or response_array.get("error"):

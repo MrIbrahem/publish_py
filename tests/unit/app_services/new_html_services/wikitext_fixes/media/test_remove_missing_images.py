@@ -347,6 +347,10 @@ class _FakeHttpClient:
         self.last_params = params
         return self._response_array
 
+    def safe_request(self, url: str, method, params):
+        self.last_params = params
+        return self._response_array
+
 
 def _make_checker(response_array) -> ImageExistenceChecker:
     checker = ImageExistenceChecker()
