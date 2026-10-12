@@ -4,9 +4,10 @@ These tests verify the full publish flow when WTF_CSRF_ENABLED=True,
 using a configuration similar to ProductionConfig.
 """
 
+from dataclasses import dataclass
 import json
 import os
-from unittest.mock import patch
+from unittest.mock import MagicMock
 
 import pytest
 from flask import Blueprint
@@ -15,37 +16,58 @@ from flask.app import Flask
 from src.main_app.database.services import UsersService, UserTokenService
 from src.main_app.services.core.crypto import CryptoService
 
-@pytest.fixture
-def common_patches():
-    """Patch the external API calls and expose mocks as a dict."""
-    with (
-        patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-        patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
-        patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
-        patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
-        patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
-        patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
-        patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
-        patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page") as mock_user_find_exists,
-        patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category"),
-    ):
-        mock_get_revid.return_value = "12345"
-        mock_changes.return_value = None
-        mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-        mock_link.return_value = {"result": "success", "qid": "Q123"}
-        mock_should_add.return_value = True
-        mock_find_exists.return_value = False
 
-        yield {
-            "get_revid": mock_get_revid,
-            "changes": mock_changes,
-            "edit": mock_edit,
-            "link": mock_link,
-            "to_do": mock_to_do,
-            "should_add": mock_should_add,
-            "find_exists_or_update_page": mock_find_exists,
-            "find_exists_or_update_user_page": mock_user_find_exists,
-        }
+@dataclass
+class MockPublishWorkerDeps:
+    get_revid: MagicMock
+    changes: MagicMock
+    edit: MagicMock
+    link: MagicMock
+    to_do: MagicMock
+    should_add: MagicMock
+    find_exists_or_update_page: MagicMock
+    find_exists_or_update_user_page: MagicMock
+
+
+@pytest.fixture
+def common_patches(monkeypatch: pytest.MonkeyPatch) -> MockPublishWorkerDeps:
+    """Patch the external API calls and expose mocks as a dataclass."""
+    mock_get_revid = MagicMock()
+    mock_changes = MagicMock()
+    mock_edit = MagicMock()
+    mock_link = MagicMock()
+    mock_to_do = MagicMock()
+    mock_should_add = MagicMock()
+    mock_find_exists = MagicMock()
+    mock_user_find_exists = MagicMock()
+
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker.get_revid", mock_get_revid)
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings", mock_changes)
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker.publish_do_edit", mock_edit)
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker.link_to_wikidata", mock_link)
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker.to_do", mock_to_do)
+    monkeypatch.setattr("src.main_app.public.routes.publish.worker.should_added_to_wikidata", mock_should_add)
+    monkeypatch.setattr("src.main_app.public.routes.publish.to_db.find_exists_or_update_page", mock_find_exists)
+    monkeypatch.setattr("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page", mock_user_find_exists)
+    monkeypatch.setattr("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category", MagicMock())
+
+    mock_get_revid.return_value = "12345"
+    mock_changes.return_value = None
+    mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
+    mock_link.return_value = {"result": "success", "qid": "Q123"}
+    mock_should_add.return_value = True
+    mock_find_exists.return_value = False
+
+    return MockPublishWorkerDeps(
+        get_revid=mock_get_revid,
+        changes=mock_changes,
+        edit=mock_edit,
+        link=mock_link,
+        to_do=mock_to_do,
+        should_add=mock_should_add,
+        find_exists_or_update_page=mock_find_exists,
+        find_exists_or_update_user_page=mock_user_find_exists,
+    )
 
 
 @pytest.fixture
@@ -164,10 +186,10 @@ class BasePublishTest:
     """Base class with services fixtures for publish endpoint tests."""
 
     @pytest.fixture(autouse=True)
-    def mock_is_allowed(self):
-        with patch("src.main_app.services.core.cors.is_allowed") as mocked:
-            mocked.return_value = "medwiki.toolforge.org"
-            yield mocked
+    def mock_is_allowed(self, monkeypatch: pytest.MonkeyPatch):
+        mock_allowed = MagicMock(return_value="medwiki.toolforge.org")
+        monkeypatch.setattr("src.main_app.services.core.cors.is_allowed", mock_allowed)
+        return mock_allowed
 
     @pytest.fixture(autouse=True)
     def seed_user_token(self, csrf_app):
@@ -191,7 +213,7 @@ class BasePublishTest:
                 access_token=encrypted_token,
                 access_secret=encrypted_secret,
             )
-        yield user
+        return user
 
     def _post(self, mock_client, payload: dict):
         return mock_client.post(
@@ -212,7 +234,7 @@ class BasePublishTest:
 
 
 class TestSuccessFlows(BasePublishTest):
-    def test_successful_edit(self, csrf_client, common_patches):
+    def test_successful_edit(self, csrf_client, common_patches: MockPublishWorkerDeps):
         response = self._post(
             csrf_client,
             self._default_payload(
@@ -226,8 +248,8 @@ class TestSuccessFlows(BasePublishTest):
         assert data["edit"]["result"] == "Success"
         assert data["LinkToWikidata"]["result"] == "success"
 
-    def test_fix_refs_applied(self, csrf_client, common_patches):
-        common_patches["changes"].return_value = "Fixed reference content"
+    def test_fix_refs_applied(self, csrf_client, common_patches: MockPublishWorkerDeps):
+        common_patches.changes.return_value = "Fixed reference content"
 
         response = self._post(
             csrf_client,
@@ -237,42 +259,42 @@ class TestSuccessFlows(BasePublishTest):
         )
 
         assert response.status_code == 200
-        to_do_calls = common_patches["to_do"].call_args_list
+        to_do_calls = common_patches.to_do.call_args_list
         assert to_do_calls[0][0][0].get("fix_refs") == "yes"
 
-    def test_revid_resolution(self, csrf_client, common_patches):
-        common_patches["get_revid"].return_value = "67890"
+    def test_revid_resolution(self, csrf_client, common_patches: MockPublishWorkerDeps):
+        common_patches.get_revid.return_value = "67890"
 
         response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200
-        common_patches["get_revid"].assert_called_once_with("Source Page")
+        common_patches.get_revid.assert_called_once_with("Source Page")
 
 
 class TestMetadataLogic(BasePublishTest):
-    def test_tr_type_passed_correctly(self, csrf_client, common_patches):
+    def test_tr_type_passed_correctly(self, csrf_client, common_patches: MockPublishWorkerDeps):
         response = self._post(csrf_client, self._default_payload(translate_type="all"))
 
         assert response.status_code == 200
 
-    def test_bad_tr_type(self, csrf_client, common_patches):
+    def test_bad_tr_type(self, csrf_client, common_patches: MockPublishWorkerDeps):
         response = self._post(csrf_client, self._default_payload(translate_type="test"))
 
         assert response.status_code == 400
 
-    def test_words_field_in_tab(self, csrf_client, common_patches):
-        with (patch("src.main_app.public.routes.publish.worker.get_word_count") as mock_word_count,):
-            mock_word_count.return_value = 500
+    def test_words_field_in_tab(self, csrf_client, common_patches: MockPublishWorkerDeps, monkeypatch: pytest.MonkeyPatch):
+        mock_word_count = MagicMock(return_value=500)
+        monkeypatch.setattr("src.main_app.public.routes.publish.worker.get_word_count", mock_word_count)
 
-            response = self._post(csrf_client, self._default_payload())
+        response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200
-        to_do_calls = common_patches["to_do"].call_args_list
+        to_do_calls = common_patches.to_do.call_args_list
         tab = to_do_calls[0][0][0]
         assert "words" in tab
         assert tab["words"] == 500
 
-    def test_hashtag_logic(self, csrf_client, common_patches):
+    def test_hashtag_logic(self, csrf_client, common_patches: MockPublishWorkerDeps):
         response = self._post(
             csrf_client,
             self._default_payload(
@@ -282,25 +304,25 @@ class TestMetadataLogic(BasePublishTest):
         )
 
         assert response.status_code == 200
-        to_do_calls = common_patches["to_do"].call_args_list
+        to_do_calls = common_patches.to_do.call_args_list
         summary = to_do_calls[0][0][0].get("summary", "")
         assert "#mdwikicx" not in summary or summary.endswith(" to:ar ")
 
-    def test_empty_revid_fallback(self, csrf_client, common_patches):
-        common_patches["get_revid"].return_value = ""
+    def test_empty_revid_fallback(self, csrf_client, common_patches: MockPublishWorkerDeps):
+        common_patches.get_revid.return_value = ""
 
         response = self._post(csrf_client, self._default_payload(revid="99999"))
 
         assert response.status_code == 200
-        to_do_calls = common_patches["to_do"].call_args_list
+        to_do_calls = common_patches.to_do.call_args_list
         tab = to_do_calls[0][0][0]
         assert tab.get("revid") == "99999"
         assert "empty revid" in tab
 
 
 class TestErrorAndEdgeCases(BasePublishTest):
-    def test_captcha_handling(self, csrf_client, common_patches):
-        common_patches["edit"].return_value = {
+    def test_captcha_handling(self, csrf_client, common_patches: MockPublishWorkerDeps):
+        common_patches.edit.return_value = {
             "edit": {"captcha": {"id": "12345", "type": "image"}, "result": "Failure"}
         }
 
@@ -309,8 +331,8 @@ class TestErrorAndEdgeCases(BasePublishTest):
         assert response.status_code == 200
         assert "captcha" in response.get_json()["edit"]
 
-    def test_edit_error_handling(self, csrf_client, common_patches):
-        common_patches["edit"].return_value = {
+    def test_edit_error_handling(self, csrf_client, common_patches: MockPublishWorkerDeps):
+        common_patches.edit.return_value = {
             "edit": {
                 "result": "Failure",
                 "error": {"code": "protectedpage", "info": "Page is protected"},
@@ -326,7 +348,7 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 
 class TestComplexWorkflows(BasePublishTest):
-    def test_wikidata_link_fallback_user(self, csrf_client, common_patches, seed_user_token):
+    def test_wikidata_link_fallback_user(self, csrf_client, common_patches: MockPublishWorkerDeps, seed_user_token, monkeypatch: pytest.MonkeyPatch):
         users_service = UsersService()
         fallback_user = users_service.create_user("Mr. Ibrahem")
 
@@ -340,15 +362,15 @@ class TestComplexWorkflows(BasePublishTest):
             access_secret=fallback_secret_encrypted,
         )
 
-        with (patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,):
-            mock_should_add.return_value = True
+        mock_should_add = MagicMock(return_value=True)
+        monkeypatch.setattr("src.main_app.public.routes.publish.worker.should_added_to_wikidata", mock_should_add)
 
-            common_patches["link"].side_effect = [
-                {"error": "get_csrftoken failed", "qid": "Q123"},
-                {"result": "success", "qid": "Q123"},
-            ]
+        common_patches.link.side_effect = [
+            {"error": "get_csrftoken failed", "qid": "Q123"},
+            {"result": "success", "qid": "Q123"},
+        ]
 
-            response = self._post(csrf_client, self._default_payload())
+        response = self._post(csrf_client, self._default_payload())
 
         assert response.status_code == 200
         data = response.get_json()
