@@ -38,11 +38,6 @@ def ensure_directories() -> None:
     for dir_name in app_settings.paths.all_paths():
         Path(dir_name).mkdir(parents=True, exist_ok=True)
 
-    for file_name in [
-        app_settings.paths.revids_file_path,
-    ]:
-        Path(file_name).parent.mkdir(parents=True, exist_ok=True)
-
     app_settings.new_html.revisions_dir.mkdir(parents=True, exist_ok=True)
 
     # Ensure JSON index files exist
