@@ -15,6 +15,38 @@ from flask.app import Flask
 from src.main_app.database.services import UsersService, UserTokenService
 from src.main_app.services.core.crypto import CryptoService
 
+@pytest.fixture
+def common_patches():
+    """Patch the external API calls and expose mocks as a dict."""
+    with (
+        patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
+        patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
+        patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
+        patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
+        patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
+        patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
+        patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
+        patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page") as mock_user_find_exists,
+        patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category"),
+    ):
+        mock_get_revid.return_value = "12345"
+        mock_changes.return_value = None
+        mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
+        mock_link.return_value = {"result": "success", "qid": "Q123"}
+        mock_should_add.return_value = True
+        mock_find_exists.return_value = False
+
+        yield {
+            "get_revid": mock_get_revid,
+            "changes": mock_changes,
+            "edit": mock_edit,
+            "link": mock_link,
+            "to_do": mock_to_do,
+            "should_add": mock_should_add,
+            "find_exists_or_update_page": mock_find_exists,
+            "find_exists_or_update_user_page": mock_user_find_exists,
+        }
+
 
 @pytest.fixture
 def csrf_app(sqlite_db) -> Flask:
@@ -160,38 +192,6 @@ class BasePublishTest:
                 access_secret=encrypted_secret,
             )
         yield user
-
-    @pytest.fixture
-    def common_patches(self):
-        """Patch the external API calls and expose mocks as a dict."""
-        with (
-            patch("src.main_app.public.routes.publish.worker.get_revid") as mock_get_revid,
-            patch("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings") as mock_changes,
-            patch("src.main_app.public.routes.publish.worker.publish_do_edit") as mock_edit,
-            patch("src.main_app.public.routes.publish.worker.link_to_wikidata") as mock_link,
-            patch("src.main_app.public.routes.publish.worker.to_do") as mock_to_do,
-            patch("src.main_app.public.routes.publish.worker.should_added_to_wikidata") as mock_should_add,
-            patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_page") as mock_find_exists,
-            patch("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page") as mock_user_find_exists,
-            patch("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category"),
-        ):
-            mock_get_revid.return_value = "12345"
-            mock_changes.return_value = None
-            mock_edit.return_value = {"edit": {"result": "Success", "newrevid": 67890}}
-            mock_link.return_value = {"result": "success", "qid": "Q123"}
-            mock_should_add.return_value = True
-            mock_find_exists.return_value = False
-
-            yield {
-                "get_revid": mock_get_revid,
-                "changes": mock_changes,
-                "edit": mock_edit,
-                "link": mock_link,
-                "to_do": mock_to_do,
-                "should_add": mock_should_add,
-                "find_exists_or_update_page": mock_find_exists,
-                "find_exists_or_update_user_page": mock_user_find_exists,
-            }
 
     def _post(self, mock_client, payload: dict):
         return mock_client.post(

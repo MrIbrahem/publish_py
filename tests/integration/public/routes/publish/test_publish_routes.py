@@ -96,7 +96,7 @@ class TestPublishPost:
 
     def test_publish_with_valid_data(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test publishing with valid data."""
-        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
             mock_process.return_value = {"result": "success", "edit": {"newrevid": 12345}}
 
             response = mock_client.post(
@@ -122,7 +122,7 @@ class TestPublishFormData:
 
     def test_publish_accepts_form_data(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test that publish accepts form data."""
-        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
             mock_process.return_value = {"result": "success"}
 
             response = mock_client.post(
@@ -140,7 +140,7 @@ class TestPublishFormData:
 
     def test_publish_accepts_json_data(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test that publish accepts JSON data."""
-        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
             mock_process.return_value = {"result": "success"}
 
             response = mock_client.post(
@@ -164,7 +164,7 @@ class TestPublishCaptcha:
 
     def test_publish_with_captcha_params(self, real_user_token, mock_validate_access, mock_client: FlaskClient):
         """Test publishing with captcha parameters."""
-        with patch("src.main_app.public.routes.publish.routes._process_edit") as mock_process:
+        with patch("src.main_app.public.routes.publish.routes._handle_form") as mock_process:
             mock_process.return_value = {"result": "success"}
 
             response = mock_client.post(
