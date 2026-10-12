@@ -31,7 +31,7 @@ class MockCxTokenGetDeps:
 @pytest.fixture
 def mock_cxtoken_get_deps(monkeypatch: pytest.MonkeyPatch) -> MockCxTokenGetDeps:
     """Bundle common dependencies for cxtoken GET endpoint tests."""
-    _base = "src.main_app.services.clients.oauth_client.OAuthClient"
+    _base = "src.main_app.public.routes.cxtoken.routes.OAuthClient"
 
     mock_get_cxtoken = MagicMock(return_value={"csrftoken": "test_token_123"})
     mock_store_jwt = MagicMock()
