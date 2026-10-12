@@ -72,16 +72,7 @@ class HttpClient:
         **kwargs: Any,
     ) -> requests.Response:
         """Perform an HTTP GET request."""
-        req_headers = self._prepare_headers(headers)
-        req_timeout = timeout if timeout is not None else self.default_timeout
-        return requests.get(
-            url,
-            params=params,
-            headers=req_headers,
-            auth=auth,
-            timeout=req_timeout,
-            **kwargs,
-        )
+        return self._send("GET", url, headers, timeout, params=params, auth=auth, **kwargs)
 
     def post(
         self,
@@ -95,16 +86,15 @@ class HttpClient:
         **kwargs: Any,
     ) -> requests.Response:
         """Perform an HTTP POST request."""
-        req_headers = self._prepare_headers(headers)
-        req_timeout = timeout if timeout is not None else self.default_timeout
-        return requests.post(
+        return self._send(
+            "POST",
             url,
+            headers,
+            timeout,
             data=data,
             json=json,
             params=params,
-            headers=req_headers,
             auth=auth,
-            timeout=req_timeout,
             **kwargs,
         )
 
@@ -121,17 +111,15 @@ class HttpClient:
         **kwargs: Any,
     ) -> requests.Response:
         """Perform a generic HTTP request."""
-        req_headers = self._prepare_headers(headers)
-        req_timeout = timeout if timeout is not None else self.default_timeout
-        return requests.request(
-            method=method,
-            url=url,
+        return self._send(
+            method,
+            url,
+            headers,
+            timeout,
             params=params,
             data=data,
             json=json_data,
-            headers=req_headers,
             auth=auth,
-            timeout=req_timeout,
             **kwargs,
         )
 
