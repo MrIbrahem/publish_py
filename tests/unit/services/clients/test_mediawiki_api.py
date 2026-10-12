@@ -32,7 +32,7 @@ def mock_mediawiki_deps(monkeypatch: pytest.MonkeyPatch) -> MockMediaWikiApiDeps
 
 
 class TestPublishDoEdit:
-    """Tests for publish_do_edit function and MediaWikiApiClient."""
+    """Tests for MediaWikiApiClient.publish_do_edit function."""
 
     def test_returns_edit_result_on_success(self, mock_mediawiki_deps: MockMediaWikiApiDeps):
         """Test that edit result is returned on success."""
@@ -107,7 +107,7 @@ class TestPublishDoEdit:
 
 
 class TestGetTitleInfo:
-    """Tests for get_title_info function and MediaWikiApiClient."""
+    """Tests for MediaWikiApiClient.get_title_info function."""
 
     def test_returns_page_info_on_success(self, mock_mediawiki_deps: MockMediaWikiApiDeps):
         """Test that page info is returned on success."""

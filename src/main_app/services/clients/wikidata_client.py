@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 class WikidataClient:
     """Client for Wikidata API operations and database lookups."""
 
+    def __init__(self) -> None:
+        self.oauth_client = OAuthClient()
+
     @staticmethod
     def get_record_by_title(title: str) -> QidRecord | None:
         """Retrieve the record for a given page title."""
@@ -41,8 +44,8 @@ class WikidataClient:
 
         return None
 
-    @staticmethod
     def _link_it(
+        self,
         qid: str,
         lang: str,
         sourcetitle: str,
@@ -77,7 +80,7 @@ class WikidataClient:
             api_params["site"] = "enwiki"
 
         try:
-            response = OAuthClient().post_params(api_params, https_domain, access_key, access_secret)
+            response = self.oauth_client.post_params(api_params, https_domain, access_key, access_secret)
         except Exception:
             logger.exception("Failed to call Wikidata API")
             return {}
@@ -93,9 +96,8 @@ class WikidataClient:
 
         return result
 
-    @classmethod
     def link_to_wikidata(
-        cls,
+        self,
         sourcetitle: str,
         lang: str,
         user: str,
@@ -116,12 +118,12 @@ class WikidataClient:
         Returns:
             Result dictionary with 'result' and 'qid' keys
         """
-        qid = cls.get_qid_for_mdtitle(sourcetitle) or ""
+        qid = self.get_qid_for_mdtitle(sourcetitle) or ""
 
         if not access_key or not access_secret:
             return {"error": f"Access credentials not found for user: {user}", "qid": qid}
 
-        link_result = cls._link_it(qid, lang, sourcetitle, targettitle, access_key, access_secret)
+        link_result = self._link_it(qid, lang, sourcetitle, targettitle, access_key, access_secret)
         link_result["qid"] = qid
 
         if link_result.get("success"):
@@ -129,7 +131,6 @@ class WikidataClient:
             return {"result": "success", "qid": qid}
 
         return link_result
-
 
 def get_record_by_title(title: str) -> QidRecord | None:
     return WikidataClient.get_record_by_title(title)
@@ -147,7 +148,7 @@ def link_to_wikidata(
     access_key: str,
     access_secret: str,
 ) -> dict[str, Any]:
-    return WikidataClient.link_to_wikidata(sourcetitle, lang, user, targettitle, access_key, access_secret)
+    return WikidataClient().link_to_wikidata(sourcetitle, lang, user, targettitle, access_key, access_secret)
 
 
 __all__ = [

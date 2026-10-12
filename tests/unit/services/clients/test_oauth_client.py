@@ -58,6 +58,10 @@ class FakeHttpClient:
             raise item
         return item
 
+    def _send(self, url: str, **kwargs: Any) -> FakeResponse:
+        self.get_calls.append({"url": url, **kwargs})
+        return self._next(self.get_responses)
+
     def get(self, url: str, **kwargs: Any) -> FakeResponse:
         self.get_calls.append({"url": url, **kwargs})
         return self._next(self.get_responses)
@@ -97,14 +101,16 @@ class TestGetCsrfToken:
         token = "test_csrf_token+\\"
         http = FakeHttpClient(get_responses=[csrf_response(token)])
 
-        result = OAuthClient(http).get_csrf_token("access_key", "access_secret", "en")
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.get_csrf_token("access_key", "access_secret", "en")
 
         assert result["query"]["tokens"]["csrftoken"] == token
 
     def test_sends_expected_request(self):
         http = FakeHttpClient(get_responses=[csrf_response()])
 
-        OAuthClient(http).get_csrf_token("access_key", "access_secret", "fr")
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        client.get_csrf_token("access_key", "access_secret", "fr")
 
         assert len(http.get_calls) == 1
         call = http.get_calls[0]
@@ -115,7 +121,8 @@ class TestGetCsrfToken:
     def test_returns_error_on_connection_error(self):
         http = FakeHttpClient(get_responses=[requests.exceptions.ConnectionError("boom")])
 
-        result = OAuthClient(http).get_csrf_token("access_key", "access_secret")
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.get_csrf_token("access_key", "access_secret")
 
         assert result["error"]["code"] == "Connection error"
         assert result["exception"] == "boom"
@@ -123,7 +130,8 @@ class TestGetCsrfToken:
     def test_returns_error_on_request_exception(self):
         http = FakeHttpClient(get_responses=[requests.exceptions.Timeout("slow")])
 
-        result = OAuthClient(http).get_csrf_token("access_key", "access_secret")
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.get_csrf_token("access_key", "access_secret")
 
         assert result["error"]["code"] == "Request error"
         assert result["exception"] == "slow"
@@ -132,7 +140,8 @@ class TestGetCsrfToken:
         bad = FakeResponse(text="<html>", json_error=requests.exceptions.JSONDecodeError("bad", "<html>", 0))
         http = FakeHttpClient(get_responses=[bad])
 
-        result = OAuthClient(http).get_csrf_token("access_key", "access_secret")
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.get_csrf_token("access_key", "access_secret")
 
         assert result == {"error": "JSON decode error", "response": "<html>"}
 
@@ -146,7 +155,8 @@ class TestPostParams:
             post_responses=[FakeResponse(text='{"success": true}')],
         )
 
-        result = OAuthClient(http).post_params(
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.post_params(
             {"action": "edit"},
             "https://en.wikipedia.org",
             "access_key",
@@ -167,7 +177,8 @@ class TestPostParams:
             post_responses=[FakeResponse(text="{}")],
         )
 
-        OAuthClient(http).post_params(
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        client.post_params(
             {"action": "edit"},
             "https://ar.wikipedia.org",
             "access_key",
@@ -180,7 +191,8 @@ class TestPostParams:
         error_response = FakeResponse(json_data={"error": {"code": "mwoauth-invalid-authorization"}})
         http = FakeHttpClient(get_responses=[error_response])
 
-        result = OAuthClient(http).post_params(
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.post_params(
             {"action": "edit"},
             "https://en.wikipedia.org",
             "access_key",
@@ -194,7 +206,8 @@ class TestPostParams:
     def test_returns_error_when_token_missing(self):
         http = FakeHttpClient(get_responses=[FakeResponse(json_data={"query": {"tokens": {}}})])
 
-        result = OAuthClient(http).post_params(
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.post_params(
             {"action": "edit"},
             "https://en.wikipedia.org",
             "access_key",
@@ -214,7 +227,8 @@ class TestGetCxtoken:
             post_responses=[FakeResponse(text='{"cxtoken": "some_cx_token"}')],
         )
 
-        result = OAuthClient(http).get_cxtoken("en", "access_key", "access_secret")
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.get_cxtoken("en", "access_key", "access_secret")
 
         assert result["cxtoken"] == "some_cx_token"
         assert http.post_calls[0]["data"]["action"] == "cxtoken"
@@ -225,6 +239,7 @@ class TestGetCxtoken:
             post_responses=[FakeResponse(text="not valid json")],
         )
 
-        result = OAuthClient(http).get_cxtoken("en", "access_key", "access_secret")
+        client = OAuthClient(http_client=http)  # pyright: ignore[reportArgumentType]
+        result = client.get_cxtoken("en", "access_key", "access_secret")
 
         assert result["error"]["code"] == "parse-error"

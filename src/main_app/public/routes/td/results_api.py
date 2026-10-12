@@ -18,7 +18,6 @@ from ....database.services import (
 
 logger = logging.getLogger(__name__)
 
-
 class ResultsApiService:
     """Service for computing Translation Dashboard results."""
 
