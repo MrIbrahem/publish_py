@@ -26,7 +26,6 @@ class MockPublishWorkerDeps:
     to_do: MagicMock
     should_add: MagicMock
     find_exists_or_update_page: MagicMock
-    find_exists_or_update_user_page: MagicMock
 
 
 @pytest.fixture
@@ -39,18 +38,15 @@ def common_patches(monkeypatch: pytest.MonkeyPatch) -> MockPublishWorkerDeps:
     mock_to_do = MagicMock()
     mock_should_add = MagicMock()
     mock_find_exists = MagicMock()
-    mock_user_find_exists = MagicMock()
 
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.PublishWorker._get_revid", mock_get_revid)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.do_changes_to_text_with_settings", mock_changes)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.publish_do_edit", mock_edit)
-    monkeypatch.setattr("src.main_app.public.routes.publish.wikidata_linker", mock_link)
+    monkeypatch.setattr("src.main_app.public.routes.publish.wikidata_linker.link_to_wikidata", mock_link)
     monkeypatch.setattr("src.main_app.public.routes.publish.report_recorder.to_do", mock_to_do)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.WikidataLinker._should_link", mock_should_add)
-    monkeypatch.setattr("src.main_app.public.routes.publish.to_db._find_exists_or_update_page", mock_find_exists)
-    monkeypatch.setattr(
-        "src.main_app.public.routes.publish.to_db._find_exists_or_update_user_page", mock_user_find_exists
-    )
+    monkeypatch.setattr("src.main_app.public.routes.publish.to_db.PageDataSaver._update_if_exists", mock_find_exists)
+
     monkeypatch.setattr("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category", MagicMock())
 
     mock_get_revid.return_value = "12345"
@@ -68,7 +64,6 @@ def common_patches(monkeypatch: pytest.MonkeyPatch) -> MockPublishWorkerDeps:
         to_do=mock_to_do,
         should_add=mock_should_add,
         find_exists_or_update_page=mock_find_exists,
-        find_exists_or_update_user_page=mock_user_find_exists,
     )
 
 

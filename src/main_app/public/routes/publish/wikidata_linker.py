@@ -7,7 +7,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-
 from ....config import app_settings
 from ....database.services import (
     UserTokenService,
