@@ -4,6 +4,7 @@ tests/
 │   ├── admin/
 │   │   ├── test_coordinators_routes_integration.py
 │   │   └── test_settings_routes_integration.py
+│   ├── app_services/
 │   ├── coordinators/
 │   │   └── routes/
 │   │       ├── qids/
@@ -12,19 +13,9 @@ tests/
 │   │       ├── test_full_translators_routes_integration.py
 │   │       ├── test_language_settings_routes_integration.py
 │   │       └── test_users_no_inprocess_routes_integration.py
-│   ├── main_app/
-│   │   ├── admin/
-│   │   │   └── routes/
-│   │   │       └── qids/
-│   │   └── public/
-│   │       ├── auth/
-│   │       └── routes/
-│   │           ├── api/
-│   │           ├── cxtoken/
-│   │           ├── main/
-│   │           ├── publish/
-│   │           ├── refs/
-│   │           └── td/
+│   ├── database/
+│   │   └── services/
+│   │       └── test_pages_service_integration.py
 │   ├── public/
 │   │   ├── auth/
 │   │   └── routes/
@@ -53,12 +44,10 @@ tests/
 │   │           ├── test_td_routes_integration.py
 │   │           └── test_translate_med_integration.py
 │   └── services/
-│       ├── core/
-│       │   └── cors/
-│       │       ├── test_is_allowed_checker.py
-│       │       └── test_main_routes_with_cors.py
-│       └── services/
-│           └── test_pages_service_integration.py
+│       └── core/
+│           └── cors/
+│               ├── test_is_allowed_checker.py
+│               └── test_main_routes_with_cors.py
 ├── unit/
 │   ├── admin/
 │   │   └── test_settings_routes.py
@@ -66,6 +55,62 @@ tests/
 │   │   └── auth/
 │   │       ├── test_auth_utils.py
 │   │       └── test_identity.py
+│   ├── app_services/
+│   │   └── new_html_services/
+│   │       ├── parser/
+│   │       │   ├── data/
+│   │       │   │   └── source-1.wiki
+│   │       │   ├── test_citation.py
+│   │       │   ├── test_citations_parser.py
+│   │       │   ├── test_lead_section_parser.py
+│   │       │   └── test_template_helpers.py
+│   │       ├── process/
+│   │       │   ├── test_process_seg.py
+│   │       │   └── test_processer.py
+│   │       ├── utils/
+│   │       │   ├── test_html_utils.py
+│   │       │   └── test_services_utils.py
+│   │       ├── wikitext_fixes/
+│   │       │   ├── fixtures/
+│   │       │   │   ├── output/
+│   │       │   │   │   ├── abdominal_pain.wiki
+│   │       │   │   │   ├── obstructive_sleep_apnea.wiki
+│   │       │   │   │   ├── test-1.wiki
+│   │       │   │   │   ├── test-2.wiki
+│   │       │   │   │   ├── Uterine_atony.wiki
+│   │       │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
+│   │       │   │   ├── result/
+│   │       │   │   │   ├── abdominal_pain.wiki
+│   │       │   │   │   ├── obstructive_sleep_apnea.wiki
+│   │       │   │   │   ├── test-1.wiki
+│   │       │   │   │   ├── test-2.wiki
+│   │       │   │   │   ├── Uterine_atony.wiki
+│   │       │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
+│   │       │   │   └── source/
+│   │       │   │       ├── abdominal_pain.wiki
+│   │       │   │       ├── obstructive_sleep_apnea.wiki
+│   │       │   │       ├── test-1.wiki
+│   │       │   │       ├── test-2.wiki
+│   │       │   │       ├── Uterine_atony.wiki
+│   │       │   │       └── Wernicke–Korsakoff_syndrome.wiki
+│   │       │   ├── media/
+│   │       │   │   ├── test_fix_images.py
+│   │       │   │   └── test_remove_missing_images.py
+│   │       │   ├── references/
+│   │       │   │   ├── test_delete_empty_refs.py
+│   │       │   │   ├── test_expand_refs.py
+│   │       │   │   └── test_ref_worker.py
+│   │       │   ├── structure/
+│   │       │   │   ├── test_fix_categories.py
+│   │       │   │   └── test_fix_language_links.py
+│   │       │   ├── templates/
+│   │       │   │   ├── test_delete_templates.py
+│   │       │   │   └── test_fix_templates.py
+│   │       │   └── test_wikitext_fixer.py
+│   │       ├── __init__.py
+│   │       ├── expend_infobox.py
+│   │       ├── test_clients.py
+│   │       └── test_storage.py
 │   ├── config/
 │   ├── coordinators/
 │   │   └── routes/
@@ -133,7 +178,6 @@ tests/
 │   │   │   │   ├── test_page_service.py
 │   │   │   │   └── test_user_page_service.py
 │   │   │   ├── reports/
-│   │   │   │   ├── test_pages_users_to_main_service.py
 │   │   │   │   └── test_report_service.py
 │   │   │   ├── users/
 │   │   │   │   ├── test_admin_service.py
@@ -151,33 +195,6 @@ tests/
 │   │   │   └── __init__.py
 │   │   └── __init__.py
 │   ├── extensions/
-│   ├── main_app/
-│   │   ├── admin/
-│   │   ├── config/
-│   │   ├── db/
-│   │   │   ├── models/
-│   │   │   └── services/
-│   │   │       ├── analytics/
-│   │   │       ├── config/
-│   │   │       ├── content/
-│   │   │       ├── pages/
-│   │   │       ├── reports/
-│   │   │       ├── users/
-│   │   │       ├── utils/
-│   │   │       └── wikidata/
-│   │   ├── extensions/
-│   │   ├── public/
-│   │   │   ├── auth/
-│   │   │   └── utils/
-│   │   └── shared/
-│   │       ├── auth/
-│   │       ├── clients/
-│   │       ├── core/
-│   │       │   ├── cookies/
-│   │       │   └── cors/
-│   │       ├── schemas/
-│   │       └── utils/
-│   │           └── helpers/
 │   ├── public/
 │   │   ├── auth/
 │   │   │   └── test_routes.py
@@ -220,61 +237,6 @@ tests/
 │   │   │   │   └── test_publish_secret_checks.py
 │   │   │   ├── test_crypto.py
 │   │   │   └── test_extensions.py
-│   │   ├── new_html_services/
-│   │   │   ├── parser/
-│   │   │   │   ├── data/
-│   │   │   │   │   └── source-1.wiki
-│   │   │   │   ├── test_citation.py
-│   │   │   │   ├── test_citations_parser.py
-│   │   │   │   ├── test_lead_section_parser.py
-│   │   │   │   └── test_template_helpers.py
-│   │   │   ├── process/
-│   │   │   │   ├── test_process_seg.py
-│   │   │   │   └── test_processer.py
-│   │   │   ├── utils/
-│   │   │   │   ├── test_html_utils.py
-│   │   │   │   └── test_services_utils.py
-│   │   │   ├── wikitext_fixes/
-│   │   │   │   ├── fixtures/
-│   │   │   │   │   ├── output/
-│   │   │   │   │   │   ├── abdominal_pain.wiki
-│   │   │   │   │   │   ├── obstructive_sleep_apnea.wiki
-│   │   │   │   │   │   ├── test-1.wiki
-│   │   │   │   │   │   ├── test-2.wiki
-│   │   │   │   │   │   ├── Uterine_atony.wiki
-│   │   │   │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
-│   │   │   │   │   ├── result/
-│   │   │   │   │   │   ├── abdominal_pain.wiki
-│   │   │   │   │   │   ├── obstructive_sleep_apnea.wiki
-│   │   │   │   │   │   ├── test-1.wiki
-│   │   │   │   │   │   ├── test-2.wiki
-│   │   │   │   │   │   ├── Uterine_atony.wiki
-│   │   │   │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
-│   │   │   │   │   └── source/
-│   │   │   │   │       ├── abdominal_pain.wiki
-│   │   │   │   │       ├── obstructive_sleep_apnea.wiki
-│   │   │   │   │       ├── test-1.wiki
-│   │   │   │   │       ├── test-2.wiki
-│   │   │   │   │       ├── Uterine_atony.wiki
-│   │   │   │   │       └── Wernicke–Korsakoff_syndrome.wiki
-│   │   │   │   ├── media/
-│   │   │   │   │   ├── test_fix_images.py
-│   │   │   │   │   └── test_remove_missing_images.py
-│   │   │   │   ├── references/
-│   │   │   │   │   ├── test_delete_empty_refs.py
-│   │   │   │   │   ├── test_expand_refs.py
-│   │   │   │   │   └── test_ref_worker.py
-│   │   │   │   ├── structure/
-│   │   │   │   │   ├── test_fix_categories.py
-│   │   │   │   │   └── test_fix_language_links.py
-│   │   │   │   ├── templates/
-│   │   │   │   │   ├── test_delete_templates.py
-│   │   │   │   │   └── test_fix_templates.py
-│   │   │   │   └── test_wikitext_fixer.py
-│   │   │   ├── __init__.py
-│   │   │   ├── expend_infobox.py
-│   │   │   ├── test_clients.py
-│   │   │   └── test_storage.py
 │   │   ├── schemas/
 │   │   └── utils/
 │   │       ├── helpers/

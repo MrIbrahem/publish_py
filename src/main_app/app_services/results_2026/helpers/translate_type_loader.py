@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import logging
 
-from ......database.models import TranslateTypeRecord
-from ......database.services import TranslateTypeService
+from ....database.models import TranslateTypeRecord
+from ....database.services import TranslateTypeService
 
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,7 @@ from urllib.parse import quote
 
 from markupsafe import Markup
 
-from ......services.utils.wiki_links import (
+from ....services.utils.wiki_links import (
     WikiLinks,
 )
 from .shared_mapping import ItemBase, Stats

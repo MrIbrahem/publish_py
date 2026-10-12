@@ -9,6 +9,69 @@ src/
 │   │   ├── flask_admin_panel.py
 │   │   ├── flask_admin_panel_models.py
 │   │   └── settings.py
+│   ├── app_services/
+│   │   ├── new_html_services/
+│   │   │   ├── parser/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── citation.py
+│   │   │   │   ├── citations_parser.py
+│   │   │   │   ├── lead_section_parser.py
+│   │   │   │   └── template_helpers.py
+│   │   │   ├── process/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── process_seg.py
+│   │   │   │   └── processer.py
+│   │   │   ├── utils/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── html_utils.py
+│   │   │   │   └── utils.py
+│   │   │   ├── wikitext_fixes/
+│   │   │   │   ├── media/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── fix_images.py
+│   │   │   │   │   └── remove_missing_images.py
+│   │   │   │   ├── references/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── delete_empty_refs.py
+│   │   │   │   │   ├── expand_refs.py
+│   │   │   │   │   └── ref_worker.py
+│   │   │   │   ├── structure/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── fix_categories.py
+│   │   │   │   │   └── fix_language_links.py
+│   │   │   │   ├── templates/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── delete_templates.py
+│   │   │   │   │   └── fix_templates.py
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── wikitext_fixer.py
+│   │   │   ├── __init__.py
+│   │   │   ├── clients.py
+│   │   │   ├── Domain_php_source.txt
+│   │   │   ├── README.md
+│   │   │   └── storage.py
+│   │   ├── results_2026/
+│   │   │   ├── data/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── results_fetcher.py
+│   │   │   ├── helpers/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── translate_type_loader.py
+│   │   │   ├── mapping/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exists_mapping.py
+│   │   │   │   ├── inprocess_mapping.py
+│   │   │   │   ├── missing_mapping.py
+│   │   │   │   └── shared_mapping.py
+│   │   │   ├── tables/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── exists_table.py
+│   │   │   │   ├── in_process_table.py
+│   │   │   │   └── missing_table.py
+│   │   │   ├── __init__.py
+│   │   │   ├── bundle.py
+│   │   │   └── results_loader.py
+│   │   └── __init__.py
 │   ├── config/
 │   │   ├── __init__.py
 │   │   ├── classes.py
@@ -101,7 +164,6 @@ src/
 │   │   │   │   └── user_page_service.py
 │   │   │   ├── reports/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── pages_users_to_main_service.py
 │   │   │   │   └── report_service.py
 │   │   │   ├── users/
 │   │   │   │   ├── __init__.py
@@ -165,27 +227,6 @@ src/
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── routes.py
 │   │   │   ├── td/
-│   │   │   │   ├── results_2026/
-│   │   │   │   │   ├── data/
-│   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   └── results_fetcher.py
-│   │   │   │   │   ├── helpers/
-│   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   └── translate_type_loader.py
-│   │   │   │   │   ├── mapping/
-│   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   ├── exists_mapping.py
-│   │   │   │   │   │   ├── inprocess_mapping.py
-│   │   │   │   │   │   ├── missing_mapping.py
-│   │   │   │   │   │   └── shared_mapping.py
-│   │   │   │   │   ├── tables/
-│   │   │   │   │   │   ├── __init__.py
-│   │   │   │   │   │   ├── exists_table.py
-│   │   │   │   │   │   ├── in_process_table.py
-│   │   │   │   │   │   └── missing_table.py
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── bundle.py
-│   │   │   │   │   └── results_loader.py
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── leaderboard.py
 │   │   │   │   ├── leaderboard_mapping.py
@@ -228,46 +269,6 @@ src/
 │   │   │   ├── __init__.py
 │   │   │   ├── crypto.py
 │   │   │   └── jinja_filters.py
-│   │   ├── new_html_services/
-│   │   │   ├── parser/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── citation.py
-│   │   │   │   ├── citations_parser.py
-│   │   │   │   ├── lead_section_parser.py
-│   │   │   │   └── template_helpers.py
-│   │   │   ├── process/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── process_seg.py
-│   │   │   │   └── processer.py
-│   │   │   ├── utils/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── html_utils.py
-│   │   │   │   └── utils.py
-│   │   │   ├── wikitext_fixes/
-│   │   │   │   ├── media/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── fix_images.py
-│   │   │   │   │   └── remove_missing_images.py
-│   │   │   │   ├── references/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── delete_empty_refs.py
-│   │   │   │   │   ├── expand_refs.py
-│   │   │   │   │   └── ref_worker.py
-│   │   │   │   ├── structure/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── fix_categories.py
-│   │   │   │   │   └── fix_language_links.py
-│   │   │   │   ├── templates/
-│   │   │   │   │   ├── __init__.py
-│   │   │   │   │   ├── delete_templates.py
-│   │   │   │   │   └── fix_templates.py
-│   │   │   │   ├── __init__.py
-│   │   │   │   └── wikitext_fixer.py
-│   │   │   ├── __init__.py
-│   │   │   ├── clients.py
-│   │   │   ├── Domain_php_source.txt
-│   │   │   ├── README.md
-│   │   │   └── storage.py
 │   │   ├── schemas/
 │   │   │   └── __init__.py
 │   │   ├── segments_wraper/
@@ -301,21 +302,12 @@ src/
 │   ├── error_pages.py
 │   ├── logger_config.py
 │   └── README.md
-├── results_api_php_code/
-│   ├── backend/
-│   │   ├── api_calls/
-│   │   ├── results/
-│   │   │   ├── new_way/
-│   │   │   └── sparql_bots/
-│   │   └── results_2026/
-│   └── README.md
 ├── static/
 │   ├── css/
 │   │   ├── Chart.min.css
 │   │   ├── dashboard_new1.css
 │   │   ├── mobile_format.css
 │   │   ├── navbar.css
-│   │   ├── Responsive_Table.css
 │   │   ├── sidebar-desktop.css
 │   │   ├── sidebar-mobile.css
 │   │   ├── style.css

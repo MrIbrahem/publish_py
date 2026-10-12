@@ -11,7 +11,7 @@ from flask.views import MethodView
 
 from ...config.main_settings import app_settings
 from ...services.core.cors import check_cors
-from ...services.new_html_services import (
+from ...app_services.new_html_services import (
     WikitextFixerService,
     list_revisions,
     process_page,
