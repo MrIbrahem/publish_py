@@ -268,7 +268,7 @@ class PublishWorker:
         api_params = self._build_api_params()
 
         # Perform the edit
-        editit = MediaWikiApiClient.publish_do_edit(
+        editit = MediaWikiApiClient().publish_do_edit(
             api_params,
             self.tab["lang"],
             self.access_key,

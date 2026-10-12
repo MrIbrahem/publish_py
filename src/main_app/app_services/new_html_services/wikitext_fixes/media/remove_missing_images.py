@@ -26,9 +26,12 @@ _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
 class ImageExistenceChecker:
     """Equivalent of the PHP ``ImageExistenceChecker`` service to check image existence via MediaWiki API."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClient()
+        self.http_client = http_client or HttpClient()
 
     def image_exists(self, filename: str) -> bool:
         """Check if an image exists on Wikimedia Commons.

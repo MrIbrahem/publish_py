@@ -28,6 +28,7 @@ def normalize_title_for_url(title: str) -> str:
     title = title.replace("/", "%2F")
     return title
 
+
 class MdwikiApi:
     """
     Service for fetching wikitext content from mdwiki.org
@@ -40,9 +41,12 @@ class MdwikiApi:
     REST_BASE = "https://mdwiki.org/w/rest.php/v1"
     API_BASE = "https://mdwiki.org/w/api.php"
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClient()
+        self.http_client = http_client or HttpClient()
 
         # Fallback to Action API
         self.fallback_to_action_api = False
@@ -138,9 +142,12 @@ class MdwikiApi:
 class TransformApi:
     """Convert wikitext to HTML using English Wikipedia REST API."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
         """Initialize the checker with an HTTP client instance."""
-        self.http_client = HttpClient()
+        self.http_client = http_client or HttpClient()
 
     def convert(self, wikitext: str, title: str) -> dict[str, str]:
         """

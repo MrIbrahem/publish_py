@@ -38,7 +38,7 @@ class WikidataLinker:
     @staticmethod
     def _should_link(lang: str, title: str) -> bool:
         """Return False if the page is missing or is a user page (ns 2)."""
-        page_information = MediaWikiApiClient.get_title_info(title, lang)
+        page_information = MediaWikiApiClient().get_title_info(title, lang)
         if not page_information:
             return False
 

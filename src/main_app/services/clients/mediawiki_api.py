@@ -9,7 +9,7 @@ import json
 import logging
 from typing import Any
 
-from .http_client import http_client
+from .http_client import HttpClient
 from .oauth_client import OAuthClient
 
 logger = logging.getLogger(__name__)
@@ -18,8 +18,14 @@ logger = logging.getLogger(__name__)
 class MediaWikiApiClient:
     """Client for MediaWiki API operations."""
 
-    @staticmethod
-    def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
+        """Initialize the checker with an HTTP client instance."""
+        self.http_client = http_client or HttpClient()
+
+    def get_title_info(self, targettitle: str, lang: str) -> dict[str, Any] | None:
         """Get page information from Wikipedia API.
 
         Args:
@@ -39,7 +45,7 @@ class MediaWikiApiClient:
         url = f"https://{lang}.wikipedia.org/w/api.php"
 
         try:
-            response = http_client.get(url, params=params, timeout=30)
+            response = self.http_client.get(url, params=params, timeout=30)
             result = response.json()
             logger.debug(f"GetTitleInfo result: {result}")
             pages = result.get("query", {}).get("pages", [])
@@ -50,8 +56,8 @@ class MediaWikiApiClient:
 
         return None
 
-    @staticmethod
     def publish_do_edit(
+        self,
         api_params: dict[str, Any],
         wiki: str,
         access_key: str,
@@ -81,7 +87,7 @@ class MediaWikiApiClient:
 
 
 def get_title_info(targettitle: str, lang: str) -> dict[str, Any] | None:
-    return MediaWikiApiClient.get_title_info(targettitle, lang)
+    return MediaWikiApiClient().get_title_info(targettitle, lang)
 
 
 def publish_do_edit(
@@ -90,7 +96,12 @@ def publish_do_edit(
     access_key: str,
     access_secret: str,
 ) -> dict[str, Any]:
-    return MediaWikiApiClient.publish_do_edit(api_params, wiki, access_key, access_secret)
+    return MediaWikiApiClient().publish_do_edit(
+        api_params,
+        wiki,
+        access_key,
+        access_secret,
+    )
 
 
 __all__ = [
