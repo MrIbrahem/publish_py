@@ -3,9 +3,7 @@ from __future__ import annotations
 import logging
 import re
 
-import requests
-
-from ...config import app_settings
+from .http_client import http_client
 
 ALLOWED_WIKI_PROJECT = re.compile(r"^(?:[a-z0-9-]+\.wikipedia\.org|commons\.wikimedia\.org)$", re.IGNORECASE)
 
@@ -30,7 +28,6 @@ class TextApiClient:
             logger.warning("Rejected unsupported wiki project: %s", project)
             return ""
 
-        headers = {"User-Agent": app_settings.other.user_agent}
         api_url = f"https://{project}/w/api.php"
         params = {
             "action": "query",
@@ -43,7 +40,7 @@ class TextApiClient:
         }
         data = {}
         try:
-            response = requests.get(api_url, params=params, headers=headers, timeout=30)
+            response = http_client.get(api_url, params=params, timeout=30)
             response.raise_for_status()
             data = response.json()
         except Exception as e:

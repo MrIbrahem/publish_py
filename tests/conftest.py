@@ -91,10 +91,13 @@ def stop_nets(request, monkeypatch):
     # Otherwise, disable the socket for all other tests
     disable_socket(allow_unix_socket=True)
 
-    # mock requests library in src/main_app/services/new_html_services/clients.py
-    _mock = MagicMock()
-    _mock.request = MagicMock(return_value=MagicMock(text="", status_code=200))
-    monkeypatch.setattr("src.main_app.app_services.new_html_services.clients.requests", _mock)
+    # Mock http_client in src/main_app/app_services/new_html_services/clients.py
+    _mock_client = MagicMock()
+    _mock_resp = MagicMock(text="", status_code=200)
+    _mock_client.request.return_value = _mock_resp
+    _mock_client.get.return_value = _mock_resp
+    _mock_client.post.return_value = _mock_resp
+    monkeypatch.setattr("src.main_app.app_services.new_html_services.clients.http_client", _mock_client)
 
 
 # ── app fixtures ───────────────────────────────────────────────────────────────────
