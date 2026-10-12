@@ -4,12 +4,12 @@ Integration tests for src/main_app/public/routes/publish/routes.py module.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from unittest.mock import MagicMock
 
 import pytest
 from flask.testing import FlaskClient
 
+from src.main_app.database.models.users import UserRecord
 from src.main_app.database.services import UsersService, UserTokenService
 from src.main_app.services.core.crypto import CryptoService
 
@@ -38,17 +38,12 @@ def real_user_token():
     return user
 
 
-@dataclass
-class MockPublishRoutesDeps:
-    handle_form: MagicMock
-
-
 @pytest.fixture
-def mock_handle_form(monkeypatch: pytest.MonkeyPatch) -> MockPublishRoutesDeps:
+def mock_handle_form(monkeypatch: pytest.MonkeyPatch):
     """Mock `_handle_form` used across publish route integration tests."""
     _mock = MagicMock()
     monkeypatch.setattr("src.main_app.public.routes.publish.routes._handle_form", _mock)
-    return MockPublishRoutesDeps(handle_form=_mock)
+    return _mock
 
 
 @pytest.mark.integration
@@ -105,9 +100,15 @@ class TestPublishPost:
         assert "error" in data
         assert response.status_code == 403
 
-    def test_publish_with_valid_data(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
+    def test_publish_with_valid_data(
+        self,
+        real_user_token,
+        mock_validate_access,
+        mock_handle_form,
+        mock_client: FlaskClient,
+    ):
         """Test publishing with valid data."""
-        mock_handle_form.handle_form.return_value = {"result": "success", "edit": {"newrevid": 12345}}
+        mock_handle_form.return_value = {"result": "success", "edit": {"newrevid": 12345}}
 
         response = mock_client.post(
             "/publish/",
@@ -130,9 +131,15 @@ class TestPublishPost:
 class TestPublishFormData:
     """Integration tests for publish form data handling."""
 
-    def test_publish_accepts_form_data(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
+    def test_publish_accepts_form_data(
+        self,
+        real_user_token,
+        mock_validate_access,
+        mock_handle_form,
+        mock_client: FlaskClient,
+    ):
         """Test that publish accepts form data."""
-        mock_handle_form.handle_form.return_value = {"result": "success"}
+        mock_handle_form.return_value = {"result": "success"}
 
         response = mock_client.post(
             "/publish/",
@@ -147,9 +154,15 @@ class TestPublishFormData:
 
         assert response.status_code == 200
 
-    def test_publish_accepts_json_data(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
+    def test_publish_accepts_json_data(
+        self,
+        real_user_token,
+        mock_validate_access,
+        mock_handle_form,
+        mock_client: FlaskClient,
+    ):
         """Test that publish accepts JSON data."""
-        mock_handle_form.handle_form.return_value = {"result": "success"}
+        mock_handle_form.return_value = {"result": "success"}
 
         response = mock_client.post(
             "/publish/",
@@ -170,9 +183,15 @@ class TestPublishFormData:
 class TestPublishCaptcha:
     """Integration tests for captcha handling in publish."""
 
-    def test_publish_with_captcha_params(self, real_user_token, mock_validate_access, mock_handle_form: MockPublishRoutesDeps, mock_client: FlaskClient):
+    def test_publish_with_captcha_params(
+        self,
+        real_user_token: UserRecord,
+        mock_validate_access,
+        mock_handle_form,
+        mock_client: FlaskClient,
+    ):
         """Test publishing with captcha parameters."""
-        mock_handle_form.handle_form.return_value = {"result": "success"}
+        mock_handle_form.return_value = {"result": "success"}
 
         response = mock_client.post(
             "/publish/",

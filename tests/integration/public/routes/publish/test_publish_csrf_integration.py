@@ -4,9 +4,9 @@ These tests verify the full publish flow when WTF_CSRF_ENABLED=True,
 using a configuration similar to ProductionConfig.
 """
 
-from dataclasses import dataclass
 import json
 import os
+from dataclasses import dataclass
 from unittest.mock import MagicMock
 
 import pytest
@@ -48,7 +48,9 @@ def common_patches(monkeypatch: pytest.MonkeyPatch) -> MockPublishWorkerDeps:
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.to_do", mock_to_do)
     monkeypatch.setattr("src.main_app.public.routes.publish.worker.should_added_to_wikidata", mock_should_add)
     monkeypatch.setattr("src.main_app.public.routes.publish.to_db.find_exists_or_update_page", mock_find_exists)
-    monkeypatch.setattr("src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page", mock_user_find_exists)
+    monkeypatch.setattr(
+        "src.main_app.public.routes.publish.to_db.find_exists_or_update_user_page", mock_user_find_exists
+    )
     monkeypatch.setattr("src.main_app.public.routes.publish.to_db.CategoryService.get_campaign_category", MagicMock())
 
     mock_get_revid.return_value = "12345"
@@ -282,7 +284,9 @@ class TestMetadataLogic(BasePublishTest):
 
         assert response.status_code == 400
 
-    def test_words_field_in_tab(self, csrf_client, common_patches: MockPublishWorkerDeps, monkeypatch: pytest.MonkeyPatch):
+    def test_words_field_in_tab(
+        self, csrf_client, common_patches: MockPublishWorkerDeps, monkeypatch: pytest.MonkeyPatch
+    ):
         mock_word_count = MagicMock(return_value=500)
         monkeypatch.setattr("src.main_app.public.routes.publish.worker.get_word_count", mock_word_count)
 
@@ -322,9 +326,7 @@ class TestMetadataLogic(BasePublishTest):
 
 class TestErrorAndEdgeCases(BasePublishTest):
     def test_captcha_handling(self, csrf_client, common_patches: MockPublishWorkerDeps):
-        common_patches.edit.return_value = {
-            "edit": {"captcha": {"id": "12345", "type": "image"}, "result": "Failure"}
-        }
+        common_patches.edit.return_value = {"edit": {"captcha": {"id": "12345", "type": "image"}, "result": "Failure"}}
 
         response = self._post(csrf_client, self._default_payload())
 
@@ -348,7 +350,9 @@ class TestErrorAndEdgeCases(BasePublishTest):
 
 
 class TestComplexWorkflows(BasePublishTest):
-    def test_wikidata_link_fallback_user(self, csrf_client, common_patches: MockPublishWorkerDeps, seed_user_token, monkeypatch: pytest.MonkeyPatch):
+    def test_wikidata_link_fallback_user(
+        self, csrf_client, common_patches: MockPublishWorkerDeps, seed_user_token, monkeypatch: pytest.MonkeyPatch
+    ):
         users_service = UsersService()
         fallback_user = users_service.create_user("Mr. Ibrahem")
 

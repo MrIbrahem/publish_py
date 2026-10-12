@@ -8,8 +8,13 @@ import logging
 from typing import Any
 
 from ....database.services import (
-    CategoryMemberService, AllQidsService, CategoryService, InProcessService, PagesService,
+    AllQidsService,
+    CategoryMemberService,
+    CategoryService,
+    InProcessService,
+    PagesService,
 )
+
 logger = logging.getLogger(__name__)
 
 

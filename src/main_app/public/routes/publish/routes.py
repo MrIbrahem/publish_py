@@ -11,10 +11,12 @@ import logging
 
 from flask import Blueprint, Response, jsonify, request
 from flask.views import MethodView
+
 from ....services.core.cors import check_cors, validate_access
 from .worker import _handle_form
 
 logger = logging.getLogger(__name__)
+
 
 class PublishPreflightView(MethodView):
     """Answer the CORS preflight request for the publish endpoint."""

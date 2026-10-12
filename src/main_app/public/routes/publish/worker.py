@@ -9,14 +9,10 @@ import logging
 from typing import Any
 
 from flask import Response, jsonify
+from marshmallow import ValidationError
 
 from ....config import app_settings
 from ....database.models import LanguageSettingRecord
-
-from marshmallow import ValidationError
-
-from ....services.schemas import PublishRequestSchema
-from ....services.utils.helpers.format import format_title, format_user
 from ....database.services import (
     LanguageSettingService,
     MdwikiRevidService,
@@ -29,12 +25,14 @@ from ....services.clients import (
     link_to_wikidata,
     publish_do_edit,
 )
+from ....services.schemas import PublishRequestSchema
 from ....services.utils.helpers import (
     determine_hashtag,
     do_changes_to_text_with_settings,
     make_summary,
     to_do,
 )
+from ....services.utils.helpers.format import format_title, format_user
 from .to_db import add_to_db
 
 logger = logging.getLogger(__name__)
@@ -410,7 +408,6 @@ def _handle_no_access(tab: dict[str, Any]) -> dict:
     )
 
     return editit
-
 
 
 def _handle_form(request_data) -> Response:

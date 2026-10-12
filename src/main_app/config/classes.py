@@ -195,7 +195,6 @@ class Paths:
         log_dir = f"{flask_data_dir}/logs"
         publish_reports_dir = os.getenv("PUBLISH_REPORTS_DIR") or f"{flask_data_dir}/publish_reports/reports_by_day"
 
-
         # Ensure log directory exists
         Path(resolve_path(log_dir)).mkdir(parents=True, exist_ok=True)
 
