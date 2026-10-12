@@ -26,7 +26,7 @@ from ....database.services import (
     UserTokenService,
     WordService,
 )
-from ....services.clients import publish_do_edit
+from ....services.clients import MediaWikiApiClient
 from ....services.schemas import PublishRequestSchema
 from ....services.utils.helpers import do_changes_to_text_with_settings
 from ....services.utils.helpers.format import Formatter
@@ -268,7 +268,7 @@ class PublishWorker:
         api_params = self._build_api_params()
 
         # Perform the edit
-        editit = publish_do_edit(
+        editit = MediaWikiApiClient.publish_do_edit(
             api_params,
             self.tab["lang"],
             self.access_key,

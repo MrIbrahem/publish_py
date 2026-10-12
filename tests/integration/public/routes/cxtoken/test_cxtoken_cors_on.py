@@ -91,7 +91,7 @@ class TestCheckCorsOnCxtokenGet:
             access_secret=encrypted_secret,
         )
 
-        with patch("src.main_app.public.routes.cxtoken.routes.get_cxtoken") as mock_get_cxtoken:
+        with patch("src.main_app.services.clients.oauth_client.OAuthClient.get_cxtoken") as mock_get_cxtoken:
             mock_get_cxtoken.return_value = {"cxtoken": "test_cx_token_123"}
 
             response = mock_client.get(

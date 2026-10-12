@@ -28,7 +28,7 @@ from ....services.core.cors import check_cors
 from ....services.schemas import PublishReportsQuerySchema
 from ....services.utils.web_utils import parse_select_fields
 from ...mapping import ApiFormData
-from .top_stats_routes import get_top_langs, get_top_users
+from .top_stats_routes import TopStatsProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +65,7 @@ class BaseReportApiView(MethodView):
         self.category_service = CategoryService()
         self.in_process_service = InProcessService()
         self.users_service = UsersService()
+        self.top_stats_processor = TopStatsProcessor()
 
     def leaderboard_status(self) -> tuple[Response, int] | Response:
         """
@@ -94,7 +95,7 @@ class BaseReportApiView(MethodView):
     def top_langs(self) -> tuple[Response, int] | Response:
         """Handle top_langs API requests."""
         form = ApiFormData.from_request(request.args)
-        result = get_top_langs(form)
+        result = self.top_stats_processor.get_top_langs(form)
         data = result.to_json()
         if result.error:
             return jsonify(data), 500
@@ -104,7 +105,7 @@ class BaseReportApiView(MethodView):
     def top_users(self) -> tuple[Response, int] | Response:
         """Handle top_users API requests."""
         form = ApiFormData.from_request(request.args)
-        result = get_top_users(form)
+        result = self.top_stats_processor.get_top_users(form)
         data = result.to_json()
         if result.error:
             return jsonify(data), 500

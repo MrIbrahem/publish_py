@@ -24,7 +24,7 @@ from ....database.services import (
     ProjectService,
 )
 from ...mapping import ApiFormData, LeaderBoardData
-from ..api.top_stats_routes import get_top_langs, get_top_users
+from ..api.top_stats_routes import TopStatsProcessor
 from .leaderboard_mapping import InProcessRow, ReadyRow
 
 logger = logging.getLogger(__name__)
@@ -42,6 +42,7 @@ class BaseLeaderBoardView(MethodView):
         self.project_service = ProjectService()
         self.lederboard_service = LeaderboardService()
         self.inprocess_service = InProcessService()
+        self.top_stats_processor = TopStatsProcessor()
 
     def _load_chart_data(
         self,
@@ -156,8 +157,8 @@ class LeaderBoardTableView(BaseLeaderBoardView):
         chart_data = self._load_chart_data(cat, args.year, args.camp, args.user_group)
 
         form = ApiFormData.from_request(request_args)
-        langs_res = get_top_langs(form)
-        users_res = get_top_users(form)
+        langs_res = self.top_stats_processor.get_top_langs(form)
+        users_res = self.top_stats_processor.get_top_users(form)
 
         langs_data = langs_res.to_json()
         users_data = users_res.to_json()

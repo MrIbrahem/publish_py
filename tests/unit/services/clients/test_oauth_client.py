@@ -15,6 +15,7 @@ class MockOAuthClientDeps:
 def mock_attr(monkeypatch, attr_name, mock):
     _client = "src.main_app.services.clients.oauth_client"
     monkeypatch.setattr(f"{_client}.{attr_name}", mock)
+    monkeypatch.setattr(f"{_client}.OAuthClient.{attr_name}", mock)
 
 
 @pytest.fixture
@@ -38,13 +39,13 @@ def mock_oauth_deps(monkeypatch: pytest.MonkeyPatch) -> MockOAuthClientDeps:
 
 
 class TestGetOauthClient:
-    """Tests for get_oauth_client function."""
+    """Tests for get_oauth_client function and OAuthClient."""
 
     def test_creates_oauth1_object(self, mock_oauth_deps: MockOAuthClientDeps):
         """Test that OAuth1 object is created correctly."""
-        from src.main_app.services.clients.oauth_client import get_oauth_client
+        from src.main_app.services.clients.oauth_client import OAuthClient
 
-        result = get_oauth_client("access_key", "access_secret", "en.wikipedia.org")
+        result = OAuthClient.get_oauth_client("access_key", "access_secret", "en.wikipedia.org")
 
         assert result is not None
         assert result.client.client_key == "test_consumer_key"
@@ -52,7 +53,7 @@ class TestGetOauthClient:
 
 
 class TestGetCsrfToken:
-    """Tests for get_csrf_token function."""
+    """Tests for get_csrf_token function and OAuthClient."""
 
     def test_returns_token_response(self, mock_oauth_deps: MockOAuthClientDeps):
         """Test that CSRF token is retrieved from API."""
@@ -60,9 +61,9 @@ class TestGetCsrfToken:
         mock_response.json.return_value = {"query": {"tokens": {"csrftoken": "test_csrf_token+\\"}}}
         mock_oauth_deps.requests.get.return_value = mock_response
 
-        from src.main_app.services.clients.oauth_client import get_csrf_token
+        from src.main_app.services.clients.oauth_client import OAuthClient
 
-        result = get_csrf_token("access_key", "access_secret", "en")
+        result = OAuthClient.get_csrf_token("access_key", "access_secret", "en")
 
         assert "query" in result
         assert "tokens" in result["query"]
@@ -70,7 +71,7 @@ class TestGetCsrfToken:
 
 
 class TestPostParams:
-    """Tests for post_params function."""
+    """Tests for post_params function and OAuthClient."""
 
     def test_includes_csrf_token_in_request(
         self, monkeypatch: pytest.MonkeyPatch, mock_oauth_deps: MockOAuthClientDeps
@@ -83,9 +84,9 @@ class TestPostParams:
         mock_response.text = '{"success": true}'
         mock_oauth_deps.requests.post.return_value = mock_response
 
-        from src.main_app.services.clients.oauth_client import post_params
+        from src.main_app.services.clients.oauth_client import OAuthClient
 
-        result = post_params(
+        result = OAuthClient.post_params(
             {"action": "edit"},
             "https://en.wikipedia.org",
             "access_key",
@@ -102,9 +103,9 @@ class TestPostParams:
         mock_get_token = MagicMock(return_value={"error": {"code": "mwoauth-invalid-authorization"}})
         mock_attr(monkeypatch, "get_csrf_token", mock_get_token)
 
-        from src.main_app.services.clients.oauth_client import post_params
+        from src.main_app.services.clients.oauth_client import OAuthClient
 
-        result = post_params(
+        result = OAuthClient.post_params(
             {"action": "edit"},
             "https://en.wikipedia.org",
             "access_key",
@@ -116,16 +117,16 @@ class TestPostParams:
 
 
 class TestGetCxtoken:
-    """Tests for get_cxtoken function."""
+    """Tests for get_cxtoken function and OAuthClient."""
 
     def test_returns_cxtoken_response(self, monkeypatch: pytest.MonkeyPatch):
         """Test that cxtoken is retrieved successfully."""
         mock_post = MagicMock(return_value='{"cxtoken": "some_cx_token"}')
         mock_attr(monkeypatch, "post_params", mock_post)
 
-        from src.main_app.services.clients.oauth_client import get_cxtoken
+        from src.main_app.services.clients.oauth_client import OAuthClient
 
-        result = get_cxtoken("en", "access_key", "access_secret")
+        result = OAuthClient.get_cxtoken("en", "access_key", "access_secret")
 
         assert "cxtoken" in result
         assert result["cxtoken"] == "some_cx_token"
@@ -135,8 +136,8 @@ class TestGetCxtoken:
         mock_post = MagicMock(return_value="not valid json")
         mock_attr(monkeypatch, "post_params", mock_post)
 
-        from src.main_app.services.clients.oauth_client import get_cxtoken
+        from src.main_app.services.clients.oauth_client import OAuthClient
 
-        result = get_cxtoken("en", "access_key", "access_secret")
+        result = OAuthClient.get_cxtoken("en", "access_key", "access_secret")
 
         assert "error" in result

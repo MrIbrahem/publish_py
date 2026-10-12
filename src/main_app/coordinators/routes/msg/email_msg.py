@@ -6,7 +6,7 @@ import logging
 from typing import Any
 
 from ....database.services import PagesService, UserPagesService, UsersService, ViewsNewService
-from ....public.routes.td.results_api import results_api_result
+from ....public.routes.td.results_api import ResultsApiService
 from ....services.auth.utils import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,8 @@ def make_sugustion(langcode: str | None, title: str | None) -> str | None:
     if not langcode or not title:
         return None
 
-    data = results_api_result(langcode, "Main")
+    results_service = ResultsApiService()
+    data = results_service.get_results(langcode, "Main")
 
     missing = [x for x in data.get("missing", []) if x != title]
     return missing[0] if missing else None

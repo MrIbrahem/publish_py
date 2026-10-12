@@ -12,82 +12,131 @@ from typing import Any
 from ...config import app_settings
 from ...database.models import QidRecord
 from ...database.services import QidService
-from .oauth_client import post_params
+from .oauth_client import OAuthClient, post_params
 
 logger = logging.getLogger(__name__)
 
 
+class WikidataClient:
+    """Client for Wikidata API operations and database lookups."""
+
+    @staticmethod
+    def get_record_by_title(title: str) -> QidRecord | None:
+        """Retrieve the record for a given page title."""
+        return QidService().get_by_title(title=title)  # type: ignore
+
+    @classmethod
+    def get_qid_for_mdtitle(cls, title: str) -> str | None:
+        """Get QID for an MDWiki title from the database.
+
+        Args:
+            title: MDWiki page title
+
+        Returns:
+            QID string or None if not found
+        """
+        qid_obj = cls.get_record_by_title(title)
+        if qid_obj:
+            return qid_obj.qid
+
+        return None
+
+    @staticmethod
+    def _link_it(
+        qid: str,
+        lang: str,
+        sourcetitle: str,
+        targettitle: str,
+        access_key: str,
+        access_secret: str,
+    ) -> dict[str, Any]:
+        """Create a sitelink on Wikidata.
+
+        Args:
+            qid: Wikidata item ID
+            lang: Target language code
+            sourcetitle: Source page title
+            targettitle: Target page title
+            access_key: OAuth access key
+            access_secret: OAuth access secret
+
+        Returns:
+            API response dictionary
+        """
+        https_domain = f"https://{app_settings.other.wikidata_domain}"
+        api_params = {
+            "action": "wbsetsitelink",
+            "linktitle": targettitle,
+            "linksite": f"{lang}wiki",
+        }
+
+        if qid:
+            api_params["id"] = qid
+        else:
+            api_params["title"] = sourcetitle
+            api_params["site"] = "enwiki"
+
+        try:
+            response = OAuthClient.post_params(api_params, https_domain, access_key, access_secret)
+        except Exception:
+            logger.exception("Failed to call Wikidata API")
+            return {}
+
+        try:
+            result = json.loads(response) if response else {}
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse Wikidata response: {response}")
+            result = {}
+
+        if "error" in result:
+            logger.debug(f"Wikidata link error: {result['error']}")
+
+        return result
+
+    @classmethod
+    def link_to_wikidata(
+        cls,
+        sourcetitle: str,
+        lang: str,
+        user: str,
+        targettitle: str,
+        access_key: str,
+        access_secret: str,
+    ) -> dict[str, Any]:
+        """Link a translated page to Wikidata.
+
+        Args:
+            sourcetitle: Source MDWiki page title
+            lang: Target language code
+            user: Username
+            targettitle: Target page title
+            access_key: OAuth access key
+            access_secret: OAuth access secret
+
+        Returns:
+            Result dictionary with 'result' and 'qid' keys
+        """
+        qid = cls.get_qid_for_mdtitle(sourcetitle) or ""
+
+        if not access_key or not access_secret:
+            return {"error": f"Access credentials not found for user: {user}", "qid": qid}
+
+        link_result = cls._link_it(qid, lang, sourcetitle, targettitle, access_key, access_secret)
+        link_result["qid"] = qid
+
+        if link_result.get("success"):
+            logger.debug("Wikidata link success")
+            return {"result": "success", "qid": qid}
+
+        return link_result
+
+
 def get_record_by_title(title: str) -> QidRecord | None:
-    """Retrieve the record for a given page title."""
-    return QidService().get_by_title(title=title)  # type: ignore
+    return WikidataClient.get_record_by_title(title)
 
 
 def get_qid_for_mdtitle(title: str) -> str | None:
-    """Get QID for an MDWiki title from the database.
-
-    Args:
-        title: MDWiki page title
-
-    Returns:
-        QID string or None if not found
-    """
-    qid_obj = get_record_by_title(title)
-    if qid_obj:
-        return qid_obj.qid
-
-    return None
-
-
-def _link_it(
-    qid: str,
-    lang: str,
-    sourcetitle: str,
-    targettitle: str,
-    access_key: str,
-    access_secret: str,
-) -> dict[str, Any]:
-    """Create a sitelink on Wikidata.
-
-    Args:
-        qid: Wikidata item ID
-        lang: Target language code
-        sourcetitle: Source page title
-        targettitle: Target page title
-        access_key: OAuth access key
-        access_secret: OAuth access secret
-
-    Returns:
-        API response dictionary
-    """
-    https_domain = f"https://{app_settings.other.wikidata_domain}"
-    api_params = {
-        "action": "wbsetsitelink",
-        "linktitle": targettitle,
-        "linksite": f"{lang}wiki",
-    }
-
-    if qid:
-        api_params["id"] = qid
-    else:
-        api_params["title"] = sourcetitle
-        api_params["site"] = "enwiki"
-
-    try:
-        response = post_params(api_params, https_domain, access_key, access_secret)
-    except Exception:
-        logger.exception("Failed to call Wikidata API")
-        return {}
-
-    try:
-        result = json.loads(response) if response else {}
-    except json.JSONDecodeError:
-        logger.error(f"Failed to parse Wikidata response: {response}")
-        result = {}
-
-    if "error" in result:
-        logger.debug(f"Wikidata link error: {result['error']}")
-
-    return result
+    return WikidataClient.get_qid_for_mdtitle(title)
 
 
 def link_to_wikidata(
@@ -98,35 +147,11 @@ def link_to_wikidata(
     access_key: str,
     access_secret: str,
 ) -> dict[str, Any]:
-    """Link a translated page to Wikidata.
-
-    Args:
-        sourcetitle: Source MDWiki page title
-        lang: Target language code
-        user: Username
-        targettitle: Target page title
-        access_key: OAuth access key
-        access_secret: OAuth access secret
-
-    Returns:
-        Result dictionary with 'result' and 'qid' keys
-    """
-    qid = get_qid_for_mdtitle(sourcetitle) or ""
-
-    if not access_key or not access_secret:
-        return {"error": f"Access credentials not found for user: {user}", "qid": qid}
-
-    link_result = _link_it(qid, lang, sourcetitle, targettitle, access_key, access_secret)
-    link_result["qid"] = qid
-
-    if link_result.get("success"):
-        logger.debug("Wikidata link success")
-        return {"result": "success", "qid": qid}
-
-    return link_result
+    return WikidataClient.link_to_wikidata(sourcetitle, lang, user, targettitle, access_key, access_secret)
 
 
 __all__ = [
+    "WikidataClient",
     "get_record_by_title",
     "get_qid_for_mdtitle",
     "link_to_wikidata",
