@@ -16,7 +16,7 @@ from typing import Any
 
 import requests
 
-from ...config.main_settings import app_settings
+from ...services.clients.http_client import http_client
 
 logger = logging.getLogger(__name__)
 
@@ -61,16 +61,13 @@ class HttpClientService:
             "http_code": 0,
         }
 
-        headers = {"User-Agent": app_settings.other.user_agent}
-
         try:
-            response = requests.request(
+            response = http_client.request(
                 method=method.upper(),
                 url=url,
                 params=params,
                 data=data,
                 json=json_data,
-                headers=headers,
                 timeout=timeout,
             )
         except requests.Timeout:
@@ -228,6 +225,8 @@ class TransformApi:
         """
         if not wikitext:
             return {"error": "Empty wikitext"}
+
+        from ...config.main_settings import app_settings
 
         base_url = app_settings.new_html.transform_base_url
 

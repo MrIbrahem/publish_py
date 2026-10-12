@@ -13,6 +13,7 @@ import requests
 from requests_oauthlib import OAuth1
 
 from ...config import app_settings
+from .http_client import http_client
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +57,10 @@ def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dic
         "meta": "tokens",
         "format": "json",
     }
-    headers = {"User-Agent": app_settings.other.user_agent}
     client = get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
 
     try:
-        response = requests.get(api_url, headers=headers, params=params, auth=client, timeout=30)
+        response = http_client.get(api_url, params=params, auth=client, timeout=30)
     except requests.exceptions.ConnectionError as e:
         logger.error(f"Connection error: {e}")
         return {"error": {"code": "Connection error", "info": "Connection error"}, "exception": str(e), "response": ""}
@@ -120,8 +120,7 @@ def post_params(
     logger.debug(f"post_params: apiParams: {api_params}")
 
     client = get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
-    headers = {"User-Agent": app_settings.other.user_agent}  # , headers=headers
-    response = requests.post(api_url, headers=headers, data=api_params, auth=client, timeout=60)
+    response = http_client.post(api_url, data=api_params, auth=client, timeout=60)
     return response.text
 
 
