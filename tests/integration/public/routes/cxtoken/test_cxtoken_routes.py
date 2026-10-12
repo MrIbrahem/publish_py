@@ -97,7 +97,9 @@ class TestCxTokenGet:
         data = response.get_json()
         assert "error" in data
 
-    def test_valid_request_returns_cxtoken(self, mock_client: FlaskClient, mock_cors, mock_cxtoken_get_deps: MockCxTokenGetDeps):
+    def test_valid_request_returns_cxtoken(
+        self, mock_client: FlaskClient, mock_cors, mock_cxtoken_get_deps: MockCxTokenGetDeps
+    ):
         """Test that valid request returns cxtoken."""
         users_service = UsersService()
         user = users_service.create_user("TokenUser")
@@ -122,7 +124,9 @@ class TestCxTokenGet:
 class TestCxTokenCache:
     """Integration tests for cxtoken caching."""
 
-    def test_cached_cxtoken_returned_from_cache(self, mock_client: FlaskClient, mock_cors, monkeypatch: pytest.MonkeyPatch):
+    def test_cached_cxtoken_returned_from_cache(
+        self, mock_client: FlaskClient, mock_cors, monkeypatch: pytest.MonkeyPatch
+    ):
         """Test that cached cxtoken is returned from cache."""
         mock_from_store = MagicMock(return_value={"csrftoken": "cached_token_123"})
         monkeypatch.setattr("src.main_app.public.routes.cxtoken.routes.get_from_store", mock_from_store)
@@ -138,7 +142,9 @@ class TestCxTokenCache:
 class TestCxTokenUserFormatting:
     """Integration tests for user formatting in cxtoken."""
 
-    def test_user_underscores_replaced_with_spaces(self, mock_client: FlaskClient, mock_cors, monkeypatch: pytest.MonkeyPatch):
+    def test_user_underscores_replaced_with_spaces(
+        self, mock_client: FlaskClient, mock_cors, monkeypatch: pytest.MonkeyPatch
+    ):
         """Test that underscores in username are replaced with spaces."""
         mock_format = MagicMock(return_value="Test User")
         monkeypatch.setattr("src.main_app.public.routes.cxtoken.routes._format_user", mock_format)
