@@ -72,13 +72,6 @@ tests/
 │   │   │   │   └── test_services_utils.py
 │   │   │   ├── wikitext_fixes/
 │   │   │   │   ├── fixtures/
-│   │   │   │   │   ├── output/
-│   │   │   │   │   │   ├── abdominal_pain.wiki
-│   │   │   │   │   │   ├── obstructive_sleep_apnea.wiki
-│   │   │   │   │   │   ├── test-1.wiki
-│   │   │   │   │   │   ├── test-2.wiki
-│   │   │   │   │   │   ├── Uterine_atony.wiki
-│   │   │   │   │   │   └── Wernicke–Korsakoff_syndrome.wiki
 │   │   │   │   │   ├── result/
 │   │   │   │   │   │   ├── abdominal_pain.wiki
 │   │   │   │   │   │   ├── obstructive_sleep_apnea.wiki
