@@ -13,156 +13,70 @@ import requests
 from requests_oauthlib import OAuth1
 
 from ...config import app_settings
+from .http_client import http_client
 
 logger = logging.getLogger(__name__)
 
 
-class OAuthClient:
-    """Client for MediaWiki OAuth operations."""
-
-    @staticmethod
-    def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wikipedia.org") -> OAuth1:
-        """Create OAuth1 session for MediaWiki API.
-
-        Args:
-            access_key: User's OAuth access key
-            access_secret: User's OAuth access secret
-            domain: Wiki domain (e.g., 'en.wikipedia.org')
-
-        Returns:
-            OAuth1 authentication object
-
-        Raises:
-            RuntimeError: If OAuth is not configured
-        """
-        return OAuth1(
-            app_settings.oauth.consumer_key,
-            client_secret=app_settings.oauth.consumer_secret,
-            resource_owner_key=access_key,
-            resource_owner_secret=access_secret,
-        )
-
-    @classmethod
-    def get_csrf_token(cls, access_key: str, access_secret: str, wiki: str = "en") -> dict[str, Any]:
-        """Get CSRF token from MediaWiki API.
-
-        Args:
-            access_key: OAuth access key
-            access_secret: OAuth access secret
-            wiki: Wiki language code (e.g., 'en')
-
-        Returns:
-            API response as dictionary containing token data
-        """
-        api_url = f"https://{wiki}.wikipedia.org/w/api.php"
-        params = {
-            "action": "query",
-            "meta": "tokens",
-            "format": "json",
-        }
-        headers = {"User-Agent": app_settings.other.user_agent}
-        client = cls.get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
-
-        try:
-            response = requests.get(api_url, headers=headers, params=params, auth=client, timeout=30)
-        except requests.exceptions.ConnectionError as e:
-            logger.error(f"Connection error: {e}")
-            return {"error": {"code": "Connection error", "info": "Connection error"}, "exception": str(e), "response": ""}
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Request error: {e}")
-            return {"error": {"code": "Request error", "info": "Request error"}, "exception": str(e), "response": ""}
-
-        try:
-            result = response.json()
-        except requests.exceptions.JSONDecodeError as e:
-            logger.error(f"JSON decode error: {e}")
-            logger.error(response.text)
-            result = {"error": "JSON decode error", "response": response.text}
-
-        return result
-
-    @classmethod
-    def post_params(
-        cls,
-        api_params: dict[str, Any],
-        https_domain: str,
-        access_key: str,
-        access_secret: str,
-    ) -> str:
-        """Make OAuth POST request to MediaWiki API.
-
-        Args:
-            api_params: API parameters for the request
-            https_domain: Full domain URL (e.g., 'https://en.wikipedia.org')
-            access_key: OAuth access key
-            access_secret: OAuth access secret
-
-        Returns:
-            Response text from API
-        """
-        api_url = f"{https_domain}/w/api.php"
-
-        # Extract wiki language from domain
-        domain_parts = https_domain.replace("https://", "").split(".")
-        wiki = domain_parts[0] if domain_parts else "en"
-
-        # Get CSRF token
-        csrf_data = cls.get_csrf_token(access_key, access_secret, wiki)
-
-        if "error" in csrf_data:
-            logger.error(f"CSRF token error: {csrf_data}")
-            return json.dumps({"error": "get_csrf_token failed", "csrftoken_data": csrf_data})
-
-        csrf_token = csrf_data.get("query", {}).get("tokens", {}).get("csrftoken")
-        if csrf_token is None:
-            logger.error(f"CSRF token not found in response: {csrf_data}")
-            return json.dumps({"error": "get_csrf_token failed", "csrftoken_data": csrf_data})
-
-        api_params["token"] = csrf_token
-        api_params["format"] = "json"
-
-        logger.debug(f"post_params: apiParams: {api_params}")
-
-        client = cls.get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
-        headers = {"User-Agent": app_settings.other.user_agent}
-        response = requests.post(api_url, headers=headers, data=api_params, auth=client, timeout=60)
-        return response.text
-
-    @classmethod
-    def get_cxtoken(cls, wiki: str, access_key: str, access_secret: str) -> dict[str, Any]:
-        """Get CX token for Content Translation.
-
-        Args:
-            wiki: Wiki domain (e.g., 'en')
-            access_key: OAuth access key
-            access_secret: OAuth access secret
-
-        Returns:
-            API response as dictionary containing token data like: { "age": 3600, "exp": 1775877248, "jwt": "..........." }
-        """
-        https_domain = f"https://{wiki}.wikipedia.org"
-        api_params = {
-            "action": "cxtoken",
-        }
-
-        response = cls.post_params(api_params, https_domain, access_key, access_secret)
-
-        try:
-            result = json.loads(response)
-        except json.JSONDecodeError:
-            logger.error(f"Failed to parse cxtoken response: {response}")
-            result = {"error": {"code": "parse-error", "info": "Failed to parse response"}}
-
-        return result
-
-
 def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wikipedia.org") -> OAuth1:
-    return OAuthClient.get_oauth_client(access_key, access_secret, domain)
+    """Create OAuth1 session for MediaWiki API.
+
+    Args:
+        access_key: User's OAuth access key
+        access_secret: User's OAuth access secret
+        domain: Wiki domain (e.g., 'en.wikipedia.org')
+
+    Returns:
+        OAuth1 authentication object
+
+    Raises:
+        RuntimeError: If OAuth is not configured
+    """
+    return OAuth1(
+        app_settings.oauth.consumer_key,
+        client_secret=app_settings.oauth.consumer_secret,
+        resource_owner_key=access_key,
+        resource_owner_secret=access_secret,
+    )
 
 
 def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dict[str, Any]:
-    return OAuthClient.get_csrf_token(access_key, access_secret, wiki)
+    """Get CSRF token from MediaWiki API.
+
+    Args:
+        access_key: OAuth access key
+        access_secret: OAuth access secret
+        wiki: Wiki language code (e.g., 'en')
+
+    Returns:
+        API response as dictionary containing token data
+    """
+    api_url = f"https://{wiki}.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "meta": "tokens",
+        "format": "json",
+    }
+    client = get_oauth_client(access_key, access_secret, f"{wiki}.wikipedia.org")
+
+    try:
+        response = http_client.get(api_url, params=params, auth=client, timeout=30)
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"Connection error: {e}")
+        return {"error": {"code": "Connection error", "info": "Connection error"}, "exception": str(e), "response": ""}
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Request error: {e}")
+        return {"error": {"code": "Request error", "info": "Request error"}, "exception": str(e), "response": ""}
+
+    try:
+        result = response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {e}")
+        logger.error(response.text)
+        result = {"error": "JSON decode error", "response": response.text}
+
+    return result
 
 
 def post_params(
@@ -171,15 +85,74 @@ def post_params(
     access_key: str,
     access_secret: str,
 ) -> str:
-    return OAuthClient.post_params(api_params, https_domain, access_key, access_secret)
+    """Make OAuth POST request to MediaWiki API.
+
+    Args:
+        api_params: API parameters for the request
+        https_domain: Full domain URL (e.g., 'https://en.wikipedia.org')
+        access_key: OAuth access key
+        access_secret: OAuth access secret
+
+    Returns:
+        Response text from API
+    """
+    api_url = f"{https_domain}/w/api.php"
+
+    # Extract wiki language from domain
+    domain_parts = https_domain.replace("https://", "").split(".")
+    wiki = domain_parts[0] if domain_parts else "en"
+
+    # Get CSRF token
+    csrf_data = get_csrf_token(access_key, access_secret, wiki)
+
+    if "error" in csrf_data:
+        logger.error(f"CSRF token error: {csrf_data}")
+        return json.dumps({"error": "get_csrf_token failed", "csrftoken_data": csrf_data})
+
+    csrf_token = csrf_data.get("query", {}).get("tokens", {}).get("csrftoken")
+    if csrf_token is None:
+        logger.error(f"CSRF token not found in response: {csrf_data}")
+        return json.dumps({"error": "get_csrf_token failed", "csrftoken_data": csrf_data})
+
+    api_params["token"] = csrf_token
+    api_params["format"] = "json"
+
+    logger.debug(f"post_params: apiParams: {api_params}")
+
+    client = get_oauth_client(access_key, access_secret, https_domain.replace("https://", ""))
+    response = http_client.post(api_url, data=api_params, auth=client, timeout=60)
+    return response.text
 
 
 def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict[str, Any]:
-    return OAuthClient.get_cxtoken(wiki, access_key, access_secret)
+    """Get CX token for Content Translation.
+
+    Args:
+        wiki: Wiki domain (e.g., 'en')
+        access_key: OAuth access key
+        access_secret: OAuth access secret
+
+    Returns:
+        API response as dictionary containing token data like: { "age": 3600, "exp": 1775877248, "jwt": "..........." }
+
+    """
+    https_domain = f"https://{wiki}.wikipedia.org"
+    api_params = {
+        "action": "cxtoken",
+    }
+
+    response = post_params(api_params, https_domain, access_key, access_secret)
+
+    try:
+        result = json.loads(response)
+    except json.JSONDecodeError:
+        logger.error(f"Failed to parse cxtoken response: {response}")
+        result = {"error": {"code": "parse-error", "info": "Failed to parse response"}}
+
+    return result
 
 
 __all__ = [
-    "OAuthClient",
     "get_oauth_client",
     "get_csrf_token",
     "post_params",

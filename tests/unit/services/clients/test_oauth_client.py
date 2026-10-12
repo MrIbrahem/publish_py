@@ -9,7 +9,7 @@ import pytest
 @dataclass
 class MockOAuthClientDeps:
     app_settings: MagicMock
-    requests: MagicMock
+    http_client: MagicMock
 
 
 def mock_attr(monkeypatch, attr_name, mock):
@@ -27,14 +27,14 @@ def mock_oauth_deps(monkeypatch: pytest.MonkeyPatch) -> MockOAuthClientDeps:
     mock_settings.oauth.consumer_key = "test_consumer_key"
     mock_settings.oauth.consumer_secret = "test_consumer_secret"
 
-    mock_requests = MagicMock()
+    mock_http_client = MagicMock()
 
     monkeypatch.setattr(f"{_client}.app_settings", mock_settings)
-    monkeypatch.setattr(f"{_client}.requests", mock_requests)
+    monkeypatch.setattr(f"{_client}.http_client", mock_http_client)
 
     return MockOAuthClientDeps(
         app_settings=mock_settings,
-        requests=mock_requests,
+        http_client=mock_http_client,
     )
 
 
@@ -59,7 +59,7 @@ class TestGetCsrfToken:
         """Test that CSRF token is retrieved from API."""
         mock_response = MagicMock()
         mock_response.json.return_value = {"query": {"tokens": {"csrftoken": "test_csrf_token+\\"}}}
-        mock_oauth_deps.requests.get.return_value = mock_response
+        mock_oauth_deps.http_client.get.return_value = mock_response
 
         from src.main_app.services.clients.oauth_client import OAuthClient
 
@@ -82,7 +82,7 @@ class TestPostParams:
 
         mock_response = MagicMock()
         mock_response.text = '{"success": true}'
-        mock_oauth_deps.requests.post.return_value = mock_response
+        mock_oauth_deps.http_client.post.return_value = mock_response
 
         from src.main_app.services.clients.oauth_client import OAuthClient
 
@@ -95,7 +95,7 @@ class TestPostParams:
 
         assert result == '{"success": true}'
         # Verify the token was added to params
-        call_args = mock_oauth_deps.requests.post.call_args
+        call_args = mock_oauth_deps.http_client.post.call_args
         assert call_args[1]["data"]["token"] == "token123"
 
     def test_returns_error_when_csrf_fails(self, monkeypatch: pytest.MonkeyPatch, mock_oauth_deps: MockOAuthClientDeps):
