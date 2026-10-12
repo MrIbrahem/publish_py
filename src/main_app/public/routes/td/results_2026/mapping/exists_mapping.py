@@ -10,8 +10,7 @@ from urllib.parse import quote
 from markupsafe import Markup
 
 from ......services.utils.wiki_links import (
-    content_translation_url,
-    wikipedia_link,
+    WikiLinks,
 )
 from .shared_mapping import ItemBase, Stats
 
@@ -78,7 +77,7 @@ class ExistsItem(ItemBase):
             "</a>"
         )
 
-        translate_url = content_translation_url(self.title, langcode, camp, "lead")
+        translate_url = WikiLinks.content_translation_url(self.title, langcode, camp, "lead")
         return Markup(html_translate_button).format(translate_url=translate_url, tr_type="lead")
 
     def _render(
@@ -109,8 +108,8 @@ class ExistsItem(ItemBase):
             encoded_title=quote(self.title.replace(" ", "_")),
             title=self.title,
             row_links=row_links,
-            translated_html=Markup(wikipedia_link(translated, langcode)),
-            translated_before_html=Markup(wikipedia_link(translated_before, langcode)),
+            translated_html=Markup(WikiLinks.wikipedia_link(translated, langcode)),
+            translated_before_html=Markup(WikiLinks.wikipedia_link(translated_before, langcode)),
             wikidata_link=Markup(self.wikidata_link()),
             mdwiki_link=Markup(mdwiki_link),
         )

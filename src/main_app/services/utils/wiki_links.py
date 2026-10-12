@@ -37,109 +37,115 @@ def _wiki_path(title: str) -> str:
     """PHP-equivalent ``rawurlencode(str_replace(' ', '_', $title))``."""
     return quote(title.replace(" ", "_"))
 
-
-def mdwiki_cat_link(category: str, name: str | None = None) -> str:
-    """``<a target="_blank">`` for a mdwiki category (PHP make_mdwiki_cat_url)."""
-    if not category:
-        return category or ""
-    clean = category.replace("Category:", "")
-    display = escape(name if name else clean)
-    encoded = quote(clean.replace(" ", "_"))
-    return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
-
-
-def wikipedia_link(
-    target: str,
-    lang: str,
-    name: str = "",
-    deleted: bool = False,
-) -> str:
-    """``<a target="_blank">`` for a Wikipedia article (PHP make_wikipedia_url_blank)."""
-    if not target:
-        return target or ""
-    display = escape(name if name else target)
-    encoded = _wiki_path(target)
-    safe_lang = escape(lang or "")
-    link = f"<a target='_blank' href='https://{safe_lang}.wikipedia.org/wiki/{encoded}'>{display}</a>"
-    if deleted:
-        link += ' <span class="text-danger">(DELETED)</span>'
-    return link
-
-
-def wikidata_link(qid: str, name: str = "", default: str = "") -> str:
-    """``<a target="_blank">`` for a Wikidata QID (PHP make_wikidata_url_blank)."""
-    if not qid:
-        return default or ""
-    display = escape(name if name else qid)
-    encoded = quote(qid.replace(" ", "_"))
-    return f"<a class='inline' target='_blank' href='https://wikidata.org/wiki/{encoded}'>{display}</a>"
-
-
-def tr_link_medwiki(
-    title: str,
-    langcode: str,
-    cat: str,
-    camp: str,
-    tr_type: str,
-    word: int | str = 0,
-) -> str:
-    """Relative URL to ``translate_med.php`` (PHP make_tr_link_medwiki).
-
-    The target endpoint is hosted by the PHP Translation-Dashboard. The
-    Python port preserves the exact relative path used elsewhere in the
-    publish_py templates so the existing dashboard handles the request.
-    """
-    params = {
-        "title": title,
-        "langcode": langcode,
-        "cat": cat,
-        "camp": camp,
-        "word": str(word),
-        "tr_type": tr_type,
-    }
-    translate_med_url = url_for("translate_med.index", **params, _external=False)
-    return translate_med_url
-
-
-def content_translation_url(
-    title: str,
-    code: str,
-    campaign: str | None,
-    tr_type: str,
-    endpoint: str = "",
-) -> str:
-    """Special:ContentTranslation URL (PHP make_ContentTranslation_url)."""
-    # PHP: $title = str_replace('%20', '_', $title);
-    # title = title.replace("%20", "_")
-
-    # Callers may pass either raw titles (`Foo Bar`) or pre-encoded titles (`Foo%20Bar`).
-    # Normalize both forms before query encoding so the output matches the PHP `_` form.
-    title = title.replace("%20", "_").replace(" ", "_")
-
-    if not endpoint:
-        endpoint = get_endpoint()
-
-    params = {
-        "title": "Special:ContentTranslation",
-        "tr_type": tr_type,
-        "from": "mdwiki",
-        "to": code,
-        "campaign": campaign or "",
-        "page": title,
-    }
-    return endpoint + "?" + urlencode(params, quote_via=quote)
-
-
 def get_endpoint() -> str:
     """ """
     return _MDWIKICX_ENDPOINT
 
 
+class WikiLinks:
+
+    @staticmethod
+    def get_endpoint() -> str:
+        return get_endpoint()
+
+    @staticmethod
+    def mdwiki_cat_link(category: str, name: str | None = None) -> str:
+        """``<a target="_blank">`` for a mdwiki category (PHP make_mdwiki_cat_url)."""
+        if not category:
+            return category or ""
+        clean = category.replace("Category:", "")
+        display = escape(name if name else clean)
+        encoded = quote(clean.replace(" ", "_"))
+        return f"<a target='_blank' href='https://mdwiki.org/wiki/Category:{encoded}'>{display}</a>"
+
+
+    @staticmethod
+    def wikipedia_link(
+        target: str,
+        lang: str,
+        name: str = "",
+        deleted: bool = False,
+    ) -> str:
+        """``<a target="_blank">`` for a Wikipedia article (PHP make_wikipedia_url_blank)."""
+        if not target:
+            return target or ""
+        display = escape(name if name else target)
+        encoded = _wiki_path(target)
+        safe_lang = escape(lang or "")
+        link = f"<a target='_blank' href='https://{safe_lang}.wikipedia.org/wiki/{encoded}'>{display}</a>"
+        if deleted:
+            link += ' <span class="text-danger">(DELETED)</span>'
+        return link
+
+
+    @staticmethod
+    def wikidata_link(qid: str, name: str = "", default: str = "") -> str:
+        """``<a target="_blank">`` for a Wikidata QID (PHP make_wikidata_url_blank)."""
+        if not qid:
+            return default or ""
+        display = escape(name if name else qid)
+        encoded = quote(qid.replace(" ", "_"))
+        return f"<a class='inline' target='_blank' href='https://wikidata.org/wiki/{encoded}'>{display}</a>"
+
+
+    @staticmethod
+    def tr_link_medwiki(
+        title: str,
+        langcode: str,
+        cat: str,
+        camp: str,
+        tr_type: str,
+        word: int | str = 0,
+    ) -> str:
+        """Relative URL to ``translate_med.php`` (PHP make_tr_link_medwiki).
+
+        The target endpoint is hosted by the PHP Translation-Dashboard. The
+        Python port preserves the exact relative path used elsewhere in the
+        publish_py templates so the existing dashboard handles the request.
+        """
+        params = {
+            "title": title,
+            "langcode": langcode,
+            "cat": cat,
+            "camp": camp,
+            "word": str(word),
+            "tr_type": tr_type,
+        }
+        translate_med_url = url_for("translate_med.index", **params, _external=False)
+        return translate_med_url
+
+
+    @staticmethod
+    def content_translation_url(
+        title: str,
+        code: str,
+        campaign: str | None,
+        tr_type: str,
+        endpoint: str = "",
+    ) -> str:
+        """Special:ContentTranslation URL (PHP make_ContentTranslation_url)."""
+        # PHP: $title = str_replace('%20', '_', $title);
+        # title = title.replace("%20", "_")
+
+        # Callers may pass either raw titles (`Foo Bar`) or pre-encoded titles (`Foo%20Bar`).
+        # Normalize both forms before query encoding so the output matches the PHP `_` form.
+        title = title.replace("%20", "_").replace(" ", "_")
+
+        if not endpoint:
+            endpoint = get_endpoint()
+
+        params = {
+            "title": "Special:ContentTranslation",
+            "tr_type": tr_type,
+            "from": "mdwiki",
+            "to": code,
+            "campaign": campaign or "",
+            "page": title,
+        }
+        return endpoint + "?" + urlencode(params, quote_via=quote)
+
+
 __all__ = [
-    "mdwiki_cat_link",
-    "wikipedia_link",
-    "wikidata_link",
-    "tr_link_medwiki",
-    "content_translation_url",
+    "WikiLinks",
     "get_endpoint",
 ]

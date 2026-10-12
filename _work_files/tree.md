@@ -155,8 +155,11 @@ src/
 │   │   │   │   └── routes.py
 │   │   │   ├── publish/
 │   │   │   │   ├── __init__.py
+│   │   │   │   ├── error_resolver.py
+│   │   │   │   ├── report_recorder.py
 │   │   │   │   ├── routes.py
 │   │   │   │   ├── to_db.py
+│   │   │   │   ├── wikidata_linker.py
 │   │   │   │   └── worker.py
 │   │   │   ├── refs/
 │   │   │   │   ├── __init__.py
@@ -209,7 +212,6 @@ src/
 │   │   │   └── utils.py
 │   │   ├── clients/
 │   │   │   ├── __init__.py
-│   │   │   ├── mdwiki_api.py
 │   │   │   ├── mediawiki_api.py
 │   │   │   ├── oauth_client.py
 │   │   │   ├── text_api.py
@@ -269,18 +271,13 @@ src/
 │   │   ├── schemas/
 │   │   │   └── __init__.py
 │   │   ├── segments_wraper/
-│   │   │   ├── __init__.py
-│   │   │   ├── local.html
-│   │   │   ├── local_not_sort.html
-│   │   │   ├── local_not_sort_z.html
-│   │   │   └── ncc2c.html
+│   │   │   └── __init__.py
 │   │   ├── utils/
 │   │   │   ├── helpers/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── files.py
 │   │   │   │   ├── format.py
-│   │   │   │   ├── text_processor.py
-│   │   │   │   └── words.py
+│   │   │   │   └── text_processor.py
 │   │   │   ├── __init__.py
 │   │   │   ├── decode_bytes.py
 │   │   │   ├── views_links.py
@@ -342,36 +339,6 @@ src/
 │   └── xtools.svg
 ├── templates/
 │   ├── admin/
-│   │   ├── bs4_admin/
-│   │   │   ├── file/
-│   │   │   │   ├── modals/
-│   │   │   │   │   └── form.html
-│   │   │   │   ├── form.html
-│   │   │   │   └── list.html
-│   │   │   ├── model/
-│   │   │   │   ├── modals/
-│   │   │   │   │   ├── create.html
-│   │   │   │   │   ├── details.html
-│   │   │   │   │   └── edit.html
-│   │   │   │   ├── create.html
-│   │   │   │   ├── details.html
-│   │   │   │   ├── edit.html
-│   │   │   │   ├── inline_field_list.html
-│   │   │   │   ├── inline_form.html
-│   │   │   │   ├── inline_list_base.html
-│   │   │   │   ├── layout.html
-│   │   │   │   ├── list.html
-│   │   │   │   └── row_actions.html
-│   │   │   ├── rediscli/
-│   │   │   │   ├── console.html
-│   │   │   │   └── response.html
-│   │   │   ├── actions.html
-│   │   │   ├── base.html
-│   │   │   ├── index.html
-│   │   │   ├── layout.html
-│   │   │   ├── lib.html
-│   │   │   ├── master.html
-│   │   │   └── static.html
 │   │   ├── base.html
 │   │   └── index_with_sidebar.html
 │   ├── coordinators/

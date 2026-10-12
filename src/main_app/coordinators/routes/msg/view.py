@@ -12,7 +12,7 @@ from flask import (
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 
-from ....services.utils.wiki_links import tr_link_medwiki
+from ....services.utils.wiki_links import WikiLinks
 from ...decorators import coordinator_required
 from .email_msg import (
     create_email_msg,
@@ -54,7 +54,7 @@ class EmailDashboardView(MethodView):
         # Generate standard email body template
         msg = ""
         if suggestion:
-            translate_url = tr_link_medwiki(
+            translate_url = WikiLinks.tr_link_medwiki(
                 title=suggestion,
                 langcode=lang,
                 cat="RTT",

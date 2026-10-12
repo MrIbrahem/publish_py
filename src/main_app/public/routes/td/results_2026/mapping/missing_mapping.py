@@ -8,7 +8,7 @@ from urllib.parse import quote
 
 from markupsafe import Markup
 
-from ......services.utils.wiki_links import tr_link_medwiki
+from ......services.utils.wiki_links import WikiLinks
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class MissingItem(ItemBase):
         if not is_authenticated:
             return self._login_html()
 
-        full_url = tr_link_medwiki(self.title, langcode, cat, camp, "all")
+        full_url = WikiLinks.tr_link_medwiki(self.title, langcode, cat, camp, "all")
 
         html_translate_button = (
             "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tr_type}'>"
@@ -46,7 +46,7 @@ class MissingItem(ItemBase):
         if self.is_full_only:
             return Markup(html_translate_button).format(translate_url=full_url, tr_type="all")
 
-        lead_url = tr_link_medwiki(self.title, langcode, cat, camp, self.tr_type)
+        lead_url = WikiLinks.tr_link_medwiki(self.title, langcode, cat, camp, self.tr_type)
 
         # 2. if not `full_tr_user`, render only lead url
         if not full_tr_user:
@@ -118,7 +118,7 @@ class MissingItem(ItemBase):
         )
 
     def translate_url(self, lang: str, cat: str, camp: str) -> str:
-        return tr_link_medwiki(
+        return WikiLinks.tr_link_medwiki(
             title=self.title,
             langcode=lang,
             cat=cat,

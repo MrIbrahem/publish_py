@@ -190,7 +190,7 @@ tests/
 │   │   │   │   └── test_cxtoken_cache.py
 │   │   │   ├── main/
 │   │   │   ├── publish/
-│   │   │   │   └── test_publish_worker.py
+│   │   │   │   └── test_error_resolver.py
 │   │   │   ├── refs/
 │   │   │   ├── td/
 │   │   │   │   └── results_2026/
@@ -204,7 +204,6 @@ tests/
 │   │   │   ├── test_auth_service.py
 │   │   │   └── test_token_manager.py
 │   │   ├── clients/
-│   │   │   ├── test_mdwiki_api.py
 │   │   │   ├── test_mediawiki_api.py
 │   │   │   ├── test_oauth_client.py
 │   │   │   ├── test_text_api.py
@@ -281,9 +280,7 @@ tests/
 │   │       ├── helpers/
 │   │       │   ├── test_files.py
 │   │       │   ├── test_format.py
-│   │       │   ├── test_text_processor.py
-│   │       │   ├── test_words.py
-│   │       │   └── test_words_unit.py
+│   │       │   └── test_text_processor.py
 │   │       ├── test_decode_bytes.py
 │   │       └── test_web_utils.py
 │   ├── templates_markups/

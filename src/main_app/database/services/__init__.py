@@ -39,10 +39,7 @@ from .pages_tables import (
     PagesService,
     UserPagesService,
 )
-from .reports import (
-    PagesUsersToMainService,
-    ReportService,
-)
+from .reports import ReportService
 from .users import (
     AdminService,
     CoordinatorService,
@@ -77,7 +74,6 @@ __all__ = [
     "InProcessService",
     "LangService",
     "ProjectService",
-    "PagesUsersToMainService",
     "QidService",
     "QidOthersService",
     "MissingStatsService",

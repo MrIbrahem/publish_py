@@ -9,7 +9,7 @@ from urllib.parse import quote
 
 from markupsafe import Markup
 
-from ......services.utils.wiki_links import content_translation_url
+from ......services.utils.wiki_links import WikiLinks
 from .shared_mapping import ItemBase, Stats
 
 logger = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ class InProcessItem(ItemBase):
         if not is_authenticated:
             return self._login_html()
 
-        full_url = content_translation_url(self.title, langcode, camp, "all")
+        full_url = WikiLinks.content_translation_url(self.title, langcode, camp, "all")
 
         html_translate_button = (
             "<a href='{translate_url}' class='btn btn-outline-primary btn-sm' target='_blank' title='{tr_type}'>"
@@ -83,7 +83,7 @@ class InProcessItem(ItemBase):
         if self.is_full_only:
             return Markup(html_translate_button).format(translate_url=full_url, tr_type="all")
 
-        lead_url = content_translation_url(self.title, langcode, camp, self.tr_type)
+        lead_url = WikiLinks.content_translation_url(self.title, langcode, camp, self.tr_type)
 
         # 2. if not `full_tr_user`, render only lead url
         if not full_tr_user:

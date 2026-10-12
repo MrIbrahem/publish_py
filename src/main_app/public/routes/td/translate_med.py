@@ -27,7 +27,7 @@ from ....database.services import (
     UsersNoInprocessService,
 )
 from ....services.auth.utils import get_current_user
-from ....services.utils.wiki_links import content_translation_url, get_endpoint
+from ....services.utils.wiki_links import WikiLinks
 
 logger = logging.getLogger(__name__)
 
@@ -108,12 +108,12 @@ class TranslateMedView(MethodView):
         # PHP prints an intermediate page with a "Click here" link plus a
         # JS/meta auto-redirect; this port issues a straight 302 instead.
         return redirect(
-            content_translation_url(
+            WikiLinks.content_translation_url(
                 title=title,
                 code=langcode,
                 campaign=camp,
                 tr_type=tr_type,
-                endpoint=get_endpoint(),
+                endpoint=WikiLinks.get_endpoint(),
             )
         )
 
