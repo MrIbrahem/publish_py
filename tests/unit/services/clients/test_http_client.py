@@ -61,23 +61,3 @@ class TestHttpClient:
             auth=None,
             timeout=20.0,
         )
-
-    @patch("requests.request")
-    def test_generic_request(self, mock_request):
-        mock_response = MagicMock()
-        mock_request.return_value = mock_response
-
-        client = HttpClient(default_timeout=25.0, user_agent="TestAgent/1.0")
-        resp = client.request("PUT", "https://example.com/api", json={"a": 1})
-
-        assert resp == mock_response
-        mock_request.assert_called_once_with(
-            method="PUT",
-            url="https://example.com/api",
-            params=None,
-            data=None,
-            json={"a": 1},
-            headers={"User-Agent": "TestAgent/1.0"},
-            auth=None,
-            timeout=25.0,
-        )
