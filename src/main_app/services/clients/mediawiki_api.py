@@ -87,6 +87,7 @@ class MediaWikiApiClient:
 
         return result
 
+
 __all__ = [
     "MediaWikiApiClient",
 ]

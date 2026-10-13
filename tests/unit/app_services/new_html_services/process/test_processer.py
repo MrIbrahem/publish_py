@@ -11,5 +11,6 @@ from src.main_app.app_services.new_html_services.process.processer import (
     PageProcesser,
 )
 
+
 class TestPageProcesser:
     """Tests for PageProcesser class."""

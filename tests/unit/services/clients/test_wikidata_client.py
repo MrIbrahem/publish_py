@@ -4,7 +4,9 @@ from dataclasses import dataclass
 from unittest.mock import MagicMock
 
 import pytest
+
 from src.main_app.services.clients.wikidata_client import WikidataClient
+
 
 @dataclass
 class MockWikidataClientDeps:
@@ -38,8 +40,6 @@ class TestGetQidForMdtitle:
         mock_db.qid = "Q12345"
         mock_wikidata_deps.get_record_by_title.return_value = mock_db
 
-
-
         result = WikidataClient.get_qid_for_mdtitle("Test Page")
 
         assert result == "Q12345"
@@ -50,8 +50,6 @@ class TestGetQidForMdtitle:
         mock_db.qid = None
         mock_db.fetch_query_safe.side_effect = Exception("Database error")
         mock_wikidata_deps.get_record_by_title.return_value = mock_db
-
-
 
         result = WikidataClient.get_qid_for_mdtitle("Test Page")
 
@@ -65,8 +63,6 @@ class TestLinkToWikidata:
         """Test that success result is returned on successful link."""
         mock_wikidata_deps.get_record_by_title.return_value = MagicMock(qid="Q12345")
         mock_wikidata_deps.link_it.return_value = {"success": True}
-
-
 
         result = WikidataClient().link_to_wikidata(
             "Source Page",
@@ -84,8 +80,6 @@ class TestLinkToWikidata:
         """Test that error is returned when no credentials provided."""
         mock_wikidata_deps.get_record_by_title.return_value = MagicMock(qid="Q12345")
 
-
-
         result = WikidataClient().link_to_wikidata(
             "Source Page",
             "ar",
@@ -102,8 +96,6 @@ class TestLinkToWikidata:
         """Test that link error includes QID."""
         mock_wikidata_deps.get_record_by_title.return_value = MagicMock(qid="Q12345")
         mock_wikidata_deps.link_it.return_value = {"error": {"code": "protectedpage"}}
-
-
 
         result = WikidataClient().link_to_wikidata(
             "Source Page",

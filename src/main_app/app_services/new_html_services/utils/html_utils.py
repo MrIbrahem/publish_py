@@ -13,6 +13,7 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 
+
 class HtmlUtils:
     @staticmethod
     def del_div_error(html: str) -> str:
@@ -21,7 +22,6 @@ class HtmlUtils:
         for div_tag in soup.find_all("div", class_="error"):
             div_tag.decompose()
         return str(soup)
-
 
     @staticmethod
     def fix_link_red(html: str) -> str:
@@ -61,7 +61,6 @@ class HtmlUtils:
                             del a_tag[attr]
 
         return str(soup)
-
 
     @staticmethod
     def remove_data_parsoid(html: str) -> str:

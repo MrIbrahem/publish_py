@@ -137,7 +137,14 @@ class WikidataLinker:
             # skip link to wd for user pages
             return {"error": "skip link to wd for user pages"}
 
-        link_result = self.wikidata_client.link_to_wikidata(sourcetitle, lang, user, title, access_key, access_secret,)
+        link_result = self.wikidata_client.link_to_wikidata(
+            sourcetitle,
+            lang,
+            user,
+            title,
+            access_key,
+            access_secret,
+        )
 
         # Check if the error is get_csrftoken failure and user is not already the fallback user
         fallback_user = app_settings.users.fallback_user

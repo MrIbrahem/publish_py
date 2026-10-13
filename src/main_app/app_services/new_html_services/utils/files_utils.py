@@ -11,6 +11,7 @@ from ....config.main_settings import get_settings
 
 logger = logging.getLogger(__name__)
 
+
 class FileUtils:
 
     @staticmethod
@@ -41,7 +42,6 @@ class FileUtils:
 
         return file_dir
 
-
     @staticmethod
     def read_file(file_path: Path | str | None) -> str:
         """
@@ -61,7 +61,6 @@ class FileUtils:
         except Exception as exc:
             logger.error("Could not read file %s: %s", path, exc)
             return ""
-
 
     @staticmethod
     def write_file(file_path: Path | str | None, text: str) -> None:

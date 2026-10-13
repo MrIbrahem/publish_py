@@ -11,6 +11,7 @@ from src.main_app.services.utils.helpers.text_processor import (  # noqa: F401
 class TestTextProcessor:
     """Tests for TextProcessor.do_changes_to_text_with_settings function."""
 
+
 class TestFixOnePage:
     """Tests for fix_one_page function."""
 

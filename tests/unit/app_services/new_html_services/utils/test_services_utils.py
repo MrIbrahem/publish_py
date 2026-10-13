@@ -11,5 +11,6 @@ from src.main_app.app_services.new_html_services.utils.files_utils import (
     FileUtils,
 )
 
+
 class TestFileUtils:
-    """ Class to test FileUtils class. """
+    """Class to test FileUtils class."""

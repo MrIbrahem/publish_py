@@ -51,6 +51,7 @@ class _FakeHttpClient:
         self.last_params = params
         return self._response_array
 
+
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
 # ---------------------------------------------------------------------------

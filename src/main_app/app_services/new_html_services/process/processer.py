@@ -25,6 +25,7 @@ from .process_seg import HtmlToSegmentsService
 
 logger = logging.getLogger(__name__)
 
+
 class PageProcesser:
 
     def __init__(
@@ -55,8 +56,7 @@ class PageProcesser:
 
         return cached_text, cached_rev
 
-
-    def _get_wikitext_and_revision( self, title: str, all_flag: str = "") -> tuple[str, str, bool]:
+    def _get_wikitext_and_revision(self, title: str, all_flag: str = "") -> tuple[str, str, bool]:
         """
         Fetch wikitext and revision ID.
         Tries live API first, then falls back to local cache.
@@ -80,7 +80,6 @@ class PageProcesser:
         source = self.fixer.run(source, title, all_flag=bool(all_flag))
 
         return source, revid, from_cache
-
 
     def _get_html(
         self,
@@ -124,7 +123,6 @@ class PageProcesser:
         FileUtils.write_file(file_html, html_removed)
 
         return html_removed, from_cache
-
 
     def process_page(
         self,

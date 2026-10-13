@@ -10,11 +10,11 @@ from flask import Blueprint, Response, abort, flash, jsonify, render_template, r
 from flask.views import MethodView
 
 from ...app_services.new_html_services import (
-    WikitextFixerService,
-    Storage,
-    PageProcesser,
     FileUtils,
     HtmlUtils,
+    PageProcesser,
+    Storage,
+    WikitextFixerService,
 )
 from ...config.main_settings import app_settings
 from ...services.core.cors import check_cors

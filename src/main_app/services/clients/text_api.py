@@ -64,7 +64,6 @@ class TextApiClient:
         return ""
 
 
-
 __all__ = [
     "TextApiClient",
 ]

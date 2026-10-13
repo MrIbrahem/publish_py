@@ -136,6 +136,7 @@ class WikidataClient:
 
         return link_result
 
+
 __all__ = [
     "WikidataClient",
 ]

@@ -1,5 +1,5 @@
-from .html_utils import HtmlUtils
 from .files_utils import FileUtils
+from .html_utils import HtmlUtils
 
 __all__ = [
     "FileUtils",

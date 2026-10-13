@@ -10,11 +10,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from ...config.main_settings import get_settings
 from .utils.files_utils import FileUtils
 
-from ...config.main_settings import get_settings
-
 logger = logging.getLogger(__name__)
+
+
 class Storage:
     @staticmethod
     def get_title_revision(title: str, all_flag: str = "") -> str:
@@ -33,7 +34,6 @@ class Storage:
             return str(data.get(title, ""))
         except Exception:
             return ""
-
 
     @staticmethod
     def add_title_revision(title: str, revision: str, all_flag: str = "") -> None:
@@ -54,7 +54,6 @@ class Storage:
 
         data[title] = str(revision)
         FileUtils.write_file(json_path, json.dumps(data, ensure_ascii=False, indent=2))
-
 
     @staticmethod
     def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
