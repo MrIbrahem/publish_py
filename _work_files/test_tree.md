@@ -57,6 +57,7 @@ tests/
 │   │       └── test_identity.py
 │   ├── app_services/
 │   │   ├── new_html_services/
+│   │   │   ├── clients/
 │   │   │   ├── parser/
 │   │   │   │   ├── data/
 │   │   │   │   │   └── source-1.wiki
@@ -102,7 +103,6 @@ tests/
 │   │   │   │   └── test_wikitext_fixer.py
 │   │   │   ├── __init__.py
 │   │   │   ├── expend_infobox.py
-│   │   │   ├── test_clients.py
 │   │   │   └── test_storage.py
 │   │   ├── results_2026/
 │   │   │   ├── __init__.py
@@ -216,6 +216,7 @@ tests/
 │   │   │   ├── test_auth_service.py
 │   │   │   └── test_token_manager.py
 │   │   ├── clients/
+│   │   │   ├── test_http_client.py
 │   │   │   ├── test_mediawiki_api.py
 │   │   │   ├── test_oauth_client.py
 │   │   │   ├── test_text_api.py

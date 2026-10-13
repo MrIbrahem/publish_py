@@ -11,6 +11,12 @@ src/
 │   │   └── settings.py
 │   ├── app_services/
 │   │   ├── new_html_services/
+│   │   │   ├── clients/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── local_rest_json_repository.py
+│   │   │   │   ├── mdwiki_api.py
+│   │   │   │   ├── mdwiki_rest_fallback_service.py
+│   │   │   │   └── transform_service.py
 │   │   │   ├── parser/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── citation.py
@@ -19,12 +25,14 @@ src/
 │   │   │   │   └── template_helpers.py
 │   │   │   ├── process/
 │   │   │   │   ├── __init__.py
+│   │   │   │   ├── html_service.py
+│   │   │   │   ├── mapping.py
 │   │   │   │   ├── process_seg.py
 │   │   │   │   └── processer.py
 │   │   │   ├── utils/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── html_utils.py
-│   │   │   │   └── utils.py
+│   │   │   │   ├── files_utils.py
+│   │   │   │   └── html_utils.py
 │   │   │   ├── wikitext_fixes/
 │   │   │   │   ├── media/
 │   │   │   │   │   ├── __init__.py
@@ -46,7 +54,6 @@ src/
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── wikitext_fixer.py
 │   │   │   ├── __init__.py
-│   │   │   ├── clients.py
 │   │   │   ├── Domain_php_source.txt
 │   │   │   ├── README.md
 │   │   │   └── storage.py
@@ -253,6 +260,7 @@ src/
 │   │   │   └── utils.py
 │   │   ├── clients/
 │   │   │   ├── __init__.py
+│   │   │   ├── http_client.py
 │   │   │   ├── mediawiki_api.py
 │   │   │   ├── oauth_client.py
 │   │   │   ├── text_api.py
