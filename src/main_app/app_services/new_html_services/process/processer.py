@@ -15,7 +15,6 @@ import logging
 from pathlib import Path
 from typing import Any
 
-
 from ....services.clients import HttpClient
 from ..clients import MdwikiApi
 from ..storage import Storage
@@ -156,7 +155,7 @@ class PagePipelineService:
 
         return source, revid, from_cache
 
-    def _from_local_cache(self, title: str, all_flag: bool=False) -> tuple[str, str]:
+    def _from_local_cache(self, title: str, all_flag: bool = False) -> tuple[str, str]:
         """Get wikitext and revision ID from cached JSON data."""
         revid = Storage.get_title_revision(title, all_flag)
 
@@ -190,7 +189,7 @@ class PagePipelineService:
         """Convert HTML to segments with caching support."""
         seg, from_cache = self.html_seg_service.get_segments(
             source_html=html,
-            file_seg=file_seg,
+            file_path=file_seg,
             force_new=force_new,
         )
         seg = HtmlUtils.fix_seg(seg)

@@ -9,7 +9,6 @@ import re
 from flask import Blueprint, Response, abort, flash, jsonify, render_template, request
 from flask.views import MethodView
 
-from ...app_services.new_html_services.process.mapping import PageResult, PageRequest
 from ...app_services.new_html_services import (
     FileUtils,
     HtmlUtils,
@@ -17,6 +16,7 @@ from ...app_services.new_html_services import (
     Storage,
     WikitextFixerService,
 )
+from ...app_services.new_html_services.process.mapping import PageRequest, PageResult
 from ...config.main_settings import app_settings
 from ...services.core.cors import check_cors
 

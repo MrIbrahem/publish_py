@@ -97,6 +97,7 @@ class HtmlUtils:
         seg = cls.remove_parsoid_data(seg)
         return seg
 
+
 __all__ = [
     "HtmlUtils",
 ]

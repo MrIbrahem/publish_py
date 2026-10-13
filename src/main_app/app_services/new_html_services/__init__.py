@@ -1,6 +1,6 @@
 from .clients import MdwikiApi, TransformApiService
 from .process import PagePipelineService
-from .process.mapping import PageResult, PageRequest
+from .process.mapping import PageRequest, PageResult
 from .storage import Storage
 from .utils import FileUtils, HtmlUtils
 from .wikitext_fixes import WikitextFixerService
