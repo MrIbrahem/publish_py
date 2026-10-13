@@ -54,7 +54,6 @@ src/
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── wikitext_fixer.py
 │   │   │   ├── __init__.py
-│   │   │   ├── Domain_php_source.txt
 │   │   │   ├── README.md
 │   │   │   └── storage.py
 │   │   ├── results_2026/
