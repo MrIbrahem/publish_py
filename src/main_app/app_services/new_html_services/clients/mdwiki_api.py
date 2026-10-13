@@ -94,7 +94,11 @@ class MdwikiApi:
             return "", "", str(exc)
 
     def _fetch_rest(self, title: str) -> tuple[str, str, str]:
-        """Get wikitext content from MDWiki REST API."""
+        """
+        Get wikitext content from MDWiki REST API.
+        rest example:
+        { "id": 2089, "key": "Abortion", "title": "Abortion", "latest": { "id": 1508311, "timestamp": "2026-08-01T11:51:04Z" }, "content_model": "wikitext", "license": { "url": "https://creativecommons.org/licenses/by-sa/4.0/", "title": "Creative Commons Attribution-ShareAlike License" }, "source": "wikitext" }
+        """
         title_encoded = normalize_title_for_url(title)
         url = f"{self.REST_BASE}/page/{title_encoded}"
 
@@ -116,16 +120,16 @@ class MdwikiApi:
 
         try:
             json_data = json.loads(output)
-            source = json_data.get("source", "")
-            revid = json_data.get("latest", {}).get("id", "")
-            return source, str(revid), ""
-
         except (Exception, json.JSONDecodeError) as exc:
             logger.error("Failed to parse MDWiki REST response: %s", exc)
             if self.fallback_to_action_api:
                 return self._fetch_action_api(title)
+            return "", "", error or "invalid json"
 
-            return "", "", error or "Empty response"
+        source = json_data.get("source", "")
+        revid = json_data.get("latest", {}).get("id", "")
+
+        return source, str(revid) if revid else "", error or "Empty response"
 
     def get_wikitext(self, title: str) -> tuple[str, str, str]:
         """
