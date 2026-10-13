@@ -13,6 +13,7 @@ from ....services.clients.http_client import HttpClient
 
 logger = logging.getLogger(__name__)
 
+
 def normalize_title_for_url(title: str) -> str:
     """
     doesn't normalize the title. Here the title is only replace("/", "%2F"), whereas MdwikiApi.get_wikitext
@@ -131,7 +132,7 @@ class MdwikiApi:
 
         return source, str(revid) if revid else "", error or "Empty response"
 
-    def get_wikitext(self, title: str) -> tuple[str, str, str]:
+    def get_wikitext(self, title: str) -> dict[str, str]:
         """
         Return (source, revid, error).
         Follows #REDIRECT if present.
@@ -149,7 +150,13 @@ class MdwikiApi:
         if not source:
             logger.error("WikitextHandler: wikitext empty for title: %s", title)
 
-        return source, str(revid) if revid else "", error
+        # return source, str(revid) if revid else "", error
+        return {
+            "source": source,
+            "revid": revid,
+            "error": error,
+        }
+
 
 __all__ = [
     "MdwikiApi",

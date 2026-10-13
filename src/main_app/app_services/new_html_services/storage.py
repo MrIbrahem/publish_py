@@ -36,7 +36,7 @@ class Storage:
             return ""
 
     @staticmethod
-    def add_title_revision(title: str, revision: str, all_flag: bool = False) -> None:
+    def add_title_revision(title: str, revision: str | int, all_flag: bool = False) -> None:
         """
         Add or update a title → revision mapping in the JSON index.
         """

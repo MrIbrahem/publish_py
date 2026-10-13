@@ -3,6 +3,7 @@
 """
 
 from __future__ import annotations
+
 import logging
 
 from ....config.main_settings import app_settings

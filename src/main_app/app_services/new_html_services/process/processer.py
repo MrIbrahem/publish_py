@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from ....services.clients import HttpClient
-from ..clients import MdwikiApi
+from ..clients import MdwikiRestFallbackService
 from ..storage import Storage
 from ..utils import FileUtils, HtmlUtils
 from ..wikitext_fixes import WikitextFixerService
@@ -51,7 +51,7 @@ class PagePipelineService:
     ) -> None:
         """Initialize the checker with an HTTP client instance."""
         self.http_client = http_client or HttpClient()
-        self.mdwiki_api = MdwikiApi(self.http_client)
+        self.mdwiki_api = MdwikiRestFallbackService(self.http_client)
         self.fixer = fixer or WikitextFixerService(self.http_client)
         self.html_service = html_service or WikitextToHtmlService()
         self.html_seg_service = html_seg_service or HtmlToSegmentsService()
@@ -137,7 +137,10 @@ class PagePipelineService:
         Returns:
             (wikitext, revision_id, from_cache)
         """
-        source, revid, error = self.mdwiki_api.get_wikitext(req.title)
+        data = self.mdwiki_api.get_wikitext(req.title)
+        source = data["source"]
+        revid = data["revid"]
+        error = data["error"]
 
         from_cache = False
         if not source or not revid:
