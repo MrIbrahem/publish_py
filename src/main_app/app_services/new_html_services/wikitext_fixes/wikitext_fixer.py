@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from ....services.clients import HttpClient
-
 from ..parser.lead_section_parser import get_lead_section
 from .media import RemoveMissingImagesService, remove_videos
 from .references import (

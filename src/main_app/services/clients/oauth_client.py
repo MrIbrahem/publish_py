@@ -178,40 +178,6 @@ class OAuthClient:
         return result
 
 
-def get_csrf_token(access_key: str, access_secret: str, wiki: str = "en") -> dict[str, Any]:
-    return OAuthClient().get_csrf_token(access_key, access_secret, wiki)
-
-
-def post_params(
-    api_params: dict[str, Any],
-    https_domain: str,
-    access_key: str,
-    access_secret: str,
-) -> str:
-    return OAuthClient().post_params(
-        api_params,
-        https_domain,
-        access_key,
-        access_secret,
-    )
-
-
-def get_cxtoken(wiki: str, access_key: str, access_secret: str) -> dict[str, Any]:
-    return OAuthClient().get_cxtoken(
-        wiki,
-        access_key,
-        access_secret,
-    )
-
-
-def get_oauth_client(access_key: str, access_secret: str, domain: str = "en.wikipedia.org") -> OAuth1:
-    return OAuthClient.get_oauth_client(access_key, access_secret, domain)
-
-
 __all__ = [
     "OAuthClient",
-    "get_oauth_client",
-    "get_csrf_token",
-    "post_params",
-    "get_cxtoken",
 ]

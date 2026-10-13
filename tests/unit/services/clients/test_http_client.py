@@ -40,9 +40,7 @@ def test_custom_user_agent_is_used(client):
 
 
 def test_user_agent_falls_back_to_settings(monkeypatch):
-    monkeypatch.setattr(
-        hc, "app_settings", SimpleNamespace(other=SimpleNamespace(user_agent="FromSettings/2.0"))
-    )
+    monkeypatch.setattr(hc, "app_settings", SimpleNamespace(other=SimpleNamespace(user_agent="FromSettings/2.0")))
     assert HttpClient().user_agent == "FromSettings/2.0"
 
 

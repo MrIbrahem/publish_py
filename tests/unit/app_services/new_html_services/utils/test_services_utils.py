@@ -1,13 +1,16 @@
 # ruff: noqa: F401
 """
-Unit tests for src/main_app/services/new_html_services/utils.py module.
+Unit tests for src/main_app/services/new_html_services/utils/files_utils.py module.
 
-Functions to test: get_file_dir, get_content_type
+Class to test: FileUtils
 
 TODO: write tests
 """
 
-from src.main_app.app_services.new_html_services.utils import (
-    get_content_type,
-    get_file_dir,
+from src.main_app.app_services.new_html_services.utils.files_utils import (
+    FileUtils,
 )
+
+
+class TestFileUtils:
+    """Class to test FileUtils class."""

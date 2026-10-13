@@ -187,6 +187,7 @@ class HttpClient:
         result["output"] = response.text
         return result
 
+
 __all__ = [
     "HttpClient",
 ]

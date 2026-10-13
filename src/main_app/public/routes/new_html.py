@@ -10,12 +10,13 @@ from flask import Blueprint, Response, abort, flash, jsonify, render_template, r
 from flask.views import MethodView
 
 from ...app_services.new_html_services import (
+    FileUtils,
+    HtmlUtils,
+    PagePipelineService,
+    Storage,
     WikitextFixerService,
-    list_revisions,
-    process_page,
-    read_file,
-    remove_data_parsoid,
 )
+from ...app_services.new_html_services.process.mapping import PageRequest, PageResult
 from ...config.main_settings import app_settings
 from ...services.core.cors import check_cors
 
@@ -107,26 +108,50 @@ class NewHtmlMainView(MethodView):
         Example: /new_html/?title=Trifluoperazine
         """
         title = (request.args.get("title") or "").strip()
-        if title:
-            title = title[0].upper() + title[1:]
-
-        printetxt = request.args.get("printetxt") or request.args.get("print") or ""
-        force_new = "new" in request.args
-
-        all_flag = request.args.get("all", "")
-        # Special case: titles starting with "Video"
-        if title.startswith("Video"):
-            all_flag = "1"
+        title = self.normalize_title(title)
 
         if not title:
             return jsonify({"error": "title is empty"})
 
-        return process_page(
-            title=title,
-            printetxt=printetxt,
-            force_new=force_new,
-            all_flag=all_flag,
-        )
+        req = PageRequest.from_array(request.args, title)
+
+        page_processer = PagePipelineService()
+        result: PageResult = page_processer.process(req)
+        return self.respond(result)
+
+    def respond(self, result: PageResult) -> Response:
+        """
+        Prepare the response data, status code, and headers.
+
+        Compatible with standard Python web frameworks (like Flask).
+        """
+        if isinstance(result.body, str):
+            content_type = self.get_content_type(result.format)
+            response = Response(result.body, mimetype=content_type)
+        else:
+            response = jsonify(result.body)
+
+        # send request error code using status_code
+        response.status_code = result.status
+        return response
+
+    @staticmethod
+    def normalize_title(title: str) -> str:
+        if not title:
+            return ""
+
+        title = title[0].upper() + title[1:]
+        return title
+
+    def get_content_type(self, format_type: str) -> str:
+        """Get the appropriate Content-Type header value based on the format."""
+        match format_type:
+            case "wikitext":
+                return "text/plain"
+            case "html" | "seg":
+                return "text/html"
+            case _:
+                return "application/json"
 
 
 class NewHtmlCheckView(MethodView):
@@ -184,13 +209,13 @@ class NewHtmlOpenFileView(MethodView):
         if not file_path.is_file():
             abort(404, description="File not found")
 
-        content = read_file(file_path)
+        content = FileUtils.read_file(file_path)
 
         mimetype = "text/plain" if file_name == "wikitext.txt" else "text/html"
 
         # if file_name in {"html.html", "seg.html"}:
         if mimetype == "text/html":
-            content = remove_data_parsoid(content)
+            content = HtmlUtils.remove_parsoid_data(content)
 
         response = Response(content, mimetype=mimetype)
         return response
@@ -203,7 +228,7 @@ class NewHtmlRevisionsApiView(MethodView):
 
     def get(self) -> Response:
         """Return the revision listing as JSON."""
-        results = list_revisions(_get_revisions_dir())
+        results = Storage.list_revisions(_get_revisions_dir())
         response = jsonify({"results": results})
         return response
 

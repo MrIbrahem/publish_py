@@ -2,11 +2,11 @@
 """
 Unit tests for src/main_app/services/new_html_services/process/process_seg.py module.
 
-Functions to test: get_segments
+class to test: HtmlToSegmentsService
 
 TODO: write tests
 """
 
 from src.main_app.app_services.new_html_services.process.process_seg import (
-    get_segments,
+    HtmlToSegmentsService,
 )

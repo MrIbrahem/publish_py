@@ -8,9 +8,7 @@ import json
 import logging
 from typing import Any
 
-from ....database.services import (
-    ReportService,
-)
+from ....database.services import ReportService
 from ....services.utils.helpers import ToDoLogger
 
 logger = logging.getLogger(__name__)
@@ -23,8 +21,13 @@ logger = logging.getLogger(__name__)
 class ReportRecorder:
     """Saves an operation to the to_do file and to the reports table."""
 
-    def __init__(self, report_service: ReportService | None = None) -> None:
+    def __init__(
+        self,
+        report_service: ReportService | None = None,
+        todo_logger: ToDoLogger | None = None,
+    ) -> None:
         self.report_service = report_service or ReportService()
+        self.todo_logger = todo_logger or ToDoLogger()
 
     def record(
         self,
@@ -36,7 +39,7 @@ class ReportRecorder:
         lang: str,
         sourcetitle: str,
     ) -> None:
-        ToDoLogger().log(data, file_name)
+        self.todo_logger.log(data, file_name)
 
         self.report_service.add_report(
             title=title,

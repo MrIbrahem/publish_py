@@ -28,11 +28,11 @@ from ....database.services import (
 )
 from ....services.clients import MediaWikiApiClient
 from ....services.schemas import PublishRequestSchema
-from ....services.utils.helpers import do_changes_to_text_with_settings
+from ....services.utils.helpers import TextProcessor
 from ....services.utils.helpers.format import Formatter
 from .error_resolver import ErrorFileResolver
 from .report_recorder import ReportRecorder
-from .to_db import add_to_db_tab
+from .to_db import PageDataSaver
 from .wikidata_linker import WikidataLinker
 
 logger = logging.getLogger(__name__)
@@ -98,13 +98,17 @@ class PublishWorker:
         token_service: UserTokenService | None = None,
         recorder: ReportRecorder | None = None,
         wikidata_linker: WikidataLinker | None = None,
+        mediawiki_api: MediaWikiApiClient | None = None,
     ) -> None:
         self.request_data = request_data
         self.token_service = token_service or UserTokenService()
         self.recorder = recorder or ReportRecorder()
-
         self.validator = validator or RequestValidator()
+
         self.wikidata_linker = wikidata_linker or WikidataLinker(self.recorder, self.token_service)
+
+        self.mediawiki_api = mediawiki_api or MediaWikiApiClient()
+        self.saver = PageDataSaver()
 
         # Per-request state (filled while running)
         self.text: str = ""
@@ -192,7 +196,7 @@ class PublishWorker:
         """Apply text changes (fix references etc.) according to language settings."""
         language_setting = self._load_language_settings(self.tab["lang"])
 
-        newtext = do_changes_to_text_with_settings(
+        newtext = TextProcessor.do_changes_to_text_with_settings(
             text=self.text,
             title=self.tab["title"],
             lang=self.tab["lang"],
@@ -243,7 +247,7 @@ class PublishWorker:
             self.access_secret,
         )
 
-        sql_result = add_to_db_tab(
+        sql_result = self.saver.save_from_tab(
             link_to_wd,
             self.tab,
         )
@@ -268,7 +272,7 @@ class PublishWorker:
         api_params = self._build_api_params()
 
         # Perform the edit
-        editit = MediaWikiApiClient().publish_do_edit(
+        editit = self.mediawiki_api.publish_do_edit(
             api_params,
             self.tab["lang"],
             self.access_key,

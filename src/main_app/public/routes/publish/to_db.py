@@ -5,7 +5,7 @@ Structure:
     UsersTableResolver : decides whether the record goes to the users table
     PageDataSaver      : normalizes the data and inserts / updates the record
 
-The only public entry point is `add_to_db_tab`.
+The only public entry point is `PageDataSaver.save_from_tab`.
 """
 
 from __future__ import annotations
@@ -168,13 +168,6 @@ class PageDataSaver:
         )
 
 
-# --------------------------------------------------------------------------- #
-# Public API
-# --------------------------------------------------------------------------- #
-def add_to_db_tab(link_to_wd: dict[str, Any], tab: dict[str, Any]) -> dict[str, Any]:
-    return PageDataSaver().save_from_tab(link_to_wd, tab)
-
-
 __all__ = [
-    "add_to_db_tab",
+    "PageDataSaver",
 ]

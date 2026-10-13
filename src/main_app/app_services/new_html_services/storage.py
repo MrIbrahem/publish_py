@@ -11,140 +11,103 @@ from pathlib import Path
 from typing import Any
 
 from ...config.main_settings import get_settings
+from .utils.files_utils import FileUtils
 
 logger = logging.getLogger(__name__)
 
 
-def read_file(file_path: Path | str | None) -> str:
-    """
-    Read the contents of a file safely.
+class Storage:
+    @staticmethod
+    def get_title_revision(title: str, all_flag: bool = False) -> str:
+        """
+        Get the stored revision ID for a title from the JSON index.
+        """
+        settings = get_settings()
+        json_path = settings.new_html.get_file(all_flag)
 
-    Returns empty string on any error.
-    """
-    if not file_path:
-        return ""
+        content = FileUtils.read_file(json_path)
+        if not content:
+            return ""
 
-    path = Path(file_path)
-    if not path.exists() or not path.is_file():
-        return ""
+        try:
+            data = json.loads(content)
+            return str(data.get(title, ""))
+        except Exception:
+            return ""
 
-    try:
-        return path.read_text(encoding="utf-8")
-    except Exception as exc:
-        logger.error("Could not read file %s: %s", path, exc)
-        return ""
+    @staticmethod
+    def add_title_revision(title: str, revision: str | int, all_flag: bool = False) -> None:
+        """
+        Add or update a title → revision mapping in the JSON index.
+        """
+        if not title or not revision:
+            return
 
+        settings = get_settings()
+        json_path = settings.new_html.get_file(all_flag)
 
-def write_file(file_path: Path | str | None, text: str) -> None:
-    """
-    Write text to a file.
-    Creates parent directories if needed.
-    """
-    if not file_path or not text:
-        return
+        content = FileUtils.read_file(json_path)
+        try:
+            data = json.loads(content) if content else {}
+        except Exception:
+            data = {}
 
-    path = Path(file_path)
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
-    except Exception as exc:
-        logger.error("Could not write to file %s: %s", path, exc)
+        data[title] = str(revision)
+        FileUtils.write_file(json_path, json.dumps(data, ensure_ascii=False, indent=2))
 
+    @staticmethod
+    def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
+        """
+        Return a sorted list of cached revisions for the dashboard.
 
-def get_title_revision(title: str, all_flag: str = "") -> str:
-    """
-    Get the stored revision ID for a title from the JSON index.
-    """
-    settings = get_settings()
-    json_path = settings.new_html.get_file(all_flag)
+        Sorted by last modification time of wikitext.txt (newest first).
+        """
 
-    content = read_file(json_path)
-    if not content:
-        return ""
+        if not revisions_dir.exists() or not revisions_dir.is_dir():
+            return []
 
-    try:
-        data = json.loads(content)
-        return str(data.get(title, ""))
-    except Exception:
-        return ""
+        dirs = [d for d in revisions_dir.iterdir() if d.is_dir()]
+        logger.info("Found %d revision directories in %s", len(dirs), str(revisions_dir))
 
+        def sort_key(d: Path) -> float:
+            wikitext = d / "wikitext.txt"
+            if wikitext.exists():
+                return wikitext.stat().st_mtime
+            return d.stat().st_mtime
 
-def add_title_revision(title: str, revision: str, all_flag: str = "") -> None:
-    """
-    Add or update a title → revision mapping in the JSON index.
-    """
-    if not title or not revision:
-        return
+        dirs.sort(key=sort_key, reverse=True)
 
-    settings = get_settings()
-    json_path = settings.new_html.get_file(all_flag)
+        results: list[dict[str, Any]] = []
 
-    content = read_file(json_path)
-    try:
-        data = json.loads(content) if content else {}
-    except Exception:
-        data = {}
+        for idx, dir_path in enumerate(dirs, start=1):
+            dir_name = dir_path.name
+            oldid = dir_name.replace("_all", "")
 
-    data[title] = str(revision)
-    write_file(json_path, json.dumps(data, ensure_ascii=False, indent=2))
+            wikitext_file = dir_path / "wikitext.txt"
+            if wikitext_file.exists():
+                last_modified = datetime.fromtimestamp(wikitext_file.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+            else:
+                last_modified = datetime.fromtimestamp(dir_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
 
+            title_file = dir_path / "title.txt"
+            title = FileUtils.read_file(title_file).replace("_", " ") if title_file.exists() else ""
 
-def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
-    """
-    Return a sorted list of cached revisions for the dashboard.
+            results.append(
+                {
+                    "number": idx,
+                    "lastModified": last_modified,
+                    "title": title,
+                    "dir_path": dir_name,
+                    "oldid_number": oldid,
+                    "wikitext_exists": (dir_path / "wikitext.txt").exists(),
+                    "html_exists": (dir_path / "html.html").exists(),
+                    "seg_exists": (dir_path / "seg.html").exists(),
+                }
+            )
 
-    Sorted by last modification time of wikitext.txt (newest first).
-    """
-
-    if not revisions_dir.exists() or not revisions_dir.is_dir():
-        return []
-
-    dirs = [d for d in revisions_dir.iterdir() if d.is_dir()]
-    logger.info("Found %d revision directories in %s", len(dirs), str(revisions_dir))
-
-    def sort_key(d: Path) -> float:
-        wikitext = d / "wikitext.txt"
-        if wikitext.exists():
-            return wikitext.stat().st_mtime
-        return d.stat().st_mtime
-
-    dirs.sort(key=sort_key, reverse=True)
-
-    results: list[dict[str, Any]] = []
-
-    for idx, dir_path in enumerate(dirs, start=1):
-        dir_name = dir_path.name
-        oldid = dir_name.replace("_all", "")
-
-        wikitext_file = dir_path / "wikitext.txt"
-        if wikitext_file.exists():
-            last_modified = datetime.fromtimestamp(wikitext_file.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
-        else:
-            last_modified = datetime.fromtimestamp(dir_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
-
-        title_file = dir_path / "title.txt"
-        title = read_file(title_file).replace("_", " ") if title_file.exists() else ""
-
-        results.append(
-            {
-                "number": idx,
-                "lastModified": last_modified,
-                "title": title,
-                "dir_path": dir_name,
-                "oldid_number": oldid,
-                "wikitext_exists": (dir_path / "wikitext.txt").exists(),
-                "html_exists": (dir_path / "html.html").exists(),
-                "seg_exists": (dir_path / "seg.html").exists(),
-            }
-        )
-
-    return results
+        return results
 
 
 __all__ = [
-    "read_file",
-    "write_file",
-    "get_title_revision",
-    "add_title_revision",
-    "list_revisions",
+    "Storage",
 ]
