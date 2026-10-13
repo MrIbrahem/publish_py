@@ -102,7 +102,7 @@ class NewHtmlConfig:
             if not json_path.exists():
                 json_path.write_text("{}", encoding="utf-8")
 
-    def get_file(self, all_flag) -> Path:
+    def get_file(self, all_flag: bool) -> Path:
         return self.json_file_all if all_flag else self.json_file
 
 

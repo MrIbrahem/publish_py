@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class Storage:
     @staticmethod
-    def get_title_revision(title: str, all_flag: str = "") -> str:
+    def get_title_revision(title: str, all_flag: bool = False) -> str:
         """
         Get the stored revision ID for a title from the JSON index.
         """
@@ -36,7 +36,7 @@ class Storage:
             return ""
 
     @staticmethod
-    def add_title_revision(title: str, revision: str, all_flag: str = "") -> None:
+    def add_title_revision(title: str, revision: str, all_flag: bool = False) -> None:
         """
         Add or update a title → revision mapping in the JSON index.
         """

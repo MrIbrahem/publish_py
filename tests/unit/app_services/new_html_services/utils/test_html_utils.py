@@ -139,7 +139,7 @@ class TestFixLinkRed:
 
 class TestRemoveDataParsoid:
     """
-    tests for HtmlUtils.remove_data_parsoid method
+    tests for HtmlUtils.remove_parsoid_data method
     """
 
     def test_with_localized_attrs_but_no_action_edit(self):
@@ -162,7 +162,7 @@ class TestRemoveDataParsoid:
 
     def test_removes_attribute(self):
         html = '<a href="/wiki/Article" data-parsoid="{}">Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert "data-parsoid" not in result
         assert 'href="/wiki/Article"' in result
@@ -171,7 +171,7 @@ class TestRemoveDataParsoid:
 
     def test_with_complex_data(self):
         html = '<a href="/wiki/Article" data-parsoid=\'{"dsr":[0,10,2,2]}\'>Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert "data-parsoid" not in result
         assert "Link" in result
@@ -179,7 +179,7 @@ class TestRemoveDataParsoid:
 
     def test_with_multiple_links(self):
         html = '<a data-parsoid="{}">Link1</a> <a data-parsoid="{}">Link2</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert "data-parsoid" not in result
         assert "Link1" in result
@@ -188,7 +188,7 @@ class TestRemoveDataParsoid:
 
     def test_preserves_other_attributes(self):
         html = '<a href="/wiki/Article" class="link" data-parsoid="{}">Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert 'href="/wiki/Article"' in result
         assert 'class="link"' in result
@@ -197,13 +197,13 @@ class TestRemoveDataParsoid:
 
     def test_with_no_data_parsoid(self):
         html = '<a href="/wiki/Article">Normal Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == html
 
     def test_with_regex_patterns(self):
         html = '<div data-parsoid="{}">Content</div><span data-parsoid=\'{"test":"value"}\'>More</span>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == "<div>Content</div><span>More</span>"
         assert "data-parsoid" not in result
@@ -212,7 +212,7 @@ class TestRemoveDataParsoid:
 
     def test_with_nested_links(self):
         html = '<div><a data-parsoid="{}">Link 1</a> and <a data-parsoid="{}">Link 2</a></div>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert "data-parsoid" not in result
         assert "Link 1" in result
@@ -221,20 +221,20 @@ class TestRemoveDataParsoid:
 
     def test_removes_data_parsoid_attribute(self):
         html = '<a href="/wiki/Article" data-parsoid="{}">Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == '<a href="/wiki/Article">Link</a>'
         assert "data-parsoid" not in result
 
     def test_preserves_link_without_data_parsoid(self):
         html = '<a href="/wiki/Article">Normal Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == html
 
     def test_removes_data_parsoid_with_single_quotes_and_complex_value(self):
         html = '<a data-parsoid=\'{"dsr":[0,10,2,2]}\' href="/wiki/Article">Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert "data-parsoid" not in result
         assert 'href="/wiki/Article"' in result
@@ -243,51 +243,51 @@ class TestRemoveDataParsoid:
 
     def test_with_only_data_parsoid_attribute(self):
         html = '<a data-parsoid="{}">OnlyDataParsoid</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == "<a>OnlyDataParsoid</a>"
         assert "data-parsoid" not in result
 
     def test_with_multiple_links_only_one_has_data_parsoid(self):
         html = '<a href="/a" data-parsoid="{}">Link1</a> <a href="/b">Link2</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == '<a href="/a">Link1</a> <a href="/b">Link2</a>'
 
     def test_with_multiple_links_both_have_data_parsoid(self):
         html = '<a href="/a" data-parsoid="{}">Link1</a> <a href="/b" data-parsoid="{}">Link2</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == '<a href="/a">Link1</a> <a href="/b">Link2</a>'
         assert "data-parsoid" not in result
 
     def test_with_empty_html(self):
-        result = HtmlUtils.remove_data_parsoid("")
+        result = HtmlUtils.remove_parsoid_data("")
         assert result == ""
 
     def test_with_no_anchor_tags(self):
         html = "<p>no links here</p>"
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == html
 
     def test_preserves_other_attributes_and_their_order(self):
         html = '<a class="link" data-parsoid="{}" id="main">Content</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == '<a class="link" id="main">Content</a>'
         assert "data-parsoid" not in result
 
     def test_with_nested_content_inside_link(self):
         html = '<a data-parsoid="{}">Text with <span>nested</span> content</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == "<a>Text with <span>nested</span> content</a>"
         assert "data-parsoid" not in result
 
     def test_is_case_insensitive_for_data_parsoid_detection(self):
         html = '<a href="/wiki/Article" DATA-PARSOID="{}">Link</a>'
-        result = HtmlUtils.remove_data_parsoid(html)
+        result = HtmlUtils.remove_parsoid_data(html)
 
         assert result == '<a href="/wiki/Article">Link</a>'
         assert "data-parsoid" not in result.lower()

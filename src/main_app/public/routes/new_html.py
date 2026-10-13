@@ -107,8 +107,7 @@ class NewHtmlMainView(MethodView):
         Example: /new_html/?title=Trifluoperazine
         """
         title = (request.args.get("title") or "").strip()
-        if title:
-            title = title[0].upper() + title[1:]
+        title = self.normalize_title(title)
 
         printetxt = request.args.get("printetxt") or request.args.get("print") or ""
         force_new = "new" in request.args
@@ -128,6 +127,24 @@ class NewHtmlMainView(MethodView):
             force_new=force_new,
             all_flag=all_flag,
         )
+
+    @staticmethod
+    def normalize_title(title: str) -> str:
+        if not title:
+            return ""
+
+        title = title[0].upper() + title[1:]
+        return title
+
+    def get_content_type(self, format_type: str) -> str:
+        """Get the appropriate Content-Type header value based on the format."""
+        match format_type:
+            case "wikitext":
+                return "text/plain"
+            case "html" | "seg":
+                return "text/html"
+            case _:
+                return "application/json"
 
 
 class NewHtmlCheckView(MethodView):
@@ -191,7 +208,7 @@ class NewHtmlOpenFileView(MethodView):
 
         # if file_name in {"html.html", "seg.html"}:
         if mimetype == "text/html":
-            content = HtmlUtils.remove_data_parsoid(content)
+            content = HtmlUtils.remove_parsoid_data(content)
 
         response = Response(content, mimetype=mimetype)
         return response

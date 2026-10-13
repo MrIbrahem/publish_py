@@ -112,7 +112,7 @@ class PagePipelineService:
         if not force_new:
             cached = FileUtils.read_file(file_html)
             if cached:
-                cached = HtmlUtils.remove_data_parsoid(cached)  # not in php
+                cached = HtmlUtils.remove_parsoid_data(cached)  # not in php
                 return cached, True
 
         # fast return if wikitext is empty
@@ -135,7 +135,7 @@ class PagePipelineService:
             return "", from_cache
 
         # remove data parsoid and save file
-        html_removed = HtmlUtils.remove_data_parsoid(html)
+        html_removed = HtmlUtils.remove_parsoid_data(html)
         FileUtils.write_file(file_html, html_removed)
 
         return html_removed, from_cache

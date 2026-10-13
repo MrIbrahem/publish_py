@@ -1,7 +1,7 @@
 """
 HTML post-processing utilities.
 
-Currently only implements remove_data_parsoid.
+Currently only implements remove_parsoid_data.
 
 TODO: Port the remaining helpers from the original PHP HtmlUtils:
       - fix_link_red
@@ -63,7 +63,7 @@ class HtmlUtils:
         return str(soup)
 
     @staticmethod
-    def remove_data_parsoid(html: str) -> str:
+    def remove_parsoid_data(html: str) -> str:
         """
         Clean link attributes by removing 'data-parsoid' attributes from HTML elements.
 
@@ -86,6 +86,16 @@ class HtmlUtils:
 
         return str(soup)
 
+    @classmethod
+    def fix_html(cls, html: str) -> str:
+        html = cls.del_div_error(html)
+        html = cls.fix_link_red(html)
+        return html
+
+    @classmethod
+    def fix_seg(cls, seg: str) -> str:
+        seg = cls.remove_parsoid_data(seg)
+        return seg
 
 __all__ = [
     "HtmlUtils",

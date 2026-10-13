@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class FileUtils:
 
     @staticmethod
-    def get_file_dir(revision: str, all_flag: str = "") -> Path:
+    def get_file_dir(revision: str, all_flag: bool = False) -> Path:
         """
         Build the cache directory path for a given revision.
 
