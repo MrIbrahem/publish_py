@@ -2,11 +2,14 @@
 """
 Unit tests for src/main_app/services/new_html_services/process/processer.py module.
 
-Functions to test: process_page
+class to test: PageProcesser
 
 TODO: write tests
 """
 
 from src.main_app.app_services.new_html_services.process.processer import (
-    process_page,
+    PageProcesser,
 )
+
+class TestPageProcesser:
+    """Tests for PageProcesser class."""

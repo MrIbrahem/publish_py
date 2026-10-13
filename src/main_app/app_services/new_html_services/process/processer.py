@@ -17,14 +17,12 @@ from typing import Any
 
 from flask import Response, jsonify
 
-from ..clients import MdwikiApi, TransformApi
+from ..clients import HttpClient, MdwikiApi, TransformApi
 from ..storage import (
     add_title_revision,
     get_title_revision,
-    read_file,
-    write_file,
 )
-from ..utils import del_div_error, fix_link_red, get_file_dir, remove_data_parsoid
+from ..utils import del_div_error, fix_link_red, FileUtils, remove_data_parsoid
 from ..wikitext_fixes import WikitextFixerService
 from .process_seg import get_segments
 
@@ -32,9 +30,15 @@ logger = logging.getLogger(__name__)
 
 class PageProcesser:
 
-    def __init__(self) -> None:
-        self.mdwiki_api = MdwikiApi()
-        self.transform = TransformApi()
+    def __init__(
+        self,
+        http_client: HttpClient | None = None,
+    ) -> None:
+        """Initialize the checker with an HTTP client instance."""
+        self.http_client = http_client or HttpClient()
+        self.mdwiki_api = MdwikiApi(self.http_client)
+        self.transform = TransformApi(self.http_client)
+        self.fixer = WikitextFixerService(self.http_client)
 
     def _get_from_json(self, title: str, all_flag: str) -> tuple[str, str]:
         """ """
@@ -43,11 +47,11 @@ class PageProcesser:
         if not cached_rev or not cached_rev.isdigit():
             return "", ""
 
-        file_dir = get_file_dir(cached_rev, all_flag)
+        file_dir = FileUtils.get_file_dir(cached_rev, all_flag)
         if not file_dir.is_dir():
             return "", ""
 
-        cached_text = read_file(file_dir / "wikitext.txt")
+        cached_text = FileUtils.read_file(file_dir / "wikitext.txt")
 
         if not cached_text:
             return "", ""
@@ -76,8 +80,7 @@ class PageProcesser:
             add_title_revision(title, revid, all_flag)
 
         # run fix_wikitext as in the original PHP version
-        fixer = WikitextFixerService()
-        source = fixer.run(source, title, all_flag=bool(all_flag))
+        source = self.fixer.run(source, title, all_flag=bool(all_flag))
 
         return source, revid, from_cache
 
@@ -95,7 +98,7 @@ class PageProcesser:
         from_cache = False
         # 1. check from cache
         if not force_new:
-            cached = read_file(file_html)
+            cached = FileUtils.read_file(file_html)
             if cached:
                 cached = remove_data_parsoid(cached)  # not in php
                 return cached, True
@@ -121,7 +124,7 @@ class PageProcesser:
 
         # remove data parsoid and save file
         html_removed = remove_data_parsoid(html)
-        write_file(file_html, html_removed)
+        FileUtils.write_file(file_html, html_removed)
 
         return html_removed, from_cache
 
@@ -154,7 +157,7 @@ class PageProcesser:
             response.status_code = 404
             return response
 
-        file_dir = get_file_dir(revision, all_flag)
+        file_dir = FileUtils.get_file_dir(revision, all_flag)
         file_wikitext = file_dir / "wikitext.txt"
         file_html = file_dir / "html.html"
         file_seg = file_dir / "seg.html"
@@ -164,8 +167,8 @@ class PageProcesser:
         fixer = WikitextFixerService()
         wikitext = fixer.fix(wikitext, title)
 
-        write_file(file_wikitext, wikitext)
-        write_file(file_title, title)
+        FileUtils.write_file(file_wikitext, wikitext)
+        FileUtils.write_file(file_title, title)
 
         # Early exit for printetxt=wikitext
         if printetxt == "wikitext":
@@ -185,7 +188,7 @@ class PageProcesser:
             file_seg=file_seg,
             force_new=force_new,
         )
-        write_file(file_seg, seg_text)
+        FileUtils.write_file(file_seg, seg_text)
 
         if printetxt == "seg":
             response = Response(seg_text, mimetype="text/html")

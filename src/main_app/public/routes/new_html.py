@@ -13,7 +13,7 @@ from ...app_services.new_html_services import (
     WikitextFixerService,
     list_revisions,
     PageProcesser,
-    read_file,
+    FileUtils,
     remove_data_parsoid,
 )
 from ...config.main_settings import app_settings
@@ -185,7 +185,7 @@ class NewHtmlOpenFileView(MethodView):
         if not file_path.is_file():
             abort(404, description="File not found")
 
-        content = read_file(file_path)
+        content = FileUtils.read_file(file_path)
 
         mimetype = "text/plain" if file_name == "wikitext.txt" else "text/html"
 

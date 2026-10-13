@@ -10,46 +10,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .utils.files_utils import FileUtils
+
 from ...config.main_settings import get_settings
 
 logger = logging.getLogger(__name__)
-
-
-def read_file(file_path: Path | str | None) -> str:
-    """
-    Read the contents of a file safely.
-
-    Returns empty string on any error.
-    """
-    if not file_path:
-        return ""
-
-    path = Path(file_path)
-    if not path.exists() or not path.is_file():
-        return ""
-
-    try:
-        return path.read_text(encoding="utf-8")
-    except Exception as exc:
-        logger.error("Could not read file %s: %s", path, exc)
-        return ""
-
-
-def write_file(file_path: Path | str | None, text: str) -> None:
-    """
-    Write text to a file.
-    Creates parent directories if needed.
-    """
-    if not file_path or not text:
-        return
-
-    path = Path(file_path)
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
-    except Exception as exc:
-        logger.error("Could not write to file %s: %s", path, exc)
-
 
 def get_title_revision(title: str, all_flag: str = "") -> str:
     """
@@ -58,7 +23,7 @@ def get_title_revision(title: str, all_flag: str = "") -> str:
     settings = get_settings()
     json_path = settings.new_html.get_file(all_flag)
 
-    content = read_file(json_path)
+    content = FileUtils.read_file(json_path)
     if not content:
         return ""
 
@@ -79,14 +44,14 @@ def add_title_revision(title: str, revision: str, all_flag: str = "") -> None:
     settings = get_settings()
     json_path = settings.new_html.get_file(all_flag)
 
-    content = read_file(json_path)
+    content = FileUtils.read_file(json_path)
     try:
         data = json.loads(content) if content else {}
     except Exception:
         data = {}
 
     data[title] = str(revision)
-    write_file(json_path, json.dumps(data, ensure_ascii=False, indent=2))
+    FileUtils.write_file(json_path, json.dumps(data, ensure_ascii=False, indent=2))
 
 
 def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
@@ -123,7 +88,7 @@ def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
             last_modified = datetime.fromtimestamp(dir_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
 
         title_file = dir_path / "title.txt"
-        title = read_file(title_file).replace("_", " ") if title_file.exists() else ""
+        title = FileUtils.read_file(title_file).replace("_", " ") if title_file.exists() else ""
 
         results.append(
             {
@@ -142,8 +107,6 @@ def list_revisions(revisions_dir: Path) -> list[dict[str, Any]]:
 
 
 __all__ = [
-    "read_file",
-    "write_file",
     "get_title_revision",
     "add_title_revision",
     "list_revisions",

@@ -6,8 +6,7 @@ import logging
 from pathlib import Path
 
 from ....services.segments_wraper import run_process_html
-from ..storage import read_file
-from ..utils import remove_data_parsoid
+from ..utils import FileUtils, remove_data_parsoid
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ def get_segments(source_html: str, file_seg: Path, force_new: bool) -> tuple[str
 
     # check cache
     if not force_new:
-        cached = read_file(file_seg)
+        cached = FileUtils.read_file(file_seg)
         if cached:
             cached = remove_data_parsoid(cached)  # not in php
             return cached, True
