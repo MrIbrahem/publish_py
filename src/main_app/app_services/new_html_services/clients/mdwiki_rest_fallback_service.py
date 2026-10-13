@@ -2,7 +2,6 @@ import logging
 from typing import Any
 
 from ....services.clients import HttpClient
-
 from .local_rest_json_repository import LocalRestJsonRepository
 
 # Assuming these are imported from your custom modules/packages
@@ -50,3 +49,8 @@ class MdwikiRestFallbackService:
             "revid": str(revid),
             "error": error_msg,
         }
+
+
+__all__ = [
+    "MdwikiRestFallbackService",
+]

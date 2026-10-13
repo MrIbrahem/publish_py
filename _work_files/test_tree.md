@@ -57,6 +57,7 @@ tests/
 │   │       └── test_identity.py
 │   ├── app_services/
 │   │   ├── new_html_services/
+│   │   │   ├── clients/
 │   │   │   ├── parser/
 │   │   │   │   ├── data/
 │   │   │   │   │   └── source-1.wiki
@@ -102,15 +103,19 @@ tests/
 │   │   │   │   └── test_wikitext_fixer.py
 │   │   │   ├── __init__.py
 │   │   │   ├── expend_infobox.py
-│   │   │   ├── test_clients.py
 │   │   │   └── test_storage.py
 │   │   ├── results_2026/
+│   │   │   ├── data/
+│   │   │   ├── helpers/
+│   │   │   ├── mapping/
+│   │   │   ├── tables/
 │   │   │   ├── __init__.py
 │   │   │   └── test_row_items.py
 │   │   └── __init__.py
 │   ├── config/
 │   ├── coordinators/
 │   │   └── routes/
+│   │       ├── msg/
 │   │       ├── qids/
 │   │       ├── translated/
 │   │       ├── test_admin_routes.py
@@ -163,6 +168,7 @@ tests/
 │   │   │   │   ├── test_category_service.py
 │   │   │   │   ├── test_lang_service.py
 │   │   │   │   └── test_project_service.py
+│   │   │   ├── others/
 │   │   │   ├── pages/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── test_chart_data.py
@@ -195,6 +201,7 @@ tests/
 │   ├── public/
 │   │   ├── auth/
 │   │   │   └── test_routes.py
+│   │   ├── mapping/
 │   │   ├── routes/
 │   │   │   ├── api/
 │   │   │   │   └── test_api_routes_unit.py
@@ -216,6 +223,7 @@ tests/
 │   │   │   ├── test_auth_service.py
 │   │   │   └── test_token_manager.py
 │   │   ├── clients/
+│   │   │   ├── test_http_client.py
 │   │   │   ├── test_mediawiki_api.py
 │   │   │   ├── test_oauth_client.py
 │   │   │   ├── test_text_api.py
@@ -233,6 +241,7 @@ tests/
 │   │   │   ├── test_crypto.py
 │   │   │   └── test_extensions.py
 │   │   ├── schemas/
+│   │   ├── segments_wraper/
 │   │   └── utils/
 │   │       ├── helpers/
 │   │       │   ├── test_files.py
@@ -241,6 +250,7 @@ tests/
 │   │       ├── test_decode_bytes.py
 │   │       └── test_web_utils.py
 │   ├── templates_markups/
+│   │   ├── coordinator_sidebar/
 │   │   ├── navbar/
 │   │   └── test_coordinator_sidebar.py
 │   └── __init__.py

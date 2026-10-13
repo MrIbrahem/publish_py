@@ -94,3 +94,10 @@ class LegacyRoutes:
 
         url = url_for("translate_med.index", **params)  # pyright: ignore[reportArgumentType]
         return redirect(url, code=301)
+
+
+__all__ = [
+    "LegacyRoutes",
+    "allowed_args",
+    "map_query_types",
+]
