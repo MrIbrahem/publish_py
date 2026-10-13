@@ -12,9 +12,15 @@ logger = logging.getLogger(__name__)
 
 
 class HtmlToSegmentsService:
+    """HTML segmentation services.
 
+    Provides functions for converting HTML to segmented content using
+    the HtmltoSegments API, with caching support.
+    """
     def get_segments(self, source_html: str, file_seg: Path, force_new: bool) -> tuple[str, bool]:
-        """ """
+        """
+        return segments text and from_cache
+        """
         # check cache
         if not force_new:
             cached = FileUtils.read_file(file_seg)
