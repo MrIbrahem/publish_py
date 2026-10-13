@@ -1,5 +1,5 @@
-from .processer import PageProcesser
+from .processer import PagePipelineService
 
 __all__ = [
-    "PageProcesser",
+    "PagePipelineService",
 ]

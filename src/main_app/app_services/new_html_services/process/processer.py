@@ -17,16 +17,32 @@ from typing import Any
 
 from flask import Response, jsonify
 
-from ..clients import HttpClient, MdwikiApi, TransformApi
+from ....services.clients import HttpClient
+from ..clients import MdwikiApi, TransformApiService
 from ..storage import Storage
 from ..utils import FileUtils, HtmlUtils
 from ..wikitext_fixes import WikitextFixerService
+from .html_service import WikitextToHtmlService
+from .mapping import PageRequest, PageResult
 from .process_seg import HtmlToSegmentsService
 
 logger = logging.getLogger(__name__)
 
 
-class PageProcesser:
+class PagePipelineService:
+    """Orchestrates: fetch wikitext -> fix -> HTML -> segments.
+
+    This file handles HTTP requests to generate page content from MDWiki.
+    It orchestrates the full pipeline: fetching wikitext, applying fixes,
+    converting to HTML, and segmenting the content.
+
+    Request parameters:
+    - title: Page title to process
+    - new: Force reqeneration of cached content
+    - all: Use 'all' data file for Video pages
+    - printetxt: Output format (wikitext|html|seg)
+    - print: Alias for printetxt
+    """
 
     def __init__(
         self,
@@ -35,10 +51,10 @@ class PageProcesser:
         """Initialize the checker with an HTTP client instance."""
         self.http_client = http_client or HttpClient()
         self.mdwiki_api = MdwikiApi(self.http_client)
-        self.transform = TransformApi(self.http_client)
+        self.transform = TransformApiService(self.http_client)
         self.fixer = WikitextFixerService(self.http_client)
 
-    def _get_from_json(self, title: str, all_flag: str) -> tuple[str, str]:
+    def _from_local_cache(self, title: str, all_flag: str) -> tuple[str, str]:
         """ """
         cached_rev = Storage.get_title_revision(title, all_flag)
 
@@ -69,7 +85,7 @@ class PageProcesser:
         from_cache = False
         if not source or not revid:
             # Fallback to local JSON mapping + cached file
-            cached_source, revid = self._get_from_json(title, all_flag)
+            cached_source, revid = self._from_local_cache(title, all_flag)
             from_cache = cached_source != ""
 
         # Add or update a title → revision mapping in the JSON index.
@@ -178,15 +194,15 @@ class PageProcesser:
             return response
 
         # 3. Convert to segments
-        seg_text, seg_from_cache = HtmlToSegmentsService().get_segments(
+        seg, seg_from_cache = HtmlToSegmentsService().get_segments(
             source_html=html,
             file_seg=file_seg,
             force_new=force_new,
         )
-        FileUtils.write_file(file_seg, seg_text)
+        FileUtils.write_file(file_seg, seg)
 
         if printetxt == "seg":
-            response = Response(seg_text, mimetype="text/html")
+            response = Response(seg, mimetype="text/html")
             return response
 
         # Final JSON response
@@ -199,7 +215,7 @@ class PageProcesser:
             "sourceLanguage": "en",
             "title": title,
             "revision": revision,
-            "segmentedContent": seg_text,
+            "segmentedContent": seg,
             "categories": [],
         }
 
@@ -211,7 +227,7 @@ class PageProcesser:
             data["error_type"] = "HTML_text:() is empty"
             data["error"] = "No content found"
 
-        elif not seg_text:
+        elif not seg:
             data["error_type"] = "seg_text:() is empty"
             data["error"] = "No content found"
             response = jsonify(data)
@@ -225,5 +241,5 @@ class PageProcesser:
 
 
 __all__ = [
-    "PageProcesser",
+    "PagePipelineService",
 ]

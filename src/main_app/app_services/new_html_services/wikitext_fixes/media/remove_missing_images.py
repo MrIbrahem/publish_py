@@ -17,7 +17,8 @@ import re
 
 import wikitextparser as wtp
 
-from ...clients import HttpClient
+from .....services.clients import HttpClient
+
 from ...parser import template_helpers as th
 
 _IMAGE_PARAM_RE = re.compile(r"^image(\d*)$", re.IGNORECASE)
