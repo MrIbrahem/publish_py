@@ -11,10 +11,10 @@ from flask.views import MethodView
 
 from ...app_services.new_html_services import (
     WikitextFixerService,
-    list_revisions,
+    Storage,
     PageProcesser,
     FileUtils,
-    remove_data_parsoid,
+    HtmlUtils,
 )
 from ...config.main_settings import app_settings
 from ...services.core.cors import check_cors
@@ -191,7 +191,7 @@ class NewHtmlOpenFileView(MethodView):
 
         # if file_name in {"html.html", "seg.html"}:
         if mimetype == "text/html":
-            content = remove_data_parsoid(content)
+            content = HtmlUtils.remove_data_parsoid(content)
 
         response = Response(content, mimetype=mimetype)
         return response
@@ -204,7 +204,7 @@ class NewHtmlRevisionsApiView(MethodView):
 
     def get(self) -> Response:
         """Return the revision listing as JSON."""
-        results = list_revisions(_get_revisions_dir())
+        results = Storage.list_revisions(_get_revisions_dir())
         response = jsonify({"results": results})
         return response
 

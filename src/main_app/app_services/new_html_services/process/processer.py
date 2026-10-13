@@ -18,13 +18,10 @@ from typing import Any
 from flask import Response, jsonify
 
 from ..clients import HttpClient, MdwikiApi, TransformApi
-from ..storage import (
-    add_title_revision,
-    get_title_revision,
-)
-from ..utils import del_div_error, fix_link_red, FileUtils, remove_data_parsoid
+from ..storage import Storage
+from ..utils import FileUtils, HtmlUtils
 from ..wikitext_fixes import WikitextFixerService
-from .process_seg import get_segments
+from .process_seg import HtmlToSegmentsService
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +39,7 @@ class PageProcesser:
 
     def _get_from_json(self, title: str, all_flag: str) -> tuple[str, str]:
         """ """
-        cached_rev = get_title_revision(title, all_flag)
+        cached_rev = Storage.get_title_revision(title, all_flag)
 
         if not cached_rev or not cached_rev.isdigit():
             return "", ""
@@ -77,7 +74,7 @@ class PageProcesser:
 
         # Add or update a title → revision mapping in the JSON index.
         if revid:
-            add_title_revision(title, revid, all_flag)
+            Storage.add_title_revision(title, revid, all_flag)
 
         # run fix_wikitext as in the original PHP version
         source = self.fixer.run(source, title, all_flag=bool(all_flag))
@@ -100,7 +97,7 @@ class PageProcesser:
         if not force_new:
             cached = FileUtils.read_file(file_html)
             if cached:
-                cached = remove_data_parsoid(cached)  # not in php
+                cached = HtmlUtils.remove_data_parsoid(cached)  # not in php
                 return cached, True
 
         # fast return if wikitext is empty
@@ -116,14 +113,14 @@ class PageProcesser:
             logger.error("HTML conversion failed for title: %s", title)
             return "", from_cache
 
-        html = del_div_error(html)
-        html = fix_link_red(html)
+        html = HtmlUtils.del_div_error(html)
+        html = HtmlUtils.fix_link_red(html)
 
         if not html or html == wikitext:
             return "", from_cache
 
         # remove data parsoid and save file
-        html_removed = remove_data_parsoid(html)
+        html_removed = HtmlUtils.remove_data_parsoid(html)
         FileUtils.write_file(file_html, html_removed)
 
         return html_removed, from_cache
@@ -183,7 +180,7 @@ class PageProcesser:
             return response
 
         # 3. Convert to segments
-        seg_text, seg_from_cache = get_segments(
+        seg_text, seg_from_cache = HtmlToSegmentsService().get_segments(
             source_html=html,
             file_seg=file_seg,
             force_new=force_new,
