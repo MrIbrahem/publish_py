@@ -47,12 +47,110 @@ class PagePipelineService:
     def __init__(
         self,
         http_client: HttpClient | None = None,
+        fixer: WikitextFixerService | None = None,
+        html_service: WikitextToHtmlService | None = None,
+        html_seg_service: HtmlToSegmentsService | None = None,
     ) -> None:
         """Initialize the checker with an HTTP client instance."""
         self.http_client = http_client or HttpClient()
         self.mdwiki_api = MdwikiApi(self.http_client)
         self.transform = TransformApiService(self.http_client)
-        self.fixer = WikitextFixerService(self.http_client)
+        self.fixer = fixer or WikitextFixerService(self.http_client)
+        self.html_service = html_service or WikitextToHtmlService()
+        self.html_seg_service = html_seg_service or HtmlToSegmentsService()
+
+    # ------------------------------------------------------------
+    # Entry point
+    # ------------------------------------------------------------
+
+    def process_page(
+        self,
+        title: str,
+        printetxt: str,
+        force_new: bool,
+        all_flag: bool,
+    ) -> Response:
+        """Process the page request through the pipeline."""
+        cache = {"wikitext": False, "html": False, "seg": False}
+
+        # 1. Get wikitext + revision
+        wikitext, revision, text_from_cache = self._fetch_wikitext(title, all_flag)
+
+        if not wikitext or not revision:
+            response = jsonify(
+                {
+                    "sourceLanguage": "en",
+                    "title": title,
+                    "revision": revision,
+                    "segmentedContent": "",
+                    "categories": [],
+                    "error_type": f"title:({title}) or revision:({revision}) not found",
+                    "error": "No content found!",
+                }
+            )
+            response.status_code = 404
+            return response
+
+        file_dir = FileUtils.get_file_dir(revision, all_flag)
+        file_wikitext = file_dir / "wikitext.txt"
+        file_html = file_dir / "html.html"
+        file_seg = file_dir / "seg.html"
+        file_title = file_dir / "title.txt"
+
+        # Apply temporary (empty) fix
+        wikitext = self.fixer.fix(wikitext, title)
+
+        # Early exit for printetxt=wikitext
+        if printetxt == "wikitext":
+            response = Response(wikitext, mimetype="text/plain")
+            return response
+
+
+        FileUtils.write_file(file_wikitext, wikitext)
+        FileUtils.write_file(file_title, title)
+
+        # 2. Convert to HTML
+        html, cache["html"] = self._get_html(wikitext, file_html, title, force_new)
+
+        if printetxt == "html":
+            response = Response(html, mimetype="text/html")
+            return response
+
+        # Final JSON response
+        data = self._base_data(title, revision, cache)
+
+        if not html:
+            # Inconsistent error contract: When html is empty you still return HTTP 200 with error/error_type set,
+            # but when seg is empty you return 404. Pick one convention (e.g. always 404 with an error envelope,
+            # or always 200 with error fields) so clients can handle failures uniformly.
+
+            data["error_type"] = "HTML_text:() is empty"
+            data["error"] = "No content found"
+
+        # 3. Convert to segments
+        seg, cache["seg"] = HtmlToSegmentsService().get_segments(
+            source_html=html,
+            file_seg=file_seg,
+            force_new=force_new,
+        )
+        FileUtils.write_file(file_seg, seg)
+
+        if printetxt == "seg":
+            response = Response(seg, mimetype="text/html")
+            return response
+
+
+        if not seg:
+            data["error_type"] = "seg_text:() is empty"
+            data["error"] = "No content found"
+            response = jsonify(data)
+            # send request error code using status_code
+            response.status_code = 404
+            return response
+
+        # Encode data as JSON with appropriate options
+        response = jsonify(data)
+        return response
 
     def _from_local_cache(self, title: str, all_flag: str) -> tuple[str, str]:
         """ """
@@ -72,7 +170,7 @@ class PagePipelineService:
 
         return cached_text, cached_rev
 
-    def _get_wikitext_and_revision(self, title: str, all_flag: str = "") -> tuple[str, str, bool]:
+    def _fetch_wikitext(self, title: str, all_flag: str = "") -> tuple[str, str, bool]:
         """
         Fetch wikitext and revision ID.
         Tries live API first, then falls back to local cache.
@@ -140,104 +238,35 @@ class PagePipelineService:
 
         return html_removed, from_cache
 
-    def process_page(
-        self,
-        title: str,
-        printetxt: str,
-        force_new: bool,
-        all_flag: str = "",
-    ) -> Response:
-        """
-        Main entry point for the /new_html/ endpoint.
-        """
-        # 1. Get wikitext + revision
-        wikitext, revision, text_from_cache = self._get_wikitext_and_revision(title, all_flag)
+    # ------------------------------------------------------------
+    # Result builders
+    # ------------------------------------------------------------
 
-        if not wikitext or not revision:
-            response = jsonify(
-                {
-                    "sourceLanguage": "en",
-                    "title": title,
-                    "revision": revision,
-                    "segmentedContent": "",
-                    "categories": [],
-                    "error_type": f"title:({title}) or revision:({revision}) not found",
-                    "error": "No content found!",
-                }
-            )
-            response.status_code = 404
-            return response
-
-        file_dir = FileUtils.get_file_dir(revision, all_flag)
-        file_wikitext = file_dir / "wikitext.txt"
-        file_html = file_dir / "html.html"
-        file_seg = file_dir / "seg.html"
-        file_title = file_dir / "title.txt"
-
-        # Apply temporary (empty) fix
-        fixer = WikitextFixerService()
-        wikitext = fixer.fix(wikitext, title)
-
-        FileUtils.write_file(file_wikitext, wikitext)
-        FileUtils.write_file(file_title, title)
-
-        # Early exit for printetxt=wikitext
-        if printetxt == "wikitext":
-            response = Response(wikitext, mimetype="text/plain")
-            return response
-
-        # 2. Convert to HTML
-        html, html_from_cache = self._get_html(wikitext, file_html, title, force_new)
-
-        if printetxt == "html":
-            response = Response(html, mimetype="text/html")
-            return response
-
-        # 3. Convert to segments
-        seg, seg_from_cache = HtmlToSegmentsService().get_segments(
-            source_html=html,
-            file_seg=file_seg,
-            force_new=force_new,
-        )
-        FileUtils.write_file(file_seg, seg)
-
-        if printetxt == "seg":
-            response = Response(seg, mimetype="text/html")
-            return response
-
-        # Final JSON response
-        data: dict[str, Any] = {
-            "cache_data": {
-                "wikitext": text_from_cache,
-                "html": html_from_cache,
-                "seg": seg_from_cache,
-            },
+    def _base_data(self, title: str, revision: str, cache: dict[str, bool]) -> dict[str, Any]:
+        """Build base response data array."""
+        return {
+            "cache_data": cache,
             "sourceLanguage": "en",
             "title": title,
             "revision": revision,
-            "segmentedContent": seg,
+            "segmentedContent": "",
             "categories": [],
         }
 
-        if not html:
-            # Inconsistent error contract: When html is empty you still return HTTP 200 with error/error_type set,
-            # but when seg is empty you return 404. Pick one convention (e.g. always 404 with an error envelope,
-            # or always 200 with error fields) so clients can handle failures uniformly.
-
-            data["error_type"] = "HTML_text:() is empty"
-            data["error"] = "No content found"
-
-        elif not seg:
-            data["error_type"] = "seg_text:() is empty"
-            data["error"] = "No content found"
-            response = jsonify(data)
-            # send request error code using status_code
-            response.status_code = 404
-            return response
-
-        # Encode data as JSON with appropriate options
-        response = jsonify(data)
-        return response
+    def _not_found(self, title: str, revision: str) -> PageResult:
+        """Build not found response."""
+        return PageResult.json(
+            404,
+            {
+                "sourceLanguage": "en",
+                "title": title,
+                "revision": revision,
+                "segmentedContent": "",
+                "categories": [],
+                "error_type": f"title:({title}) or revision:({revision}) not found",
+                "error": "No content found!",
+            },
+        )
 
 
 __all__ = [

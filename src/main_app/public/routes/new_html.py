@@ -9,6 +9,7 @@ import re
 from flask import Blueprint, Response, abort, flash, jsonify, render_template, request
 from flask.views import MethodView
 
+from ...app_services.new_html_services.process.mapping import PageResult, PageRequest
 from ...app_services.new_html_services import (
     FileUtils,
     HtmlUtils,
@@ -109,24 +110,30 @@ class NewHtmlMainView(MethodView):
         title = (request.args.get("title") or "").strip()
         title = self.normalize_title(title)
 
-        printetxt = request.args.get("printetxt") or request.args.get("print") or ""
-        force_new = "new" in request.args
-
-        all_flag = request.args.get("all", "")
-        # Special case: titles starting with "Video"
-        if title.startswith("Video"):
-            all_flag = "1"
-
         if not title:
             return jsonify({"error": "title is empty"})
 
+        req = PageRequest.from_array(request.args, title)
+
         page_processer = PagePipelineService()
-        return page_processer.process_page(
-            title=title,
-            printetxt=printetxt,
-            force_new=force_new,
-            all_flag=all_flag,
-        )
+        result: PageResult = page_processer.process(req)
+        return self.respond(result)
+
+    def respond(self, result: PageResult) -> Response:
+        """
+        Prepare the response data, status code, and headers.
+
+        Compatible with standard Python web frameworks (like Flask).
+        """
+        if isinstance(result.body, str):
+            content_type = self.get_content_type(result.format)
+            response = Response(result.body, mimetype=content_type)
+        else:
+            response = jsonify(result.body)
+
+        # send request error code using status_code
+        response.status_code = result.status
+        return response
 
     @staticmethod
     def normalize_title(title: str) -> str:
