@@ -66,3 +66,8 @@ class LocalRestJsonRepository:
             return None
 
         return json_data
+
+
+__all__ = [
+    "LocalRestJsonRepository",
+]

@@ -7,20 +7,10 @@ from __future__ import annotations
 import logging
 
 from ....config.main_settings import app_settings
-from ....services.clients.http_client import HttpClient
+from ....services.clients import HttpClient
+from .mdwiki_api import normalize_title_for_url
 
 logger = logging.getLogger(__name__)
-
-
-def normalize_title_for_url(title: str) -> str:
-    """
-    doesn't normalize the title. Here the title is only replace("/", "%2F"), whereas MdwikiApi.get_wikitext
-    also replaces spaces with underscores. Multi-word titles will build a malformed REST URL and the
-    transform will fail. Reuse the same encoding as the fetch path.
-    """
-    title = title.replace(" ", "_")
-    title = title.replace("/", "%2F")
-    return title
 
 
 class TransformApiService:

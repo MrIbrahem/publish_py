@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_host(url: str) -> str:
-    return urlparse(url).netloc
+    return urlparse(url).netloc  # type: ignore
 
 
 def make_url(url: str) -> str | None:

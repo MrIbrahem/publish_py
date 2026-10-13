@@ -80,3 +80,9 @@ class PageResult:
     def text(cls, format: str, body: str, status: int = 200) -> PageResult:
         """Create a text page result (wikitext, html, or seg)."""
         return cls(status=status, format=format, body=body)
+
+
+__all__ = [
+    "PageRequest",
+    "PageResult",
+]
