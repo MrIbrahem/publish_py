@@ -7,34 +7,67 @@ Mirrors: php_src/text_change.php
 
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
 import logging
 from typing import Any
 
-fix_one_page = None
+PageFixer = None
 
 try:
-    from fix_refs import fix_one_page
+    from fix_refs import PageFixer
 except ImportError:
-    fix_one_page = None
+    PageFixer = None
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class LangSetting:
+    """Per-language fixing options."""
+    lang: str
+    move_dots: bool = True
+    expend_infobox: bool = True
+    add_en_lang: bool = False
+    add_category: bool = False
+
+    def to_json(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_any(cls, setting: LangSetting | dict[str, Any]) -> LangSetting:
+        """Create LangSetting from any input."""
+        if isinstance(setting, LangSetting):
+            return setting
+
+        return cls(**setting)
+
 class TextProcessor:
 
     @staticmethod
-    def do_changes_to_text_with_settings(
-        text: str | Any,
-        title: str,
+    def load_lang(
         lang: str,
-        source_title: str = "",
-        mdwiki_revid: int | str = 0,
         move_dots: bool = True,
         expend_infobox: bool = True,
         add_en_lang: bool = False,
         add_category: bool = False,
+    ) -> LangSetting:
+        return LangSetting(
+            lang=lang,
+            move_dots=move_dots,
+            expend_infobox=expend_infobox,
+            add_en_lang=add_en_lang,
+            add_category=add_category,
+        )
+
+    @staticmethod
+    def fix(
+        text: str | Any,
+        title: str,
+        lang_setting: LangSetting,
+        source_title: str = "",
+        mdwiki_revid: int | str = 0,
     ) -> str:
-        if fix_one_page is None:
+        if PageFixer is None:
             logger.error("fix_refs library is not installed")
             return text
 
@@ -44,18 +77,15 @@ class TextProcessor:
         if not text.strip():
             return text
 
-        return fix_one_page(
+        fixer = PageFixer(
             text=text,
             title=title,
-            lang=lang,
             source_title=source_title,
             mdwiki_revid=mdwiki_revid,
-            move_dots=move_dots,
-            expend_infobox=expend_infobox,
-            add_en_lang=add_en_lang,
-            add_category=add_category,
+            lang_setting=lang_setting.to_json(),
         )
 
+        return fixer.run()
 
 __all__ = [
     "TextProcessor",

@@ -196,16 +196,18 @@ class PublishWorker:
         """Apply text changes (fix references etc.) according to language settings."""
         language_setting = self._load_language_settings(self.tab["lang"])
 
-        newtext = TextProcessor.do_changes_to_text_with_settings(
-            text=self.text,
-            title=self.tab["title"],
+        lang_setting = TextProcessor.load_lang(
             lang=self.tab["lang"],
-            source_title=self.tab["sourcetitle"],
-            mdwiki_revid=self.tab["revid"],
             move_dots=bool(language_setting.move_dots),
             expend_infobox=bool(language_setting.expend),
             add_en_lang=bool(language_setting.add_en_lang),
-            # add_category=add_category,
+        )
+        newtext = TextProcessor.fix(
+            text=self.text,
+            title=self.tab["title"],
+            source_title=self.tab["sourcetitle"],
+            mdwiki_revid=self.tab["revid"],
+            lang_setting=lang_setting,
         )
 
         if newtext:

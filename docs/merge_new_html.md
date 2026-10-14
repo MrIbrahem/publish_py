@@ -43,7 +43,7 @@ suitable for the ContentTranslation (`cx-1`) tool. The pipeline is:
 ### Out of scope / notes
 
 -   The `fix_wikitext` cleanup is **distinct** from the existing `refs` blueprint
-    (`text_processor.do_changes_to_text_with_settings`), which _fixes references for
+    (`TextProcessor.fix`), which _fixes references for
     publishing_. The `new_html` cleanup _strips content to prepare it for translation_.
     Keep them separate; only share low-level helpers if identical.
 -   The `HtmltoSegments` endpoint is an **external** tool (maintained under `mdwikipy`); we
