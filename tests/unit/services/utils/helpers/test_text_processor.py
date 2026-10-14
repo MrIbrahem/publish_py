@@ -9,4 +9,3 @@ from src.main_app.services.utils.helpers.text_processor import (  # noqa: F401
 
 class TestTextProcessor:
     """Tests for TextProcessor.fix function."""
-

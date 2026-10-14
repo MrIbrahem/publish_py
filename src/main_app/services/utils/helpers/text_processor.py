@@ -7,8 +7,8 @@ Mirrors: php_src/text_change.php
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
 import logging
+from dataclasses import asdict, dataclass
 from typing import Any
 
 PageFixer = None
@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class LangSetting:
     """Per-language fixing options."""
+
     lang: str
     move_dots: bool = True
     expend_infobox: bool = True
@@ -40,6 +41,7 @@ class LangSetting:
             return setting
 
         return cls(**setting)
+
 
 class TextProcessor:
 
@@ -86,6 +88,7 @@ class TextProcessor:
         )
 
         return fixer.run()
+
 
 __all__ = [
     "TextProcessor",
