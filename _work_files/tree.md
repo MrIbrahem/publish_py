@@ -64,8 +64,10 @@ src/
 │   │   │   │   │   ├── __init__.py
 │   │   │   │   │   ├── delete_templates.py
 │   │   │   │   │   └── fix_templates.py
+│   │   │   │   │
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── wikitext_fixer.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   ├── README.md
 │   │   │   └── storage.py
@@ -92,9 +94,11 @@ src/
 │   │   │   │   ├── exists_table.py
 │   │   │   │   ├── in_process_table.py
 │   │   │   │   └── missing_table.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   ├── bundle.py
 │   │   │   └── results_loader.py
+│   │   │
 │   │   └── __init__.py
 │   │
 │   ├── config/
@@ -124,6 +128,7 @@ src/
 │   │   │   │   ├── translated_main.py
 │   │   │   │   ├── translated_shared_routes.py
 │   │   │   │   └── translated_users.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   ├── add_translate.py
 │   │   │   ├── campaigns.py
@@ -137,6 +142,7 @@ src/
 │   │   │   ├── tt.py
 │   │   │   ├── users_emails.py
 │   │   │   └── users_no_inprocess.py
+│   │   │
 │   │   ├── __init__.py
 │   │   ├── coordinator_panel.py
 │   │   └── decorators.py
@@ -225,8 +231,10 @@ src/
 │   │   │   │   ├── qid_others_service.py
 │   │   │   │   ├── qid_service.py
 │   │   │   │   └── qid_shared_service.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   └── crud_service.py
+│   │   │
 │   │   ├── __init__.py
 │   │   ├── create_helper.py
 │   │   ├── exceptions.py
@@ -287,6 +295,7 @@ src/
 │   │   │   │   ├── results_api.py
 │   │   │   │   ├── td_route.py
 │   │   │   │   └── translate_med.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   ├── html2segments.py
 │   │   │   ├── legacy_compat.py
@@ -295,6 +304,7 @@ src/
 │   │   ├── utils/
 │   │   │   ├── __init__.py
 │   │   │   └── routes_utils.py
+│   │   │
 │   │   ├── __init__.py
 │   │   └── README.md
 │   │
@@ -328,6 +338,7 @@ src/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── is_allowed_checker.py
 │   │   │   │   └── publish_secret_checks.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   ├── crypto.py
 │   │   │   └── jinja_filters.py
@@ -345,11 +356,13 @@ src/
 │   │   │   │   ├── files.py
 │   │   │   │   ├── format.py
 │   │   │   │   └── text_processor.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   ├── decode_bytes.py
 │   │   │   ├── views_links.py
 │   │   │   ├── web_utils.py
 │   │   │   └── wiki_links.py
+│   │   │
 │   │   ├── __init__.py
 │   │   └── README.md
 │   │
@@ -366,7 +379,9 @@ src/
 │   │   │   ├── mapping.py
 │   │   │   ├── nav_bar.py
 │   │   │   └── td_navbar_list.py
+│   │   │
 │   │   └── __init__.py
+│   │
 │   ├── __init__.py
 │   ├── error_pages.py
 │   ├── logger_config.py
@@ -399,6 +414,7 @@ src/
 │   │   ├── sidebar.js
 │   │   ├── td_autocomplete.js
 │   │   └── views_api.js
+│   │
 │   ├── favicon.ico
 │   ├── favicon.svg
 │   └── xtools.svg
@@ -433,6 +449,7 @@ src/
 │   │   ├── users_emails/
 │   │   │   ├── edit.html
 │   │   │   └── index.html
+│   │   │
 │   │   ├── _sidebar.html
 │   │   ├── add_translate.html
 │   │   ├── base1.html
@@ -479,12 +496,14 @@ src/
 │   │   │   ├── inprocess_table.html
 │   │   │   ├── missing_table.html
 │   │   │   └── results_card.html
+│   │   │
 │   │   ├── form.html
 │   │   ├── index.html
 │   │   ├── missing.html
 │   │   ├── td_base.html
 │   │   ├── td_navbar.html
 │   │   └── translate_med.html
+│   │
 │   ├── _macros.html
 │   ├── _navbar.html
 │   ├── base.html
@@ -492,6 +511,7 @@ src/
 │   ├── index.html
 │   ├── index_db_error.html
 │   └── reports.html
+│
 ├── __init__.py
 ├── app.py
 ├── bootstrap.py

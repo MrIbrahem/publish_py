@@ -16,6 +16,7 @@ tests/
 │   │       ├── qids/
 │   │       │
 │   │       ├── translated/
+│   │       │
 │   │       ├── test_admin_routes_integration.py
 │   │       ├── test_full_translators_routes_integration.py
 │   │       ├── test_language_settings_routes_integration.py
@@ -96,6 +97,7 @@ tests/
 │   │   │   │   │
 │   │   │   │   ├── data/
 │   │   │   │   │   └── source-1.wiki
+│   │   │   │   │
 │   │   │   │   ├── test_citation.py
 │   │   │   │   ├── test_citations_parser.py
 │   │   │   │   ├── test_lead_section_parser.py
@@ -145,7 +147,9 @@ tests/
 │   │   │   │   ├── templates/
 │   │   │   │   │   ├── test_delete_templates.py
 │   │   │   │   │   └── test_fix_templates.py
+│   │   │   │   │
 │   │   │   │   └── test_wikitext_fixer.py
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   ├── expend_infobox.py
 │   │   │   └── test_storage.py
@@ -159,8 +163,10 @@ tests/
 │   │   │   ├── mapping/
 │   │   │   │
 │   │   │   ├── tables/
+│   │   │   │
 │   │   │   ├── __init__.py
 │   │   │   └── test_row_items.py
+│   │   │
 │   │   └── __init__.py
 │   │
 │   ├── config/
@@ -174,6 +180,7 @@ tests/
 │   │       ├── qids/
 │   │       │
 │   │       ├── translated/
+│   │       │
 │   │       ├── test_admin_routes.py
 │   │       ├── test_full_translators_routes.py
 │   │       ├── test_language_settings_routes.py
@@ -271,7 +278,9 @@ tests/
 │   │   │   │   ├── test_allqid_service.py
 │   │   │   │   ├── test_qid_others_service.py
 │   │   │   │   └── test_qid_service.py
+│   │   │   │
 │   │   │   └── __init__.py
+│   │   │
 │   │   └── __init__.py
 │   │
 │   ├── extensions/
@@ -302,6 +311,7 @@ tests/
 │   │   │   ├── refs/
 │   │   │   │
 │   │   │   ├── td/
+│   │   │   │
 │   │   │   ├── test_html2segments.py
 │   │   │   ├── test_legacy_url_redirects.py
 │   │   │   └── test_new_html_routes.py
@@ -333,6 +343,7 @@ tests/
 │   │   │   │   ├── test_cors_wrappers_and_headers.py
 │   │   │   │   ├── test_is_allowed_checker_unit.py
 │   │   │   │   └── test_publish_secret_checks.py
+│   │   │   │
 │   │   │   ├── test_crypto.py
 │   │   │   └── test_extensions.py
 │   │   │
@@ -346,6 +357,7 @@ tests/
 │   │       │   ├── test_files.py
 │   │       │   ├── test_format.py
 │   │       │   └── test_text_processor.py
+│   │       │
 │   │       ├── test_decode_bytes.py
 │   │       └── test_web_utils.py
 │   │
@@ -354,8 +366,11 @@ tests/
 │   │   ├── coordinator_sidebar/
 │   │   │
 │   │   ├── navbar/
+│   │   │
 │   │   └── test_coordinator_sidebar.py
+│   │
 │   └── __init__.py
+│
 ├── __init__.py
 ├── conftest.py
 └── README.md
