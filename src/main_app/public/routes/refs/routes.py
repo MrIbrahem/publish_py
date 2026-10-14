@@ -1,7 +1,7 @@
 """
 Routes for the 'Fix References' feature.
 This blueprint provides a user interface for processing text to fix references
-using the `TextProcessor.do_changes_to_text_with_settings` service.
+using the `TextProcessor.fix` service.
 """
 
 from __future__ import annotations
@@ -49,16 +49,19 @@ def _process(data) -> str:
         text = TextApiClient().get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
 
     try:
-        result = TextProcessor.do_changes_to_text_with_settings(
-            text=text,
-            title=title,
+        lang_setting = TextProcessor.load_lang(
             lang=lang,
-            source_title=source_title,
-            mdwiki_revid=mdwiki_revid,
             move_dots=movedots,
             expend_infobox=infobox,
             # add_en_lang=add_en_lang,
             # add_category=add_category,
+        )
+        result = TextProcessor.fix(
+            text=text,
+            title=title,
+            source_title=source_title,
+            mdwiki_revid=mdwiki_revid,
+            lang_setting=lang_setting,
         )
     except Exception:
         logger.exception("Error processing text")

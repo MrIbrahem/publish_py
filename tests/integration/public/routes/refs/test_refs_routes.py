@@ -21,7 +21,7 @@ class MockRefsDeps:
 @pytest.fixture
 def mock_refs_deps(monkeypatch: pytest.MonkeyPatch) -> MockRefsDeps:
     """Fixture to bundle and set up common patches for refs route tests."""
-    _target = "src.main_app.public.routes.refs.routes.TextProcessor.do_changes_to_text_with_settings"
+    _target = "src.main_app.public.routes.refs.routes.TextProcessor.fix"
     _mock = MagicMock()
     monkeypatch.setattr(_target, _mock)
     return MockRefsDeps(do_changes_to_text=_mock)
@@ -81,7 +81,7 @@ class TestRefsProcess:
         assert response.status_code == 200
 
     def test_fixrefs_process_calls_do_changes_to_text(self, auth_client: FlaskClient, mock_refs_deps: MockRefsDeps):
-        """Test that fixrefs process calls TextProcessor.do_changes_to_text_with_settings."""
+        """Test that fixrefs process calls TextProcessor.fix."""
         mock_refs_deps.do_changes_to_text.return_value = "Processed text"
 
         auth_client.post(

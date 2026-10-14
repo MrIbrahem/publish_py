@@ -50,7 +50,7 @@ class EnvironmentInitializer:
     def _setup_fix_refs_path() -> None:
         """Check for fix_refs availability and dynamically append its path if configured."""
         try:
-            from fix_refs import fix_one_page  # noqa: F401
+            from fix_refs import PageFixer  # noqa: F401
         except ImportError:
             logger.warning("fix_refs library not found")
             msg = """

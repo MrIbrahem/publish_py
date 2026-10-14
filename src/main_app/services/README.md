@@ -6,25 +6,25 @@ The `shared` package contains reusable infrastructure code shared across all blu
 
 ### Main Modules
 
-| Directory | Purpose |
-|-----------|---------|
-| `auth/` | Authentication decorators and user identity resolution |
-| `clients/` | External API clients (MediaWiki, Wikidata, MDWiki, OAuth) |
-| `core/` | Flask extensions (DB, CSRF, CORS), encryption, cookie signing |
-| `schemas/` | Marshmallow request validation schemas |
-| `utils/` | Utility functions (text processing, file handling, wiki links) |
+| Directory  | Purpose                                                        |
+| ---------- | -------------------------------------------------------------- |
+| `auth/`    | Authentication decorators and user identity resolution         |
+| `clients/` | External API clients (MediaWiki, Wikidata, MDWiki, OAuth)      |
+| `core/`    | Flask extensions (DB, CSRF, CORS), encryption, cookie signing  |
+| `schemas/` | Marshmallow request validation schemas                         |
+| `utils/`   | Utility functions (text processing, file handling, wiki links) |
 
 ### Technologies & Dependencies
 
-- **Flask-WTF** for CSRF protection
-- **Flask-SQLAlchemy** with custom `Base` class
-- **Flask-Migrate** (Alembic) for database migrations
-- **Fernet** (cryptography) for OAuth token encryption
-- **itsdangerous** for signed cookies
-- **Marshmallow** for request validation
-- **mwoauth** for MediaWiki OAuth handshake
-- **requests** for HTTP API calls
-- **cachetools** for TTL-based caching
+-   **Flask-WTF** for CSRF protection
+-   **Flask-SQLAlchemy** with custom `Base` class
+-   **Flask-Migrate** (Alembic) for database migrations
+-   **Fernet** (cryptography) for OAuth token encryption
+-   **itsdangerous** for signed cookies
+-   **Marshmallow** for request validation
+-   **mwoauth** for MediaWiki OAuth handshake
+-   **requests** for HTTP API calls
+-   **cachetools** for TTL-based caching
 
 ## Architecture & Code Quality Review
 
@@ -44,20 +44,21 @@ Request -> current_user() resolution:
 ```
 
 Decorators:
-- `@login_required` -- Redirects to login if unauthenticated
-- `@oauth_required` -- Redirects to OAuth if configured but no user
-- `@admin_required` -- 403 if not an active coordinator (in admin package)
+
+-   `@login_required` -- Redirects to login if unauthenticated
+-   `@oauth_required` -- Redirects to OAuth if configured but no user
+-   `@admin_required` -- 403 if not an active coordinator (in admin package)
 
 ### Client Architecture
 
-| Client | Target API | Key Functions |
-|--------|-----------|---------------|
-| `mediawiki_api.py` | `{lang}.wikipedia.org` | `get_title_info()`, `publish_do_edit()` |
-| `mdwiki_api.py` | `mdwiki.org` | `get_mdwiki_cat_members()` with BFS traversal + file cache |
-| `oauth_client.py` | MediaWiki OAuth | `get_csrf_token()`, `post_params()`, `get_cxtoken()` |
-| `text_api.py` | Wikimedia projects | `get_wikitext()` with project whitelist validation |
-| `wikidata_client.py` | Wikidata API | `get_qid_for_mdtitle()`, `link_to_wikidata()` |
-| `revids_client.py` | Local files / API | `get_revid()`, `get_revid_db()` |
+| Client               | Target API             | Key Functions                                              |
+| -------------------- | ---------------------- | ---------------------------------------------------------- |
+| `mediawiki_api.py`   | `{lang}.wikipedia.org` | `get_title_info()`, `publish_do_edit()`                    |
+| `mdwiki_api.py`      | `mdwiki.org`           | `get_mdwiki_cat_members()` with BFS traversal + file cache |
+| `oauth_client.py`    | MediaWiki OAuth        | `get_csrf_token()`, `post_params()`, `get_cxtoken()`       |
+| `text_api.py`        | Wikimedia projects     | `get_wikitext()` with project whitelist validation         |
+| `wikidata_client.py` | Wikidata API           | `get_qid_for_mdtitle()`, `link_to_wikidata()`              |
+| `revids_client.py`   | Local files / API      | `get_revid()`, `get_revid_db()`                            |
 
 ### Core Extensions
 
@@ -71,24 +72,25 @@ shared/core/extensions/
 ### CORS Protection
 
 Two decorators in `shared/core/cors/`:
-- `@check_cors` -- Validates Origin/Referer against allowed domains list
-- `@validate_access` -- Validates CORS OR `X-Secret-Key` header (for publish endpoint)
+
+-   `@check_cors` -- Validates Origin/Referer against allowed domains list
+-   `@validate_access` -- Validates CORS OR `X-Secret-Key` header (for publish endpoint)
 
 ### Schemas (Marshmallow)
 
-| Schema | Validates | Key Fields |
-|--------|----------|------------|
-| `PublishRequestSchema` | `/publish/` POST | user, title, text, target (2-10 chars), translate_type |
-| `PublishReportsQuerySchema` | `/api/publish_reports` GET | year, month, title, user, lang, result, limit |
-| `CXTokenRequestSchema` | `/cxtoken/` GET | wiki (required), user (required) |
+| Schema                      | Validates                  | Key Fields                                             |
+| --------------------------- | -------------------------- | ------------------------------------------------------ |
+| `PublishRequestSchema`      | `/publish/` POST           | user, title, text, target (2-10 chars), translate_type |
+| `PublishReportsQuerySchema` | `/api/publish_reports` GET | year, month, title, user, lang, result, limit          |
+| `CXTokenRequestSchema`      | `/cxtoken/` GET            | wiki (required), user (required)                       |
 
 ### Design Patterns
 
-- **Decorator Pattern**: Auth, CORS, CSRF applied via decorators
-- **Lazy Initialization**: Fernet cipher, words table, ContentTranslation endpoint use lazy loading
-- **Facade Pattern**: `shared/clients/__init__.py` re-exports all client functions
-- **Whitelist Pattern**: `text_api.py` validates `project` against regex whitelist
-- **TTL Cache**: `cxtoken/cache.py` uses `cachetools.TTLCache` for token caching
+-   **Decorator Pattern**: Auth, CORS, CSRF applied via decorators
+-   **Lazy Initialization**: Fernet cipher, words table, ContentTranslation endpoint use lazy loading
+-   **Facade Pattern**: `shared/clients/__init__.py` re-exports all client functions
+-   **Whitelist Pattern**: `text_api.py` validates `project` against regex whitelist
+-   **TTL Cache**: `cxtoken/cache.py` uses `cachetools.TTLCache` for token caching
 
 ## Strengths
 
@@ -109,7 +111,7 @@ Two decorators in `shared/core/cors/`:
 
 ### Code Quality
 
-3. **`do_changes_to_text()` vs `do_changes_to_text_with_settings()`** (`text_processor.py`): Two similar functions exist. The former uses legacy `apply_text_modifications`, the latter uses `fix_one_page`. Only `do_changes_to_text_with_settings()` is used by routes.
+3. **`do_changes_to_text()` vs `TextProcessor.fix()`** (`text_processor.py`): Two similar functions exist. The former uses legacy `apply_text_modifications`, the latter uses `PageFixer.run`. Only `TextProcessor.fix()` is used by routes.
 
 4. **`os.sys.path.insert` in `text_processor.py`**: Uses `os.sys.path.insert(0, fix_refs_path)` instead of the standard `import sys; sys.path.insert(...)`.
 
@@ -139,41 +141,44 @@ Two decorators in `shared/core/cors/`:
 
 ## Areas That Need Attention
 
-| Area | Priority | Details |
-|------|----------|---------|
-| XSS in HTML builders | **High** | `results_api.py` and `results_2026.py` need `html.escape` on interpolated values |
-| OAuth state token lifetime | **High** | Use shorter TTL (5-10 min) instead of cookie max_age |
-| Rate limit bypass via X-Forwarded-For | **Medium** | Use `request.remote_addr` or configure trusted proxies properly |
-| Thread-safe Fernet init | **Medium** | Uncomment the lock or use a module-level singleton |
-| Dead code cleanup | **Low** | Remove `do_changes_to_text()`, `validate_json`, unreachable CORS error |
+| Area                                  | Priority   | Details                                                                          |
+| ------------------------------------- | ---------- | -------------------------------------------------------------------------------- |
+| XSS in HTML builders                  | **High**   | `results_api.py` and `results_2026.py` need `html.escape` on interpolated values |
+| OAuth state token lifetime            | **High**   | Use shorter TTL (5-10 min) instead of cookie max_age                             |
+| Rate limit bypass via X-Forwarded-For | **Medium** | Use `request.remote_addr` or configure trusted proxies properly                  |
+| Thread-safe Fernet init               | **Medium** | Uncomment the lock or use a module-level singleton                               |
+| Dead code cleanup                     | **Low**    | Remove `do_changes_to_text()`, `validate_json`, unreachable CORS error           |
 
 ## Improvement Plan
 
 ### Quick Wins
-- [ ] Add `html.escape()` to all HTML string builders in `results_api.py` and `results_2026.py`
-- [ ] Fix duplicate flash messages in logout handler
-- [ ] Fix copy-paste error message in `users_by_translations_count()`
-- [ ] Remove dead `g` attribute assignments after `make_response()`
+
+-   [ ] Add `html.escape()` to all HTML string builders in `results_api.py` and `results_2026.py`
+-   [ ] Fix duplicate flash messages in logout handler
+-   [ ] Fix copy-paste error message in `users_by_translations_count()`
+-   [ ] Remove dead `g` attribute assignments after `make_response()`
 
 ### Medium-term Improvements
-- [ ] Implement separate TTL for OAuth state tokens (shorter than cookie max_age)
-- [ ] Uncomment thread-safety lock in `crypto.py` or use a proper singleton pattern
-- [ ] Fix rate limiting to use `request.remote_addr` instead of `X-Forwarded-For`
-- [ ] Remove unused `do_changes_to_text()` function
-- [ ] Clean up unreachable code in `validate_access`
+
+-   [ ] Implement separate TTL for OAuth state tokens (shorter than cookie max_age)
+-   [ ] Uncomment thread-safety lock in `crypto.py` or use a proper singleton pattern
+-   [ ] Fix rate limiting to use `request.remote_addr` instead of `X-Forwarded-For`
+-   [ ] Remove unused `do_changes_to_text()` function
+-   [ ] Clean up unreachable code in `validate_access`
 
 ### Long-term Recommendations
-- [ ] Add request-scoped caching for `get_endpoint()` (currently hits DB on every call)
-- [ ] Implement structured API error responses (consistent JSON error format)
-- [ ] Add OpenAPI/Swagger documentation for all API endpoints
-- [ ] Consider using `httpx` instead of `requests` for async-capable HTTP client
+
+-   [ ] Add request-scoped caching for `get_endpoint()` (currently hits DB on every call)
+-   [ ] Implement structured API error responses (consistent JSON error format)
+-   [ ] Add OpenAPI/Swagger documentation for all API endpoints
+-   [ ] Consider using `httpx` instead of `requests` for async-capable HTTP client
 
 ## Comprehensive Review
 
-| Metric | Score | Notes |
-|--------|-------|-------|
-| **Overall Rating** | **7/10** | Solid infrastructure with some security gaps |
-| **Production Readiness** | Ready with caveats | XSS and rate limit bypass need fixing |
-| **Technical Debt** | **Medium** | Dead code, duplicate functions, inconsistent patterns |
-| **Risk Assessment** | **Medium** | XSS risk in HTML builders; rate limit bypass |
-| **Maintainability** | **High** | Clean separation, good documentation, consistent patterns |
+| Metric                   | Score              | Notes                                                     |
+| ------------------------ | ------------------ | --------------------------------------------------------- |
+| **Overall Rating**       | **7/10**           | Solid infrastructure with some security gaps              |
+| **Production Readiness** | Ready with caveats | XSS and rate limit bypass need fixing                     |
+| **Technical Debt**       | **Medium**         | Dead code, duplicate functions, inconsistent patterns     |
+| **Risk Assessment**      | **Medium**         | XSS risk in HTML builders; rate limit bypass              |
+| **Maintainability**      | **High**           | Clean separation, good documentation, consistent patterns |
