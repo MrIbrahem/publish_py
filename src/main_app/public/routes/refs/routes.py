@@ -17,9 +17,7 @@ from flask import (
 )
 from flask.views import MethodView
 
-from ....database.services import PagesService
-from ....database.services import UserPagesService
-
+from ....database.services import PagesService, UserPagesService
 from ....public.auth import oauth_required
 from ....services.clients.text_api import TextApiClient
 from ....services.utils.helpers.text_processor import (
@@ -34,11 +32,11 @@ def safe_bool(value) -> bool:
 
 
 class FixRefsBase(MethodView):
-
     """
     A base class for handling reference fixing operations in a web application.
     Inherits from MethodView to support HTTP methods like GET, POST, etc.
     """
+
     def _process(self, data) -> str:
         source_title = data.get("source_title", "")
         title = data.get("title", "")
@@ -61,7 +59,7 @@ class FixRefsBase(MethodView):
         if not text and lang and title:
             text = TextApiClient().get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
 
-        def result_template(no_changes: bool= False, result: str = "") -> str:
+        def result_template(no_changes: bool = False, result: str = "") -> str:
             return render_template(
                 "fixrefs/index.html",
                 no_changes=no_changes,
@@ -243,7 +241,9 @@ class FixRefsRoutes:
         bp.add_url_rule("/test", view_func=FixRefsTestView.as_view("test"))
         bp.add_url_rule("/", view_func=FixRefsProcessNewView.as_view("process_new"), methods=["POST"])
         bp.add_url_rule("/process", view_func=FixRefsProcessView.as_view("process"))
-        bp.add_url_rule("/process_by_id/<string:table>/<string:id>", view_func=FixRefsProcessByIdView.as_view("process_by_id"))
+        bp.add_url_rule(
+            "/process_by_id/<string:table>/<string:id>", view_func=FixRefsProcessByIdView.as_view("process_by_id")
+        )
 
 
 __all__ = [
