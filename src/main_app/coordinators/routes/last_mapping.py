@@ -103,6 +103,14 @@ class LastRow:
         )
 
     @property
+    def fix_url_by_id(self) -> str:
+        return url_for(
+            "fixrefs.process_by_id",
+            table=self.last_table,
+            id=self.id,
+        )
+
+    @property
     def email_url(self) -> str:
         return url_for(
             "coordinators_panel.email_msg.dashboard",
@@ -176,7 +184,7 @@ class LastRow:
             user_url=self.user_url,
             email_url=self.email_url,
             lang_url=self.lang_url,
-            fix_url=self.fix_url,
+            fix_url=self.fix_url_by_id,
             draft_html=self.draft_html,
         )
 
