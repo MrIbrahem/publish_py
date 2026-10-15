@@ -21,7 +21,7 @@ from flask.views import MethodView
 from ....database.models import PageSharedRecord
 from ....database.services import LanguageSettingService, PagesService, UserPagesService
 from ....public.auth import oauth_required
-from ....services.clients.text_api import TextApiClient
+from ....services.clients import TextApiClient
 from ....services.utils.helpers.text_processor import (
     LangSetting,
     TextProcessor,
