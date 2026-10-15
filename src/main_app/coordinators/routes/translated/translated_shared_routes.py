@@ -15,7 +15,7 @@ from ....database.services import LangService, PagesService, UserPagesService
 logger = logging.getLogger(__name__)
 
 
-def _safe_int(value: str | None, default: int) -> int:
+def safe_int(value: str | None, default: int) -> int:
     try:
         return int(value) if value is not None else default
     except (TypeError, ValueError):
@@ -49,8 +49,8 @@ class TranslatedIndexView(BaseTranslatedView):
     def get(self) -> str:
         """List translated pages with filter options."""
         lang = request.args.get("lang", "All")
-        page = max(_safe_int(request.args.get("page"), 1), 1)
-        limit = max(_safe_int(request.args.get("limit"), 500), 1)
+        page = max(safe_int(request.args.get("page"), 1), 1)
+        limit = max(safe_int(request.args.get("limit"), 500), 1)
         offset = (page - 1) * limit
 
         try:
@@ -82,7 +82,7 @@ class TranslatedEditView(BaseTranslatedView):
 
     def get(self) -> str:
         """Render the edit popup form for a single page record."""
-        page_id = _safe_int(request.args.get("id"), 0)
+        page_id = safe_int(request.args.get("id"), 0)
         if page_id <= 0:
             abort(400, description="id is required")
 
@@ -98,7 +98,7 @@ class TranslatedEditView(BaseTranslatedView):
 
     def post(self) -> ResponseReturnValue:
         """Update or delete a page record from the popup form."""
-        page_id = _safe_int(request.form.get("id"), 0)
+        page_id = safe_int(request.form.get("id"), 0)
 
         if page_id <= 0:
             flash("Invalid id supplied.", "danger")
