@@ -18,14 +18,12 @@ from flask import (
 )
 from flask.views import MethodView
 
-from ....services.utils.helpers.text_processor import LangSetting
-
 from ....database.models import PageSharedRecord
-
 from ....database.services import LanguageSettingService, PagesService, UserPagesService
 from ....public.auth import oauth_required
 from ....services.clients.text_api import TextApiClient
 from ....services.utils.helpers.text_processor import (
+    LangSetting,
     TextProcessor,
 )
 
@@ -62,7 +60,7 @@ class FixRefsBase(MethodView):
             # add_category=add_category,
         )
 
-    def _process(self, data: dict[str, Any], lang_setting : LangSetting | None = None) -> str:
+    def _process(self, data: dict[str, Any], lang_setting: LangSetting | None = None) -> str:
         source_title = data.get("source_title", "")
         title = data.get("title", "")
         text = data.get("text", "")
