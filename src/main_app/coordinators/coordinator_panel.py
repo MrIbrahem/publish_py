@@ -18,7 +18,7 @@ from werkzeug.wrappers.response import Response
 from ..templates_markups import create_side
 from .decorators import coordinator_required
 from .routes.categories import categories_dashboard
-from .routes.last import last_translations_dashboard
+from .routes.last import LastTranslationsDashboard
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ class CoordinatorPanelPagesView(BaseCoordinatorPanelView):
 
     def get(self, lang: str | None = None) -> str:
         """Render the ``pages`` last-translations dashboard."""
-        return last_translations_dashboard("pages", lang)
+        return LastTranslationsDashboard.dashboard("pages", lang)
 
 
 class CoordinatorPanelPagesUsersView(BaseCoordinatorPanelView):
@@ -70,7 +70,7 @@ class CoordinatorPanelPagesUsersView(BaseCoordinatorPanelView):
 
     def get(self, lang: str | None = None) -> str:
         """Render the ``pages_users`` last-translations dashboard."""
-        return last_translations_dashboard("pages_users", lang)
+        return LastTranslationsDashboard.dashboard("pages_users", lang)
 
 
 class CoordinatorPanelReportsView(BaseCoordinatorPanelView):

@@ -12,7 +12,9 @@ from flask import request
 
 logger = logging.getLogger(__name__)
 
+
 class FormatTimestamps:
+
     @staticmethod
     def _format_timestamp(
         value: str | datetime,
@@ -38,7 +40,6 @@ class FormatTimestamps:
 
         return dt.strftime(format_str)  # type: ignore
 
-
     @staticmethod
     def format_long_date(value: str | datetime, default: str = "") -> str:
         """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
@@ -48,7 +49,6 @@ class FormatTimestamps:
             default=default,
         )
 
-
     @staticmethod
     def format_date(value: str | datetime, format_str: str = "%Y-%m-%d %H:%M:%S", default: str = "") -> str:
         """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
@@ -57,7 +57,6 @@ class FormatTimestamps:
             format_str=format_str,
             default=default,
         )
-
 
     @staticmethod
     def format_short_date(value: str | datetime, default: str = "") -> str:
@@ -148,7 +147,6 @@ filters = {
     "format_long_date": FormatTimestamps.format_long_date,
     "format_short_date": FormatTimestamps.format_short_date,
     "format_date": FormatTimestamps.format_date,
-
     "get_status_class": get_status_class,
     "short_url": short_url,
     "check_active_route": check_active_route,
@@ -158,6 +156,6 @@ filters = {
 }
 
 __all__ = [
+    "FormatTimestamps",
     "filters",
-    "format_date",
 ]
