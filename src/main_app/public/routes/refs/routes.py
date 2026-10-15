@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import random
+from typing import Any
 
 from flask import (
     Blueprint,
@@ -17,7 +18,11 @@ from flask import (
 )
 from flask.views import MethodView
 
-from ....database.services import PagesService, UserPagesService
+from ....services.utils.helpers.text_processor import LangSetting
+
+from ....database.models import PageSharedRecord
+
+from ....database.services import LanguageSettingService, PagesService, UserPagesService
 from ....public.auth import oauth_required
 from ....services.clients.text_api import TextApiClient
 from ....services.utils.helpers.text_processor import (
@@ -37,18 +42,33 @@ class FixRefsBase(MethodView):
     Inherits from MethodView to support HTTP methods like GET, POST, etc.
     """
 
-    def _process(self, data) -> str:
+    def load_lang(self, data: dict[str, Any]) -> LangSetting:
+        lang = data.get("lang", "")
+
+        # `expend` from `LanguageSettingRecord`
+        infobox = safe_bool(data.get("infobox") or data.get("expend", ""))
+
+        # `move_dots` from `LanguageSettingRecord`
+        movedots = safe_bool(data.get("movedots") or data.get("move_dots", ""))
+
+        # add_en_lang = safe_bool(data.get("add_en_lang", ""))
+        # add_category = safe_bool(data.get("add_category", ""))
+
+        return TextProcessor.load_lang(
+            lang=lang,
+            move_dots=movedots,
+            expend_infobox=infobox,
+            # add_en_lang=add_en_lang,
+            # add_category=add_category,
+        )
+
+    def _process(self, data: dict[str, Any], lang_setting : LangSetting | None = None) -> str:
         source_title = data.get("source_title", "")
         title = data.get("title", "")
         text = data.get("text", "")
         lang = data.get("lang", "")
         mdwiki_revid_raw = str(data.get("mdwiki_revid", "")).strip()
-
         save = safe_bool(data.get("save", ""))
-        infobox = safe_bool(data.get("infobox", ""))
-        movedots = safe_bool(data.get("movedots", ""))
-        # add_en_lang = safe_bool(data.get("add_en_lang", ""))
-        # add_category = safe_bool(data.get("add_category", ""))
 
         try:
             mdwiki_revid = int(mdwiki_revid_raw or 0)
@@ -58,6 +78,9 @@ class FixRefsBase(MethodView):
 
         if not text and lang and title:
             text = TextApiClient().get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
+
+        if not lang_setting:
+            lang_setting = self.load_lang(data)
 
         def result_template(no_changes: bool = False, result: str = "") -> str:
             return render_template(
@@ -71,8 +94,8 @@ class FixRefsBase(MethodView):
                 result=result,
                 form={
                     "save": save,
-                    "infobox": infobox,
-                    "movedots": movedots,
+                    "infobox": lang_setting.expend_infobox,
+                    "movedots": lang_setting.move_dots,
                 },
             )
 
@@ -81,13 +104,6 @@ class FixRefsBase(MethodView):
             return result_template()
 
         try:
-            lang_setting = TextProcessor.load_lang(
-                lang=lang,
-                move_dots=movedots,
-                expend_infobox=infobox,
-                # add_en_lang=add_en_lang,
-                # add_category=add_category,
-            )
             result = TextProcessor.fix(
                 text=text,
                 title=title,
@@ -209,7 +225,8 @@ class FixRefsProcessByIdView(FixRefsBase):
             )
 
         service = PagesService() if table == "pages" else UserPagesService()
-        record = service.get_by_id(int_id)
+        record: PageSharedRecord | None = service.get_by_id(int_id)
+
         if not record:
             flash("Page not found", "warning")
             return render_template(
@@ -221,9 +238,14 @@ class FixRefsProcessByIdView(FixRefsBase):
         data["source_title"] = data.pop("title", None)
         data["title"] = data.pop("target", None)
 
+        langs_service = LanguageSettingService()
+        lang_data = langs_service.get_language_setting_by_code(data["lang"]) if data.get("lang") else None
+
         # data = request.args
         logger.info("Processing text with settings: %s", data)
-        return self._process(data)
+        language_settings = self.load_lang(lang_data.to_json()) if lang_data else None
+
+        return self._process(data, language_settings)
 
 
 class FixRefsRoutes:
