@@ -8,7 +8,12 @@ def _fetch_yesterday_iso() -> str:
 
 class ViewsLinks:
     @staticmethod
-    def build_pageviews_url(lang: str, target: str, pupdate: str | None = None, yesterday: str = "") -> str:
+    def build_pageviews_url(
+        lang: str,
+        target: str,
+        pupdate: str | None = None,
+        yesterday: str = "",
+    ) -> str:
         """
         Constructs the target fallback URL for pageviews.wmcloud.org.
         """

@@ -12,57 +12,61 @@ from flask import request
 
 logger = logging.getLogger(__name__)
 
-
-def _format_timestamp(
-    value: str | datetime,
-    format_str: str = "%Y-%m-%d %H:%M:%S",
-    default: str = "",
-) -> str:
-    """Format a timestamp string or datetime/date object using the specified format string."""
-    if not value:
-        return default
-
-    if not format_str:
-        format_str = "%Y-%m-%d %H:%M:%S"
-
-    if isinstance(value, datetime) or hasattr(value, "strftime"):
-        dt = value
-    else:
-        try:
-            dt = datetime.fromisoformat(value)
-        except (ValueError, TypeError):
-            logger.exception("Failed to parse timestamp: %s", value)
-            logger.error("type of value: %s", type(value))
+class FormatTimestamps:
+    @staticmethod
+    def _format_timestamp(
+        value: str | datetime,
+        format_str: str = "%Y-%m-%d %H:%M:%S",
+        default: str = "",
+    ) -> str:
+        """Format a timestamp string or datetime/date object using the specified format string."""
+        if not value:
             return default
 
-    return dt.strftime(format_str)  # type: ignore
+        if not format_str:
+            format_str = "%Y-%m-%d %H:%M:%S"
+
+        if isinstance(value, datetime) or hasattr(value, "strftime"):
+            dt = value
+        else:
+            try:
+                dt = datetime.fromisoformat(value)
+            except (ValueError, TypeError):
+                logger.exception("Failed to parse timestamp: %s", value)
+                logger.error("type of value: %s", type(value))
+                return default
+
+        return dt.strftime(format_str)  # type: ignore
 
 
-def format_long_date(value: str | datetime, default: str = "") -> str:
-    """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
-    return _format_timestamp(
-        value=value,
-        format_str="%Y-%m-%d %H:%M:%S",
-        default=default,
-    )
+    @staticmethod
+    def format_long_date(value: str | datetime, default: str = "") -> str:
+        """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
+        return FormatTimestamps._format_timestamp(
+            value=value,
+            format_str="%Y-%m-%d %H:%M:%S",
+            default=default,
+        )
 
 
-def format_date(value: str | datetime, format_str: str = "%Y-%m-%d %H:%M:%S", default: str = "") -> str:
-    """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
-    return _format_timestamp(
-        value=value,
-        format_str=format_str,
-        default=default,
-    )
+    @staticmethod
+    def format_date(value: str | datetime, format_str: str = "%Y-%m-%d %H:%M:%S", default: str = "") -> str:
+        """Format ISO8601 like '2026-05-28T23:51:50' to '2026-05-28 23:51:50'."""
+        return FormatTimestamps._format_timestamp(
+            value=value,
+            format_str=format_str,
+            default=default,
+        )
 
 
-def format_short_date(value: str | datetime, default: str = "") -> str:
-    """Format ISO8601 like '2026-05-28T23:51:50' to '23:51:50"""
-    return _format_timestamp(
-        value=value,
-        format_str="%H:%M:%S",
-        default=default,
-    )
+    @staticmethod
+    def format_short_date(value: str | datetime, default: str = "") -> str:
+        """Format ISO8601 like '2026-05-28T23:51:50' to '23:51:50"""
+        return FormatTimestamps._format_timestamp(
+            value=value,
+            format_str="%H:%M:%S",
+            default=default,
+        )
 
 
 def get_status_class(status: str) -> str:
@@ -141,9 +145,10 @@ def is_job_running(job_status: str | None) -> bool:
 
 
 filters = {
-    "format_long_date": format_long_date,
-    "format_short_date": format_short_date,
-    "format_date": format_date,
+    "format_long_date": FormatTimestamps.format_long_date,
+    "format_short_date": FormatTimestamps.format_short_date,
+    "format_date": FormatTimestamps.format_date,
+
     "get_status_class": get_status_class,
     "short_url": short_url,
     "check_active_route": check_active_route,
@@ -154,4 +159,5 @@ filters = {
 
 __all__ = [
     "filters",
+    "format_date",
 ]
