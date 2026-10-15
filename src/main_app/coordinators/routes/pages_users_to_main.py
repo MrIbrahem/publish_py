@@ -16,7 +16,7 @@ from ...database.services import LangService, PagesService, PagesUsersToMainPage
 logger = logging.getLogger(__name__)
 
 
-def _safe_int(value: str | None, default: int) -> int:
+def safe_int(value: str | None, default: int) -> int:
     try:
         return int(value) if value is not None else default
     except (TypeError, ValueError):
@@ -63,7 +63,7 @@ class PagesUsersToMainFixItView(BasePagesUsersMainView):
 
     def get(self) -> str:
         """Render the promotion form for the page identified by ``id``."""
-        page_id = _safe_int(request.args.get("id"), 0)
+        page_id = safe_int(request.args.get("id"), 0)
         new_user = (request.args.get("new_user") or "").strip()
         new_target = (request.args.get("new_target") or "").strip()
 
@@ -95,7 +95,7 @@ class PagesUsersToMainFixItPostView(BasePagesUsersMainView):
 
     def post(self) -> ResponseReturnValue:
         """Promote a user page to main and delete the source rows."""
-        page_id = _safe_int(request.form.get("id"), 0)
+        page_id = safe_int(request.form.get("id"), 0)
         title = (request.form.get("title") or "").strip()
         lang = (request.form.get("lang") or "").strip()
         new_target = (request.form.get("new_target") or "").strip()

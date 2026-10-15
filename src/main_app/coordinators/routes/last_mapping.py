@@ -21,34 +21,59 @@ def _wiki_title(title: str) -> str:
     return quote((title or "").replace(" ", "_"), safe="/")
 
 
+def safe_int(value: str | int | None, default: int = 0) -> int:
+    try:
+        return int(value) if value is not None else default
+    except (TypeError, ValueError):
+        return default
+
+
 @dataclass
 class LastRow:
-    id: Any
-    user: str
     last_table: str
+    id: int
+    mdwiki_revid: int
+
+    user: str
     title: str
     campaign: str
     cat: str
     lang: str
     target: str
+    translate_type: str
+
     pupdate: str
-    views: Any
-    add_date: Any
+    date: str
+    add_date: str
+
+    views: int
+
+    deleted: bool = False
+    word: int = 0
 
     @classmethod
     def from_row(cls, *, row: dict[str, Any], last_table: str) -> LastRow:
+        """ """
         return cls(
-            id=row.get("id"),
             last_table=last_table,
-            user=row.get("user") or "",
-            title=row.get("title") or "",
+            deleted=bool(row.get("deleted")),
+            # date
+            add_date=row.get("add_date") or "",
+            date=row.get("date") or "",
+            pupdate=row.get("pupdate") or "",
+            # string
             campaign=row.get("campaign") or "",
             cat=row.get("cat") or "",
             lang=row.get("lang") or "",
             target=row.get("target") or "",
-            pupdate=row.get("pupdate") or "",
-            views=row.get("views"),
-            add_date=row.get("add_date"),
+            title=row.get("title") or "",
+            translate_type=row.get("translate_type") or "",
+            user=row.get("user") or "",
+            # int
+            id=safe_int(row.get("id")),
+            mdwiki_revid=safe_int(row.get("mdwiki_revid")),
+            views=safe_int(row.get("views")),
+            word=safe_int(row.get("word")),
         )
 
     @property
@@ -71,6 +96,7 @@ class LastRow:
     def fix_url(self) -> str:
         return url_for(
             "fixrefs.process",
+            mdwiki_revid=self.mdwiki_revid,
             source_title=self.title,
             lang=self.lang,
             title=self.target,
@@ -104,7 +130,7 @@ class LastRow:
 
         return Markup("""
             <tr>
-                <td>{index} zz</td>
+                <td>{index}</td>
                 <td>
                     <a href="{user_url}" data-bs-toggle="tooltip" title="{user}">
                         {display_user}

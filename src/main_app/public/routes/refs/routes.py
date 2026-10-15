@@ -26,6 +26,10 @@ from ....services.utils.helpers.text_processor import (
 logger = logging.getLogger(__name__)
 
 
+def safe_bool(value) -> bool:
+    return str(value).lower() in {"1", "true", "on", "yes"}
+
+
 def _process(data) -> str:
     source_title = data.get("source_title", "")
     title = data.get("title", "")
@@ -39,11 +43,11 @@ def _process(data) -> str:
         flash("Invalid MDWiki revision ID.", "warning")
         mdwiki_revid = 0
 
-    save = data.get("save", "").lower() in {"1", "true", "on", "yes"}
-    infobox = data.get("infobox", "").lower() in {"1", "true", "on", "yes"}
-    movedots = data.get("movedots", "").lower() in {"1", "true", "on", "yes"}
-    # add_en_lang = data.get("add_en_lang", "").lower() in {"1", "true", "on", "yes"}
-    # add_category = data.get("add_category", "").lower() in {"1", "true", "on", "yes"}
+    save = safe_bool(data.get("save", ""))
+    infobox = safe_bool(data.get("infobox", ""))
+    movedots = safe_bool(data.get("movedots", ""))
+    # add_en_lang = safe_bool(data.get("add_en_lang", ""))
+    # add_category = safe_bool(data.get("add_category", ""))
 
     if not text and lang and title:
         text = TextApiClient().get_wikitext(title, project=f"{lang}.wikipedia.org") or ""
