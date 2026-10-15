@@ -220,15 +220,24 @@ class FixRefsProcessByIdView(FixRefsBase):
             flash("Invalid page ID", "warning")
             return render_template(
                 "fixrefs/index.html",
+                form={},
             )
 
-        service = PagesService() if table == "pages" else UserPagesService()
+        services = {"pages": PagesService, "pages_users": UserPagesService}
+        service_cls = services.get(table)
+
+        if service_cls is None:
+            flash("Invalid table", "warning")
+            return render_template("fixrefs/index.html", form={})
+
+        service = service_cls()
         record: PageSharedRecord | None = service.get_by_id(int_id)
 
         if not record:
             flash("Page not found", "warning")
             return render_template(
                 "fixrefs/index.html",
+                form={},
             )
 
         data = record.to_json()
